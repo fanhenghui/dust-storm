@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Src\Config">
+      <UniqueIdentifier>{52f11276-b9cc-44f7-a5d5-546991b692ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{f79f0364-9c7f-4eba-bbda-211da1e948c4}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{c17d684e-b8cc-4c41-b686-67b80b7cd543}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Src\Painter">
+      <UniqueIdentifier>{cc1f6545-8977-47b1-a633-53514fc006f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene container">
+      <UniqueIdentifier>{260efcb8-7d1e-484b-8c93-b9d030c2d6a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Operation">
+      <UniqueIdentifier>{f23d02ed-aaef-4386-85d2-e958ef2ef914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Model Observer">
+      <UniqueIdentifier>{973684e5-3f2f-45ad-b387-e5bdbe97874f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mi_qt_widgets_stdafx.cpp">
+      <Filter>Src\Config</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_shared_widget.cpp">
+      <Filter>Src\Scene container</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_shared_widget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_shared_widget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_scene_container.cpp">
+      <Filter>Src\Scene container</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_scene_container.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_scene_container.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_zoom.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_windowing.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_rotate.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_pan.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_probe.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_annotate.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_painter_corners_info.cpp">
+      <Filter>Src\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_painter_cross_hair.cpp">
+      <Filter>Src\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_model_voi.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_painter_voi.cpp">
+      <Filter>Src\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_mpr_paging.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_model_cross_hair.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_painter_mpr_border.cpp">
+      <Filter>Src\Painter</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_locate.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_observer_scene_container.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
+      <Filter>Src\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_base.h">
+      <Filter>Src\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_interface.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_zoom.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_pan.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_rotate.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_windowing.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_probe.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_annotate.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_corners_info.h">
+      <Filter>Src\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_cross_hair.h">
+      <Filter>Src\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_voi.h">
+      <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_voi.h">
+      <Filter>Src\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_paging.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_cross_hair.h">
+      <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_mpr_border.h">
+      <Filter>Src\Painter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_locate.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_scene_container.h">
+      <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Include\MedImgQtWidgets\mi_shared_widget.h">
+      <Filter>Src\Scene container</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Include\MedImgQtWidgets\mi_scene_container.h">
+      <Filter>Src\Scene container</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

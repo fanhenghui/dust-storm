@@ -1,0 +1,287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{629B1DC9-7923-4DE3-A892-53B65E90DB69}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MedImgRenderAlgorithm</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\Ext;$(SolutionDir)Include\MedImgRenderAlgorithm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>mi_render_algo_stdafx.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgCommon.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  $(SolutionDir)\MedImgRenderAlgorithm\Shader\shader_config</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\Ext;$(SolutionDir)Include\MedImgRenderAlgorithm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>mi_render_algo_stdafx.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgCommon.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  $(SolutionDir)\MedImgRenderAlgorithm\Shader\shader_config</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\Ext;$(SolutionDir)Include\MedImgRenderAlgorithm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>mi_render_algo_stdafx.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgCommon.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  $(SolutionDir)\MedImgRenderAlgorithm\Shader\shader_config</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\Ext;$(SolutionDir)Include\MedImgRenderAlgorithm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>mi_render_algo_stdafx.h</ForcedIncludeFiles>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgCommon.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  $(SolutionDir)\MedImgRenderAlgorithm\Shader\shader_config</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_generator.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_corners_info_unit.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_entry_exit_points.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_entry_exit_points.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_scene.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_opacity_transfer_function.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster_canvas.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster_define.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_render_algo_stdafx.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_scene_base.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_volume_infos.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_entry_exit_points.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_proxy_geometry_brick.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_proxy_geometry_cube.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_scene.h" />
+    <ClInclude Include="mi_ray_caster_inner_buffer.h" />
+    <ClInclude Include="mi_ray_casting_cpu.h" />
+    <ClInclude Include="mi_ray_casting_cpu_brick_acc.h" />
+    <ClInclude Include="mi_ray_casting_gpu.h" />
+    <ClInclude Include="mi_rc_step_base.h" />
+    <ClInclude Include="mi_rc_step_color_inverse.h" />
+    <ClInclude Include="mi_rc_step_composite.h" />
+    <ClInclude Include="mi_rc_step_main.h" />
+    <ClInclude Include="mi_rc_step_ray_casting.h" />
+    <ClInclude Include="mi_rc_step_mask_sampler.h" />
+    <ClInclude Include="mi_rc_step_shading.h" />
+    <ClInclude Include="mi_rc_step_utils.h" />
+    <ClInclude Include="mi_rc_step_volume_sampler.h" />
+    <ClInclude Include="mi_shader_collection.h" />
+    <ClInclude Include="mi_vr_entry_exit_points_culling.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mi_brick_define.cpp" />
+    <ClCompile Include="mi_brick_generator.cpp" />
+    <ClCompile Include="mi_brick_info_generator.cpp" />
+    <ClCompile Include="mi_brick_pool.cpp" />
+    <ClCompile Include="mi_brick_utils.cpp" />
+    <ClCompile Include="mi_camera_interactor.cpp" />
+    <ClCompile Include="mi_entry_exit_points.cpp" />
+    <ClCompile Include="mi_camera_calculator.cpp" />
+    <ClCompile Include="mi_color_transfer_function.cpp" />
+    <ClCompile Include="mi_mpr_entry_exit_points.cpp" />
+    <ClCompile Include="mi_mpr_scene.cpp" />
+    <ClCompile Include="mi_opacity_transfer_function.cpp" />
+    <ClCompile Include="mi_ray_caster.cpp" />
+    <ClCompile Include="mi_ray_caster_canvas.cpp" />
+    <ClCompile Include="mi_ray_caster_inner_buffer.cpp" />
+    <ClCompile Include="mi_ray_casting_cpu.cpp" />
+    <ClCompile Include="mi_ray_casting_cpu_brick_acc.cpp" />
+    <ClCompile Include="mi_ray_casting_gpu.cpp" />
+    <ClCompile Include="mi_ray_cast_scene.cpp" />
+    <ClCompile Include="mi_rc_step_color_inverse.cpp" />
+    <ClCompile Include="mi_rc_step_composite.cpp" />
+    <ClCompile Include="mi_rc_step_main.cpp" />
+    <ClCompile Include="mi_rc_step_ray_casting.cpp" />
+    <ClCompile Include="mi_rc_step_mask_sampler.cpp" />
+    <ClCompile Include="mi_rc_step_shading.cpp" />
+    <ClCompile Include="mi_rc_step_utils.cpp" />
+    <ClCompile Include="mi_rc_step_volume_sampler.cpp" />
+    <ClCompile Include="mi_render_algo_stdafx.cpp" />
+    <ClCompile Include="mi_scene_base.cpp" />
+    <ClCompile Include="mi_volume_infos.cpp" />
+    <ClCompile Include="mi_vr_entry_exit_points.cpp" />
+    <ClCompile Include="mi_vr_entry_exit_points_culling.cpp" />
+    <ClCompile Include="mi_vr_proxy_geometry_brick.cpp" />
+    <ClCompile Include="mi_vr_proxy_geometry_cube.cpp" />
+    <ClCompile Include="mi_vr_scene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\mpr_entry_exit_points.glsl" />
+    <None Include="Shader\rc_color_inverse_disable.frag" />
+    <None Include="Shader\rc_color_inverse_enable.frag" />
+    <None Include="Shader\rc_composite_average.frag" />
+    <None Include="Shader\rc_composite_dvr.frag" />
+    <None Include="Shader\rc_composite_minip.frag" />
+    <None Include="Shader\rc_composite_mip.frag" />
+    <None Include="Shader\rc_mask_linear_sampler.frag" />
+    <None Include="Shader\rc_main.frag" />
+    <None Include="Shader\rc_main.vert" />
+    <None Include="Shader\rc_mask_nearst_sampler.frag" />
+    <None Include="Shader\rc_mask_none_sampler.frag" />
+    <None Include="Shader\rc_ray_casting_average.frag" />
+    <None Include="Shader\rc_ray_casting_dvr.frag" />
+    <None Include="Shader\rc_ray_casting_mip_minip.frag" />
+    <None Include="Shader\rc_shading_none.frag" />
+    <None Include="Shader\rc_shading_phong.frag" />
+    <None Include="Shader\rc_utils.frag" />
+    <None Include="Shader\rc_volume_linear_samper.frag" />
+    <None Include="Shader\rc_volume_nearst_samper.frag" />
+    <None Include="Shader\shader_config" />
+    <None Include="Shader\test_compute.glsl" />
+    <None Include="Shader\vr_entry_exit_points_culling.glsl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

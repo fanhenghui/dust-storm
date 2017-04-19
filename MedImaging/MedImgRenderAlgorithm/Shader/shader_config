@@ -1,0 +1,38 @@
+EncoderDst = mi_shader_collection.h
+
+//MPR entry exit points
+EncoderItem = shader/mpr_entry_exit_points.glsl ksMPREntryExitPointsComp
+
+//GPU ray caster
+//1 Main
+EncoderItem = shader/rc_main.vert ksRCMainVert
+EncoderItem = shader/rc_main.frag ksRCMainFrag
+
+//2 Ray casting
+EncoderItem = shader/rc_ray_casting_dvr.frag ksRCRayCastingDVRFrag
+EncoderItem = shader/rc_ray_casting_mip_minip.frag ksRCRayCastingMIPMinIPFrag
+EncoderItem = shader/rc_ray_casting_average.frag ksRCRayCastingAverageFrag
+
+//3 Composite
+EncoderItem = shader/rc_composite_average.frag ksRCCompositeAverageFrag
+EncoderItem = shader/rc_composite_dvr.frag ksRCCompositeDVRFrag
+EncoderItem = shader/rc_composite_mip.frag ksRCCompositeMIPFrag
+EncoderItem = shader/rc_composite_minip.frag ksRCCompositeMinIPFrag
+
+//4 Shading
+EncoderItem = shader/rc_shading_none.frag ksRCShadingNoneFrag
+EncoderItem = shader/rc_shading_phong.frag ksRCShadingPhongFrag
+
+//5 Sampler
+EncoderItem = shader/rc_volume_linear_samper.frag ksRCVolumeLinearSamplerFrag
+EncoderItem = shader/rc_volume_nearst_samper.frag ksRCVolumeNearstSamplerFrag
+EncoderItem = shader/rc_mask_linear_sampler.frag ksRCMaskLinearSamplerFrag
+EncoderItem = shader/rc_mask_nearst_sampler.frag ksRCMaskNearstSamplerFrag
+EncoderItem = shader/rc_mask_none_sampler.frag ksRCMaskNoneSamplerFrag
+
+//6 Color Inverse
+EncoderItem = shader/rc_color_inverse_disable.frag ksRCColorInverseDisableFrag
+EncoderItem = shader/rc_color_inverse_enable.frag ksRCColorInverseEnableFrag
+
+//7 Utils
+EncoderItem = shader/rc_utils.frag ksRCUtilsFrag

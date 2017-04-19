@@ -1,0 +1,182 @@
+#include "mi_brick_info_generator.h"
+
+#include "boost/thread.hpp"
+
+#include "MedImgCommon/mi_concurrency.h"
+#include "MedImgIO/mi_image_data.h"
+
+#include "mi_brick_utils.h"
+
+MED_IMAGING_BEGIN_NAMESPACE
+
+CPUVolumeBrickInfoGenerator::CPUVolumeBrickInfoGenerator()
+{
+
+}
+
+CPUVolumeBrickInfoGenerator::~CPUVolumeBrickInfoGenerator()
+{
+
+}
+
+void CPUVolumeBrickInfoGenerator::CalculateBrickInfo( 
+std::shared_ptr<ImageData> pImgData , 
+unsigned int uiBrickSize , 
+unsigned int uiBrickExpand , 
+BrickCorner* pBrickCorner , 
+BrickUnit* pBrickUnit , 
+VolumeBrickInfo* pBrickInfo )
+{
+    RENDERALGO_CHECK_NULL_EXCEPTION(pBrickUnit);
+
+    unsigned int uiBrickDim[3] = {1,1,1};
+    BrickUtils::Instance()->GetBrickDim(pImgData->m_uiDim , uiBrickDim , uiBrickSize);
+
+    const unsigned int uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
+
+    const unsigned int uiDispatch = Concurrency::Instance()->GetAppConcurrency();
+
+    std::vector<boost::thread> vecThreads(uiDispatch-1);
+    const unsigned int uiBrickDispath = uiBrickCount/uiDispatch;
+
+    switch(pImgData->m_eDataType)
+    {
+    case UCHAR:
+        {
+            for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
+            {
+                vecThreads[i] = boost::thread(boost::bind(&CPUVolumeBrickInfoGenerator::CalculateBrickInfoKernel_i<unsigned char>, this , 
+                    uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit , pBrickInfo , pImgData , uiBrickSize , uiBrickExpand));
+            }
+            CalculateBrickInfoKernel_i<unsigned char>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand);
+            std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
+
+            break;
+        }
+    case USHORT:
+        {
+            for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
+            {
+                vecThreads[i] = boost::thread(boost::bind(&CPUVolumeBrickInfoGenerator::CalculateBrickInfoKernel_i<unsigned short>, this , 
+                    uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand));
+            }
+            CalculateBrickInfoKernel_i<unsigned short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand);
+            std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
+
+            break;
+        }
+    case SHORT:
+        {
+            for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
+            {
+                vecThreads[i] = boost::thread(boost::bind(&CPUVolumeBrickInfoGenerator::CalculateBrickInfoKernel_i<short>, this , 
+                    uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand));
+            }
+            CalculateBrickInfoKernel_i<short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand);
+            std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
+
+            break;
+        }
+    case FLOAT:
+        {
+            for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
+            {
+                vecThreads[i] = boost::thread(boost::bind(&CPUVolumeBrickInfoGenerator::CalculateBrickInfoKernel_i<float>, this , 
+                    uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand));
+            }
+            CalculateBrickInfoKernel_i<float>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit ,  pBrickInfo , pImgData , uiBrickSize , uiBrickExpand);
+            std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
+
+            break;
+        }
+    default:
+        {
+            RENDERALGO_THROW_EXCEPTION("Undefined data type!");
+        }
+    }
+}
+
+
+template<typename T>
+void CPUVolumeBrickInfoGenerator::CalculateBrickInfo_i( 
+    BrickCorner& bc , 
+    BrickUnit& bu , 
+    VolumeBrickInfo& vbi,
+    std::shared_ptr<ImageData> pImgData , 
+    unsigned int uiBrickSize , 
+    unsigned int uiBrickExpand )
+{
+    unsigned int *uiVolumeDim = pImgData->m_uiDim;
+
+    const unsigned int uiBrickLength = uiBrickSize + 2*uiBrickExpand;
+
+    unsigned int uiBegin[3] = {bc.m_Min[0] , bc.m_Min[1], bc.m_Min[2]};
+    unsigned int uiEnd[3] = {bc.m_Min[0]  + uiBrickSize + uiBrickExpand, bc.m_Min[1] + uiBrickSize + uiBrickExpand, bc.m_Min[2] + uiBrickSize + uiBrickExpand};
+
+    unsigned int uiBeginBrick[3] = {0,0,0};
+    unsigned int uiEndBrick[3] = {uiBrickLength,uiBrickLength,uiBrickLength};
+
+    for ( int i= 0 ; i < 3 ; ++i)
+    {
+        if (uiBegin[i] < uiBrickExpand)
+        {
+            uiBeginBrick[i] += uiBrickExpand - uiBegin[i];
+            uiBegin[i] = 0;
+        }
+        else
+        {
+            uiBegin[i] -= uiBrickExpand;
+        }
+
+        if (uiEnd[i] > uiVolumeDim[i])
+        {
+            uiEndBrick[i] -= (uiEnd[i] - uiVolumeDim[i]);
+            uiEnd[i] = uiVolumeDim[i];
+        }
+    }
+
+    float fMax = -65535.0f;
+    float fMin = 65535.0f;
+    T* pBrickData = (T*)bu.m_pData;
+    T curValue = 0;
+    float fCurValue = 0;
+    const unsigned int uiBrickLayerCount = uiBrickLength*uiBrickLength;
+    for (unsigned int z = uiBeginBrick[2] ; z < uiEndBrick[2] ; ++z)
+    {
+        for (unsigned int y = uiBeginBrick[1] ; y < uiEndBrick[1] ; ++y)
+        {
+            for (unsigned int x = uiBeginBrick[0] ; x < uiEndBrick[0] ; ++x)
+            {
+                curValue = pBrickData[z*uiBrickLayerCount + y*uiBrickLength + x];
+                fCurValue = (float)curValue;
+                fMax = fCurValue > fMax ? fCurValue : fMax;
+                fMin = fCurValue < fMin ? fCurValue : fMin;
+            }
+        }
+    }
+
+    vbi.m_fMin = fMin;
+    vbi.m_fMax = fMax;
+}
+
+
+template<typename T>
+void CPUVolumeBrickInfoGenerator::CalculateBrickInfoKernel_i( 
+    unsigned int uiBegin , 
+    unsigned int uiEnd , 
+    BrickCorner* pBrickCorner , 
+    BrickUnit* pBrickUnit , 
+    VolumeBrickInfo* pBrickInfo,
+    std::shared_ptr<ImageData> pImgData , 
+    unsigned int uiBrickSize , 
+    unsigned int uiBrickExpand )
+{
+    for (unsigned int i = uiBegin ; i < uiEnd ; ++i)
+    {
+        CalculateBrickInfo_i<T>(pBrickCorner[i] , pBrickUnit[i] ,pBrickInfo[i] , pImgData , uiBrickSize , uiBrickExpand);
+    }
+}
+
+
+
+MED_IMAGING_END_NAMESPACE

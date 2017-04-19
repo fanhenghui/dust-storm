@@ -1,0 +1,1 @@
+#include "mi_gl_resource_stdafx.h"

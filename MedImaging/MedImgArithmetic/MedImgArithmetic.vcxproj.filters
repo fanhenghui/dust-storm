@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Double">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Float">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Sampler">
+      <UniqueIdentifier>{2c6ef048-6751-4cfb-8cd3-e4f484543a09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Color Related">
+      <UniqueIdentifier>{e2c8b0ff-b814-46f4-91b0-7471f09df719}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shape">
+      <UniqueIdentifier>{1f299bb5-5d30-4142-a8c2-7f52e945cd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{9ed2ff20-c1c5-40c5-8f5d-5707f5a5e009}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
+      <Filter>Sampler</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_camera_base.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_matrix4.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_ortho_camera.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_perspective_camera.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_point2.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_point3.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_quat4.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector2.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector3.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_stdafx.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_matrix4f.h">
+      <Filter>Float</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector2f.h">
+      <Filter>Float</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector3f.h">
+      <Filter>Float</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector4f.h">
+      <Filter>Float</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_sampler.h">
+      <Filter>Sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_color_unit.h">
+      <Filter>Color Related</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_track_ball.h">
+      <Filter>Double</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_line.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_line_segment.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_plane.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_triangle.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_rectangle.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_sphere.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_aabb.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_shape_interface.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_common.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mi_vector3.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_camera_base.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_matrix4.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ortho_camera.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_perspective_camera.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_point2.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_point3.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vector2.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_matrix4f.cpp">
+      <Filter>Float</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vector2f.cpp">
+      <Filter>Float</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vector3f.cpp">
+      <Filter>Float</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vector4f.cpp">
+      <Filter>Float</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_sampler.cpp">
+      <Filter>Sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_color_unit.cpp">
+      <Filter>Color Related</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_arithmetic_stdafx.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_track_ball.cpp">
+      <Filter>Double</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_aabb.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_line.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_line_segment.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_plane.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rectangle.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_sphere.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_triangle.cpp">
+      <Filter>Shape</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_arithmetic_utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_intersection_test.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

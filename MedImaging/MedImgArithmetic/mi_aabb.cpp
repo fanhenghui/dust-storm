@@ -1,0 +1,15 @@
+#include "mi_aabb.h"
+
+MED_IMAGING_BEGIN_NAMESPACE
+
+AABB::AABB()
+{
+
+}
+
+AABB::~AABB()
+{
+
+}
+
+MED_IMAGING_END_NAMESPACE

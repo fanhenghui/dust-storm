@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Transfer Function">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Entry Exit Points">
+      <UniqueIdentifier>{d289c6be-9a06-45fc-b2c0-97bddf4f3e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MPR&amp;VR replacement">
+      <UniqueIdentifier>{2e189aa0-ab13-4bff-b2ba-cd18a22a2917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ray Caster">
+      <UniqueIdentifier>{66196e01-a890-4d38-9f06-df1b5e058165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ray Caster\CPU Ray Casting">
+      <UniqueIdentifier>{1cb617b9-8efb-46ce-9317-e704fd0e5a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ray Caster\GPU Ray Casting">
+      <UniqueIdentifier>{98d5fb16-97d8-4403-b186-a227df3631eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Brick ACC">
+      <UniqueIdentifier>{61003786-c233-43f9-bac3-6d50542408b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Volume Infos">
+      <UniqueIdentifier>{c8211b3a-a08f-4ce4-aecb-c35f98a1b141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Corner Infos">
+      <UniqueIdentifier>{3fd804f5-5f9b-4e25-a050-7c9e2a3ed223}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{cd4e76cb-2465-475d-b9b6-c5008a802f34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Entry exit points">
+      <UniqueIdentifier>{e35f37e7-f505-490a-a0d6-af1071b7ca2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Ray caster">
+      <UniqueIdentifier>{2310ace5-f98e-4d74-9679-beaec14c1e5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{b142b0b7-e051-434f-a3e9-e51dfca51604}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h">
+      <Filter>Transfer Function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_opacity_transfer_function.h">
+      <Filter>Transfer Function</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_render_algo_stdafx.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h">
+      <Filter>MPR&amp;VR replacement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_entry_exit_points.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_entry_exit_points.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster_define.h">
+      <Filter>Ray Caster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster.h">
+      <Filter>Ray Caster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_entry_exit_points.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_ray_caster_inner_buffer.h">
+      <Filter>Ray Caster</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_ray_casting_cpu.h">
+      <Filter>Ray Caster\CPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_ray_casting_gpu.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_caster_canvas.h">
+      <Filter>Ray Caster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h">
+      <Filter>MPR&amp;VR replacement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
+      <Filter>Brick ACC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h">
+      <Filter>Brick ACC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_generator.h">
+      <Filter>Brick ACC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h">
+      <Filter>Brick ACC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h">
+      <Filter>Brick ACC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_corners_info_unit.h">
+      <Filter>Corner Infos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_proxy_geometry_cube.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_proxy_geometry_brick.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_vr_entry_exit_points_culling.h">
+      <Filter>Entry Exit Points</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_ray_casting_cpu_brick_acc.h">
+      <Filter>Ray Caster\CPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_shader_collection.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_composite.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_base.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_main.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_mask_sampler.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_ray_casting.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_shading.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_utils.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_color_inverse.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_volume_sampler.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_scene_base.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_volume_infos.h">
+      <Filter>Volume Infos</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="mi_render_algo_stdafx.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_color_transfer_function.cpp">
+      <Filter>Transfer Function</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_opacity_transfer_function.cpp">
+      <Filter>Transfer Function</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_camera_calculator.cpp">
+      <Filter>MPR&amp;VR replacement</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mpr_entry_exit_points.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_caster.cpp">
+      <Filter>Ray Caster</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_entry_exit_points.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_caster_inner_buffer.cpp">
+      <Filter>Ray Caster</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_casting_cpu.cpp">
+      <Filter>Ray Caster\CPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_casting_gpu.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_caster_canvas.cpp">
+      <Filter>Ray Caster</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_camera_interactor.cpp">
+      <Filter>MPR&amp;VR replacement</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_brick_utils.cpp">
+      <Filter>Brick ACC</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_brick_generator.cpp">
+      <Filter>Brick ACC</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_brick_info_generator.cpp">
+      <Filter>Brick ACC</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_brick_pool.cpp">
+      <Filter>Brick ACC</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_brick_define.cpp">
+      <Filter>Brick ACC</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vr_entry_exit_points.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vr_proxy_geometry_brick.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vr_proxy_geometry_cube.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vr_entry_exit_points_culling.cpp">
+      <Filter>Entry Exit Points</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_casting_cpu_brick_acc.cpp">
+      <Filter>Ray Caster\CPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_composite.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_main.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_mask_sampler.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_ray_casting.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_shading.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_utils.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_color_inverse.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_volume_sampler.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mpr_scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ray_cast_scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_scene_base.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_vr_scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_volume_infos.cpp">
+      <Filter>Volume Infos</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\rc_main.vert">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_main.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_utils.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_composite_minip.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_composite_mip.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_composite_average.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_composite_dvr.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_mask_linear_sampler.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_shading_none.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_shading_phong.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\shader_config">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\rc_volume_linear_samper.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_volume_nearst_samper.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_mask_none_sampler.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\mpr_entry_exit_points.glsl">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="Shader\rc_ray_casting_dvr.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_ray_casting_average.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_ray_casting_mip_minip.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_color_inverse_disable.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_color_inverse_enable.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\vr_entry_exit_points_culling.glsl">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="Shader\test_compute.glsl">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="Shader\rc_mask_nearst_sampler.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+  </ItemGroup>
+</Project>
