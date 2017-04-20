@@ -77,67 +77,67 @@ namespace
 
     void Init()
     {
-        Configuration::Instance()->SetProcessingUnitType(GPU);
-        GLUtils::SetCheckGLFlag(true);
+        Configuration::instance()->set_processing_unit_type(GPU);
+        GLUtils::set_check_gl_flag(true);
 
         std::vector<std::string> vecFiles = GetFiles();
         DICOMLoader loader;
-        IOStatus status = loader.LoadSeries(vecFiles , m_pImgData , m_pDataHeader);
+        IOStatus status = loader.load_series(vecFiles , m_pImgData , m_pDataHeader);
 
         m_pVolumeInfos.reset( new VolumeInfos());
-        m_pVolumeInfos->SetDataHeader(m_pDataHeader);
-        m_pVolumeInfos->SetVolume(m_pImgData);
+        m_pVolumeInfos->set_data_header(m_pDataHeader);
+        m_pVolumeInfos->set_volume(m_pImgData);
 
         m_pCamera.reset(new OrthoCamera());
         m_pCameraCal.reset(new CameraCalculator(m_pImgData));
-        m_pCameraCal->InitMPRPlacement(m_pCamera , TRANSVERSE , Point3(0,0,0));
+        m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
 
         m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
 
         m_pMPREE.reset(new MPREntryExitPoints());
-        m_pMPREE->SetDisplaySize(m_iWidth,m_iHeight);
-        m_pMPREE->SetCamera(m_pCamera);
-        m_pMPREE->SetCameraCalculator(m_pCameraCal);
-        m_pMPREE->SetStrategy(GPU_BASE);
-        m_pMPREE->SetImageData(m_pImgData);
-        m_pMPREE->SetThickness(1.0f);
+        m_pMPREE->set_display_size(m_iWidth,m_iHeight);
+        m_pMPREE->set_camera(m_pCamera);
+        m_pMPREE->set_camera_calculator(m_pCameraCal);
+        m_pMPREE->set_strategy(GPU_BASE);
+        m_pMPREE->set_image_data(m_pImgData);
+        m_pMPREE->set_thickness(1.0f);
 
         m_pCanvas.reset(new RayCasterCanvas());
-        m_pCanvas->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->Initialize();
+        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->initialize();
 
         m_pRayCaster.reset(new RayCaster());
-        m_pRayCaster->SetEntryExitPoints(m_pMPREE);
-        m_pRayCaster->SetCanvas(m_pCanvas);
-        m_pRayCaster->SetCamera(m_pCamera);
-        m_pRayCaster->SetVolumeData(m_pImgData);
-        m_pRayCaster->SetVolumeToWorldMatrix(m_pCameraCal->GetVolumeToWorldMatrix());
-        m_pRayCaster->SetSampleRate(1.0);
-        m_pRayCaster->SetGlobalWindowLevel(252,40+1024);
-        m_pRayCaster->SetStrategy(GPU_BASE);
-        m_pRayCaster->SetCompositeMode(COMPOSITE_AVERAGE);
-        m_pRayCaster->SetColorInverseMode(COLOR_INVERSE_DISABLE);
+        m_pRayCaster->set_entry_exit_points(m_pMPREE);
+        m_pRayCaster->set_canvas(m_pCanvas);
+        m_pRayCaster->set_camera(m_pCamera);
+        m_pRayCaster->set_volume_data(m_pImgData);
+        m_pRayCaster->set_volume_to_world_matrix(m_pCameraCal->get_volume_to_world_matrix());
+        m_pRayCaster->set_sample_rate(1.0);
+        m_pRayCaster->set_global_window_level(252,40+1024);
+        m_pRayCaster->set_strategy(GPU_BASE);
+        m_pRayCaster->set_composite_mode(COMPOSITE_AVERAGE);
+        m_pRayCaster->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
 
         //GPU
-        m_pRayCaster->SetVolumeDataTexture(m_pVolumeInfos->GetVolumeTexture());
+        m_pRayCaster->set_volume_data_texture(m_pVolumeInfos->get_volume_texture());
 
         UIDType uid;
-        m_pPseudoColor = GLResourceManagerContainer::Instance()->GetTexture1DManager()->CreateObject(uid);
-        m_pPseudoColor->SetDescription("Pseudo color texture gray");
-        m_pPseudoColor->Initialize();
-        m_pPseudoColor->Bind();
-        GLTextureUtils::Set1DWrapS(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::SetFilter(GL_TEXTURE_1D , GL_LINEAR);
+        m_pPseudoColor = GLResourceManagerContainer::instance()->get_texture_1d_manager()->create_object(uid);
+        m_pPseudoColor->set_description("Pseudo color texture gray");
+        m_pPseudoColor->initialize();
+        m_pPseudoColor->bind();
+        GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
         unsigned char pData[] = {0,0,0,0,255,255,255,255};
-        m_pPseudoColor->Load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
+        m_pPseudoColor->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
 
-        m_pRayCaster->SetPseudoColorTexture(m_pPseudoColor , 2);
+        m_pRayCaster->set_pseudo_color_texture(m_pPseudoColor , 2);
 
     }
 
     void RayCasterCanvasToScreen()
     {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->GetFBO()->GetID());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->get_fbo()->get_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -145,7 +145,7 @@ namespace
 
 
         /* glEnable(GL_TEXTURE_2D);
-        m_pCanvas->GetColorAttachTexture()->Bind();
+        m_pCanvas->get_color_attach_texture()->bind();
 
         glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); 
@@ -163,7 +163,7 @@ namespace
         glEnd();
         glDisable(GL_TEXTURE_2D);
 
-        m_pCanvas->DebugOutputColor("D:/mpr_rgba.raw");*/
+        m_pCanvas->debug_output_color("D:/mpr_rgba.raw");*/
     }
 
     void Display()
@@ -174,13 +174,13 @@ namespace
             glClearColor(1.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            m_pMPREE->CalculateEntryExitPoints();
-            m_pRayCaster->Render(m_iTestCode);
+            m_pMPREE->calculate_entry_exit_points();
+            m_pRayCaster->render(m_iTestCode);
 
 
             RayCasterCanvasToScreen();
 
-            //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->GetColorArray());
+            //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->get_color_array());
 
             glutSwapBuffers();
         }
@@ -198,26 +198,26 @@ namespace
         case 't':
             {
                 std::cout << "W H :" << m_iWidth << " " << m_iHeight << std::endl;
-                m_pMPREE->DebugOutputEntryPoints("D:/entry_exit.rgb.raw");
+                m_pMPREE->debug_output_entry_points("D:/entry_exit.rgb.raw");
                 break;
             }
         case 'a':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , TRANSVERSE , Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
             }
         case 's':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , SAGITTAL , Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , SAGITTAL , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
             }
         case 'c':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , CORONAL, Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , CORONAL, Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
@@ -238,9 +238,9 @@ namespace
     {
         m_iWidth = x;
         m_iHeight = y;
-        m_pMPREE->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->UpdateFBO();
+        m_pMPREE->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->update_fbo();
         m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
         glutPostRedisplay();
     }
@@ -290,16 +290,16 @@ namespace
         //std::cout << "Cur : " << ptCur.x << " " <<ptCur.y << std::endl;
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->Rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
             
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->Pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->Zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
 
         m_ptPre = ptCur;
@@ -327,7 +327,7 @@ void UT_GPUMPR(int argc , char* argv[])
 
         GLEnvironment env;
         int iMajor , iMinor;
-        env.GetGLVersion(iMajor , iMinor);
+        env.get_gl_version(iMajor , iMinor);
 
         glutDisplayFunc(Display);
         glutReshapeFunc(Resize);

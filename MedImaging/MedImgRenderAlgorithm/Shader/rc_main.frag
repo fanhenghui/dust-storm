@@ -13,7 +13,7 @@ uniform sampler3D sVolume;
 uniform sampler3D sMask;
 uniform float fSampleRate;
 
-void Preprocess(out vec3 vRayStart,out vec3 vRayDirWithSampleRate, out float fStartStep, out float fEndStep)
+void preprocess(out vec3 vRayStart,out vec3 vRayDirWithSampleRate, out float fStartStep, out float fEndStep)
 {
     ivec2 vFragCoord = ivec2(gl_FragCoord.x, gl_FragCoord.y);
     vec3 vStartPoint = imageLoad(imgEntryPoints, vFragCoord.xy).xyz;
@@ -38,7 +38,7 @@ void Preprocess(out vec3 vRayStart,out vec3 vRayDirWithSampleRate, out float fSt
 //1 first sub data step 
 //2 middle sub data step 
 //4 last sub data step
-vec4 Raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec4 vIntegralColor,
+vec4 raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec4 vIntegralColor,
     sampler3D sVolume,  sampler3D sMask,   vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift , int iRayCastStepCode);
 
 void main()
@@ -50,9 +50,9 @@ void main()
 
     vec4 vIntegralColor = vec4(0,0,0,0);
 
-    Preprocess(vRayStrat, vRayDirWithSampleRate, fStartStep, fEndStep);
+    preprocess(vRayStrat, vRayDirWithSampleRate, fStartStep, fEndStep);
 
-    oFragColor = Raycast(
+    oFragColor = raycast(
         vRayStrat, 
         vRayDirWithSampleRate, 
         fStartStep, 

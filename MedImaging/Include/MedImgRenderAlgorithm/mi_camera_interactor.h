@@ -16,15 +16,15 @@ class RenderAlgo_Export OrthoCameraInteractor
 public:
     OrthoCameraInteractor(std::shared_ptr<OrthoCamera> pCamera );
     ~OrthoCameraInteractor();
-    void ResetCamera();
-    void SetInitialStatus(std::shared_ptr<OrthoCamera> pCamera);
-    void Resize(int iWidth , int iHeight);
-    void Zoom(double dScale);
-    void Pan(const Vector2& vPan );
-    void Rotate(const Matrix4& mat);
-    void Zoom(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
-    void Pan(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
-    void Rotate(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
+    void reset_camera();
+    void set_initial_status(std::shared_ptr<OrthoCamera> pCamera);
+    void resize(int iWidth , int iHeight);
+    void zoom(double dScale);
+    void pan(const Vector2& vPan );
+    void rotate(const Matrix4& mat);
+    void zoom(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
+    void pan(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
+    void rotate(const Point2& ptPre , const Point2& ptCur , int iWidth, int iHeight);
 
 protected:
 private:

@@ -1,6 +1,6 @@
 #version 430
 
-bool CheckOpacity(in out float opacity)
+bool check_opacity(in out float opacity)
 {
     if(opacity > 0.95)
     {
@@ -15,7 +15,7 @@ bool CheckOpacity(in out float opacity)
 
 
 //Encoding label to intger array 4*32 can contain 0~127 labels
-void LabelEncode(int iLabel , in out int maskFlag[4])
+void label_encode(int iLabel , in out int maskFlag[4])
 {
     if(iLabel < 32)
     {
@@ -36,7 +36,7 @@ void LabelEncode(int iLabel , in out int maskFlag[4])
 }
 
 //Decoding label from intger array 4*32 can contain 0~127 labels
-bool LabelDecode(int iLabel , int maskFlag[4])
+bool label_decode(int iLabel , int maskFlag[4])
 {
 
     bool bHitted = false;

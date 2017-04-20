@@ -95,8 +95,8 @@ namespace
             pData[i].a = 255;
         }*/
         //glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA8 , m_iWidth , m_iHeight , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pData);
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA32F , m_iWidth , m_iHeight , 0 , GL_RGBA , GL_FLOAT, NULL);
         //glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_iWidth, m_iHeight);
         //glBindTexture(GL_TEXTURE_2D , 0);
@@ -117,9 +117,9 @@ namespace
         //glLinkProgram(m_uiProgram);
 
         /*m_pProgram = new GLProgram(1);
-        m_pProgram->SetShaders(std::vector<GLShaderInfo>(1,s));
-        m_pProgram->Initialize();
-        m_pProgram->Compile();*/
+        m_pProgram->set_shaders(std::vector<GLShaderInfo>(1,s));
+        m_pProgram->initialize();
+        m_pProgram->compile();*/
     }
 
     
@@ -237,7 +237,7 @@ void UT_CompureShader(int argc , char* argv[])
 
         GLEnvironment env;
         int iMajor , iMinor;
-        env.GetGLVersion(iMajor , iMinor);
+        env.get_gl_version(iMajor , iMinor);
 
         glutDisplayFunc(Display);
         glutReshapeFunc(Resize);

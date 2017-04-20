@@ -14,7 +14,7 @@ MouseOpPan::~MouseOpPan()
 
 }
 
-void MouseOpPan::Press(const QPoint& pt)
+void MouseOpPan::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -24,18 +24,18 @@ void MouseOpPan::Press(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpPan::Move(const QPoint& pt)
+void MouseOpPan::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
         return;
     }
 
-    m_pScene->Pan(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
+    m_pScene->pan(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
     m_ptPre = pt;
 }
 
-void MouseOpPan::Release(const QPoint& pt)
+void MouseOpPan::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -44,7 +44,7 @@ void MouseOpPan::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpPan::DoubleClick(const QPoint& pt)
+void MouseOpPan::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {

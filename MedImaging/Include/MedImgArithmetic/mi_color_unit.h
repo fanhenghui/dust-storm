@@ -40,7 +40,7 @@ public:
 
     ~RGBUnit() {};
 
-    void Print()
+    void print()
     {
         std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " )";
     }
@@ -112,7 +112,7 @@ public:
 
     ~RGBAUnit() {};
 
-    void Print()
+    void print()
     {
         std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " , " << (int)a<< " )";
     }

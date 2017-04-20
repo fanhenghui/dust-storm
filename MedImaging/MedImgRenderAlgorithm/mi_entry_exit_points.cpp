@@ -17,27 +17,27 @@ EntryExitPoints::EntryExitPoints():m_iWidth(4),m_iHeight(4),m_bInit(false),m_eSt
     m_pEntryBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
     m_pExitBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
     UIDType uid;
-    m_pEntryTex = GLResourceManagerContainer::Instance()->GetTexture2DManager()->CreateObject(uid);
-    m_pExitTex = GLResourceManagerContainer::Instance()->GetTexture2DManager()->CreateObject(uid);
+    m_pEntryTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+    m_pExitTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
 }
 
-void EntryExitPoints::Initialize()
+void EntryExitPoints::initialize()
 {
     if (!m_bInit)
     {
-        m_pEntryTex->Initialize();
-        m_pExitTex->Initialize();
+        m_pEntryTex->initialize();
+        m_pExitTex->initialize();
         m_bInit = true;
     }
 }
 
-void EntryExitPoints::Finialize()
+void EntryExitPoints::finialize()
 {
     if (m_bInit)
     {
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->RemoveObject(m_pEntryTex->GetUID());
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->RemoveObject(m_pExitTex->GetUID());
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->Update();
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pEntryTex->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pExitTex->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
         m_bInit = false;
     }
 }
@@ -47,78 +47,78 @@ EntryExitPoints::~EntryExitPoints()
 
 }
 
-void EntryExitPoints::SetDisplaySize(int iWidth , int iHeight)
+void EntryExitPoints::set_display_size(int iWidth , int iHeight)
 {
     m_iWidth = iWidth;
     m_iHeight = iHeight;
     m_pEntryBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
     m_pExitBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
 
-    //Resize texture
+    //resize texture
     if (GPU_BASE == m_eStrategy)
     { 
-        Initialize();
+        initialize();
 
         CHECK_GL_ERROR;
 
-        m_pEntryTex->Bind();
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pEntryTex->Load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
-        m_pEntryTex->UnBind();
+        m_pEntryTex->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        m_pEntryTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
+        m_pEntryTex->unbind();
 
-        m_pExitTex->Bind();
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pExitTex->Load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
-        m_pExitTex->UnBind();
+        m_pExitTex->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        m_pExitTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
+        m_pExitTex->unbind();
 
         CHECK_GL_ERROR;
     }
 }
 
-void EntryExitPoints::GetDisplaySize(int& iWidth , int& iHeight)
+void EntryExitPoints::get_display_size(int& iWidth , int& iHeight)
 {
     iWidth = m_iWidth;
     iHeight = m_iHeight;
 }
 
-std::shared_ptr<GLTexture2D> EntryExitPoints::GetEntryPointsTexture()
+std::shared_ptr<GLTexture2D> EntryExitPoints::get_entry_points_texture()
 {
     return m_pEntryTex;
 }
 
-std::shared_ptr<GLTexture2D> EntryExitPoints::GetExitPointsTexture()
+std::shared_ptr<GLTexture2D> EntryExitPoints::get_exit_points_texture()
 {
     return m_pExitTex;
 }
 
-Vector4f* EntryExitPoints::GetEntryPointsArray()
+Vector4f* EntryExitPoints::get_entry_points_array()
 {
     return m_pEntryBuffer.get();
 }
 
-Vector4f* EntryExitPoints::GetExitPointsArray()
+Vector4f* EntryExitPoints::get_exit_points_array()
 {
     return m_pExitBuffer.get();
 }
 
-void EntryExitPoints::SetImageData(std::shared_ptr<ImageData> pImgData)
+void EntryExitPoints::set_image_data(std::shared_ptr<ImageData> pImgData)
 {
     m_pImgData = pImgData;
 }
 
-void EntryExitPoints::SetCamera(std::shared_ptr<CameraBase> pCamera)
+void EntryExitPoints::set_camera(std::shared_ptr<CameraBase> pCamera)
 {
     m_pCamera = pCamera;
 }
 
-void EntryExitPoints::SetCameraCalculator(std::shared_ptr<CameraCalculator> pCameraCal)
+void EntryExitPoints::set_camera_calculator(std::shared_ptr<CameraCalculator> pCameraCal)
 {
     m_pCameraCalculator = pCameraCal;
 }
 
-void EntryExitPoints::DebugOutputEntryPoints(const std::string& sFileName)
+void EntryExitPoints::debug_output_entry_points(const std::string& sFileName)
 {
     Vector4f* pPoints = m_pEntryBuffer.get();
     std::ofstream out(sFileName , std::ios::binary | std::ios::out);
@@ -165,7 +165,7 @@ void EntryExitPoints::DebugOutputEntryPoints(const std::string& sFileName)
     }
 }
 
-void EntryExitPoints::DebugOutputExitPoints(const std::string& sFileName)
+void EntryExitPoints::debug_output_exit_points(const std::string& sFileName)
 {
     Vector4f* pPoints = m_pExitBuffer.get();
     std::ofstream out(sFileName , std::ios::binary | std::ios::out);
@@ -212,7 +212,7 @@ void EntryExitPoints::DebugOutputExitPoints(const std::string& sFileName)
     }
 }
 
-void EntryExitPoints::SetStrategy( RayCastingStrategy eStrategy )
+void EntryExitPoints::set_strategy( RayCastingStrategy eStrategy )
 {
     m_eStrategy = eStrategy;
 }

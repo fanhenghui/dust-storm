@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLResourceManagerContainer* GLResourceManagerContainer::m_instance = nullptr;
 
-GLResourceManagerContainer* GLResourceManagerContainer::Instance()
+GLResourceManagerContainer* GLResourceManagerContainer::instance()
 {
     if (nullptr == m_instance)
     {
@@ -26,20 +26,20 @@ GLResourceManagerContainer::~GLResourceManagerContainer()
 
 }
 
-GLProgramManagerPtr GLResourceManagerContainer::GetProgramManager() const
+GLProgramManagerPtr GLResourceManagerContainer::get_program_manager() const
 {
     return m_pProgramMag;
 }
 
-GLBufferManagerPtr GLResourceManagerContainer::GetBufferManager() const
+GLBufferManagerPtr GLResourceManagerContainer::get_buffer_manager() const
 {
     return m_pBufferMag;
 }
 
-void GLResourceManagerContainer::UpdateAll()
+void GLResourceManagerContainer::update_all()
 {
-    m_pProgramMag->Update();
-    m_pBufferMag->Update();
+    m_pProgramMag->update();
+    m_pBufferMag->update();
 }
 
 GLResourceManagerContainer::GLResourceManagerContainer():
@@ -55,32 +55,32 @@ m_pProgramMag(new GLProgramManager()),
 
 }
 
-GLTexture1DManagerPtr GLResourceManagerContainer::GetTexture1DManager() const
+GLTexture1DManagerPtr GLResourceManagerContainer::get_texture_1d_manager() const
 {
     return m_pTex1DMag;
 }
 
-GLTexture2DManagerPtr GLResourceManagerContainer::GetTexture2DManager() const
+GLTexture2DManagerPtr GLResourceManagerContainer::get_texture_2d_manager() const
 {
     return m_pTex2DMag;
 }
 
-GLTexture3DManagerPtr GLResourceManagerContainer::GetTexture3DManager() const
+GLTexture3DManagerPtr GLResourceManagerContainer::get_texture_3d_manager() const
 {
     return m_pTex3DMag;
 }
 
-GLVAOManagerPtr GLResourceManagerContainer::GetVAOManager() const
+GLVAOManagerPtr GLResourceManagerContainer::get_vao_manager() const
 {
     return m_pVAOMag;
 }
 
-GLFBOManagerPtr GLResourceManagerContainer::GetFBOManager() const
+GLFBOManagerPtr GLResourceManagerContainer::get_fbo_manager() const
 {
     return m_pFBOMag;
 }
 
-GLTexture1DArrayManagerPtr GLResourceManagerContainer::GetTexture1DArrayManager() const
+GLTexture1DArrayManagerPtr GLResourceManagerContainer::get_texture_1d_array_manager() const
 {
     return m_pTex1DArrayMag;
 }

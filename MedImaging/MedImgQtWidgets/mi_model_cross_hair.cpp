@@ -21,24 +21,24 @@ CrosshairModel::~CrosshairModel()
 
 }
 
-void CrosshairModel::SetMPRScene(const ScanSliceType (&aScanType)[3] ,const MPRScenePtr (&aMPRScenes)[3] ,const RGBUnit (aMPRColors)[3])
+void CrosshairModel::set_mpr_scene(const ScanSliceType (&aScanType)[3] ,const MPRScenePtr (&aMPRScenes)[3] ,const RGBUnit (aMPRColors)[3])
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(aMPRScenes[0]);
-    m_pCameraCal = aMPRScenes[0]->GetCameraCalculator();
+    m_pCameraCal = aMPRScenes[0]->get_camera_calculator();
 
     for (int i = 0; i<3 ; ++i)
     {
         QTWIDGETS_CHECK_NULL_EXCEPTION(aMPRScenes[i]);
         m_aMPRScene[i] = aMPRScenes[i];
         m_aMPRColor[i] = aMPRColors[i];
-        m_aPage[i] =  m_pCameraCal->GetDefaultPage(aScanType[i]);
+        m_aPage[i] =  m_pCameraCal->get_default_page(aScanType[i]);
     }
 
-    m_ptLocationDiscreteW = m_pCameraCal->GetDefaultMPRCenterWorld();
+    m_ptLocationDiscreteW = m_pCameraCal->get_default_mpr_center_world();
     m_ptLocationContineousW = m_ptLocationDiscreteW;
 }
 
-void CrosshairModel::GetCrossLine(const MPRScenePtr& pTargetMPRScene, Line2D (&lines)[2] , RGBUnit (&color)[2])
+void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (&lines)[2] , RGBUnit (&color)[2])
 {
     //1 Choose crossed MPR
     QTWIDGETS_CHECK_NULL_EXCEPTION(pTargetMPRScene);
@@ -58,19 +58,19 @@ void CrosshairModel::GetCrossLine(const MPRScenePtr& pTargetMPRScene, Line2D (&l
 
 
     //2 MPR plane intersected to a plane
-    const Matrix4 matVP = pTargetMPRScene->GetCamera()->GetViewProjectionMatrix();
-    Plane planeTarget = pTargetMPRScene->ToPlane();
+    const Matrix4 matVP = pTargetMPRScene->GetCamera()->get_view_projection_matrix();
+    Plane planeTarget = pTargetMPRScene->to_plane();
     for (int i = 0; i<2; ++i)
     {
-        Plane p = aCrossScene[i]->ToPlane();
+        Plane p = aCrossScene[i]->to_plane();
         Line3D lineIntersect;
-        if( IntersectionTest::PlaneIntersectPlane(p, planeTarget,lineIntersect))
+        if( IntersectionTest::plane_to_plane(p, planeTarget,lineIntersect))
         {
             //Project intersected line to screen
-            Point3 ptScreen = matVP.Transform(lineIntersect.m_pt);
+            Point3 ptScreen = matVP.transform(lineIntersect.m_pt);
             lines[i].m_pt = Point2(ptScreen.x , ptScreen.y);
-            Vector3 vDir = matVP.GetInverse().GetTranspose().Transform(lineIntersect.m_vDir);
-            lines[i].m_vDir = Vector2(vDir.x , vDir.y).GetNormalize();
+            Vector3 vDir = matVP.get_inverse().get_transpose().transform(lineIntersect.m_vDir);
+            lines[i].m_vDir = Vector2(vDir.x , vDir.y).get_normalize();
         }
         else
         {
@@ -80,7 +80,7 @@ void CrosshairModel::GetCrossLine(const MPRScenePtr& pTargetMPRScene, Line2D (&l
     }
 }
 
-RGBUnit CrosshairModel::GetBorderColor(MPRScenePtr pTargetMPRScene)
+RGBUnit CrosshairModel::get_border_color(MPRScenePtr pTargetMPRScene)
 {
     for (int i = 0 ; i< 3 ; ++i)
     {
@@ -92,72 +92,72 @@ RGBUnit CrosshairModel::GetBorderColor(MPRScenePtr pTargetMPRScene)
     return RGBUnit();
 }
 
-bool CrosshairModel::PagingTo(const std::shared_ptr<MPRScene>& pTargetMPRScene, int iPage)
+bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, int iPage)
 {
-    //1 Paging target MPR
-    int iCurrentPage= GetPage(pTargetMPRScene);
+    //1 page target MPR
+    int iCurrentPage= get_page(pTargetMPRScene);
     if (iCurrentPage == iPage)
     {
         return false;
     }
 
     std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->GetCamera());
-    if( !m_pCameraCal->MPROrthoPagingTo(pCamera , iPage))
+    if( !m_pCameraCal->page_orthognal_mpr_to(pCamera , iPage))
     {
         return false;
     }
 
-    pTargetMPRScene->SetDirty(true);
-    SetPage_i(pTargetMPRScene , iPage);
+    pTargetMPRScene->set_dirty(true);
+    set_page_i(pTargetMPRScene , iPage);
 
     //2 Change cross location
-    const Point3 ptCenter = pTargetMPRScene->GetCamera()->GetLookAt();
-    const Vector3 vDir = pTargetMPRScene->GetCamera()->GetViewDirection();
-    const double dDistance = vDir.DotProduct(ptCenter - m_ptLocationContineousW);
+    const Point3 ptCenter = pTargetMPRScene->GetCamera()->get_look_at();
+    const Vector3 vDir = pTargetMPRScene->GetCamera()->get_view_direction();
+    const double dDistance = vDir.dot_product(ptCenter - m_ptLocationContineousW);
     m_ptLocationContineousW += dDistance*vDir;
     m_ptLocationDiscreteW += dDistance*vDir;
 
-    SetChanged();
+    set_changed();
 
     return true;
 }
 
-bool CrosshairModel::Paging(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep)
+bool CrosshairModel::page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep)
 {
-    //1 Paging target MPR
+    //1 page target MPR
     std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->GetCamera());
-    if( !m_pCameraCal->MPROrthoPaging(pCamera , iPageStep))
+    if( !m_pCameraCal->page_orthognal_mpr(pCamera , iPageStep))
     {
         return false;
     }
 
-    pTargetMPRScene->SetDirty(true);
-    SetPage_i(pTargetMPRScene , m_pCameraCal->GetMPROrthoPage(pCamera));
+    pTargetMPRScene->set_dirty(true);
+    set_page_i(pTargetMPRScene , m_pCameraCal->get_orthognal_mpr_page(pCamera));
 
     //2 Change cross location
-    const Point3 ptCenter = pTargetMPRScene->GetCamera()->GetLookAt();
-    const Vector3 vDir = pTargetMPRScene->GetCamera()->GetViewDirection();
-    const double dDistance = vDir.DotProduct(ptCenter - m_ptLocationContineousW);
+    const Point3 ptCenter = pTargetMPRScene->GetCamera()->get_look_at();
+    const Vector3 vDir = pTargetMPRScene->GetCamera()->get_view_direction();
+    const double dDistance = vDir.dot_product(ptCenter - m_ptLocationContineousW);
     m_ptLocationContineousW += dDistance*vDir;
     m_ptLocationDiscreteW += dDistance*vDir;
 
-    SetChanged();
+    set_changed();
 
     return true;
 }
 
-bool CrosshairModel::Locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC)
+bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC)
 {
     //1 Get latest location
     Point3 ptV;
-    if (!pTargetMPRScene->GetVolumePosition(ptDC , ptV))
+    if (!pTargetMPRScene->get_volume_position(ptDC , ptV))
     {
         return false;
     }
 
-    const Matrix4 matV2W = m_pCameraCal->GetVolumeToWorldMatrix();
-    m_ptLocationContineousW = matV2W.Transform(ptV);
-    m_ptLocationDiscreteW = matV2W.Transform(Point3( (double)( (int)ptV.x) , (double)( (int)ptV.y) ,(double)( (int)ptV.z) ));
+    const Matrix4 matV2W = m_pCameraCal->get_volume_to_world_matrix();
+    m_ptLocationContineousW = matV2W.transform(ptV);
+    m_ptLocationDiscreteW = matV2W.transform(Point3( (double)( (int)ptV.x) , (double)( (int)ptV.y) ,(double)( (int)ptV.z) ));
 
     //2 Choose crossed MPR
     QTWIDGETS_CHECK_NULL_EXCEPTION(pTargetMPRScene);
@@ -176,28 +176,28 @@ bool CrosshairModel::Locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , c
     }
     assert(id == 2);
 
-    //3 Translate crossed MPR( Update LookAt and Update Page)
+    //3 Translate crossed MPR( update LookAt and update Page)
     for (int i = 0; i<2 ; ++i)
     {
         std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(aCrossScene[i]->GetCamera());
-        m_pCameraCal->MPRTranslateTo(pCamera, m_ptLocationContineousW);
+        m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
-        aCrossScene[i]->SetDirty(true);
-        int iPage = m_pCameraCal->GetMPROrthoPage(pCamera);
+        aCrossScene[i]->set_dirty(true);
+        int iPage = m_pCameraCal->get_orthognal_mpr_page(pCamera);
         m_aPage[aIdx[i]] = iPage;
     }
 
-    SetChanged();
+    set_changed();
 
     return true;
 
 }
 
-bool CrosshairModel::Locate(const Point3& ptCenterW)
+bool CrosshairModel::locate(const Point3& ptCenterW)
 {
     //3 MPR plane paging to the input point slice towards to each normal
     //don't focus the center
-    if (!SetCenter_i(ptCenterW))
+    if (!set_center_i(ptCenterW))
     {
         return false;
     }
@@ -205,26 +205,26 @@ bool CrosshairModel::Locate(const Point3& ptCenterW)
     for (int i = 0 ; i<3 ; ++ i)
     {
         std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(m_aMPRScene[i]->GetCamera());
-        m_pCameraCal->MPRTranslateTo(pCamera, m_ptLocationContineousW);
+        m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
-        m_aMPRScene[i]->SetDirty(true);
-        int iPage = m_pCameraCal->GetMPROrthoPage(pCamera);
+        m_aMPRScene[i]->set_dirty(true);
+        int iPage = m_pCameraCal->get_orthognal_mpr_page(pCamera);
         m_aPage[i] = iPage;
     }
 
-    SetChanged();
+    set_changed();
 
     return true;
 }
 
-bool CrosshairModel::LocateFocus(const Point3& ptCenterW)
+bool CrosshairModel::locate_focus(const Point3& ptCenterW)
 {
     //Place MPR center to this center
 
     return true;
 }
 
-void CrosshairModel::SetPage_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage)
+void CrosshairModel::set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage)
 {
     for (int i = 0 ; i< 3; ++i)
     {
@@ -238,7 +238,7 @@ void CrosshairModel::SetPage_i(const std::shared_ptr<MPRScene>& pTargetMPRScene 
     QTWIDGETS_THROW_EXCEPTION("Cant find certain MPR scene!");
 }
 
-int CrosshairModel::GetPage(const std::shared_ptr<MPRScene>& pTargetMPRScene)
+int CrosshairModel::get_page(const std::shared_ptr<MPRScene>& pTargetMPRScene)
 {
     for (int i = 0 ; i< 3; ++i)
     {
@@ -251,30 +251,30 @@ int CrosshairModel::GetPage(const std::shared_ptr<MPRScene>& pTargetMPRScene)
     QTWIDGETS_THROW_EXCEPTION("Cant find certain MPR scene!");
 }
 
-bool CrosshairModel::SetCenter_i(const Point3& ptCenterW)
+bool CrosshairModel::set_center_i(const Point3& ptCenterW)
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_aMPRScene[0]);
-    std::shared_ptr<VolumeInfos> pVolumeInfos = m_aMPRScene[0]->GetVolumeInfos();
+    std::shared_ptr<VolumeInfos> pVolumeInfos = m_aMPRScene[0]->get_volume_infos();
     QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
-    std::shared_ptr<ImageData> pVolume = pVolumeInfos->GetVolume();
+    std::shared_ptr<ImageData> pVolume = pVolumeInfos->get_volume();
     QTWIDGETS_CHECK_NULL_EXCEPTION(pVolume);
     unsigned int *uiDim = pVolume->m_uiDim;
 
-    Point3 ptV = m_pCameraCal->GetWorldToVolumeMatrix().Transform(ptCenterW);
-    if (!ArithmeticUtils::CheckInBound(ptV , Point3(uiDim[0] , uiDim[1] , uiDim[2])))
+    Point3 ptV = m_pCameraCal->get_world_to_volume_matrix().transform(ptCenterW);
+    if (!ArithmeticUtils::check_in_bound(ptV , Point3(uiDim[0] , uiDim[1] , uiDim[2])))
     {
         return false;
     }
 
     m_ptLocationContineousW = ptCenterW;
     
-    m_ptLocationDiscreteW = m_pCameraCal->GetVolumeToWorldMatrix().Transform(
+    m_ptLocationDiscreteW = m_pCameraCal->get_volume_to_world_matrix().transform(
         Point3(double((int)ptV.x) , double((int)ptV.y) , double((int)ptV.z) ));
 
     return true;
 }
 
-bool CrosshairModel::CheckFocus(MPRScenePtr pTargetMPRScene)
+bool CrosshairModel::check_focus(MPRScenePtr pTargetMPRScene)
 {
     for (int i = 0 ; i< 3; ++i)
     {
@@ -294,7 +294,7 @@ bool CrosshairModel::CheckFocus(MPRScenePtr pTargetMPRScene)
     return false;
 }
 
-void CrosshairModel::Focus(MPRScenePtr pTargetMPRScene)
+void CrosshairModel::focus(MPRScenePtr pTargetMPRScene)
 {
     if (!pTargetMPRScene)
     {
@@ -314,12 +314,12 @@ void CrosshairModel::Focus(MPRScenePtr pTargetMPRScene)
     }
 }
 
-void CrosshairModel::SetVisibility(bool bFlag)
+void CrosshairModel::set_visibility(bool bFlag)
 {
     m_bVisible = bFlag;
 }
 
-bool CrosshairModel::GetVisibility() const
+bool CrosshairModel::get_visibility() const
 {
     return m_bVisible;
 }

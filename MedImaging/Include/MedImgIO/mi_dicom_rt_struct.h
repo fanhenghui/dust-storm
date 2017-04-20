@@ -17,9 +17,9 @@ class IO_Export RTStruct
 public:
     RTStruct();
     ~RTStruct();
-    void AddContour(const std::string& sROIName , ContourData* pContour);
-    const std::map<std::string , std::vector<ContourData*>>& GetAllContour() const;
-    void WriteToFile(const std::string& sFile);
+    void add_contour(const std::string& sROIName , ContourData* pContour);
+    const std::map<std::string , std::vector<ContourData*>>& get_all_contour() const;
+    void write_to_file(const std::string& sFile);
 protected:
 private:
     std::map<std::string , std::vector<ContourData*>> m_mapRTData;

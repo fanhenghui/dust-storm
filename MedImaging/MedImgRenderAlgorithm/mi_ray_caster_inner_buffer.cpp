@@ -15,11 +15,11 @@ struct RayCasterInnerBuffer::GLResource
         memset(m_DirtyFlag , 1 , sizeof(bool)*TypeEnd);
     }
 
-    void Release()
+    void release()
     {
         for (auto it = m_mapBufferID.begin() ; it != m_mapBufferID.end() ; ++it)
         {
-            GLResourceManagerContainer::Instance()->GetBufferManager()->RemoveObject(it->second->GetUID());
+            GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it->second->get_uid());
         }
         m_mapBufferID.clear();
         memset(m_DirtyFlag , 0 , sizeof(bool)*TypeEnd);
@@ -35,9 +35,9 @@ struct RayCasterInnerBuffer::GLResource
         else
         {
             UIDType uidBuffer= 0;
-            GLBufferPtr pBuffer = GLResourceManagerContainer::Instance()->GetBufferManager()->CreateObject(uidBuffer);
-            pBuffer->Initialize();
-            pBuffer->SetBufferTarget(GL_SHADER_STORAGE_BUFFER);
+            GLBufferPtr pBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uidBuffer);
+            pBuffer->initialize();
+            pBuffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
             m_mapBufferID[eType] = pBuffer;
             return pBuffer;
         }
@@ -51,15 +51,15 @@ RayCasterInnerBuffer::RayCasterInnerBuffer():m_pRes(new GLResource())
 
 RayCasterInnerBuffer::~RayCasterInnerBuffer()
 {
-    ReleaseBuffer();
+    release_buffer();
 }
 
-void RayCasterInnerBuffer::ReleaseBuffer()
+void RayCasterInnerBuffer::release_buffer()
 {
-    m_pRes->Release();
+    m_pRes->release();
 }
 
-GLBufferPtr RayCasterInnerBuffer::GetBuffer(BufferType eType)
+GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType eType)
 {
     try
     {
@@ -89,8 +89,8 @@ GLBufferPtr RayCasterInnerBuffer::GetBuffer(BufferType eType)
                         pWL[uLabel*2+1] = it->second.m_Value.y;
                     }
 
-                    pBuffer->Bind();
-                    pBuffer->Load(static_cast<int>(m_eLabelLevel)*sizeof(float)*2 , pWL, GL_DYNAMIC_DRAW);
+                    pBuffer->bind();
+                    pBuffer->load(static_cast<int>(m_eLabelLevel)*sizeof(float)*2 , pWL, GL_DYNAMIC_DRAW);
 
                     m_pRes->m_DirtyFlag[WindowLevelBucket] = false;
                 }
@@ -115,8 +115,8 @@ GLBufferPtr RayCasterInnerBuffer::GetBuffer(BufferType eType)
                         pLabel[*it] = 1;
                     }
 
-                    pBuffer->Bind();
-                    pBuffer->Load(static_cast<int>(m_eLabelLevel)*sizeof(int) , pLabel , GL_STATIC_DRAW);
+                    pBuffer->bind();
+                    pBuffer->load(static_cast<int>(m_eLabelLevel)*sizeof(int) , pLabel , GL_STATIC_DRAW);
 
                     m_pRes->m_DirtyFlag[VisibleLabelBucket] = false;
                 }
@@ -144,7 +144,7 @@ GLBufferPtr RayCasterInnerBuffer::GetBuffer(BufferType eType)
     }
 }
 
-void RayCasterInnerBuffer::SetMaskLabelLevel(LabelLevel eLevel)
+void RayCasterInnerBuffer::set_mask_label_level(LabelLevel eLevel)
 {
     if (m_eLabelLevel != eLevel)
     {
@@ -154,7 +154,7 @@ void RayCasterInnerBuffer::SetMaskLabelLevel(LabelLevel eLevel)
     }
 }
 
-void RayCasterInnerBuffer::SetWindowLevel(float fWW , float fWL , unsigned char ucLabel)
+void RayCasterInnerBuffer::set_window_level(float fWW , float fWL , unsigned char ucLabel)
 {
     const Vector2f vWL(fWW , fWL);
     auto it = m_mapWindowLevel.find(ucLabel);
@@ -173,7 +173,7 @@ void RayCasterInnerBuffer::SetWindowLevel(float fWW , float fWL , unsigned char 
     }
 }
 
-void RayCasterInnerBuffer::SetVisibleLabels(std::vector<unsigned char> vecLabels)
+void RayCasterInnerBuffer::set_visible_labels(std::vector<unsigned char> vecLabels)
 {
     if (m_vecVisibleLabel != vecLabels)
     {

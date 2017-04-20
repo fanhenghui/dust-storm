@@ -26,10 +26,10 @@ namespace
     void Init()
     {
         m_pCamera.reset(new OrthoCamera());
-        m_pCamera->SetEye(Point3(0,0,700));
-        m_pCamera->SetLookAt(Point3(0,0,0));
-        m_pCamera->SetUpDirection(Vector3(0,1,0));
-        m_pCamera->SetOrtho(-175,175,-175,175,-700,2100);
+        m_pCamera->set_eye(Point3(0,0,700));
+        m_pCamera->set_look_at(Point3(0,0,0));
+        m_pCamera->set_up_direction(Vector3(0,1,0));
+        m_pCamera->set_ortho(-175,175,-175,175,-700,2100);
 
         m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
 
@@ -54,7 +54,7 @@ namespace
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        Matrix4 matMVP = m_pCamera->GetViewProjectionMatrix();
+        Matrix4 matMVP = m_pCamera->get_view_projection_matrix();
 
         
         glLoadMatrixd(matMVP._m);
@@ -132,15 +132,15 @@ namespace
         Point2 ptCur(x,y);
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->Rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->Pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->Zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
 
         m_ptPre = ptCur;

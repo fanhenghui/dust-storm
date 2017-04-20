@@ -15,50 +15,37 @@ public:
 
     ~RayCasterCanvas();
 
-    void Initialize();
+    void initialize();
 
-    void Finialize();
+    void finialize();
 
-    //void SetDataType(DataType eDataType);
+    void set_display_size(int iWidth , int iHeight);
 
-    void SetDisplaySize(int iWidth , int iHeight);
+    void get_display_size(int& iWidth, int& iHeight) const;
 
-    void GetDisplaySize(int& iWidth, int& iHeight) const;
+    GLFBOPtr get_fbo();
 
-    GLFBOPtr GetFBO();
+    GLTexture2DPtr get_color_attach_texture();
 
-    GLTexture2DPtr GetColorAttachTexture();
-
-    GLTexture2DPtr GetGrayAttachTexture();
-
-    RGBAUnit* GetColorArray();
+    RGBAUnit* get_color_array();
 
     //If change data type or display size. Should call it to update FBO and mapped array
-    void UpdateFBO();
+    void update_fbo();
 
-    void UploadColorArray();
-
-    //void* GetGrayArray();
-
-    //void DownloadGrayArray();
+    void update_color_array();
 
 public:
-    void DebugOutputColor(const std::string& sFileName);
-
-    //void DebugOutputGray(const std::string& sFileName);
+    void debug_output_color(const std::string& sFileName);
 
 protected:
 
 private:
     GLFBOPtr m_pFBO;
     GLTexture2DPtr m_pColorAttach0;//For RGBA Color
-    //GLTexture2DPtr m_pGrayAttach1;//For Raw //TODO if not save image to gray 16bit ,then its useless
     GLTexture2DPtr m_pDepthAttach;
     int m_iWidth;
     int m_iHeight;
-    //DataType m_eDataType;
     std::unique_ptr<RGBAUnit[]> m_pColorArray;
-    //std::unique_ptr<char[]> m_pGrayArray;
     bool m_bInit;
 };
 

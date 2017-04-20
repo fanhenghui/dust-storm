@@ -14,15 +14,15 @@ class RayCastingGPU
 public:
     RayCastingGPU(std::shared_ptr<RayCaster> pRayCaster);
     ~RayCastingGPU();
-    void Render(int iTestCode = 0);
+    void render(int iTestCode = 0);
 private:
-    void Update_i();
+    void update_i();
 private:
     std::weak_ptr<RayCaster> m_pRayCaster;
     GLProgramPtr m_pProgram;
     std::shared_ptr<GLActiveTextureCounter> m_pGLActTexCounter;
 
-    //Render steps
+    //render steps
     std::vector<std::shared_ptr<RCStepBase>> m_vecSteps;
 
     //Ray casting mode cache

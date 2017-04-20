@@ -10,11 +10,11 @@ class QtWidgets_Export MouseOpMPRPaging : public IMouseOp
 public:
     MouseOpMPRPaging();
     virtual ~MouseOpMPRPaging();
-    virtual void Press(const QPoint& pt);
-    virtual void Move(const QPoint& pt);
-    virtual void Release(const QPoint& pt);
-    virtual void DoubleClick(const QPoint& pt);
-    void SetCrosshairModel(std::shared_ptr<CrosshairModel> pModel);
+    virtual void press(const QPoint& pt);
+    virtual void move(const QPoint& pt);
+    virtual void release(const QPoint& pt);
+    virtual void double_click(const QPoint& pt);
+    void set_crosshair_model(std::shared_ptr<CrosshairModel> pModel);
 protected:
 private:
     std::shared_ptr<CrosshairModel> m_pModel;

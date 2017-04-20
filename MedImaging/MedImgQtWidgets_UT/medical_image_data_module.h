@@ -3,7 +3,7 @@
 
 #include "qt/qobject.h"
 
-namespace MedImaging
+namespace medical_imaging
 {
     class VolumeInfos;
     class MPRScene;
@@ -33,7 +33,7 @@ protected:
 private:
     MyMainWindow* m_pMainWindow;
     SceneContainer* m_pMPRScene;
-    std::shared_ptr<MedImaging::VolumeInfos> m_pVolumeInfos;
+    std::shared_ptr<medical_imaging::VolumeInfos> m_pVolumeInfos;
 };
 
 #endif

@@ -12,17 +12,17 @@ NoduleSet::~NoduleSet()
 
 }
 
-void NoduleSet::AddNodule(const VOISphere& v)
+void NoduleSet::add_nodule(const VOISphere& v)
 {
     m_vecNoduleSet.push_back(v);
 }
 
-const std::vector<VOISphere>& NoduleSet::GetNoduleSet() const
+const std::vector<VOISphere>& NoduleSet::get_nodule_set() const
 {
     return m_vecNoduleSet;
 }
 
-void NoduleSet::GetNoduleSet(std::vector<VOISphere>& nset) const
+void NoduleSet::get_nodule_set(std::vector<VOISphere>& nset) const
 {
     nset = m_vecNoduleSet;
 }

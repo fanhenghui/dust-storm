@@ -18,31 +18,31 @@ public:
 
     ~BrickPool();
 
-    void SetVolume(std::shared_ptr<ImageData> pImgData);
+    void set_volume(std::shared_ptr<ImageData> pImgData);
 
-    void SetMask(std::shared_ptr<ImageData> pImgData);
+    void set_mask(std::shared_ptr<ImageData> pImgData);
 
-    void SetBrickSize(unsigned int uiBrickSize);
+    void set_brick_size(unsigned int uiBrickSize);
 
-    void SetBrickExpand(unsigned int uiBrickExpand);
+    void set_brick_expand(unsigned int uiBrickExpand);
 
-    void GetBrickDim(unsigned int (&uiBrickDim)[3]);
+    void get_brick_dim(unsigned int (&uiBrickDim)[3]);
 
-    BrickCorner* GetBrickCorner();
+    BrickCorner* get_brick_corner();
 
-    BrickUnit* GetVolumeBrickUnit();
+    BrickUnit* get_volume_brick_unit();
 
-    BrickUnit* GetMaskBrickUnit();
+    BrickUnit* get_mask_brick_unit();
 
-    VolumeBrickInfo* GetVolumeBrickInfo();
+    VolumeBrickInfo* get_volume_brick_info();
 
-    MaskBrickInfo* GetMaskBrickInfo(const std::vector<unsigned char>& vecVisLabels);
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vecVisLabels);
 
-    void CalculateVolumeBrick();
+    void calculate_volume_brick();
 
-    void CalculateMaskBrick();
+    void calculate_mask_brick();
 
-    void UpdateMaskBrick(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3]);
+    void update_mask_brick(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3]);
 
 protected:
 

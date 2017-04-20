@@ -12,14 +12,20 @@ class QtWidgets_Export VOIModel : public IModel
 public:
     VOIModel();
     virtual ~VOIModel();
-    void AddVOISphere(const VOISphere& voi);
-    VOISphere GetVOISphere(int id);
-    void ModifyVOISphereName(int id , std::string sName);
-    void ModifyVOISphereDiameter(int id , double dDiameter);
-    void ModifyVOISphereRear(const VOISphere& voi);
-    void RemoveVOISphere(int id);
-    const std::list<VOISphere>& GetVOISpheres() const;
-    void GetVOISpheres(std::list<VOISphere>& l) const;
+
+    void add_voi_sphere(const VOISphere& voi);
+    VOISphere get_voi_sphere(int id);
+
+    void modify_voi_sphere_name(int id , std::string sName);
+    void modify_voi_sphere_diameter(int id , double dDiameter);
+
+    void modify_voi_sphere_list_rear(const VOISphere& voi);
+
+    void remove_voi_sphere(int id);
+
+    const std::list<VOISphere>& get_voi_spheres() const;
+    void get_voi_spheres(std::list<VOISphere>& l) const;
+
 protected:
 private:
     std::list<VOISphere> m_VOISphereList;

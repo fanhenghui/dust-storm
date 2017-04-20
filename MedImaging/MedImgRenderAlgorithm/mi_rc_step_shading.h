@@ -13,7 +13,7 @@ public:
 
     virtual ~RCStepShadingNone(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -26,9 +26,9 @@ public:
 
     virtual ~RCStepShadingPhong(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
-    virtual void SetGPUParameter();
+    virtual void set_gpu_parameter();
 
 private:
 };

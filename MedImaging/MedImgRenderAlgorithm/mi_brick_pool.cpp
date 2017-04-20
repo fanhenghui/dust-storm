@@ -13,8 +13,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 BrickPool::BrickPool()
 {
-    m_uiBrickSize = BrickUtils::Instance()->GetBrickSize();
-    m_uiBrickExpand = BrickUtils::Instance()->GetBrickExpand();
+    m_uiBrickSize = BrickUtils::instance()->GetBrickSize();
+    m_uiBrickExpand = BrickUtils::instance()->get_brick_expand();
     m_uiBrickDim[0] = 1;
     m_uiBrickDim[1] = 1;
     m_uiBrickDim[2] = 1;
@@ -25,55 +25,55 @@ BrickPool::~BrickPool()
 
 }
 
-void BrickPool::GetBrickDim(unsigned int (&uiBrickDim)[3])
+void BrickPool::get_brick_dim(unsigned int (&uiBrickDim)[3])
 {
     memcpy(uiBrickDim , m_uiBrickDim , sizeof(unsigned int)*3);
 }
 
-void BrickPool::SetBrickSize( unsigned int uiBrickSize )
+void BrickPool::set_brick_size( unsigned int uiBrickSize )
 {
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolume);
     m_uiBrickSize= uiBrickSize;
-    BrickUtils::Instance()->GetBrickDim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
+    BrickUtils::instance()->get_brick_dim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
 }
 
-void BrickPool::SetBrickExpand( unsigned int uiBrickExpand )
+void BrickPool::set_brick_expand( unsigned int uiBrickExpand )
 {
     m_uiBrickExpand = uiBrickExpand;
 }
 
-void BrickPool::SetVolume( std::shared_ptr<ImageData> pImgData )
+void BrickPool::set_volume( std::shared_ptr<ImageData> pImgData )
 {
     m_pVolume = pImgData;
 }
 
-void BrickPool::SetMask( std::shared_ptr<ImageData> pImgData )
+void BrickPool::set_mask( std::shared_ptr<ImageData> pImgData )
 {
     m_pMask = pImgData;
 }
 
 
-BrickCorner* BrickPool::GetBrickCorner()
+BrickCorner* BrickPool::get_brick_corner()
 {
     return m_pBrickCorner.get();
 }
 
-BrickUnit* BrickPool::GetVolumeBrickUnit()
+BrickUnit* BrickPool::get_volume_brick_unit()
 {
     return m_pVolumeBrickUnit.get();
 }
 
-BrickUnit* BrickPool::GetMaskBrickUnit()
+BrickUnit* BrickPool::get_mask_brick_unit()
 {
     return m_pMaskBrickUnit.get();
 }
 
-VolumeBrickInfo* BrickPool::GetVolumeBrickInfo()
+VolumeBrickInfo* BrickPool::get_volume_brick_info()
 {
     return m_pVolumeBrickInfo.get();
 }
 
-MaskBrickInfo* BrickPool::GetMaskBrickInfo( const std::vector<unsigned char>& vecVisLabels )
+MaskBrickInfo* BrickPool::get_mask_brick_info( const std::vector<unsigned char>& vecVisLabels )
 {
     LabelKey key(vecVisLabels);
     auto it = m_mapMaskBrickInfos.find(key);
@@ -87,12 +87,12 @@ MaskBrickInfo* BrickPool::GetMaskBrickInfo( const std::vector<unsigned char>& ve
     }
 }
 
-void BrickPool::CalculateVolumeBrick()
+void BrickPool::calculate_volume_brick()
 {
     try
     {
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolume);
-        BrickUtils::Instance()->GetBrickDim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
+        BrickUtils::instance()->get_brick_dim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
         const unsigned int uiBrickCount = m_uiBrickDim[0]*m_uiBrickDim[1]*m_uiBrickDim[2];
         m_pBrickCorner.reset(new BrickCorner[uiBrickCount]);
         m_pVolumeBrickUnit.reset(new BrickUnit[uiBrickCount]);
@@ -105,22 +105,22 @@ void BrickPool::CalculateVolumeBrick()
         std::cout << "Brick expand : " << m_uiBrickExpand << std::endl;
         std::cout << "Brick dimension : " << m_uiBrickDim[0] << " " << m_uiBrickDim[1] << " "<<m_uiBrickDim[2] << std::endl;
         std::cout << "Brick count : " << uiBrickCount << std::endl; 
-        std::cout << "Calculate concurrency : " << Concurrency::Instance()->GetAppConcurrency() << std::endl;
+        std::cout << "Calculate concurrency : " << Concurrency::instance()->get_app_concurrency() << std::endl;
 
         BrickGenerator brickGen;
         clock_t  t0 = clock();
-        brickGen.CalculateBrickCorner(m_pVolume , m_uiBrickSize , m_uiBrickExpand , m_pBrickCorner.get());
+        brickGen.calculate_brick_corner(m_pVolume , m_uiBrickSize , m_uiBrickExpand , m_pBrickCorner.get());
         clock_t  t1 = clock();
         std::cout << "Calculate brick corner cost : " << double(t1 - t0) << "ms.\n";
 
-        brickGen.CalculateBrickUnit(m_pVolume, m_pBrickCorner.get()  , m_uiBrickSize, m_uiBrickExpand ,  m_pVolumeBrickUnit.get());
+        brickGen.calculate_brick_unit(m_pVolume, m_pBrickCorner.get()  , m_uiBrickSize, m_uiBrickExpand ,  m_pVolumeBrickUnit.get());
         clock_t  t2 = clock();
         std::cout << "Calculate volume brick unit cost : " << double(t2 - t1) << "ms.\n";
 
-        if (CPU == Configuration::Instance()->GetProcessingUnitType())
+        if (CPU == Configuration::instance()->get_processing_unit_type())
         {
             CPUVolumeBrickInfoGenerator brickInfoGen;
-            brickInfoGen.CalculateBrickInfo(m_pVolume , m_uiBrickSize , m_uiBrickExpand , 
+            brickInfoGen.calculate_brick_info(m_pVolume , m_uiBrickSize , m_uiBrickExpand , 
                 m_pBrickCorner.get() , m_pVolumeBrickUnit.get() , m_pVolumeBrickInfo.get());
             clock_t  t3 = clock();
             std::cout << "Calculate volume brick info cost : " << double(t3 - t2) << "ms.\n";
@@ -142,12 +142,12 @@ void BrickPool::CalculateVolumeBrick()
     }
 }
 
-void BrickPool::CalculateMaskBrick()
+void BrickPool::calculate_mask_brick()
 {
 
 }
 
-void BrickPool::UpdateMaskBrick(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3])
+void BrickPool::update_mask_brick(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3])
 {
 
 }

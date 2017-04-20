@@ -39,25 +39,25 @@ public:
 
     ~ColorTransFunc();
 
-    void SetWidth(int iWidth);
+    void set_width(int iWidth);
 
-    void SetColorType(ColorType eInputColorType, ColorType eInterpolationColorType);
+    void set_color_type(ColorType eInputColorType, ColorType eInterpolationColorType);
 
     /// \输入的RGB的范围是 0~255
-    void AddRGBPoint(float fRealValue, float x, float y, float z);
+    void add_rgb_point(float fRealValue, float x, float y, float z);
 
     /// \输入的HSV的范围是 H（hue）0~359
     //S(saturation) 0 ~ 1(0~100%)
     //V(value) 0~1(0~100%)
-    void AddHSVPoint(float fRealValue, float x, float y, float z);
+    void add_hsv_point(float fRealValue, float x, float y, float z);
 
-    void GetPointList(std::vector<ColorTFPoint>& vecResultList);
+    void get_point_list(std::vector<ColorTFPoint>& vecResultList);
 
-    int GetWidth() const;
+    int get_width() const;
 
-    static ColorTFPoint HSV2RGB(const ColorTFPoint& hsv);
+    static ColorTFPoint hsv_to_rgb(const ColorTFPoint& hsv);
 
-    static ColorTFPoint RGB2HSV(const ColorTFPoint& rgb);
+    static ColorTFPoint rgb_to_hsv(const ColorTFPoint& rgb);
 
 protected:
 

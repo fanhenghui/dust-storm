@@ -16,28 +16,28 @@ public:
 
     virtual ~MPRScene();
 
-    virtual void Rotate(const Point2& ptPre , const Point2& ptCur);
+    virtual void rotate(const Point2& ptPre , const Point2& ptCur);
 
-    virtual void Zoom(const Point2& ptPre , const Point2& ptCur);
+    virtual void zoom(const Point2& ptPre , const Point2& ptCur);
 
-    virtual void Pan(const Point2& ptPre , const Point2& ptCur);
+    virtual void pan(const Point2& ptPre , const Point2& ptCur);
 
     //Default positive direction
     // Axial F->H
     // Sagittal R->L
     // Coronal A -> P
-    void Paging(int iStep);
+    void page(int iStep);
 
-    void PagingTo(int iPage);
+    void page_to(int iPage);
 
     //Call to initialize MPR placement
-    void PlaceMPR(MedImaging::ScanSliceType eType);
+    void place_mpr(ScanSliceType eType);
 
-    bool GetVolumePosition(const Point2& ptDC, Point3& ptPosV);
+    bool get_volume_position(const Point2& ptDC, Point3& ptPosV);
 
-    bool GetWorldPosition(const Point2& ptDC, Point3& ptPosW);
+    bool get_world_position(const Point2& ptDC, Point3& ptPosW);
 
-    Plane ToPlane()const;
+    Plane to_plane()const;
 
 protected:
 private:

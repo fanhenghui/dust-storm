@@ -12,21 +12,21 @@ public:
 
     ~GLBuffer();
 
-    void SetBufferTarget(GLenum target);
+    void set_buffer_target(GLenum target);
 
-    GLenum GetBufferTarget() const;
+    GLenum get_buffer_target() const;
 
-    virtual void Initialize();
+    virtual void initialize();
 
-    virtual void Finalize();
+    virtual void finalize();
 
-    unsigned int GetID() const;
+    unsigned int get_id() const;
 
-    void Bind();
+    void bind();
 
-    void UnBind();
+    void unbind();
 
-    void Load(GLsizei size, const void* data, GLenum usage);
+    void load(GLsizei size, const void* data, GLenum usage);
 
 private:
     GLenum m_eTarget;

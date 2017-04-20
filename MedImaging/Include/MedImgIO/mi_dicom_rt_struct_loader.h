@@ -17,8 +17,8 @@ class IO_Export DICOMRTLoader
 public:
     DICOMRTLoader();
     ~DICOMRTLoader();
-    IOStatus LoadRTStruct(const std::string& sFile , std::shared_ptr<RTStruct> &pRTStruct);
-    IOStatus LoadRTStruct(DcmFileFormatPtr pFileFormat , std::shared_ptr<RTStruct> &pRTStruct);
+    IOStatus load_rt_struct(const std::string& sFile , std::shared_ptr<RTStruct> &pRTStruct);
+    IOStatus load_rt_struct(DcmFileFormatPtr pFileFormat , std::shared_ptr<RTStruct> &pRTStruct);
 protected:
 private:
 };

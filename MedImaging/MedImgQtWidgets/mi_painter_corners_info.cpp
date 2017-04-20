@@ -26,7 +26,7 @@ CornersInfoPainter::~CornersInfoPainter()
 
 }
 
-void CornersInfoPainter::Render()//TODO patient four corners info by configuration way
+void CornersInfoPainter::render()//TODO patient four corners info by configuration way
 {
     try
     {
@@ -36,14 +36,14 @@ void CornersInfoPainter::Render()//TODO patient four corners info by configurati
         std::shared_ptr<RayCastScene> pScene = std::dynamic_pointer_cast<RayCastScene>(m_pScene);
         QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->GetVolumeInfos();
+        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
         QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
 
-        std::shared_ptr<ImageDataHeader> pDataHeader = pVolumeInfos->GetDataHeader();
+        std::shared_ptr<ImageDataHeader> pDataHeader = pVolumeInfos->get_data_header();
         QTWIDGETS_CHECK_NULL_EXCEPTION(pDataHeader );
 
         int iWidth(1),iHeight(1);
-        pScene->GetDisplaySize(iWidth , iHeight);
+        pScene->get_display_size(iWidth , iHeight);
 
         //1 Set font
         const int iPointSize = 12;
@@ -123,11 +123,11 @@ void CornersInfoPainter::Render()//TODO patient four corners info by configurati
         if (pMPRScene)
         {
             float fWW(1) , fWL(0);
-            pMPRScene->GetGlobalWindowLevel(fWW , fWL);
+            pMPRScene->get_global_window_level(fWW , fWL);
             int iWL = (int)fWL;
             int iWW = (int)fWW;
             StrNumConverter<int> numToStr;
-            std::string sWL = std::string("C : ") + numToStr.ToString(iWL) + std::string("  W : ") + numToStr.ToString(iWW); 
+            std::string sWL = std::string("C : ") + numToStr.to_string(iWL) + std::string("  W : ") + numToStr.to_string(iWW); 
             iItem = 0;
             m_pPainter->drawText(iBorder , iHeight - (iItem++)*iMargin - 2 , sWL.c_str());
         }

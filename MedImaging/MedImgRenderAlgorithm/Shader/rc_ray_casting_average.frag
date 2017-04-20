@@ -8,12 +8,12 @@ uniform float fPseudoColorIntercept;
 
 uniform vec2 vGlobalWL;
 
-void Composite(vec3 samplePosVolume, vec3 vRayDir, in out vec4 vIntegralColor,
+void composite(vec3 samplePosVolume, vec3 vRayDir, in out vec4 vIntegralColor,
     sampler3D sVolume  , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset,  vec3 vSampleShift);
 
-void ColorInverse(in out float fGray);
+void color_inverse(in out float fGray);
 
-vec4 Raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec4 vIntegralColor,
+vec4 raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec4 vIntegralColor,
     sampler3D sVolume,  sampler3D sMask,   vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift , int iRayCastStepCode)
 {
     float fSumGray = 0.0;
@@ -37,7 +37,7 @@ vec4 Raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec
     for (float i = fStartStep ; i <= fEndStep ; ++i)
     {
         vSamplePos = vRayStart + vRayDir * i;
-        Composite(vSamplePos , vRayDir, vCurIntegralColor , sVolume , sMask , vSubDataDim ,vSubDataOffset ,vSampleShift );
+        composite(vSamplePos , vRayDir, vCurIntegralColor , sVolume , sMask , vSubDataDim ,vSubDataOffset ,vSampleShift );
         fSumGray += vCurIntegralColor.r*100.0;
         ++fSumNum;
     }
@@ -58,7 +58,7 @@ vec4 Raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec
             discard;
         }
 
-        ColorInverse(fResultGray);
+        color_inverse(fResultGray);
         vCurIntegralColor = vec4(texture(sPseudoColor, (fResultGray*fPseudoColorSlope + fPseudoColorIntercept)).rgb, 1.0);
     }
 

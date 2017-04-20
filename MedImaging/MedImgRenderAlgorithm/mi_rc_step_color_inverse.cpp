@@ -3,12 +3,12 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLShaderInfo RCStepColorInverseDisable::GetShaderInfo()
+GLShaderInfo RCStepColorInverseDisable::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCColorInverseDisableFrag , "RCStepColorInverseDisable");
 }
 
-GLShaderInfo RCStepColorInverseEnable::GetShaderInfo()
+GLShaderInfo RCStepColorInverseEnable::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCColorInverseEnableFrag , "RCStepColorInverseEnable");
 }

@@ -3,7 +3,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLShaderInfo RCStepUtils::GetShaderInfo()
+GLShaderInfo RCStepUtils::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCUtilsFrag , "RCStepUtils");
 }

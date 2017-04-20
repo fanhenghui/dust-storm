@@ -4,7 +4,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLVAO::GLVAO(UIDType uid):GLObject(uid),m_uiVAOID(0)
 {
-    SetType("GLVAO");
+    set_type("GLVAO");
 }
 
 GLVAO::~GLVAO()
@@ -12,7 +12,7 @@ GLVAO::~GLVAO()
 
 }
 
-void GLVAO::Initialize()
+void GLVAO::initialize()
 {
     if (0 == m_uiVAOID)
     {
@@ -20,7 +20,7 @@ void GLVAO::Initialize()
     }
 }
 
-void GLVAO::Finalize()
+void GLVAO::finalize()
 {
     if (0 != m_uiVAOID)
     {
@@ -28,17 +28,17 @@ void GLVAO::Finalize()
     }
 }
 
-unsigned int GLVAO::GetID() const
+unsigned int GLVAO::get_id() const
 {
     return m_uiVAOID;
 }
 
-void GLVAO::Bind()
+void GLVAO::bind()
 {
     glBindVertexArray(m_uiVAOID);
 }
 
-void GLVAO::UnBind()
+void GLVAO::unbind()
 {
     glBindVertexArray(0);
 }

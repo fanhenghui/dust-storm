@@ -3,7 +3,7 @@
 #include "mi_gl_environment.h"
 
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 namespace
 {
@@ -20,10 +20,10 @@ namespace
     {
         GLEnvironment env;
         int iMajor(0) , iMinor(0);
-        env.GetGLVersion(iMajor , iMinor);
+        env.get_gl_version(iMajor , iMinor);
         std::cout << "OpenGL Version : " << iMajor << "." << iMinor << std::endl;
-        std::cout << "GL vendor : " << env.GetGLVendor() << std::endl;
-        std::cout << "GL renderer : " << env.GetGLRenderer() << std::endl;
+        std::cout << "GL vendor : " << env.get_gl_vendor() << std::endl;
+        std::cout << "GL renderer : " << env.get_gl_renderer() << std::endl;
     }
 }
 

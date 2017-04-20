@@ -14,7 +14,7 @@ public:
 
     virtual ~RCStepCompositeAverage(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -28,7 +28,7 @@ public:
 
       virtual ~RCStepCompositeMIP(){};
 
-      virtual GLShaderInfo GetShaderInfo();
+      virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -42,11 +42,11 @@ public:
 
       virtual ~RCStepCompositeMinIP(){};
 
-      virtual GLShaderInfo GetShaderInfo();
+      virtual GLShaderInfo get_shader_info();
 
-      virtual void SetGPUParameter();
+      virtual void set_gpu_parameter();
 
-      virtual void GetUniformLocation();
+      virtual void get_uniform_location();
 
 private:
     int m_iLocCustomMinThreshold;
@@ -61,11 +61,11 @@ public:
 
       virtual ~RCStepCompositeDVR(){};
 
-      virtual GLShaderInfo GetShaderInfo();
+      virtual GLShaderInfo get_shader_info();
 
-      virtual void SetGPUParameter();
+      virtual void set_gpu_parameter();
 
-      virtual void GetUniformLocation();
+      virtual void get_uniform_location();
 
 private:
 };

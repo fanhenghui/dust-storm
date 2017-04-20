@@ -13,7 +13,7 @@ public:
 
     virtual ~RCStepUtils(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };

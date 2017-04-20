@@ -14,7 +14,7 @@ const Matrix4 Matrix4::kIdentityMatrix = Matrix4(
 	0, 0, 1, 0,
 	0, 0, 0, 1);
 
-Matrix4 MakeScale(const Vector3 & v)
+Matrix4 make_scale(const Vector3 & v)
 {
 	return Matrix4(
 		v.x, 0.0, 0.0, 0.0,
@@ -23,7 +23,7 @@ Matrix4 MakeScale(const Vector3 & v)
 		0.0, 0.0, 0.0, 1.0);
 }
 
-Matrix4 MakeTranslate(const Vector3 &v)
+Matrix4 make_translate(const Vector3 &v)
 {
 	return Matrix4(1.0, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,

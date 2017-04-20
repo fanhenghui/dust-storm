@@ -9,32 +9,32 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLShaderInfo RCStepCompositeAverage::GetShaderInfo()
+GLShaderInfo RCStepCompositeAverage::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeAverageFrag , "RCStepCompositeAverage");
 }
 
 
-GLShaderInfo RCStepCompositeMIP::GetShaderInfo()
+GLShaderInfo RCStepCompositeMIP::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeMIPFrag , "RCStepCompositeMIP");
 }
 
 
-GLShaderInfo RCStepCompositeMinIP::GetShaderInfo()
+GLShaderInfo RCStepCompositeMinIP::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeMinIPFrag , "RCStepCompositeMinIP");
 }
 
-void RCStepCompositeMinIP::SetGPUParameter()
+void RCStepCompositeMinIP::set_gpu_parameter()
 {
 
 }
 
-void RCStepCompositeMinIP::GetUniformLocation()
+void RCStepCompositeMinIP::get_uniform_location()
 {
     GLProgramPtr pProgram = m_pProgram.lock();
-    m_iLocCustomMinThreshold = pProgram->GetUniformLocation("fCustomMinThreshold");
+    m_iLocCustomMinThreshold = pProgram->get_uniform_location("fCustomMinThreshold");
 
     if (-1 == m_iLocCustomMinThreshold)
     {
@@ -43,17 +43,17 @@ void RCStepCompositeMinIP::GetUniformLocation()
 }
 
 
-GLShaderInfo RCStepCompositeDVR::GetShaderInfo()
+GLShaderInfo RCStepCompositeDVR::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeDVRFrag , "RCStepCompositeDVR");
 }
 
-void RCStepCompositeDVR::SetGPUParameter()
+void RCStepCompositeDVR::set_gpu_parameter()
 {
     //TODO
 }
 
-void RCStepCompositeDVR::GetUniformLocation()
+void RCStepCompositeDVR::get_uniform_location()
 {
     //TODO
 }

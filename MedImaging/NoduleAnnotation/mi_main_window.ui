@@ -62,7 +62,7 @@
            <item row="1" column="0">
             <widget class="QCheckBox" name="checkBoxColorInverse">
              <property name="text">
-              <string>Inverse</string>
+              <string>inverse</string>
              </property>
             </widget>
            </item>
@@ -305,7 +305,7 @@
   </action>
   <action name="actionLoad_Nodule">
    <property name="text">
-    <string>Load Nodule</string>
+    <string>load Nodule</string>
    </property>
   </action>
   <action name="actionSave_Nodule">

@@ -16,26 +16,26 @@ public:
 
     virtual ~OrthoCamera();
 
-    void SetOrtho(double left, double right, double bottom, double top, double near, double far0);
+    void set_ortho(double left, double right, double bottom, double top, double near, double far0);
 
-    void GetOrtho(double& left, double& right, double& bottom, double& top, double& near, double& far0) const;
+    void get_ortho(double& left, double& right, double& bottom, double& top, double& near, double& far0) const;
 
-    virtual Matrix4 GetProjectionMatrix();
+    virtual Matrix4 get_projection_matrix();
 
-    virtual Matrix4 GetViewProjectionMatrix();
+    virtual Matrix4 get_view_projection_matrix();
 
-    virtual void Zoom(double rate);
+    virtual void zoom(double rate);
 
-    virtual void Pan(const Vector2& pan);
+    virtual void pan(const Vector2& pan);
 
-    double GetNearClipDistance() const;
+    double get_near_clip_distance() const;
 
-    double GetFarClipDistance() const;
+    double get_far_clip_distance() const;
 
     OrthoCamera& operator =(const OrthoCamera& camera);
 
 protected:
-    virtual void CalculateProjectionMatrix_i();
+    virtual void calculate_projection_matrix_i();
 
 private:
     double m_Left;

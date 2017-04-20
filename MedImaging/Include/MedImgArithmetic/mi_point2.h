@@ -75,7 +75,7 @@ public:
             std::fabs(y - pt.y) < DOUBLE_EPSILON);
     }
 
-    void Print()
+    void print()
     {
         std::cout <<"( "<<x << " , "<<y << " ) ";
     }

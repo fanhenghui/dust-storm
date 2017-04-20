@@ -13,8 +13,8 @@ class QtWidgets_Export VOIPainter : public PainterBase
 public:
     VOIPainter();
     virtual ~VOIPainter();
-    void SetVOIModel(std::shared_ptr<VOIModel> pModel);
-    virtual void Render();
+    void set_voi_model(std::shared_ptr<VOIModel> pModel);
+    virtual void render();
 protected:
 private:
     std::shared_ptr<VOIModel> m_pModel;

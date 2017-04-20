@@ -55,12 +55,12 @@ public:
         m_Vec128 = vf4;
     }
 
-    inline const __m128 Vector4f::Get128() const
+    inline const __m128 Vector4f::get_128() const
     {
         return m_Vec128;
     }
 
-    inline Vector4f & Vector4f::Set128( __m128 vf4 )
+    inline Vector4f & Vector4f::set_128( __m128 vf4 )
     {
         m_Vec128 = vf4;
         return *this;
@@ -72,73 +72,73 @@ public:
         return *this;
     }
 
-    inline Vector4f & Vector4f::SetXYZ( const Vector3f &vec )
+    inline Vector4f & Vector4f::set_xyz( const Vector3f &vec )
     {
         MCSF_3D_ALIGN16 unsigned int sw[4] = {0, 0, 0, 0xffffffff};
         m_Vec128 = vec_sel( vec.m_Vec128, m_Vec128, sw );
         return *this;
     }
 
-    inline const Vector3f Vector4f::GetXYZ() const
+    inline const Vector3f Vector4f::get_xyz() const
     {
         return Vector3f(m_Vec128);
     }
 
-    inline Vector4f & Vector4f::SetX( const float x )
+    inline Vector4f & Vector4f::set_x( const float x )
     {
         _vmathVfSetElement(m_Vec128, x, 0);
         return *this;
     }
 
-    inline Vector4f & Vector4f::SetY( const float y )
+    inline Vector4f & Vector4f::set_y( const float y )
     {
         _vmathVfSetElement(m_Vec128, y, 1);
         return *this;
     }
 
-    inline Vector4f & Vector4f::SetZ( const float z )
+    inline Vector4f & Vector4f::set_z( const float z )
     {
         _vmathVfSetElement(m_Vec128, z, 2);
         return *this;
     }
 
-    inline Vector4f & Vector4f::SetW( const float w )
+    inline Vector4f & Vector4f::set_w( const float w )
     {
         _vmathVfSetElement(m_Vec128, w, 3);
         return *this;
     }
 
-    inline const float Vector4f::GetX() const
+    inline const float Vector4f::get_x() const
     {
         return _vmathVfGetElement(m_Vec128, 0);
         //return m_Value.x;
     }
 
-    inline const float Vector4f::GetY() const
+    inline const float Vector4f::get_y() const
     {
         return _vmathVfGetElement(m_Vec128, 1);
         // return m_Value.y;
     }
 
-    inline const float Vector4f::GetZ() const
+    inline const float Vector4f::get_z() const
     {
         return _vmathVfGetElement(m_Vec128, 2);
         // return m_Value.z;
     }
 
-    inline const float Vector4f::GetW() const
+    inline const float Vector4f::get_w() const
     {
         return _vmathVfGetElement(m_Vec128, 3);
         // return m_Value.w;
     }
 
-    inline Vector4f & Vector4f::SetElem( const int idx, const float value )
+    inline Vector4f & Vector4f::set_elem( const int idx, const float value )
     {
         _vmathVfSetElement(m_Vec128, value, idx);
         return *this;
     }
 
-    inline const float Vector4f::GetElem( const int idx ) const
+    inline const float Vector4f::get_elem( const int idx ) const
     {
         return _vmathVfGetElement(m_Vec128, idx);
     }
@@ -211,7 +211,7 @@ public:
         return _vmathVfGetElement(t , 0) <= FLOAT_EPSILON;
     }
 
-    inline const float Vector4f::MaxElem() const
+    inline const float Vector4f::max_elem() const
     {
         __m128 t = _mm_max_ps(
             _mm_max_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
@@ -219,7 +219,7 @@ public:
         return _vmathVfGetElement(t , 0); 
     }
 
-    inline const float Vector4f::MinElem() const
+    inline const float Vector4f::min_elem() const
     {
         __m128 t = _mm_min_ps(
             _mm_min_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
@@ -227,7 +227,7 @@ public:
         return _vmathVfGetElement(t , 0); 
     }
 
-    inline const float Vector4f::Sum() const
+    inline const float Vector4f::sum() const
     {
         __m128 t = _mm_add_ps(
             _mm_add_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
@@ -235,19 +235,19 @@ public:
         return _vmathVfGetElement(t , 0); 
     }
 
-    inline float DotProduct( const Vector4f& vec) const
+    inline float dot_product( const Vector4f& vec) const
     {
         __m128 t = _vmathVfDot4( m_Vec128, vec.m_Vec128 );
         return _vmathVfGetElement(t, 0);
     }
 
-    inline const float Vector4f::Length() const
+    inline const float Vector4f::length() const
     {
         __m128 temp = _mm_sqrt_ps(_vmathVfDot4( m_Vec128, m_Vec128 ));
         return _vmathVfGetElement(temp, 0);
     }
 
-    inline const float Vector4f::LengthSqr() const
+    inline const float Vector4f::length_sqr() const
     {
         __m128 temp = _vmathVfDot4( m_Vec128, m_Vec128 );
         return _vmathVfGetElement(temp, 0);
@@ -260,68 +260,68 @@ public:
 
 // Multiply two 4-D vectors per element
 Arithmetic_Export 
-    const Vector4f MulPerElem( const Vector4f &vec0, const Vector4f &vec1 );
+    const Vector4f mul_per_elem( const Vector4f &vec0, const Vector4f &vec1 );
 
 // Divide two 4-D vectors per element
 // Floating-point behavior matches standard library function divf4.
 Arithmetic_Export 
-    const Vector4f DivPerElem( const Vector4f &vec0, const Vector4f &vec1 );
+    const Vector4f div_per_elem( const Vector4f &vec0, const Vector4f &vec1 );
 
 // Compute the reciprocal of a 4-D vector per element
 // Floating-point behavior matches standard library function recipf4.
 Arithmetic_Export 
-    const Vector4f RecipPerElem( const Vector4f &vec );
+    const Vector4f recip_per_elem( const Vector4f &vec );
 
 // Compute the absolute value of a 4-D vector per element
 Arithmetic_Export 
-    const Vector4f AbsPerElem( const Vector4f &vec );
+    const Vector4f abs_per_elem( const Vector4f &vec );
 
 // Maximum of two 4-D vectors per element
 Arithmetic_Export 
-    const Vector4f MaxPerElem( const Vector4f &vec0, const Vector4f &vec1 );
+    const Vector4f max_per_elem( const Vector4f &vec0, const Vector4f &vec1 );
 
 // Minimum of two 4-D vectors per element
 Arithmetic_Export 
-    const Vector4f MinPerElem( const Vector4f &vec0, const Vector4f &vec1 );
+    const Vector4f min_per_elem( const Vector4f &vec0, const Vector4f &vec1 );
 
 // Maximum element of a 4-D vector
 Arithmetic_Export 
-    const float MaxElem( const Vector4f &vec );
+    const float max_elem( const Vector4f &vec );
 
 // Minimum element of a 4-D vector
 Arithmetic_Export 
-    const float MinElem( const Vector4f &vec );
+    const float min_elem( const Vector4f &vec );
 
 // Compute the sum of all elements of a 4-D vector
 Arithmetic_Export 
-    const float Sum( const Vector4f &vec );
+    const float sum( const Vector4f &vec );
 
 // Compute the dot product of two 4-D vectors
 Arithmetic_Export 
-    const float DotProduct( const Vector4f &vec0, const Vector4f &vec1 );
+    const float dot_product( const Vector4f &vec0, const Vector4f &vec1 );
 
 // Compute the square of the length of a 4-D vector
 Arithmetic_Export 
-    const float LengthSqr( const Vector4f &vec );
+    const float length_sqr( const Vector4f &vec );
 
 // Compute the length of a 4-D vector
 Arithmetic_Export 
-    const float Length( const Vector4f &vec );
+    const float length( const Vector4f &vec );
 
-// Normalize a 4-D vector, result is not accurate enough
+// normalize a 4-D vector, result is not accurate enough
 // The result is unpredictable when all elements of vec are at or near zero.
 Arithmetic_Export 
-    const Vector4f NormalizeApprox( const Vector4f &vec );
+    const Vector4f normalize_approx( const Vector4f &vec );
 
-// Normalize a 4-D vector
+// normalize a 4-D vector
 // The result is unpredictable when all elements of vec are at or near zero.
 Arithmetic_Export 
-    const Vector4f Normalize( const Vector4f &vec );
+    const Vector4f normalize( const Vector4f &vec );
 
 // Linear interpolation between two 4-D vectors (scalar data contained in vector data type)
 // vec0 * (1 - t) + vec1 * t
 Arithmetic_Export 
-    const Vector4f Lerp( const float t, const Vector4f &vec0, const Vector4f &vec1 );
+    const Vector4f lerp( const float t, const Vector4f &vec0, const Vector4f &vec1 );
 
 // Spherical linear interpolation between two 4-D vectors
 // The result is unpredictable if the vectors point in opposite directions.
@@ -332,23 +332,23 @@ Arithmetic_Export
 // scale1 = ( sinf( ( t * angle ) ) * recipSinAngle );
 // return ( ( unitVec0 * scale0 ) + ( unitVec1 * scale1 ) );
 Arithmetic_Export 
-    const Vector4f Slerp( const float t, const Vector4f &unitVec0, const Vector4f &unitVec1 );
+    const Vector4f slerp( const float t, const Vector4f &unitVec0, const Vector4f &unitVec1 );
 
 // Store x, y, z and w elements of 4-D vector in first four words of a float ptr
 Arithmetic_Export 
-    void StoreXYZW( const Vector4f &vec, float * fptr );
+    void store_xyzw( const Vector4f &vec, float * fptr );
 
-// Load x, y, z and w elements of 4-D vector in first four words of a float ptr
+// load x, y, z and w elements of 4-D vector in first four words of a float ptr
 Arithmetic_Export 
-    void LoadXYZW( Vector4f &vec, const float * fptr );
+    void load_xyzw( Vector4f &vec, const float * fptr );
 
 #ifdef _DEBUG
 
-// Print a 4-D vector
+// print a 4-D vector
 // Function is only defined when _DEBUG is defined.
 Arithmetic_Export void print( const Vector4f &vec );
 
-// Print a 4-D vector and an associated string identifier
+// print a 4-D vector and an associated string identifier
 // Function is only defined when _DEBUG is defined.
 Arithmetic_Export void print( const Vector4f &vec, const char * name );
 

@@ -20,7 +20,7 @@ PerspectiveCamera::~PerspectiveCamera()
 
 }
 
-void PerspectiveCamera::SetPerspective(double fovy, double aspect, double zNear, double zFar)
+void PerspectiveCamera::set_perspective(double fovy, double aspect, double zNear, double zFar)
 {
 	m_Fovy = fovy;
 	m_Aspect = aspect;
@@ -29,44 +29,44 @@ void PerspectiveCamera::SetPerspective(double fovy, double aspect, double zNear,
 	m_bIsPCalculated = false;
 }
 
-void PerspectiveCamera::SetNearClipDistance(double zNear)
+void PerspectiveCamera::set_near_clip_distance(double zNear)
 {
 	m_Near = zNear;
 	m_bIsPCalculated = false;
 }
 
-void PerspectiveCamera::SetFarClipDistance(double zFar)
+void PerspectiveCamera::set_far_clip_distance(double zFar)
 {
 	m_Far = zFar;
 	m_bIsPCalculated = false;
 }
 
-void PerspectiveCamera::SetFovy(double fovy)
+void PerspectiveCamera::set_fovy(double fovy)
 {
 	m_Fovy = fovy;
 	m_bIsPCalculated = false;
 }
 
-void PerspectiveCamera::SetAspectRatio(double aspect)
+void PerspectiveCamera::set_aspect_ratio(double aspect)
 {
 	m_Aspect = aspect;
 	m_bIsPCalculated = false;
 }
 
-Matrix4 PerspectiveCamera::GetProjectionMatrix()
+Matrix4 PerspectiveCamera::get_projection_matrix()
 {
-	CalculateProjectionMatrix_i();
+	calculate_projection_matrix_i();
 	return m_matProjection;
 }
 
-Matrix4 PerspectiveCamera::GetViewProjectionMatrix()
+Matrix4 PerspectiveCamera::get_view_projection_matrix()
 {
-	CalculateViewMatrix_i();
-	CalculateProjectionMatrix_i();
+	calculate_view_matrix_i();
+	calculate_projection_matrix_i();
 	return m_matProjection*m_matView;
 }
 
-void PerspectiveCamera::CalculateProjectionMatrix_i()
+void PerspectiveCamera::calculate_projection_matrix_i()
 {
 	if (!m_bIsPCalculated)
 	{
@@ -87,22 +87,22 @@ void PerspectiveCamera::CalculateProjectionMatrix_i()
 	}
 }
 
-void PerspectiveCamera::Zoom(double rate)
+void PerspectiveCamera::zoom(double rate)
 {
 	rate;
 }
 
-void PerspectiveCamera::Pan(const Vector2& pan)
+void PerspectiveCamera::pan(const Vector2& pan)
 {
 	pan;
 }
 
-double PerspectiveCamera::GetNearClipDistance() const
+double PerspectiveCamera::get_near_clip_distance() const
 {
 	return m_Near;
 }
 
-double PerspectiveCamera::GetFarClipDistance() const
+double PerspectiveCamera::get_far_clip_distance() const
 {
 	return m_Far;
 }

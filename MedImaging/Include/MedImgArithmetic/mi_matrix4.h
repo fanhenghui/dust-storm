@@ -183,7 +183,7 @@ public:
 			std::fabs(_m[15] - mat._m[15]) > DOUBLE_EPSILON);
 	}
 
-	void Matrix4::SetIdintity()
+	void Matrix4::set_idintity()
 	{
 		m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = 0.0;
 		m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = 0.0;
@@ -191,17 +191,17 @@ public:
 		m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
 	}
 
-	inline void Matrix4::Prepend(const Matrix4 &mat)
+	inline void Matrix4::prepend(const Matrix4 &mat)
 	{
 		*this = mat * (*this);
 	}
 
-	inline void Matrix4::Append(const Matrix4 &mat)
+	inline void Matrix4::append(const Matrix4 &mat)
 	{
 		*this = (*this) * mat;
 	}
 
-	inline void Matrix4::Transpose()
+	inline void Matrix4::transpose()
 	{
 		std::swap(_m[1], _m[4]);
 		std::swap(_m[2], _m[8]);
@@ -211,7 +211,7 @@ public:
 		std::swap(_m[11], _m[14]);
 	}
 
-	inline Matrix4 Matrix4::GetTranspose() const
+	inline Matrix4 Matrix4::get_transpose() const
 	{
 		return Matrix4(_m[0], _m[4], _m[8], _m[12],
 			_m[1], _m[5], _m[9], _m[13],
@@ -219,13 +219,13 @@ public:
 			_m[3], _m[7], _m[11], _m[15]);
 	}
 
-	inline bool Matrix4::HasInverse() const
+	inline bool Matrix4::has_inverse() const
 	{
-		return (std::fabs(Determinant()) > DOUBLE_EPSILON);
+		return (std::fabs(determinant()) > DOUBLE_EPSILON);
 
 	}
 
-	inline double Matrix4::Determinant() const
+	inline double Matrix4::determinant() const
 	{
 		double m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
 		double m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
@@ -247,7 +247,7 @@ public:
 		return  (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
 	}
 
-	inline Matrix4 Matrix4::GetInverse() const
+	inline Matrix4 Matrix4::get_inverse() const
 	{
 		double m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
 		double m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
@@ -314,23 +314,23 @@ public:
 			d30, d31, d32, d33);
 	}
 
-	inline Matrix4 Matrix4::Inverse()
+	inline Matrix4 Matrix4::inverse()
 	{
-		*this = GetInverse();
+		*this = get_inverse();
 		return *this;
 	}
 
-	inline Point3 Matrix4::Transform(const Point3 &pt) const
+	inline Point3 Matrix4::transform(const Point3 &pt) const
 	{
 		return (*this) * pt;
 	}
 
-	inline Vector3 Matrix4::Transform(const Vector3 & v) const
+	inline Vector3 Matrix4::transform(const Vector3 & v) const
 	{
 		return (*this) * v;
 	}
 
-    inline void ToFloat16(float (&fMat)[16]) const
+    inline void to_float16(float (&fMat)[16]) const
     {
         for (int i = 0; i<16 ; ++i)
         {
@@ -339,9 +339,9 @@ public:
     }
 };
 
-Matrix4 Arithmetic_Export MakeScale(const Vector3 & v);
+Matrix4 Arithmetic_Export make_scale(const Vector3 & v);
 
-Matrix4 Arithmetic_Export MakeTranslate(const Vector3 &v);
+Matrix4 Arithmetic_Export make_translate(const Vector3 &v);
 
 MED_IMAGING_END_NAMESPACE
 

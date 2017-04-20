@@ -13,7 +13,7 @@ SceneContainerObserver::~SceneContainerObserver()
 
 }
 
-void SceneContainerObserver::Update()
+void SceneContainerObserver::update()
 {
     for (auto it = m_vecContainers.begin() ; it != m_vecContainers.end() ; ++it)
     {
@@ -24,17 +24,17 @@ void SceneContainerObserver::Update()
     }
 }
 
-void SceneContainerObserver::AddSceneContainer(SceneContainer* pContainer)
+void SceneContainerObserver::add_scene_container(SceneContainer* pContainer)
 {
     m_vecContainers.push_back(pContainer);
 }
 
-void SceneContainerObserver::SetSceneContainer(const std::vector<SceneContainer*>& vecConainers)
+void SceneContainerObserver::set_scene_container(const std::vector<SceneContainer*>& vecConainers)
 {
     m_vecContainers = vecConainers;
 }
 
-void SceneContainerObserver::ClearSceneContainer()
+void SceneContainerObserver::clear_scene_container()
 {
     m_vecContainers.clear();
 }

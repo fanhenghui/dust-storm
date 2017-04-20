@@ -340,9 +340,6 @@
     <None Include="Shader\vr_entry_exit_points_culling.glsl">
       <Filter>Shader\Entry exit points</Filter>
     </None>
-    <None Include="Shader\test_compute.glsl">
-      <Filter>Shader\Entry exit points</Filter>
-    </None>
     <None Include="Shader\rc_mask_nearst_sampler.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>

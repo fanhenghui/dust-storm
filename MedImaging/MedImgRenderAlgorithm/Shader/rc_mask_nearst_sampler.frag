@@ -7,7 +7,7 @@ layout (std430 , binding = BUFFER_BINDING_VISIBLE_LABEL_BUCKET) buffer VisibleLa
     int visibleLabel[];
 };
 
-bool AccessMask(sampler3D sampler , vec3 vPos , out int iOutLabel)
+bool access_mask(sampler3D sampler , vec3 vPos , out int iOutLabel)
 {
     iOutLabel = int(texture(sampler, vPos).r*255);
     if(0 == iOutLabel)//0 is invisible

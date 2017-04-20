@@ -12,21 +12,21 @@ public:
 
     ~GLTexture1D();
 
-    virtual void Bind();
+    virtual void bind();
 
-    virtual void UnBind();
+    virtual void unbind();
 
-    void Load(GLint internalformat , GLsizei width, GLenum format , GLenum type , 
+    void load(GLint internalformat , GLsizei width, GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Update(GLint xoffset , GLsizei width , GLenum format , GLenum type , 
+    void update(GLint xoffset , GLsizei width , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
+    void download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
 
-    GLsizei GetWidth();
+    GLsizei get_width();
 
-    GLenum GetFormat();
+    GLenum get_format();
 
 protected:
 private:

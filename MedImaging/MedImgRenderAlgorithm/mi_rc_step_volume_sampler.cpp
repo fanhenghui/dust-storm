@@ -3,13 +3,13 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLShaderInfo RCStepVolumeNearstSampler::GetShaderInfo()
+GLShaderInfo RCStepVolumeNearstSampler::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCVolumeNearstSamplerFrag , "RCStepVolumeNearstSampler");
 }
 
 
-GLShaderInfo RCStepVolumeLinearSampler::GetShaderInfo()
+GLShaderInfo RCStepVolumeLinearSampler::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCVolumeLinearSamplerFrag, "RCStepVolumeLinearSampler");
 }

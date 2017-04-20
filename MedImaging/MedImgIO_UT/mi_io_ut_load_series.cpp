@@ -3,7 +3,7 @@
 #include "mi_image_data_header.h"
 
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 namespace
 {
@@ -43,14 +43,14 @@ void IOUT_LoadSeries()
 
     std::vector<std::string> vecFiles = GetFiles();
     DICOMLoader loader;
-    IOStatus status = loader.LoadSeries(vecFiles , pImgData , pDataHeader);
+    IOStatus status = loader.load_series(vecFiles , pImgData , pDataHeader);
 
     if (IO_SUCCESS == status)
     {
         std::ofstream out("D:/Data/MyData/AB_CTA_01.raw" , std::ios::binary | std::ios::out);
         if (out.is_open())
         {
-            out.write((char*)pImgData->GetPixelPointer() , pImgData->m_uiDim[0]*pImgData->m_uiDim[1]*pImgData->m_uiDim[2]*2);
+            out.write((char*)pImgData->get_pixel_pointer() , pImgData->m_uiDim[0]*pImgData->m_uiDim[1]*pImgData->m_uiDim[2]*2);
             out.close();
         }
     }

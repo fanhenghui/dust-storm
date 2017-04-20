@@ -13,7 +13,7 @@ public:
 
     virtual ~RCStepMaskNoneSampler(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -26,7 +26,7 @@ public:
 
     virtual ~RCStepMaskNearstSampler(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };

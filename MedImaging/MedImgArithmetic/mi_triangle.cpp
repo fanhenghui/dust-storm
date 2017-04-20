@@ -14,7 +14,7 @@ Triangle::Triangle(Point3 pt0 , Point3 pt1 ,Point3 pt2)
     m_pt[2] = pt2;
 }
 
-void Triangle::GenerateLines(std::vector<LineSegment3D> &vLines) const
+void Triangle::to_lines(std::vector<LineSegment3D> &vLines) const
 {
     vLines.clear();
     vLines.resize(3);
@@ -23,32 +23,32 @@ void Triangle::GenerateLines(std::vector<LineSegment3D> &vLines) const
     vLines[2] = LineSegment3D(m_pt[2] , m_pt[0]);
 }
 
-Vector3 Triangle::GetNormal() const
+Vector3 Triangle::get_normal() const
 {
     Vector3 v01 = m_pt[1] - m_pt[0];
     Vector3 v02  = m_pt[2] - m_pt[0];
-    Vector3 vNorm = v01.CrossProduct(v02);
-    return vNorm.GetNormalize();
+    Vector3 vNorm = v01.cross_product(v02);
+    return vNorm.get_normalize();
 }
 
-bool Triangle::InTriangle(const Point3 &pt0)
+bool Triangle::in_triangle(const Point3 &pt0)
 {
     //P点在ABC内的方法可以用PAB PBC PCA呈现顺时针排列或者逆时针排列 ，计算差乘结果判断方向一致性
     const Vector3 a = m_pt[0] - pt0;
     const Vector3 b = m_pt[1] - pt0;
     const Vector3 c = m_pt[2] - pt0;
 
-    const Vector3 u = b.CrossProduct(c);
-    const Vector3 v = c.CrossProduct(a);
+    const Vector3 u = b.cross_product(c);
+    const Vector3 v = c.cross_product(a);
 
-    if (u.DotProduct(v) < 0.0)
+    if (u.dot_product(v) < 0.0)
     {
         return false;
     }
     else
     {
-        Vector3 w = a.CrossProduct(b);
-        if (u.DotProduct(w) < 0.0)
+        Vector3 w = a.cross_product(b);
+        if (u.dot_product(w) < 0.0)
         {
             return false;
         }

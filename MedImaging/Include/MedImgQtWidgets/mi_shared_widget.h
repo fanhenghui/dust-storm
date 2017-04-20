@@ -13,7 +13,7 @@ class QtWidgets_Export SharedWidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    static SharedWidget* Instance();
+    static SharedWidget* instance();
     ~SharedWidget();
 protected:
     virtual void initializeGL();

@@ -38,13 +38,13 @@ RayCastScene::RayCastScene():SceneBase(),m_iTestCode(0),
     m_pCanvas.reset(new RayCasterCanvas());
 
 
-    if (CPU == Configuration::Instance()->GetProcessingUnitType())
+    if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pRayCaster->SetStrategy(CPU_BASE);
+        m_pRayCaster->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pRayCaster->SetStrategy(GPU_BASE);
+        m_pRayCaster->set_strategy(GPU_BASE);
     }
 }
 
@@ -62,13 +62,13 @@ RayCastScene::RayCastScene(int iWidth , int iHeight):SceneBase(iWidth , iHeight)
     m_pCanvas.reset(new RayCasterCanvas());
 
 
-    if (CPU == Configuration::Instance()->GetProcessingUnitType())
+    if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pRayCaster->SetStrategy(CPU_BASE);
+        m_pRayCaster->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pRayCaster->SetStrategy(GPU_BASE);
+        m_pRayCaster->set_strategy(GPU_BASE);
     }
 }
 
@@ -77,35 +77,35 @@ RayCastScene::~RayCastScene()
 
 }
 
-void RayCastScene::Initialize()
+void RayCastScene::initialize()
 {
-    SceneBase::Initialize();
+    SceneBase::initialize();
 
     //Canvas
-    m_pCanvas->SetDisplaySize(m_iWidth , m_iHeight);
-    m_pCanvas->Initialize();
+    m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+    m_pCanvas->initialize();
 }
 
-void RayCastScene::Finalize()
+void RayCastScene::finalize()
 {
-    m_pCanvas->Finialize();
-    m_pEntryExitPoints->Finialize();
-    m_pRayCaster->Finialize();
+    m_pCanvas->finialize();
+    m_pEntryExitPoints->finialize();
+    m_pRayCaster->finialize();
 }
 
-void RayCastScene::SetDisplaySize(int iWidth , int iHeight)
+void RayCastScene::set_display_size(int iWidth , int iHeight)
 {
-    SceneBase::SetDisplaySize(iWidth ,iHeight);
-    m_pCanvas->SetDisplaySize(iWidth , iHeight);
-    m_pCanvas->UpdateFBO();//Update texture size
-    m_pEntryExitPoints->SetDisplaySize(iWidth , iHeight);
-    m_pCameraInteractor->Resize(iWidth , iHeight);
+    SceneBase::set_display_size(iWidth ,iHeight);
+    m_pCanvas->set_display_size(iWidth , iHeight);
+    m_pCanvas->update_fbo();//update texture size
+    m_pEntryExitPoints->set_display_size(iWidth , iHeight);
+    m_pCameraInteractor->resize(iWidth , iHeight);
 }
 
-void RayCastScene::Render(int iTestCode)
+void RayCastScene::render(int iTestCode)
 {
     //Skip render scene
-    if (!GetDirty())
+    if (!get_dirty())
     {
         return;
     }
@@ -122,8 +122,8 @@ void RayCastScene::Render(int iTestCode)
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_pEntryExitPoints->CalculateEntryExitPoints();
-    m_pRayCaster->Render(m_iTestCode);
+    m_pEntryExitPoints->calculate_entry_exit_points();
+    m_pRayCaster->render(m_iTestCode);
 
     glPopAttrib();
     CHECK_GL_ERROR;
@@ -134,13 +134,13 @@ void RayCastScene::Render(int iTestCode)
 
     glViewport(0,0,m_iWidth , m_iHeight);
 
-    m_pSceneFBO->Bind();
+    m_pSceneFBO->bind();
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
     CHECK_GL_ERROR;
 
     glEnable(GL_TEXTURE_2D);
-    m_pCanvas->GetColorAttachTexture()->Bind();
+    m_pCanvas->get_color_attach_texture()->bind();
 
     CHECK_GL_ERROR;
 
@@ -160,63 +160,63 @@ void RayCastScene::Render(int iTestCode)
     glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
     CHECK_GL_ERROR;
 
-    SetDirty(false);
+    set_dirty(false);
 }
 
-void RayCastScene::SetVolumeInfos(std::shared_ptr<VolumeInfos> pVolumeInfos)
+void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
 {
     try
     {
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeInfos);
         m_pVolumeInfos = pVolumeInfos;
 
-        std::shared_ptr<ImageData> pVolume = m_pVolumeInfos->GetVolume();
+        std::shared_ptr<ImageData> pVolume = m_pVolumeInfos->get_volume();
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolume);
 
-        std::shared_ptr<ImageDataHeader> pDataHeader = m_pVolumeInfos->GetDataHeader();
+        std::shared_ptr<ImageDataHeader> pDataHeader = m_pVolumeInfos->get_data_header();
         RENDERALGO_CHECK_NULL_EXCEPTION(pDataHeader);
 
         //Camera calculator
-        m_pCameraCalculator = pVolumeInfos->GetCameraCalculator();
+        m_pCameraCalculator = pVolumeInfos->get_camera_calculator();
 
         //Entry exit points
-        m_pEntryExitPoints->SetImageData(pVolume);
-        m_pEntryExitPoints->SetCamera(m_pCamera);
-        m_pEntryExitPoints->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pEntryExitPoints->SetCameraCalculator(m_pCameraCalculator);
-        m_pEntryExitPoints->Initialize();
+        m_pEntryExitPoints->set_image_data(pVolume);
+        m_pEntryExitPoints->set_camera(m_pCamera);
+        m_pEntryExitPoints->set_display_size(m_iWidth , m_iHeight);
+        m_pEntryExitPoints->set_camera_calculator(m_pCameraCalculator);
+        m_pEntryExitPoints->initialize();
 
         //Ray caster
-        m_pRayCaster->SetCanvas(m_pCanvas);
-        m_pRayCaster->SetEntryExitPoints(m_pEntryExitPoints);
-        m_pRayCaster->SetCamera(m_pCamera);
-        m_pRayCaster->SetVolumeToWorldMatrix(m_pCameraCalculator->GetVolumeToWorldMatrix());
-        m_pRayCaster->SetVolumeData(pVolume);
-        //m_pRayCaster->SetMaskData(pMask);
+        m_pRayCaster->set_canvas(m_pCanvas);
+        m_pRayCaster->set_entry_exit_points(m_pEntryExitPoints);
+        m_pRayCaster->set_camera(m_pCamera);
+        m_pRayCaster->set_volume_to_world_matrix(m_pCameraCalculator->get_volume_to_world_matrix());
+        m_pRayCaster->set_volume_data(pVolume);
+        //m_pRayCaster->set_mask_data(pMask);
 
-        if (GPU == Configuration::Instance()->GetProcessingUnitType())
+        if (GPU == Configuration::instance()->get_processing_unit_type())
         {
-            //Initialize gray pseudo color texture
+            //initialize gray pseudo color texture
             if (!m_pPseudoColor)
             {
                 UIDType uid;
-                m_pPseudoColor = GLResourceManagerContainer::Instance()->GetTexture1DManager()->CreateObject(uid);
-                m_pPseudoColor->SetDescription("Pseudo color texture gray");
-                m_pPseudoColor->Initialize();
-                m_pPseudoColor->Bind();
-                GLTextureUtils::Set1DWrapS(GL_CLAMP_TO_EDGE);
-                GLTextureUtils::SetFilter(GL_TEXTURE_1D , GL_LINEAR);
+                m_pPseudoColor = GLResourceManagerContainer::instance()->get_texture_1d_manager()->create_object(uid);
+                m_pPseudoColor->set_description("Pseudo color texture gray");
+                m_pPseudoColor->initialize();
+                m_pPseudoColor->bind();
+                GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_EDGE);
+                GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
                 unsigned char pData[] = {0,0,0,0,255,255,255,255};
-                m_pPseudoColor->Load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
+                m_pPseudoColor->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
             }
-            m_pRayCaster->SetPseudoColorTexture(m_pPseudoColor , 2);
+            m_pRayCaster->set_pseudo_color_texture(m_pPseudoColor , 2);
 
             //Volume texture
-            m_pRayCaster->SetVolumeDataTexture(pVolumeInfos->GetVolumeTexture());
+            m_pRayCaster->set_volume_data_texture(pVolumeInfos->get_volume_texture());
         }
-        m_pRayCaster->Initialize();
+        m_pRayCaster->initialize();
 
-        SetDirty(true);
+        set_dirty(true);
     }
     catch (const Exception& e)
     {
@@ -227,101 +227,101 @@ void RayCastScene::SetVolumeInfos(std::shared_ptr<VolumeInfos> pVolumeInfos)
     }
 }
 
-void RayCastScene::SetMaskLabelLevel(LabelLevel eLabelLevel)
+void RayCastScene::set_mask_label_level(LabelLevel eLabelLevel)
 {
-    m_pRayCaster->SetMaskLabelLevel(eLabelLevel);
-    SetDirty(true);
+    m_pRayCaster->set_mask_label_level(eLabelLevel);
+    set_dirty(true);
 }
 
-void RayCastScene::SetSampleRate(float fSampleRate)
+void RayCastScene::set_sample_rate(float fSampleRate)
 {
-    m_pRayCaster->SetSampleRate(fSampleRate);
-    SetDirty(true);
+    m_pRayCaster->set_sample_rate(fSampleRate);
+    set_dirty(true);
 }
 
-void RayCastScene::SetVisibleLabels(std::vector<unsigned char> vecLabels)
+void RayCastScene::set_visible_labels(std::vector<unsigned char> vecLabels)
 {
-    m_pRayCaster->SetVisibleLabels(vecLabels);
-    SetDirty(true);
+    m_pRayCaster->set_visible_labels(vecLabels);
+    set_dirty(true);
 }
 
-void RayCastScene::SetWindowlevel(float fWW , float fWL , unsigned char ucLabel)
+void RayCastScene::set_window_level(float fWW , float fWL , unsigned char ucLabel)
 {
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
-    m_pVolumeInfos->GetVolume()->RegulateWindowLevel(fWW , fWL);
+    m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
 
-    m_pRayCaster->SetWindowlevel(fWW , fWL , ucLabel);
+    m_pRayCaster->set_window_level(fWW , fWL , ucLabel);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetGlobalWindowLevel(float fWW , float fWL)
+void RayCastScene::set_global_window_level(float fWW , float fWL)
 {
     m_fGlobalWW = fWW;
     m_fGlobalWL = fWL;
 
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
-    m_pVolumeInfos->GetVolume()->RegulateWindowLevel(fWW , fWL);
+    m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
 
-    m_pRayCaster->SetGlobalWindowLevel(fWW, fWL);
+    m_pRayCaster->set_global_window_level(fWW, fWL);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetMaskMode(MaskMode eMode)
+void RayCastScene::set_mask_mode(MaskMode eMode)
 {
-    m_pRayCaster->SetMaskMode(eMode);
+    m_pRayCaster->set_mask_mode(eMode);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetCompositeMode(CompositeMode eMode)
+void RayCastScene::set_composite_mode(CompositeMode eMode)
 {
-    m_pRayCaster->SetCompositeMode(eMode);
+    m_pRayCaster->set_composite_mode(eMode);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetInterpolationMode(InterpolationMode eMode)
+void RayCastScene::set_interpolation_mode(InterpolationMode eMode)
 {
-    m_pRayCaster->SetInterpolationMode(eMode);
+    m_pRayCaster->set_interpolation_mode(eMode);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetShadingMode(ShadingMode eMode)
+void RayCastScene::set_shading_mode(ShadingMode eMode)
 {
-    m_pRayCaster->SetShadingMode(eMode);
+    m_pRayCaster->set_shading_mode(eMode);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetColorInverseMode(ColorInverseMode eMode)
+void RayCastScene::set_color_inverse_mode(ColorInverseMode eMode)
 {
-    m_pRayCaster->SetColorInverseMode(eMode);
+    m_pRayCaster->set_color_inverse_mode(eMode);
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::SetTestCode(int iTestCode)
+void RayCastScene::set_test_code(int iTestCode)
 {
     m_iTestCode = iTestCode;
 
-    SetDirty(true);
+    set_dirty(true);
 }
 
-void RayCastScene::GetGlobalWindowLevel(float& fWW , float& fWL) const
+void RayCastScene::get_global_window_level(float& fWW , float& fWL) const
 {
     fWW = m_fGlobalWW;
     fWL = m_fGlobalWL;
 }
 
-std::shared_ptr<VolumeInfos> RayCastScene::GetVolumeInfos() const
+std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const
 {
     return m_pVolumeInfos;
 }
 
-std::shared_ptr<CameraCalculator> RayCastScene::GetCameraCalculator() const
+std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const
 {
     return m_pCameraCalculator;
 }

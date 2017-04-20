@@ -29,12 +29,12 @@ VolumeInfos::~VolumeInfos()
     
 }
 
-void VolumeInfos::Finialize()
+void VolumeInfos::finialize()
 {
-    ReleaseVolumeResource_i();
+    release_volume_resource_i();
 }
 
-void VolumeInfos::SetVolume(std::shared_ptr<ImageData> pImgData)
+void VolumeInfos::set_volume(std::shared_ptr<ImageData> pImgData)
 {
     try
     {
@@ -51,20 +51,20 @@ void VolumeInfos::SetVolume(std::shared_ptr<ImageData> pImgData)
         //TODO brick info used in GPU , but brick unit useless 
         //////////////////////////////////////////////////////////////////////////
         //m_pBrickPool.reset(new BrickPool());//Reset brick pool
-        //m_pBrickPool->SetVolume(m_pVolume);
-        //m_pBrickPool->SetBrickSize(BrickUtils::Instance()->GetBrickSize());
-        //m_pBrickPool->SetBrickExpand(BrickUtils::Instance()->GetBrickExpand());
+        //m_pBrickPool->set_volume(m_pVolume);
+        //m_pBrickPool->set_brick_size(BrickUtils::instance()->GetBrickSize());
+        //m_pBrickPool->set_brick_expand(BrickUtils::instance()->get_brick_expand());
 
-        //m_pBrickPool->CalculateVolumeBrick();
+        //m_pBrickPool->calculate_volume_brick();
 
         //////////////////////////////////////////////////////////////////////////
         //Upload volume texture(TODO using data loader to wrap it . for separate volume later)
-        //Release previous resource
-        ReleaseVolumeResource_i();
+        //release previous resource
+        release_volume_resource_i();
 
         //////////////////////////////////////////////////////////////////////////
         //Upload volume brick info
-        LoadVolumeResource_i();
+        load_volume_resource_i();
 
     }
     catch (const Exception& e)
@@ -75,7 +75,7 @@ void VolumeInfos::SetVolume(std::shared_ptr<ImageData> pImgData)
     }
 }
 
-void VolumeInfos::SetMask(std::shared_ptr<ImageData> pImgData)
+void VolumeInfos::set_mask(std::shared_ptr<ImageData> pImgData)
 {
     try
     {
@@ -83,8 +83,8 @@ void VolumeInfos::SetMask(std::shared_ptr<ImageData> pImgData)
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pBrickPool);
 
         m_pMask = pImgData;
-        m_pBrickPool->SetMask(m_pMask);
-        m_pBrickPool->CalculateMaskBrick();
+        m_pBrickPool->set_mask(m_pMask);
+        m_pBrickPool->calculate_mask_brick();
     }
     catch (const Exception& e)
     {
@@ -94,22 +94,22 @@ void VolumeInfos::SetMask(std::shared_ptr<ImageData> pImgData)
     }
 }
 
-void VolumeInfos::SetDataHeader(std::shared_ptr<ImageDataHeader> pDataHeader)
+void VolumeInfos::set_data_header(std::shared_ptr<ImageDataHeader> pDataHeader)
 {
     m_pDataHeader = pDataHeader;
 }
 
-std::vector<GLTexture3DPtr> VolumeInfos::GetVolumeTexture()
+std::vector<GLTexture3DPtr> VolumeInfos::get_volume_texture()
 {
     return m_vecVolumeTex;
 }
 
-std::vector<GLTexture3DPtr> VolumeInfos::GetMaskTexture()
+std::vector<GLTexture3DPtr> VolumeInfos::get_mask_texture()
 {
     return m_vecMaskTex;
 }
 
-GLBufferPtr VolumeInfos::GetVolumeBrickInfoBuffer()
+GLBufferPtr VolumeInfos::get_volume_brick_info_buffer()
 {
     return m_pVolumeBrickInfoBuffer;
 }
@@ -119,83 +119,83 @@ GLBufferPtr VolumeInfos::GetVolumeBrickInfoBuffer()
 //    //TODO check dirty
 //}
 
-std::shared_ptr<ImageData> VolumeInfos::GetVolume()
+std::shared_ptr<ImageData> VolumeInfos::get_volume()
 {
     return m_pVolume;
 }
 
-std::shared_ptr<ImageData> VolumeInfos::GetMask()
+std::shared_ptr<ImageData> VolumeInfos::get_mask()
 {
     return m_pMask;
 }
 
-BrickCorner* VolumeInfos::GetBrickCorner()
+BrickCorner* VolumeInfos::get_brick_corner()
 {
-    return m_pBrickPool->GetBrickCorner();
+    return m_pBrickPool->get_brick_corner();
 }
 
-BrickUnit* VolumeInfos::GetVolumeBrickUnit()
+BrickUnit* VolumeInfos::get_volume_brick_unit()
 {
-    return m_pBrickPool->GetVolumeBrickUnit();
+    return m_pBrickPool->get_volume_brick_unit();
 }
 
-BrickUnit* VolumeInfos::GetMaskBrickUnit()
+BrickUnit* VolumeInfos::get_mask_brick_unit()
 {
-    return m_pBrickPool->GetMaskBrickUnit();
+    return m_pBrickPool->get_mask_brick_unit();
 }
 
-VolumeBrickInfo* VolumeInfos::GetVolumeBrickInfo()
+VolumeBrickInfo* VolumeInfos::get_volume_brick_info()
 {
-    return m_pBrickPool->GetVolumeBrickInfo();
+    return m_pBrickPool->get_volume_brick_info();
 }
 
-MaskBrickInfo* VolumeInfos::GetMaskBrickInfo(const std::vector<unsigned char>& vecVisLabels)
+MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>& vecVisLabels)
 {
-    return m_pBrickPool->GetMaskBrickInfo(vecVisLabels);
+    return m_pBrickPool->get_mask_brick_info(vecVisLabels);
 }
 
-void VolumeInfos::UpdateVolume(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , void* pData)
+void VolumeInfos::update_volume(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , void* pData)
 {
     //TODO
-    //Update volume CPU
+    //update volume CPU
 
-    //Update volume GPU
+    //update volume GPU
 }
 
-void VolumeInfos::UpdateMask(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , unsigned char* pData)
+void VolumeInfos::update_mask(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , unsigned char* pData)
 {
     //TODO
-    //Update mask CPU
+    //update mask CPU
 
-    //Update mask GPU
+    //update mask GPU
 }
 
-void VolumeInfos::ReleaseVolumeResource_i()
+void VolumeInfos::release_volume_resource_i()
 {
-    //Release volume textures
+    //release volume textures
     if (!m_vecVolumeTex.empty())
     {
         for (auto it = m_vecVolumeTex.begin() ; it != m_vecVolumeTex.end() ; ++it)
         {
-            GLResourceManagerContainer::Instance()->GetTexture3DManager()->RemoveObject((*it)->GetUID());
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
         }
 
         m_vecVolumeTex.clear();
-        GLResourceManagerContainer::Instance()->GetTexture3DManager()->Update();
+        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
     }
 
-    //Release volume brick info
+    //release volume brick info
     if (m_pVolumeBrickInfoBuffer)
     {
-        GLResourceManagerContainer::Instance()->GetBufferManager()->RemoveObject(m_pVolumeBrickInfoBuffer->GetUID());
+        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(m_pVolumeBrickInfoBuffer->get_uid());
         m_pVolumeBrickInfoBuffer.reset();
-        GLResourceManagerContainer::Instance()->GetBufferManager()->Update();
+        GLResourceManagerContainer::instance()->get_buffer_manager()->update();
     }
 }
 
-void VolumeInfos::LoadVolumeResource_i()
+void VolumeInfos::load_volume_resource_i()
 {
-    if (GPU == Configuration::Instance()->GetProcessingUnitType())
+    if (GPU == Configuration::instance()->get_processing_unit_type())
     {
         //////////////////////////////////////////////////////////////////////////
         // 1 Volume texture
@@ -203,24 +203,24 @@ void VolumeInfos::LoadVolumeResource_i()
 
         //Single volume
         UIDType uid(0);
-        GLTexture3DPtr pTex = GLResourceManagerContainer::Instance()->GetTexture3DManager()->CreateObject(uid);
+        GLTexture3DPtr pTex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
         if (m_pDataHeader)
         {
-            pTex->SetDescription("Volume : " + m_pDataHeader->m_sSeriesUID);
+            pTex->set_description("Volume : " + m_pDataHeader->m_sSeriesUID);
         }
         else
         {
-            pTex->SetDescription("Volume : Undefined series UID");
+            pTex->set_description("Volume : Undefined series UID");
         }
 
-        pTex->Initialize();
-        pTex->Bind();
-        GLTextureUtils::Set3DWrapSTR(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::SetFilter(GL_TEXTURE_3D , GL_LINEAR);
+        pTex->initialize();
+        pTex->bind();
+        GLTextureUtils::set_1d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
         GLenum eInternalFormat , eFormat , eType;
-        GLUtils::GetGrayTextureFormat(m_pVolume->m_eDataType , eInternalFormat , eFormat ,eType);
-        pTex->Load(eInternalFormat ,m_pVolume->m_uiDim[0] , m_pVolume->m_uiDim[1] , m_pVolume->m_uiDim[2] , eFormat, eType , m_pVolume->GetPixelPointer());
-        pTex->UnBind();
+        GLUtils::get_gray_texture_format(m_pVolume->m_eDataType , eInternalFormat , eFormat ,eType);
+        pTex->load(eInternalFormat ,m_pVolume->m_uiDim[0] , m_pVolume->m_uiDim[1] , m_pVolume->m_uiDim[2] , eFormat, eType , m_pVolume->get_pixel_pointer());
+        pTex->unbind();
 
         m_vecVolumeTex.push_back(pTex);
 
@@ -228,33 +228,33 @@ void VolumeInfos::LoadVolumeResource_i()
 
         //////////////////////////////////////////////////////////////////////////
         //2 Volume brick info
-        /*m_pVolumeBrickInfoBuffer = GLResourceManagerContainer::Instance()->GetBufferManager()->CreateObject(uid);
-        m_pVolumeBrickInfoBuffer->SetBufferTarget(GL_SHADER_STORAGE_BUFFER);
-        m_pVolumeBrickInfoBuffer->Initialize();
-        m_pVolumeBrickInfoBuffer->Bind();
+        /*m_pVolumeBrickInfoBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+        m_pVolumeBrickInfoBuffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+        m_pVolumeBrickInfoBuffer->initialize();
+        m_pVolumeBrickInfoBuffer->bind();
 
         unsigned int uiBrickDim[3] = {1,1,1};
-        m_pBrickPool->GetBrickDim(uiBrickDim);
+        m_pBrickPool->get_brick_dim(uiBrickDim);
         const unsigned int uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
-        m_pVolumeBrickInfoBuffer->Load(uiBrickCount*sizeof(VolumeBrickInfo) , m_pBrickPool->GetVolumeBrickInfo() , GL_STATIC_DRAW);
-        m_pVolumeBrickInfoBuffer->UnBind();*/
+        m_pVolumeBrickInfoBuffer->load(uiBrickCount*sizeof(VolumeBrickInfo) , m_pBrickPool->get_volume_brick_info() , GL_STATIC_DRAW);
+        m_pVolumeBrickInfoBuffer->unbind();*/
     }
 }
 
-void VolumeInfos::UpdateVolumeResource_i()
+void VolumeInfos::update_volume_resource_i()
 {
-    if (GPU == Configuration::Instance()->GetProcessingUnitType())
+    if (GPU == Configuration::instance()->get_processing_unit_type())
     {
-        //TODO Update
+        //TODO update
     }
 }
 
-std::shared_ptr<ImageDataHeader> VolumeInfos::GetDataHeader()
+std::shared_ptr<ImageDataHeader> VolumeInfos::get_data_header()
 {
     return m_pDataHeader;
 }
 
-std::shared_ptr<CameraCalculator> VolumeInfos::GetCameraCalculator()
+std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator()
 {
     return m_pCameraCalculator;
 }

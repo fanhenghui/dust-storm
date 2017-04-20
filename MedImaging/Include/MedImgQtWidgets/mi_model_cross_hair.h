@@ -15,7 +15,7 @@ class MPRScene;
 class SceneBase;
 class CameraCalculator;
 
-class QtWidgets_Export CrosshairModel : public MedImaging::IModel
+class QtWidgets_Export CrosshairModel : public medical_imaging::IModel
 {
 public:
     typedef std::shared_ptr<MPRScene> MPRScenePtr;
@@ -24,45 +24,45 @@ public:
 
     virtual ~CrosshairModel();
 
-    void SetMPRScene(const ScanSliceType (&aScanType)[3] , const MPRScenePtr (&aMPRScenes)[3] , const RGBUnit (aMPRColors)[3]);
+    void set_mpr_scene(const ScanSliceType (&aScanType)[3] , const MPRScenePtr (&aMPRScenes)[3] , const RGBUnit (aMPRColors)[3]);
 
-    void GetCrossLine(
+    void get_cross_line(
         const MPRScenePtr& pTragetMPRScene, 
         Line2D (&lines)[2],
         RGBUnit (&color)[2]);
 
-    RGBUnit GetBorderColor(MPRScenePtr pTargetMPRScene);
+    RGBUnit get_border_color(MPRScenePtr pTargetMPRScene);
 
-    bool CheckFocus(MPRScenePtr pTargetMPRScene);
+    bool check_focus(MPRScenePtr pTargetMPRScene);
 
-    void Focus(MPRScenePtr pTargetMPRScene);
+    void focus(MPRScenePtr pTargetMPRScene);
 
-    Point3 GetCrossLocationDiscreteWorld() const;
+    Point3 get_cross_location_discrete_world() const;
 
-    Point3 GetCrossLocationContineousWorld() const;
+    Point3 get_cross_location_contineous_world() const;
 
-    //Paging one MPR will change cross line in other 2
-    bool PagingTo(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
+    //page one MPR will change cross line in other 2
+    bool page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
 
-    bool Paging(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep);
+    bool page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep);
 
-    int GetPage(const std::shared_ptr<MPRScene>& pTargetMPRScene );
+    int get_page(const std::shared_ptr<MPRScene>& pTargetMPRScene );
 
-    //Locate in one MPR will paging others 2
-    bool Locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC);
+    //locate in one MPR will paging others 2
+    bool locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC);
 
-    bool Locate(const Point3& ptCenterW);
+    bool locate(const Point3& ptCenterW);
 
-    bool LocateFocus(const Point3& ptCenterW);
+    bool locate_focus(const Point3& ptCenterW);
 
-    void SetVisibility(bool bFlag);
+    void set_visibility(bool bFlag);
 
-    bool GetVisibility() const;
+    bool get_visibility() const;
 
 private:
-    void SetPage_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
+    void set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
 
-    bool SetCenter_i(const Point3& ptCenterW);
+    bool set_center_i(const Point3& ptCenterW);
 
 private:
     MPRScenePtr m_aMPRScene[3];

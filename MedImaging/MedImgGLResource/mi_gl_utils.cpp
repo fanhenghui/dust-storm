@@ -7,7 +7,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-bool GLUtils::CheckFramebufferState()
+bool GLUtils::check_framebuffer_state()
 {
     bool bFBOStatusComplete = false;
     GLenum eFBOStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -58,7 +58,7 @@ bool GLUtils::CheckFramebufferState()
     return bFBOStatusComplete;
 }
 
-void GLUtils::GetGrayTextureFormat( DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType )
+void GLUtils::get_gray_texture_format( DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType )
 {
     switch(eDataType)
     {
@@ -91,7 +91,7 @@ void GLUtils::GetGrayTextureFormat( DataType eDataType , GLenum &eInternalFormat
     }
 }
 
-unsigned int GLUtils::GetByteByDataType(DataType eDataType)
+unsigned int GLUtils::get_byte_by_data_type(DataType eDataType)
 {
     switch(eDataType)
     {
@@ -118,7 +118,7 @@ unsigned int GLUtils::GetByteByDataType(DataType eDataType)
     }
 }
 
-std::string GLUtils::GetGLenumDescription(GLenum e)
+std::string GLUtils::get_gl_enum_description(GLenum e)
 {
     switch(e)
     {
@@ -184,12 +184,12 @@ std::string GLUtils::GetGLenumDescription(GLenum e)
 }
 
 bool GLUtils::m_bCheckGLFlag = true;
-void GLUtils::SetCheckGLFlag(bool bFlag)
+void GLUtils::set_check_gl_flag(bool bFlag)
 {
     m_bCheckGLFlag = bFlag;
 }
 
-bool GLUtils::GetCheckGLFlag()
+bool GLUtils::get_check_gl_flag()
 {
     return m_bCheckGLFlag;
 }
@@ -306,7 +306,7 @@ GLActiveTextureCounter::GLActiveTextureCounter():m_iCurActiveTexID(0)
 GLActiveTextureCounter::~GLActiveTextureCounter()
 {}
 
-int GLActiveTextureCounter::Tick()
+int GLActiveTextureCounter::tick()
 {
     if (m_iCurActiveTexID > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS  - 1)
     {
@@ -315,12 +315,12 @@ int GLActiveTextureCounter::Tick()
     return m_iCurActiveTexID++;
 }
 
-void GLActiveTextureCounter::Reset()
+void GLActiveTextureCounter::reset()
 {
     m_iCurActiveTexID = 0;
 }
 
-bool GLContextHelper::HasGLContext()
+bool GLContextHelper::has_gl_context()
 {
     //TODO WR here is not cross-platform. Should add other OS define
 #ifdef WIN32
@@ -331,7 +331,7 @@ bool GLContextHelper::HasGLContext()
 #endif
 }
 
-void GLTextureUtils::Set1DWrapS( GLint iWrapType )
+void GLTextureUtils::set_1d_wrap_s( GLint iWrapType )
 {
     glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, iWrapType);
     if (GL_CLAMP_TO_BORDER == iWrapType)
@@ -341,7 +341,7 @@ void GLTextureUtils::Set1DWrapS( GLint iWrapType )
     }
 }
 
-void GLTextureUtils::Set2DWrapST( GLint iWrapType )
+void GLTextureUtils::set_2d_wrap_s_t( GLint iWrapType )
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, iWrapType); 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, iWrapType); 
@@ -352,7 +352,7 @@ void GLTextureUtils::Set2DWrapST( GLint iWrapType )
     }
 }
 
-void GLTextureUtils::Set3DWrapSTR( GLint iWrapType )
+void GLTextureUtils::set_1d_wrap_s_t_r( GLint iWrapType )
 {
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, iWrapType); 
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, iWrapType); 
@@ -364,7 +364,7 @@ void GLTextureUtils::Set3DWrapSTR( GLint iWrapType )
     }
 }
 
-void GLTextureUtils::SetFilter( GLenum eTexTarget , GLint iFilterType )
+void GLTextureUtils::set_filter( GLenum eTexTarget , GLint iFilterType )
 {
     glTexParameteri(eTexTarget, GL_TEXTURE_MIN_FILTER, iFilterType); 
     glTexParameteri(eTexTarget, GL_TEXTURE_MAG_FILTER, iFilterType); 

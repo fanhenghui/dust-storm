@@ -129,7 +129,7 @@ struct MetaObjectTag
 class IO_Export MetaObjectLoader
 {
 public:
-    IOStatus Load(
+    IOStatus load(
         const std::string& sInfoFile ,
         std::shared_ptr<ImageData> &pImgData , 
         std::shared_ptr<MetaObjectTag> & pMetaObjTag,

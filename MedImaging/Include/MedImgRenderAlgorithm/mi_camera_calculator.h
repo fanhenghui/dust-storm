@@ -57,37 +57,37 @@ public:
     //////////////////////////////////////////////////////////////////////////
 
     //仅仅改变了度量，从pixel 到 mm ，且在这个坐标系下的Volume bounding box仍然是axis aligned
-    const Matrix4& GetVolumeToPhysicalMatrix() const;
+    const Matrix4& get_volume_to_physical_matrix() const;
 
     //旋转到了和病人坐标系轴对齐，世界坐标系的原点是体数据体素中心点
-    const Matrix4& GetPhysicalToWorldMatrix() const;
+    const Matrix4& get_physical_to_world_matrix() const;
 
-    const Matrix4& GetVolumeToWorldMatrix() const;
+    const Matrix4& get_volume_to_world_matrix() const;
 
-    const Matrix4& GetWorldToVolumeMatrix() const;
+    const Matrix4& get_world_to_volume_matrix() const;
 
     //病人坐标系和世界坐标系仅仅是坐标原点不一样而已
-    const Matrix4& GetWorldToPatientMatrix() const;
+    const Matrix4& get_world_to_patient_matrix() const;
 
-    const Point3& GetDefaultMPRCenterWorld() const;
+    const Point3& get_default_mpr_center_world() const;
 
-    void InitMPRPlacement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//实时获取
+    void init_mpr_placement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//实时获取
 
-    void InitMPRPlacement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType ) const;//Default replacement
+    void init_mpr_placement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType ) const;//Default replacement
 
-    void InitVRRPlacement(std::shared_ptr<OrthoCamera> pCamera) const;
+    void init_vr_placement(std::shared_ptr<OrthoCamera> pCamera) const;
 
-    PatientAxisInfo GetHeadPatientAxisInfo() const;
+    PatientAxisInfo get_head_patient_axis_info() const;
 
-    PatientAxisInfo GetLeftPatientAxisInfo() const;
+    PatientAxisInfo get_left_patient_axis_info() const;
 
-    PatientAxisInfo GetPosteriorPatientAxisInfo() const;
+    PatientAxisInfo get_posterior_patient_axis_info() const;
 
-    int GetPageMaximum(ScanSliceType eType) const;
+    int get_page_maximum(ScanSliceType eType) const;
 
-    int GetDefaultPage(ScanSliceType eType) const;
+    int get_default_page(ScanSliceType eType) const;
 
-    bool GetVolumeOrthogonal() const;
+    bool check_volume_orthogonal() const;
 
     //////////////////////////////////////////////////////////////////////////
     //Interaction
@@ -97,35 +97,35 @@ public:
     // Axial F->H
     // Sagittal R->L
     // Coronal A -> P
-    bool MPROrthoPaging(std::shared_ptr<OrthoCamera> pMPRCamera , int iPageStep) const;
+    bool page_orthognal_mpr(std::shared_ptr<OrthoCamera> pMPRCamera , int iPageStep) const;
 
-    bool MPROrthoPagingTo(std::shared_ptr<OrthoCamera> pMPRCamera , int iPage) const;
+    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , int iPage) const;
 
-    int GetMPROrthoPage(std::shared_ptr<OrthoCamera> pMPRCamera) const;
+    int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> pMPRCamera) const;
 
     //MPR translate toward normal direction until MPR's plane is intersect with input point
-    void MPRTranslateTo(std::shared_ptr<OrthoCamera> pMPRCamera , const Point3& pt);
+    void translate_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , const Point3& pt);
 
-    ScanSliceType CheckScaneType(std::shared_ptr<OrthoCamera> pMPRCamera) const;
+    ScanSliceType check_scan_type(std::shared_ptr<OrthoCamera> pMPRCamera) const;
 
-    Point3 AdjustPointToDiscrete(const Point3& ptWorld) const;
+    /*Point3 adjust_point_to_discrete(const Point3& ptWorld) const;
 
-    float ConvertThicknessW2V(std::shared_ptr<OrthoCamera> pMPRCamera , float fThicknessWorldmm) const;
+    float convert_thickness_world_to_volume(std::shared_ptr<OrthoCamera> pMPRCamera , float fThicknessWorldmm) const;*/
 
 private:
-    void Calculate_i();
+    void calculate_i();
 
-    void CalculateMatrix_i();
+    void calculate_matrix_i();
 
-    void CheckVolumeOrthogonal_i();
+    void check_volume_orthogonal_i();
 
-    void CalculatePatientAxisInfo_i();
+    void calculate_patient_axis_info_i();
 
-    void CalculateVRReplacement_i();
+    void calculate_vr_placement_i();
 
-    void CalculateDefaultMPRCenterWorld_i();
+    void calculate_default_mpr_center_world_i();
 
-    void CaluculateOrthogonalMPRReplacement_i();
+    void caluculate_orthogonal_mpr_placement_i();
 
 private:
     std::shared_ptr<ImageData> m_pImgData;

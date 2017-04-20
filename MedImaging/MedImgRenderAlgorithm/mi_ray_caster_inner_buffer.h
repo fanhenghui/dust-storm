@@ -29,15 +29,15 @@ public:
 
     ~RayCasterInnerBuffer();
 
-    void ReleaseBuffer();
+    void release_buffer();
 
-    GLBufferPtr GetBuffer(BufferType eType);
+    GLBufferPtr get_buffer(BufferType eType);
 
-    void SetMaskLabelLevel(LabelLevel eLevel);
+    void set_mask_label_level(LabelLevel eLevel);
 
-    void SetWindowLevel(float fWW , float fWL , unsigned char ucLabel);
+    void set_window_level(float fWW , float fWL , unsigned char ucLabel);
 
-    void SetVisibleLabels(std::vector<unsigned char> vecLabels);
+    void set_visible_labels(std::vector<unsigned char> vecLabels);
 
 private:
     struct GLResource;

@@ -2,103 +2,103 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-    const Vector2f MulPerElem( const Vector2f &vec0, const Vector2f &vec1 )
+    const Vector2f mul_per_elem( const Vector2f &vec0, const Vector2f &vec1 )
 {
     return Vector2f(_mm_mul_ps(vec0.m_Vec128, vec1.m_Vec128));
 }
 
  
-    const Vector2f DivPerElem( const Vector2f &vec0, const Vector2f &vec1 )
+    const Vector2f div_per_elem( const Vector2f &vec0, const Vector2f &vec1 )
 {
     return Vector2f(_mm_div_ps(vec0.m_Vec128, vec1.m_Vec128));
 }
 
  
-    const Vector2f RecipPerElem( const Vector2f &vec )
+    const Vector2f recip_per_elem( const Vector2f &vec )
 {
     return Vector2f(_mm_rcp_ps(vec.m_Vec128));
 }
 
  
-    const Vector2f AbsPerElem( const Vector2f &vec )
+    const Vector2f abs_per_elem( const Vector2f &vec )
 {
     return Vector2f(fabsf4(vec.m_Vec128));
 }
 
  
-    const Vector2f MaxPerElem( const Vector2f &vec0, const Vector2f &vec1 )
+    const Vector2f max_per_elem( const Vector2f &vec0, const Vector2f &vec1 )
 {
     return Vector2f(_mm_max_ps(vec0.m_Vec128, vec1.m_Vec128));
 }
 
  
-    const Vector2f MinPerElem( const Vector2f &vec0, const Vector2f &vec1 )
+    const Vector2f min_per_elem( const Vector2f &vec0, const Vector2f &vec1 )
 {
     return Vector2f(_mm_min_ps(vec0.m_Vec128, vec1.m_Vec128));
 }
 
  
-    const float MaxElem( const Vector2f &vec )
+    const float max_elem( const Vector2f &vec )
 {
     __m128 t = _mm_max_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float MinElem( const Vector2f &vec )
+    const float min_elem( const Vector2f &vec )
 {
     __m128 t = _mm_min_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float Sum( const Vector2f &vec )
+    const float sum( const Vector2f &vec )
 {
     __m128 t = _mm_add_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float DotProduct( const Vector2f &vec0, const Vector2f &vec1 )
+    const float dot_product( const Vector2f &vec0, const Vector2f &vec1 )
 {
     __m128 t = _vmathVfDot2( vec0.m_Vec128, vec1.m_Vec128 );
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const float LengthSqr( const Vector2f &vec )
+    const float length_sqr( const Vector2f &vec )
 {
     __m128 t = _vmathVfDot2( vec.m_Vec128, vec.m_Vec128 );
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const float Length( const Vector2f &vec )
+    const float length( const Vector2f &vec )
 {
     __m128 t = _mm_sqrt_ps(_vmathVfDot2( vec.m_Vec128, vec.m_Vec128 ));
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const Vector2f NormalizeApprox( const Vector2f &vec )
+    const Vector2f normalize_approx( const Vector2f &vec )
 {
     return Vector2f( _mm_mul_ps( vec.m_Vec128, _mm_rsqrt_ps( _vmathVfDot2( vec.m_Vec128, vec.m_Vec128 ) ) ) );
 }
 
  
-    const Vector2f Normalize( const Vector2f &vec )
+    const Vector2f normalize( const Vector2f &vec )
 {
     return Vector2f( _mm_mul_ps( vec.m_Vec128, newtonrapson_rsqrt4( _vmathVfDot2( vec.m_Vec128, vec.m_Vec128 ) ) ) );
 }
 
  
-    const Vector2f Lerp( const float t, const Vector2f &vec0, const Vector2f &vec1 )
+    const Vector2f lerp( const float t, const Vector2f &vec0, const Vector2f &vec1 )
 {
     return ( vec0 + ( ( vec1 - vec0 ) * t ) );
 }
 
  
-    const Vector2f Slerp( const float t, const Vector2f &unitVec0, const Vector2f &unitVec1 )
+    const Vector2f slerp( const float t, const Vector2f &unitVec0, const Vector2f &unitVec1 )
 {
 #define _MCSF_3D_SLERP_TOL 0.999f
     __m128 scales, scale0, scale1, cosAngle, angle, tttt, oneMinusT, angles, sines;
@@ -118,14 +118,14 @@ MED_IMAGING_BEGIN_NAMESPACE
 }
 
  
-    void StoreXY( const Vector2f &vec, float * fptr )
+    void store_xy( const Vector2f &vec, float * fptr )
 {
-    fptr[0] = vec.GetX();
-    fptr[1] = vec.GetY();
+    fptr[0] = vec.get_x();
+    fptr[1] = vec.get_y();
 }
 
  
-    void LoadXY( Vector2f &vec, const float * fptr )
+    void load_xy( Vector2f &vec, const float * fptr )
 {
     vec = Vector2f(fptr[0], fptr[1]);
 }

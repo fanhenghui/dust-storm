@@ -11,8 +11,8 @@ class QtWidgets_Export CrosshairPainter : public PainterBase
 public:
     CrosshairPainter();
     virtual ~CrosshairPainter();
-    void SetCrossHairModel(std::shared_ptr<CrosshairModel> pModel);
-    virtual void Render();
+    void set_crosshair_model(std::shared_ptr<CrosshairModel> pModel);
+    virtual void render();
 protected:
 private:
     std::shared_ptr<CrosshairModel> m_pModel;

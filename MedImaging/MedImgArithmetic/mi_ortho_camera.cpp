@@ -24,7 +24,7 @@ OrthoCamera::~OrthoCamera()
 
 }
 
-void OrthoCamera::SetOrtho(double left, double right, double bottom, double top, double near, double far0)
+void OrthoCamera::set_ortho(double left, double right, double bottom, double top, double near, double far0)
 {
     m_Left = left;
     m_Right = right;
@@ -35,7 +35,7 @@ void OrthoCamera::SetOrtho(double left, double right, double bottom, double top,
     m_bIsPCalculated = false;
 }
 
-void OrthoCamera::GetOrtho(double& left, double& right, double& bottom, double& top, double& near, double& far0) const
+void OrthoCamera::get_ortho(double& left, double& right, double& bottom, double& top, double& near, double& far0) const
 {
     left= m_Left ;
     right= m_Right ;
@@ -45,20 +45,20 @@ void OrthoCamera::GetOrtho(double& left, double& right, double& bottom, double& 
     far0= m_Far  ;
 }
 
-Matrix4 OrthoCamera::GetProjectionMatrix()
+Matrix4 OrthoCamera::get_projection_matrix()
 {
-    CalculateProjectionMatrix_i();
+    calculate_projection_matrix_i();
     return m_matProjection;
 }
 
-Matrix4 OrthoCamera::GetViewProjectionMatrix()
+Matrix4 OrthoCamera::get_view_projection_matrix()
 {
-    CalculateViewMatrix_i();
-    CalculateProjectionMatrix_i();
+    calculate_view_matrix_i();
+    calculate_projection_matrix_i();
     return m_matProjection*m_matView;
 }
 
-void OrthoCamera::CalculateProjectionMatrix_i()
+void OrthoCamera::calculate_projection_matrix_i()
 {
     if (!m_bIsPCalculated)
     {
@@ -75,7 +75,7 @@ void OrthoCamera::CalculateProjectionMatrix_i()
     }
 }
 
-void OrthoCamera::Zoom(double rate)
+void OrthoCamera::zoom(double rate)
 {
     //Check if rate is (-1 ~ 1)
     if (rate < 1.0 && rate > -1.0)
@@ -85,7 +85,7 @@ void OrthoCamera::Zoom(double rate)
     }
 }
 
-void OrthoCamera::Pan(const Vector2& pan)
+void OrthoCamera::pan(const Vector2& pan)
 {
     m_VecPan += pan;
     //只能移动一半窗口
@@ -108,12 +108,12 @@ void OrthoCamera::Pan(const Vector2& pan)
     m_bIsPCalculated = false;
 }
 
-double OrthoCamera::GetNearClipDistance() const
+double OrthoCamera::get_near_clip_distance() const
 {
     return m_Near;
 }
 
-double OrthoCamera::GetFarClipDistance() const
+double OrthoCamera::get_far_clip_distance() const
 {
     return m_Far;
 }

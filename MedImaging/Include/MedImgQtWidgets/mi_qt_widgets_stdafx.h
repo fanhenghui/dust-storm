@@ -29,7 +29,7 @@
 #pragma warning(disable: 4251 4819)
 
 #ifndef QTWIDGETS_THROW_EXCEPTION
-#define QTWIDGETS_THROW_EXCEPTION(desc) throw MedImaging::Exception("QtWidgets"  , __FILE__ , __LINE__ , __FUNCTION__ , desc);
+#define QTWIDGETS_THROW_EXCEPTION(desc) throw medical_imaging::Exception("QtWidgets"  , __FILE__ , __LINE__ , __FUNCTION__ , desc);
 #endif
 
 #ifndef QTWIDGETS_CHECK_NULL_EXCEPTION

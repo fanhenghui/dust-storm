@@ -12,7 +12,7 @@ RTStruct::~RTStruct()
 
 }
 
-void RTStruct::AddContour(const std::string& sROIName , ContourData* pContour)
+void RTStruct::add_contour(const std::string& sROIName , ContourData* pContour)
 {
     IO_CHECK_NULL_EXCEPTION(pContour);
 
@@ -28,12 +28,12 @@ void RTStruct::AddContour(const std::string& sROIName , ContourData* pContour)
     }
 }
 
-const std::map<std::string , std::vector<ContourData*>>& RTStruct::GetAllContour() const
+const std::map<std::string , std::vector<ContourData*>>& RTStruct::get_all_contour() const
 {
     return m_mapRTData;
 }
 
-void RTStruct::WriteToFile(const std::string& sFile)
+void RTStruct::write_to_file(const std::string& sFile)
 {
     std::ofstream out(sFile , std::ios::out);
     if (out.is_open())

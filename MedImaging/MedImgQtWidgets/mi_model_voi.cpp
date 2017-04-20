@@ -12,13 +12,13 @@ VOIModel::~VOIModel()
 
 }
 
-void VOIModel::AddVOISphere(const VOISphere& voi)
+void VOIModel::add_voi_sphere(const VOISphere& voi)
 {
     m_VOISphereList.push_back(voi);
-    SetChanged();
+    set_changed();
 }
 
-void VOIModel::RemoveVOISphere(int id)
+void VOIModel::remove_voi_sphere(int id)
 {
     int iDelete = 0;
     for (auto it = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
@@ -31,27 +31,27 @@ void VOIModel::RemoveVOISphere(int id)
     }
 }
 
-const std::list<VOISphere>& VOIModel::GetVOISpheres() const
+const std::list<VOISphere>& VOIModel::get_voi_spheres() const
 {
     return m_VOISphereList;
 }
 
-void VOIModel::GetVOISpheres(std::list<VOISphere>& l) const
+void VOIModel::get_voi_spheres(std::list<VOISphere>& l) const
 {
     l = m_VOISphereList;
 }
 
-void VOIModel::ModifyVOISphereRear(const VOISphere& voi)
+void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
 {
     if (!m_VOISphereList.empty())
     {
         (--m_VOISphereList.end())->m_dDiameter = voi.m_dDiameter;
         (--m_VOISphereList.end())->m_ptCenter = voi.m_ptCenter;
     }
-    SetChanged();
+    set_changed();
 }
 
-void VOIModel::ModifyVOISphereName(int id , std::string sName)
+void VOIModel::modify_voi_sphere_name(int id , std::string sName)
 {
     int i = 0;
     for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
@@ -66,7 +66,7 @@ void VOIModel::ModifyVOISphereName(int id , std::string sName)
     //Find no
 }
 
-void VOIModel::ModifyVOISphereDiameter(int id , double dDiameter)
+void VOIModel::modify_voi_sphere_diameter(int id , double dDiameter)
 {
     int i = 0;
     for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
@@ -74,14 +74,14 @@ void VOIModel::ModifyVOISphereDiameter(int id , double dDiameter)
         if (i++ == id)
         {
             it->m_dDiameter= dDiameter;
-            SetChanged();
+            set_changed();
             return;
         }
     }
     //Find no
 }
 
-VOISphere VOIModel::GetVOISphere(int id)
+VOISphere VOIModel::get_voi_sphere(int id)
 {
     int i = 0;
     for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)

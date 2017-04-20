@@ -13,16 +13,16 @@ class QtWidgets_Export MouseOpAnnotate : public IMouseOp
 public:
     MouseOpAnnotate();
     virtual ~MouseOpAnnotate();
-    virtual void Press(const QPoint& pt);
-    virtual void Move(const QPoint& pt);
-    virtual void Release(const QPoint& pt);
-    virtual void DoubleClick(const QPoint& pt);
-    void SetType();//TODO type 
-    void SetVOIModel(std::shared_ptr<VOIModel> pVOIModel);
+    virtual void press(const QPoint& pt);
+    virtual void move(const QPoint& pt);
+    virtual void release(const QPoint& pt);
+    virtual void double_click(const QPoint& pt);
+    void set_type();//TODO type 
+    void set_voi_model(std::shared_ptr<VOIModel> pVOIModel);
 protected:
 private:
     bool m_bPin;
-    MedImaging::Point3 m_ptCenter;
+    medical_imaging::Point3 m_ptCenter;
     double m_dDiameter;
     std::shared_ptr<VOIModel> m_pVOIModel;
 };

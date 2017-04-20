@@ -8,7 +8,7 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 #define CHECK_GL_ERROR \
-if(GLUtils::GetCheckGLFlag())\
+if(GLUtils::get_check_gl_flag())\
 {\
     GLenum err = glGetError();\
     switch(err)\
@@ -51,17 +51,17 @@ if(GLUtils::GetCheckGLFlag())\
 class GLResource_Export GLUtils
 {
 public:
-    static bool CheckFramebufferState();
+    static bool check_framebuffer_state();
 
-    static void GetGrayTextureFormat(DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType );
+    static void get_gray_texture_format(DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType );
 
-    static unsigned int GetByteByDataType(DataType eDataType);
+    static unsigned int get_byte_by_data_type(DataType eDataType);
 
-    static std::string GetGLenumDescription(GLenum e);
+    static std::string get_gl_enum_description(GLenum e);
 
-    static void SetCheckGLFlag(bool bFlag);
+    static void set_check_gl_flag(bool bFlag);
 
-    static bool GetCheckGLFlag();
+    static bool get_check_gl_flag();
 
 private:
     static bool m_bCheckGLFlag;
@@ -108,9 +108,9 @@ public:
 
     ~GLActiveTextureCounter();
 
-    int Tick();
+    int tick();
 
-    void Reset();
+    void reset();
 
 private:
     int m_iCurActiveTexID;
@@ -119,16 +119,16 @@ private:
 class GLResource_Export GLContextHelper
 {
 public:
-    static bool HasGLContext();
+    static bool has_gl_context();
 };
 
 class GLResource_Export GLTextureUtils
 {
 public:
-    static void Set1DWrapS(GLint iWrapType);
-    static void Set2DWrapST(GLint iWrapType);
-    static void Set3DWrapSTR(GLint iWrapType);
-    static void SetFilter(GLenum eTexTarget , GLint iFilterType);
+    static void set_1d_wrap_s(GLint iWrapType);
+    static void set_2d_wrap_s_t(GLint iWrapType);
+    static void set_1d_wrap_s_t_r(GLint iWrapType);
+    static void set_filter(GLenum eTexTarget , GLint iFilterType);
 };
 
 

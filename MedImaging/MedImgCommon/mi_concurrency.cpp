@@ -7,7 +7,7 @@ Concurrency* Concurrency::m_instance = nullptr;
 
 boost::mutex Concurrency::m_mutexStatic;
 
-Concurrency* Concurrency::Instance()
+Concurrency* Concurrency::instance()
 {
     if (!m_instance)
     {
@@ -31,17 +31,17 @@ Concurrency::Concurrency()
     m_uiAppConcurrency = m_uiHardwareConcurrency;
 }
 
-void Concurrency::SetAppConcurrency(unsigned int uiValue)
+void Concurrency::set_app_concurrency(unsigned int uiValue)
 {
     m_uiAppConcurrency = uiValue > m_uiHardwareConcurrency ? m_uiHardwareConcurrency : uiValue;
 }
 
-unsigned int Concurrency::GetAppConcurrency()
+unsigned int Concurrency::get_app_concurrency()
 {
     return m_uiAppConcurrency;
 }
 
-unsigned int Concurrency::GetHardwareConcurrency()
+unsigned int Concurrency::get_hardware_concurrency()
 {
     return m_uiHardwareConcurrency;
 }

@@ -29,13 +29,13 @@ public:
 
     ~OpacityTransFunc();
 
-    void SetWidth(int iWidth);
+    void set_width(int iWidth);
 
-    void AddPoint(float fRealValue, float a);
+    void add_point(float fRealValue, float a);
 
-    void GetPointList(std::vector<OpacityTFPoint>& vecResultList);
+    void get_point_list(std::vector<OpacityTFPoint>& vecResultList);
 
-    int GetWidth() const;
+    int get_width() const;
 
 protected:
 

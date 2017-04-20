@@ -24,7 +24,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 namespace
 {
     //Return true if out
-    bool CheckOutside(Vector3f pt, Vector3f bound)
+    bool check_outside(Vector3f pt, Vector3f bound)
     {
         if (pt._m[0] <0 || pt._m[1] < 0 || pt._m[2] < 0 ||
             pt._m[0] > bound._m[0] || pt._m[1] > bound._m[1] || pt._m[2] > bound._m[2])
@@ -50,8 +50,8 @@ namespace
         vBottomStep2 += vAdjust;
         vTopStep2 += vAdjust;
 
-        fEntryStep = vBottomStep.MinPerElem(vTopStep).MaxElem();
-        fExitStep = vBottomStep2.MaxPerElem(vTopStep2).MinElem();
+        fEntryStep = vBottomStep.min_per_elem(vTopStep).max_elem();
+        fExitStep = vBottomStep2.max_per_elem(vTopStep2).min_elem();
 
         //////////////////////////////////////////////////////////////////////////
         //fNear > fFar not intersected
@@ -72,39 +72,39 @@ MPREntryExitPoints::~MPREntryExitPoints()
 
 }
 
-void MPREntryExitPoints::SetSampleRate(float fSampleRate)
+void MPREntryExitPoints::set_sample_rate(float fSampleRate)
 {
     m_fSampleRate = fSampleRate;
 }
 
-void MPREntryExitPoints::SetThickness(float fThickness)
+void MPREntryExitPoints::set_thickness(float fThickness)
 {
     m_fThickness = fThickness;
 }
 
-void MPREntryExitPoints::CalculateEntryExitPoints()
+void MPREntryExitPoints::calculate_entry_exit_points()
 {
     m_fStandardSteps = float(int(m_fThickness / m_fSampleRate + 0.5f));
 
     //clock_t t0 = clock();
     if (CPU_BASE == m_eStrategy)
     {
-        CalEEPoints_CPU_i();
+        cal_entry_exit_points_cpu_i();
     }
     else if (CPU_BRICK_ACCELERATE == m_eStrategy)
     {
-        CalEEPoints_CPU_i();
-        CalEEPlane_CPU_i();
+        cal_entry_exit_points_cpu_i();
+        cal_entry_exit_plane_cpu_i();
     }
     else if (GPU_BASE == m_eStrategy)
     {
-        CalEEPoints_GPU_i();
+        cal_entry_exit_points_gpu_i();
     }
     //clock_t t1 = clock();
     //std::cout << "Calculate entry exit points cost : " << double(t1 - t0) << std::endl;
 }
 
-void MPREntryExitPoints::CalEEPoints_CPU_i()
+void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
 {
     try
     {
@@ -117,22 +117,22 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
             (float)m_pImgData->m_uiDim[2]);
 
         //Calculate base plane of MPR
-        const Matrix4 matV2W = m_pCameraCalculator->GetVolumeToWorldMatrix();
-        const Matrix4 matVP = m_pCamera->GetViewProjectionMatrix();
+        const Matrix4 matV2W = m_pCameraCalculator->get_volume_to_world_matrix();
+        const Matrix4 matVP = m_pCamera->get_view_projection_matrix();
         const Matrix4 matMVP = matVP*matV2W;
-        const Matrix4 matMVPInv = matMVP.GetInverse();
+        const Matrix4 matMVPInv = matMVP.get_inverse();
 
-        const Point3 pt00 = matMVPInv.Transform(Point3(-1.0,-1.0,0));
-        const Point3 pt01 = matMVPInv.Transform(Point3(-1.0,1.0,0));
-        const Point3 pt10 = matMVPInv.Transform(Point3(1.0,-1.0,0));
+        const Point3 pt00 = matMVPInv.transform(Point3(-1.0,-1.0,0));
+        const Point3 pt01 = matMVPInv.transform(Point3(-1.0,1.0,0));
+        const Point3 pt10 = matMVPInv.transform(Point3(1.0,-1.0,0));
         const Vector3 vXDelta = (pt10 - pt00) * (1.0/(m_iWidth-1));
         const Vector3 vYDelta = (pt01 - pt00) * (1.0/(m_iHeight-1));
 
-        Vector3 vViewDir = m_pCamera->GetLookAt() - m_pCamera->GetEye();
-        vViewDir = matV2W.GetTranspose().Transform(vViewDir);
-        vViewDir.Normalize();
+        Vector3 vViewDir = m_pCamera->get_look_at() - m_pCamera->get_eye();
+        vViewDir = matV2W.get_transpose().transform(vViewDir);
+        vViewDir.normalize();
 
-        const Vector3f vRayDir = ArithmeticUtils::ConvertVector(vViewDir);
+        const Vector3f vRayDir = ArithmeticUtils::convert_vector(vViewDir);
 
         const Vector3f pt00F((float)pt00.x , (float)pt00.y , (float)pt00.z);
         const Vector3f vXDeltaF((float)vXDelta.x,(float)vXDelta.y,(float)vXDelta.z);
@@ -184,7 +184,7 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
             const bool bIntersection = RayIntersectAABBAcc(ptEntryF, Vector3f(0,0,0), vDim, vRayBrick, vRayBrickAdjust , fEntryStep, fExitStep);
 
             //Entry point outside
-            if( CheckOutside(ptEntryF, vDim) )
+            if( check_outside(ptEntryF, vDim) )
             {
                 if(!bIntersection || fEntryStep < 0 || fEntryStep > fThickness ) // check entry points in range of thickness and volume
                 {
@@ -196,7 +196,7 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
             }
 
             //Exit point outside
-            if( CheckOutside(ptExitF, vDim) )
+            if( check_outside(ptExitF, vDim) )
             {
                 if(!bIntersection)
                 {
@@ -209,7 +209,7 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
 
             //////////////////////////////////////////////////////////////////////////
             //alpha value : ray step
-            float fStep = (float)(int)( (ptExitIntersection - ptEntryIntersection).Magnitude()/m_fSampleRate + 0.5f);
+            float fStep = (float)(int)( (ptExitIntersection - ptEntryIntersection).magnitude()/m_fSampleRate + 0.5f);
             if (fStep > m_fStandardSteps)//Adjust step to prevent  fStep = standard step + epsilon which it's ceil equals ( standard cell + 1)
             {
                 fStep = m_fStandardSteps;
@@ -220,18 +220,18 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
             //////////////////////////////////////////////////////////////////////////
         }
 
-        /*Initialize();
-        m_pEntryTex->Bind();
-        m_pEntryTex->Load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
+        /*initialize();
+        m_pEntryTex->bind();
+        m_pEntryTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
 
-        m_pExitTex->Bind();
-        m_pExitTex->Load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
+        m_pExitTex->bind();
+        m_pExitTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
 
-        m_pEntryTex->Bind();
-        m_pEntryTex->Download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
+        m_pEntryTex->bind();
+        m_pEntryTex->download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
 
-        m_pExitTex->Bind();
-        m_pExitTex->Download(GL_RGBA , GL_FLOAT , m_pExitBuffer.get());*/
+        m_pExitTex->bind();
+        m_pExitTex->download(GL_RGBA , GL_FLOAT , m_pExitBuffer.get());*/
     }
     catch (const Exception& e)
     {
@@ -241,7 +241,7 @@ void MPREntryExitPoints::CalEEPoints_CPU_i()
     }
 }
 
-void MPREntryExitPoints::CalEEPlane_CPU_i()
+void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
 {
     try
     {
@@ -254,26 +254,26 @@ void MPREntryExitPoints::CalEEPlane_CPU_i()
             (float)m_pImgData->m_uiDim[2]);
 
         //Calculate base plane of MPR
-        const Matrix4 matV2W = m_pCameraCalculator->GetVolumeToWorldMatrix();
-        const Matrix4 matVP = m_pCamera->GetViewProjectionMatrix();
+        const Matrix4 matV2W = m_pCameraCalculator->get_volume_to_world_matrix();
+        const Matrix4 matVP = m_pCamera->get_view_projection_matrix();
         const Matrix4 matMVP = matVP*matV2W;
-        const Matrix4 matMVPInv = matMVP.GetInverse();
+        const Matrix4 matMVPInv = matMVP.get_inverse();
 
-        Vector3 vViewDir = m_pCamera->GetLookAt() - m_pCamera->GetEye();
-        vViewDir = matV2W.GetTranspose().Transform(vViewDir);
-        vViewDir.Normalize();
+        Vector3 vViewDir = m_pCamera->get_look_at() - m_pCamera->get_eye();
+        vViewDir = matV2W.get_transpose().transform(vViewDir);
+        vViewDir.normalize();
         const Vector3 vRayDir = vViewDir;
-        m_vRayDirNorm = ArithmeticUtils::ConvertVector(vRayDir);
+        m_vRayDirNorm = ArithmeticUtils::convert_vector(vRayDir);
 
         const float fThickness = m_fThickness;
         const float fThicknessHalf = fThickness*0.5f;
 
-        const Point3 ptCenter = matMVPInv.Transform(Point3(0.0,0.0,0));
+        const Point3 ptCenter = matMVPInv.transform(Point3(0.0,0.0,0));
         const Point3 ptEntry = ptCenter - vRayDir*fThicknessHalf;
         const Point3 ptExit = ptCenter + vRayDir*fThicknessHalf;
 
-        double dDisEntry = vRayDir.DotProduct(ptEntry - Point3::kZeroPoint);
-        double dDisExit = (-vRayDir).DotProduct(ptExit - Point3::kZeroPoint);
+        double dDisEntry = vRayDir.dot_product(ptEntry - Point3::kZeroPoint);
+        double dDisExit = (-vRayDir).dot_product(ptExit - Point3::kZeroPoint);
 
         m_vEntryPlane = Vector4f((float)vRayDir.x ,(float)vRayDir.y , (float)vRayDir.z , (float)dDisEntry);
         m_vExitPlane = Vector4f(-(float)vRayDir.x ,-(float)vRayDir.y , -(float)vRayDir.z , (float)dDisExit);
@@ -287,14 +287,14 @@ void MPREntryExitPoints::CalEEPlane_CPU_i()
     }
 }
 
-void MPREntryExitPoints::GetEntryExitPlane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm)
+void MPREntryExitPoints::get_entry_exit_plane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm)
 {
     vEntry = m_vEntryPlane;
     vExit = m_vExitPlane;
     vRayDirNorm = m_vRayDirNorm;
 }
 
-void MPREntryExitPoints::CalEEPoints_GPU_i()
+void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 {
     try
     {
@@ -308,21 +308,21 @@ void MPREntryExitPoints::CalEEPoints_GPU_i()
 
         CHECK_GL_ERROR;
 
-        Initialize();
+        initialize();
 
-        const unsigned int uiProgram = m_pProgram->GetID();
+        const unsigned int uiProgram = m_pProgram->get_id();
         if (0 ==uiProgram)
         {
             RENDERALGO_THROW_EXCEPTION("Program ID is 0!");
         }
 
-        m_pProgram->Bind();
+        m_pProgram->bind();
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
 
-        m_pEntryTex->BindImage(IMAGE_ENTRY_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
-        m_pExitTex->BindImage(IMAGE_EXIT_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
+        m_pEntryTex->bind_image(IMAGE_ENTRY_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
+        m_pExitTex->bind_image(IMAGE_EXIT_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
 
         CHECK_GL_ERROR;
 
@@ -335,15 +335,15 @@ void MPREntryExitPoints::CalEEPoints_GPU_i()
 
         CHECK_GL_ERROR;
 
-        const Matrix4 matV2W = m_pCameraCalculator->GetVolumeToWorldMatrix();
-        const Matrix4 matVP = m_pCamera->GetViewProjectionMatrix();
+        const Matrix4 matV2W = m_pCameraCalculator->get_volume_to_world_matrix();
+        const Matrix4 matVP = m_pCamera->get_view_projection_matrix();
         const Matrix4 matMVP = matVP*matV2W;
-        const Matrix4 matMVPInv = matMVP.GetInverse();
+        const Matrix4 matMVPInv = matMVP.get_inverse();
 
         CHECK_GL_ERROR;
 
         float fMat[16] = {0.0f};
-        matMVPInv.ToFloat16(fMat);
+        matMVPInv.to_float16(fMat);
         glProgramUniformMatrix4fv(uiProgram , MVP_INVERSE , 1 , GL_FALSE , fMat);
 
         CHECK_GL_ERROR;
@@ -352,9 +352,9 @@ void MPREntryExitPoints::CalEEPoints_GPU_i()
 
         CHECK_GL_ERROR;
 
-        Vector3 vViewDir = m_pCamera->GetLookAt() - m_pCamera->GetEye();
-        vViewDir = matV2W.GetTranspose().Transform(vViewDir);
-        vViewDir.Normalize();
+        Vector3 vViewDir = m_pCamera->get_look_at() - m_pCamera->get_eye();
+        vViewDir = matV2W.get_transpose().transform(vViewDir);
+        vViewDir.normalize();
         glProgramUniform3f(uiProgram , RAY_DIRECTION , (float)vViewDir.x ,(float)vViewDir.y , (float)vViewDir.z);
 
         CHECK_GL_ERROR;
@@ -373,20 +373,20 @@ void MPREntryExitPoints::CalEEPoints_GPU_i()
 
         glPopAttrib();
 
-        m_pProgram->UnBind();
+        m_pProgram->unbind();
 
         CHECK_GL_ERROR;
 
         //////////////////////////////////////////////////////////////////////////
         //For testing
         /*std::cout << "Size : " << m_iWidth << " " << m_iHeight << std::endl;
-        m_pEntryTex->Bind();
-        m_pEntryTex->Download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());*/
+        m_pEntryTex->bind();
+        m_pEntryTex->download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());*/
 
-        //m_pExitTex->Bind();
-        //m_pExitTex->Download(GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
+        //m_pExitTex->bind();
+        //m_pExitTex->download(GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
 
-        //this->DebugOutputEntryPoints("D:/temp/gpu_MPR_ee.raw");
+        //this->debug_output_entry_points("D:/temp/gpu_MPR_ee.raw");
 
         CHECK_GL_ERROR;
 
@@ -407,33 +407,33 @@ void MPREntryExitPoints::CalEEPoints_GPU_i()
     }
 }
 
-void MPREntryExitPoints::Initialize()
+void MPREntryExitPoints::initialize()
 {
-    EntryExitPoints::Initialize();
+    EntryExitPoints::initialize();
 
     if (GPU_BASE == m_eStrategy)
     {
         if (!m_pProgram)
         {
             UIDType uid = 0;
-            m_pProgram = GLResourceManagerContainer::Instance()->GetProgramManager()->CreateObject(uid);
-            m_pProgram->SetDescription("MPR entry exit program");
-            m_pProgram->SetShaders(std::vector<GLShaderInfo>(1 , GLShaderInfo(GL_COMPUTE_SHADER , ksMPREntryExitPointsComp , "MPR entry exit compute shader")));
-            m_pProgram->Initialize();
-            m_pProgram->Compile();
+            m_pProgram = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
+            m_pProgram->set_description("MPR entry exit program");
+            m_pProgram->set_shaders(std::vector<GLShaderInfo>(1 , GLShaderInfo(GL_COMPUTE_SHADER , ksMPREntryExitPointsComp , "MPR entry exit compute shader")));
+            m_pProgram->initialize();
+            m_pProgram->compile();
         }
     }
 }
 
-void MPREntryExitPoints::Finialize()
+void MPREntryExitPoints::finialize()
 {
-    EntryExitPoints::Finialize();
+    EntryExitPoints::finialize();
 
     if (m_pProgram)
     {
-        GLResourceManagerContainer::Instance()->GetProgramManager()->RemoveObject(m_pProgram->GetUID());
+        GLResourceManagerContainer::instance()->get_program_manager()->remove_object(m_pProgram->get_uid());
         m_pProgram.reset();
-        GLResourceManagerContainer::Instance()->GetProgramManager()->Update();
+        GLResourceManagerContainer::instance()->get_program_manager()->update();
     }
 }
 

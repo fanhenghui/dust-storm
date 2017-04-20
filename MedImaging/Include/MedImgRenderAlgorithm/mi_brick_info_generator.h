@@ -13,7 +13,7 @@ public:
     CPUVolumeBrickInfoGenerator();
     ~CPUVolumeBrickInfoGenerator();
 
-    void CalculateBrickInfo(
+    void calculate_brick_info(
         std::shared_ptr<ImageData> pImgData , 
         unsigned int uiBrickSize , 
         unsigned int uiBrickExpand , 
@@ -22,7 +22,7 @@ public:
         VolumeBrickInfo* pBrickInfo);
 protected:
     template<typename T>
-    void CalculateBrickInfo_i(
+    void calculate_brick_info_i(
         BrickCorner& bc , 
         BrickUnit& bu ,
         VolumeBrickInfo& vbi,
@@ -31,7 +31,7 @@ protected:
         unsigned int uiBrickExpand);
 
     template<typename T>
-    void CalculateBrickInfoKernel_i(
+    void calculate_brick_info_kernel_i(
         unsigned int uiBegin , 
         unsigned int uiEnd , 
         BrickCorner* pBrickCorner , 

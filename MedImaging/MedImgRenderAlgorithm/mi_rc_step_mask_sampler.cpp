@@ -3,13 +3,13 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLShaderInfo RCStepMaskNoneSampler::GetShaderInfo()
+GLShaderInfo RCStepMaskNoneSampler::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCMaskNoneSamplerFrag , "RCStepMaskNoneSampler");
 }
 
 
-GLShaderInfo RCStepMaskNearstSampler::GetShaderInfo()
+GLShaderInfo RCStepMaskNearstSampler::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCMaskNearstSamplerFrag , "RCStepMaskNearstSampler");
 }

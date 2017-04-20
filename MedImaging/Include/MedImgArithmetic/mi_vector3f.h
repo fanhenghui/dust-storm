@@ -21,22 +21,22 @@ public:
     };
 
 public:
-     Vector3f()
+    Vector3f()
     {
         m_Vec128 = _mm_setzero_ps();
     }
 
-     Vector3f(const Vector3f& vec)
+    Vector3f(const Vector3f& vec)
     {
         m_Vec128 = vec.m_Vec128;
     }
 
-     Vector3f( const float _x, const float _y, const float _z )
+    Vector3f( const float _x, const float _y, const float _z )
     {
         m_Vec128 = _mm_setr_ps(_x, _y, _z, 0.0f);
     }
 
-     Vector3f( const float scalar )
+    Vector3f( const float scalar )
     {
         m_Vec128 = _mm_set1_ps(scalar);
     }
@@ -52,49 +52,49 @@ public:
         return *this;
     }
 
-    inline Vector3f & SetX( const float x )
+    inline Vector3f & set_x( const float x )
     {
         _vmathVfSetElement(m_Vec128, x, 0);
         return *this;
     }
 
-    inline Vector3f & SetY( const float x )
+    inline Vector3f & set_y( const float x )
     {
         _vmathVfSetElement(m_Vec128, x, 1);
         return *this;
     }
 
-    inline Vector3f & SetZ( const float x )
+    inline Vector3f & set_z( const float x )
     {
         _vmathVfSetElement(m_Vec128, x, 2);
         return *this;
     }
 
-    inline const float GetX() const 
+    inline const float get_x() const 
     {
         return _vmathVfGetElement(m_Vec128, 0);
         //return m_Value.x;
     }
 
-    inline const float GetY() const 
+    inline const float get_y() const 
     {
         return _vmathVfGetElement(m_Vec128, 1);
         // return m_Value.y;
     }
 
-    inline const float GetZ() const 
+    inline const float get_z() const 
     {
         return _vmathVfGetElement(m_Vec128, 2);
         // return m_Value.z;
     }
 
-    inline Vector3f & SetElem( const int idx, const float value )
+    inline Vector3f & set_elem( const int idx, const float value )
     {
         _vmathVfSetElement(m_Vec128, value, idx);
         return *this;
     }
 
-    inline const float GetElem( const int idx ) const
+    inline const float get_elem( const int idx ) const
     {
         return _vmathVfGetElement(m_Vec128, idx);
     }
@@ -104,12 +104,12 @@ public:
         return _vmathVfGetElement(m_Vec128, idx);
     }
 
-    inline const __m128 Get128() const
+    inline const __m128 get_128() const
     {
         return m_Vec128;
     }
 
-    inline Vector3f & Set128( __m128 vec)
+    inline Vector3f & set_128( __m128 vec)
     {
         m_Vec128 = vec;
         return *this;
@@ -195,97 +195,97 @@ public:
         return _vmathVfGetElement(t , 0) <= FLOAT_EPSILON;
     }
 
-    inline float AngleBetween( const Vector3f& vec) const
+    inline float angle_between( const Vector3f& vec) const
     {
-        float dlen = this->Magnitude() * vec.Magnitude();
+        float dlen = this->magnitude() * vec.magnitude();
         dlen = (dlen > FLOAT_EPSILON) ? dlen : FLOAT_EPSILON;
-        float dprod = this->DotProduct(vec) / dlen;
+        float dprod = this->dot_product(vec) / dlen;
         return acos(dprod);
     }
 
-    inline Vector3f CrossProduct( const Vector3f& vec) const
+    inline Vector3f cross_product( const Vector3f& vec) const
     {
         return Vector3f( _vmathVfCross( m_Vec128, vec.m_Vec128 ) );
     }
 
-    inline float DotProduct( const Vector3f& vec) const
+    inline float dot_product( const Vector3f& vec) const
     {
         __m128 t = _vmathVfDot3( m_Vec128, vec.m_Vec128 );
         return _vmathVfGetElement(t, 0);
     }
 
-    inline float Magnitude() const
+    inline float magnitude() const
     {
         __m128 t = _mm_sqrt_ps(_vmathVfDot3( m_Vec128, m_Vec128 ));
         return _vmathVfGetElement(t, 0);
     }
 
-    inline void Normalize()
+    inline void normalize()
     {
         m_Vec128 = _mm_mul_ps( m_Vec128, newtonrapson_rsqrt4( _vmathVfDot3( m_Vec128, m_Vec128 ) ) );
     }
 
-    inline Vector3f GetNormalize() const
+    inline Vector3f get_normalize() const
     {
         return Vector3f(_mm_mul_ps( m_Vec128, newtonrapson_rsqrt4( _vmathVfDot3( m_Vec128, m_Vec128 ) ) ));
     }
 
-    inline Vector3f Reflect(const Vector3f& normal) const
+    inline Vector3f reflect(const Vector3f& normal) const
     {
-        return Vector3f(*this - (normal * 2.0f * this->DotProduct(normal)));
+        return Vector3f(*this - (normal * 2.0f * this->dot_product(normal)));
     }
 
-    inline const float MaxElem() const
+    inline const float max_elem() const
     {
         __m128 t = _mm_max_ps( _mm_max_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ), vec_splat( m_Vec128, 2 ) );
         return _vmathVfGetElement(t , 0);
     }
 
-    inline const float MinElem() const
+    inline const float min_elem() const
     {
         __m128 t = _mm_min_ps( _mm_min_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ), vec_splat( m_Vec128, 2 ) );
         return _vmathVfGetElement(t , 0);
     }
 
-     inline Vector3f MaxPerElem(const Vector3f& v) const
-     {
-         return Vector3f(_mm_max_ps(m_Vec128 , v.m_Vec128));
-     }
+    inline Vector3f max_per_elem(const Vector3f& v) const
+    {
+        return Vector3f(_mm_max_ps(m_Vec128 , v.m_Vec128));
+    }
 
-     inline Vector3f MinPerElem(const Vector3f& v) const
-     {
-         return Vector3f(_mm_min_ps(m_Vec128 , v.m_Vec128));
-     }
+    inline Vector3f min_per_elem(const Vector3f& v) const
+    {
+        return Vector3f(_mm_min_ps(m_Vec128 , v.m_Vec128));
+    }
 
-    inline const float Sum() const
+    inline const float sum() const
     {
         __m128 t =  _mm_add_ps( _mm_add_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ), vec_splat( m_Vec128, 2 ) );
         return _vmathVfGetElement(t , 0);
     }
 
-    inline const float Length() const
+    inline const float length() const
     {
         __m128 t = _mm_sqrt_ps(_vmathVfDot3( m_Vec128, m_Vec128 ));
         return _vmathVfGetElement(t, 0);
     }
 
-    inline const float LengthSqr() const
+    inline const float length_sqr() const
     {
         __m128 t = _vmathVfDot3( m_Vec128, m_Vec128 );
         return _vmathVfGetElement(t, 0);
     }
 
-    inline Vector3f LessThan(const Vector3f& v) const
+    inline Vector3f less_than(const Vector3f& v) const
     {
         return Vector3f(_mm_cmplt_ps(m_Vec128 , v.m_Vec128));
     }
 
-    inline Vector3f ToAbs() const
+    inline Vector3f to_abs() const
     {
         return Vector3f(_mm_and_ps( m_Vec128, toM128( 0x7fffffff )));
     }
 
-    inline void Abs()
+    inline void abs()
     {
         m_Vec128 = _mm_and_ps( m_Vec128, toM128( 0x7fffffff ));
     }
@@ -297,72 +297,72 @@ public:
 
 // Multiply two 3-D vectors per element
 Arithmetic_Export  
-    const Vector3f MulPerElem( const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f mul_per_elem( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Divide two 3-D vectors per element
 // Floating-point behavior matches standard library function divf4.
 Arithmetic_Export  
-    const Vector3f DivPerElem( const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f div_per_elem( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Compute the reciprocal of a 3-D vector per element
 // Floating-point behavior matches standard library function recipf4.
 Arithmetic_Export  
-    const Vector3f RecipPerElem( const Vector3f &vec );
+    const Vector3f recip_per_elem( const Vector3f &vec );
 
 // Compute the absolute value of a 3-D vector per element
 Arithmetic_Export  
-    const Vector3f AbsPerElem( const Vector3f &vec );
+    const Vector3f abs_per_elem( const Vector3f &vec );
 
 // Maximum of two 3-D vectors per element
 Arithmetic_Export  
-    const Vector3f MaxPerElem( const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f max_per_elem( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Minimum of two 3-D vectors per element
 Arithmetic_Export  
-    const Vector3f MinPerElem( const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f min_per_elem( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Maximum element of a 3-D vector
 Arithmetic_Export  
-    const float MaxElem( const Vector3f &vec );
+    const float max_elem( const Vector3f &vec );
 
 // Minimum element of a 3-D vector
 Arithmetic_Export  
-    const float MinElem( const Vector3f &vec );
+    const float min_elem( const Vector3f &vec );
 
 // Compute the sum of all elements of a 3-D vector
 Arithmetic_Export  
-    const float Sum( const Vector3f &vec );
+    const float sum( const Vector3f &vec );
 
 // Compute the dot product of two 3-D vectors
 Arithmetic_Export  
-    const float DotProduct( const Vector3f &vec0, const Vector3f &vec1 );
+    const float dot_product( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Compute the square of the length of a 3-D vector
 Arithmetic_Export  
-    const float LengthSqr( const Vector3f &vec );
+    const float length_sqr( const Vector3f &vec );
 
 // Compute the length of a 3-D vector
 Arithmetic_Export  
-    const float Length( const Vector3f &vec );
+    const float length( const Vector3f &vec );
 
-// Normalize a 3-D vector, result is not accurate enough
+// normalize a 3-D vector, result is not accurate enough
 // The result is unpredictable when all elements of vec are at or near zero.
 Arithmetic_Export  
-    const Vector3f NormalizeApprox( const Vector3f &vec );
+    const Vector3f normalize_approx( const Vector3f &vec );
 
-// Normalize a 3-D vector, using Newton iteration to refine rsqrt operation
+// normalize a 3-D vector, using Newton iteration to refine rsqrt operation
 // The result is unpredictable when all elements of vec are at or near zero.
 Arithmetic_Export  
-    const Vector3f Normalize( const Vector3f &vec );
+    const Vector3f normalize( const Vector3f &vec );
 
 // Compute cross product of two 3-D vectors
 Arithmetic_Export  
-    const Vector3f CrossProduct( const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f cross( const Vector3f &vec0, const Vector3f &vec1 );
 
 // Linear interpolation between two 3-D vectors
 // vec0 * (1 - t) + vec1 * t
 Arithmetic_Export  
-    const Vector3f Lerp( const float t, const Vector3f &vec0, const Vector3f &vec1 );
+    const Vector3f lerp( const float t, const Vector3f &vec0, const Vector3f &vec1 );
 
 // Spherical linear interpolation between two 3-D vectors
 // The result is unpredictable if the vectors point in opposite directions.
@@ -372,26 +372,26 @@ Arithmetic_Export
 // scale1 = ( sinf( ( t * angle ) ) * recipSinAngle );
 // return ( ( unitVec0 * scale0 ) + ( unitVec1 * scale1 ) );
 Arithmetic_Export  
-    const Vector3f Slerp( const float t, const Vector3f &unitVec0, const Vector3f &unitVec1 );
+    const Vector3f slerp( const float t, const Vector3f &unitVec0, const Vector3f &unitVec1 );
 
 // Store x, y, and z elements of 3-D vector in first three words of a float ptr, preserving fourth word
 Arithmetic_Export  
-    void StoreXYZ( const Vector3f &vec, float * fptr );
+    void store_xyz( const Vector3f &vec, float * fptr );
 
-// Load x, y, and z elements of 3-D vector in first three words of a float ptr, preserving fourth word
+// load x, y, and z elements of 3-D vector in first three words of a float ptr, preserving fourth word
 Arithmetic_Export  
-    void LoadXYZ( Vector3f &vec, const float * fptr );
+    void load_xyz( Vector3f &vec, const float * fptr );
 
 Arithmetic_Export const Vector3f operator /( const float scalar , const Vector3f& vec );
 
 
 #ifdef _DEBUG
-// Print a 3-D vector
+// print a 3-D vector
 // Function is only defined when _DEBUG is defined.
 Arithmetic_Export  
     void print( const Vector3f &vec );
 
-// Print a 3-D vector and an associated string identifier
+// print a 3-D vector and an associated string identifier
 // Function is only defined when _DEBUG is defined.
 Arithmetic_Export  
     void print( const Vector3f &vec, const char * name );

@@ -13,13 +13,13 @@ public:
     ~GLEnvironment();
 
     //OpenGL 版本信息
-    void GetGLVersion(int &iMajor , int &iMinor);
+    void get_gl_version(int &iMajor , int &iMinor);
 
     //OpenGL 的实现厂商
-    std::string GetGLVendor();
+    std::string get_gl_vendor();
 
     //OpenGL 渲染器（硬件平台）
-    std::string GetGLRenderer();
+    std::string get_gl_renderer();
 
 protected:
 

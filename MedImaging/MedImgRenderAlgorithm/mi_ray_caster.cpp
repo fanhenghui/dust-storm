@@ -42,14 +42,14 @@ m_uiBrickExpand(2)
 
 }
 
-void RayCaster::Initialize()
+void RayCaster::initialize()
 {
     
 }
 
-void RayCaster::Finialize()
+void RayCaster::finialize()
 {
-    m_pInnerBuffer->ReleaseBuffer();
+    m_pInnerBuffer->release_buffer();
 }
 
 RayCaster::~RayCaster()
@@ -57,7 +57,7 @@ RayCaster::~RayCaster()
 
 }
 
-void RayCaster::Render(int iTestCode)
+void RayCaster::render(int iTestCode)
 {
     //clock_t t0 = clock();
 
@@ -67,7 +67,7 @@ void RayCaster::Render(int iTestCode)
         {
             m_pRayCastingCPU.reset(new RayCastingCPU(shared_from_this()));
         }
-        m_pRayCastingCPU->Render(iTestCode);
+        m_pRayCastingCPU->render(iTestCode);
     }
     else if (CPU_BRICK_ACCELERATE == m_eStrategy)
     {
@@ -75,7 +75,7 @@ void RayCaster::Render(int iTestCode)
         {
             m_pRayCastingCPUBrickAcc.reset(new RayCastingCPUBrickAcc(shared_from_this()));
         }
-        m_pRayCastingCPUBrickAcc->Render(iTestCode);
+        m_pRayCastingCPUBrickAcc->render(iTestCode);
     }
     else if (GPU_BASE == m_eStrategy)
     {
@@ -88,7 +88,7 @@ void RayCaster::Render(int iTestCode)
             CHECK_GL_ERROR;
 
             FBOStack fboStack;
-            m_pCanvas->GetFBO()->Bind();
+            m_pCanvas->get_fbo()->bind();
 
             CHECK_GL_ERROR;
 
@@ -103,12 +103,12 @@ void RayCaster::Render(int iTestCode)
 
             //Viewport
             int iWidth , iHeight;
-            m_pCanvas->GetDisplaySize(iWidth , iHeight);
+            m_pCanvas->get_display_size(iWidth , iHeight);
             glViewport(0,0,iWidth , iHeight);
 
             CHECK_GL_ERROR;
 
-            m_pRayCastingGPU->Render(iTestCode);
+            m_pRayCastingGPU->render(iTestCode);
         }
     }
 
@@ -118,238 +118,238 @@ void RayCaster::Render(int iTestCode)
     //std::cout << "<<<>>><<<>>><<<>>><<<>>><<<>>>\n";
 }
 
-void RayCaster::SetVolumeData(std::shared_ptr<ImageData> pImgData)
+void RayCaster::set_volume_data(std::shared_ptr<ImageData> pImgData)
 {
     m_pVolumeData = pImgData;
 }
 
-void RayCaster::SetMaskData(std::shared_ptr<ImageData> pImgData)
+void RayCaster::set_mask_data(std::shared_ptr<ImageData> pImgData)
 {
     m_pMaskData = pImgData;
 }
 
-void RayCaster::SetVolumeDataTexture(std::vector<GLTexture3DPtr> vecTex)
+void RayCaster::set_volume_data_texture(std::vector<GLTexture3DPtr> vecTex)
 {
     m_vecVolumeDataTex = vecTex;
 }
 
-void RayCaster::SetMaskDataTexture(std::vector<GLTexture3DPtr> vecTex)
+void RayCaster::set_mask_data_texture(std::vector<GLTexture3DPtr> vecTex)
 {
     m_vecMaskDataTex =vecTex;
 }
 
-void RayCaster::SetEntryExitPoints(std::shared_ptr<EntryExitPoints> pEEPs)
+void RayCaster::set_entry_exit_points(std::shared_ptr<EntryExitPoints> pEEPs)
 {
     m_pEntryExitPoints = pEEPs;
 }
 
-void RayCaster::SetCamera(std::shared_ptr<CameraBase> pCamera)
+void RayCaster::set_camera(std::shared_ptr<CameraBase> pCamera)
 {
     m_pCamera = pCamera;
 }
 
-void RayCaster::SetVolumeToWorldMatrix(const Matrix4& mat)
+void RayCaster::set_volume_to_world_matrix(const Matrix4& mat)
 {
     m_matVolume2World = mat;
 }
 
-void RayCaster::SetSampleRate(float fSampleRate)
+void RayCaster::set_sample_rate(float fSampleRate)
 {
     m_fSampleRate = fSampleRate;
 }
 
-void RayCaster::SetMaskLabelLevel(LabelLevel eLabelLevel)
+void RayCaster::set_mask_label_level(LabelLevel eLabelLevel)
 {
-    m_pInnerBuffer->SetMaskLabelLevel(eLabelLevel);
+    m_pInnerBuffer->set_mask_label_level(eLabelLevel);
 }
 
-void RayCaster::SetVisibleLabels(std::vector<unsigned char> vecLabels)
+void RayCaster::set_visible_labels(std::vector<unsigned char> vecLabels)
 {
-    m_pInnerBuffer->SetVisibleLabels(vecLabels);
+    m_pInnerBuffer->set_visible_labels(vecLabels);
 }
 
-void RayCaster::SetWindowlevel(float fWW , float fWL , unsigned char ucLabel)
+void RayCaster::set_window_level(float fWW , float fWL , unsigned char ucLabel)
 {
-    m_pInnerBuffer->SetWindowLevel(fWW , fWL , ucLabel);
+    m_pInnerBuffer->set_window_level(fWW , fWL , ucLabel);
 }
 
-void RayCaster::SetGlobalWindowLevel(float fWW , float fWL)
+void RayCaster::set_global_window_level(float fWW , float fWL)
 {
     m_fGlobalWW = fWW;
     m_fGlobalWL = fWL;
 }
 
-void RayCaster::SetPseudoColorTexture(GLTexture1DPtr pTex , unsigned int uiLength)
+void RayCaster::set_pseudo_color_texture(GLTexture1DPtr pTex , unsigned int uiLength)
 {
     m_pPseudoColorTexture = pTex;
     m_uiPseudoColorLength= uiLength;
 }
 
-GLTexture1DPtr RayCaster::GetPseudoColorTexture(unsigned int& uiLength) const
+GLTexture1DPtr RayCaster::get_pseudo_color_texture(unsigned int& uiLength) const
 {
     uiLength = m_uiPseudoColorLength;
     return m_pPseudoColorTexture;
 }
 
-void RayCaster::SetPseudoColorArray(unsigned char* pArray , unsigned int uiLength)
+void RayCaster::set_pseudo_color_array(unsigned char* pArray , unsigned int uiLength)
 {
     m_pPseudoColorArray = pArray;
     m_uiPseudoColorLength = uiLength;
 }
 
-void RayCaster::SetTransferFunctionTexture(GLTexture1DArrayPtr pTexArray)
+void RayCaster::set_transfer_function_texture(GLTexture1DArrayPtr pTexArray)
 {
     m_pTransferFunction = pTexArray;
 }
 
-void RayCaster::SetSilhouetteEnhancement()
+void RayCaster::set_sillhouette_enhancement()
 {
 
 }
 
-void RayCaster::SetBoundaryEnhancement()
+void RayCaster::set_boundary_enhancement()
 {
 
 }
 
-void RayCaster::SetMaterial()
+void RayCaster::set_material()
 {
 
 }
 
-void RayCaster::SetLightColor()
+void RayCaster::set_light_color()
 {
 
 }
 
-void RayCaster::SetLightFactor()
+void RayCaster::set_light_factor()
 {
 
 }
 
-void RayCaster::SetSSDGray(float fGray)
+void RayCaster::set_ssd_gray(float fGray)
 {
     m_fSSDGray = fGray;
 }
 
-void RayCaster::SetJitteringEnabled(bool bFlag)
+void RayCaster::set_jittering_enabled(bool bFlag)
 {
     m_bJitteringEnabled = bFlag;
 }
 
-void RayCaster::SetBounding(const Vector3f& vMin, const Vector3f& vMax)
+void RayCaster::set_bounding(const Vector3f& vMin, const Vector3f& vMax)
 {
     m_vBoundingMin = vMin;
     m_vBoundingMax = vMax;
 }
 
-void RayCaster::SetClippingPlaneFunction(const std::vector<Vector4f> &vecFunc)
+void RayCaster::set_clipping_plane_function(const std::vector<Vector4f> &vecFunc)
 {
     m_vClippingPlaneFunc = vecFunc;
 }
 
-void RayCaster::SetMaskMode(MaskMode eMode)
+void RayCaster::set_mask_mode(MaskMode eMode)
 {
     m_eMaskMode = eMode;
 }
 
-void RayCaster::SetCompositeMode(CompositeMode eMode)
+void RayCaster::set_composite_mode(CompositeMode eMode)
 {
     m_eCompositeMode = eMode;
 }
 
-void RayCaster::SetInterpolationMode(InterpolationMode eMode)
+void RayCaster::set_interpolation_mode(InterpolationMode eMode)
 {
     m_eInterpolationMode = eMode;
 }
 
-void RayCaster::SetShadingMode(ShadingMode eMode)
+void RayCaster::set_shading_mode(ShadingMode eMode)
 {
     m_eShadingMode = eMode;
 }
 
-void RayCaster::SetColorInverseMode(ColorInverseMode eMode)
+void RayCaster::set_color_inverse_mode(ColorInverseMode eMode)
 {
     m_eColorInverseMode = eMode;
 }
 
-void RayCaster::SetCanvas(std::shared_ptr<RayCasterCanvas> pCanvas)
+void RayCaster::set_canvas(std::shared_ptr<RayCasterCanvas> pCanvas)
 {
     m_pCanvas = pCanvas;
 }
 
-void RayCaster::SetStrategy(RayCastingStrategy eS)
+void RayCaster::set_strategy(RayCastingStrategy eS)
 {
     m_eStrategy = eS;
 }
 
-void RayCaster::SetBrickSize(unsigned int uiBrickSize)
+void RayCaster::set_brick_size(unsigned int uiBrickSize)
 {
     m_uiBrickSize = uiBrickSize;
 }
 
-void RayCaster::SetBrickExpand(unsigned int uiBrickExpand)
+void RayCaster::set_brick_expand(unsigned int uiBrickExpand)
 {
     m_uiBrickExpand = uiBrickExpand;
 }
 
-void RayCaster::SetBrickCorner(BrickCorner* pBC)
+void RayCaster::set_brick_corner(BrickCorner* pBC)
 {
     m_pBrickCorner = pBC;
 }
 
-void RayCaster::SetVolumeBrickUnit(BrickUnit* pBU)
+void RayCaster::set_volume_brick_unit(BrickUnit* pBU)
 {
     m_pVolumeBrickUnit = pBU;
 }
 
-void RayCaster::SetMaskBrickUnit(BrickUnit* pBU)
+void RayCaster::set_mask_brick_unit(BrickUnit* pBU)
 {
     m_pMaskBrickUnit = pBU;
 }
 
-void RayCaster::SetMaskBrickInfo(MaskBrickInfo* pMBI)
+void RayCaster::set_mask_brick_info(MaskBrickInfo* pMBI)
 {
     m_pMaskBrickInfo = pMBI;
 }
 
-void RayCaster::SetVolumeBrickInfo(VolumeBrickInfo* pVBI)
+void RayCaster::set_volume_brick_info(VolumeBrickInfo* pVBI)
 {
     m_pVolumeBrickInfo = pVBI;
 }
 
-const std::vector<BrickDistance>& RayCaster::GetBrickDistance() const
+const std::vector<BrickDistance>& RayCaster::get_brick_distance() const
 {
-    return m_pRayCastingCPUBrickAcc->GetBrickDistance();
+    return m_pRayCastingCPUBrickAcc->get_brick_distance();
 }
 
-unsigned int RayCaster::GetRayCastingBrickCount() const
+unsigned int RayCaster::get_ray_casting_brick_count() const
 {
-    return m_pRayCastingCPUBrickAcc->GetRayCastingBrickCount();
+    return m_pRayCastingCPUBrickAcc->get_ray_casting_brick_count();
 }
 
-std::shared_ptr<ImageData> RayCaster::GetVolumeData()
+std::shared_ptr<ImageData> RayCaster::get_volume_data()
 {
     return m_pVolumeData;
 }
 
-std::vector<GLTexture3DPtr> RayCaster::GetVolumeDataTexture()
+std::vector<GLTexture3DPtr> RayCaster::get_volume_data_texture()
 {
     return m_vecVolumeDataTex;
 }
 
-float RayCaster::GetSampleRate() const
+float RayCaster::get_sample_rate() const
 {
     return m_fSampleRate;
 }
 
-void RayCaster::GetGlobalWindowLevel(float& fWW , float& fWL) const
+void RayCaster::get_global_window_level(float& fWW , float& fWL) const
 {
     fWW = m_fGlobalWW;
     fWL = m_fGlobalWL;
 }
 
-std::shared_ptr<EntryExitPoints> RayCaster::GetEntryExitPoints() const
+std::shared_ptr<EntryExitPoints> RayCaster::get_entry_exit_points() const
 {
     return m_pEntryExitPoints;
 }

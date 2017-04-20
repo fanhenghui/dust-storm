@@ -30,7 +30,7 @@ RayCastingCPU::~RayCastingCPU()
 
 }
 
-void RayCastingCPU::Render(int iTestCode )
+void RayCastingCPU::render(int iTestCode )
 {
     try
     {
@@ -39,28 +39,28 @@ void RayCastingCPU::Render(int iTestCode )
 
         //Volume info
         RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pEntryExitPoints);
-        pRayCaster->m_pEntryExitPoints->GetDisplaySize(m_iWidth , m_iHeight);
+        pRayCaster->m_pEntryExitPoints->get_display_size(m_iWidth , m_iHeight);
 
         std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
         memcpy(m_uiDim , pVolumeData->m_uiDim , sizeof(unsigned int)*3);
-        m_pVolumeDataRaw = pVolumeData->GetPixelPointer();
+        m_pVolumeDataRaw = pVolumeData->get_pixel_pointer();
 
         //Entry exit points
-        m_pEntryPoints = pRayCaster->m_pEntryExitPoints->GetEntryPointsArray();
-        m_pExitPoints = pRayCaster->m_pEntryExitPoints->GetExitPointsArray();
+        m_pEntryPoints = pRayCaster->m_pEntryExitPoints->get_entry_points_array();
+        m_pExitPoints = pRayCaster->m_pEntryExitPoints->get_exit_points_array();
 
         //Canvas
         RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pCanvas);
-        m_pColorCanvas = pRayCaster->m_pCanvas->GetColorArray();
+        m_pColorCanvas = pRayCaster->m_pCanvas->get_color_array();
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pColorCanvas);
 
         //////////////////////////////////////////////////////////////////////////
         //For testing entry & exit points
         if (0 != iTestCode)
         {
-           RenderEntryExitPoints_i(iTestCode);
-            pRayCaster->m_pCanvas->UploadColorArray();
+           render_entry_exit_points_i(iTestCode);
+            pRayCaster->m_pCanvas->update_color_array();
             return;
         }
         //////////////////////////////////////////////////////////////////////////
@@ -71,19 +71,19 @@ void RayCastingCPU::Render(int iTestCode )
         {
         case USHORT:
             {
-                RayCasting_i<unsigned short>( pRayCaster );
+                ray_casting_i<unsigned short>( pRayCaster );
                 break;
             }
 
         case SHORT:
             {
-                RayCasting_i<short>( pRayCaster );
+                ray_casting_i<short>( pRayCaster );
                 break;
             }
 
         case FLOAT:
             {
-                RayCasting_i<float>( pRayCaster );
+                ray_casting_i<float>( pRayCaster );
                 break;
             }
         default:
@@ -96,7 +96,7 @@ void RayCastingCPU::Render(int iTestCode )
             COMPOSITE_MIP == pRayCaster->m_eCompositeMode ||
             COMPOSITE_MINIP == pRayCaster->m_eCompositeMode)
         {
-            pRayCaster->m_pCanvas->UploadColorArray();
+            pRayCaster->m_pCanvas->update_color_array();
         }
 
         CHECK_GL_ERROR;
@@ -124,23 +124,23 @@ void RayCastingCPU::Render(int iTestCode )
 
 
 template<class T>
-void RayCastingCPU::RayCasting_i(std::shared_ptr<RayCaster> pRayCaster )
+void RayCastingCPU::ray_casting_i(std::shared_ptr<RayCaster> pRayCaster )
 {
     switch(pRayCaster->m_eCompositeMode)
     {
     case COMPOSITE_AVERAGE:
         {
-            RayCasting_Average_i<T>(pRayCaster);
+            ray_casting_average_i<T>(pRayCaster);
             break;
         }
     case COMPOSITE_MIP:
         {
-            RayCasting_MIP_i<T>(pRayCaster );
+            ray_casting_mip_i<T>(pRayCaster );
             break;
         }
     case COMPOSITE_MINIP:
         {
-            RayCasting_MinIP_i<T>(pRayCaster);
+            ray_casting_minip_i<T>(pRayCaster);
             break;
         }
     default:
@@ -149,7 +149,7 @@ void RayCastingCPU::RayCasting_i(std::shared_ptr<RayCaster> pRayCaster )
 }
 
 template<class T>
-void RayCastingCPU::RayCasting_Average_i(std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
     const int iTotalPixelNum = m_iWidth*m_iHeight;
@@ -174,8 +174,8 @@ void RayCastingCPU::RayCasting_Average_i(std::shared_ptr<RayCaster> pRayCaster)
         }
 
         const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.Magnitude();
-        const Vector3f vDirStep = vDir.GetNormalize()*pRayCaster->m_fSampleRate;
+        const float fLength = vDir.magnitude();
+        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
         const float fStep = fLength / pRayCaster->m_fSampleRate;
         int iStep =(int)fStep;
         if (iStep == 0)//保证至少积分一次
@@ -194,7 +194,7 @@ void RayCastingCPU::RayCasting_Average_i(std::shared_ptr<RayCaster> pRayCaster)
         {
             ptSamplePos += ( vDirStep * float(i) );
 
-            fSampleValue = sampler.Sample3DLinear(
+            fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
                 m_uiDim[0], m_uiDim[1], m_uiDim[2],
                 (T*)m_pVolumeDataRaw);
@@ -215,7 +215,7 @@ void RayCastingCPU::RayCasting_Average_i(std::shared_ptr<RayCaster> pRayCaster)
 }
 
 template<class T>
-void RayCastingCPU::RayCasting_MIP_i( std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
     const int iTotalPixelNum = m_iWidth*m_iHeight;
@@ -238,8 +238,8 @@ void RayCastingCPU::RayCasting_MIP_i( std::shared_ptr<RayCaster> pRayCaster)
         }
 
         const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.Magnitude();
-        const Vector3f vDirStep = vDir.GetNormalize()*pRayCaster->m_fSampleRate;
+        const float fLength = vDir.magnitude();
+        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
         const float fStep = fLength / pRayCaster->m_fSampleRate;
         int iStep =(int)fStep;
         if (iStep == 0)//保证至少积分一次
@@ -256,7 +256,7 @@ void RayCastingCPU::RayCasting_MIP_i( std::shared_ptr<RayCaster> pRayCaster)
         {
             ptSamplePos += ( vDirStep * float(i) );
 
-            fSampleValue = sampler.Sample3DLinear(
+            fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
                 m_uiDim[0], m_uiDim[1], m_uiDim[2],
                 (T*)m_pVolumeDataRaw);
@@ -275,7 +275,7 @@ void RayCastingCPU::RayCasting_MIP_i( std::shared_ptr<RayCaster> pRayCaster)
 }
 
 template<class T>
-void RayCastingCPU::RayCasting_MinIP_i( std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
     const int iTotalPixelNum = m_iWidth*m_iHeight;
@@ -298,8 +298,8 @@ void RayCastingCPU::RayCasting_MinIP_i( std::shared_ptr<RayCaster> pRayCaster)
         }
 
         const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.Magnitude();
-        const Vector3f vDirStep = vDir.GetNormalize()*pRayCaster->m_fSampleRate;
+        const float fLength = vDir.magnitude();
+        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
         const float fStep = fLength / pRayCaster->m_fSampleRate;
         int iStep =(int)fStep;
         if (iStep == 0)//保证至少积分一次
@@ -316,7 +316,7 @@ void RayCastingCPU::RayCasting_MinIP_i( std::shared_ptr<RayCaster> pRayCaster)
         {
             ptSamplePos += ( vDirStep * float(i) );
 
-            fSampleValue = sampler.Sample3DLinear(
+            fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
                 m_uiDim[0], m_uiDim[1], m_uiDim[2],
                 (T*)m_pVolumeDataRaw);
@@ -334,7 +334,7 @@ void RayCastingCPU::RayCasting_MinIP_i( std::shared_ptr<RayCaster> pRayCaster)
     }
 }
 
-void RayCastingCPU::RenderEntryExitPoints_i( int iTestCode)
+void RayCastingCPU::render_entry_exit_points_i( int iTestCode)
 {
     Vector3f vDimR(1.0f/m_uiDim[0] , 1.0f/m_uiDim[1] , 1.0f/m_uiDim[2]);
     const int iTotalPixelNum = m_iWidth*m_iHeight;

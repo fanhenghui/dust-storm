@@ -12,19 +12,19 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RenderAlgo_Export BrickUtils
 {
 public:
-    static BrickUtils* Instance();
+    static BrickUtils* instance();
 
     ~BrickUtils();
 
-    void SetBrickSize(unsigned int uiSize);
+    void set_brick_size(unsigned int uiSize);
 
     unsigned int GetBrickSize();
 
-    void SetBrickExpand(unsigned int uiSize);
+    void set_brick_expand(unsigned int uiSize);
 
-    unsigned int GetBrickExpand();
+    unsigned int get_brick_expand();
 
-    void GetBrickDim(const unsigned int(&uiVolumeDim)[3] , unsigned int(&uiBrickDim)[3] , unsigned int uiBrickSize);
+    void get_brick_dim(const unsigned int(&uiVolumeDim)[3] , unsigned int(&uiBrickDim)[3] , unsigned int uiBrickSize);
 
 private:
     BrickUtils();

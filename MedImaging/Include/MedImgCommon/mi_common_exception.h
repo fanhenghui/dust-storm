@@ -22,15 +22,15 @@ public:
 
     const char* what() const;
 
-    long GetLine() const;
+    long get_line() const;
 
-    const std::string& GetFunction() const;
+    const std::string& get_function() const;
 
-    const std::string& GetFile() const;
+    const std::string& get_file() const;
 
-    const std::string& GetDescription() const;
+    const std::string& get_description() const;
 
-    const std::string& GetFullDescription() const;
+    const std::string& get_full_description() const;
 
 protected:
 private:

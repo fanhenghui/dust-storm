@@ -3,7 +3,7 @@
 #include "mi_dicom_rt_struct.h"
 
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 namespace
 {
@@ -25,12 +25,12 @@ void IOUT_LoadRTStructureSet()
     std::string sFile = "E:/Data/RT/chenhongming/RS.0000001.dcm";
 
     DICOMRTLoader loader;
-    loader.LoadRTStruct(sFile , pRT);
-    pRT->WriteToFile("D:/temp/chenhongming_Contour.txt");
-    //loader.LoadRTStruct(sFile1);
-    //loader.LoadRTStruct(sFile2);
-    //loader.LoadRTStruct(sFile3);
-    //loader.LoadRTStruct(sFile4);
+    loader.load_rt_struct(sFile , pRT);
+    pRT->write_to_file("D:/temp/chenhongming_Contour.txt");
+    //loader.load_rt_struct(sFile1);
+    //loader.load_rt_struct(sFile2);
+    //loader.load_rt_struct(sFile3);
+    //loader.load_rt_struct(sFile4);
 
 
 }

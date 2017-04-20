@@ -12,23 +12,23 @@ public:
 
     ~GLTexture2D();
 
-    virtual void Bind();
+    virtual void bind();
 
-    virtual void UnBind();
+    virtual void unbind();
 
-    void Load(GLint internalformat , GLsizei width, GLsizei height , GLenum format , GLenum type , 
+    void load(GLint internalformat , GLsizei width, GLsizei height , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Update(GLint xoffset , GLint yoffset ,GLsizei width , GLsizei height , GLenum format , GLenum type , 
+    void update(GLint xoffset , GLint yoffset ,GLsizei width , GLsizei height , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
+    void download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
 
-    GLsizei GetWidth();
+    GLsizei get_width();
 
-    GLsizei GetHeight();
+    GLsizei get_height();
 
-    GLenum GetFormat();
+    GLenum get_format();
 
 protected:
 private:

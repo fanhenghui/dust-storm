@@ -5,25 +5,25 @@
 #include <vector>
 #include "MedImgCommon/mi_observer_interface.h"
 
-namespace MedImaging
+namespace medical_imaging
 {
     class MPRScene;
     class CrosshairModel;
 }
 
 class QScrollBar;
-class MPRScrollBarObserver : public MedImaging::IObserver
+class MPRScrollBarObserver : public medical_imaging::IObserver
 {
 public:
     MPRScrollBarObserver();
     virtual ~MPRScrollBarObserver();
-    void SetCrosshairModel(std::shared_ptr<MedImaging::CrosshairModel> pModel);
-    void AddScrollBar(std::shared_ptr<MedImaging::MPRScene> pScene, QScrollBar* pWidget);
-    virtual void Update();
+    void set_crosshair_model(std::shared_ptr<medical_imaging::CrosshairModel> pModel);
+    void AddScrollBar(std::shared_ptr<medical_imaging::MPRScene> pScene, QScrollBar* pWidget);
+    virtual void update();
 protected:
 private:
-    std::weak_ptr<MedImaging::CrosshairModel> m_pModel;
-    std::vector<std::shared_ptr<MedImaging::MPRScene>> m_vecScenes;
+    std::weak_ptr<medical_imaging::CrosshairModel> m_pModel;
+    std::vector<std::shared_ptr<medical_imaging::MPRScene>> m_vecScenes;
     std::vector<QScrollBar*> m_vecScrollBars;
 };
 

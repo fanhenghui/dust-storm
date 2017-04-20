@@ -29,7 +29,7 @@
 
 
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 namespace
 {
@@ -134,67 +134,67 @@ namespace
 
     void CalculateBrickPool()
     {
-        BrickUtils::Instance()->SetBrickSize(32);
-        BrickUtils::Instance()->SetBrickExpand(2);
+        BrickUtils::instance()->set_brick_size(32);
+        BrickUtils::instance()->set_brick_expand(2);
 
         m_pBrickPool.reset(new BrickPool());
-        m_pBrickPool->SetVolume(m_pImgData);
+        m_pBrickPool->set_volume(m_pImgData);
         
 
-        m_pBrickPool->CalculateVolumeBrick();
+        m_pBrickPool->calculate_volume_brick();
     }
 
     void Init()
     {
         std::vector<std::string> vecFiles = GetFiles();
         DICOMLoader loader;
-        IOStatus status = loader.LoadSeries(vecFiles , m_pImgData , m_pDataHeader);
+        IOStatus status = loader.load_series(vecFiles , m_pImgData , m_pDataHeader);
 
         m_pCamera.reset(new OrthoCamera());
         m_pCameraBrick.reset(new OrthoCamera());
         m_pCameraCal.reset(new CameraCalculator(m_pImgData));
-        m_pCameraCal->InitMPRPlacement(m_pCamera , TRANSVERSE , Point3(0,0,0));
-        m_pCameraCal->InitVRRPlacement(m_pCameraBrick);
+        m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
+        m_pCameraCal->init_vr_placement(m_pCameraBrick);
         m_pCameraInteractorBrick.reset(new OrthoCameraInteractor(m_pCameraBrick));
         m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
 
         CalculateBrickPool();
 
         m_pMPREE.reset(new MPREntryExitPoints());
-        m_pMPREE->SetDisplaySize(m_iWidth,m_iHeight);
-        m_pMPREE->SetCamera(m_pCamera);
-        m_pMPREE->SetCameraCalculator(m_pCameraCal);
-        m_pMPREE->SetStrategy(m_eStrategy);
-        m_pMPREE->SetImageData(m_pImgData);
-        m_pMPREE->SetThickness(1.0f);
+        m_pMPREE->set_display_size(m_iWidth,m_iHeight);
+        m_pMPREE->set_camera(m_pCamera);
+        m_pMPREE->set_camera_calculator(m_pCameraCal);
+        m_pMPREE->set_strategy(m_eStrategy);
+        m_pMPREE->set_image_data(m_pImgData);
+        m_pMPREE->set_thickness(1.0f);
 
         m_pCanvas.reset(new RayCasterCanvas());
-        m_pCanvas->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->Initialize();
+        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->initialize();
 
         m_pRayCaster.reset(new RayCaster());
-        m_pRayCaster->SetEntryExitPoints(m_pMPREE);
-        m_pRayCaster->SetCanvas(m_pCanvas);
-        m_pRayCaster->SetCamera(m_pCamera);
-        m_pRayCaster->SetVolumeData(m_pImgData);
-        m_pRayCaster->SetVolumeToWorldMatrix(m_pCameraCal->GetVolumeToWorldMatrix());
-        m_pRayCaster->SetSampleRate(1.0);
-        m_pRayCaster->SetGlobalWindowLevel(m_fWW,m_fWL);
-        m_pRayCaster->SetStrategy(m_eStrategy);
-        m_pRayCaster->SetCompositeMode(COMPOSITE_AVERAGE);
+        m_pRayCaster->set_entry_exit_points(m_pMPREE);
+        m_pRayCaster->set_canvas(m_pCanvas);
+        m_pRayCaster->set_camera(m_pCamera);
+        m_pRayCaster->set_volume_data(m_pImgData);
+        m_pRayCaster->set_volume_to_world_matrix(m_pCameraCal->get_volume_to_world_matrix());
+        m_pRayCaster->set_sample_rate(1.0);
+        m_pRayCaster->set_global_window_level(m_fWW,m_fWL);
+        m_pRayCaster->set_strategy(m_eStrategy);
+        m_pRayCaster->set_composite_mode(COMPOSITE_AVERAGE);
 
-        m_pRayCaster->SetBrickSize(BrickUtils::Instance()->GetBrickSize());
-        m_pRayCaster->SetBrickExpand(BrickUtils::Instance()->GetBrickExpand());
-        m_pRayCaster->SetBrickCorner(m_pBrickPool->GetBrickCorner());
-        m_pRayCaster->SetVolumeBrickUnit(m_pBrickPool->GetVolumeBrickUnit());
-        m_pRayCaster->SetVolumeBrickInfo(m_pBrickPool->GetVolumeBrickInfo());
+        m_pRayCaster->set_brick_size(BrickUtils::instance()->GetBrickSize());
+        m_pRayCaster->set_brick_expand(BrickUtils::instance()->get_brick_expand());
+        m_pRayCaster->set_brick_corner(m_pBrickPool->get_brick_corner());
+        m_pRayCaster->set_volume_brick_unit(m_pBrickPool->get_volume_brick_unit());
+        m_pRayCaster->set_volume_brick_info(m_pBrickPool->get_volume_brick_info());
 
-        //Concurrency::Instance()->SetAppConcurrency(4);
+        //Concurrency::instance()->set_app_concurrency(4);
     }
 
     void RayCasterCanvasToScreen()
     {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->GetFBO()->GetID());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->get_fbo()->get_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -253,23 +253,23 @@ namespace
 
     void DrawBricks()
     {
-        BrickCorner* pBrickCorner = m_pBrickPool->GetBrickCorner();
-        VolumeBrickInfo* pBrickInfo = m_pBrickPool->GetVolumeBrickInfo();
+        BrickCorner* pBrickCorner = m_pBrickPool->get_brick_corner();
+        VolumeBrickInfo* pBrickInfo = m_pBrickPool->get_volume_brick_info();
 
         unsigned int uiBrickDim[3];
-        m_pBrickPool->GetBrickDim(uiBrickDim);
+        m_pBrickPool->get_brick_dim(uiBrickDim);
         const unsigned int uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
-        const unsigned int uiBrickSize = BrickUtils::Instance()->GetBrickSize();
+        const unsigned int uiBrickSize = BrickUtils::instance()->GetBrickSize();
 
         //////////////////////////////////////////////////////////////////////////
         //Rendering bricks
         /////////////////////////////////////////////////////////////////////////
-        //Render by sorting bricks
+        //render by sorting bricks
         if (m_uiBrickMode == 0)
         {
            
-            const std::vector<BrickDistance>& vecBrickDistance = m_pRayCaster->GetBrickDistance();
-            const unsigned int uiNum = m_pRayCaster->GetRayCastingBrickCount();
+            const std::vector<BrickDistance>& vecBrickDistance = m_pRayCaster->get_brick_distance();
+            const unsigned int uiNum = m_pRayCaster->get_ray_casting_brick_count();
             for (unsigned int i = 0 ; i < uiNum ; ++i)
             {
                 unsigned int idx = vecBrickDistance[i].m_id;
@@ -279,7 +279,7 @@ namespace
                 DrawSingleBrick(ptMin, ptMax);
             }
         }
-         //Render by WL
+         //render by WL
         else if (m_uiBrickMode == 1)
         {
            
@@ -326,18 +326,18 @@ namespace
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         clock_t t0=clock();
-        m_pMPREE->CalculateEntryExitPoints();
-        m_pRayCaster->Render(m_iTestCode);
+        m_pMPREE->calculate_entry_exit_points();
+        m_pRayCaster->render(m_iTestCode);
         clock_t t1=clock();
-        std::cout << "Render cost : " << double(t1 - t0) << std::endl;
+        std::cout << "render cost : " << double(t1 - t0) << std::endl;
        /* glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         glPushMatrix();
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glLoadMatrixd(m_pCameraBrick->GetViewProjectionMatrix()._m);
+        glLoadMatrixd(m_pCameraBrick->get_view_projection_matrix()._m);
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixd(m_pCameraCal->GetVolumeToWorldMatrix()._m);
+        glLoadMatrixd(m_pCameraCal->get_volume_to_world_matrix()._m);
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
@@ -356,7 +356,7 @@ namespace
 
         RayCasterCanvasToScreen();
 
-        //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->GetColorArray());
+        //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->get_color_array());
 
         glutSwapBuffers();
     }
@@ -368,11 +368,11 @@ namespace
         case 't':
             {
                 std::cout << "W H :" << m_iWidth << " " << m_iHeight << std::endl;
-                m_pMPREE->DebugOutputEntryPoints("D:/temp/entry_points.rgb.raw");
-                m_pMPREE->DebugOutputExitPoints("D:/temp/exit_points.rgb.raw");
-                m_pCanvas->DebugOutputColor("D:/temp/out_put_rgba.raw");
-                const std::vector<BrickDistance>& vecBrickDis = m_pRayCaster->GetBrickDistance();
-                unsigned int uiBrickNum = m_pRayCaster->GetRayCastingBrickCount();
+                m_pMPREE->debug_output_entry_points("D:/temp/entry_points.rgb.raw");
+                m_pMPREE->debug_output_exit_points("D:/temp/exit_points.rgb.raw");
+                m_pCanvas->debug_output_color("D:/temp/out_put_rgba.raw");
+                const std::vector<BrickDistance>& vecBrickDis = m_pRayCaster->get_brick_distance();
+                unsigned int uiBrickNum = m_pRayCaster->get_ray_casting_brick_count();
                 std::ofstream out("D:/temp/brick_sort.txt" , std::ios::out);
                 if (out.is_open())
                 {
@@ -397,27 +397,27 @@ namespace
                     m_eStrategy = CPU_BASE;
                     std::cout << "Ray casting strategy is : CPU based. \n";
                 }
-                m_pRayCaster->SetStrategy(m_eStrategy);
-                m_pMPREE->SetStrategy(m_eStrategy);
+                m_pRayCaster->set_strategy(m_eStrategy);
+                m_pMPREE->set_strategy(m_eStrategy);
                 break;
             }
         case 'a':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , TRANSVERSE , Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
             }
         case 's':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , SAGITTAL , Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , SAGITTAL , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
             }
         case 'c':
             {
-                m_pCameraCal->InitMPRPlacement(m_pCamera , CORONAL, Point3(0,0,0));
+                m_pCameraCal->init_mpr_placement(m_pCamera , CORONAL, Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
                 m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
                 break;
@@ -430,13 +430,13 @@ namespace
         case '8':
             {
                 //m_uiBrickTestNum +=10;
-                m_pCameraCal->MPROrthoPaging(m_pCamera, -16);
+                m_pCameraCal->page_orthognal_mpr(m_pCamera, -16);
                 break;
             }
         case '2':
             {
                 //m_uiBrickTestNum -=10;
-                m_pCameraCal->MPROrthoPaging(m_pCamera, 16);
+                m_pCameraCal->page_orthognal_mpr(m_pCamera, 16);
                 break;
             }
 
@@ -454,7 +454,7 @@ namespace
             {
                 m_fThickness+=1.0;
                 std::cout << "Thickness : " << m_fThickness << std::endl;
-                m_pMPREE->SetThickness(m_fThickness);
+                m_pMPREE->set_thickness(m_fThickness);
                 break;
             }
         case '4':
@@ -465,7 +465,7 @@ namespace
                     m_fThickness = 0.5f;
                 }
                 std::cout << "Thickness : " << m_fThickness << std::endl;
-                m_pMPREE->SetThickness(m_fThickness);
+                m_pMPREE->set_thickness(m_fThickness);
                 break;
             }
         case 'h':
@@ -478,7 +478,7 @@ namespace
                 {
                     m_fThickness  = 1.0f;
                 }
-                m_pMPREE->SetThickness(m_fThickness);
+                m_pMPREE->set_thickness(m_fThickness);
             }
         default:
             break;
@@ -491,9 +491,9 @@ namespace
     {
         m_iWidth = x;
         m_iHeight = y;
-        m_pMPREE->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->SetDisplaySize(m_iWidth , m_iHeight);
-        m_pCanvas->UpdateFBO();
+        m_pMPREE->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->update_fbo();
         m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
         m_pCameraInteractorBrick->Resize(m_iWidth , m_iHeight);
         glutPostRedisplay();
@@ -544,12 +544,12 @@ namespace
         //std::cout << "Cur : " << ptCur.x << " " <<ptCur.y << std::endl;
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            //m_pCameraInteractorBrick->Rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
-            m_pCameraInteractor->Rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            //m_pCameraInteractorBrick->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->Pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
             /*float fDeltaX = x - m_ptPre.x;
             float fDeltaY = m_ptPre.y - y;
             if (m_fWW + fDeltaX > 1.0f)
@@ -557,12 +557,12 @@ namespace
             m_fWW += fDeltaX;
             }
             m_fWL += fDeltaY;
-            m_pRayCaster->SetGlobalWindowLevel(m_fWW, m_fWL);*/
+            m_pRayCaster->set_global_window_level(m_fWW, m_fWL);*/
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            //m_pCameraInteractorBrick->Zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
-            m_pCameraInteractor->Zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            //m_pCameraInteractorBrick->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
         }
 
         m_ptPre = ptCur;

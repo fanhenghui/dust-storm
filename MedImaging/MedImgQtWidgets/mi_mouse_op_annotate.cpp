@@ -24,7 +24,7 @@ MouseOpAnnotate::~MouseOpAnnotate()
 
 }
 
-void MouseOpAnnotate::Press(const QPoint& pt)
+void MouseOpAnnotate::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -40,19 +40,19 @@ void MouseOpAnnotate::Press(const QPoint& pt)
     if (pScene&&m_pVOIModel)
     {
         Point3 ptCenter;
-        if(pScene->GetWorldPosition(Point2(pt.x() , pt.y()) , ptCenter))
+        if(pScene->get_world_position(Point2(pt.x() , pt.y()) , ptCenter))
         {
             //Get VOI center
             m_bPin = true;
             m_ptCenter = ptCenter;
             m_dDiameter = 0.0;
-            m_pVOIModel->AddVOISphere(MedImaging::VOISphere(m_ptCenter , m_dDiameter , ksNoduleTypeGGN));
-            m_pVOIModel->NotifyAllObserver();
+            m_pVOIModel->add_voi_sphere(medical_imaging::VOISphere(m_ptCenter , m_dDiameter , ksNoduleTypeGGN));
+            m_pVOIModel->notify();
         }
     }
 }
 
-void MouseOpAnnotate::Move(const QPoint& pt)
+void MouseOpAnnotate::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -63,21 +63,21 @@ void MouseOpAnnotate::Move(const QPoint& pt)
     {
         Point3 ptFace;
         std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-        if(pScene->GetWorldPosition(Point2(pt.x() , pt.y()) , ptFace))
+        if(pScene->get_world_position(Point2(pt.x() , pt.y()) , ptFace))
         {
             //Get VOI center
             Vector3 v = ptFace - m_ptCenter;
-            m_dDiameter = v.Magnitude()*2.0;
+            m_dDiameter = v.magnitude()*2.0;
 
-            m_pVOIModel->ModifyVOISphereRear(MedImaging::VOISphere(m_ptCenter , m_dDiameter));
-            m_pVOIModel->NotifyAllObserver();
+            m_pVOIModel->modify_voi_sphere_list_rear(medical_imaging::VOISphere(m_ptCenter , m_dDiameter));
+            m_pVOIModel->notify();
         }
     }
 
     m_ptPre = pt;
 }
 
-void MouseOpAnnotate::Release(const QPoint& pt)
+void MouseOpAnnotate::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -86,7 +86,7 @@ void MouseOpAnnotate::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpAnnotate::DoubleClick(const QPoint& pt)
+void MouseOpAnnotate::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -95,7 +95,7 @@ void MouseOpAnnotate::DoubleClick(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpAnnotate::SetVOIModel(std::shared_ptr<VOIModel> pVOIModel)
+void MouseOpAnnotate::set_voi_model(std::shared_ptr<VOIModel> pVOIModel)
 {
     m_pVOIModel = pVOIModel;
 }

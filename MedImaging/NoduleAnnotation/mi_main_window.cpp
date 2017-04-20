@@ -55,7 +55,7 @@
 #include "qmessagebox.h"
 #include "qsignalmapper.h"
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 //Nodule type
 const std::string ksNoduleTypeGGN = std::string("GGN");
@@ -92,16 +92,16 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    m_pMPR00 = new SceneContainer(SharedWidget::Instance());
+    m_pMPR00 = new SceneContainer(SharedWidget::instance());
     m_pMPR00->setMinimumSize(100,100);
 
-    m_pMPR01 = new SceneContainer(SharedWidget::Instance());
+    m_pMPR01 = new SceneContainer(SharedWidget::instance());
     m_pMPR01->setMinimumSize(100,100);
 
-    m_pMPR10 = new SceneContainer(SharedWidget::Instance());
+    m_pMPR10 = new SceneContainer(SharedWidget::instance());
     m_pMPR10->setMinimumSize(100,100);
 
-    m_pVR11 = new SceneContainer(SharedWidget::Instance());
+    m_pVR11 = new SceneContainer(SharedWidget::instance());
     m_pVR11->setMinimumSize(100,100);
 
     m_pMPR00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
@@ -134,9 +134,9 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     m_pNoduleObject = new QNoduleObject(this);
     m_pMinMaxHintObject = new QMinMaxHintObject(this);
 
-    Configure_i();
+    configure_i();
 
-    ConnectSignalSlot_i();
+    connectS_signal_slot_i();
 
 }
 
@@ -145,14 +145,14 @@ NoduleAnnotation::~NoduleAnnotation()
 
 }
 
-void NoduleAnnotation::Configure_i()
+void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
-    Configuration::Instance()->SetProcessingUnitType(GPU);
-    GLUtils::SetCheckGLFlag(false);
+    Configuration::instance()->set_processing_unit_type(GPU);
+    GLUtils::set_check_gl_flag(false);
 }
 
-void NoduleAnnotation::CreateScene_i()
+void NoduleAnnotation::create_scene_i()
 {
     m_pMPRScene00.reset(new MPRScene(m_pMPR00->width() , m_pMPR00->height()));
     m_pMPRScene01.reset(new MPRScene(m_pMPR01->width() , m_pMPR01->height()));
@@ -171,70 +171,70 @@ void NoduleAnnotation::CreateScene_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         //1 Set Scene
-        vecMPRs[i]->SetScene(vecMPRScenes[i]);
+        vecMPRs[i]->set_scene(vecMPRScenes[i]);
 
         //2 Set scene parameter
-        vecMPRScenes[i]->SetVolumeInfos(m_pVolumeInfos);
-        vecMPRScenes[i]->SetSampleRate(1.0);
-        vecMPRScenes[i]->SetGlobalWindowLevel(kfPresetCTLungsWW,kfPresetCTLungsWL);
-        vecMPRScenes[i]->SetCompositeMode(COMPOSITE_AVERAGE);
-        vecMPRScenes[i]->SetColorInverseMode(COLOR_INVERSE_DISABLE);
-        vecMPRScenes[i]->SetMaskMode(MASK_NONE);
-        vecMPRScenes[i]->SetInterpolationMode(LINEAR);
+        vecMPRScenes[i]->set_volume_infos(m_pVolumeInfos);
+        vecMPRScenes[i]->set_sample_rate(1.0);
+        vecMPRScenes[i]->set_global_window_level(kfPresetCTLungsWW,kfPresetCTLungsWL);
+        vecMPRScenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
+        vecMPRScenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+        vecMPRScenes[i]->set_mask_mode(MASK_NONE);
+        vecMPRScenes[i]->set_interpolation_mode(LINEAR);
 
         //3 Add painter list
         std::vector<std::shared_ptr<PainterBase>> vecPainterList;
         std::shared_ptr<CornersInfoPainter> pCornerInfo(new CornersInfoPainter());
-        pCornerInfo->SetScene(vecMPRScenes[i]);
+        pCornerInfo->set_scene(vecMPRScenes[i]);
         vecPainterList.push_back(pCornerInfo);
 
         std::shared_ptr<VOIPainter> pVOI(new VOIPainter());
-        pVOI->SetScene(vecMPRScenes[i]);
-        pVOI->SetVOIModel(m_pVOIModel);
+        pVOI->set_scene(vecMPRScenes[i]);
+        pVOI->set_voi_model(m_pVOIModel);
         vecPainterList.push_back(pVOI);
 
         std::shared_ptr<CrosshairPainter> pCrosshair(new CrosshairPainter());
-        pCrosshair->SetScene(vecMPRScenes[i]);
-        pCrosshair->SetCrossHairModel(m_pCrosshairModel);
+        pCrosshair->set_scene(vecMPRScenes[i]);
+        pCrosshair->set_crosshair_model(m_pCrosshairModel);
         vecPainterList.push_back(pCrosshair);
 
         std::shared_ptr<MPRBorderPainter> pMPRBorder(new MPRBorderPainter());
-        pMPRBorder->SetScene(vecMPRScenes[i]);
-        pMPRBorder->SetCrossHairModel(m_pCrosshairModel);
+        pMPRBorder->set_scene(vecMPRScenes[i]);
+        pMPRBorder->set_crosshair_model(m_pCrosshairModel);
         vecPainterList.push_back(pMPRBorder);
 
-        vecMPRs[i]->AddPainterList(vecPainterList);
+        vecMPRs[i]->add_painter_list(vecPainterList);
 
         //4 Add operation 
         std::shared_ptr<MouseOpLocate> pMPRLocate(new MouseOpLocate());
-        pMPRLocate->SetScene(vecMPRScenes[i]);
-        pMPRLocate->SetCrosshairModel(m_pCrosshairModel);
+        pMPRLocate->set_scene(vecMPRScenes[i]);
+        pMPRLocate->set_crosshair_model(m_pCrosshairModel);
 
         std::shared_ptr<MouseOpMinMaxHint> pMinMaxHint(new MouseOpMinMaxHint());
-        pMinMaxHint->SetScene(vecMPRScenes[i]);
-        pMinMaxHint->SetMinMaxHintObject(m_pMinMaxHintObject);
+        pMinMaxHint->set_scene(vecMPRScenes[i]);
+        pMinMaxHint->set_min_max_hint_object(m_pMinMaxHintObject);
 
         IMouseOpPtrCollection vecOpsLBtn(2);
         vecOpsLBtn[0] = pMPRLocate;
         vecOpsLBtn[1] = pMinMaxHint;
-        vecMPRs[i]->RegisterMouseOperation(vecOpsLBtn, Qt::LeftButton , Qt::NoModifier);
+        vecMPRs[i]->register_mouse_operation(vecOpsLBtn, Qt::LeftButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pZoom , Qt::RightButton , Qt::NoModifier);
+        pZoom->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pZoom , Qt::RightButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
+        pWindowing->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pPan , Qt::MiddleButton , Qt::ControlModifier);
+        pPan->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pPan , Qt::MiddleButton , Qt::ControlModifier);
     }
 
     //////////////////////////////////////////////////////////////////////////
     //Placement orthogonal MPR
-    std::shared_ptr<CameraCalculator> pCameraCal = m_pVolumeInfos->GetCameraCalculator();
+    std::shared_ptr<CameraCalculator> pCameraCal = m_pVolumeInfos->get_camera_calculator();
     ScanSliceType aScanType[3] = {SAGITTAL ,CORONAL , TRANSVERSE};
     const std::string aScanTypeString[3] = {"Sagittal_MPR_scene_00" ,"Coronal_MPR_scene_01" , "Transverse_MPR_scene_10"};
     MPRScenePtr aScenes[3] = {m_pMPRScene00 , m_pMPRScene01 , m_pMPRScene10};
@@ -242,7 +242,7 @@ void NoduleAnnotation::CreateScene_i()
     QScrollBar* aScrollBar[3] = {m_pMPR00ScrollBar , m_pMPR01ScrollBar , m_pMPR10ScrollBar};
 
     //Model set scenes
-    m_pCrosshairModel->SetMPRScene(aScanType , aScenes , aColors);
+    m_pCrosshairModel->set_mpr_scene(aScanType , aScenes , aColors);
 
     m_pMPRScrollBarOb->AddScrollBar(m_pMPRScene00 , m_pMPR00ScrollBar);
     m_pMPRScrollBarOb->AddScrollBar(m_pMPRScene01 , m_pMPR01ScrollBar);
@@ -250,117 +250,117 @@ void NoduleAnnotation::CreateScene_i()
 
     for (int i = 0 ; i<3 ; ++i)
     {
-        aScenes[i]->PlaceMPR(aScanType[i]);
-        aScenes[i]->SetName(aScanTypeString[i]);
+        aScenes[i]->place_mpr(aScanType[i]);
+        aScenes[i]->set_name(aScanTypeString[i]);
 
         //Init page
-        aScrollBar[i]->setMaximum(pCameraCal->GetPageMaximum(aScanType[i])-1);
+        aScrollBar[i]->setMaximum(pCameraCal->get_page_maximum(aScanType[i])-1);
         aScrollBar[i]->setMinimum(0);
         aScrollBar[i]->setPageStep(1);
-        aScrollBar[i]->setValue(pCameraCal->GetDefaultPage(aScanType[i]));
+        aScrollBar[i]->setValue(pCameraCal->get_default_page(aScanType[i]));
     }
 
     //////////////////////////////////////////////////////////////////////////
-    //Focus in/out scene signal mapper
+    //focus in/out scene signal mapper
     QSignalMapper* pFocusInSignalMapper = new QSignalMapper();
 
     connect(m_pMPR00 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->GetName().c_str()));
+    pFocusInSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->get_name().c_str()));
     connect(m_pMPR01 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->GetName().c_str()));
+    pFocusInSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->get_name().c_str()));
     connect(m_pMPR10 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->GetName().c_str()));
+    pFocusInSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->get_name().c_str()));
 
-    connect(pFocusInSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(SlotFocusInScene_i(QString)));
+    connect(pFocusInSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
 
     QSignalMapper* pFocusOutSignalMapper = new QSignalMapper();
 
     connect(m_pMPR00 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->GetName().c_str()));
+    pFocusOutSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->get_name().c_str()));
     connect(m_pMPR01 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->GetName().c_str()));
+    pFocusOutSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->get_name().c_str()));
     connect(m_pMPR10 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->GetName().c_str()));
+    pFocusOutSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->get_name().c_str()));
 
-    connect(pFocusOutSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(SlotFocusOutScene_i(QString)));
+    connect(pFocusOutSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));
     //////////////////////////////////////////////////////////////////////////
 }
 
-void NoduleAnnotation::ConnectSignalSlot_i()
+void NoduleAnnotation::connectS_signal_slot_i()
 {
     //Layout
     //connect(ui.action1x1 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout1x1_i()));
-    connect(ui.action2x2 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout2x2_i()));
+    connect(ui.action2x2 , SIGNAL(triggered()) , this , SLOT(slot_change_layout2x2_i()));
 
     //File
-    connect(ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(SlotOpenDICOMFolder_i()));
-    connect(ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(SlotOpenMetaImage_i()));
-    connect(ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(SlotOpenRaw_i()));
-    connect(ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(SlotSaveNodule_i()));
+    connect(ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
+    connect(ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
+    connect(ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(slot_open_raw_i()));
+    connect(ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_i()));
 
     //MPR scroll bar
-    connect(m_pMPR00ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(SlotSlidingBarMPR00_i(int)));
-    connect(m_pMPR01ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(SlotSlidingBarMPR01_i(int)));
-    connect(m_pMPR10ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(SlotSlidingBarMPR10_i(int)));
+    connect(m_pMPR00ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
+    connect(m_pMPR01ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr01_i(int)));
+    connect(m_pMPR10ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr10_i(int)));
 
     //Common tools
-    connect(ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(SlotPressBtnArrow_i()));
-    connect(ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(SlotPressBtnAnnotate_i()));
-    connect(ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(SlotPressBtnRotate_i()));
-    connect(ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(SlotPressBtnZoom_i()));
-    connect(ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(SlotPressBtnPan_i()));
-    connect(ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(SlotPressBtnWindowing_i()));
-    connect(ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(SlotPressBtnFitWindow_i()));
+    connect(ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
+    connect(ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_annotate_i()));
+    connect(ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_rotate_i()));
+    connect(ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_aoom_i()));
+    connect(ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
+    connect(ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
+    connect(ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
 
     //VOI list
-    connect(ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(SlotVOITableWidgetCellSelect_i(int ,int)));
-    connect(ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(SlotVOITableWidgetItemChanged_i(QTableWidgetItem *)));
-    connect(m_pNoduleObject , SIGNAL(addNodule()) , this , SLOT(SlotVOIAddNodule_i()));
+    connect(ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
+    connect(ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem *)));
+    connect(m_pNoduleObject , SIGNAL(nodule_added()) , this , SLOT(slot_add_nodule_i()));
 
     //Preset WL
-    connect(ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(SlotPersetWLChanged_i(QString)));
+    connect(ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(slot_preset_wl_changed_i(QString)));
 
     //Scene Min Max hint
-    connect(m_pMinMaxHintObject , SIGNAL(triggered(const std::string&)) , this , SLOT(SlotSceneMinMaxHint_i(const std::string&)));
+    connect(m_pMinMaxHintObject , SIGNAL(triggered(const std::string&)) , this , SLOT(slot_scene_min_max_hint_i(const std::string&)));
 
     //Crosshair visibility
-    connect(ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(SlotCrosshairVisbility_i(int)));
+    connect(ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
 }
 
-void NoduleAnnotation::CreateModelObserver_i()
+void NoduleAnnotation::create_model_observer_i()
 {
     //VOI
     m_pVOIModel.reset(new VOIModel());
 
     m_pVOITableOb.reset(new VOITableObserver());
-    m_pVOITableOb->SetNoduleObject(m_pNoduleObject);
+    m_pVOITableOb->set_nodule_object(m_pNoduleObject);
 
     m_pSceneContainerOb.reset(new SceneContainerObserver());//万能 observer
-    m_pSceneContainerOb->AddSceneContainer(m_pMPR00);
-    m_pSceneContainerOb->AddSceneContainer(m_pMPR01);
-    m_pSceneContainerOb->AddSceneContainer(m_pMPR10);
+    m_pSceneContainerOb->add_scene_container(m_pMPR00);
+    m_pSceneContainerOb->add_scene_container(m_pMPR01);
+    m_pSceneContainerOb->add_scene_container(m_pMPR10);
 
-    m_pVOIModel->AddObserver(m_pVOITableOb);
-    //m_pVOIModel->AddObserver(m_pSceneContainerOb);//Scene的刷新通过change item来完成
+    m_pVOIModel->add_observer(m_pVOITableOb);
+    //m_pVOIModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 
     //Crosshair & cross location
     m_pCrosshairModel.reset(new CrosshairModel());
 
     m_pMPRScrollBarOb.reset(new MPRScrollBarObserver());
-    m_pMPRScrollBarOb->SetCrosshairModel(m_pCrosshairModel);
+    m_pMPRScrollBarOb->set_crosshair_model(m_pCrosshairModel);
 
-    m_pCrosshairModel->AddObserver(m_pMPRScrollBarOb);
-    m_pCrosshairModel->AddObserver(m_pSceneContainerOb);
+    m_pCrosshairModel->add_observer(m_pMPRScrollBarOb);
+    m_pCrosshairModel->add_observer(m_pSceneContainerOb);
 
     if (!m_pNoduleTypeSignalMapper)
     {
         delete m_pNoduleTypeSignalMapper;
         m_pNoduleTypeSignalMapper = new QSignalMapper(this);
-        connect(m_pNoduleTypeSignalMapper , SIGNAL(mapped(int)) , this , SLOT(SlotVOITableWidgetNoduleTypeChanged_i(int)));
+        connect(m_pNoduleTypeSignalMapper , SIGNAL(mapped(int)) , this , SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
     }
 }
 
-void NoduleAnnotation::SlotChangeLayout2x2_i()
+void NoduleAnnotation::slot_change_layout2x2_i()
 {
     if (!m_bReady)
     {
@@ -402,7 +402,7 @@ void NoduleAnnotation::SlotChangeLayout2x2_i()
     m_iLayoutType = 0;
 }
 
-void NoduleAnnotation::SlotOpenDICOMFolder_i()
+void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(
         this ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
@@ -423,26 +423,26 @@ void NoduleAnnotation::SlotOpenDICOMFolder_i()
         std::shared_ptr<ImageDataHeader> pDataHeader;
         std::shared_ptr<ImageData> pImgData;
         DICOMLoader loader;
-        IOStatus status = loader.LoadSeries(vecSTDFiles, pImgData , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, pImgData , pDataHeader);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
-            QMessageBox::warning(this , tr("Load DICOM Folder") , tr("Load DICOM folder failed!"));
+            QMessageBox::warning(this , tr("load DICOM Folder") , tr("load DICOM folder failed!"));
             return;
         }
 
         if (m_pVolumeInfos)//Delete last one
         {
-            m_pVolumeInfos->Finialize();
+            m_pVolumeInfos->finialize();
         }
         m_pVolumeInfos.reset(new VolumeInfos());
-        m_pVolumeInfos->SetDataHeader(pDataHeader);
-        //SharedWidget::Instance()->makeCurrent();
-        m_pVolumeInfos->SetVolume(pImgData);//Load volume texture if has graphic card
+        m_pVolumeInfos->set_data_header(pDataHeader);
+        //SharedWidget::instance()->makeCurrent();
+        m_pVolumeInfos->set_volume(pImgData);//load volume texture if has graphic card
 
-        CreateModelObserver_i();
+        create_model_observer_i();
 
-        CreateScene_i();
+        create_scene_i();
 
         QApplication::restoreOverrideCursor();
 
@@ -458,17 +458,17 @@ void NoduleAnnotation::SlotOpenDICOMFolder_i()
     }
 }
 
-void NoduleAnnotation::SlotOpenMetaImage_i()
+void NoduleAnnotation::slot_open_meta_image_i()
 {
 
 }
 
-void NoduleAnnotation::SlotOpenRaw_i()
+void NoduleAnnotation::slot_open_raw_i()
 {
 
 }
 
-void NoduleAnnotation::SlotPressBtnAnnotate_i()
+void NoduleAnnotation::slot_press_btn_annotate_i()
 {
     if (!m_bReady)
     {
@@ -488,13 +488,13 @@ void NoduleAnnotation::SlotPressBtnAnnotate_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpAnnotate> pAnnotate(new MouseOpAnnotate());
-        pAnnotate->SetScene(vecMPRScenes[i]);
-        pAnnotate->SetVOIModel(m_pVOIModel);//Set Model to annotate tools
-        vecMPRs[i]->RegisterMouseOperation(pAnnotate , Qt::LeftButton , Qt::NoModifier);
+        pAnnotate->set_scene(vecMPRScenes[i]);
+        pAnnotate->set_voi_model(m_pVOIModel);//Set Model to annotate tools
+        vecMPRs[i]->register_mouse_operation(pAnnotate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnArrow_i()
+void NoduleAnnotation::slot_press_btn_arrow_i()
 {
     if (!m_bReady)
     {
@@ -514,13 +514,13 @@ void NoduleAnnotation::SlotPressBtnArrow_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpLocate> pMPRLocate(new MouseOpLocate());
-        pMPRLocate->SetScene(vecMPRScenes[i]);
-        pMPRLocate->SetCrosshairModel(m_pCrosshairModel);
-        vecMPRs[i]->RegisterMouseOperation(pMPRLocate , Qt::LeftButton , Qt::NoModifier);
+        pMPRLocate->set_scene(vecMPRScenes[i]);
+        pMPRLocate->set_crosshair_model(m_pCrosshairModel);
+        vecMPRs[i]->register_mouse_operation(pMPRLocate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnRotate_i()
+void NoduleAnnotation::slot_press_btn_rotate_i()
 {
     if (!m_bReady)
     {
@@ -540,12 +540,12 @@ void NoduleAnnotation::SlotPressBtnRotate_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpRotate> pRotate(new MouseOpRotate());
-        pRotate->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pRotate , Qt::LeftButton , Qt::NoModifier);
+        pRotate->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnZoom_i()
+void NoduleAnnotation::slot_press_btn_aoom_i()
 {
     if (!m_bReady)
     {
@@ -565,12 +565,12 @@ void NoduleAnnotation::SlotPressBtnZoom_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pZoom , Qt::LeftButton , Qt::NoModifier);
+        pZoom->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pZoom , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnPan_i()
+void NoduleAnnotation::slot_press_btn_pan_i()
 {
     if (!m_bReady)
     {
@@ -590,12 +590,12 @@ void NoduleAnnotation::SlotPressBtnPan_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pPan , Qt::LeftButton , Qt::NoModifier);
+        pPan->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pPan , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnWindowing_i()
+void NoduleAnnotation::slot_press_btn_windowing_i()
 {
     if (!m_bReady)
     {
@@ -615,12 +615,12 @@ void NoduleAnnotation::SlotPressBtnWindowing_i()
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->SetScene(vecMPRScenes[i]);
-        vecMPRs[i]->RegisterMouseOperation(pWindowing , Qt::LeftButton , Qt::NoModifier);
+        pWindowing->set_scene(vecMPRScenes[i]);
+        vecMPRs[i]->register_mouse_operation(pWindowing , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::SlotPressBtnFitWindow_i()
+void NoduleAnnotation::slot_press_btn_fit_window_i()
 {
     //TODO
     if (!m_bReady)
@@ -629,14 +629,14 @@ void NoduleAnnotation::SlotPressBtnFitWindow_i()
     }
 }
 
-void NoduleAnnotation::SlotSaveNodule_i()
+void NoduleAnnotation::slot_save_nodule_i()
 {
     if (!m_bReady)
     {
         return;
     }
 
-    if (m_pVOIModel->GetVOISpheres().empty())
+    if (m_pVOIModel->get_voi_spheres().empty())
     {
         if(QMessageBox::No == QMessageBox::warning(
             this , tr("Save Nodule") , tr("Nodule count is zero. If you still want to save to file?"),QMessageBox::Yes |QMessageBox::No))
@@ -645,19 +645,19 @@ void NoduleAnnotation::SlotSaveNodule_i()
         }
     }
 
-    QString sFileCustom = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(m_pVolumeInfos->GetDataHeader()->m_sSeriesUID.c_str()), tr("NoduleSet(*.csv)"));
+    QString sFileCustom = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(m_pVolumeInfos->get_data_header()->m_sSeriesUID.c_str()), tr("NoduleSet(*.csv)"));
     if (!sFileCustom.isEmpty())
     {
         std::shared_ptr<NoduleSet> pNoduleSet(new NoduleSet());
-        const std::list<VOISphere>& voiList = m_pVOIModel->GetVOISpheres();
+        const std::list<VOISphere>& voiList = m_pVOIModel->get_voi_spheres();
         for (auto it = voiList.begin() ; it != voiList.end() ; ++it)
         {
-            pNoduleSet->AddNodule(*it);
+            pNoduleSet->add_nodule(*it);
         }
 
         NoduleSetCSVParser parser;
         std::string sFilePath(sFileCustom.toLocal8Bit());
-        IOStatus status = parser.Save(sFilePath , pNoduleSet);
+        IOStatus status = parser.save(sFilePath , pNoduleSet);
 
         if (status == IO_SUCCESS)
         {
@@ -671,39 +671,39 @@ void NoduleAnnotation::SlotSaveNodule_i()
     }
 }
 
-void NoduleAnnotation::SlotSlidingBarMPR00_i(int value)
+void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value)
 {
-    if(m_pCrosshairModel->PagingTo(m_pMPRScene00 , value))
+    if(m_pCrosshairModel->page_to(m_pMPRScene00 , value))
     {
-        m_pCrosshairModel->NotifyAllObserver();
+        m_pCrosshairModel->notify();
     }
 }
 
-void NoduleAnnotation::SlotSlidingBarMPR01_i(int value)
+void NoduleAnnotation::slot_sliding_bar_mpr01_i(int value)
 {
-    if(m_pCrosshairModel->PagingTo(m_pMPRScene01 , value))
+    if(m_pCrosshairModel->page_to(m_pMPRScene01 , value))
     {
-        m_pCrosshairModel->NotifyAllObserver();
+        m_pCrosshairModel->notify();
     }
 }
 
-void NoduleAnnotation::SlotSlidingBarMPR10_i(int value)
+void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
 {
-    if(m_pCrosshairModel->PagingTo(m_pMPRScene10 , value))
+    if(m_pCrosshairModel->page_to(m_pMPRScene10 , value))
     {
-        m_pCrosshairModel->NotifyAllObserver();
+        m_pCrosshairModel->notify();
     }
 }
 
-void NoduleAnnotation::SlotVOITableWidgetCellSelect_i(int row , int column)
+void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
 {
     std::cout << "CellSelect "<< row << " " << column<< std::endl; 
-    VOISphere voi = m_pVOIModel->GetVOISphere(row);
-    m_pCrosshairModel->Locate(voi.m_ptCenter);
-    m_pCrosshairModel->NotifyAllObserver();
+    VOISphere voi = m_pVOIModel->get_voi_sphere(row);
+    m_pCrosshairModel->locate(voi.m_ptCenter);
+    m_pCrosshairModel->notify();
 }
 
-void NoduleAnnotation::SlotVOITableWidgetItemChanged_i(QTableWidgetItem *item)
+void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *item)
 {
     const int row = item->row();
     const int column = item->column();
@@ -711,14 +711,14 @@ void NoduleAnnotation::SlotVOITableWidgetItemChanged_i(QTableWidgetItem *item)
     {
         std::string sDiameter =  (item->text()).toLocal8Bit();
         StrNumConverter<double> con;
-        m_pVOIModel->ModifyVOISphereDiameter(row , con.ToNumber(sDiameter));
-        m_pSceneContainerOb->Update();
+        m_pVOIModel->modify_voi_sphere_diameter(row , con.to_num(sDiameter));
+        m_pSceneContainerOb->update();
     }
 }
 
-void NoduleAnnotation::SlotVOIAddNodule_i()
+void NoduleAnnotation::slot_add_nodule_i()
 {
-    const std::list<VOISphere>& vecVOISphere = m_pVOIModel->GetVOISpheres();
+    const std::list<VOISphere>& vecVOISphere = m_pVOIModel->get_voi_spheres();
     if (!vecVOISphere.empty())
     {
         ui.tableWidgetNoduleList->setRowCount(vecVOISphere.size());//Set row count , otherwise set item useless
@@ -728,10 +728,10 @@ void NoduleAnnotation::SlotVOIAddNodule_i()
         for (auto it = vecVOISphere.begin() ; it != vecVOISphere.end() ; ++it)
         {
             const VOISphere& voi = *it;
-            std::string sPos = converter.ToStringDecimal(voi.m_ptCenter.x , iPrecision) + "," +
-                converter.ToStringDecimal(voi.m_ptCenter.y , iPrecision) + "," +
-                converter.ToStringDecimal(voi.m_ptCenter.z , iPrecision);
-            std::string sRadius = converter.ToStringDecimal(voi.m_dDiameter , iPrecision);
+            std::string sPos = converter.to_string_decimal(voi.m_ptCenter.x , iPrecision) + "," +
+                converter.to_string_decimal(voi.m_ptCenter.y , iPrecision) + "," +
+                converter.to_string_decimal(voi.m_ptCenter.z , iPrecision);
+            std::string sRadius = converter.to_string_decimal(voi.m_dDiameter , iPrecision);
 
             QTableWidgetItem* pPos= new QTableWidgetItem(sPos.c_str());
             pPos->setFlags(pPos->flags() & ~Qt::ItemIsEnabled);
@@ -753,12 +753,12 @@ void NoduleAnnotation::SlotVOIAddNodule_i()
     }
 }
 
-void NoduleAnnotation::SlotVOIDeleteNodule_i(int id)
+void NoduleAnnotation::slot_delete_nodule_i(int id)
 {
 
 }
 
-void NoduleAnnotation::SlotVOITableWidgetNoduleTypeChanged_i(int id)
+void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
 {
     QWidget* pWidget = ui.tableWidgetNoduleList->cellWidget(id , 2);
 
@@ -768,11 +768,11 @@ void NoduleAnnotation::SlotVOITableWidgetNoduleTypeChanged_i(int id)
         std::string sType = pBox->currentText().toStdString();
         std::cout << id <<'\t' << sType << std::endl;
 
-        m_pVOIModel->ModifyVOISphereName(id , sType);
+        m_pVOIModel->modify_voi_sphere_name(id , sType);
     }
 }
 
-void NoduleAnnotation::SlotPersetWLChanged_i(QString s)
+void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
 {
     if (!m_bReady)
     {
@@ -816,13 +816,13 @@ void NoduleAnnotation::SlotPersetWLChanged_i(QString s)
         return;
     }
 
-    m_pMPRScene00->SetGlobalWindowLevel(fWW , fWL);
-    m_pMPRScene01->SetGlobalWindowLevel(fWW , fWL);
-    m_pMPRScene10->SetGlobalWindowLevel(fWW , fWL);
-    m_pSceneContainerOb->Update();
+    m_pMPRScene00->set_global_window_level(fWW , fWL);
+    m_pMPRScene01->set_global_window_level(fWW , fWL);
+    m_pMPRScene10->set_global_window_level(fWW , fWL);
+    m_pSceneContainerOb->update();
 }
 
-void NoduleAnnotation::SlotSceneMinMaxHint_i(const std::string& sName)
+void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& sName)
 {
     if (!m_bReady)
     {
@@ -833,17 +833,17 @@ void NoduleAnnotation::SlotSceneMinMaxHint_i(const std::string& sName)
     QScrollBar* pTargetBar = nullptr;
     if (0 == m_iLayoutType)
     {
-        if (sName == m_pMPRScene00->GetName())
+        if (sName == m_pMPRScene00->get_name())
         {
             pTragetContainer = m_pMPR00;
             pTargetBar = m_pMPR00ScrollBar;
         }
-        else if (sName == m_pMPRScene01->GetName())
+        else if (sName == m_pMPRScene01->get_name())
         {
             pTragetContainer = m_pMPR01;
             pTargetBar = m_pMPR01ScrollBar;
         }
-        else if (sName == m_pMPRScene10->GetName())
+        else if (sName == m_pMPRScene10->get_name())
         {
             pTragetContainer = m_pMPR10;
             pTargetBar = m_pMPR10ScrollBar;
@@ -881,11 +881,11 @@ void NoduleAnnotation::SlotSceneMinMaxHint_i(const std::string& sName)
     }
     else
     {
-        SlotChangeLayout2x2_i();
+        slot_change_layout2x2_i();
     }
 }
 
-void NoduleAnnotation::SlotFocusInScene_i(QString s)
+void NoduleAnnotation::slot_focus_in_scene_i(QString s)
 {
     if (!m_bReady)
     {
@@ -894,17 +894,17 @@ void NoduleAnnotation::SlotFocusInScene_i(QString s)
 
     const std::string sName(s.toLocal8Bit());
 
-    if (sName == m_pMPRScene00->GetName())
+    if (sName == m_pMPRScene00->get_name())
     {
-        m_pCrosshairModel->Focus(m_pMPRScene00);
+        m_pCrosshairModel->focus(m_pMPRScene00);
     }
-    else if (sName == m_pMPRScene01->GetName())
+    else if (sName == m_pMPRScene01->get_name())
     {
-        m_pCrosshairModel->Focus(m_pMPRScene01);
+        m_pCrosshairModel->focus(m_pMPRScene01);
     }
-    else if (sName == m_pMPRScene10->GetName())
+    else if (sName == m_pMPRScene10->get_name())
     {
-        m_pCrosshairModel->Focus(m_pMPRScene10);
+        m_pCrosshairModel->focus(m_pMPRScene10);
     }
     else
     {
@@ -912,25 +912,25 @@ void NoduleAnnotation::SlotFocusInScene_i(QString s)
     }
 }
 
-void NoduleAnnotation::SlotFocusOutScene_i(QString sName)
+void NoduleAnnotation::slot_focus_out_scene_i(QString sName)
 {
     if (!m_bReady)
     {
         return;
     }
 
-    m_pCrosshairModel->Focus(nullptr);
+    m_pCrosshairModel->focus(nullptr);
 
 }
 
-void NoduleAnnotation::SlotCrosshairVisbility_i(int iFlag)
+void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 {
     if (!m_bReady)
     {
         return;
     }
 
-    m_pCrosshairModel->SetVisibility(iFlag != 0);
+    m_pCrosshairModel->set_visibility(iFlag != 0);
 
     SceneContainer* aContainers[3] = {m_pMPR00 , m_pMPR01 , m_pMPR10};
     std::shared_ptr<MPRScene> aScenes[3] = {m_pMPRScene00 , m_pMPRScene01 , m_pMPRScene10};
@@ -938,7 +938,7 @@ void NoduleAnnotation::SlotCrosshairVisbility_i(int iFlag)
     {
         for (int i = 0 ;i<3 ; ++i)
         {
-            IMouseOpPtrCollection vecOps = aContainers[i]->GetMouseOperation(Qt::LeftButton ,  Qt::NoModifier);
+            IMouseOpPtrCollection vecOps = aContainers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
             IMouseOpPtrCollection vecOpsNew;
             for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
             {
@@ -947,14 +947,14 @@ void NoduleAnnotation::SlotCrosshairVisbility_i(int iFlag)
                     vecOpsNew.push_back(*it);
                 }
             }
-            aContainers[i]->RegisterMouseOperation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
+            aContainers[i]->register_mouse_operation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
         }
     }
     else
     {
         for (int i = 0 ;i<3 ; ++i)
         {
-            IMouseOpPtrCollection vecOps = aContainers[i]->GetMouseOperation(Qt::LeftButton ,  Qt::NoModifier);
+            IMouseOpPtrCollection vecOps = aContainers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
             IMouseOpPtrCollection vecOpsNew;
             for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
             {
@@ -964,13 +964,13 @@ void NoduleAnnotation::SlotCrosshairVisbility_i(int iFlag)
                 }
             }
             std::shared_ptr<MouseOpLocate> pOpLocate(new MouseOpLocate());
-            pOpLocate->SetScene(aScenes[i]);
-            pOpLocate->SetCrosshairModel(m_pCrosshairModel);
+            pOpLocate->set_scene(aScenes[i]);
+            pOpLocate->set_crosshair_model(m_pCrosshairModel);
             vecOpsNew.push_back(pOpLocate);
-            aContainers[i]->RegisterMouseOperation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
+            aContainers[i]->register_mouse_operation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
         }
     }
-    m_pSceneContainerOb->Update();
+    m_pSceneContainerOb->update();
 }
 
 

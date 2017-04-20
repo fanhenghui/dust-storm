@@ -25,7 +25,7 @@ public:
 	Quat4(double angle, const Vector3& axis)
 		: w(std::cos(angle / 2)) , m_bNorm(true)
 	{
-		double mag = axis.Magnitude();
+		double mag = axis.magnitude();
 		if (mag < DOUBLE_EPSILON)
 		{
 			x = 0;
@@ -75,10 +75,10 @@ public:
 		return *this;
 	}
 
-	Matrix4 ToMatrix() const
+	Matrix4 to_matrix() const
 	{
 		Quat4 quat(*this);
-		quat.Normalize();
+		quat.normalize();
 
 		double ww = quat.w * quat.w;
 		double xx = quat.x * quat.x;
@@ -98,7 +98,7 @@ public:
 			0, 0, 0, 1);
 	}
 
-	inline bool Normalize()
+	inline bool normalize()
 	{
 		if (m_bNorm)
 		{

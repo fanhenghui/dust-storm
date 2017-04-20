@@ -1,13 +1,13 @@
 
 template<class T>
-float Sampler<T>::Sample1DNearst(float idx , unsigned int len , T* data)const
+float Sampler<T>::sample_1d_nearst(float idx , unsigned int len , T* data)const
 {
     const unsigned int uIdx = (unsigned int)idx;
     return data[uIdx];
 }
 
 template<class T>
-float Sampler<T>::Sample1DLinear(float idx , unsigned int len , T* data)const
+float Sampler<T>::sample_1d_linear(float idx , unsigned int len , T* data)const
 {
     if (idx >= (float)(len-1) - FLOAT_EPSILON)
     {
@@ -24,7 +24,7 @@ float Sampler<T>::Sample1DLinear(float idx , unsigned int len , T* data)const
 }
 
 template<class T>
-float Sampler<T>::Sample2DNearst(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const
+float Sampler<T>::sample_2d_nearst(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const
 {
     const unsigned int uX = (unsigned int)x;
     const unsigned int uY = (unsigned int)y;
@@ -32,7 +32,7 @@ float Sampler<T>::Sample2DNearst(float x , float y , unsigned int uiWidth , unsi
 }
 
 template<class T>
-float Sampler<T>::Sample2DLinear(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const
+float Sampler<T>::sample_2d_linear(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const
 {
     unsigned int uiXAdjust = 1;
     if (x >= (float)(uiWidth-1) - FLOAT_EPSILON)
@@ -67,7 +67,7 @@ float Sampler<T>::Sample2DLinear(float x , float y , unsigned int uiWidth , unsi
 }
 
 template<class T>
-float Sampler<T>::Sample3DNearst(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth ,T* data)const
+float Sampler<T>::sample_3d_nearst(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth ,T* data)const
 {
     const unsigned int uX = (unsigned int)x;
     const unsigned int uY = (unsigned int)y;
@@ -77,7 +77,7 @@ float Sampler<T>::Sample3DNearst(float x , float y , float z , unsigned int uiWi
 }
 
 template<class T>
-float Sampler<T>::Sample3DLinear(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth ,T* data)const
+float Sampler<T>::sample_3d_linear(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth ,T* data)const
 {
     unsigned int uiXAdjust = 1;
     if (x >= (float)(uiWidth-1) - FLOAT_EPSILON)

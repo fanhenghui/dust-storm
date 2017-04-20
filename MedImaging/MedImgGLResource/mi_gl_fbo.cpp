@@ -6,7 +6,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLFBO::GLFBO(UIDType uid):GLObject(uid),m_uiFBOID(0),m_eTarget(GL_FRAMEBUFFER)
 {
-    SetType("GLFBO");
+    set_type("GLFBO");
 }
 
 GLFBO::~GLFBO()
@@ -14,7 +14,7 @@ GLFBO::~GLFBO()
 
 }
 
-void GLFBO::Initialize()
+void GLFBO::initialize()
 {
     if (0 == m_uiFBOID)
     {
@@ -22,7 +22,7 @@ void GLFBO::Initialize()
     }
 }
 
-void GLFBO::Finalize()
+void GLFBO::finalize()
 {
     if (0 != m_uiFBOID)
     {
@@ -30,34 +30,34 @@ void GLFBO::Finalize()
     }
 }
 
-unsigned int GLFBO::GetID() const
+unsigned int GLFBO::get_id() const
 {
     return m_uiFBOID;
 }
 
-void GLFBO::Bind()
+void GLFBO::bind()
 {
     glBindFramebuffer(m_eTarget , m_uiFBOID);
 }
 
-void GLFBO::UnBind()
+void GLFBO::unbind()
 {
     glBindFramebuffer(m_eTarget , 0);
 }
 
-void GLFBO::SetTraget(GLenum eTarget)
+void GLFBO::set_target(GLenum eTarget)
 {
     m_eTarget = eTarget;
 }
 
-GLenum GLFBO::GetTraget()
+GLenum GLFBO::get_target()
 {
     return m_eTarget;
 }
 
-void GLFBO::AttachTexture( GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D )
+void GLFBO::attach_texture( GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D )
 {
-    glFramebufferTexture2D(m_eTarget , eAttach , GL_TEXTURE_2D , pTex2D->GetID() , 0);
+    glFramebufferTexture2D(m_eTarget , eAttach , GL_TEXTURE_2D , pTex2D->get_id() , 0);
 }
 
 MED_IMAGING_END_NAMESPACE

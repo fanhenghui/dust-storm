@@ -6,7 +6,7 @@
 #include "qt/qpoint.h"
 #include "boost/thread/mutex.hpp"
 
-namespace MedImaging
+namespace medical_imaging
 {
     class SceneBase;
     class PainterBase;
@@ -19,9 +19,9 @@ class QKeyEvent;
 
 class SharedWidget;
 
-typedef std::shared_ptr<MedImaging::IMouseOp> IMouseOpPtr;
+typedef std::shared_ptr<medical_imaging::IMouseOp> IMouseOpPtr;
 typedef std::vector<IMouseOpPtr> IMouseOpPtrCollection;
-typedef std::shared_ptr<MedImaging::PainterBase> PainterPtr;
+typedef std::shared_ptr<medical_imaging::PainterBase> PainterPtr;
 
 class QtWidgets_Export SceneContainer : public QGLWidget
 {
@@ -29,15 +29,20 @@ class QtWidgets_Export SceneContainer : public QGLWidget
 public:
     SceneContainer(SharedWidget* pShared , QWidget* parent = 0);
     virtual ~SceneContainer();
-    void SetName(const std::string& sDes);
-    std::string GetName() const;
-    void SetScene(std::shared_ptr<MedImaging::SceneBase> pScene);
-    std::shared_ptr<MedImaging::SceneBase> GetScene();
-    void RegisterMouseOperation(IMouseOpPtr pMouseOP , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
-    void RegisterMouseOperation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
-    IMouseOpPtrCollection GetMouseOperation(Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
-    void RegisterKeyOperation();
-    void AddPainterList(std::vector<PainterPtr> vecPainters);
+
+    void set_name(const std::string& sDes);
+    std::string get_name() const;
+
+    void set_scene(std::shared_ptr<medical_imaging::SceneBase> pScene);
+    std::shared_ptr<medical_imaging::SceneBase> get_scene();
+
+    void register_mouse_operation(IMouseOpPtr pMouseOP , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
+    void register_mouse_operation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
+    IMouseOpPtrCollection get_mouse_operation(Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
+
+    void register_key_operation();
+
+    void add_painter_list(std::vector<PainterPtr> vecPainters);
 
 signals:
     void focusInScene();
@@ -60,13 +65,13 @@ protected:
     virtual void focusOutEvent(QFocusEvent *event);
     ////////////////////////////////////////////////////////////////////////// 
 
-    void RenderToBack_i();
+    void render_to_back_i();
 
 private:
-    bool GetMouseOperation_i(QMouseEvent *event , IMouseOpPtrCollection& pOp);
+    bool get_mouse_operation_i(QMouseEvent *event , IMouseOpPtrCollection& pOp);
 
 protected:
-    std::shared_ptr<MedImaging::SceneBase> m_pScene;
+    std::shared_ptr<medical_imaging::SceneBase> m_pScene;
     std::vector<PainterPtr> m_vecPainters;
     std::map<int , IMouseOpPtrCollection> m_mapMouseOps;
     Qt::MouseButton m_eButton;

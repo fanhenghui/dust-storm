@@ -19,18 +19,18 @@ class RayCastingCPUBrickAcc
 public:
     RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> pRayCaster);
     ~RayCastingCPUBrickAcc();
-    void Render(int iTestCode = 0);
+    void render(int iTestCode = 0);
 
     //////////////////////////////////////////////////////////////////////////
     //For testing 
-    const std::vector<BrickDistance>& GetBrickDistance() const;
-    unsigned int GetRayCastingBrickCount() const;
+    const std::vector<BrickDistance>& get_brick_distance() const;
+    unsigned int get_ray_casting_brick_count() const;
 public:
 
 private:
-    void BrickSort_i();//Just for orthogonal camera(same ray direction)
+    void sort_brick_i();//Just for orthogonal camera(same ray direction)
 
-    void RayCastingInBrick_i(unsigned int id ,  const std::shared_ptr<RayCaster>& pRayCaster);
+    void ray_casting_in_brick_i(unsigned int id ,  const std::shared_ptr<RayCaster>& pRayCaster);
 
 private:
     std::weak_ptr<RayCaster> m_pRayCaster;

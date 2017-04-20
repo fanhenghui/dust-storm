@@ -15,26 +15,26 @@ class RayCastingCPU
 public:
     RayCastingCPU(std::shared_ptr<RayCaster> pRayCaster);
     ~RayCastingCPU();
-    void Render(int iTestCode = 0);
+    void render(int iTestCode = 0);
 private:
     //For testing
-    void RenderEntryExitPoints_i(int iTestCode);
+    void render_entry_exit_points_i(int iTestCode);
 
     //Dispatch render mode
     template<class T>
-    void RayCasting_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_i(std::shared_ptr<RayCaster> pRayCaster);
 
     //Average
     template<class T>
-    void RayCasting_Average_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster);
 
     //MIP
     template<class T>
-    void RayCasting_MIP_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_mip_i(std::shared_ptr<RayCaster> pRayCaster);
 
     //MinIP
     template<class T>
-    void RayCasting_MinIP_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_minip_i(std::shared_ptr<RayCaster> pRayCaster);
 
 private:
     std::weak_ptr<RayCaster> m_pRayCaster;

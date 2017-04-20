@@ -38,7 +38,7 @@
 
 #include "my_main_window.h"
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 MedicalImageDataModule::MedicalImageDataModule(
     MyMainWindow*pMainWindow , 
@@ -74,49 +74,49 @@ void MedicalImageDataModule::SlotActionOpenDICOMFolder()
         std::shared_ptr<ImageDataHeader> pDataHeader;
         std::shared_ptr<ImageData> pImgData;
         DICOMLoader loader;
-        IOStatus status = loader.LoadSeries(vecSTDFiles, pImgData , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, pImgData , pDataHeader);
 
         m_pVolumeInfos.reset(new VolumeInfos());
-        m_pVolumeInfos->SetDataHeader(pDataHeader);
-        m_pVolumeInfos->SetVolume(pImgData);
+        m_pVolumeInfos->set_data_header(pDataHeader);
+        m_pVolumeInfos->set_volume(pImgData);
 
-        std::shared_ptr<MedImaging::MPRScene> pScene(new MedImaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));
+        std::shared_ptr<medical_imaging::MPRScene> pScene(new medical_imaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));
 
         //m_pMPRScene->makeCurrent();
-        pScene->SetVolumeInfos(m_pVolumeInfos);
-        pScene->SetSampleRate(1.0);
-        pScene->SetGlobalWindowLevel(252,40);
-        pScene->SetCompositeMode(COMPOSITE_AVERAGE);
-        pScene->PlaceMPR(TRANSVERSE);
-        m_pMPRScene->SetScene(pScene);
+        pScene->set_volume_infos(m_pVolumeInfos);
+        pScene->set_sample_rate(1.0);
+        pScene->set_global_window_level(252,40);
+        pScene->set_composite_mode(COMPOSITE_AVERAGE);
+        pScene->place_mpr(TRANSVERSE);
+        m_pMPRScene->set_scene(pScene);
 
 
         //Add painter list
         std::shared_ptr<CornersInfoPainter> pPatientInfo(new CornersInfoPainter());
-        pPatientInfo->SetScene(pScene);
-        m_pMPRScene->AddPainterList(std::vector<std::shared_ptr<PainterBase>>(1 , pPatientInfo));
+        pPatientInfo->set_scene(pScene);
+        m_pMPRScene->add_painter_list(std::vector<std::shared_ptr<PainterBase>>(1 , pPatientInfo));
 
 
         //Add operation 
         std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->SetScene(pScene);
-        m_pMPRScene->RegisterMouseOperation(pZoom , Qt::RightButton , Qt::NoModifier);
+        pZoom->set_scene(pScene);
+        m_pMPRScene->register_mouse_operation(pZoom , Qt::RightButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpRotate> pRotate(new MouseOpRotate());
-        pRotate->SetScene(pScene);
-        m_pMPRScene->RegisterMouseOperation(pRotate , Qt::LeftButton , Qt::NoModifier);
+        pRotate->set_scene(pScene);
+        m_pMPRScene->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->SetScene(pScene);
-        m_pMPRScene->RegisterMouseOperation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
+        pWindowing->set_scene(pScene);
+        m_pMPRScene->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->SetScene(pScene);
-        m_pMPRScene->RegisterMouseOperation(pPan , Qt::MiddleButton , Qt::ControlModifier);
+        pPan->set_scene(pScene);
+        m_pMPRScene->register_mouse_operation(pPan , Qt::MiddleButton , Qt::ControlModifier);
 
         std::shared_ptr<MouseOpProbe> pProbe(new MouseOpProbe());
-        pProbe->SetScene(pScene);
-        m_pMPRScene->RegisterMouseOperation(pProbe , Qt::NoButton, Qt::NoModifier);
+        pProbe->set_scene(pScene);
+        m_pMPRScene->register_mouse_operation(pProbe , Qt::NoButton, Qt::NoModifier);
 
 
         QApplication::restoreOverrideCursor();
@@ -146,7 +146,7 @@ void MedicalImageDataModule::SlotActionOpenMetaFolder()
             std::string s((*it).toLocal8Bit());
             std::cout << s << std::endl;
             std::shared_ptr<MetaObjectTag> pMetaObjTag;
-            loader.Load(s , pImg ,pMetaObjTag , pImgHeader );
+            loader.load(s , pImg ,pMetaObjTag , pImgHeader );
             vecMetaObjTag.push_back(pMetaObjTag);
         }
     }

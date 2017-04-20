@@ -10,10 +10,10 @@ class QtWidgets_Export MouseOpProbe : public IMouseOp
 public:
     MouseOpProbe();
     virtual ~MouseOpProbe();
-    virtual void Press(const QPoint& pt);
-    virtual void Move(const QPoint& pt);
-    virtual void Release(const QPoint& pt);
-    virtual void DoubleClick(const QPoint& pt);
+    virtual void press(const QPoint& pt);
+    virtual void move(const QPoint& pt);
+    virtual void release(const QPoint& pt);
+    virtual void double_click(const QPoint& pt);
 protected:
 private:
 };

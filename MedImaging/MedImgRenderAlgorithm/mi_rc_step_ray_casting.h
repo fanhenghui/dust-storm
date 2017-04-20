@@ -19,9 +19,9 @@ public:
 
       virtual ~RCStepRayCastingMIPBase(){};
 
-      virtual void SetGPUParameter();
+      virtual void set_gpu_parameter();
 
-      virtual void GetUniformLocation();
+      virtual void get_uniform_location();
     
 
 private:
@@ -40,7 +40,7 @@ public:
 
     virtual ~RCStepRayCastingAverage(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -54,7 +54,7 @@ public:
 
     virtual ~RCStepRayCastingMIPMinIP(){};
 
-    virtual GLShaderInfo GetShaderInfo();
+    virtual GLShaderInfo get_shader_info();
 
 private:;
 };

@@ -14,7 +14,7 @@ MouseOpZoom::~MouseOpZoom()
 
 }
 
-void MouseOpZoom::Press(const QPoint& pt)
+void MouseOpZoom::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -24,18 +24,18 @@ void MouseOpZoom::Press(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpZoom::Move(const QPoint& pt)
+void MouseOpZoom::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
         return;
     }
 
-    m_pScene->Zoom(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
+    m_pScene->zoom(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
     m_ptPre = pt;
 }
 
-void MouseOpZoom::Release(const QPoint& pt)
+void MouseOpZoom::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -44,7 +44,7 @@ void MouseOpZoom::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpZoom::DoubleClick(const QPoint& pt)
+void MouseOpZoom::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {

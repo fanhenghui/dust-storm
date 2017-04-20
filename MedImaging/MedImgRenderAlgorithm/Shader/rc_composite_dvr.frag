@@ -14,12 +14,12 @@ layout (std430 , binding = BUFFER_BINDING_WINDOW_LEVEL_BUCKET) buffer WindowLeve
     vec2 windowing[];
 };
 
-bool AccessMask(vec3 vPos, sampler3D sampler , out int iOutLabel);
-float AccessVolume(sampler3D sampler , vec3 vPos);
+bool access_mask(vec3 vPos, sampler3D sampler , out int iOutLabel);
+float access_volume(sampler3D sampler , vec3 vPos);
 
-vec4 Shade(vec3 vSamplePos, vec4 vOutputColor, vec3 vRayDir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel);
+vec4 shade(vec3 vSamplePos, vec4 vOutputColor, vec3 vRayDir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel);
 
-void Composite(vec3 vSamplePos,vec3 vRayDir, in out vec4 vIntegralColor, 
+void composite(vec3 vSamplePos,vec3 vRayDir, in out vec4 vIntegralColor, 
 sampler3D sVolume , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift)
 {
     int iLabel = 0;
@@ -28,17 +28,17 @@ sampler3D sVolume , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset , v
     float fGray;
 
     vec3 vActualSamplePos = (vSamplePos + vSubDataOffset )/vSubDataDim;//Actual SamplePos in sampler
-    if(AccessMask(sMask , vActualSamplePos , iLabel))
+    if(access_mask(sMask , vActualSamplePos , iLabel))
     {
         fMinGray = windowing[iLabel].y - 0.5 * windowing[iLabel].x;
 
-        fGray = AccessVolume(sVolume, vActualSamplePos);
+        fGray = access_volume(sVolume, vActualSamplePos);
         fGray = (fGray - fMinGray) / windowing[iLabel].x;
 
         vCurColor = texture1DArray(sColorTableArray, vec2(fGray + fColorTableTexShift , iLabel) );
         if(vCurColor.a >0.0)
         {
-            vec4 vShading = Shade(vActualSamplePos, vCurColor, vRayDir , sVolume , vSamplePos , vSampleShift , iLabel);
+            vec4 vShading = shade(vActualSamplePos, vCurColor, vRayDir , sVolume , vSamplePos , vSampleShift , iLabel);
             vShading.a = 1 - pow(1 - vShading.a, fSampleRate/fOpacityCompensation);
             vIntegralColor.rgb += vShading.rgb * (1.0 - vIntegralColor.a) * vShading.a;
             vIntegralColor.a += vShading.a * (1.0 - vIntegralColor.a);

@@ -14,17 +14,17 @@ public:
 
     ~GLResourceManager();
 
-    std::string GetObjectDescription();
+    std::shared_ptr<ResourceType> create_object(UIDType &uid);
 
-    std::shared_ptr<ResourceType> CreateObject(UIDType &uid);
+    std::shared_ptr<ResourceType> get_object(UIDType uid);
 
-    std::shared_ptr<ResourceType> GetObject(UIDType uid);
+    void remove_object(UIDType uid);
 
-    void RemoveObject(UIDType uid);
+    void remove_all();
 
-    void RemoveAll();
+    void update();
 
-    void Update();
+    std::string get_type() const;
 
 private:
     std::map<UIDType, std::shared_ptr<ResourceType>> m_Objects;

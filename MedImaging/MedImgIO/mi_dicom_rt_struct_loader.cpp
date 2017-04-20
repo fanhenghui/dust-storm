@@ -27,7 +27,7 @@ DICOMRTLoader::~DICOMRTLoader()
 
 }
 
-IOStatus DICOMRTLoader::LoadRTStruct(const std::string& sFile , std::shared_ptr<RTStruct> &pRTStruct)
+IOStatus DICOMRTLoader::load_rt_struct(const std::string& sFile , std::shared_ptr<RTStruct> &pRTStruct)
 {
     try
     {
@@ -39,7 +39,7 @@ IOStatus DICOMRTLoader::LoadRTStruct(const std::string& sFile , std::shared_ptr<
             std::cout << "err\n";
         }
 
-        return LoadRTStruct(pFileformat , pRTStruct);
+        return load_rt_struct(pFileformat , pRTStruct);
 
     }
     catch (const Exception& e)
@@ -50,7 +50,7 @@ IOStatus DICOMRTLoader::LoadRTStruct(const std::string& sFile , std::shared_ptr<
     
 }
 
-IOStatus DICOMRTLoader::LoadRTStruct(DcmFileFormatPtr pFileformat , std::shared_ptr<RTStruct> &pRTStruct)
+IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr pFileformat , std::shared_ptr<RTStruct> &pRTStruct)
 {
     try
     {
@@ -147,7 +147,7 @@ IOStatus DICOMRTLoader::LoadRTStruct(DcmFileFormatPtr pFileformat , std::shared_
                     pData->m_vecPoints[k]._m[2] = (float)atof(vecPoints[k*3+2].c_str());
                 }
 
-                pRTStruct->AddContour(sROIName.c_str() , pData);
+                pRTStruct->add_contour(sROIName.c_str() , pData);
 
             }
 

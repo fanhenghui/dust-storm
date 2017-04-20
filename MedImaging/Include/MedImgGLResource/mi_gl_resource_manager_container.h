@@ -36,27 +36,27 @@ typedef std::shared_ptr<GLTexture1DArrayManager> GLTexture1DArrayManagerPtr;
 class GLResource_Export GLResourceManagerContainer
 {
 public:
-    static GLResourceManagerContainer* Instance();
+    static GLResourceManagerContainer* instance();
 
     ~GLResourceManagerContainer();
 
-    GLProgramManagerPtr GetProgramManager() const;
+    GLProgramManagerPtr get_program_manager() const;
 
-    GLBufferManagerPtr GetBufferManager() const;
+    GLBufferManagerPtr get_buffer_manager() const;
 
-    GLTexture1DManagerPtr GetTexture1DManager() const;
+    GLTexture1DManagerPtr get_texture_1d_manager() const;
 
-    GLTexture2DManagerPtr GetTexture2DManager() const;
+    GLTexture2DManagerPtr get_texture_2d_manager() const;
 
-    GLTexture3DManagerPtr GetTexture3DManager() const;
+    GLTexture3DManagerPtr get_texture_3d_manager() const;
 
-    GLTexture1DArrayManagerPtr GetTexture1DArrayManager() const;
+    GLTexture1DArrayManagerPtr get_texture_1d_array_manager() const;
 
-    GLVAOManagerPtr GetVAOManager() const;
+    GLVAOManagerPtr get_vao_manager() const;
 
-    GLFBOManagerPtr GetFBOManager() const;
+    GLFBOManagerPtr get_fbo_manager() const;
 
-    void UpdateAll();
+    void update_all();
 
 private:
     GLResourceManagerContainer();

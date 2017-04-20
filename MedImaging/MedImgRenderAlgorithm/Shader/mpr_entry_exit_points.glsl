@@ -20,7 +20,7 @@ layout (location = THICKNESS) uniform float fThickness;
 layout (location = RAY_DIRECTION) uniform vec3 vRayDir;
 
 /// Get exaclty point
-float RayBrickIntersectInit(vec3 initialPt, vec3 brickMin, vec3 brickDim, vec3 rayDir, 
+float ray_intersect_brick(vec3 initialPt, vec3 brickMin, vec3 brickDim, vec3 rayDir, 
     out float startStep, out float endStep)
 {
     vec3 invR = 1.0 / (rayDir); 
@@ -42,7 +42,7 @@ float RayBrickIntersectInit(vec3 initialPt, vec3 brickMin, vec3 brickDim, vec3 r
     return tnear - startStep;
 }
 
-bool CheckOutside(vec3 point, vec3 boundary)
+bool check_outside(vec3 point, vec3 boundary)
 {
     bvec3 bCompareMin = lessThan(point, vec3(0.0, 0.0, 0.0));
     bvec3 bCompareMax = greaterThan(point, boundary);
@@ -81,10 +81,10 @@ void main()
     vec3 vEntryIntersection = vEntry;
     vec3 vExitIntersection = vExit;
 
-    RayBrickIntersectInit(vEntry, vec3(0,0,0),vVolumeDim, vRayDir, fEntryStep, fExitStep);
+    ray_intersect_brick(vEntry, vec3(0,0,0),vVolumeDim, vRayDir, fEntryStep, fExitStep);
 
     //Entry point outside
-    if( CheckOutside(vEntry, vVolumeDim) )
+    if( check_outside(vEntry, vVolumeDim) )
     {
         if(fEntryStep >= fExitStep || fEntryStep < 0 || fEntryStep > fThickness)// check entry points in range of thickness and volume
         {
@@ -97,7 +97,7 @@ void main()
     }
 
     //Exit point outside
-    if( CheckOutside(vExit, vVolumeDim) )
+    if( check_outside(vExit, vVolumeDim) )
     {
         if(fEntryStep >= fExitStep)
         {

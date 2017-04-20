@@ -17,7 +17,7 @@ BrickGenerator::~BrickGenerator()
 
 }
 
- void BrickGenerator::CalculateBrickCorner( 
+ void BrickGenerator::calculate_brick_corner( 
      std::shared_ptr<ImageData> pImgData , 
      unsigned int uiBrickSize , unsigned int uiBrickExpand , 
      BrickCorner* pBrickCorner)
@@ -25,7 +25,7 @@ BrickGenerator::~BrickGenerator()
     RENDERALGO_CHECK_NULL_EXCEPTION(pBrickCorner);
 
     unsigned int uiBrickDim[3] = {1,1,1};
-    BrickUtils::Instance()->GetBrickDim(pImgData->m_uiDim , uiBrickDim , uiBrickSize);
+    BrickUtils::instance()->get_brick_dim(pImgData->m_uiDim , uiBrickDim , uiBrickSize);
 
     const unsigned int uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
 
@@ -44,7 +44,7 @@ BrickGenerator::~BrickGenerator()
 
 }
 
-void BrickGenerator::CalculateBrickUnit( 
+void BrickGenerator::calculate_brick_unit( 
     std::shared_ptr<ImageData> pImgData ,
     BrickCorner* pBrickCorner , 
     unsigned int uiBrickSize , unsigned int uiBrickExpand , 
@@ -53,12 +53,12 @@ void BrickGenerator::CalculateBrickUnit(
     RENDERALGO_CHECK_NULL_EXCEPTION(pBrickUnit);
 
     unsigned int uiBrickDim[3] = {1,1,1};
-    BrickUtils::Instance()->GetBrickDim(pImgData->m_uiDim , uiBrickDim , uiBrickSize);
+    BrickUtils::instance()->get_brick_dim(pImgData->m_uiDim , uiBrickDim , uiBrickSize);
 
     const unsigned int uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
     //BrickUnit* pBrickUnit = new BrickUnit[uiBrickCount];
 
-    const unsigned int uiDispatch = Concurrency::Instance()->GetAppConcurrency();
+    const unsigned int uiDispatch = Concurrency::instance()->get_app_concurrency();
 
     std::vector<boost::thread> vecThreads(uiDispatch-1);
     const unsigned int uiBrickDispath = uiBrickCount/uiDispatch;
@@ -69,16 +69,16 @@ void BrickGenerator::CalculateBrickUnit(
         {
             if (1 == uiDispatch)
             {
-                CalculateBrickUnitKernel_i<unsigned char>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<unsigned char>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
             }
             else
             {
                 for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
                 {
-                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::CalculateBrickUnitKernel_i<unsigned char>, this , 
+                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::calculate_brick_unit_kernel_i<unsigned char>, this , 
                         uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand));
                 }
-                CalculateBrickUnitKernel_i<unsigned char>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<unsigned char>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
                 std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
             }
 
@@ -88,16 +88,16 @@ void BrickGenerator::CalculateBrickUnit(
         {
             if (1 == uiDispatch)
             {
-                CalculateBrickUnitKernel_i<unsigned short>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<unsigned short>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
             }
             else
             {
                 for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
                 {
-                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::CalculateBrickUnitKernel_i<unsigned short>, this , 
+                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::calculate_brick_unit_kernel_i<unsigned short>, this , 
                         uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand));
                 }
-                CalculateBrickUnitKernel_i<unsigned short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<unsigned short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
                 std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
             }
             break;
@@ -106,16 +106,16 @@ void BrickGenerator::CalculateBrickUnit(
         {
             if (1 == uiDispatch)
             {
-                CalculateBrickUnitKernel_i<short>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<short>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
             }
             else
             {
                 for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
                 {
-                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::CalculateBrickUnitKernel_i<short>, this , 
+                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::calculate_brick_unit_kernel_i<short>, this , 
                         uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand));
                 }
-                CalculateBrickUnitKernel_i<short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<short>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
                 std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
             }
             break;
@@ -124,16 +124,16 @@ void BrickGenerator::CalculateBrickUnit(
         {
             if (1 == uiDispatch)
             {
-                CalculateBrickUnitKernel_i<float>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<float>(0 , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
             }
             else
             {
                 for ( unsigned int i = 0 ; i < uiDispatch - 1 ; ++i)
                 {
-                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::CalculateBrickUnitKernel_i<float>, this , 
+                    vecThreads[i] = boost::thread(boost::bind(&BrickGenerator::calculate_brick_unit_kernel_i<float>, this , 
                         uiBrickDispath*i , uiBrickDispath*(i+1) , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand));
                 }
-                CalculateBrickUnitKernel_i<float>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
+                calculate_brick_unit_kernel_i<float>(uiBrickDispath*(uiDispatch-1) , uiBrickCount , pBrickCorner , pBrickUnit , pImgData , uiBrickSize , uiBrickExpand);
                 std::for_each(vecThreads.begin() , vecThreads.end() , std::mem_fun_ref(&boost::thread::join));
             }
             break;
@@ -146,7 +146,7 @@ void BrickGenerator::CalculateBrickUnit(
 }
 
 template<typename T>
-void BrickGenerator::CalculateBrickUnitKernel_i( 
+void BrickGenerator::calculate_brick_unit_kernel_i( 
     unsigned int uiBegin , unsigned int uiEnd ,
     BrickCorner* pBrickCorner , BrickUnit* pBrickUnit , 
     std::shared_ptr<ImageData> pImgData , 
@@ -154,12 +154,12 @@ void BrickGenerator::CalculateBrickUnitKernel_i(
 {
     for (unsigned int i = uiBegin ; i < uiEnd ; ++i)
     {
-        CalculateBrickUnit_i<T>(pBrickCorner[i] , pBrickUnit[i] ,pImgData , uiBrickSize , uiBrickExpand);
+        calculate_brick_unit_i<T>(pBrickCorner[i] , pBrickUnit[i] ,pImgData , uiBrickSize , uiBrickExpand);
     }
 }
 
 template<typename T>
-void BrickGenerator::CalculateBrickUnit_i( 
+void BrickGenerator::calculate_brick_unit_i( 
     BrickCorner& bc , BrickUnit& bu , 
     std::shared_ptr<ImageData> pImgData , 
     unsigned int uiBrickSize , unsigned int uiBrickExpand )
@@ -169,7 +169,7 @@ void BrickGenerator::CalculateBrickUnit_i(
     memset(bu.m_pData , 0 , sizeof(T)*(uiBrickLength*uiBrickLength*uiBrickLength));
 
     T* pDst = (T*)bu.m_pData;
-    T* pSrc = (T*)pImgData->GetPixelPointer();
+    T* pSrc = (T*)pImgData->get_pixel_pointer();
     unsigned int *uiVolumeDim = pImgData->m_uiDim;
 
     unsigned int uiBegin[3] = {bc.m_Min[0] , bc.m_Min[1], bc.m_Min[2]};

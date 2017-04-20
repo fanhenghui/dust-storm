@@ -10,7 +10,7 @@ class Common_Export IObserver
 public:
     IObserver(){}
     virtual ~IObserver(){}
-    virtual void Update() = 0;
+    virtual void update() = 0;
 protected:
 private:
 };

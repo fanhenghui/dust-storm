@@ -11,16 +11,16 @@ class Arithmetic_Export TrackBall
 {
 public:
     /// \ Mouse position coordinate (0 ~ m_iWidth-1 , 0 ~ m_iHeight - 1)
-    static Quat4 MouseMotionToRotation(
+    static Quat4 mouse_motion_to_rotation(
         const Point2& ptMouseFrom, const Point2& ptMouseTo,
         double width, double height, const Point2& ptBottomLeftCorner = Point2::kZeroPoint);
 
 protected:
     ///Convert 2D window coordinates to coordinates on the 3D unit sphere. 
-    static Point3 ConvertScreenPointToSphere_i(
+    static Point3 convert_screen_point_to_sphere_i(
         const Point2& ptPos, double width , double height , const Point2& ptBottomLeftCorner );
 
-    static Quat4 CalculateTrackBallRotation(const Point3& ptPrevious , const Point3& ptCurrent , const Point3& ptCenter);
+    static Quat4 calculate_track_ball_rotation(const Point3& ptPrevious , const Point3& ptCurrent , const Point3& ptCenter);
 private:
 };
 

@@ -21,13 +21,13 @@ public:
 
     virtual ~RCStepBase(){};
 
-    virtual GLShaderInfo GetShaderInfo() = 0;
+    virtual GLShaderInfo get_shader_info() = 0;
 
-    virtual void SetGPUParameter() 
+    virtual void set_gpu_parameter() 
     {
     }
 
-    virtual void GetUniformLocation()
+    virtual void get_uniform_location()
     {
 
     }

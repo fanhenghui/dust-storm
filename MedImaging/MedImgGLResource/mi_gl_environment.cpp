@@ -15,7 +15,7 @@ GLEnvironment::~GLEnvironment()
 
 }
 
-void GLEnvironment::GetGLVersion(int &iMajor , int &iMinor)
+void GLEnvironment::get_gl_version(int &iMajor , int &iMinor)
 {
     std::stringstream ss;
     ss << glGetString(GL_VERSION);
@@ -28,11 +28,11 @@ void GLEnvironment::GetGLVersion(int &iMajor , int &iMinor)
     std::string sMinor;
     sMinor.push_back(sVersionInfo[2]);
 
-    iMajor = strNumConv.ToNumber(sMajor);
-    iMinor = strNumConv.ToNumber(sMinor);
+    iMajor = strNumConv.to_num(sMajor);
+    iMinor = strNumConv.to_num(sMinor);
 }
 
-std::string GLEnvironment::GetGLVendor()
+std::string GLEnvironment::get_gl_vendor()
 {
     std::stringstream ss;
     ss << glGetString(GL_VENDOR);
@@ -40,7 +40,7 @@ std::string GLEnvironment::GetGLVendor()
     return ss.str();
 }
 
-std::string GLEnvironment::GetGLRenderer()
+std::string GLEnvironment::get_gl_renderer()
 {
     std::stringstream ss;
     ss << glGetString(GL_RENDERER);

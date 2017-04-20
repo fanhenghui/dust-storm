@@ -13,7 +13,7 @@ IModel::~IModel()
 
 }
 
-void IModel::AddObserver( ObserverPtr pObserver )
+void IModel::add_observer( ObserverPtr pObserver )
 {
     bool bIsRegistered = false;
     auto it = m_Observers.begin();
@@ -32,7 +32,7 @@ void IModel::AddObserver( ObserverPtr pObserver )
     }
 }
 
-void IModel::DeleteObserver( ObserverPtr pObserver )
+void IModel::delete_observer( ObserverPtr pObserver )
 {
     auto it = m_Observers.begin();
     while(it != m_Observers.end())
@@ -46,31 +46,31 @@ void IModel::DeleteObserver( ObserverPtr pObserver )
     }
 }
 
-void IModel::NotifyAllObserver()
+void IModel::notify()
 {
     if (m_bIsChanged)
     {
 
         for (auto it = m_Observers.begin() ; it != m_Observers.end() ; ++it)
         {
-            (*it)->Update();
+            (*it)->update();
         }
 
         m_bIsChanged = false;
     }
 }
 
-void IModel::SetChanged()
+void IModel::set_changed()
 {
     m_bIsChanged = true;
 }
 
-void IModel::CleanChanged()
+void IModel::reset_changed()
 {
     m_bIsChanged = false;
 }
 
-bool IModel::HasChanged()
+bool IModel::has_changed()
 {
     return m_bIsChanged;
 }

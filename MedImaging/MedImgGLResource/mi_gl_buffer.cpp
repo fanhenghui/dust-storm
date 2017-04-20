@@ -6,7 +6,7 @@ GLBuffer::GLBuffer(UIDType uid):GLObject(uid)
 ,m_eTarget(GL_ARRAY_BUFFER)
 ,m_uiBufferID(0)
 {
-    SetType("GLBuffer");
+    set_type("GLBuffer");
 }
 
 GLBuffer::~GLBuffer()
@@ -14,17 +14,17 @@ GLBuffer::~GLBuffer()
 
 }
 
-void GLBuffer::SetBufferTarget(GLenum target)
+void GLBuffer::set_buffer_target(GLenum target)
 {
     m_eTarget = target;
 }
 
-GLenum GLBuffer::GetBufferTarget() const
+GLenum GLBuffer::get_buffer_target() const
 {
     return m_eTarget;
 }
 
-void GLBuffer::Initialize()
+void GLBuffer::initialize()
 {
     if (0 == m_uiBufferID)
     {
@@ -32,7 +32,7 @@ void GLBuffer::Initialize()
     }
 }
 
-void GLBuffer::Finalize()
+void GLBuffer::finalize()
 {
     if (0 != m_uiBufferID)
     {  
@@ -41,12 +41,12 @@ void GLBuffer::Finalize()
     }
 }
 
-unsigned int GLBuffer::GetID() const
+unsigned int GLBuffer::get_id() const
 {
     return m_uiBufferID;
 }
 
-void GLBuffer::Bind()
+void GLBuffer::bind()
 {
     if (0 == m_uiBufferID)
     {
@@ -55,12 +55,12 @@ void GLBuffer::Bind()
     glBindBuffer(m_eTarget , m_uiBufferID);
 }
 
-void GLBuffer::UnBind()
+void GLBuffer::unbind()
 {
     glBindBuffer(m_eTarget , 0);
 }
 
-void GLBuffer::Load(GLsizei size, const void* data, GLenum usage)
+void GLBuffer::load(GLsizei size, const void* data, GLenum usage)
 {
     glBufferData(m_eTarget , size , data, usage);
 }

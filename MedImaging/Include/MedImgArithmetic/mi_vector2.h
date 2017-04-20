@@ -90,29 +90,29 @@ public:
         return *this;
     }
 
-    inline double AngleBetween(const Vector2& v) const
+    inline double angle_between(const Vector2& v) const
     {
-        double len = Magnitude() * v.Magnitude();
+        double len = magnitude() * v.magnitude();
 
         len = (len > DOUBLE_EPSILON) ? len : DOUBLE_EPSILON;
 
-        double dot = DotProduct(v) / len;
+        double dot = dot_product(v) / len;
         dot = (std::min)(dot, 1.0);
         dot = (std::max)(dot, -1.0);
         return std::acos(dot);
     }
 
-    inline double DotProduct(const Vector2& v) const
+    inline double dot_product(const Vector2& v) const
     {
         return x * v.x + y * v.y;
     }
 
-    inline double Magnitude() const
+    inline double magnitude() const
     {
         return std::sqrt(x * x + y * y);
     }
 
-    inline void Normalize()
+    inline void normalize()
     {
         double len = std::sqrt(x * x + y * y);
         if (len < DOUBLE_EPSILON)
@@ -124,7 +124,7 @@ public:
         y *= leninv;
     }
 
-    Vector2 GetNormalize() const
+    Vector2 get_normalize() const
     {
         double len = std::sqrt(x * x + y * y);
         if (len < DOUBLE_EPSILON)
@@ -135,17 +135,17 @@ public:
         return Vector2(x * leninv, y * leninv);
     }
 
-    bool Parallel(const Vector2& v) const
+    bool parallel(const Vector2& v) const
     {
-        return std::fabs(this->DotProduct(v) - this->Magnitude()*v.Magnitude()) < DOUBLE_EPSILON;
+        return std::fabs(this->dot_product(v) - this->magnitude()*v.magnitude()) < DOUBLE_EPSILON;
     }
 
-    bool Orthogonal(const Vector2& v) const
+    bool orthogonal(const Vector2& v) const
     {
-        return std::fabs(this->DotProduct(v)) < DOUBLE_EPSILON;
+        return std::fabs(this->dot_product(v)) < DOUBLE_EPSILON;
     }
 
-    void Print()
+    void print()
     {
         std::cout <<"( "<<x << " , "<<y << " ) ";
     }
@@ -153,15 +153,15 @@ public:
 
 Vector2 Arithmetic_Export operator *(double scale, const Vector2& v);
 
-double Arithmetic_Export AngleBetween(const Vector2& v1, const Vector2& v2);
+double Arithmetic_Export angle_between(const Vector2& v1, const Vector2& v2);
 
-Vector2 Arithmetic_Export CrossProduct(const Vector2& v1, const Vector2& v2);
+Vector2 Arithmetic_Export cross(const Vector2& v1, const Vector2& v2);
 
-double Arithmetic_Export DotProduct(const Vector2& v1, const Vector2& v2);
+double Arithmetic_Export dot_product(const Vector2& v1, const Vector2& v2);
 
-bool Arithmetic_Export Parallel(const Vector2& v1, const Vector2& v2);
+bool Arithmetic_Export parallel(const Vector2& v1, const Vector2& v2);
 
-bool Arithmetic_Export Orthogonal(const Vector2& v1, const Vector2& v2);
+bool Arithmetic_Export orthogonal(const Vector2& v1, const Vector2& v2);
 
 MED_IMAGING_END_NAMESPACE
 

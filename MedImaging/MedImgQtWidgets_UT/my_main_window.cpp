@@ -17,14 +17,14 @@
 #include "MedImgQtWidgets/mi_shared_widget.h"
 #include "MedImgQtWidgets/mi_scene_container.h"
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 MyMainWindow::MyMainWindow(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
     //Set configuration
-    Configuration::Instance()->SetProcessingUnitType(GPU);
-    GLUtils::SetCheckGLFlag(false);
+    Configuration::instance()->set_processing_unit_type(GPU);
+    GLUtils::set_check_gl_flag(false);
 
     ui.setupUi(this);
 
@@ -55,7 +55,7 @@ MyMainWindow::MyMainWindow(QWidget *parent, Qt::WFlags flags)
 
     QPushButton* pTest = new QPushButton();
 
-    m_pMPRScene = new SceneContainer(SharedWidget::Instance());
+    m_pMPRScene = new SceneContainer(SharedWidget::instance());
     m_pMPRScene->setMinimumSize(500,500);
     //m_pMPRScene->setFixedSize(300,300);
 

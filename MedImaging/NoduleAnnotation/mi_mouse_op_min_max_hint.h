@@ -11,7 +11,7 @@ class QMinMaxHintObject : public QObject
 public:
     QMinMaxHintObject(QObject* parent = 0);
     ~QMinMaxHintObject();
-    void Triggered(const std::string& s);
+    void trigger(const std::string& s);
 
 signals:
     void triggered(const std::string& s);
@@ -28,11 +28,11 @@ class MouseOpMinMaxHint : public IMouseOp
 public:
     MouseOpMinMaxHint();
     virtual ~MouseOpMinMaxHint();
-    virtual void Press(const QPoint& pt);
-    virtual void Move(const QPoint& pt);
-    virtual void Release(const QPoint& pt);
-    virtual void DoubleClick(const QPoint& pt);
-    void SetMinMaxHintObject(QMinMaxHintObject* pObj);
+    virtual void press(const QPoint& pt);
+    virtual void move(const QPoint& pt);
+    virtual void release(const QPoint& pt);
+    virtual void double_click(const QPoint& pt);
+    void set_min_max_hint_object(QMinMaxHintObject* pObj);
 protected:
 private:
     QMinMaxHintObject* m_pMinMaxHintObject;

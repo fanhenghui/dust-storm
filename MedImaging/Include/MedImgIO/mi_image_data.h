@@ -15,29 +15,29 @@ public:
 
     ~ImageData();
 
-    bool AllocateMemory();
+    bool mem_allocate();
 
-    float GetMinScalar();
+    float get_min_scalar();
 
-    float GetMaxScalar();
+    float get_max_scalar();
 
-    bool RegulateWindowLevelAndNormalize(float& fWindow, float& fLevel);
+    bool regulate_normalize_wl(float& fWindow, float& fLevel);
 
-    bool RegulateWindowLevel(float& fWindow, float& fLevel);
+    bool regulate_wl(float& fWindow, float& fLevel);
 
-    void NormalizeWindowLevel(float& fWindow, float& fLevel);
+    void normalize_wl(float& fWindow, float& fLevel);
 
-    void GetPixelValue(unsigned int x, unsigned int y , unsigned int z , double& pValue) const;
+    void get_pixel_value(unsigned int x, unsigned int y , unsigned int z , double& pValue) const;
 
-    void GetPixelValue(const Point3& ptPos ,  double& pPixelValue) const;
+    void get_pixel_value(const Point3& ptPos ,  double& pPixelValue) const;
 
-    void SetImageDataDirty();
+    void set_data_dirty();
 
-    void* GetPixelPointer();
+    void* get_pixel_pointer();
 
-    void ShallowCopy(ImageData *&pImgData);
+    void shallow_copy(ImageData *&pImgData);
 
-    void DeepCopy(ImageData *&pImgData);
+    void deep_copy(ImageData *&pImgData);
 
 public:
     DataType m_eDataType;
@@ -58,15 +58,15 @@ private:
 
 private:
     template<typename T>
-    void FindMinMax_i(T *pData);
+    void find_min_max_i(T *pData);
 
-    void CalculateMinMax_i();
+    void find_min_max_i();
 
-    size_t GetVolumeDataSize_i();
+    size_t get_data_size_i();
 };
 
 template<typename T>
-void ImageData::FindMinMax_i( T *pData )
+void ImageData::find_min_max_i( T *pData )
 {
     if(nullptr == pData)
     {

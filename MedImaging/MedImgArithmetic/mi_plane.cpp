@@ -12,9 +12,9 @@ Plane::~Plane()
 
 }
 
-double Plane::DistanceToPoint(const Point3 &pt) const
+double Plane::distance_to_point(const Point3 &pt) const
 {
-     return m_vNorm.DotProduct(pt - Point3::kZeroPoint) - m_dDistance;
+     return m_vNorm.dot_product(pt - Point3::kZeroPoint) - m_dDistance;
 }
 
 MED_IMAGING_END_NAMESPACE

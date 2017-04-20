@@ -6,7 +6,7 @@ boost::mutex Configuration::m_mutex;
 
 Configuration* Configuration::m_instance = nullptr;
 
-Configuration* Configuration::Instance()
+Configuration* Configuration::instance()
 {
     if (!m_instance)
     {
@@ -24,7 +24,7 @@ Configuration::~Configuration()
 
 }
 
-ProcessingUnitType Configuration::GetProcessingUnitType()
+ProcessingUnitType Configuration::get_processing_unit_type()
 {
     return m_ePUT;
 }
@@ -34,7 +34,7 @@ Configuration::Configuration():m_ePUT(CPU)
     //Check hardware processing unit . Check if has GPU
 }
 
-void Configuration::SetProcessingUnitType(ProcessingUnitType eType)
+void Configuration::set_processing_unit_type(ProcessingUnitType eType)
 {
     m_ePUT = eType;
 }

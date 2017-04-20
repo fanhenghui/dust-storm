@@ -23,7 +23,7 @@ DICOMLoader::~DICOMLoader()
 
 }
 
-IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std::shared_ptr<ImageData> &pImgData , std::shared_ptr<ImageDataHeader> &pImgDataHeader)
+IOStatus DICOMLoader::load_series(const std::vector<std::string>& vecFiles , std::shared_ptr<ImageData> &pImgData , std::shared_ptr<ImageDataHeader> &pImgDataHeader)
 {
     if (vecFiles.empty())
     {
@@ -34,7 +34,7 @@ IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std:
     DcmFileFormatSet vecDataFormats;
 
     //////////////////////////////////////////////////////////////////////////
-    //1 Load series
+    //1 load series
     for (auto it = vecFiles.begin() ; it != vecFiles.end() ; ++it)
     {
         const std::string sFileName = *it;
@@ -49,7 +49,7 @@ IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std:
 
     //////////////////////////////////////////////////////////////////////////
     //2 Data check
-    IOStatus eCheckingStatus = DataCheck_i(vecDataFormats);
+    IOStatus eCheckingStatus = data_check_i(vecDataFormats);
     if(IO_SUCCESS !=  eCheckingStatus)
     {
         return eCheckingStatus;
@@ -62,12 +62,12 @@ IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std:
 
     //////////////////////////////////////////////////////////////////////////
     //3 Sort series
-    SortSeries_i(vecDataFormats);
+    sort_series_i(vecDataFormats);
 
     //////////////////////////////////////////////////////////////////////////
     //4 Construct image data header
     pImgDataHeader.reset(new ImageDataHeader());
-    IOStatus eDataHeadingStatus = ConstructDataHeader_i(vecDataFormats , pImgDataHeader);
+    IOStatus eDataHeadingStatus = construct_data_header_i(vecDataFormats , pImgDataHeader);
     if(IO_SUCCESS !=  eDataHeadingStatus)
     {
         pImgDataHeader.reset();
@@ -77,7 +77,7 @@ IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std:
     //////////////////////////////////////////////////////////////////////////
     //5 Construct image data
     pImgData.reset(new ImageData());
-    IOStatus eDataImagingStatus = ConstructImageData_i(vecDataFormats , pImgDataHeader , pImgData);
+    IOStatus eDataImagingStatus = construct_image_data_i(vecDataFormats , pImgDataHeader , pImgData);
     if(IO_SUCCESS !=  eDataImagingStatus)
     {
         pImgDataHeader.reset();
@@ -88,17 +88,17 @@ IOStatus DICOMLoader::LoadSeries(const std::vector<std::string>& vecFiles , std:
     return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::DataCheck_i(DcmFileFormatSet& vecDatasets)
+IOStatus DICOMLoader::data_check_i(DcmFileFormatSet& vecDatasets)
 {
     return IO_SUCCESS;
 }
 
-void DICOMLoader::SortSeries_i(DcmFileFormatSet& vecFileFormat)
+void DICOMLoader::sort_series_i(DcmFileFormatSet& vecFileFormat)
 {
 
 }
 
-IOStatus DICOMLoader::ConstructDataHeader_i(DcmFileFormatSet& vecFileFormat , std::shared_ptr<ImageDataHeader> pImgDataHeader)
+IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& vecFileFormat , std::shared_ptr<ImageDataHeader> pImgDataHeader)
 {
     IOStatus eLoadingStatus = IO_DATA_DAMAGE;
     try
@@ -119,28 +119,28 @@ IOStatus DICOMLoader::ConstructDataHeader_i(DcmFileFormatSet& vecFileFormat , st
         }
 
         //4.1 Get Transfer Syntax UID
-        if (!GetTransferSyntaxUID_i(pMetaInfoFirst , pImgDataHeader))
+        if (!get_transfer_syntax_uid_i(pMetaInfoFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag TransferSyntaxUID failed!");
         }
 
         //4.2 Get Study UID
-        if (!GetStudyUID_i(pImgFirst , pImgDataHeader))
+        if (!get_study_uid_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag StudyUID failed!");
         }
 
         //4.3 Get Series UID
-        if (!GetSeriesUID_i(pImgFirst , pImgDataHeader))
+        if (!get_series_uid_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag SeriesUID failed!");
         }
 
         //4.4 Get Date
-        if (!GetContentTime_i(pImgFirst , pImgDataHeader))
+        if (!get_content_time_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag ContentTime failed!");
@@ -177,70 +177,70 @@ IOStatus DICOMLoader::ConstructDataHeader_i(DcmFileFormatSet& vecFileFormat , st
         }
 
         //4.6 Manufacturer
-        if (!GetManufacturer_i(pImgFirst , pImgDataHeader))
+        if (!get_manufacturer_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag Manufacturer failed!");
         }
 
         //4.7 Manufacturer model
-        if (!GetManufacturerModelName_i(pImgFirst , pImgDataHeader))
+        if (!get_manufacturer_model_name_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag ManufacturerModelName failed!");
         }
 
         //4.8 Patient name
-        if (!GetPatientName_i(pImgFirst , pImgDataHeader))
+        if (!get_patient_name_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientName failed!");
         }
 
         //4.9 Patient ID
-        if (!GetPatientID_i(pImgFirst , pImgDataHeader))
+        if (!get_patient_id_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
         //4.10 Patient Sex(很多图像都没有这个Tag)
-        if (!GetPatientSex_i(pImgFirst , pImgDataHeader))
+        if (!get_patient_sex_i(pImgFirst , pImgDataHeader))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
             //IO_THROW_EXCEPTION("Parse tag PatientSex failed!");
         }
 
         //4.11 Patient Age(很多图像都没有这个Tag)
-        if (!GetPatientAge_i(pImgFirst , pImgDataHeader))
+        if (!get_patient_age_i(pImgFirst , pImgDataHeader))
         {
             /*eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientAge failed!");*/
         }
 
         //4.12 Slice thickness (不是一定必要)
-        if (!GetSliceThickness_i(pImgFirst , pImgDataHeader))
+        if (!get_slice_thickness_i(pImgFirst , pImgDataHeader))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
             //IO_THROW_EXCEPTION("Parse tag SliceThickness failed!");
         }
 
         //4.13 KVP (CT only)
-        if (!GetKVP_i(pImgFirst , pImgDataHeader))
+        if (!get_kvp_i(pImgFirst , pImgDataHeader))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
             //IO_THROW_EXCEPTION("Parse tag KVP failed!");
         }
 
         //4.14 Patient position
-        if (!GetPatientPosition_i(pImgFirst , pImgDataHeader))
+        if (!get_patient_position_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientPositio failed!");
         }
 
         //4.15 Samples per Pixel
-        if (!GetSamplePerPixel_i(pImgFirst , pImgDataHeader))
+        if (!get_sample_per_pixel_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag SamplePerPixel failed!");
@@ -275,35 +275,35 @@ IOStatus DICOMLoader::ConstructDataHeader_i(DcmFileFormatSet& vecFileFormat , st
         }
 
         //4.17 Rows
-        if (!GetRows_i(pImgFirst , pImgDataHeader))
+        if (!get_rows_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag Rows failed!");
         }
 
         //4.18 Columns
-        if (!GetColumns_i(pImgFirst , pImgDataHeader))
+        if (!get_columns_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag Columns failed!");
         }
 
         //4.19 Pixel Spacing
-        if (!GetPixelSpacing_i(pImgFirst , pImgDataHeader))
+        if (!get_pixel_spacing_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PixelSpacing failed!");
         }
 
         //4.20 Bits Allocated
-        if (!GetBitsAllocated_i(pImgFirst , pImgDataHeader))
+        if (!get_bits_allocated_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag BitsAllocated failed!");
         }
 
         //4.21 Pixel Representation
-        if (!GetPixelRepresentation_i(pImgFirst , pImgDataHeader))
+        if (!get_pixel_representation_i(pImgFirst , pImgDataHeader))
         {
             eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PixelRepresentation failed!");
@@ -325,7 +325,7 @@ IOStatus DICOMLoader::ConstructDataHeader_i(DcmFileFormatSet& vecFileFormat , st
     }
 }
 
-IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std::shared_ptr<ImageDataHeader> pDataHeader , std::shared_ptr<ImageData> pImgData)
+IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& vecFileFormat , std::shared_ptr<ImageDataHeader> pDataHeader , std::shared_ptr<ImageData> pImgData)
 {
     const unsigned int uiSliceCount= static_cast<unsigned int>(vecFileFormat.size());
     DcmFileFormatPtr pFileFirst = vecFileFormat[0];
@@ -334,8 +334,8 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
     DcmDataset* pImgLast = pFileLast->getDataset();
 
     //Intercept and slope
-    GetIntercept_i(pImgFirst , pImgData->m_fIntercept);
-    GetSlope_i(pImgFirst , pImgData->m_fSlope);
+    get_intercept_i(pImgFirst , pImgData->m_fIntercept);
+    get_slope_i(pImgFirst , pImgData->m_fSlope);
 
     pDataHeader->m_SliceLocations.resize(uiSliceCount);
     pDataHeader->m_ImgPositions.resize(uiSliceCount);
@@ -349,10 +349,10 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
             return IO_DATA_DAMAGE;
         }
 
-        GetSliceLocation_i(dataset , dSliceLoc);
+        get_slice_location_i(dataset , dSliceLoc);
         pDataHeader->m_SliceLocations[i] = dSliceLoc;
 
-        GetImagePosition_i(dataset , ptImgPos);
+        get_image_position_i(dataset , ptImgPos);
         pDataHeader->m_ImgPositions[i] = ptImgPos;
     }
 
@@ -420,18 +420,18 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
     //Image Orientation in patient
     Vector3 vOriRow;
     Vector3 vOriColumn;
-    if(!GetImageOrientation_i(pImgFirst , vOriRow , vOriColumn))
+    if(!get_image_orientation_i(pImgFirst , vOriRow , vOriColumn))
     {
         return IO_DATA_DAMAGE;
     }
     pImgData->m_vImgOrientation[0] = vOriRow;
     pImgData->m_vImgOrientation[1] = vOriColumn;
     pImgData->m_vImgOrientation[2] = pDataHeader->m_ImgPositions[uiSliceCount-1] - pDataHeader->m_ImgPositions[0];
-    pImgData->m_vImgOrientation[2].Normalize();
+    pImgData->m_vImgOrientation[2].normalize();
 
     //Image data
-    pImgData->AllocateMemory();
-    char* pData = (char*)(pImgData->GetPixelPointer());
+    pImgData->mem_allocate();
+    char* pData = (char*)(pImgData->get_pixel_pointer());
     //DICOM transfer syntaxes
     const std::string ksTSU_LittleEndianImplicitTransferSyntax     = std::string("1.2.840.10008.1.2");//Default transfer for DICOM
     const std::string ksTSU_LittleEndianExplicitTransferSyntax    = std::string("1.2.840.10008.1.2.1");
@@ -460,7 +460,7 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
             {
                 return IO_DATA_DAMAGE;
             }
-            GetPixelData_i(vecFileFormat[i] , dataset , pData + uiImgSize*i , uiImgSize);
+            get_pixel_data_i(vecFileFormat[i] , dataset , pData + uiImgSize*i , uiImgSize);
         }
     }
     else if (ksMyTSU == ksTSU_JPEGProcess14SV1TransferSyntax ||
@@ -473,7 +473,7 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
             {
                 return IO_DATA_DAMAGE;
             }
-            GetJPEGCompressedPixelData_i(vecFileFormat[i] , dataset , pData + uiImgSize*i , uiImgSize);
+            get_jpeg_compressed_pixel_data_i(vecFileFormat[i] , dataset , pData + uiImgSize*i , uiImgSize);
         }
     }
     else if (ksMyTSU == ksTSU_JEPG2000CompressionLosslessOnly ||
@@ -491,7 +491,7 @@ IOStatus DICOMLoader::ConstructImageData_i(DcmFileFormatSet& vecFileFormat , std
 
 
 
-bool DICOMLoader::GetTransferSyntaxUID_i(DcmMetaInfo* pMetaInfo, std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_transfer_syntax_uid_i(DcmMetaInfo* pMetaInfo, std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sTransferSynaxUID;
     OFCondition status = pMetaInfo->findAndGetOFString(DCM_TransferSyntaxUID , sTransferSynaxUID);
@@ -503,7 +503,7 @@ bool DICOMLoader::GetTransferSyntaxUID_i(DcmMetaInfo* pMetaInfo, std::shared_ptr
     return true;
 }
 
-bool DICOMLoader::GetContentTime_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_content_time_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sDate;
     OFCondition status = pImg->findAndGetOFString(DCM_ContentDate , sDate);
@@ -515,7 +515,7 @@ bool DICOMLoader::GetContentTime_i(DcmDataset*pImg , std::shared_ptr<ImageDataHe
     return true;
 }
 
-bool DICOMLoader::GetManufacturer_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_manufacturer_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sManufacturer;
     OFCondition status = pImg->findAndGetOFString(DCM_Manufacturer , sManufacturer);
@@ -527,7 +527,7 @@ bool DICOMLoader::GetManufacturer_i(DcmDataset*pImg , std::shared_ptr<ImageDataH
     return true;
 }
 
-bool DICOMLoader::GetManufacturerModelName_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_manufacturer_model_name_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sManufacturerModel;
     OFCondition status = pImg->findAndGetOFString(DCM_ManufacturerModelName , sManufacturerModel);
@@ -539,7 +539,7 @@ bool DICOMLoader::GetManufacturerModelName_i(DcmDataset*pImg , std::shared_ptr<I
     return true;
 }
 
-bool DICOMLoader::GetPatientName_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_patient_name_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_PatientName , sString);
@@ -551,7 +551,7 @@ bool DICOMLoader::GetPatientName_i(DcmDataset*pImg , std::shared_ptr<ImageDataHe
     return true;
 }
 
-bool DICOMLoader::GetPatientID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_patient_id_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_PatientID , sString);
@@ -563,7 +563,7 @@ bool DICOMLoader::GetPatientID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHead
     return true;
 }
 
-bool DICOMLoader::GetPatientSex_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_patient_sex_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_PatientSex , sString);
@@ -575,7 +575,7 @@ bool DICOMLoader::GetPatientSex_i(DcmDataset*pImg , std::shared_ptr<ImageDataHea
     return true;
 }
 
-bool DICOMLoader::GetPatientAge_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_patient_age_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_PatientAge, sString);
@@ -587,7 +587,7 @@ bool DICOMLoader::GetPatientAge_i(DcmDataset*pImg , std::shared_ptr<ImageDataHea
     return true;
 }
 
-bool DICOMLoader::GetSliceThickness_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_slice_thickness_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_SliceThickness, sString);
@@ -599,7 +599,7 @@ bool DICOMLoader::GetSliceThickness_i(DcmDataset*pImg , std::shared_ptr<ImageDat
     return true;
 }
 
-bool DICOMLoader::GetKVP_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_kvp_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_KVP, sString);
@@ -611,7 +611,7 @@ bool DICOMLoader::GetKVP_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & 
     return true;
 }
 
-bool DICOMLoader::GetPatientPosition_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_patient_position_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_PatientPosition, sString);
@@ -657,7 +657,7 @@ bool DICOMLoader::GetPatientPosition_i(DcmDataset*pImg , std::shared_ptr<ImageDa
     return true;
 }
 
-bool DICOMLoader::GetSeriesUID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_series_uid_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sSeriesUID;
     OFCondition status = pImg->findAndGetOFString(DCM_SeriesInstanceUID , sSeriesUID);
@@ -669,7 +669,7 @@ bool DICOMLoader::GetSeriesUID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHead
     return true;
 }
 
-bool DICOMLoader::GetStudyUID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_study_uid_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sStudyUID;
     OFCondition status = pImg->findAndGetOFString(DCM_StudyInstanceUID , sStudyUID);
@@ -681,7 +681,7 @@ bool DICOMLoader::GetStudyUID_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeade
     return true;
 }
 
-bool DICOMLoader::GetSamplePerPixel_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_sample_per_pixel_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     unsigned short usValue = 0;
     OFCondition status = pImg->findAndGetUint16(DCM_SamplesPerPixel , usValue);
@@ -693,7 +693,7 @@ bool DICOMLoader::GetSamplePerPixel_i(DcmDataset*pImg , std::shared_ptr<ImageDat
     return true;
 }
 
-bool DICOMLoader::GetRows_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_rows_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     unsigned short usValue = 0;
     OFCondition status = pImg->findAndGetUint16(DCM_Rows , usValue);
@@ -705,7 +705,7 @@ bool DICOMLoader::GetRows_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> &
     return true;
 }
 
-bool DICOMLoader::GetColumns_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_columns_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     unsigned short usValue = 0;
     OFCondition status = pImg->findAndGetUint16(DCM_Columns , usValue);
@@ -717,7 +717,7 @@ bool DICOMLoader::GetColumns_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader
     return true;
 }
 
-bool DICOMLoader::GetPixelSpacing_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_pixel_spacing_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     OFString sRowspacing, sColspacing;
     OFCondition status1 =pImg->findAndGetOFString(DCM_PixelSpacing , sRowspacing , 0);
@@ -732,7 +732,7 @@ bool DICOMLoader::GetPixelSpacing_i(DcmDataset*pImg , std::shared_ptr<ImageDataH
     return true;
 }
 
-bool DICOMLoader::GetBitsAllocated_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_bits_allocated_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     unsigned short usValue = 0;
     OFCondition status = pImg->findAndGetUint16(DCM_BitsAllocated , usValue);
@@ -744,7 +744,7 @@ bool DICOMLoader::GetBitsAllocated_i(DcmDataset*pImg , std::shared_ptr<ImageData
     return true;
 }
 
-bool DICOMLoader::GetPixelRepresentation_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+bool DICOMLoader::get_pixel_representation_i(DcmDataset*pImg , std::shared_ptr<ImageDataHeader> & pImgDataHeader)
 {
     unsigned short usValue = 0;
     OFCondition status = pImg->findAndGetUint16(DCM_PixelRepresentation , usValue);
@@ -756,7 +756,7 @@ bool DICOMLoader::GetPixelRepresentation_i(DcmDataset*pImg , std::shared_ptr<Ima
     return true;
 }
 
-bool DICOMLoader::GetIntercept_i(DcmDataset*pImg , float& fIntercept)
+bool DICOMLoader::get_intercept_i(DcmDataset*pImg , float& fIntercept)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_RescaleIntercept , sString);
@@ -768,7 +768,7 @@ bool DICOMLoader::GetIntercept_i(DcmDataset*pImg , float& fIntercept)
     return true;
 }
 
-bool DICOMLoader::GetSlope_i(DcmDataset*pImg , float& fSlope)
+bool DICOMLoader::get_slope_i(DcmDataset*pImg , float& fSlope)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_RescaleSlope , sString);
@@ -780,7 +780,7 @@ bool DICOMLoader::GetSlope_i(DcmDataset*pImg , float& fSlope)
     return true;
 }
 
-bool DICOMLoader::GetInstanceNumber_i(DcmDataset*pImg , int& iInstanceNumber)
+bool DICOMLoader::get_instance_number_i(DcmDataset*pImg , int& iInstanceNumber)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_InstanceNumber , sString);
@@ -792,7 +792,7 @@ bool DICOMLoader::GetInstanceNumber_i(DcmDataset*pImg , int& iInstanceNumber)
     return true;
 }
 
-bool DICOMLoader::GetImagePosition_i(DcmDataset*pImg , Point3& ptImgPos)
+bool DICOMLoader::get_image_position_i(DcmDataset*pImg , Point3& ptImgPos)
 {
     OFString sImagePos;
     OFCondition status = pImg->findAndGetOFString(DCM_ImagePositionPatient , sImagePos , 0);
@@ -819,7 +819,7 @@ bool DICOMLoader::GetImagePosition_i(DcmDataset*pImg , Point3& ptImgPos)
     return true;
 }
 
-bool DICOMLoader::GetImageOrientation_i(DcmDataset*pImg , Vector3& vRow , Vector3& vColumn)
+bool DICOMLoader::get_image_orientation_i(DcmDataset*pImg , Vector3& vRow , Vector3& vColumn)
 {
     double dImgOri[6] = {0};
     for (int i = 0 ; i <6 ; ++i)
@@ -839,7 +839,7 @@ bool DICOMLoader::GetImageOrientation_i(DcmDataset*pImg , Vector3& vRow , Vector
     return true;
 }
 
-bool DICOMLoader::GetSliceLocation_i(DcmDataset*pImg , double& dSliceLoc)
+bool DICOMLoader::get_slice_location_i(DcmDataset*pImg , double& dSliceLoc)
 {
     OFString sString;
     OFCondition status = pImg->findAndGetOFString(DCM_SliceLocation , sString);
@@ -851,7 +851,7 @@ bool DICOMLoader::GetSliceLocation_i(DcmDataset*pImg , double& dSliceLoc)
     return true;
 }
 
-bool DICOMLoader::GetPixelData_i(DcmFileFormatPtr pFileFormat , DcmDataset*pImg , char* pData , unsigned int uiSize)
+bool DICOMLoader::get_pixel_data_i(DcmFileFormatPtr pFileFormat , DcmDataset*pImg , char* pData , unsigned int uiSize)
 {
     const unsigned char* pReadData;
     OFCondition status = pImg->findAndGetUint8Array(DCM_PixelData , pReadData);
@@ -864,7 +864,7 @@ bool DICOMLoader::GetPixelData_i(DcmFileFormatPtr pFileFormat , DcmDataset*pImg 
     return true;
 }
 
-bool DICOMLoader::GetJPEGCompressedPixelData_i(DcmFileFormatPtr pFileFormat , DcmDataset*pImg , char* pData , unsigned int uiSize)
+bool DICOMLoader::get_jpeg_compressed_pixel_data_i(DcmFileFormatPtr pFileFormat , DcmDataset*pImg , char* pData , unsigned int uiSize)
 {
     //Code from : http://support.dcmtk.org/docs/mod_dcmjpeg.html
     //Write to a temp decompressed file , then read the decompressed one
@@ -884,7 +884,7 @@ bool DICOMLoader::GetJPEGCompressedPixelData_i(DcmFileFormatPtr pFileFormat , Dc
     pFileFormat->loadFile("test_decompressed.dcm");
     DcmDataset* pDataSet = pFileFormat->getDataset();
 
-    return GetPixelData_i(pFileFormat , pDataSet , pData , uiSize);
+    return get_pixel_data_i(pFileFormat , pDataSet , pData , uiSize);
 }
 
 MED_IMAGING_END_NAMESPACE

@@ -13,21 +13,21 @@ public:
 
     ~Sampler() {};
 
-    inline float Sample1DNearst(float idx , unsigned int len , T* data) const;
+    inline float sample_1d_nearst(float idx , unsigned int len , T* data) const;
 
-    inline float Sample1DLinear(float idx , unsigned int len , T* data)const;
+    inline float sample_1d_linear(float idx , unsigned int len , T* data)const;
 
-    inline float Sample2DNearst(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
+    inline float sample_2d_nearst(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
 
-    inline float Sample2DLinear(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
+    inline float sample_2d_linear(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
 
-    inline float Sample2DCubic(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
+    inline float sample_2d_cubic(float x , float y , unsigned int uiWidth , unsigned int uiHeight , T* data)const;
 
-    inline float Sample3DNearst(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
+    inline float sample_3d_nearst(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
 
-    inline float Sample3DLinear(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
+    inline float sample_3d_linear(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
 
-    inline float Sample3DCubic(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
+    inline float sample_3d_cubic(float x , float y , float z , unsigned int uiWidth , unsigned int uiHeight , unsigned int uiDepth , T* data)const;
 
 };
 

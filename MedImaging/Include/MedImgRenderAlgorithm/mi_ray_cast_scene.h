@@ -21,41 +21,41 @@ public:
     RayCastScene(int iWidth , int iHeight);
     virtual ~RayCastScene();
 
-    virtual void Initialize();
-    virtual void Finalize();
-    virtual void SetDisplaySize(int iWidth , int iHeight);
-    virtual void Render(int iTestCode);
+    virtual void initialize();
+    virtual void finalize();
+    virtual void set_display_size(int iWidth , int iHeight);
+    virtual void render(int iTestCode);
 
-    void SetVolumeInfos(std::shared_ptr<VolumeInfos> pVolumeInfos);
+    void set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos);
 
-    std::shared_ptr<VolumeInfos> GetVolumeInfos() const;
+    std::shared_ptr<VolumeInfos> get_volume_infos() const;
 
-    std::shared_ptr<CameraCalculator> GetCameraCalculator() const;
+    std::shared_ptr<CameraCalculator> get_camera_calculator() const;
 
-    void SetTestCode(int iTestCode);
+    void set_test_code(int iTestCode);
 
     //Mask label level
     //Default is L_8
-    void SetMaskLabelLevel(LabelLevel eLabelLevel);
+    void set_mask_label_level(LabelLevel eLabelLevel);
 
     //Sample rate
-    void SetSampleRate(float fSampleRate);
+    void set_sample_rate(float fSampleRate);
 
     //Label parameter
-    void SetVisibleLabels(std::vector<unsigned char> vecLabels);
+    void set_visible_labels(std::vector<unsigned char> vecLabels);
 
     //Window level parameter ( unregulated)
     // EG: CT modality , the unit is HU
-    void SetWindowlevel(float fWW , float fWL , unsigned char ucLabel);
-    void SetGlobalWindowLevel(float fWW , float fWL);
-    void GetGlobalWindowLevel(float& fWW , float& fWL) const;
+    void set_window_level(float fWW , float fWL , unsigned char ucLabel);
+    void set_global_window_level(float fWW , float fWL);
+    void get_global_window_level(float& fWW , float& fWL) const;
 
     //Ray casting mode parameter
-    void SetMaskMode(MaskMode eMode);
-    void SetCompositeMode(CompositeMode eMode);
-    void SetInterpolationMode(InterpolationMode eMode);
-    void SetShadingMode(ShadingMode eMode);
-    void SetColorInverseMode(ColorInverseMode eMode);
+    void set_mask_mode(MaskMode eMode);
+    void set_composite_mode(CompositeMode eMode);
+    void set_interpolation_mode(InterpolationMode eMode);
+    void set_shading_mode(ShadingMode eMode);
+    void set_color_inverse_mode(ColorInverseMode eMode);
 
 protected:
     std::shared_ptr<VolumeInfos> m_pVolumeInfos;

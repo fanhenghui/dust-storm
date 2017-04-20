@@ -18,11 +18,11 @@ public:
 
     Triangle(Point3 pt0 , Point3 pt1 ,Point3 pt2);
 
-    void GenerateLines(std::vector<LineSegment3D> &vLines) const;
+    void to_lines(std::vector<LineSegment3D> &vLines) const;
 
-    Vector3 GetNormal() const;
+    Vector3 get_normal() const;
 
-    bool InTriangle(const Point3 &pt0);
+    bool in_triangle(const Point3 &pt0);
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -19,7 +19,7 @@ BrickUtils::BrickUtils():m_uiBrickSize(32),m_uiBrickExpand(2)
 
 }
 
-BrickUtils* BrickUtils::Instance()
+BrickUtils* BrickUtils::instance()
 {
     if (nullptr == m_instance)
     {
@@ -32,12 +32,12 @@ BrickUtils* BrickUtils::Instance()
     return m_instance;
 }
 
-void BrickUtils::SetBrickSize( unsigned int uiSize )
+void BrickUtils::set_brick_size( unsigned int uiSize )
 {
     m_uiBrickSize = uiSize;
 }
 
-void BrickUtils::SetBrickExpand( unsigned int uiSize )
+void BrickUtils::set_brick_expand( unsigned int uiSize )
 {
     m_uiBrickExpand = uiSize;
 }
@@ -47,12 +47,12 @@ unsigned int BrickUtils::GetBrickSize()
     return m_uiBrickSize;
 }
 
-unsigned int BrickUtils::GetBrickExpand()
+unsigned int BrickUtils::get_brick_expand()
 {
     return m_uiBrickExpand;
 }
 
-void BrickUtils::GetBrickDim( const unsigned int(&uiVolumeDim)[3] , unsigned int(&uiBrickDim)[3] , unsigned int uiBrickSize)
+void BrickUtils::get_brick_dim( const unsigned int(&uiVolumeDim)[3] , unsigned int(&uiBrickDim)[3] , unsigned int uiBrickSize)
 {
     for (int i = 0 ; i< 3 ; ++i)
     {

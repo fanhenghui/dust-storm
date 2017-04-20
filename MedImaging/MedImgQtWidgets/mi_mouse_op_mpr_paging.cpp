@@ -15,7 +15,7 @@ MouseOpMPRPaging::~MouseOpMPRPaging()
 
 }
 
-void MouseOpMPRPaging::Press(const QPoint& pt)
+void MouseOpMPRPaging::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -25,7 +25,7 @@ void MouseOpMPRPaging::Press(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpMPRPaging::Move(const QPoint& pt)
+void MouseOpMPRPaging::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -38,16 +38,16 @@ void MouseOpMPRPaging::Move(const QPoint& pt)
 
     if (m_pModel)
     {
-        m_pModel->Paging(pScene , iStep);
+        m_pModel->page(pScene , iStep);
     }
     else
     {
-        pScene->Paging(iStep);
+        pScene->page(iStep);
     }
     m_ptPre = pt;
 }
 
-void MouseOpMPRPaging::Release(const QPoint& pt)
+void MouseOpMPRPaging::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -56,7 +56,7 @@ void MouseOpMPRPaging::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpMPRPaging::DoubleClick(const QPoint& pt)
+void MouseOpMPRPaging::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -65,7 +65,7 @@ void MouseOpMPRPaging::DoubleClick(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpMPRPaging::SetCrosshairModel(std::shared_ptr<CrosshairModel> pModel)
+void MouseOpMPRPaging::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
 {
     m_pModel = pModel;
 }

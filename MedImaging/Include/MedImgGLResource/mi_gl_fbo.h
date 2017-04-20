@@ -13,21 +13,21 @@ public:
 
     ~GLFBO();
 
-    virtual void Initialize();
+    virtual void initialize();
 
-    virtual void Finalize();
+    virtual void finalize();
 
-    unsigned int GetID() const;
+    unsigned int get_id() const;
 
-    void Bind();
+    void bind();
 
-    void UnBind();
+    void unbind();
 
-    void SetTraget(GLenum eTarget);
+    void set_target(GLenum eTarget);
 
-    GLenum GetTraget();
+    GLenum get_target();
 
-    void AttachTexture(GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D);
+    void attach_texture(GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D);
 
 protected:
 private:

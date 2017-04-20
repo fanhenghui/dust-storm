@@ -23,9 +23,9 @@ MED_IMAGING_BEGIN_NAMESPACE
 //(0018,0050) DS Slice thickness 
 //(0018,0060) DS KVP
 //(0018,5100) CS Patient Position 
-//(0020,000D) UI Study Instance UID
-//(0020,000E) UI Series Instance UID
-//(0020,0013) IS Instance Number
+//(0020,000D) UI Study instance UID
+//(0020,000E) UI Series instance UID
+//(0020,0013) IS instance Number
 //(0020,0032) DS Image Position(Patient)
 //(0020,0037) DS Image Orientation(Patient)
 //(0020,1041) DS Slice Location
@@ -128,10 +128,10 @@ public:
     //(0028,0030) DS Pixel Spacing 一张图像的spacing（每个slice应该一样）
     double m_dPixelSpacing[2];//Rows and Columns spacing
 
-    //(0020,000D) UI Study Instance UID
+    //(0020,000D) UI Study instance UID
     std::string m_sStudyUID;
 
-    //(0020,000E) UI Series Instance UID
+    //(0020,000E) UI Series instance UID
     std::string m_sSeriesUID;
 
     //(0020,0032) DS Image Position(Patient) 图像位置，图像左上角的第一个像素的空间坐标(每个slice都不同)

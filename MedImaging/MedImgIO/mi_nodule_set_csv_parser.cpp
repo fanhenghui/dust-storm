@@ -13,7 +13,7 @@ NoduleSetCSVParser::~NoduleSetCSVParser()
 
 }
 
-IOStatus NoduleSetCSVParser::Load(const std::string& sFilePath , std::shared_ptr<NoduleSet>& pNoduleSet)
+IOStatus NoduleSetCSVParser::load(const std::string& sFilePath , std::shared_ptr<NoduleSet>& pNoduleSet)
 {
     std::fstream out(sFilePath.c_str() , std::ios::out);
 
@@ -21,7 +21,7 @@ IOStatus NoduleSetCSVParser::Load(const std::string& sFilePath , std::shared_ptr
     return IO_SUCCESS;
 }
 
-IOStatus NoduleSetCSVParser::Save(const std::string& sFilePath , const std::shared_ptr<NoduleSet>& pNoduleSet)
+IOStatus NoduleSetCSVParser::save(const std::string& sFilePath , const std::shared_ptr<NoduleSet>& pNoduleSet)
 {
     IO_CHECK_NULL_EXCEPTION(pNoduleSet);
 
@@ -32,7 +32,7 @@ IOStatus NoduleSetCSVParser::Save(const std::string& sFilePath , const std::shar
     }
     else
     {
-        const std::vector<VOISphere>& nodules = pNoduleSet->GetNoduleSet();
+        const std::vector<VOISphere>& nodules = pNoduleSet->get_nodule_set();
         out << "id,coordX,coordY,coordZ,diameter_mm,Type\n";
         out << std::fixed;
         int id = 0;

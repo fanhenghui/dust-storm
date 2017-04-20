@@ -97,34 +97,34 @@ public:
         return *this;
     }
 
-    inline double AngleBetween(const Vector3& v) const
+    inline double angle_between(const Vector3& v) const
     {
-        double len = Magnitude() * v.Magnitude();
+        double len = magnitude() * v.magnitude();
 
         len = (len > DOUBLE_EPSILON) ? len : DOUBLE_EPSILON;
 
-        double dot = DotProduct(v) / len;
+        double dot = dot_product(v) / len;
         dot = (std::min)(dot, 1.0);
         dot = (std::max)(dot, -1.0);
         return std::acos(dot);
     }
 
-    inline Vector3 CrossProduct(const Vector3& v) const
+    inline Vector3 cross_product(const Vector3& v) const
     {
         return Vector3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
     }
 
-    inline double DotProduct(const Vector3& v) const
+    inline double dot_product(const Vector3& v) const
     {
         return x * v.x + y * v.y + z * v.z;
     }
 
-    inline double Magnitude() const
+    inline double magnitude() const
     {
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    inline void Normalize()
+    inline void normalize()
     {
         double len = std::sqrt(x * x + y * y + z * z);
         if (len < DOUBLE_EPSILON)
@@ -137,7 +137,7 @@ public:
         z *= leninv;
     }
 
-    Vector3 GetNormalize() const
+    Vector3 get_normalize() const
     {
         double len = std::sqrt(x * x + y * y + z * z);
         if (len < DOUBLE_EPSILON)
@@ -148,22 +148,22 @@ public:
         return Vector3(x * leninv, y * leninv, z * leninv);
     }
 
-    inline Vector3 Reflect(const Vector3& norm) const
+    inline Vector3 reflect(const Vector3& norm) const
     {
-        return Vector3(*this - norm*(2 * this->DotProduct(norm)));
+        return Vector3(*this - norm*(2 * this->dot_product(norm)));
     }
 
-    bool Parallel(const Vector3& v) const
+    bool parallel(const Vector3& v) const
     {
-        return this->CrossProduct(v) == Vector3(0, 0, 0);
+        return this->cross_product(v) == Vector3(0, 0, 0);
     }
 
-    bool Orthogonal(const Vector3& v) const
+    bool orthogonal(const Vector3& v) const
     {
-        return std::fabs(this->DotProduct(v)) < DOUBLE_EPSILON;
+        return std::fabs(this->dot_product(v)) < DOUBLE_EPSILON;
     }
 
-    void Print()
+    void print()
     {
         std::cout <<"( "<<x << " , "<<y << " , " << z << " ) ";
     }
@@ -171,15 +171,15 @@ public:
 
 Vector3 Arithmetic_Export operator *(double scale, const Vector3& v);
 
-double Arithmetic_Export AngleBetween(const Vector3& v1, const Vector3& v2);
+double Arithmetic_Export angle_between(const Vector3& v1, const Vector3& v2);
 
-Vector3 Arithmetic_Export CrossProduct(const Vector3& v1, const Vector3& v2);
+Vector3 Arithmetic_Export cross(const Vector3& v1, const Vector3& v2);
 
-double Arithmetic_Export DotProduct(const Vector3& v1, const Vector3& v2);
+double Arithmetic_Export dot_product(const Vector3& v1, const Vector3& v2);
 
-bool Arithmetic_Export Parallel(const Vector3& v1, const Vector3& v2);
+bool Arithmetic_Export parallel(const Vector3& v1, const Vector3& v2);
 
-bool Arithmetic_Export Orthogonal(const Vector3& v1, const Vector3& v2);
+bool Arithmetic_Export orthogonal(const Vector3& v1, const Vector3& v2);
 
 MED_IMAGING_END_NAMESPACE
 

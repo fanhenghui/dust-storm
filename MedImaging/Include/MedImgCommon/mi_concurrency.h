@@ -9,11 +9,11 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Common_Export Concurrency
 {
 public:
-    static Concurrency* Instance();
+    static Concurrency* instance();
     ~Concurrency();
-    void SetAppConcurrency(unsigned int uiValue);
-    unsigned int GetAppConcurrency();
-    unsigned int GetHardwareConcurrency();
+    void set_app_concurrency(unsigned int uiValue);
+    unsigned int get_app_concurrency();
+    unsigned int get_hardware_concurrency();
 private:
     Concurrency();
 private:

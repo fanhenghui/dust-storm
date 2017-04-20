@@ -11,25 +11,25 @@ class RenderAlgo_Export SceneBase
 public:
     SceneBase();
     SceneBase(int iWidth , int iHeight);
-    void SetName(const std::string& sName);
-    const std::string& GetName() const;
+    void set_name(const std::string& sName);
+    const std::string& get_name() const;
 
     virtual ~SceneBase();
-    virtual void Initialize();
-    virtual void Finalize();
-    virtual void SetDisplaySize(int iWidth , int iHeight);
-    void GetDisplaySize(int& iWidth, int& iHeight) const;
-    virtual void Render(int iTestCode);
+    virtual void initialize();
+    virtual void finalize();
+    virtual void set_display_size(int iWidth , int iHeight);
+    void get_display_size(int& iWidth, int& iHeight) const;
+    virtual void render(int iTestCode);
 
-    virtual void Rotate(const Point2& ptPre , const Point2& ptCur);
-    virtual void Zoom(const Point2& ptPre , const Point2& ptCur);
-    virtual void Pan(const Point2& ptPre , const Point2& ptCur);
+    virtual void rotate(const Point2& ptPre , const Point2& ptCur);
+    virtual void zoom(const Point2& ptPre , const Point2& ptCur);
+    virtual void pan(const Point2& ptPre , const Point2& ptCur);
 
     std::shared_ptr<CameraBase> GetCamera();
-    void RenderToBack();
+    void render_to_back();
 
-    void SetDirty(bool bFlag);
-    bool GetDirty() const;
+    void set_dirty(bool bFlag);
+    bool get_dirty() const;
 
 protected:
     int m_iWidth , m_iHeight;

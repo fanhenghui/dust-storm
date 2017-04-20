@@ -4,7 +4,7 @@
 #include <QtGui/QMainWindow>
 #include "ui_mi_main_window.h"
 
-namespace MedImaging
+namespace medical_imaging
 {
     class SceneBase;
     class MPRScene;
@@ -14,7 +14,7 @@ namespace MedImaging
     class CrosshairModel;
     class SceneContainerObserver;
 }
-typedef std::shared_ptr<MedImaging::MPRScene> MPRScenePtr;
+typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
 class SceneContainer;
 
@@ -36,54 +36,54 @@ public:
 
 protected slots:
     //Layout 
-    void SlotChangeLayout2x2_i();
+    void slot_change_layout2x2_i();
 
     //File
-    void SlotOpenDICOMFolder_i();
-    void SlotOpenMetaImage_i();
-    void SlotOpenRaw_i();
-    void SlotSaveNodule_i();
+    void slot_open_dicom_folder_i();
+    void slot_open_meta_image_i();
+    void slot_open_raw_i();
+    void slot_save_nodule_i();
 
     //Common tools
-    void SlotPressBtnArrow_i();
-    void SlotPressBtnAnnotate_i();
-    void SlotPressBtnRotate_i();
-    void SlotPressBtnZoom_i();
-    void SlotPressBtnPan_i();
-    void SlotPressBtnWindowing_i();
-    void SlotPressBtnFitWindow_i();
+    void slot_press_btn_arrow_i();
+    void slot_press_btn_annotate_i();
+    void slot_press_btn_rotate_i();
+    void slot_press_btn_aoom_i();
+    void slot_press_btn_pan_i();
+    void slot_press_btn_windowing_i();
+    void slot_press_btn_fit_window_i();
 
     //MPR scroll bar 
-    void SlotSlidingBarMPR00_i(int value);
-    void SlotSlidingBarMPR01_i(int value);
-    void SlotSlidingBarMPR10_i(int value);
+    void slot_sliding_bar_mpr00_i(int value);
+    void slot_sliding_bar_mpr01_i(int value);
+    void slot_sliding_bar_mpr10_i(int value);
 
     //VOI list
-    void SlotVOITableWidgetCellSelect_i(int row , int column);
-    void SlotVOITableWidgetItemChanged_i(QTableWidgetItem *item);
-    void SlotVOITableWidgetNoduleTypeChanged_i(int id);
-    void SlotVOIAddNodule_i();
-    void SlotVOIDeleteNodule_i(int id);
+    void slot_voi_table_widget_cell_select_i(int row , int column);
+    void slot_voi_table_widget_item_changed_i(QTableWidgetItem *item);
+    void slot_voi_table_widget_nodule_type_changed_i(int id);
+    void slot_add_nodule_i();
+    void slot_delete_nodule_i(int id);
 
     //Preset WL
-    void SlotPersetWLChanged_i(QString s);
+    void slot_preset_wl_changed_i(QString s);
 
     //Min Max Hint
-    void SlotSceneMinMaxHint_i(const std::string& sName);
+    void slot_scene_min_max_hint_i(const std::string& sName);
 
-    //Focus In/Out Scene
-    void SlotFocusInScene_i(QString sName);
-    void SlotFocusOutScene_i(QString sName);
+    //focus In/Out Scene
+    void slot_focus_in_scene_i(QString sName);
+    void slot_focus_out_scene_i(QString sName);
 
     //Crosshair visible
-    void SlotCrosshairVisbility_i(int );
+    void slot_crosshair_visibility_i(int );
 
 
 private:
-    void ConnectSignalSlot_i();
-    void Configure_i();
-    void CreateScene_i();
-    void CreateModelObserver_i();
+    void connectS_signal_slot_i();
+    void configure_i();
+    void create_scene_i();
+    void create_model_observer_i();
 
 private:
     Ui::NoduleAnnotationClass ui;
@@ -100,7 +100,7 @@ private:
     QScrollBar * m_pMPR01ScrollBar;
     QScrollBar * m_pMPR10ScrollBar;
 
-    std::shared_ptr<MedImaging::VolumeInfos> m_pVolumeInfos;
+    std::shared_ptr<medical_imaging::VolumeInfos> m_pVolumeInfos;
     MPRScenePtr m_pMPRScene00;
     MPRScenePtr m_pMPRScene01;
     MPRScenePtr m_pMPRScene10;
@@ -111,12 +111,12 @@ private:
     int m_iLayoutType;
 
     //Model
-    std::shared_ptr<MedImaging::VOIModel> m_pVOIModel;
-    std::shared_ptr<MedImaging::CrosshairModel> m_pCrosshairModel;
+    std::shared_ptr<medical_imaging::VOIModel> m_pVOIModel;
+    std::shared_ptr<medical_imaging::CrosshairModel> m_pCrosshairModel;
 
     //Observer
     std::shared_ptr<VOITableObserver> m_pVOITableOb;
-    std::shared_ptr<MedImaging::SceneContainerObserver> m_pSceneContainerOb;
+    std::shared_ptr<medical_imaging::SceneContainerObserver> m_pSceneContainerOb;
     std::shared_ptr<MPRScrollBarObserver> m_pMPRScrollBarOb;
 
     //Nodule VOI list

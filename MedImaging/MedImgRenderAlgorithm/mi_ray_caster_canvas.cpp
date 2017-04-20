@@ -6,195 +6,122 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-RayCasterCanvas::RayCasterCanvas():m_bInit(false),m_iWidth(32),m_iHeight(32)/*,m_eDataType(USHORT)*/
+RayCasterCanvas::RayCasterCanvas():m_bInit(false),m_iWidth(32),m_iHeight(32)
 {
 
 }
 
 RayCasterCanvas::~RayCasterCanvas()
 {
-    Finialize();
+    finialize();
 }
 
-void RayCasterCanvas::Initialize()
+void RayCasterCanvas::initialize()
 {
     if (!m_bInit)
     {
         CHECK_GL_ERROR
 
         UIDType idFBO=0;
-        m_pFBO = GLResourceManagerContainer::Instance()->GetFBOManager()->CreateObject(idFBO);
-        m_pFBO->Initialize();
-        m_pFBO->SetTraget(GL_FRAMEBUFFER);
+        m_pFBO = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(idFBO);
+        m_pFBO->initialize();
+        m_pFBO->set_target(GL_FRAMEBUFFER);
 
         UIDType idTexColor = 0;
-        m_pColorAttach0 = GLResourceManagerContainer::Instance()->GetTexture2DManager()->CreateObject(idTexColor);
-        m_pColorAttach0->Initialize();
-        m_pColorAttach0->Bind();
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pColorAttach0->Load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
-
-        /*UIDType idTexGray = 0;
-        m_pGrayAttach1 = GLResourceManagerContainer::Instance()->GetTexture2DManager()->CreateObject(idTexGray);
-        m_pGrayAttach1->Initialize();
-        m_pGrayAttach1->Bind();
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
-        GLenum eInteranlForamt , eFormat , eDataType;
-        GLUtils::GetGrayTextureFormat(m_eDataType , eInteranlForamt , eFormat , eDataType);
-        m_pGrayAttach1->Load(eInteranlForamt , m_iWidth , m_iHeight , eFormat , eDataType , nullptr);*/
+        m_pColorAttach0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexColor);
+        m_pColorAttach0->initialize();
+        m_pColorAttach0->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        m_pColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         UIDType idTexDepth = 0;
-        m_pDepthAttach = GLResourceManagerContainer::Instance()->GetTexture2DManager()->CreateObject(idTexDepth);
-        m_pDepthAttach->Initialize();
-        m_pDepthAttach->Bind();
-        GLTextureUtils::Set2DWrapST(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::SetFilter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pDepthAttach->Load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+        m_pDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexDepth);
+        m_pDepthAttach->initialize();
+        m_pDepthAttach->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
-        //Bind texture to FBO
-        m_pFBO->Bind();
+        //bind texture to FBO
+        m_pFBO->bind();
         
-        m_pFBO->AttachTexture(GL_COLOR_ATTACHMENT0 , m_pColorAttach0);
-        //m_pFBO->AttachTexture(GL_COLOR_ATTACHMENT1 , m_pGrayAttach1);
-        m_pFBO->AttachTexture(GL_DEPTH_ATTACHMENT , m_pDepthAttach);
+        m_pFBO->attach_texture(GL_COLOR_ATTACHMENT0 , m_pColorAttach0);
+        //m_pFBO->attach_texture(GL_COLOR_ATTACHMENT1 , m_pGrayAttach1);
+        m_pFBO->attach_texture(GL_DEPTH_ATTACHMENT , m_pDepthAttach);
 
-        m_pFBO->UnBind();
+        m_pFBO->unbind();
 
         CHECK_GL_ERROR;
 
         //Create array
         m_pColorArray.reset(new RGBAUnit[m_iWidth*m_iHeight]);
 
-        /*if (UCHAR == m_eDataType || CHAR == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight]);
-        }
-        else if (USHORT == m_eDataType || SHORT == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight*sizeof(short)]);
-        }
-        else if (FLOAT == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight*sizeof(float)]);
-        }
-        else
-        {
-        RENDERALGO_THROW_EXCEPTION("Invalid data type!");
-        }*/
-
         m_bInit = true;
     }
 }
 
-void RayCasterCanvas::Finialize()
+void RayCasterCanvas::finialize()
 {
     if (m_bInit)
     {
-        GLResourceManagerContainer::Instance()->GetFBOManager()->RemoveObject(m_pFBO->GetUID());
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->RemoveObject(m_pColorAttach0->GetUID());
-        //GLResourceManagerContainer::Instance()->GetTexture2DManager()->RemovOebject(m_pGrayAttach1->GetUID());
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->RemoveObject(m_pDepthAttach->GetUID());
+        GLResourceManagerContainer::instance()->get_fbo_manager()->remove_object(m_pFBO->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pColorAttach0->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pDepthAttach->get_uid());
 
-        GLResourceManagerContainer::Instance()->GetFBOManager()->Update();
-        GLResourceManagerContainer::Instance()->GetTexture2DManager()->Update();
+        GLResourceManagerContainer::instance()->get_fbo_manager()->update();
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
         m_bInit = false;
     }
 }
 
-void RayCasterCanvas::SetDisplaySize( int iWidth , int iHeight )
+void RayCasterCanvas::set_display_size( int iWidth , int iHeight )
 {
     m_iWidth = iWidth;
     m_iHeight = iHeight;
 }
 
-GLFBOPtr RayCasterCanvas::GetFBO()
+GLFBOPtr RayCasterCanvas::get_fbo()
 {
     return m_pFBO;
 }
 
-RGBAUnit* RayCasterCanvas::GetColorArray()
+RGBAUnit* RayCasterCanvas::get_color_array()
 {
     return m_pColorArray.get();
 }
 
-//void* RayCasterCanvas::GetGrayArray()
-//{
-//    return m_pGrayArray.get();
-//}
-
-void RayCasterCanvas::UpdateFBO()
+void RayCasterCanvas::update_fbo()
 {
     if (m_bInit)
     {
-        m_pColorAttach0->Bind();
-        m_pColorAttach0->Load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        m_pColorAttach0->bind();
+        m_pColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
-        /*m_pGrayAttach1->Bind();
-        GLenum eInteranlForamt , eFormat , eDataType;
-        GLUtils::GetGrayTextureFormat(m_eDataType , eInteranlForamt , eFormat , eDataType);
-        m_pGrayAttach1->Load(eInteranlForamt , m_iWidth , m_iHeight , eFormat , eDataType , nullptr);*/
+        m_pDepthAttach->bind();
+        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
-        m_pDepthAttach->Bind();
-        m_pDepthAttach->Load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
-
-        /*m_pColorArray.reset(new RGBAUnit[m_iWidth*m_iHeight]);
-        if (UCHAR == m_eDataType || CHAR == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight]);
-        }
-        else if (USHORT == m_eDataType || SHORT == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight*sizeof(short)]);
-        }
-        else if (FLOAT == m_eDataType)
-        {
-        m_pGrayArray.reset(new char[m_iWidth*m_iHeight*sizeof(float)]);
-        }
-        else
-        {
-        RENDERALGO_THROW_EXCEPTION("Invalid data type!");
-        }*/
     }
 }
 
-//void RayCasterCanvas::SetDataType(DataType eDataType)
-//{
-//    m_eDataType = eDataType;
-//}
-
-void RayCasterCanvas::UploadColorArray()
+void RayCasterCanvas::update_color_array()
 {
     CHECK_GL_ERROR
-    m_pColorAttach0->Bind();
-    m_pColorAttach0->Update(0,0,m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , m_pColorArray.get());
+    m_pColorAttach0->bind();
+    m_pColorAttach0->update(0,0,m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , m_pColorArray.get());
     CHECK_GL_ERROR
 }
 
-//void RayCasterCanvas::DownloadGrayArray()
-//{
-//    GLenum eInteranlForamt , eFormat , eDataType;
-//    GLUtils::GetGrayTextureFormat(m_eDataType , eInteranlForamt , eFormat , eDataType);
-//    m_pGrayAttach1->Bind();
-//    m_pGrayAttach1->Download(eFormat , eDataType , m_pGrayArray.get());
-//}
-
-GLTexture2DPtr RayCasterCanvas::GetColorAttachTexture()
+GLTexture2DPtr RayCasterCanvas::get_color_attach_texture()
 {
     return m_pColorAttach0;
 }
 
-//GLTexture2DPtr RayCasterCanvas::GetGrayAttachTexture()
-//{
-//    return m_pGrayAttach1;
-//}
-
-void RayCasterCanvas::DebugOutputColor(const std::string& sFileName)
+void RayCasterCanvas::debug_output_color(const std::string& sFileName)
 {
-    m_pColorAttach0->Bind();
+    m_pColorAttach0->bind();
     std::unique_ptr<unsigned char[]> pRGBA(new unsigned char[m_iWidth*m_iHeight*4]);
-    m_pColorAttach0->Download(GL_RGBA , GL_UNSIGNED_BYTE , pRGBA.get());
+    m_pColorAttach0->download(GL_RGBA , GL_UNSIGNED_BYTE , pRGBA.get());
 
     std::ofstream out(sFileName , std::ios::out | std::ios::binary);
     if (out.is_open())
@@ -202,21 +129,9 @@ void RayCasterCanvas::DebugOutputColor(const std::string& sFileName)
         out.write((char*)pRGBA.get(), m_iWidth*m_iHeight*4);
     }
     out.close();
-
-    /*std::ofstream out(sFileName , std::ios::out | std::ios::binary);
-    if (out.is_open())
-    {
-        out.write((char*)m_pColorArray.get(), m_iWidth*m_iHeight*4);
-    }
-    out.close();*/
 }
 
-//void RayCasterCanvas::DebugOutputGray(const std::string& sFileName)
-//{
-//
-//}
-
-void RayCasterCanvas::GetDisplaySize(int& iWidth, int& iHeight) const
+void RayCasterCanvas::get_display_size(int& iWidth, int& iHeight) const
 {
     iWidth = m_iWidth;
     iHeight = m_iHeight;

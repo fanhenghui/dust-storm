@@ -5,7 +5,7 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 
-IOStatus MetaObjectLoader::Load(
+IOStatus MetaObjectLoader::load(
 const std::string& sInfoFile, 
 std::shared_ptr<ImageData> &pImgData , 
 std::shared_ptr<MetaObjectTag> & pMetaObjTag,

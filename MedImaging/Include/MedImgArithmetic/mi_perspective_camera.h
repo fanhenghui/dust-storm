@@ -10,46 +10,46 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export PerspectiveCamera : public CameraBase
 {
 public:
-	PerspectiveCamera();
+    PerspectiveCamera();
 
-	PerspectiveCamera(double fovy, double aspect, double zNear, double zFar);
+    PerspectiveCamera(double fovy, double aspect, double zNear, double zFar);
 
-	virtual ~PerspectiveCamera();
+    virtual ~PerspectiveCamera();
 
-	void SetPerspective(double fovy, double aspect, double zNear, double zFar);
+    void set_perspective(double fovy, double aspect, double zNear, double zFar);
 
-	void SetNearClipDistance(double zNear);
+    void set_near_clip_distance(double zNear);
 
-	void SetFarClipDistance(double zFar);
+    void set_far_clip_distance(double zFar);
 
-	virtual double GetNearClipDistance() const;
+    virtual double get_near_clip_distance() const;
 
-	virtual double GetFarClipDistance() const;
+    virtual double get_far_clip_distance() const;
 
-	void SetFovy(double fovy);
+    void set_fovy(double fovy);
 
-	void SetAspectRatio(double aspect);
+    void set_aspect_ratio(double aspect);
 
-	virtual Matrix4 GetProjectionMatrix();
+    virtual Matrix4 get_projection_matrix();
 
-	virtual Matrix4 GetViewProjectionMatrix();
+    virtual Matrix4 get_view_projection_matrix();
 
-	virtual void Zoom(double rate);
+    virtual void zoom(double rate);
 
-	virtual void Pan(const Vector2& pan);
+    virtual void pan(const Vector2& pan);
 
     PerspectiveCamera& operator =(const PerspectiveCamera& camera);
 
 protected:
-	virtual void CalculateProjectionMatrix_i();
+    virtual void calculate_projection_matrix_i();
 
 private:
-	double m_Fovy;
-	double m_Aspect;
-	double m_Near;
-	double m_Far;
-	Matrix4 m_matProjection;
-	bool m_bIsPCalculated;
+    double m_Fovy;
+    double m_Aspect;
+    double m_Near;
+    double m_Far;
+    Matrix4 m_matProjection;
+    bool m_bIsPCalculated;
 private:
 };
 

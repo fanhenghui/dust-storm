@@ -1,6 +1,6 @@
 #version 430
 
-void ColorInverse(in out float fGray)
+void color_inverse(in out float fGray)
 {
     //Do nothing
 }

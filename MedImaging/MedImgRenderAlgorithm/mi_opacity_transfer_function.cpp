@@ -11,19 +11,19 @@ OpacityTransFunc::~OpacityTransFunc()
 
 }
 
-void OpacityTransFunc::SetWidth(int iWidth)
+void OpacityTransFunc::set_width(int iWidth)
 {
     m_iWidth = iWidth;
     m_bIsDataDirty = true;
 }
 
-void OpacityTransFunc::AddPoint(float fRealValue, float a)
+void OpacityTransFunc::add_point(float fRealValue, float a)
 {
     m_vecTFPoint.push_back(OpacityTFPoint(fRealValue, a*255.0f));
     m_bIsDataDirty = true;
 }
 
-void OpacityTransFunc::GetPointList(std::vector<OpacityTFPoint>& vecResultList)
+void OpacityTransFunc::get_point_list(std::vector<OpacityTFPoint>& vecResultList)
 {
     if (m_bIsDataDirty)//Point changed
     {
@@ -90,7 +90,7 @@ void OpacityTransFunc::GetPointList(std::vector<OpacityTFPoint>& vecResultList)
     }
 }
 
-int OpacityTransFunc::GetWidth() const
+int OpacityTransFunc::get_width() const
 {
     return m_iWidth;
 }

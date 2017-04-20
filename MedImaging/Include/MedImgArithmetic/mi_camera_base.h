@@ -14,46 +14,44 @@ public:
 
     virtual ~CameraBase();
 
-    void SetEye(const Point3& ptEye);
+    void set_eye(const Point3& ptEye);
 
-    void SetLookAt(const Point3& ptCenter);
+    void set_look_at(const Point3& ptCenter);
 
-    void SetUpDirection(const Vector3& vecUp);
+    void set_up_direction(const Vector3& vecUp);
 
-    Point3 GetEye() const;
+    Point3 get_eye() const;
 
-    Point3 GetLookAt() const;
+    Point3 get_look_at() const;
 
-    Vector3 GetUpDirection() const;
+    Vector3 get_up_direction() const;
 
-    Vector3 GetViewDirection() const;
+    Vector3 get_view_direction() const;
 
-    Matrix4 GetViewMatrix();
+    Matrix4 get_view_matrix();
 
-    virtual Matrix4 GetProjectionMatrix() = 0;
+    virtual Matrix4 get_projection_matrix() = 0;
 
-    virtual Matrix4 GetViewProjectionMatrix() = 0;
+    virtual Matrix4 get_view_projection_matrix() = 0;
 
-    virtual double GetNearClipDistance() const = 0;
+    virtual double get_near_clip_distance() const = 0;
 
-    virtual double GetFarClipDistance() const = 0;
+    virtual double get_far_clip_distance() const = 0;
 
-    void GetOpenGLViewMatrix(float (&fMat)[16]);
+    void rotate(const Quat4& quat);
 
-    void Rotate(const Quat4& quat);
+    void rotate(const Matrix4& mat);
 
-    void Rotate(const Matrix4& mat);
+    virtual void zoom(double rate) = 0;
 
-    virtual void Zoom(double rate) = 0;
-
-    virtual void Pan(const Vector2& pan) = 0;
+    virtual void pan(const Vector2& pan) = 0;
 
     CameraBase& operator =(const CameraBase& camera);
 
 protected:
-    void CalculateViewMatrix_i();
+    void calculate_view_matrix_i();
 
-    virtual void CalculateProjectionMatrix_i() = 0;
+    virtual void calculate_projection_matrix_i() = 0;
 
 protected:
     Point3 m_ptEye;

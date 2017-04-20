@@ -4,7 +4,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLTextureBase::GLTextureBase(UIDType uid) : GLObject(uid) , m_uiTextueID(0)
 {
-    SetType("GLTextureBase");
+    set_type("GLTextureBase");
 }
 
 GLTextureBase::~GLTextureBase()
@@ -12,7 +12,7 @@ GLTextureBase::~GLTextureBase()
 
 }
 
-void GLTextureBase::Initialize()
+void GLTextureBase::initialize()
 {
     if (0 == m_uiTextueID)
     {
@@ -20,7 +20,7 @@ void GLTextureBase::Initialize()
     }
 }
 
-void GLTextureBase::Finalize()
+void GLTextureBase::finalize()
 {
     if (0 != m_uiTextueID)
     {
@@ -29,12 +29,12 @@ void GLTextureBase::Finalize()
     }
 }
 
-unsigned int GLTextureBase::GetID() const
+unsigned int GLTextureBase::get_id() const
 {
     return m_uiTextueID;
 }
 
-void GLTextureBase::BindImage(GLuint unit , GLint level , GLboolean layered , GLint layer , GLenum access, GLenum format)
+void GLTextureBase::bind_image(GLuint unit , GLint level , GLboolean layered , GLint layer , GLenum access, GLenum format)
 {
     glBindImageTexture(unit , m_uiTextueID , level , layered , layer , access , format);
 }

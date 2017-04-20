@@ -17,15 +17,15 @@ public:
 
     virtual ~PainterBase() {};
 
-    void SetQPainter(QPainter* pPainter) {m_pPainter = pPainter;};
+    void set_painter(QPainter* pPainter) {m_pPainter = pPainter;};
 
-    void SetScene(std::shared_ptr<SceneBase> pScene)
+    void set_scene(std::shared_ptr<SceneBase> pScene)
     {
         QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
         m_pScene = pScene;
     }
 
-    virtual void Render() = 0;
+    virtual void render() = 0;
 
 protected:
     QPainter* m_pPainter;

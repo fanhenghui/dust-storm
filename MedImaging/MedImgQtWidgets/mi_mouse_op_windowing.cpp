@@ -15,7 +15,7 @@ MouseOpWindowing::~MouseOpWindowing()
 
 }
 
-void MouseOpWindowing::Press(const QPoint& pt)
+void MouseOpWindowing::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -25,7 +25,7 @@ void MouseOpWindowing::Press(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpWindowing::Move(const QPoint& pt)
+void MouseOpWindowing::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -37,7 +37,7 @@ void MouseOpWindowing::Move(const QPoint& pt)
     if (pScene)
     {
         float fWW , fWL;
-        pScene->GetGlobalWindowLevel(fWW, fWL);
+        pScene->get_global_window_level(fWW, fWL);
         float fDeltaWW = pt.x() - m_ptPre.x();
         float fDeltaWL = m_ptPre.y() - pt.y();
         if (fWW + fDeltaWW > 1.0f)
@@ -45,13 +45,13 @@ void MouseOpWindowing::Move(const QPoint& pt)
             fWW += fDeltaWW;
         }
         fWL += fDeltaWL;
-        pScene->SetGlobalWindowLevel(fWW , fWL);
+        pScene->set_global_window_level(fWW , fWL);
     }
 
     m_ptPre = pt;
 }
 
-void MouseOpWindowing::Release(const QPoint& pt)
+void MouseOpWindowing::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -60,7 +60,7 @@ void MouseOpWindowing::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpWindowing::DoubleClick(const QPoint& pt)
+void MouseOpWindowing::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {

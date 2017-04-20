@@ -7,7 +7,7 @@ boost::mutex SharedWidget::m_mutex;
 
 SharedWidget* SharedWidget::m_instance = nullptr;
 
-SharedWidget* SharedWidget::Instance()
+SharedWidget* SharedWidget::instance()
 {
     if (!m_instance)
     {
@@ -44,7 +44,7 @@ void SharedWidget::initializeGL()
             QTWIDGETS_THROW_EXCEPTION("Glew init failed!");
         }
     }
-    catch (const MedImaging::Exception& e)
+    catch (const medical_imaging::Exception& e)
     {
         //TODO LOG
         std::cout << e.what();

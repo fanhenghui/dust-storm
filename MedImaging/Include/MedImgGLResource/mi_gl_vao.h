@@ -12,15 +12,15 @@ public:
 
     ~GLVAO();
 
-    virtual void Initialize();
+    virtual void initialize();
 
-    virtual void Finalize();
+    virtual void finalize();
 
-    unsigned int GetID() const;
+    unsigned int get_id() const;
 
-    void Bind();
+    void bind();
 
-    void UnBind();
+    void unbind();
 
 protected:
 private:

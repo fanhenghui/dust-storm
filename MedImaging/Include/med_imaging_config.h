@@ -1,15 +1,15 @@
 #pragma once
 
 #ifndef MED_IMAGING_NAMESPACE
-#define MED_IMAGING_NAMESPACE                 MedImaging
+#define MED_IMAGING_NAMESPACE                 medical_imaging
 #endif
 
 #ifndef MED_IMAGING_BEGIN_NAMESPACE
 #define MED_IMAGING_BEGIN_NAMESPACE           \
-    namespace MED_IMAGING_NAMESPACE           {    /* begin namespace MedImaging */
+    namespace MED_IMAGING_NAMESPACE           {    /* begin namespace medical_imaging */
 #endif
 #ifndef MED_IMAGING_END_NAMESPACE
-#define MED_IMAGING_END_NAMESPACE             }    /* end namespace MedImaging   */
+#define MED_IMAGING_END_NAMESPACE             }    /* end namespace medical_imaging   */
 #endif
 
 

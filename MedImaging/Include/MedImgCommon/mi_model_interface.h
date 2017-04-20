@@ -15,12 +15,12 @@ class Common_Export IModel
 public:
     IModel();
     virtual ~IModel();
-    void AddObserver(ObserverPtr pObserver);
-    void DeleteObserver(ObserverPtr pObserver);
-    void NotifyAllObserver();
-    void SetChanged();
-    void CleanChanged();
-    bool HasChanged();
+    void add_observer(ObserverPtr pObserver);
+    void delete_observer(ObserverPtr pObserver);
+    void notify();
+    void set_changed();
+    void reset_changed();
+    bool has_changed();
 
 private:
     bool m_bIsChanged;

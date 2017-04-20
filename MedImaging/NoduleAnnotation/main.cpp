@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
         w.show();
         return a.exec();
     }
-    catch (const MedImaging::Exception& e)
+    catch (const medical_imaging::Exception& e)
     {
         std::cout << e.what();
         assert(false);

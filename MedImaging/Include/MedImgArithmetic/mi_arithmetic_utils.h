@@ -14,30 +14,30 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export ArithmeticUtils
 {
 public:
-    static Matrix4f ConvertMatrix(const Matrix4& mat);
+    static Matrix4f convert_matrix(const Matrix4& mat);
 
-    static Vector3f ConvertVector(const Vector3& v);
+    static Vector3f convert_vector(const Vector3& v);
 
     static Vector3f ConvertPoint(const Point3& v);
 
-    static Point2 DCToNDC(const Point2& ptDC ,  int iWidth , int iHeight);
+    static Point2 dc_to_ndc(const Point2& ptDC ,  int iWidth , int iHeight);
 
     //iSpillTag 1 X direction 2 Y direction 0 no spill
-    static Point2 NDCToDC(Point2 ptNDC , int iWidth , int iHeight , int iSpillTag);
+    static Point2 ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight , int iSpillTag);
 
-    static Point2 NDCToDC(Point2 ptNDC , int iWidth , int iHeight );
+    static Point2 ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight );
 
     //TODO 下面的几个输出并不对
-    static double FloorDouble(double x);
+    //static double FloorDouble(double x);
 
-    static int FloorInt(double x);
+    //static int FloorInt(double x);
 
-    static double RoundDouble(double x);
+    //static double RoundDouble(double x);
 
-    static int RoundInt(double x);
+    //static int RoundInt(double x);
 
     //Check pt in [ (0,0,0) , vBound ]
-    static bool CheckInBound(const Point3& pt , const Point3& vBound);
+    static bool check_in_bound(const Point3& pt , const Point3& vBound);
 
 protected:
 private:

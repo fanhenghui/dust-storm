@@ -11,12 +11,12 @@ QMinMaxHintObject::~QMinMaxHintObject()
 
 }
 
-//void QMinMaxHintObject::Triggered(std::shared_ptr<MedImaging::SceneBase> pScene)
+//void QMinMaxHintObject::Triggered(std::shared_ptr<medical_imaging::SceneBase> pScene)
 //{
 //    emit triggered(pScene);
 //}
 
-void QMinMaxHintObject::Triggered(const std::string& s)
+void QMinMaxHintObject::trigger(const std::string& s)
 {
     emit triggered(s);
 }
@@ -33,30 +33,30 @@ MouseOpMinMaxHint::~MouseOpMinMaxHint()
 
 }
 
-void MouseOpMinMaxHint::Press(const QPoint& pt)
+void MouseOpMinMaxHint::press(const QPoint& pt)
 {
     
 }
 
-void MouseOpMinMaxHint::Move(const QPoint& pt)
+void MouseOpMinMaxHint::move(const QPoint& pt)
 {
 
 }
 
-void MouseOpMinMaxHint::Release(const QPoint& pt)
+void MouseOpMinMaxHint::release(const QPoint& pt)
 {
 
 }
 
-void MouseOpMinMaxHint::DoubleClick(const QPoint& pt)
+void MouseOpMinMaxHint::double_click(const QPoint& pt)
 {
     if (m_pMinMaxHintObject)
     {
-        m_pMinMaxHintObject->Triggered(m_pScene->GetName());
+        m_pMinMaxHintObject->trigger(m_pScene->get_name());
     }
 }
 
-void MouseOpMinMaxHint::SetMinMaxHintObject(QMinMaxHintObject* pObj)
+void MouseOpMinMaxHint::set_min_max_hint_object(QMinMaxHintObject* pObj)
 {
     m_pMinMaxHintObject = pObj;
 }

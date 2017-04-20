@@ -11,10 +11,10 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Common_Export Configuration
 {
 public:
-    static Configuration* Instance();
+    static Configuration* instance();
     ~Configuration();
-    ProcessingUnitType GetProcessingUnitType();
-    void SetProcessingUnitType(ProcessingUnitType eType);//For testing
+    ProcessingUnitType get_processing_unit_type();
+    void set_processing_unit_type(ProcessingUnitType eType);//For testing
 protected:
 private:
     Configuration();

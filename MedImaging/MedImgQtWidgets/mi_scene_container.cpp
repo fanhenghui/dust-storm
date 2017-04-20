@@ -10,7 +10,7 @@
 #include "mi_painter_base.h"
 #include "mi_mouse_op_interface.h"
 
-using namespace MedImaging;
+using namespace medical_imaging;
 
 SceneContainer::SceneContainer(SharedWidget* pShared , QWidget* parent /*= 0*/):QGLWidget(parent , pShared),m_eButton(Qt::NoButton),m_pPixelMap(new QPixmap(256,256))
 {
@@ -27,7 +27,7 @@ SceneContainer::~SceneContainer()
 
     /*if (m_pScene)
     {
-        m_pScene->Finalize();
+        m_pScene->finalize();
     }*/
 }
 
@@ -40,7 +40,7 @@ void SceneContainer::initializeGL()
 
     if (m_pScene)
     {
-        m_pScene->Initialize();
+        m_pScene->initialize();
     }
 }
 
@@ -71,20 +71,20 @@ void SceneContainer::paintEvent(QPaintEvent* pPainter)
         CHECK_GL_ERROR;
         if (m_pScene)
         {
-            m_pScene->Initialize();
+            m_pScene->initialize();
         }
         CHECK_GL_ERROR;
         //1 Scene rendering
-        m_pScene->Render(0);
-        m_pScene->RenderToBack();
+        m_pScene->render(0);
+        m_pScene->render_to_back();
 
         //2 Painter drawing
         m_pPixelMap->fill(Qt::transparent);
         QPainter painter(m_pPixelMap.get());
         for (auto it = m_vecPainters.begin() ; it != m_vecPainters.end()  ;++it)
         {
-            (*it)->SetQPainter(&painter);
-            (*it)->Render();
+            (*it)->set_painter(&painter);
+            (*it)->render();
         }
 
         QPainter p(this);
@@ -98,17 +98,17 @@ void SceneContainer::paintEvent(QPaintEvent* pPainter)
 
 void SceneContainer::mousePressEvent(QMouseEvent *event)
 {
-    //Focus
+    //focus
     this->setFocus();
 
     m_eButton = event->button();
 
     IMouseOpPtrCollection vecOps;
-    if(GetMouseOperation_i(event , vecOps))
+    if(get_mouse_operation_i(event , vecOps))
     {
         for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
         {
-            (*it)->Press(event->pos());
+            (*it)->press(event->pos());
         }
     }
 
@@ -118,11 +118,11 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
 void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
 {
     IMouseOpPtrCollection vecOps;
-    if(GetMouseOperation_i(event , vecOps))
+    if(get_mouse_operation_i(event , vecOps))
     {
         for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
         {
-            (*it)->Release(event->pos());
+            (*it)->release(event->pos());
         }
     }
 
@@ -133,11 +133,11 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
 void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 {
     IMouseOpPtrCollection vecOps;
-    if(GetMouseOperation_i(event , vecOps))
+    if(get_mouse_operation_i(event , vecOps))
     {
         for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
         {
-            (*it)->Move(event->pos());
+            (*it)->move(event->pos());
         }
     }
 
@@ -149,11 +149,11 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
     m_eButton = event->button();
 
     IMouseOpPtrCollection vecOps;
-    if(GetMouseOperation_i(event , vecOps))
+    if(get_mouse_operation_i(event , vecOps))
     {
         for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
         {
-            (*it)->DoubleClick(event->pos());
+            (*it)->double_click(event->pos());
         }
     }
 
@@ -180,32 +180,32 @@ void SceneContainer::resizeGL(int w, int h)
     boost::unique_lock<boost::mutex> locker(m_mutex);
     if (m_pScene)
     {
-        m_pScene->SetDisplaySize(w,h);
+        m_pScene->set_display_size(w,h);
     }
     m_pPixelMap.reset(new QPixmap(w,h));
 }
 
-void SceneContainer::SetScene(std::shared_ptr<MedImaging::SceneBase> pScene)
+void SceneContainer::set_scene(std::shared_ptr<medical_imaging::SceneBase> pScene)
 {
     m_pScene = pScene;
 }
 
-void SceneContainer::AddPainterList(std::vector<std::shared_ptr<PainterBase>> vecPainters)
+void SceneContainer::add_painter_list(std::vector<std::shared_ptr<PainterBase>> vecPainters)
 {
     m_vecPainters = vecPainters;
 }
 
-void SceneContainer::RegisterMouseOperation(std::shared_ptr<IMouseOp> pMouseOP , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
+void SceneContainer::register_mouse_operation(std::shared_ptr<IMouseOp> pMouseOP , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
 {
     m_mapMouseOps[eButton|eKeyBoardModifier] = IMouseOpPtrCollection(1 , pMouseOP);
 }
 
-void SceneContainer::RegisterMouseOperation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
+void SceneContainer::register_mouse_operation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
 {
     m_mapMouseOps[eButton|eKeyBoardModifier] = vecMouseOPs;
 }
 
-bool SceneContainer::GetMouseOperation_i(QMouseEvent *event , IMouseOpPtrCollection& pOp)
+bool SceneContainer::get_mouse_operation_i(QMouseEvent *event , IMouseOpPtrCollection& pOp)
 {
     int key = m_eButton | event->modifiers();
     auto it = m_mapMouseOps.find(key);
@@ -220,19 +220,19 @@ bool SceneContainer::GetMouseOperation_i(QMouseEvent *event , IMouseOpPtrCollect
     }
 }
 
-void SceneContainer::SetName(const std::string& sDes)
+void SceneContainer::set_name(const std::string& sDes)
 {
     if (m_pScene)
     {
-        m_pScene->SetName(sDes);
+        m_pScene->set_name(sDes);
     }
 }
 
-std::string SceneContainer::GetName() const
+std::string SceneContainer::get_name() const
 {
     if (m_pScene)
     {
-        return m_pScene->GetName();
+        return m_pScene->get_name();
     }
     else
     {
@@ -250,7 +250,7 @@ void SceneContainer::focusOutEvent(QFocusEvent *event)
     emit focusOutScene();
 }
 
-IMouseOpPtrCollection SceneContainer::GetMouseOperation(Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
+IMouseOpPtrCollection SceneContainer::get_mouse_operation(Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier)
 {
     int key = eButton | eKeyBoardModifier;
     auto it = m_mapMouseOps.find(key);

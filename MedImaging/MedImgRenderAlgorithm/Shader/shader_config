@@ -30,7 +30,7 @@ EncoderItem = shader/rc_mask_linear_sampler.frag ksRCMaskLinearSamplerFrag
 EncoderItem = shader/rc_mask_nearst_sampler.frag ksRCMaskNearstSamplerFrag
 EncoderItem = shader/rc_mask_none_sampler.frag ksRCMaskNoneSamplerFrag
 
-//6 Color Inverse
+//6 Color inverse
 EncoderItem = shader/rc_color_inverse_disable.frag ksRCColorInverseDisableFrag
 EncoderItem = shader/rc_color_inverse_enable.frag ksRCColorInverseEnableFrag
 

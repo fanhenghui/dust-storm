@@ -13,7 +13,7 @@ template<class T>
 class StrNumConverter
 {
 public:
-    T ToNumber(std::string s)
+    T to_num(std::string s)
     {
         std::stringstream ss(s);
         T v;
@@ -21,14 +21,14 @@ public:
         return v;
     }
 
-    std::string ToStringDecimal( T i, int iPrecision)
+    std::string to_string_decimal( T i, int iPrecision)
     {
         std::stringstream ss;
         ss << std::setprecision(iPrecision) <<  std::fixed << i;
         return ss.str();
     }
 
-    std::string ToString(T i)
+    std::string to_string(T i)
     {
         std::stringstream ss;
         ss << i;

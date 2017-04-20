@@ -3,7 +3,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-bool IntersectionTest::PlaneIntersectPlane(const Plane& plane1,const Plane& plane2,Line3D& intersectingLine)
+bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Line3D& intersectingLine)
 {
     const Vector3 vNorm1 = plane1.m_vNorm;//Here should be normalised
     const Vector3 vNorm2 = plane2.m_vNorm;
@@ -13,8 +13,8 @@ bool IntersectionTest::PlaneIntersectPlane(const Plane& plane1,const Plane& plan
     }
     else
     {
-        Vector3 vDir = plane1.m_vNorm.CrossProduct(plane2.m_vNorm);
-        vDir.Normalize();
+        Vector3 vDir = plane1.m_vNorm.cross_product(plane2.m_vNorm);
+        vDir.normalize();
         intersectingLine.m_vDir = vDir;
         const double a0 = plane1.m_vNorm.x;
         const double b0 = plane1.m_vNorm.y;

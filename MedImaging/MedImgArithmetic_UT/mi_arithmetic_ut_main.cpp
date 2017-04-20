@@ -17,14 +17,14 @@ void main()
 
     Vector3f v0(1,3,7);
     Vector3f v1(2,1,5);
-    Vector3f v3 = MinPerElem(v0,v1);
-    Vector3f v4 = MaxPerElem(v0,v1);
+    Vector3f v3 = min_per_elem(v0,v1);
+    Vector3f v4 = max_per_elem(v0,v1);
 
-    Vector3f v5 = v0.MaxPerElem(v1);
+    Vector3f v5 = v0.max_per_elem(v1);
 
     Vector3f v6(-0.0, 1.6595 , -std::numeric_limits<float>::max());
-    Vector3f v7 = v6.ToAbs();
-    Vector3f v8 = v7.LessThan(Vector3f(10.0f , FLOAT_EPSILON , FLOAT_EPSILON));
+    Vector3f v7 = v6.to_abs();
+    Vector3f v8 = v7.less_than(Vector3f(10.0f , FLOAT_EPSILON , FLOAT_EPSILON));
     float f = std::numeric_limits<float>::max()*0.5f + std::numeric_limits<float>::max()*0.5f;
 
     //Test 1D sampler
@@ -35,8 +35,8 @@ void main()
     }
 
     Sampler<unsigned short> sample;
-    std::cout  << sample.Sample1DNearst(3.4f , 10 , pData) << std::endl;
-    std::cout  << sample.Sample1DLinear(3.4f , 10 , pData) << std::endl;
+    std::cout  << sample.sample_1d_nearst(3.4f , 10 , pData) << std::endl;
+    std::cout  << sample.sample_1d_linear(3.4f , 10 , pData) << std::endl;
 
     //Test 2D sampler
     //std::ifstream in("D:/AB_CTA_01_0.raw", std::ios::binary | std::ios::out);
@@ -57,7 +57,7 @@ void main()
     //        }
     //        float fX = (float)x/(float)(uiWidth) * 512;
     //        float fY = (float)y/(float)(uiHeight) * 512;
-    //        pImgZoom[y*uiWidth + x] = unsigned short(sample.Sample2DLinear(fX ,fY, 512,512 , pImg));
+    //        pImgZoom[y*uiWidth + x] = unsigned short(sample.sample_2d_linear(fX ,fY, 512,512 , pImg));
     //    }
     //}
 
@@ -105,7 +105,7 @@ void main()
                 float fX = (float)x/(float)(uiWidth) * uiX;
                 float fY = (float)y/(float)(uiHeight) * uiY;
                 float fZ = (float)z/(float)(uiDepth) * uiZ;
-                pImgZoom[z*uiWidth*uiHeight + y*uiWidth + x] = (unsigned short)(sample.Sample3DNearst(fX ,fY, fZ , uiX,uiY , uiZ ,pImg));
+                pImgZoom[z*uiWidth*uiHeight + y*uiWidth + x] = (unsigned short)(sample.sample_3d_nearst(fX ,fY, fZ , uiX,uiY , uiZ ,pImg));
             }
         }
     }

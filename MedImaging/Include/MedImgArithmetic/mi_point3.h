@@ -80,7 +80,7 @@ public:
             std::fabs(z - pt.z) < DOUBLE_EPSILON);
     }
 
-    void Print()
+    void print()
     {
         std::cout <<"( "<<x << " , "<<y << " , " << z << " ) ";
     }

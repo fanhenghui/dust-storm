@@ -14,12 +14,12 @@ CrosshairPainter::~CrosshairPainter()
 
 }
 
-void CrosshairPainter::SetCrossHairModel(std::shared_ptr<CrosshairModel> pModel)
+void CrosshairPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
 {
     m_pModel = pModel;
 }
 
-void CrosshairPainter::Render()
+void CrosshairPainter::render()
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_pModel);
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_pScene);
@@ -28,7 +28,7 @@ void CrosshairPainter::Render()
     std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
     QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-    if (!m_pModel->GetVisibility())
+    if (!m_pModel->get_visibility())
     {
         return;
     }
@@ -36,19 +36,19 @@ void CrosshairPainter::Render()
 
     Line2D lines[2];
     RGBUnit colors[2];
-    m_pModel->GetCrossLine(pScene , lines , colors);
+    m_pModel->get_cross_line(pScene , lines , colors);
 
     //std::cout << "<><><><><><><><>\n";
-    //std::cout << pScene->GetDescription() << std::endl;
+    //std::cout << pScene->get_description() << std::endl;
 
     int iWidth(1) , iHeight(1);
-    m_pScene->GetDisplaySize(iWidth , iHeight);
+    m_pScene->get_display_size(iWidth , iHeight);
 
     for (int i = 0 ; i< 2 ; ++i)
     {
         //Convert to DC
         Line2D line = lines[i];
-        line.m_pt = ArithmeticUtils::NDCToDC(lines[i].m_pt , iWidth , iHeight);
+        line.m_pt = ArithmeticUtils::ndc_to_dc(lines[i].m_pt , iWidth , iHeight);
         line.m_vDir.y = -line.m_vDir.y;
 
         //Convert to line function a*x + b*y = c
@@ -57,9 +57,9 @@ void CrosshairPainter::Render()
         const double c = a*line.m_pt.x + b*line.m_pt.y;
 
         //std::cout << "Pt : ";
-        //line.m_pt.Print();
+        //line.m_pt.print();
         //std::cout << "  Dir : ";
-        //line.m_vDir.Print();
+        //line.m_vDir.print();
         //std::cout << std::endl;
 
         QPoint pDC0 , pDC1;

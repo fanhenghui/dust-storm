@@ -14,7 +14,7 @@ public:
 
       virtual ~RCStepColorInverseEnable(){};
 
-      virtual GLShaderInfo GetShaderInfo();
+      virtual GLShaderInfo get_shader_info();
 
 private:
 };
@@ -28,7 +28,7 @@ public:
 
       virtual ~RCStepColorInverseDisable(){};
 
-      virtual GLShaderInfo GetShaderInfo();
+      virtual GLShaderInfo get_shader_info();
 
 private:
 };

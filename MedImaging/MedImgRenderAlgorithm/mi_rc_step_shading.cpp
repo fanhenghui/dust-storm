@@ -4,17 +4,17 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 
-GLShaderInfo RCStepShadingNone::GetShaderInfo()
+GLShaderInfo RCStepShadingNone::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCShadingNoneFrag , "RCStepShadingNone");
 }
 
-GLShaderInfo RCStepShadingPhong::GetShaderInfo()
+GLShaderInfo RCStepShadingPhong::get_shader_info()
 {
     return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCShadingPhongFrag , "RCStepShadingPhong");
 }
 
-void RCStepShadingPhong::SetGPUParameter()
+void RCStepShadingPhong::set_gpu_parameter()
 {
 
 }

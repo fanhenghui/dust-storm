@@ -3,58 +3,58 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
      
-    const Matrix4f AppendScale( const Matrix4f & mat, const Vector3f &scaleVec )
+    const Matrix4f append_scale( const Matrix4f & mat, const Vector3f &scaleVec )
 {
     return Matrix4f(
-        ( mat.GetCol0() * scaleVec.GetX( ) ),
-        ( mat.GetCol1() * scaleVec.GetY( ) ),
-        ( mat.GetCol2() * scaleVec.GetZ( ) ),
-        mat.GetCol3()
+        ( mat.get_col0() * scaleVec.get_x( ) ),
+        ( mat.get_col1() * scaleVec.get_y( ) ),
+        ( mat.get_col2() * scaleVec.get_z( ) ),
+        mat.get_col3()
         );
 }
 
  
-    const Matrix4f PrependScale( const Vector3f &scaleVec, const Matrix4f & mat )
+    const Matrix4f prepend_scale( const Vector3f &scaleVec, const Matrix4f & mat )
 {
     Vector4f scale4 = Vector4f( scaleVec, 1.0f );
     return Matrix4f(
-        MulPerElem( mat.GetCol0(), scale4 ),
-        MulPerElem( mat.GetCol1(), scale4 ),
-        MulPerElem( mat.GetCol2(), scale4 ),
-        MulPerElem( mat.GetCol3(), scale4 )
+        mul_per_elem( mat.get_col0(), scale4 ),
+        mul_per_elem( mat.get_col1(), scale4 ),
+        mul_per_elem( mat.get_col2(), scale4 ),
+        mul_per_elem( mat.get_col3(), scale4 )
         );
 }
 
  
-    const Matrix4f MulPerElem( const Matrix4f & mat0, const Matrix4f & mat1 )
+    const Matrix4f mul_per_elem( const Matrix4f & mat0, const Matrix4f & mat1 )
 {
     return Matrix4f(
-        MulPerElem( mat0.GetCol0(), mat1.GetCol0() ),
-        MulPerElem( mat0.GetCol1(), mat1.GetCol1() ),
-        MulPerElem( mat0.GetCol2(), mat1.GetCol2() ),
-        MulPerElem( mat0.GetCol3(), mat1.GetCol3() )
+        mul_per_elem( mat0.get_col0(), mat1.get_col0() ),
+        mul_per_elem( mat0.get_col1(), mat1.get_col1() ),
+        mul_per_elem( mat0.get_col2(), mat1.get_col2() ),
+        mul_per_elem( mat0.get_col3(), mat1.get_col3() )
         );
 }
 
  
-    const Matrix4f AbsPerElem( const Matrix4f & mat )
+    const Matrix4f abs_per_elem( const Matrix4f & mat )
 {
     return Matrix4f(
-        AbsPerElem( mat.GetCol0() ),
-        AbsPerElem( mat.GetCol1() ),
-        AbsPerElem( mat.GetCol2() ),
-        AbsPerElem( mat.GetCol3() )
+        abs_per_elem( mat.get_col0() ),
+        abs_per_elem( mat.get_col1() ),
+        abs_per_elem( mat.get_col2() ),
+        abs_per_elem( mat.get_col3() )
         );
 }
 
  
-    const Matrix4f Transpose( const Matrix4f & mat )
+    const Matrix4f transpose( const Matrix4f & mat )
 {
     __m128 tmp0, tmp1, tmp2, tmp3, res0, res1, res2, res3;
-    tmp0 = vec_mergeh( mat.GetCol0().m_Vec128, mat.GetCol2().m_Vec128 );
-    tmp1 = vec_mergeh( mat.GetCol1().m_Vec128, mat.GetCol3().m_Vec128 );
-    tmp2 = vec_mergel( mat.GetCol0().m_Vec128, mat.GetCol2().m_Vec128 );
-    tmp3 = vec_mergel( mat.GetCol1().m_Vec128, mat.GetCol3().m_Vec128 );
+    tmp0 = vec_mergeh( mat.get_col0().m_Vec128, mat.get_col2().m_Vec128 );
+    tmp1 = vec_mergeh( mat.get_col1().m_Vec128, mat.get_col3().m_Vec128 );
+    tmp2 = vec_mergel( mat.get_col0().m_Vec128, mat.get_col2().m_Vec128 );
+    tmp3 = vec_mergel( mat.get_col1().m_Vec128, mat.get_col3().m_Vec128 );
     res0 = vec_mergeh( tmp0, tmp1 );
     res1 = vec_mergel( tmp0, tmp1 );
     res2 = vec_mergeh( tmp2, tmp3 );
@@ -68,17 +68,17 @@ MED_IMAGING_BEGIN_NAMESPACE
 }
 
  
-    const Matrix4f Inverse( const Matrix4f & mat )
+    const Matrix4f inverse( const Matrix4f & mat )
 {
     __m128 Va,Vb,Vc;
     __m128 r1,r2,r3,tt,tt2;
     __m128 sum,Det,RDet;
     __m128 trns0,trns1,trns2,trns3;
 
-    __m128 _L1 = mat.GetCol0().m_Vec128;
-    __m128 _L2 = mat.GetCol1().m_Vec128;
-    __m128 _L3 = mat.GetCol2().m_Vec128;
-    __m128 _L4 = mat.GetCol3().m_Vec128;
+    __m128 _L1 = mat.get_col0().m_Vec128;
+    __m128 _L2 = mat.get_col1().m_Vec128;
+    __m128 _L3 = mat.get_col2().m_Vec128;
+    __m128 _L4 = mat.get_col3().m_Vec128;
     // Calculating the minterms for the first line.
 
     // _mm_ror_ps is just a macro using _mm_shuffle_ps().
@@ -167,26 +167,26 @@ MED_IMAGING_BEGIN_NAMESPACE
 }
 
  
-    const Matrix4f AffineInverse( const Matrix4f & mat )
+    const Matrix4f affine_inverse( const Matrix4f & mat )
 {
-    Vector3f col0 = mat.GetCol0().GetXYZ(); 
-    Vector3f col1 = mat.GetCol1().GetXYZ();
-    Vector3f col2 = mat.GetCol2().GetXYZ();
-    Vector3f col3 = mat.GetCol3().GetXYZ();
+    Vector3f col0 = mat.get_col0().get_xyz(); 
+    Vector3f col1 = mat.get_col1().get_xyz();
+    Vector3f col2 = mat.get_col2().get_xyz();
+    Vector3f col3 = mat.get_col3().get_xyz();
 
     Vector3f tmp0, tmp1, tmp2, inv0, inv1, inv2;
 
-    tmp0 = CrossProduct( col1, col2 );
-    tmp1 = CrossProduct( col2, col0 );
-    tmp2 = CrossProduct( col0, col1 );
-    float detinv = ( 1.0f / DotProduct( col2, tmp2 ) );
+    tmp0 = cross( col1, col2 );
+    tmp1 = cross( col2, col0 );
+    tmp2 = cross( col0, col1 );
+    float detinv = ( 1.0f / dot_product( col2, tmp2 ) );
 
-    inv0 = Vector3f( ( tmp0.GetX() * detinv ), ( tmp1.GetX() * detinv ), ( tmp2.GetX() * detinv ) );
-    inv1 = Vector3f( ( tmp0.GetY() * detinv ), ( tmp1.GetY() * detinv ), ( tmp2.GetY() * detinv ) );
-    inv2 = Vector3f( ( tmp0.GetZ() * detinv ), ( tmp1.GetZ() * detinv ), ( tmp2.GetZ() * detinv ) );
+    inv0 = Vector3f( ( tmp0.get_x() * detinv ), ( tmp1.get_x() * detinv ), ( tmp2.get_x() * detinv ) );
+    inv1 = Vector3f( ( tmp0.get_y() * detinv ), ( tmp1.get_y() * detinv ), ( tmp2.get_y() * detinv ) );
+    inv2 = Vector3f( ( tmp0.get_z() * detinv ), ( tmp1.get_z() * detinv ), ( tmp2.get_z() * detinv ) );
 
     Vector3f temp = Vector3f( 
-        -( ( inv0 * col3.GetX() ) + ( ( inv1 * col3.GetY() ) + ( inv2 * col3.GetZ() ) ) ) 
+        -( ( inv0 * col3.get_x() ) + ( ( inv1 * col3.get_y() ) + ( inv2 * col3.get_z() ) ) ) 
         );
 
     return Matrix4f(
@@ -199,13 +199,13 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 
  
-    const Matrix4f OrthoInverse( const Matrix4f & mat )
+    const Matrix4f ortho_inverse( const Matrix4f & mat )
 {
-    Vector3f inv0 = mat.GetRow(0).GetXYZ();
-    Vector3f inv1 = mat.GetRow(1).GetXYZ();
-    Vector3f inv2 = mat.GetRow(2).GetXYZ();
+    Vector3f inv0 = mat.get_row(0).get_xyz();
+    Vector3f inv1 = mat.get_row(1).get_xyz();
+    Vector3f inv2 = mat.get_row(2).get_xyz();
     Vector3f temp = Vector3f( 
-        -( ( inv0 * mat.GetCol3().GetX() ) + ( ( inv1 * mat.GetCol3().GetY() ) + ( inv2 * mat.GetCol3().GetZ() ) ) )
+        -( ( inv0 * mat.get_col3().get_x() ) + ( ( inv1 * mat.get_col3().get_y() ) + ( inv2 * mat.get_col3().get_z() ) ) )
         );
     return Matrix4f(
         Vector4f(inv0, 0.0f),
@@ -216,16 +216,16 @@ MED_IMAGING_BEGIN_NAMESPACE
 }
 
  
-    const float Determinant( const Matrix4f & mat )
+    const float determinant( const Matrix4f & mat )
 {
     __m128 Va,Vb,Vc;
     __m128 r1,r2,r3,tt,tt2;
     __m128 sum,Det;
 
-    __m128 _L1 = mat.GetCol0().m_Vec128;
-    __m128 _L2 = mat.GetCol1().m_Vec128;
-    __m128 _L3 = mat.GetCol2().m_Vec128;
-    __m128 _L4 = mat.GetCol3().m_Vec128;
+    __m128 _L1 = mat.get_col0().m_Vec128;
+    __m128 _L2 = mat.get_col1().m_Vec128;
+    __m128 _L3 = mat.get_col2().m_Vec128;
+    __m128 _L4 = mat.get_col3().m_Vec128;
     // Calculating the minterms for the first line.
 
     // _mm_ror_ps is just a macro using _mm_shuffle_ps().
@@ -260,19 +260,19 @@ MED_IMAGING_BEGIN_NAMESPACE
 #ifdef _DEBUG
 
  
-    void Print( const Matrix4f & mat )
+    void print( const Matrix4f & mat )
 {
-    print( mat.GetRow( 0 ) );
-    print( mat.GetRow( 1 ) );
-    print( mat.GetRow( 2 ) );
-    print( mat.GetRow( 3 ) );
+    print( mat.get_row( 0 ) );
+    print( mat.get_row( 1 ) );
+    print( mat.get_row( 2 ) );
+    print( mat.get_row( 3 ) );
 }
 
  
-    void Print( const Matrix4f & mat, const char * name )
+    void print( const Matrix4f & mat, const char * name )
 {
     printf("%s:\n", name);
-    Print( mat );
+    print( mat );
 }
 
 #endif

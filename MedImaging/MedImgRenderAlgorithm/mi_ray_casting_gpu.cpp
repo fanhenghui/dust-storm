@@ -28,9 +28,9 @@ RayCastingGPU::~RayCastingGPU()
 
 }
 
-void RayCastingGPU::Render(int iTestCode)
+void RayCastingGPU::render(int iTestCode)
 {
-    Update_i();
+    update_i();
 
     CHECK_GL_ERROR;
 
@@ -39,24 +39,24 @@ void RayCastingGPU::Render(int iTestCode)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    m_pVAO->Bind();
-    m_pProgram->Bind();
+    m_pVAO->bind();
+    m_pProgram->bind();
 
     for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
     {
-        (*it)->SetGPUParameter();
+        (*it)->set_gpu_parameter();
     }
 
     glDrawArrays(GL_TRIANGLES , 0 , 6);
 
-    m_pVAO->UnBind();
-    m_pProgram->UnBind();
+    m_pVAO->unbind();
+    m_pProgram->unbind();
     glPopAttrib();
 
     CHECK_GL_ERROR;
 }
 
-void RayCastingGPU::Update_i()
+void RayCastingGPU::update_i()
 {
     CHECK_GL_ERROR;
 
@@ -64,25 +64,25 @@ void RayCastingGPU::Update_i()
     if (!m_pVAO)
     {
         UIDType uid;
-        m_pVAO = GLResourceManagerContainer::Instance()->GetVAOManager()->CreateObject(uid);
-        m_pVAO->SetDescription("Ray casting GPU VAO");
-        m_pVAO->Initialize();
+        m_pVAO = GLResourceManagerContainer::instance()->get_vao_manager()->create_object(uid);
+        m_pVAO->set_description("Ray casting GPU VAO");
+        m_pVAO->initialize();
 
-        m_pVertexBuffer = GLResourceManagerContainer::Instance()->GetBufferManager()->CreateObject(uid);
-        m_pVertexBuffer->SetDescription("Ray casting GPU vertex buffer (-1 -1)~ (1,1)");
-        m_pVertexBuffer->Initialize();
-        m_pVertexBuffer->SetBufferTarget(GL_ARRAY_BUFFER);
+        m_pVertexBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+        m_pVertexBuffer->set_description("Ray casting GPU vertex buffer (-1 -1)~ (1,1)");
+        m_pVertexBuffer->initialize();
+        m_pVertexBuffer->set_buffer_target(GL_ARRAY_BUFFER);
 
-        m_pVAO->Bind();
-        m_pVertexBuffer->Bind();
+        m_pVAO->bind();
+        m_pVertexBuffer->bind();
         float pVertex[] = { -1,1,0 , -1,-1,0 , 1,-1,0,
         1,-1,0, 1,1,0,-1,1,0 };
-        m_pVertexBuffer->Load(sizeof(pVertex) , pVertex , GL_STATIC_DRAW);
+        m_pVertexBuffer->load(sizeof(pVertex) , pVertex , GL_STATIC_DRAW);
         glVertexAttribPointer(0 , 3 , GL_FLOAT , GL_FALSE , 0 , NULL );
         glEnableVertexAttribArray(0);
 
-        m_pVAO->UnBind();
-        m_pVertexBuffer->UnBind();
+        m_pVAO->unbind();
+        m_pVertexBuffer->unbind();
     }
 
     CHECK_GL_ERROR;
@@ -91,9 +91,9 @@ void RayCastingGPU::Update_i()
     if (!m_pProgram)
     {
         UIDType uid;
-        m_pProgram = GLResourceManagerContainer::Instance()->GetProgramManager()->CreateObject(uid);
-        m_pProgram->SetDescription("Ray casting GPU program");
-        m_pProgram->Initialize();
+        m_pProgram = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
+        m_pProgram->set_description("Ray casting GPU program");
+        m_pProgram->initialize();
     }
 
     std::shared_ptr<RayCaster> pRayCaster = m_pRayCaster.lock();
@@ -191,18 +191,18 @@ void RayCastingGPU::Update_i()
 
 
 
-        //Compile
+        //compile
         std::vector<GLShaderInfo> vecShaders;
         for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
         {
-            vecShaders.push_back((*it)->GetShaderInfo());
+            vecShaders.push_back((*it)->get_shader_info());
         }
-        m_pProgram->SetShaders(vecShaders);
-        m_pProgram->Compile();
+        m_pProgram->set_shaders(vecShaders);
+        m_pProgram->compile();
 
         for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
         {
-            (*it)->GetUniformLocation();
+            (*it)->get_uniform_location();
         }
     }
 

@@ -11,20 +11,20 @@ ColorTransFunc::~ColorTransFunc()
 
 }
 
-void ColorTransFunc::SetWidth(int iWidth)
+void ColorTransFunc::set_width(int iWidth)
 {
     m_iWidth = iWidth;
     m_bIsDataDirty = true;
 }
 
-void ColorTransFunc::SetColorType(ColorType eInputColorType, ColorType eInterpolationColorType)
+void ColorTransFunc::set_color_type(ColorType eInputColorType, ColorType eInterpolationColorType)
 {
     m_eInterpolationColorType = eInterpolationColorType;
     m_eInputColorType = eInputColorType;
     m_bIsDataDirty = true;
 }
 
-void ColorTransFunc::AddRGBPoint(float fRealValue, float x, float y, float z)
+void ColorTransFunc::add_rgb_point(float fRealValue, float x, float y, float z)
 {
     //     if(x > 1.0f)
     //     {
@@ -42,13 +42,13 @@ void ColorTransFunc::AddRGBPoint(float fRealValue, float x, float y, float z)
     m_bIsDataDirty = true;
 }
 
-void ColorTransFunc::AddHSVPoint(float fRealValue, float x, float y, float z)
+void ColorTransFunc::add_hsv_point(float fRealValue, float x, float y, float z)
 {
     m_vecTFPoint.push_back(ColorTFPoint(fRealValue, x, y, z));
     m_bIsDataDirty = true;
 }
 
-void ColorTransFunc::GetPointList(std::vector<ColorTFPoint>& vecResultList)
+void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
 {
     if (m_bIsDataDirty)//Point changed
     {
@@ -65,7 +65,7 @@ void ColorTransFunc::GetPointList(std::vector<ColorTFPoint>& vecResultList)
                 for (auto it = m_vecTFPoint.begin(); it != m_vecTFPoint.end(); ++it)
                 {
                     //Convert RGB tot HSV
-                    *it = RGB2HSV(*it);
+                    *it = hsv_to_rgb(*it);
                 }
             }
             if (HSV == m_eInputColorType)
@@ -73,7 +73,7 @@ void ColorTransFunc::GetPointList(std::vector<ColorTFPoint>& vecResultList)
                 for (auto it = m_vecTFPoint.begin(); it != m_vecTFPoint.end(); ++it)
                 {
                     //Convert HSV tot RGB
-                    *it = HSV2RGB(*it);
+                    *it = hsv_to_rgb(*it);
                 }
             }
         }
@@ -141,7 +141,7 @@ void ColorTransFunc::GetPointList(std::vector<ColorTFPoint>& vecResultList)
         {
             for (size_t i = 0; i < m_vecResultList.size(); ++i)
             {
-                m_vecResultList[i] = HSV2RGB(m_vecResultList[i]);
+                m_vecResultList[i] = hsv_to_rgb(m_vecResultList[i]);
             }
         }
 
@@ -154,12 +154,12 @@ void ColorTransFunc::GetPointList(std::vector<ColorTFPoint>& vecResultList)
     }
 }
 
-int ColorTransFunc::GetWidth() const
+int ColorTransFunc::get_width() const
 {
     return m_iWidth;
 }
 
-ColorTFPoint ColorTransFunc::HSV2RGB(const ColorTFPoint& hsv)
+ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv)
 {
     /// \输入的HSV的范围是 H（hue）0~359
     //S(saturation) 0 ~ 1(0~100%)
@@ -225,7 +225,7 @@ ColorTFPoint ColorTransFunc::HSV2RGB(const ColorTFPoint& hsv)
     return ColorTFPoint(hsv.v, r, g, b);
 }
 
-ColorTFPoint ColorTransFunc::RGB2HSV(const ColorTFPoint& rgb)
+ColorTFPoint ColorTransFunc::rgb_to_hsv(const ColorTFPoint& rgb)
 {
     /// \输入的RGB的范围是 0~1
     float onethird = 1.0f / 3.0f;

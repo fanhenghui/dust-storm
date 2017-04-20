@@ -3,109 +3,109 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
      
-    const Vector3f MulPerElem( const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f mul_per_elem( const Vector3f &vec0, const Vector3f &vec1 )
 {
     return Vector3f( _mm_mul_ps( vec0.m_Vec128, vec1.m_Vec128 ) );
 }
 
  
-    const Vector3f DivPerElem( const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f div_per_elem( const Vector3f &vec0, const Vector3f &vec1 )
 {
     return Vector3f( _mm_div_ps( vec0.m_Vec128, vec1.m_Vec128 ) );
 }
 
  
-    const Vector3f RecipPerElem( const Vector3f &vec )
+    const Vector3f recip_per_elem( const Vector3f &vec )
 {
     return Vector3f( _mm_rcp_ps( vec.m_Vec128 ) );
 }
 
  
-    const Vector3f AbsPerElem( const Vector3f &vec )
+    const Vector3f abs_per_elem( const Vector3f &vec )
 {
     return Vector3f( fabsf4( vec.m_Vec128 ) );
 }
 
  
-    const Vector3f MaxPerElem( const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f max_per_elem( const Vector3f &vec0, const Vector3f &vec1 )
 {
     return Vector3f( _mm_max_ps( vec0.m_Vec128, vec1.m_Vec128 ) );
 }
 
  
-    const Vector3f MinPerElem( const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f min_per_elem( const Vector3f &vec0, const Vector3f &vec1 )
 {
     return Vector3f( _mm_min_ps( vec0.m_Vec128, vec1.m_Vec128 ) );
 }
 
  
-    const float MaxElem( const Vector3f &vec )
+    const float max_elem( const Vector3f &vec )
 {
     __m128 t = _mm_max_ps( _mm_max_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) ), vec_splat( vec.m_Vec128, 2 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float MinElem( const Vector3f &vec )
+    const float min_elem( const Vector3f &vec )
 {
     __m128 t = _mm_min_ps( _mm_min_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) ), vec_splat( vec.m_Vec128, 2 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float Sum( const Vector3f &vec )
+    const float sum( const Vector3f &vec )
 {
     __m128 t =  _mm_add_ps( _mm_add_ps( vec_splat( vec.m_Vec128, 0 ), vec_splat( vec.m_Vec128, 1 ) ), vec_splat( vec.m_Vec128, 2 ) );
     return _vmathVfGetElement(t , 0);
 }
 
  
-    const float DotProduct( const Vector3f &vec0, const Vector3f &vec1 )
+    const float dot_product( const Vector3f &vec0, const Vector3f &vec1 )
 {
     __m128 t = _vmathVfDot3( vec0.m_Vec128, vec1.m_Vec128 );
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const float LengthSqr( const Vector3f &vec )
+    const float length_sqr( const Vector3f &vec )
 {
     __m128 t = _vmathVfDot3( vec.m_Vec128, vec.m_Vec128 );
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const float Length( const Vector3f &vec )
+    const float length( const Vector3f &vec )
 {
     __m128 t = _mm_sqrt_ps(_vmathVfDot3( vec.m_Vec128, vec.m_Vec128 ));
     return _vmathVfGetElement(t, 0);
 }
 
  
-    const Vector3f NormalizeApprox( const Vector3f &vec )
+    const Vector3f normalize_approx( const Vector3f &vec )
 {
     return Vector3f( _mm_mul_ps( vec.m_Vec128, _mm_rsqrt_ps( _vmathVfDot3( vec.m_Vec128, vec.m_Vec128 ) ) ) );
 }
 
  
-    const Vector3f Normalize( const Vector3f &vec )
+    const Vector3f normalize( const Vector3f &vec )
 {
     return Vector3f( _mm_mul_ps( vec.m_Vec128, newtonrapson_rsqrt4( _vmathVfDot3( vec.m_Vec128, vec.m_Vec128 ) ) ) );
 }
 
  
-    const Vector3f CrossProduct( const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f cross( const Vector3f &vec0, const Vector3f &vec1 )
 {
     return Vector3f( _vmathVfCross( vec0.m_Vec128, vec1.m_Vec128 ) );
 }
 
  
-    const Vector3f Lerp( const float t, const Vector3f &vec0, const Vector3f &vec1 )
+    const Vector3f lerp( const float t, const Vector3f &vec0, const Vector3f &vec1 )
 {
     return ( vec0 + ( ( vec1 - vec0 ) * t ) );
 }
 
  
-    const Vector3f Slerp( const float t, const Vector3f &unitVec0, const Vector3f &unitVec1 )
+    const Vector3f slerp( const float t, const Vector3f &unitVec0, const Vector3f &unitVec1 )
 {
 #define _MCSF_3D_SLERP_TOL 0.999f
     __m128 scales, scale0, scale1, cosAngle, angle, tttt, oneMinusT, angles, sines;
@@ -126,7 +126,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 
  
-    void StoreXYZ(const Vector3f& vec, float* fptr)
+    void store_xyz(const Vector3f& vec, float* fptr)
 {
     fptr[0] = vec.m_Value.x;
     fptr[1] = vec.m_Value.y;
@@ -134,7 +134,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 }
 
  
-    void LoadXYZ(Vector3f& vec, float* fptr)
+    void load_xyz(Vector3f& vec, float* fptr)
 {
     vec = Vector3f(fptr[0], fptr[1], fptr[2]);
 }

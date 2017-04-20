@@ -17,7 +17,7 @@ MouseOpProbe::~MouseOpProbe()
 
 }
 
-void MouseOpProbe::Press(const QPoint& pt)
+void MouseOpProbe::press(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -27,7 +27,7 @@ void MouseOpProbe::Press(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpProbe::Move(const QPoint& pt)
+void MouseOpProbe::move(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -39,16 +39,16 @@ void MouseOpProbe::Move(const QPoint& pt)
     if (pScene)
     {
         Point3 ptV;
-        if(pScene->GetVolumePosition(Point2(pt.x() , pt.y()) , ptV))
+        if(pScene->get_volume_position(Point2(pt.x() , pt.y()) , ptV))
         {
-            std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->GetVolumeInfos();
+            std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
             if (pVolumeInfos)
             {
-                std::shared_ptr<ImageData> pImg = pVolumeInfos->GetVolume();
+                std::shared_ptr<ImageData> pImg = pVolumeInfos->get_volume();
                 if (pImg)
                 {
                     double dPixelValue(0);
-                    pImg->GetPixelValue(ptV , dPixelValue);
+                    pImg->get_pixel_value(ptV , dPixelValue);
                     dPixelValue =dPixelValue*pImg->m_fSlope + pImg->m_fIntercept;
                     std::cout <<dPixelValue << " " << ptV.x << " " << ptV.y << " " << ptV.z << std::endl;
                 }
@@ -59,7 +59,7 @@ void MouseOpProbe::Move(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpProbe::Release(const QPoint& pt)
+void MouseOpProbe::release(const QPoint& pt)
 {
     if (!m_pScene)
     {
@@ -68,7 +68,7 @@ void MouseOpProbe::Release(const QPoint& pt)
     m_ptPre = pt;
 }
 
-void MouseOpProbe::DoubleClick(const QPoint& pt)
+void MouseOpProbe::double_click(const QPoint& pt)
 {
     if (!m_pScene)
     {

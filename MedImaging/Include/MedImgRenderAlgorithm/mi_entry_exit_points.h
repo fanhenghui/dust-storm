@@ -19,36 +19,36 @@ public:
 
     virtual ~EntryExitPoints();
 
-    void SetDisplaySize(int iWidth , int iHeight);
+    void set_display_size(int iWidth , int iHeight);
 
-    void GetDisplaySize(int& iWidth , int& iHeight);
+    void get_display_size(int& iWidth , int& iHeight);
 
-    void SetStrategy( RayCastingStrategy eStrategy );
+    void set_strategy( RayCastingStrategy eStrategy );
 
-    virtual void Initialize();
+    virtual void initialize();
 
-    virtual void Finialize();
+    virtual void finialize();
 
-    std::shared_ptr<GLTexture2D> GetEntryPointsTexture();
+    std::shared_ptr<GLTexture2D> get_entry_points_texture();
 
-    std::shared_ptr<GLTexture2D> GetExitPointsTexture();
+    std::shared_ptr<GLTexture2D> get_exit_points_texture();
 
-    Vector4f* GetEntryPointsArray();
+    Vector4f* get_entry_points_array();
 
-    Vector4f* GetExitPointsArray();
+    Vector4f* get_exit_points_array();
 
-    void SetImageData(std::shared_ptr<ImageData> pImgData);
+    void set_image_data(std::shared_ptr<ImageData> pImgData);
 
-    void SetCamera(std::shared_ptr<CameraBase> pCamera);
+    void set_camera(std::shared_ptr<CameraBase> pCamera);
 
-    void SetCameraCalculator(std::shared_ptr<CameraCalculator> pCameraCal);
+    void set_camera_calculator(std::shared_ptr<CameraCalculator> pCameraCal);
 
-    virtual void CalculateEntryExitPoints() = 0;
+    virtual void calculate_entry_exit_points() = 0;
 
 public:
-    void DebugOutputEntryPoints(const std::string& sFileName);
+    void debug_output_entry_points(const std::string& sFileName);
 
-    void DebugOutputExitPoints(const std::string& sFileName);
+    void debug_output_exit_points(const std::string& sFileName);
 
 protected:
     std::shared_ptr<GLTexture2D> m_pEntryTex;

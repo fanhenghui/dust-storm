@@ -43,30 +43,30 @@ Exception& Exception::operator=(const Exception& e)
 
 const char* Exception::what() const
 {
-    return GetFullDescription().c_str();
+    return get_full_description().c_str();
 }
 
-inline long Exception::GetLine() const
+inline long Exception::get_line() const
 {
     return m_iLine;
 }
 
-const std::string& Exception::GetFunction() const
+const std::string& Exception::get_function() const
 {
     return m_sFunction;
 }
 
-const std::string& Exception::GetFile() const
+const std::string& Exception::get_file() const
 {
     return m_sFile;
 }
 
-const std::string& Exception::GetDescription() const
+const std::string& Exception::get_description() const
 {
     return m_sDescription;
 }
 
-const std::string& Exception::GetFullDescription() const
+const std::string& Exception::get_full_description() const
 {
     if (m_sFullDescription.empty())
     {

@@ -16,15 +16,15 @@ public:
 
     virtual ~MPREntryExitPoints();
 
-    virtual void Initialize();
+    virtual void initialize();
 
-    virtual void Finialize();
+    virtual void finialize();
 
-    void SetThickness(float fThickness);// In volume coordinate
+    void set_thickness(float fThickness);// In volume coordinate
 
-    void SetSampleRate(float fSampleRate);
+    void set_sample_rate(float fSampleRate);
 
-    virtual void CalculateEntryExitPoints();
+    virtual void calculate_entry_exit_points();
 
     //////////////////////////////////////////////////////////////////////////
     /// \ plane function :  ax + by + cz = d
@@ -34,14 +34,14 @@ public:
     ///\ Exit plane's normal is form exit to entry
     /// \In volume coordinate
     //////////////////////////////////////////////////////////////////////////
-    void GetEntryExitPlane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm);
+    void get_entry_exit_plane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm);
 
 private:
-    void CalEEPoints_CPU_i();
+    void cal_entry_exit_points_cpu_i();
 
-    void CalEEPlane_CPU_i();
+    void cal_entry_exit_plane_cpu_i();
 
-    void CalEEPoints_GPU_i();
+    void cal_entry_exit_points_gpu_i();
 
 private:
     

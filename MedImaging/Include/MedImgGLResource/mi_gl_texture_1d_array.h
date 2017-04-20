@@ -12,23 +12,23 @@ public:
 
     ~GLTexture1DArray();
 
-    virtual void Bind();
+    virtual void bind();
 
-    virtual void UnBind();
+    virtual void unbind();
 
-    void Load(GLint internalformat , GLsizei width, GLsizei arraysize , GLenum format , GLenum type , 
+    void load(GLint internalformat , GLsizei width, GLsizei arraysize , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Update(GLint xoffset , GLsizei width , GLsizei arrayidx, GLenum format , GLenum type , 
+    void update(GLint xoffset , GLsizei width , GLsizei arrayidx, GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void Download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
+    void download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;
 
-    int GetWidth();
+    int get_width();
 
-    int GetArraySize();
+    int get_array_size();
 
-    GLenum GetFormat();
+    GLenum get_format();
 
 protected:
 private:

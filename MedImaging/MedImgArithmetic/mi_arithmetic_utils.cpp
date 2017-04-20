@@ -3,7 +3,7 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 
-Matrix4f ArithmeticUtils::ConvertMatrix(const Matrix4& mat)
+Matrix4f ArithmeticUtils::convert_matrix(const Matrix4& mat)
 {
     Vector4f vCol0((float)mat.m[0][0] , (float)mat.m[0][1] , (float)mat.m[0][2] , (float)mat.m[0][3]);
     Vector4f vCol1((float)mat.m[1][0] , (float)mat.m[1][1] , (float)mat.m[1][2] , (float)mat.m[1][3]);
@@ -13,7 +13,7 @@ Matrix4f ArithmeticUtils::ConvertMatrix(const Matrix4& mat)
     return Matrix4f(vCol0 , vCol1 , vCol2 , vCol3);
 }
 
-Vector3f ArithmeticUtils::ConvertVector(const Vector3& v)
+Vector3f ArithmeticUtils::convert_vector(const Vector3& v)
 {
     return Vector3f((float)v.x , (float)v.y ,(float)v.z);
 }
@@ -23,48 +23,48 @@ Vector3f ArithmeticUtils::ConvertPoint(const Point3& v)
     return Vector3f((float)v.x , (float)v.y ,(float)v.z);
 }
 
-double ArithmeticUtils::RoundDouble(double x)
-{
-    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
-    double tmp = x;
-    tmp += magic;
-    return tmp;
-}
+//double ArithmeticUtils::RoundDouble(double x)
+//{
+//    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
+//    double tmp = x;
+//    tmp += magic;
+//    return tmp;
+//}
+//
+//int ArithmeticUtils::RoundInt( double x)
+//{
+//    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
+//    double tmp = x;
+//    tmp += magic;
+//    return *(int*)&tmp;
+//}
+//
+//double ArithmeticUtils::FloorDouble(double x)
+//{
+//    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
+//    double tmp = x;
+//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //如果需要4舍5入取整就去掉这一行
+//    tmp += magic;
+//    return tmp;
+//}
+//
+//int ArithmeticUtils::FloorInt(double x)
+//{
+//    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
+//    double tmp = x;
+//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //如果需要4舍5入取整就去掉这一行
+//    tmp += magic;
+//    return *(int*)&tmp;
+//}
 
-int ArithmeticUtils::RoundInt( double x)
-{
-    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
-    double tmp = x;
-    tmp += magic;
-    return *(int*)&tmp;
-}
-
-double ArithmeticUtils::FloorDouble(double x)
-{
-    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
-    double tmp = x;
-    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //如果需要4舍5入取整就去掉这一行
-    tmp += magic;
-    return tmp;
-}
-
-int ArithmeticUtils::FloorInt(double x)
-{
-    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
-    double tmp = x;
-    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //如果需要4舍5入取整就去掉这一行
-    tmp += magic;
-    return *(int*)&tmp;
-}
-
-Point2 ArithmeticUtils::DCToNDC(const Point2& ptDC , int iWidth , int iHeight)
+Point2 ArithmeticUtils::dc_to_ndc(const Point2& ptDC , int iWidth , int iHeight)
 {
     double x = (ptDC.x +0.5)/(double)iWidth;
     double y = (ptDC.y +0.5)/(double)iHeight;
     return Point2(x*2.0-1.0 , -(y*2.0 - 1.0));
 }
 
-Point2 ArithmeticUtils::NDCToDC(Point2 ptNDC , int iWidth , int iHeight , int iSpillTag)
+Point2 ArithmeticUtils::ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight , int iSpillTag)
 {
     iSpillTag = 0;
     if (ptNDC.x < -1.0)
@@ -97,7 +97,7 @@ Point2 ArithmeticUtils::NDCToDC(Point2 ptNDC , int iWidth , int iHeight , int iS
     return Point2( (int)x , (int)y);
 }
 
-Point2 ArithmeticUtils::NDCToDC(Point2 ptNDC , int iWidth , int iHeight)
+Point2 ArithmeticUtils::ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight)
 {
     double x = (ptNDC.x+1.0)*0.5;
     double y = (-ptNDC.y+1.0)*0.5;
@@ -107,7 +107,7 @@ Point2 ArithmeticUtils::NDCToDC(Point2 ptNDC , int iWidth , int iHeight)
     return Point2( (int)x , (int)y);
 }
 
-bool ArithmeticUtils::CheckInBound(const Point3& pt , const Point3& vBound)
+bool ArithmeticUtils::check_in_bound(const Point3& pt , const Point3& vBound)
 {
     if (pt.x < 0 || pt.x > vBound.x || 
         pt.y < 0 || pt.y > vBound.y || 

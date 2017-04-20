@@ -28,7 +28,7 @@ VOIPainter::~VOIPainter()
 
 }
 
-void VOIPainter::Render()
+void VOIPainter::render()
 {
     try
     {
@@ -38,44 +38,44 @@ void VOIPainter::Render()
         std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
         QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->GetVolumeInfos();
+        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
         QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
 
         int iWidth(1),iHeight(1);
-        pScene->GetDisplaySize(iWidth , iHeight);
+        pScene->get_display_size(iWidth , iHeight);
 
         //1 Get MPR plane
         std::shared_ptr<CameraBase> pCamera = pScene->GetCamera();
-        Point3 ptLookAt = pCamera->GetLookAt();
-        Point3 ptEye = pCamera->GetEye();
+        Point3 ptLookAt = pCamera->get_look_at();
+        Point3 ptEye = pCamera->get_eye();
         Vector3 vNorm = ptLookAt - ptEye;
-        vNorm.Normalize();
-        Vector3 vUp = pCamera->GetUpDirection();
+        vNorm.normalize();
+        Vector3 vUp = pCamera->get_up_direction();
 
-        const Matrix4 matVP = pCamera->GetViewProjectionMatrix();
+        const Matrix4 matVP = pCamera->get_view_projection_matrix();
 
         //2 Calculate sphere intersect with plane
         std::vector<Point2> vecCircleCenter;
         std::vector<int> vecRadius;
         Point3 ptCenter;
         double dDiameter(0.0);
-        const std::list<VOISphere> listVOI = m_pModel->GetVOISpheres();
+        const std::list<VOISphere> listVOI = m_pModel->get_voi_spheres();
         for (auto it = listVOI.begin() ; it != listVOI.end() ; ++it)
         {
             ptCenter = it->m_ptCenter;
             dDiameter = it->m_dDiameter;
-            double dDis = vNorm.DotProduct(ptLookAt - ptCenter);
+            double dDis = vNorm.dot_product(ptLookAt - ptCenter);
             if (abs(dDis) < dDiameter*0.5)
             {
                 Point3 pt0 = ptCenter + dDis*vNorm;
                 double dRadius = sqrt(dDiameter*dDiameter*0.25 - dDis*dDis);
                 Point3 pt1 = pt0 + dRadius*vUp;
-                pt0 = matVP.Transform(pt0);
-                pt1 = matVP.Transform(pt1);
+                pt0 = matVP.transform(pt0);
+                pt1 = matVP.transform(pt1);
                 int iSpillTag =0;
-                Point2 pt0DC = ArithmeticUtils::NDCToDC(Point2(pt0.x , pt0.y) , iWidth , iHeight , iSpillTag);
-                Point2 pt1DC = ArithmeticUtils::NDCToDC(Point2(pt1.x , pt1.y) , iWidth , iHeight , iSpillTag);
-                int iRadius = (int)( (pt1DC - pt0DC).Magnitude()+0.5);
+                Point2 pt0DC = ArithmeticUtils::ndc_to_dc(Point2(pt0.x , pt0.y) , iWidth , iHeight , iSpillTag);
+                Point2 pt1DC = ArithmeticUtils::ndc_to_dc(Point2(pt1.x , pt1.y) , iWidth , iHeight , iSpillTag);
+                int iRadius = (int)( (pt1DC - pt0DC).magnitude()+0.5);
                 if (iRadius > 1)
                 {
                     vecCircleCenter.push_back(pt0DC);
@@ -101,7 +101,7 @@ void VOIPainter::Render()
     }
 }
 
-void VOIPainter::SetVOIModel(std::shared_ptr<VOIModel> pModel)
+void VOIPainter::set_voi_model(std::shared_ptr<VOIModel> pModel)
 {
     m_pModel = pModel;
 }

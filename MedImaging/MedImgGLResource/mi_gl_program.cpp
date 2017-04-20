@@ -41,7 +41,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLProgram::GLProgram(UIDType uid):GLObject(uid),m_uiProgramID(0)
 {
-    SetType("GLProgram");
+    set_type("GLProgram");
 }
 
 GLProgram::~GLProgram()
@@ -49,7 +49,7 @@ GLProgram::~GLProgram()
 
 }
 
-void GLProgram::Initialize()
+void GLProgram::initialize()
 {
     if (0 == m_uiProgramID)
     {
@@ -57,7 +57,7 @@ void GLProgram::Initialize()
     }
 }
 
-void GLProgram::Finalize()
+void GLProgram::finalize()
 {
     if (0 != m_uiProgramID)
     {
@@ -66,19 +66,19 @@ void GLProgram::Finalize()
     }
 }
 
-unsigned int GLProgram::GetID() const
+unsigned int GLProgram::get_id() const
 {
     return m_uiProgramID;
 }
 
-void GLProgram::Compile()
+void GLProgram::compile()
 {
     if (m_Shaders.empty())
     {
         GLRESOURCE_THROW_EXCEPTION("Shaders is empty!");
     }
 
-    Initialize();
+    initialize();
 
     for (auto it = m_Shaders.begin(); it != m_Shaders.end(); ++it)
     {
@@ -165,22 +165,22 @@ void GLProgram::Compile()
     CHECK_GL_ERROR;
 }
 
-void GLProgram::SetShaders(std::vector<GLShaderInfo> shaders)
+void GLProgram::set_shaders(std::vector<GLShaderInfo> shaders)
 {
     m_Shaders = shaders;
 }
 
-void GLProgram::Bind()
+void GLProgram::bind()
 {
     glUseProgram(m_uiProgramID);
 }
 
-void GLProgram::UnBind()
+void GLProgram::unbind()
 {
     glUseProgram(0);
 }
 
-int GLProgram::GetUniformLocation(const char* sName)
+int GLProgram::get_uniform_location(const char* sName)
 {
     return glGetUniformLocation(m_uiProgramID, sName);
 }

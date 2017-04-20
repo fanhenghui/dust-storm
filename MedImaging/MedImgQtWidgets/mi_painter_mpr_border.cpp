@@ -15,7 +15,7 @@ MPRBorderPainter::~MPRBorderPainter()
 
 }
 
-void MPRBorderPainter::Render()
+void MPRBorderPainter::render()
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_pModel);
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_pScene);
@@ -25,11 +25,11 @@ void MPRBorderPainter::Render()
     QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
     int iWidth(1) , iHeight(1);
-    pScene->GetDisplaySize(iWidth , iHeight);
+    pScene->get_display_size(iWidth , iHeight);
 
-    RGBUnit color = m_pModel->GetBorderColor(pScene);
+    RGBUnit color = m_pModel->get_border_color(pScene);
 
-    if (m_pModel->CheckFocus(pScene))
+    if (m_pModel->check_focus(pScene))
     {
         QPen pen(QColor(0,255,255));
         pen.setWidth(7);
@@ -45,7 +45,7 @@ void MPRBorderPainter::Render()
     }
 }
 
-void MPRBorderPainter::SetCrossHairModel(std::shared_ptr<CrosshairModel> pModel)
+void MPRBorderPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
 {
     m_pModel = pModel;
 }

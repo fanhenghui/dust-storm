@@ -19,42 +19,42 @@ public:
     VolumeInfos();
     ~VolumeInfos();
 
-    void Finialize();
+    void finialize();
 
     //Set input
-    void SetVolume(std::shared_ptr<ImageData> pImgData);
-    void SetMask(std::shared_ptr<ImageData> pImgData);
-    void SetDataHeader(std::shared_ptr<ImageDataHeader> pDataHeader);
+    void set_volume(std::shared_ptr<ImageData> pImgData);
+    void set_mask(std::shared_ptr<ImageData> pImgData);
+    void set_data_header(std::shared_ptr<ImageDataHeader> pDataHeader);
 
     //Get camera calculator
-    std::shared_ptr<CameraCalculator> GetCameraCalculator();
+    std::shared_ptr<CameraCalculator> get_camera_calculator();
 
     //Get GPU resource
-    std::vector<GLTexture3DPtr> GetVolumeTexture();
-    std::vector<GLTexture3DPtr> GetMaskTexture();
+    std::vector<GLTexture3DPtr> get_volume_texture();
+    std::vector<GLTexture3DPtr> get_mask_texture();
 
-    GLBufferPtr GetVolumeBrickInfoBuffer();
+    GLBufferPtr get_volume_brick_info_buffer();
     //GLBufferPtr GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vecVisLabels);
 
     //Get GPU resource
-    std::shared_ptr<ImageData> GetVolume();
-    std::shared_ptr<ImageData> GetMask();
-    std::shared_ptr<ImageDataHeader> GetDataHeader();
+    std::shared_ptr<ImageData> get_volume();
+    std::shared_ptr<ImageData> get_mask();
+    std::shared_ptr<ImageDataHeader> get_data_header();
 
-    BrickCorner* GetBrickCorner();
-    BrickUnit* GetVolumeBrickUnit();
-    BrickUnit* GetMaskBrickUnit();
-    VolumeBrickInfo* GetVolumeBrickInfo();
-    MaskBrickInfo* GetMaskBrickInfo(const std::vector<unsigned char>& vecVisLabels);
+    BrickCorner* get_brick_corner();
+    BrickUnit* get_volume_brick_unit();
+    BrickUnit* get_mask_brick_unit();
+    VolumeBrickInfo* get_volume_brick_info();
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vecVisLabels);
 
-    //Update(should update to CPU and GPU)
-    void UpdateVolume(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , void* pData);//Data size should match sizeof(Data type)*data length
-    void UpdateMask(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , unsigned char* pData);
+    //update(should update to CPU and GPU)
+    void update_volume(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , void* pData);//Data size should match sizeof(Data type)*data length
+    void update_mask(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , unsigned char* pData);
 
 private:
-    void LoadVolumeResource_i();
-    void ReleaseVolumeResource_i();
-    void UpdateVolumeResource_i();
+    void load_volume_resource_i();
+    void release_volume_resource_i();
+    void update_volume_resource_i();
 
 private:
     std::shared_ptr<ImageData> m_pVolume;
