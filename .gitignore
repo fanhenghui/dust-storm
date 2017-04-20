@@ -19,13 +19,10 @@
 [Rr]eleases/
 x64/
 x86/
-[Ww]in32/
 bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-[Gg]eneratedFiles/
-[Ee]xt/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -289,3 +286,9 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Custom
+[Ee]xt/
+[Ww]in32/
+[Gg]eneratedFiles/
+mi_shader_collection.h
