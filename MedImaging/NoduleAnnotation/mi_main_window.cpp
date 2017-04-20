@@ -699,7 +699,8 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
 {
     std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = m_pVOIModel->get_voi_sphere(row);
-    m_pCrosshairModel->locate(voi.m_ptCenter);
+    const Matrix4 matP2W = m_pMPRScene00->get_camera_calculator()->get_patient_to_world_matrix();
+    m_pCrosshairModel->locate(matP2W.transform(voi.m_ptCenter));
     m_pCrosshairModel->notify();
 }
 

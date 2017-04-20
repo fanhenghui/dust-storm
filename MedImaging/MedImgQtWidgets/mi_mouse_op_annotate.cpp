@@ -40,7 +40,7 @@ void MouseOpAnnotate::press(const QPoint& pt)
     if (pScene&&m_pVOIModel)
     {
         Point3 ptCenter;
-        if(pScene->get_world_position(Point2(pt.x() , pt.y()) , ptCenter))
+        if(pScene->get_patient_position(Point2(pt.x() , pt.y()) , ptCenter))
         {
             //Get VOI center
             m_bPin = true;
@@ -63,7 +63,7 @@ void MouseOpAnnotate::move(const QPoint& pt)
     {
         Point3 ptFace;
         std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-        if(pScene->get_world_position(Point2(pt.x() , pt.y()) , ptFace))
+        if(pScene->get_patient_position(Point2(pt.x() , pt.y()) , ptFace))
         {
             //Get VOI center
             Vector3 v = ptFace - m_ptCenter;

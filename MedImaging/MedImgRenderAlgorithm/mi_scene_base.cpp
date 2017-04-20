@@ -29,7 +29,7 @@ void SceneBase::render_to_back()
     glBlitFramebuffer(0,0,m_iWidth, m_iHeight , 0,0,m_iWidth , m_iHeight , GL_COLOR_BUFFER_BIT , GL_NEAREST);
 }
 
-std::shared_ptr<CameraBase> SceneBase::GetCamera()
+std::shared_ptr<CameraBase> SceneBase::get_camera()
 {
     return m_pCamera;
 }

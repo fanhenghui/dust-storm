@@ -58,7 +58,7 @@ void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (
 
 
     //2 MPR plane intersected to a plane
-    const Matrix4 matVP = pTargetMPRScene->GetCamera()->get_view_projection_matrix();
+    const Matrix4 matVP = pTargetMPRScene->get_camera()->get_view_projection_matrix();
     Plane planeTarget = pTargetMPRScene->to_plane();
     for (int i = 0; i<2; ++i)
     {
@@ -101,7 +101,7 @@ bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, i
         return false;
     }
 
-    std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->GetCamera());
+    std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->get_camera());
     if( !m_pCameraCal->page_orthognal_mpr_to(pCamera , iPage))
     {
         return false;
@@ -111,8 +111,8 @@ bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, i
     set_page_i(pTargetMPRScene , iPage);
 
     //2 Change cross location
-    const Point3 ptCenter = pTargetMPRScene->GetCamera()->get_look_at();
-    const Vector3 vDir = pTargetMPRScene->GetCamera()->get_view_direction();
+    const Point3 ptCenter = pTargetMPRScene->get_camera()->get_look_at();
+    const Vector3 vDir = pTargetMPRScene->get_camera()->get_view_direction();
     const double dDistance = vDir.dot_product(ptCenter - m_ptLocationContineousW);
     m_ptLocationContineousW += dDistance*vDir;
     m_ptLocationDiscreteW += dDistance*vDir;
@@ -125,7 +125,7 @@ bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, i
 bool CrosshairModel::page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep)
 {
     //1 page target MPR
-    std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->GetCamera());
+    std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->get_camera());
     if( !m_pCameraCal->page_orthognal_mpr(pCamera , iPageStep))
     {
         return false;
@@ -135,8 +135,8 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int
     set_page_i(pTargetMPRScene , m_pCameraCal->get_orthognal_mpr_page(pCamera));
 
     //2 Change cross location
-    const Point3 ptCenter = pTargetMPRScene->GetCamera()->get_look_at();
-    const Vector3 vDir = pTargetMPRScene->GetCamera()->get_view_direction();
+    const Point3 ptCenter = pTargetMPRScene->get_camera()->get_look_at();
+    const Vector3 vDir = pTargetMPRScene->get_camera()->get_view_direction();
     const double dDistance = vDir.dot_product(ptCenter - m_ptLocationContineousW);
     m_ptLocationContineousW += dDistance*vDir;
     m_ptLocationDiscreteW += dDistance*vDir;
@@ -179,7 +179,7 @@ bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , c
     //3 Translate crossed MPR( update LookAt and update Page)
     for (int i = 0; i<2 ; ++i)
     {
-        std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(aCrossScene[i]->GetCamera());
+        std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(aCrossScene[i]->get_camera());
         m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
         aCrossScene[i]->set_dirty(true);
@@ -204,7 +204,7 @@ bool CrosshairModel::locate(const Point3& ptCenterW)
 
     for (int i = 0 ; i<3 ; ++ i)
     {
-        std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(m_aMPRScene[i]->GetCamera());
+        std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(m_aMPRScene[i]->get_camera());
         m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
         m_aMPRScene[i]->set_dirty(true);

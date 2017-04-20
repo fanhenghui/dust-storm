@@ -25,7 +25,7 @@ public:
     virtual void zoom(const Point2& ptPre , const Point2& ptCur);
     virtual void pan(const Point2& ptPre , const Point2& ptCur);
 
-    std::shared_ptr<CameraBase> GetCamera();
+    std::shared_ptr<CameraBase> get_camera();
     void render_to_back();
 
     void set_dirty(bool bFlag);

@@ -37,6 +37,8 @@ public:
 
     bool get_world_position(const Point2& ptDC, Point3& ptPosW);
 
+    bool get_patient_position(const Point2& ptDC, Point3& ptPosP);
+
     Plane to_plane()const;
 
 protected:

@@ -69,6 +69,8 @@ public:
     //病人坐标系和世界坐标系仅仅是坐标原点不一样而已
     const Matrix4& get_world_to_patient_matrix() const;
 
+    const Matrix4& get_patient_to_world_matrix() const;
+
     const Point3& get_default_mpr_center_world() const;
 
     void init_mpr_placement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//实时获取
@@ -139,6 +141,7 @@ private:
     Matrix4 m_matVolume2Physical;
     Matrix4 m_matPhysical2World;
     Matrix4 m_matWorld2Patient;
+    Matrix4 m_matPatient2World;
     Matrix4 m_matVolume2Wolrd;
     Matrix4 m_matWorld2Volume;
     OrthoCamera m_VRPlacementCamera;

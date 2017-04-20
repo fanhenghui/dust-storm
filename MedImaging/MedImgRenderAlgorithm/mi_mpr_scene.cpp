@@ -145,4 +145,18 @@ Plane MPRScene::to_plane() const
     return p;
 }
 
+bool MPRScene::get_patient_position(const Point2& ptDC, Point3& ptPosP)
+{
+    Point3 ptW;
+    if (get_world_position(ptDC , ptW))
+    {
+        ptPosP = m_pCameraCalculator->get_world_to_patient_matrix().transform(ptW);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 MED_IMAGING_END_NAMESPACE

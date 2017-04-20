@@ -134,6 +134,7 @@ void CameraCalculator::calculate_matrix_i()
     const Point3 &ptImgPosition = m_pImgData->m_ptImgPositon;
     const Point3 &ptImgWorld = m_matVolume2Wolrd.transform(Point3::kZeroPoint);
     m_matWorld2Patient = make_translate(ptImgPosition - ptImgWorld);
+    m_matPatient2World = m_matWorld2Patient.get_inverse();
 }
 
 
@@ -663,6 +664,11 @@ void CameraCalculator::calculate_default_mpr_center_world_i()
     }
 
     m_ptDefaultMPRCenter = ptLookAt;
+}
+
+const Matrix4& CameraCalculator::get_patient_to_world_matrix() const
+{
+    return m_matPatient2World;
 }
 
 //Point3 CameraCalculator::adjust_point_to_discrete(const Point3& ptWorld) const

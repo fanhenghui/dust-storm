@@ -45,7 +45,8 @@ void VOIPainter::render()
         pScene->get_display_size(iWidth , iHeight);
 
         //1 Get MPR plane
-        std::shared_ptr<CameraBase> pCamera = pScene->GetCamera();
+        std::shared_ptr<CameraBase> pCamera = pScene->get_camera();
+        std::shared_ptr<CameraCalculator> pCameraCal = pScene->get_camera_calculator();
         Point3 ptLookAt = pCamera->get_look_at();
         Point3 ptEye = pCamera->get_eye();
         Vector3 vNorm = ptLookAt - ptEye;
@@ -53,6 +54,7 @@ void VOIPainter::render()
         Vector3 vUp = pCamera->get_up_direction();
 
         const Matrix4 matVP = pCamera->get_view_projection_matrix();
+        const Matrix4 matP2W = pCameraCal->get_patient_to_world_matrix();
 
         //2 Calculate sphere intersect with plane
         std::vector<Point2> vecCircleCenter;
@@ -62,7 +64,7 @@ void VOIPainter::render()
         const std::list<VOISphere> listVOI = m_pModel->get_voi_spheres();
         for (auto it = listVOI.begin() ; it != listVOI.end() ; ++it)
         {
-            ptCenter = it->m_ptCenter;
+            ptCenter = matP2W.transform(it->m_ptCenter);
             dDiameter = it->m_dDiameter;
             double dDis = vNorm.dot_product(ptLookAt - ptCenter);
             if (abs(dDis) < dDiameter*0.5)
