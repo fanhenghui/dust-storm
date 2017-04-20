@@ -19,7 +19,7 @@ void MPRScrollBarObserver::set_crosshair_model(std::shared_ptr<medical_imaging::
     m_pModel = pModel;
 }
 
-void MPRScrollBarObserver::AddScrollBar(std::shared_ptr<medical_imaging::MPRScene> pScene, QScrollBar* pWidget)
+void MPRScrollBarObserver::add_scroll_bar(std::shared_ptr<medical_imaging::MPRScene> pScene, QScrollBar* pWidget)
 {
     m_vecScenes.push_back(pScene);
     m_vecScrollBars.push_back(pWidget);

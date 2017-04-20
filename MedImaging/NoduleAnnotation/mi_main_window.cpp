@@ -223,13 +223,14 @@ void NoduleAnnotation::create_scene_i()
         pZoom->set_scene(vecMPRScenes[i]);
         vecMPRs[i]->register_mouse_operation(pZoom , Qt::RightButton , Qt::NoModifier);
 
-        std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
+        /*std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
         pWindowing->set_scene(vecMPRScenes[i]);
         vecMPRs[i]->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
-
+*/
         std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
         pPan->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pPan , Qt::MiddleButton , Qt::ControlModifier);
+        vecMPRs[i]->register_mouse_operation(pPan , Qt::LeftButton | Qt::RightButton , Qt::NoModifier);
+
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -244,9 +245,9 @@ void NoduleAnnotation::create_scene_i()
     //Model set scenes
     m_pCrosshairModel->set_mpr_scene(aScanType , aScenes , aColors);
 
-    m_pMPRScrollBarOb->AddScrollBar(m_pMPRScene00 , m_pMPR00ScrollBar);
-    m_pMPRScrollBarOb->AddScrollBar(m_pMPRScene01 , m_pMPR01ScrollBar);
-    m_pMPRScrollBarOb->AddScrollBar(m_pMPRScene10 , m_pMPR10ScrollBar);
+    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene00 , m_pMPR00ScrollBar);
+    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene01 , m_pMPR01ScrollBar);
+    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene10 , m_pMPR10ScrollBar);
 
     for (int i = 0 ; i<3 ; ++i)
     {

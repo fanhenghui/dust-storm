@@ -36,9 +36,9 @@ public:
     void set_scene(std::shared_ptr<medical_imaging::SceneBase> pScene);
     std::shared_ptr<medical_imaging::SceneBase> get_scene();
 
-    void register_mouse_operation(IMouseOpPtr pMouseOP , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
-    void register_mouse_operation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
-    IMouseOpPtrCollection get_mouse_operation(Qt::MouseButton eButton , Qt::KeyboardModifier eKeyBoardModifier);
+    void register_mouse_operation(IMouseOpPtr pMouseOP , Qt::MouseButtons eButtons , Qt::KeyboardModifier eKeyBoardModifier);
+    void register_mouse_operation(IMouseOpPtrCollection vecMouseOPs , Qt::MouseButtons eButtons , Qt::KeyboardModifier eKeyBoardModifier);
+    IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons eButton , Qt::KeyboardModifier eKeyBoardModifier);
 
     void register_key_operation();
 
@@ -74,7 +74,7 @@ protected:
     std::shared_ptr<medical_imaging::SceneBase> m_pScene;
     std::vector<PainterPtr> m_vecPainters;
     std::map<int , IMouseOpPtrCollection> m_mapMouseOps;
-    Qt::MouseButton m_eButton;
+    Qt::MouseButtons m_eButtons;
     std::unique_ptr<QPixmap> m_pPixelMap;
     boost::mutex m_mutex;
 };
