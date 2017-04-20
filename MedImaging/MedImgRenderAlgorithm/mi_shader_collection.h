@@ -218,21 +218,7 @@ void Composite(vec3 samplePosVolume, vec3 vRayDir, in out vec4 vIntegralColor,\n
 vec4 Raycast(vec3 vRayStart, vec3 vRayDir, float fStartStep, float fEndStep, vec4 vIntegralColor,\n\
     sampler3D sVolume,  sampler3D sMask,   vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift, int iRayCastStepCode)\n\
 {\n\
-    vec3 vSamplePos = vRayStart + vRayDir * fStartStep;\n\
-    vec4 vCurIntegralColor =  vIntegralColor;\n\
 \n\
-    for (float i = fStartStep; i <= fEndStep; ++i)\n\
-    {\n\
-        vSamplePos = vRayStart + vRayDir * i;\n\
-        Composite(vSamplePos , vRayDir, vCurIntegralColor , sVolume , sMask , vSubDataOffset ,vSampleShift );\n\
-        if (CheckOpacity(vCurIntegralColor.a))\n\
-        {\n\
-            break;\n\
-        }\n\
-    }\n\
-\n\
-    vCurIntegralColor = clamp(vCurIntegralColor, 0.0, 1.0);\n\
-    return vCurIntegralColor;\n\
 }\n\
 ";
 
@@ -503,96 +489,10 @@ vec4 Shade(vec3 sampleCoord, vec4 sampleColor, vec3 rayDir , sampler3D vDataVolu
 static const char* ksRCShadingPhongFrag = "\
 #version 430\n\
 \n\
-#define BUFFER_BINDING_SHADING_MATERIAL_BUCKET 14\n\
-#define BUFFER_BINDING_SHADING_BOUNDARY_ENHANCEMENT_BUCKET 15\n\
-#define BUFFER_BINDING_SHADING_SILHOUETTE_ENHANCEMENT_BUCKET 16\n\
-\n\
-uniform mat4 matNormal;//Matrix model's inverse's transpose to convert normal\n\
-uniform mat4 matVolume2View;\n\
-uniform vec3 vSpacing;\n\
-\n\
-///Golbal light(one point light source)\n\
-uniform vec3 vLightProperty[3];\n\
-uniform vec4 vLightFactor;\n\
-\n\
-///Material\n\
-struct Material\n\
-{\n\
-    vec4 diffuse;\n\
-    vec4 specular;\n\
-};\n\
-\n\
-layout(std430 , binding = BUFFER_BINDING_SHADING_MATERIAL_BUCKET) buffer MaterialBucket\n\
-{\n\
-    Material material[];\n\
-};\n\
-\n\
-///Feature enhancement(stippling techniques)\n\
-layout(std430 , binding = BUFFER_BINDING_SHADING_BOUNDARY_ENHANCEMENT_BUCKET) buffer BEBucket\n\
-{\n\
-    vec2 vBoundaryEnhan[];\n\
-};\n\
-\n\
-layout(std430 , binding = BUFFER_BINDING_SHADING_SILHOUETTE_ENHANCEMENT_BUCKET) buffer SEBucket\n\
-{\n\
-    vec2 vSilhouetteEnhan[];\n\
-};\n\
-\n\
-\n\
-//Calculate gray gradient with central - difference scheme.\n\
-vec3 CalculateGradient(sampler3D sampler,vec3 vPos,vec3 vSampleShift,vec3 vSpacing)\n\
-{\n\
-    vec4  vSampleShifPhysical = vec4(vSampleShift / vSpacing,0.0);\n\
-\n\
-    vec3 vNorm = vec3(\n\
-    texture(sampler, vPos + vSampleShifPhysical.xww).r - texture(sampler, vPos - vSampleShifPhysical.xww).r,\n\
-    texture(sampler, vPos + vSampleShifPhysical.wyw).r - texture(sampler, vPos - vSampleShifPhysical.wyw).r,\n\
-    texture(sampler, vPos + vSampleShifPhysical.wwz).r - texture(sampler, vPos - vSampleShifPhysical.wwz).r);\n\
-\n\
-    return vNorm;\n\
-}\n\
-\n\
-\n\
-vec4 PhongLighting(vec3 vSamplePos, vec4 vOutputColor, vec3 vRayDir , vec3 vNorm,vec3 vPosInVolume , int iLabel)\n\
-{\n\
-    vNorm = (matNormal * vec4(vNorm,0.0)).xyz;\n\
-    vNorm = normalize(vNorm);\n\
-\n\
-    vec3 vEyePos = (matVolume2View * vec4(vRayDir,0.0)).xyz;\n\
-    vEyePos = normalize(vEyePos);\n\
-\n\
-    vec3 vLightDir =vPosInVolume - vLightProperty[2]; \n\
-    vLightDir = (matVolume2View * vec4(vLightDir, 0.0)).rgb; \n\
-    vLightDir = normalize(vLightDir);\n\
-\n\
-    vec3 vShadedVal = vLightProperty[0] * vLightFactor.r * vOutputColor.rgb;\n\
-    float fViewDotNormal = dot(vLightDir, vNorm); \n\
-    if (fViewDotNormal > 0.0) \n\
-    {\n\
-        vNorm = -vNorm;\n\
-    } \n\
-    float fDiffuse = max(dot(vNorm, -vLightDir), 0.0);\n\
-    vShadedVal += fDiffuse * vLightFactor.g * vOutputColor.rgb * vLightProperty[0] * material[iLabel].diffuse.xyz;\n\
-\n\
-    float fSpecular = max(dot(reflect(vEyePos, vNorm), -vLightDir), 0.0);\n\
-    fSpecular = pow(fSpecular, vLightFactor.a);\n\
-    vShadedVal += fSpecular * vLightFactor.b * vLightProperty[0]* material[iLabel].specular.xyz;\n\
-\n\
-    // silhouette enhancement for opacity\n\
-    if(vSilhouetteEnhan[iLabel].x > 0 && vSilhouetteEnhan[iLabel].y > 0)\n\
-    {\n\
-        float fDot = 1.0 - abs(fViewDotNormal);\n\
-        vOutputColor.a *= (0.0 + vSilhouetteEnhan[iLabel].y * pow(fDot, vSilhouetteEnhan[iLabel].x));\n\
-        vOutputColor.a = clamp(vOutputColor.a, 0.0, 1.0);\n\
-    }\n\
-    vShadedVal = clamp(vShadedVal, 0.0, 1.0);\n\
-    return vec4(vShadedVal, vOutputColor.a);\n\
-}\n\
 \n\
 vec4 Shade(vec3 vSamplePos, vec4 vOutputColor, vec3 vRayDir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel)\n\
 {\n\
-    vec3 vNorm = CalculateGradient(sampler,vSamplePos ,vSampleShift, vSpacing); \n\
-    return PhongLighting(vSamplePos, vOutputColor,vRayDir , vNorm,vPosInVolume ,iLabel);\n\
+    return sampleColor;\n\
 }\n\
 ";
 
