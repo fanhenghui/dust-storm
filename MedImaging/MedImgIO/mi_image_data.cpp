@@ -4,27 +4,23 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 ImageData::ImageData(): 
-m_eDataType(SHORT)
-    , m_uiChannelNum(1)
-    , m_fMinScalar(0)
-    , m_fMaxScalar(1024)
-    , m_fSlope(1.0)
-    , m_fIntercept(0.0)
-    , m_bCalcMinMax(false)
+        _data_type(SHORT), 
+        _channel_num(1),
+        _min_scalar(0),
+        _max_scalar(1024),
+        _slope(1.0),
+        _intercept(0.0),
+        _image_position(Point3::S_ZERO_POINT),
+        _has_cal_min_max(false)
 {
-    m_uiDim[0] = 0;
-    m_uiDim[1] = 0;
-    m_uiDim[2] = 0;
+    memset(_dim , 0 , sizeof(_dim));
+    memset(_dim , 0 , sizeof(_spacing));
 
-    m_dSpacing[0] = 1;
-    m_dSpacing[1] = 1;
-    m_dSpacing[2] = 1;
+    _image_position = Point3(0.0, 0.0, 0.0);
 
-    m_vImgOrientation[0] = Vector3(1.0,0.0,0.0);
-    m_vImgOrientation[1] = Vector3(0.0,1.0,0.0);
-    m_vImgOrientation[2] = Vector3(0.0,0.0,1.0);
-
-    m_ptImgPositon = Point3(0.0, 0.0, 0.0);
+    _image_orientation[0] = Vector3(1.0,0.0,0.0);
+    _image_orientation[1] = Vector3(0.0,1.0,0.0);
+    _image_orientation[2] = Vector3(0.0,0.0,1.0);
 }
 
 ImageData::~ImageData()
@@ -34,72 +30,72 @@ ImageData::~ImageData()
 
 bool ImageData::mem_allocate()
 {
-    const size_t imemSize = get_data_size_i();
-    m_pMappedData.reset(new char[imemSize]);
-    m_bCalcMinMax = false;
+    const size_t mem_size = get_data_size_i();
+    _data_array.reset(new char[mem_size]);
+    _has_cal_min_max = false;
     return true;
 }
 
 float ImageData::get_min_scalar()
 {
-    if(!m_bCalcMinMax)
+    if(!_has_cal_min_max)
     {
         find_min_max_i();
     }
-    return m_fMinScalar;
+    return _min_scalar;
 }
 
 float ImageData::get_max_scalar()
 {
-    if(!m_bCalcMinMax)
+    if(!_has_cal_min_max)
     {
         find_min_max_i();
     }
-    return m_fMaxScalar;
+    return _max_scalar;
 }
 
-bool ImageData::regulate_wl(float& fWindow, float& fLevel)
+bool ImageData::regulate_wl(float& window, float& level)
 {
     // CT should apply slope and intercept
     // MR has always slope(1) and intercept(0)
-    if (m_fSlope < DOUBLE_EPSILON)
+    if (_slope < DOUBLE_EPSILON)
     {
         return false;
     }
 
     double dMin = get_min_scalar();
 
-    fLevel = (fLevel - m_fIntercept)/m_fSlope;
-    fWindow = fWindow/m_fSlope;
+    level = (level - _intercept)/_slope;
+    window = window/_slope;
 
     return true;
 }
 
 
-void ImageData::normalize_wl(float& fWindow, float& fLevel)
+void ImageData::normalize_wl(float& window, float& level)
 {
-    const static float f65535R = 1.0f/65535.0f;
-    const static float f255R = 1.0f/255.0f;
+    const static float S_65535_R = 1.0f/65535.0f;
+    const static float S_255_R = 1.0f/255.0f;
 
-    float fMin = get_min_scalar();
+    float min_scalar = get_min_scalar();
 
-    switch(m_eDataType)
+    switch(_data_type)
     {
     case  USHORT:
-        fWindow *= f65535R;
-        fLevel *= f65535R;
+        window *= S_65535_R;
+        level *= S_65535_R;
         break;
     case  SHORT:
-        fWindow *= f65535R;
-        fLevel = (fLevel - std::min(0.0f, fMin) ) * f65535R;
+        window *= S_65535_R;
+        level = (level - std::min(0.0f, min_scalar) ) * S_65535_R;
         break;
     case UCHAR:
-        fWindow *= f255R;
-        fLevel *= f255R;
+        window *= S_255_R;
+        level *= S_255_R;
         break;
     case CHAR:
-        fWindow *= f255R;
-        fLevel = (fLevel - std::min(0.0f, fMin)) *f255R;
+        window *= S_255_R;
+        level = (level - std::min(0.0f, min_scalar)) *S_255_R;
         break;
     case FLOAT:
         break;
@@ -109,218 +105,211 @@ void ImageData::normalize_wl(float& fWindow, float& fLevel)
 }
 
 
-bool ImageData::regulate_normalize_wl(float& fWindow, float& fLevel)
+bool ImageData::regulate_normalize_wl(float& window, float& level)
 {
-    if (!regulate_wl(fWindow , fLevel))
+    if (!regulate_wl(window , level))
     {
         return false;
     }
 
-    normalize_wl(fWindow , fLevel);
+    normalize_wl(window , level);
 
     return true;
 }
 
-void ImageData::get_pixel_value(unsigned int x,unsigned int y ,unsigned int z , double& pValue) const
+void ImageData::get_pixel_value(unsigned int x,unsigned int y ,unsigned int z , double& value) const
 {
-    void* pMappedData = m_pMappedData.get();
-    if (nullptr == pMappedData)
+    void* data_array = _data_array.get();
+    if (nullptr == data_array)
     {
-        IO_THROW_EXCEPTION("Undefined image type!");("Volume data is null!");
+        IO_THROW_EXCEPTION("Volume data is null!");
     }
 
-    // check if the x,y,z coordinate is valid
-    if ( x >= m_uiDim[0] ||
-        y >= m_uiDim[1] ||
-        z >= m_uiDim[2] )
+    if ( x >= _dim[0] || y >= _dim[1] || z >= _dim[2] )
     {
         IO_THROW_EXCEPTION("Input coordinate is out of data range!");
     }
 
-    // Find the pixel value
-    double dPixelValue = 0.0;
-    unsigned int nOffset = x + y * m_uiDim[0] + z * m_uiDim[0] * m_uiDim[1];
-    switch(m_eDataType)
+    double pixel_value = 0.0;
+    unsigned int offset = x + y * _dim[0] + z * _dim[0] * _dim[1];
+    switch(_data_type)
     {
     case CHAR:
         {
-            char *pChar = (char *)pMappedData;
-            dPixelValue =(double) pChar[nOffset];
+            char *char_array = (char *)data_array;
+            pixel_value = static_cast<double>( char_array[offset]);
             break;
         }
     case UCHAR:
         {
-            unsigned char *pUchar = (unsigned char *)pMappedData;
-            dPixelValue =(double) pUchar[nOffset];
+            unsigned char *unsigned_char_array = (unsigned char *)data_array;
+            pixel_value = static_cast<double>( unsigned_char_array[offset]);
             break;
         }
     case USHORT:
         {
-            unsigned short *pUshort = (unsigned short *)pMappedData;
-            dPixelValue =(double) pUshort[nOffset];
+            unsigned short *unsigned_short_array = (unsigned short *)data_array;
+            pixel_value = static_cast<double>( unsigned_short_array[offset]);
             break;
         }
     case SHORT:
         {
-            short *pShort = (short *)pMappedData;
-            dPixelValue =(double) pShort[nOffset];
+            short *short_array = (short *)data_array;
+            pixel_value = static_cast<double>( short_array[offset]);
             break;
         }
     case FLOAT:
         {
-            float *pFloat = (float *)pMappedData;
-            dPixelValue =(double) pFloat[nOffset];
+            float *float_array = (float *)data_array;
+            pixel_value = static_cast<double>( float_array[offset]);
             break;
         }
     default:
         IO_THROW_EXCEPTION("Undefined image type!");
     }
 
-    pValue = dPixelValue;
+    value = pixel_value;
 }
 
-void ImageData::get_pixel_value(const Point3& ptPos , double& pValue) const
+void ImageData::get_pixel_value(const Point3& pos , double& value) const
 {
-    void* pMappedData = m_pMappedData.get();
-    if (nullptr == pMappedData)
+    void* data_array = _data_array.get();
+    if (nullptr == data_array)
     {
-        IO_THROW_EXCEPTION("Undefined image type!");("Volume data is null!");
+        IO_THROW_EXCEPTION("Undefined image type!");
     }
 
-    // check if the x,y,z coordinate is valid
-    if ( ptPos.x > m_uiDim[0]-1 ||
-        ptPos.y > m_uiDim[1]-1 ||
-        ptPos.z > m_uiDim[2]-1 )
+    if ( pos.x > _dim[0]-1 || pos.y > _dim[1]-1 || pos.z > _dim[2]-1 )
     {
         IO_THROW_EXCEPTION("Input coordinate is out of data range!");
     }
 
     // Find the pixel value
-    double dPixelValue = 0.0;
-    switch(m_eDataType)
+    double pixel_value = 0.0;
+    switch(_data_type)
     {
     case CHAR:
         {
             Sampler<char> sampler;
-            dPixelValue =(double) sampler.sample_3d_linear((float)ptPos.x , (float)ptPos.y , (float)ptPos.z , 
-                m_uiDim[0] , m_uiDim[1], m_uiDim[2] , (char*)pMappedData);
+            pixel_value =(double) sampler.sample_3d_linear((float)pos.x , (float)pos.y , (float)pos.z , 
+                _dim[0] , _dim[1], _dim[2] , (char*)data_array);
             break;
         }
     case UCHAR:
         {
             Sampler<unsigned char> sampler;
-            dPixelValue =(double) sampler.sample_3d_linear((float)ptPos.x , (float)ptPos.y , (float)ptPos.z , 
-                m_uiDim[0] , m_uiDim[1], m_uiDim[2] , (unsigned char*)pMappedData);
+            pixel_value =(double) sampler.sample_3d_linear((float)pos.x , (float)pos.y , (float)pos.z , 
+                _dim[0] , _dim[1], _dim[2] , (unsigned char*)data_array);
             break;
         }
     case USHORT:
         {
             Sampler<unsigned short> sampler;
-            dPixelValue =(double) sampler.sample_3d_linear((float)ptPos.x , (float)ptPos.y , (float)ptPos.z , 
-                m_uiDim[0] , m_uiDim[1], m_uiDim[2] , (unsigned short*)pMappedData);
+            pixel_value =(double) sampler.sample_3d_linear((float)pos.x , (float)pos.y , (float)pos.z , 
+                _dim[0] , _dim[1], _dim[2] , (unsigned short*)data_array);
             break;
         }
     case SHORT:
         {
             Sampler<short> sampler;
-            dPixelValue =(double) sampler.sample_3d_linear((float)ptPos.x , (float)ptPos.y , (float)ptPos.z , 
-                m_uiDim[0] , m_uiDim[1], m_uiDim[2] , (short*)pMappedData);
+            pixel_value =(double) sampler.sample_3d_linear((float)pos.x , (float)pos.y , (float)pos.z , 
+                _dim[0] , _dim[1], _dim[2] , (short*)data_array);
             break;
         }
     case FLOAT:
         {
             Sampler<float> sampler;
-            dPixelValue =(float) sampler.sample_3d_linear((float)ptPos.x , (float)ptPos.y , (float)ptPos.z , 
-                m_uiDim[0] , m_uiDim[1], m_uiDim[2] , (float*)pMappedData);
+            pixel_value =(float) sampler.sample_3d_linear((float)pos.x , (float)pos.y , (float)pos.z , 
+                _dim[0] , _dim[1], _dim[2] , (float*)data_array);
             break;
         }
     default:
         IO_THROW_EXCEPTION("Undefined image type!");
     }
-    pValue = dPixelValue;
+    value = pixel_value;
 }
 
 void ImageData::set_data_dirty()
 {
-    m_bCalcMinMax = false;
+    _has_cal_min_max = false;
 }
 
 void* ImageData::get_pixel_pointer()
 {
-    return m_pMappedData.get();
+    return _data_array.get();
 }
 
-void ImageData::shallow_copy(ImageData *&pImgData)
+void ImageData::shallow_copy(ImageData *&image_data)
 {
-    pImgData = new ImageData();
+    image_data = new ImageData();
 
-#define COPY_PARAMETER(p) pImgData->p = p
-    COPY_PARAMETER(m_eDataType);
-    COPY_PARAMETER(m_uiChannelNum);
-    COPY_PARAMETER(m_fSlope);
-    COPY_PARAMETER(m_fIntercept);
-    COPY_PARAMETER(m_vImgOrientation[0]);
-    COPY_PARAMETER(m_vImgOrientation[1]);
-    COPY_PARAMETER(m_vImgOrientation[2]);
-    COPY_PARAMETER(m_ptImgPositon);
-    COPY_PARAMETER(m_uiDim[0]);
-    COPY_PARAMETER(m_uiDim[1]);
-    COPY_PARAMETER(m_uiDim[2]);
-    COPY_PARAMETER(m_dSpacing[0]);
-    COPY_PARAMETER(m_dSpacing[1]);
-    COPY_PARAMETER(m_dSpacing[2]);
-    COPY_PARAMETER(m_fMinScalar);
-    COPY_PARAMETER(m_fMaxScalar);
-    COPY_PARAMETER(m_bCalcMinMax);
+#define COPY_PARAMETER(p) image_data->p = p
+    COPY_PARAMETER(_data_type);
+    COPY_PARAMETER(_channel_num);
+    COPY_PARAMETER(_slope);
+    COPY_PARAMETER(_intercept);
+    COPY_PARAMETER(_image_orientation[0]);
+    COPY_PARAMETER(_image_orientation[1]);
+    COPY_PARAMETER(_image_orientation[2]);
+    COPY_PARAMETER(_image_position);
+    COPY_PARAMETER(_dim[0]);
+    COPY_PARAMETER(_dim[1]);
+    COPY_PARAMETER(_dim[2]);
+    COPY_PARAMETER(_spacing[0]);
+    COPY_PARAMETER(_spacing[1]);
+    COPY_PARAMETER(_spacing[2]);
+    COPY_PARAMETER(_min_scalar);
+    COPY_PARAMETER(_max_scalar);
+    COPY_PARAMETER(_has_cal_min_max);
 #undef COPY_PARAMETER
 }
 
-void ImageData::deep_copy(ImageData *&pImgData)
+void ImageData::deep_copy(ImageData *&image_data)
 {
-    this->shallow_copy(pImgData);
+    this->shallow_copy(image_data);
 
     //Copy this image data
-    pImgData->mem_allocate();
+    image_data->mem_allocate();
     const size_t imemSize = this->get_data_size_i();
-    memcpy(pImgData->m_pMappedData.get(), this->m_pMappedData.get(), imemSize );
+    memcpy(image_data->_data_array.get(), this->_data_array.get(), imemSize );
 }
 
 void ImageData::find_min_max_i()
 {
-    void* pMappedData = m_pMappedData.get();
-    if (nullptr == pMappedData)
+    void* data_array = _data_array.get();
+    if (nullptr == data_array)
     {
         throw std::exception("Volume data is null!");
     }
 
-    switch(m_eDataType)
+    switch(_data_type)
     {
     case CHAR: 
-        this->find_min_max_i((char *)pMappedData);
+        this->find_min_max_i((char *)data_array);
         break;
     case UCHAR: 
-        this->find_min_max_i((unsigned char *)pMappedData);
+        this->find_min_max_i((unsigned char *)data_array);
         break;
     case USHORT:
-        this->find_min_max_i((unsigned short *)pMappedData);
+        this->find_min_max_i((unsigned short *)data_array);
         break;
     case SHORT:
-        this->find_min_max_i((short *)pMappedData);
+        this->find_min_max_i((short *)data_array);
         break;
     case FLOAT:
-        this->find_min_max_i((float *)pMappedData);
+        this->find_min_max_i((float *)data_array);
         break;
     default:
         IO_THROW_EXCEPTION("Undefined image type!");
     }
 
-    m_bCalcMinMax = true;
+    _has_cal_min_max = true;
 }
 
 size_t ImageData::get_data_size_i()
 {
-    size_t imemSize = m_uiDim[0] * m_uiDim[1] * m_uiDim[2] * m_uiChannelNum;
-    switch(m_eDataType)
+    size_t imemSize = _dim[0] * _dim[1] * _dim[2] * _channel_num;
+    switch(_data_type)
     {
     case CHAR:
         imemSize *= sizeof(char);

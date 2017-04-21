@@ -22,8 +22,8 @@ public:
     void finialize();
 
     //Set input
-    void set_volume(std::shared_ptr<ImageData> pImgData);
-    void set_mask(std::shared_ptr<ImageData> pImgData);
+    void set_volume(std::shared_ptr<ImageData> image_data);
+    void set_mask(std::shared_ptr<ImageData> image_data);
     void set_data_header(std::shared_ptr<ImageDataHeader> pDataHeader);
 
     //Get camera calculator

@@ -64,8 +64,8 @@ void VOIPainter::render()
         const std::list<VOISphere> listVOI = m_pModel->get_voi_spheres();
         for (auto it = listVOI.begin() ; it != listVOI.end() ; ++it)
         {
-            ptCenter = matP2W.transform(it->m_ptCenter);
-            dDiameter = it->m_dDiameter;
+            ptCenter = matP2W.transform(it->center);
+            dDiameter = it->diameter;
             double dDis = vNorm.dot_product(ptLookAt - ptCenter);
             if (abs(dDis) < dDiameter*0.5)
             {

@@ -115,12 +115,12 @@ void TextEditerModule::NewFile_i()
     }
 }
 
-bool TextEditerModule::SaveFile_i(const QString& sFile)
+bool TextEditerModule::SaveFile_i(const QString& file_name)
 {
-    QFile qFile(sFile);
+    QFile qFile(file_name);
     if (!qFile.open(QFile::WriteOnly  | QFile::Text))
     {
-        QMessageBox::warning(m_pMainWindow , tr("Save file") , tr("Cant open file : %1").arg(sFile));
+        QMessageBox::warning(m_pMainWindow , tr("Save file") , tr("Cant open file : %1").arg(file_name));
         return false;
     }
     else

@@ -14,17 +14,17 @@ NoduleSet::~NoduleSet()
 
 void NoduleSet::add_nodule(const VOISphere& v)
 {
-    m_vecNoduleSet.push_back(v);
+    nodule_set.push_back(v);
 }
 
 const std::vector<VOISphere>& NoduleSet::get_nodule_set() const
 {
-    return m_vecNoduleSet;
+    return nodule_set;
 }
 
 void NoduleSet::get_nodule_set(std::vector<VOISphere>& nset) const
 {
-    nset = m_vecNoduleSet;
+    nset = nodule_set;
 }
 
 MED_IMAGING_END_NAMESPACE

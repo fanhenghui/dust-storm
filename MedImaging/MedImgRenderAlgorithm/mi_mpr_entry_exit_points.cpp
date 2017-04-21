@@ -112,9 +112,9 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pCameraCalculator);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
 
-        const Vector3f vDim((float)m_pImgData->m_uiDim[0],
-            (float)m_pImgData->m_uiDim[1],
-            (float)m_pImgData->m_uiDim[2]);
+        const Vector3f vDim((float)m_pImgData->_dim[0],
+            (float)m_pImgData->_dim[1],
+            (float)m_pImgData->_dim[2]);
 
         //Calculate base plane of MPR
         const Matrix4 matV2W = m_pCameraCalculator->get_volume_to_world_matrix();
@@ -249,9 +249,9 @@ void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pCameraCalculator);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
 
-        Vector3f vDim((float)m_pImgData->m_uiDim[0],
-            (float)m_pImgData->m_uiDim[1],
-            (float)m_pImgData->m_uiDim[2]);
+        Vector3f vDim((float)m_pImgData->_dim[0],
+            (float)m_pImgData->_dim[1],
+            (float)m_pImgData->_dim[2]);
 
         //Calculate base plane of MPR
         const Matrix4 matV2W = m_pCameraCalculator->get_volume_to_world_matrix();
@@ -330,7 +330,7 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         CHECK_GL_ERROR;
 
-        const float fDim[3] = {(float)m_pImgData->m_uiDim[0] , (float)m_pImgData->m_uiDim[1] , (float)m_pImgData->m_uiDim[2]};
+        const float fDim[3] = {(float)m_pImgData->_dim[0] , (float)m_pImgData->_dim[1] , (float)m_pImgData->_dim[2]};
         glProgramUniform3f(uiProgram , VOLUME_DIM , fDim[0] , fDim[1] , fDim[2]);
 
         CHECK_GL_ERROR;

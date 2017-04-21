@@ -9,7 +9,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 struct ContourData
 {
-    std::vector<Vector3f> m_vecPoints;
+    std::vector<Vector3f> points;
 };
 
 class IO_Export RTStruct
@@ -17,12 +17,12 @@ class IO_Export RTStruct
 public:
     RTStruct();
     ~RTStruct();
-    void add_contour(const std::string& sROIName , ContourData* pContour);
+    void add_contour(const std::string& roi_name , ContourData* contour);
     const std::map<std::string , std::vector<ContourData*>>& get_all_contour() const;
-    void write_to_file(const std::string& sFile);
+    void write_to_file(const std::string& file_name);
 protected:
 private:
-    std::map<std::string , std::vector<ContourData*>> m_mapRTData;
+    std::map<std::string , std::vector<ContourData*>> rt_data;
 };
 
 MED_IMAGING_END_NAMESPACE

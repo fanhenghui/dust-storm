@@ -39,7 +39,7 @@ private:
     int _height;
     Vector4f* m_pEntryPoints;
     Vector4f* m_pExitPoints;
-    unsigned int m_uiDim[3];
+    unsigned int _dim[3];
     RGBAUnit* m_pColorCanvas;
 
     //Brick struct

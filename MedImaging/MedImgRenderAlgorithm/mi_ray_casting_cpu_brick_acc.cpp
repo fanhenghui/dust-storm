@@ -137,7 +137,7 @@ RayCastingCPUBrickAcc::RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> pRayCast
     m_uiInterBrickNum(0),
     m_iRayCount(0)
 {
-    m_uiDim[0] = m_uiDim[1] = m_uiDim[2] = 32;
+    _dim[0] = _dim[1] = _dim[2] = 32;
     m_uiBrickDim[0] = m_uiBrickDim[1] = m_uiBrickDim[2] = 0;
 
     m_iTestPixelX = 123546;
@@ -162,7 +162,7 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
 
         std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
-        memcpy(m_uiDim , pVolumeData->m_uiDim , sizeof(unsigned int)*3);
+        memcpy(_dim , pVolumeData->_dim , sizeof(unsigned int)*3);
 
         //Brick struct
         m_uiBrickSize = pRayCaster->m_uiBrickSize;
@@ -173,7 +173,7 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
         m_pVolumeBrickInfo = pRayCaster->m_pVolumeBrickInfo;
         m_pMaskBrickInfo = pRayCaster->m_pMaskBrickInfo;
         unsigned int uiBrickDim[3] = {1,1,1};
-        BrickUtils::instance()->get_brick_dim(m_uiDim , uiBrickDim , m_uiBrickSize);
+        BrickUtils::instance()->get_brick_dim(_dim , uiBrickDim , m_uiBrickSize);
         m_uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
         if( !(m_uiBrickDim[0] ==uiBrickDim[0] && m_uiBrickDim[1] == uiBrickDim[1] && m_uiBrickDim[2] == uiBrickDim[2]) )
         {

@@ -27,9 +27,6 @@
     <ClInclude Include="..\Include\MedImgIO\mi_dicom_loader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_io_utils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -57,9 +54,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mi_dicom_loader.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mi_io_utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mi_meta_object_loader.cpp">

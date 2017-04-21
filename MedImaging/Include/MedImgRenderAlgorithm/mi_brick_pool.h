@@ -18,9 +18,9 @@ public:
 
     ~BrickPool();
 
-    void set_volume(std::shared_ptr<ImageData> pImgData);
+    void set_volume(std::shared_ptr<ImageData> image_data);
 
-    void set_mask(std::shared_ptr<ImageData> pImgData);
+    void set_mask(std::shared_ptr<ImageData> image_data);
 
     void set_brick_size(unsigned int uiBrickSize);
 

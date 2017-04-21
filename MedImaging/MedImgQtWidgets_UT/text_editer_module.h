@@ -46,7 +46,7 @@ private:
 
     void NewFile_i();
 
-    bool SaveFile_i(const QString& sFile);
+    bool SaveFile_i(const QString& file_name);
 
     bool Save_i();
 

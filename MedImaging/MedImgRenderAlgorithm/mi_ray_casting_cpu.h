@@ -43,7 +43,7 @@ private:
     int _height;
     Vector4f* m_pEntryPoints;
     Vector4f* m_pExitPoints;
-    unsigned int m_uiDim[3];
+    unsigned int _dim[3];
     void* m_pVolumeDataRaw;
     unsigned char* m_pMaskDataRaw;
     RGBAUnit* m_pColorCanvas;

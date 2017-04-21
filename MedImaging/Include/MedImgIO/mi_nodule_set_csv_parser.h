@@ -12,8 +12,8 @@ class IO_Export NoduleSetCSVParser
 public:
     NoduleSetCSVParser();
     ~NoduleSetCSVParser();
-    IOStatus load(const std::string& sFilePath , std::shared_ptr<NoduleSet>& pNoduleSet);
-    IOStatus save(const std::string& sFilePath , const std::shared_ptr<NoduleSet>& pNoduleSet);
+    IOStatus load(const std::string& file_path , std::shared_ptr<NoduleSet>& nodule_set);
+    IOStatus save(const std::string& file_path , const std::shared_ptr<NoduleSet>& nodule_set);
 protected:
 private:
 };

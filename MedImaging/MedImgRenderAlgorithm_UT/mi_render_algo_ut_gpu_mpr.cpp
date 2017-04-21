@@ -49,30 +49,30 @@ namespace
 
     std::vector<std::string> GetFiles()
     {
-        const std::string sFile = "E:/Data/MyData/AB_CTA_01/";
+        const std::string file_name = "E:/Data/MyData/AB_CTA_01/";
         unsigned int uiSliceCount = 734;
         const std::string sPrefix ="DICOM7_000";
         std::string sCurFile;
-        std::vector<std::string> vecFiles;
+        std::vector<std::string> files;
         for (unsigned int i = 0 ; i< uiSliceCount ; ++i)
         {
             std::stringstream ss;
             if (i<10)
             {
-                ss << sFile << sPrefix << "00" << i;
+                ss << file_name << sPrefix << "00" << i;
             }
             else if (i<100)
             {
-                ss << sFile << sPrefix << "0" << i;
+                ss << file_name << sPrefix << "0" << i;
             }
             else
             {
-                ss << sFile << sPrefix  << i;
+                ss << file_name << sPrefix  << i;
             }
-            vecFiles.push_back(ss.str());
+            files.push_back(ss.str());
         }
 
-        return vecFiles;
+        return files;
     }
 
     void Init()
@@ -80,9 +80,9 @@ namespace
         Configuration::instance()->set_processing_unit_type(GPU);
         GLUtils::set_check_gl_flag(true);
 
-        std::vector<std::string> vecFiles = GetFiles();
+        std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecFiles , m_pImgData , m_pDataHeader);
+        IOStatus status = loader.load_series(files , m_pImgData , m_pDataHeader);
 
         m_pVolumeInfos.reset( new VolumeInfos());
         m_pVolumeInfos->set_data_header(m_pDataHeader);

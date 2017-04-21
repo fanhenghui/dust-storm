@@ -4,15 +4,15 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-CameraCalculator::CameraCalculator(std::shared_ptr<ImageData> pImgData):m_pImgData(pImgData),
+CameraCalculator::CameraCalculator(std::shared_ptr<ImageData> image_data):m_pImgData(image_data),
 m_bVolumeOrthogonal(true)
 {
     calculate_i();
 }
  
-//void CameraCalculator::UpdateImageData(std::shared_ptr<ImageData> pImgData)
+//void CameraCalculator::UpdateImageData(std::shared_ptr<ImageData> image_data)
 //{
-//    m_pImgData = pImgData;
+//    m_pImgData = image_data;
 //    Calculate_i();
 //}
 
@@ -81,8 +81,8 @@ void CameraCalculator::calculate_i()
 void CameraCalculator::calculate_matrix_i()
 {
     //1 Calculate volume to physical
-    unsigned int *uiDim = m_pImgData->m_uiDim;
-    double *dSpacing = m_pImgData->m_dSpacing;
+    unsigned int *uiDim = m_pImgData->_dim;
+    double *dSpacing = m_pImgData->_spacing;
 
     m_matVolume2Physical.set_idintity();
     m_matVolume2Physical.prepend(make_translate(-Vector3(uiDim[0] * 0.5, uiDim[1] * 0.5, uiDim[2] * 0.5)));
@@ -131,7 +131,7 @@ void CameraCalculator::calculate_matrix_i()
     m_matWorld2Volume = m_matVolume2Wolrd.get_inverse();
 
     //4 Calculate world to patient
-    const Point3 &ptImgPosition = m_pImgData->m_ptImgPositon;
+    const Point3 &ptImgPosition = m_pImgData->_image_position;
     const Point3 &ptImgWorld = m_matVolume2Wolrd.transform(Point3::S_ZERO_POINT);
     m_matWorld2Patient = make_translate(ptImgPosition - ptImgWorld);
     m_matPatient2World = m_matWorld2Patient.get_inverse();
@@ -140,12 +140,12 @@ void CameraCalculator::calculate_matrix_i()
 
 void CameraCalculator::calculate_patient_axis_info_i()
 {
-    const Vector3& vXCoordPatient = m_pImgData->m_vImgOrientation[0];
-    const Vector3& vYCoordPatient = m_pImgData->m_vImgOrientation[1];
-    const Vector3& vZCoordPatient = m_pImgData->m_vImgOrientation[2];
+    const Vector3& vXCoordPatient = m_pImgData->_image_orientation[0];
+    const Vector3& vYCoordPatient = m_pImgData->_image_orientation[1];
+    const Vector3& vZCoordPatient = m_pImgData->_image_orientation[2];
 
-    double *dSpacing = m_pImgData->m_dSpacing;
-    unsigned int *uiDim = m_pImgData->m_uiDim;
+    double *dSpacing = m_pImgData->_spacing;
+    unsigned int *uiDim = m_pImgData->_dim;
 
     /// rotate the volume to get consistent with patient coordinate 
     const Vector3 vStandardHeadAxis(0.0,0.0,1.0);
@@ -260,8 +260,8 @@ void CameraCalculator::calculate_vr_placement_i()
     Vector3 vUp = m_headInfo.vecInPatient;
 
 
-    double *dSpacing = m_pImgData->m_dSpacing;
-    unsigned int *uiDim = m_pImgData->m_uiDim;
+    double *dSpacing = m_pImgData->_spacing;
+    unsigned int *uiDim = m_pImgData->_dim;
     const double dMaxLen = std::max(std::max(uiDim[0] * dSpacing[0],uiDim[1] * dSpacing[1]),uiDim[2] * dSpacing[2]);
 
     Point3 ptEye = Point3(-vView.x, -vView.y, -vView.z)*dMaxLen*2;
@@ -273,9 +273,9 @@ void CameraCalculator::calculate_vr_placement_i()
 
 void CameraCalculator::check_volume_orthogonal_i()
 {
-    const Vector3& vXCoordPatient = m_pImgData->m_vImgOrientation[0];
-    const Vector3& vYCoordPatient = m_pImgData->m_vImgOrientation[1];
-    const Vector3& vZCoordPatient = m_pImgData->m_vImgOrientation[2];
+    const Vector3& vXCoordPatient = m_pImgData->_image_orientation[0];
+    const Vector3& vYCoordPatient = m_pImgData->_image_orientation[1];
+    const Vector3& vZCoordPatient = m_pImgData->_image_orientation[2];
 
     double dXYDot = vXCoordPatient.dot_product(vYCoordPatient);
     double dXZDot = vXCoordPatient.dot_product(vZCoordPatient);
@@ -356,21 +356,21 @@ bool CameraCalculator::page_orthognal_mpr(std::shared_ptr<OrthoCamera> pCamera ,
     double dSpacingStep = 0;
     if (dDotHead > dDotLeft && dDotHead > dDotPosterior)//Transverse
     {
-        dSpacingStep = m_pImgData->m_dSpacing[m_headInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_headInfo.eVolumeCoord/2];
     }
     else if (dDotLeft > dDotHead && dDotLeft > dDotPosterior)//Sagittal
     {
-        dSpacingStep = m_pImgData->m_dSpacing[m_leftInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_leftInfo.eVolumeCoord/2];
     }
     else//Coronal
     {
-        dSpacingStep = m_pImgData->m_dSpacing[m_posteriorInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_posteriorInfo.eVolumeCoord/2];
     }
 
     ptEye += vDir*dSpacingStep*iPageStep;
     ptLookAt+= vDir*dSpacingStep*iPageStep;
     Point3 ptV = m_matWorld2Volume.transform(ptLookAt);
-    if (ArithmeticUtils::check_in_bound(ptV , Point3(m_pImgData->m_uiDim[0]-1 , m_pImgData->m_uiDim[1]-1 , m_pImgData->m_uiDim[2]-1)))
+    if (ArithmeticUtils::check_in_bound(ptV , Point3(m_pImgData->_dim[0]-1 , m_pImgData->_dim[1]-1 , m_pImgData->_dim[2]-1)))
     {
         pCamera->set_eye(ptEye);
         pCamera->set_look_at(ptLookAt);
@@ -398,17 +398,17 @@ bool CameraCalculator::page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pCamer
     if (dDotHead > dDotLeft && dDotHead > dDotPosterior)//Transverse
     {
         eScanType = fabs(dDotHead - 1.0) > DOUBLE_EPSILON ? OBLIQUE : TRANSVERSE;
-        dSpacingStep = m_pImgData->m_dSpacing[m_headInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_headInfo.eVolumeCoord/2];
     }
     else if (dDotLeft > dDotHead && dDotLeft > dDotPosterior)//Sagittal
     {
         eScanType = fabs(dDotLeft - 1.0) > DOUBLE_EPSILON ? OBLIQUE : SAGITTAL;
-        dSpacingStep = m_pImgData->m_dSpacing[m_leftInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_leftInfo.eVolumeCoord/2];
     }
     else//Coronal
     {
         eScanType = fabs(dDotPosterior - 1.0) > DOUBLE_EPSILON ? OBLIQUE : CORONAL;
-        dSpacingStep = m_pImgData->m_dSpacing[m_posteriorInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_posteriorInfo.eVolumeCoord/2];
     }
 
     if (eScanType == OBLIQUE)
@@ -428,7 +428,7 @@ bool CameraCalculator::page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pCamer
     ptChangedEye += vDir* (iStep ) * dSpacingStep;
 
     Point3 ptV = m_matWorld2Volume.transform(ptChangedLookAt);
-    if (ArithmeticUtils::check_in_bound(ptV , Point3(m_pImgData->m_uiDim[0]-1 , m_pImgData->m_uiDim[1]-1 , m_pImgData->m_uiDim[2]-1)))
+    if (ArithmeticUtils::check_in_bound(ptV , Point3(m_pImgData->_dim[0]-1 , m_pImgData->_dim[1]-1 , m_pImgData->_dim[2]-1)))
     {
         pCamera->set_eye(ptChangedEye);
         pCamera->set_look_at(ptChangedLookAt);
@@ -456,17 +456,17 @@ int CameraCalculator::get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> pCamer
     if (dDotHead > dDotLeft && dDotHead > dDotPosterior)//Transverse
     {
         eScanType = fabs(dDotHead - 1.0) > DOUBLE_EPSILON ? OBLIQUE : TRANSVERSE;
-        dSpacingStep = m_pImgData->m_dSpacing[m_headInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_headInfo.eVolumeCoord/2];
     }
     else if (dDotLeft > dDotHead && dDotLeft > dDotPosterior)//Sagittal
     {
         eScanType = fabs(dDotLeft - 1.0) > DOUBLE_EPSILON ? OBLIQUE : SAGITTAL;
-        dSpacingStep = m_pImgData->m_dSpacing[m_leftInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_leftInfo.eVolumeCoord/2];
     }
     else//Coronal
     {
         eScanType = fabs(dDotPosterior - 1.0) > DOUBLE_EPSILON ? OBLIQUE : CORONAL;
-        dSpacingStep = m_pImgData->m_dSpacing[m_posteriorInfo.eVolumeCoord/2];
+        dSpacingStep = m_pImgData->_spacing[m_posteriorInfo.eVolumeCoord/2];
     }
 
     if (eScanType == OBLIQUE)
@@ -512,15 +512,15 @@ int CameraCalculator::get_page_maximum(ScanSliceType eType)const
     {
     case TRANSVERSE:
         {
-            return m_pImgData->m_uiDim[m_headInfo.eVolumeCoord/2];
+            return m_pImgData->_dim[m_headInfo.eVolumeCoord/2];
         }
     case SAGITTAL:
         {
-            return m_pImgData->m_uiDim[m_leftInfo.eVolumeCoord/2];
+            return m_pImgData->_dim[m_leftInfo.eVolumeCoord/2];
         }
     case CORONAL:
         {
-            return m_pImgData->m_uiDim[m_posteriorInfo.eVolumeCoord/2];
+            return m_pImgData->_dim[m_posteriorInfo.eVolumeCoord/2];
         }
     default:
         {
@@ -535,15 +535,15 @@ int CameraCalculator::get_default_page(ScanSliceType eType)const
     {
     case TRANSVERSE:
         {
-            return m_pImgData->m_uiDim[m_headInfo.eVolumeCoord/2]/2;
+            return m_pImgData->_dim[m_headInfo.eVolumeCoord/2]/2;
         }
     case SAGITTAL:
         {
-            return m_pImgData->m_uiDim[m_leftInfo.eVolumeCoord/2]/2;
+            return m_pImgData->_dim[m_leftInfo.eVolumeCoord/2]/2;
         }
     case CORONAL:
         {
-            return m_pImgData->m_uiDim[m_posteriorInfo.eVolumeCoord/2]/2;
+            return m_pImgData->_dim[m_posteriorInfo.eVolumeCoord/2]/2;
         }
     default:
         {
@@ -554,8 +554,8 @@ int CameraCalculator::get_default_page(ScanSliceType eType)const
 
 void CameraCalculator::caluculate_orthogonal_mpr_placement_i()
 {
-    double *dSpacing = m_pImgData->m_dSpacing;
-    unsigned int *uiDim = m_pImgData->m_uiDim;
+    double *dSpacing = m_pImgData->_spacing;
+    unsigned int *uiDim = m_pImgData->_dim;
     const double dMaxLen = std::max(std::max(uiDim[0] * dSpacing[0],uiDim[1] * dSpacing[1]),uiDim[2] * dSpacing[2]);
 
     const Point3 ptLookAt = m_ptDefaultMPRCenter;
@@ -639,28 +639,28 @@ void CameraCalculator::calculate_default_mpr_center_world_i()
     //Sagittal translate
     Vector3 vViewDir = m_leftInfo.vecInPatient;
     vViewDir.normalize();
-    const unsigned int uiSagittalDimension = m_pImgData->m_uiDim[m_leftInfo.eVolumeCoord/2];
+    const unsigned int uiSagittalDimension = m_pImgData->_dim[m_leftInfo.eVolumeCoord/2];
     if ( uiSagittalDimension % 2 == 0 )
     {
-        ptLookAt -= vViewDir*0.5*m_pImgData->m_dSpacing[m_leftInfo.eVolumeCoord/2];//取下整
+        ptLookAt -= vViewDir*0.5*m_pImgData->_spacing[m_leftInfo.eVolumeCoord/2];//取下整
     }
 
     //Transversal translate
     vViewDir = m_headInfo.vecInPatient;
     vViewDir.normalize();
-    const unsigned int uiTransversalDimension = m_pImgData->m_uiDim[m_headInfo.eVolumeCoord/2];
+    const unsigned int uiTransversalDimension = m_pImgData->_dim[m_headInfo.eVolumeCoord/2];
     if ( 0 == uiTransversalDimension % 2)
     {
-        ptLookAt -= vViewDir*0.5*m_pImgData->m_dSpacing[m_headInfo.eVolumeCoord/2];//取下整
+        ptLookAt -= vViewDir*0.5*m_pImgData->_spacing[m_headInfo.eVolumeCoord/2];//取下整
     }
 
     //Coronal translate
     vViewDir = m_posteriorInfo.vecInPatient;
     vViewDir.normalize();
-    const unsigned int uiCoronalDimension = m_pImgData->m_uiDim[m_posteriorInfo.eVolumeCoord/2];
+    const unsigned int uiCoronalDimension = m_pImgData->_dim[m_posteriorInfo.eVolumeCoord/2];
     if ( 0 == uiCoronalDimension % 2)
     {
-        ptLookAt -= vViewDir*0.5*m_pImgData->m_dSpacing[m_posteriorInfo.eVolumeCoord/2];//取下整
+        ptLookAt -= vViewDir*0.5*m_pImgData->_spacing[m_posteriorInfo.eVolumeCoord/2];//取下整
     }
 
     m_ptDefaultMPRCenter = ptLookAt;

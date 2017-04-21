@@ -63,12 +63,12 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         //3.1 Left Top
         int iItem = 1;
         //3.1.1
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->m_sManufacturer.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->manufacturer.c_str());
         //3.1.2
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->m_sManufacturerModelName.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->manufacturer_model_name.c_str());
         //3.1.3
         std::string sModality = "UnSupported";
-        switch(pDataHeader->m_eModality)
+        switch(pDataHeader->modality)
         {
         case CR:
             sModality = "CR";
@@ -87,30 +87,30 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         }
         m_pPainter->drawText(iBorder , (iItem++)*iMargin , sModality.c_str());
         //3.1.4
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->m_sImageDate.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->image_date.c_str());
 
         //////////////////////////////////////////////////////////////////////////
         //3.2 Right Top
         iItem = 1;
         int iX = 0;
         //3.2.1
-        QString sPatientName(pDataHeader->m_sPatientName.c_str());
+        QString sPatientName(pDataHeader->patient_name.c_str());
         iX = iWidth - m_pPainter->fontMetrics().width(sPatientName) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientName);
 
         //3.2.2
-        QString sPatientID(pDataHeader->m_sPatientID.c_str());
+        QString sPatientID(pDataHeader->patient_id.c_str());
         iX = iWidth - m_pPainter->fontMetrics().width(sPatientID) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientID);
 
         //3.2.3
-        QString sPatientSex(pDataHeader->m_sPatientSex.c_str());
+        QString sPatientSex(pDataHeader->patient_sex.c_str());
         iX = iWidth - m_pPainter->fontMetrics().width(sPatientSex) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientSex);
 
         //3.2.4
         std::stringstream ss;
-        ss << pDataHeader->m_uiImgColumns << " " << pDataHeader->m_uiImgRows << " " << pDataHeader->m_SliceLocations.size();
+        ss << pDataHeader->columns << " " << pDataHeader->rows << " " << pDataHeader->slice_location.size();
         QString sDim(ss.str().c_str());
         iX = iWidth - m_pPainter->fontMetrics().width(sDim) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sDim);

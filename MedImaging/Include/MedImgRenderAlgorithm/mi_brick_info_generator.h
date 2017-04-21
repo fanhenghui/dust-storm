@@ -14,7 +14,7 @@ public:
     ~CPUVolumeBrickInfoGenerator();
 
     void calculate_brick_info(
-        std::shared_ptr<ImageData> pImgData , 
+        std::shared_ptr<ImageData> image_data , 
         unsigned int uiBrickSize , 
         unsigned int uiBrickExpand , 
         BrickCorner* pBrickCorner , 
@@ -26,7 +26,7 @@ protected:
         BrickCorner& bc , 
         BrickUnit& bu ,
         VolumeBrickInfo& vbi,
-        std::shared_ptr<ImageData> pImgData , 
+        std::shared_ptr<ImageData> image_data , 
         unsigned int uiBrickSize , 
         unsigned int uiBrickExpand);
 
@@ -37,7 +37,7 @@ protected:
         BrickCorner* pBrickCorner , 
         BrickUnit* pBrickUnit , 
         VolumeBrickInfo* pBrickInfo,
-        std::shared_ptr<ImageData> pImgData , 
+        std::shared_ptr<ImageData> image_data , 
         unsigned int uiBrickSize , 
         unsigned int uiBrickExpand);
 private:

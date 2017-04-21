@@ -22,7 +22,7 @@ MED_IMAGING_BEGIN_NAMESPACE
     m_pMaskDataRaw(nullptr),
     m_pColorCanvas(nullptr)
 {
-    m_uiDim[0] = m_uiDim[1] = m_uiDim[2] = 32;
+    _dim[0] = _dim[1] = _dim[2] = 32;
 }
 
 RayCastingCPU::~RayCastingCPU()
@@ -43,7 +43,7 @@ void RayCastingCPU::render(int iTestCode )
 
         std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
-        memcpy(m_uiDim , pVolumeData->m_uiDim , sizeof(unsigned int)*3);
+        memcpy(_dim , pVolumeData->_dim , sizeof(unsigned int)*3);
         m_pVolumeDataRaw = pVolumeData->get_pixel_pointer();
 
         //Entry exit points
@@ -67,7 +67,7 @@ void RayCastingCPU::render(int iTestCode )
 
 
 
-        switch(pVolumeData->m_eDataType)
+        switch(pVolumeData->_data_type)
         {
         case USHORT:
             {
@@ -196,7 +196,7 @@ void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster)
 
             fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
-                m_uiDim[0], m_uiDim[1], m_uiDim[2],
+                _dim[0], _dim[1], _dim[2],
                 (T*)m_pVolumeDataRaw);
 
             fSum += fSampleValue*fRatioR;
@@ -258,7 +258,7 @@ void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> pRayCaster)
 
             fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
-                m_uiDim[0], m_uiDim[1], m_uiDim[2],
+                _dim[0], _dim[1], _dim[2],
                 (T*)m_pVolumeDataRaw);
 
             fMaxGray = fSampleValue > fMaxGray ? fSampleValue : fMaxGray;
@@ -318,7 +318,7 @@ void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
 
             fSampleValue = sampler.sample_3d_linear(
                 ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
-                m_uiDim[0], m_uiDim[1], m_uiDim[2],
+                _dim[0], _dim[1], _dim[2],
                 (T*)m_pVolumeDataRaw);
 
             fMaxGray = fSampleValue > fMaxGray ? fSampleValue : fMaxGray;
@@ -336,7 +336,7 @@ void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
 
 void RayCastingCPU::render_entry_exit_points_i( int iTestCode)
 {
-    Vector3f vDimR(1.0f/m_uiDim[0] , 1.0f/m_uiDim[1] , 1.0f/m_uiDim[2]);
+    Vector3f vDimR(1.0f/_dim[0] , 1.0f/_dim[1] , 1.0f/_dim[2]);
     const int iTotalPixelNum = _width*_height;
     if (1 == iTestCode)
     {

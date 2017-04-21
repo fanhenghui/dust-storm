@@ -16,7 +16,7 @@ public:
     void get_nodule_set(std::vector<VOISphere>& nset) const;
 
 private:
-    std::vector<VOISphere> m_vecNoduleSet;
+    std::vector<VOISphere> nodule_set;
 };
 
 MED_IMAGING_END_NAMESPACE

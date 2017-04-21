@@ -92,7 +92,7 @@ bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
     matMVP.inverse();
 
     Point3 ptVolume = matMVP.transform(Point3(pt.x , pt.y , 0.0));
-    if (ArithmeticUtils::check_in_bound(ptVolume , Point3(pImg->m_uiDim[0] - 1.0 , pImg->m_uiDim[1] - 1 , pImg->m_uiDim[2] - 1)))
+    if (ArithmeticUtils::check_in_bound(ptVolume , Point3(pImg->_dim[0] - 1.0 , pImg->_dim[1] - 1 , pImg->_dim[2] - 1)))
     {
         ptPosV = ptVolume;
         return true;

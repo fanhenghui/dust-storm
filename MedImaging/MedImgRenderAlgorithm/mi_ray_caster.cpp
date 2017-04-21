@@ -118,14 +118,14 @@ void RayCaster::render(int iTestCode)
     //std::cout << "<<<>>><<<>>><<<>>><<<>>><<<>>>\n";
 }
 
-void RayCaster::set_volume_data(std::shared_ptr<ImageData> pImgData)
+void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data)
 {
-    m_pVolumeData = pImgData;
+    m_pVolumeData = image_data;
 }
 
-void RayCaster::set_mask_data(std::shared_ptr<ImageData> pImgData)
+void RayCaster::set_mask_data(std::shared_ptr<ImageData> image_data)
 {
-    m_pMaskData = pImgData;
+    m_pMaskData = image_data;
 }
 
 void RayCaster::set_volume_data_texture(std::vector<GLTexture3DPtr> vecTex)

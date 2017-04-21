@@ -103,9 +103,9 @@ Vector4f* EntryExitPoints::get_exit_points_array()
     return m_pExitBuffer.get();
 }
 
-void EntryExitPoints::set_image_data(std::shared_ptr<ImageData> pImgData)
+void EntryExitPoints::set_image_data(std::shared_ptr<ImageData> image_data)
 {
-    m_pImgData = pImgData;
+    m_pImgData = image_data;
 }
 
 void EntryExitPoints::set_camera(std::shared_ptr<CameraBase> pCamera)
@@ -126,7 +126,7 @@ void EntryExitPoints::debug_output_entry_points(const std::string& sFileName)
     {
         std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
-        unsigned int *uiDim = m_pImgData->m_uiDim;
+        unsigned int *uiDim = m_pImgData->_dim;
         float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
         unsigned char r,g,b;
         float fR , fG , fB;
@@ -173,7 +173,7 @@ void EntryExitPoints::debug_output_exit_points(const std::string& sFileName)
     {
         std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
-        unsigned int *uiDim = m_pImgData->m_uiDim;
+        unsigned int *uiDim = m_pImgData->_dim;
         float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
         unsigned char r,g,b;
         float fR , fG , fB;

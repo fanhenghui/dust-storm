@@ -8,17 +8,17 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 struct VOISphere
 {
-    Point3 m_ptCenter;
-    double m_dDiameter;
-    std::string m_sName;
+    Point3 center;
+    double diameter;
+    std::string name;
 
-    VOISphere():m_ptCenter(Point3::S_ZERO_POINT),m_dDiameter(0),m_sName("")
+    VOISphere():center(Point3::S_ZERO_POINT),diameter(0),name("")
     {}
 
-    VOISphere(const Point3& pt , double d):m_ptCenter(pt),m_dDiameter(d),m_sName("")
+    VOISphere(const Point3& pt , double d):center(pt),diameter(d),name("")
     {}
 
-    VOISphere(const Point3& pt , double d , const std::string& sName):m_ptCenter(pt),m_dDiameter(d),m_sName(sName)
+    VOISphere(const Point3& pt , double d , const std::string& sName):center(pt),diameter(d),name(sName)
     {}
 };
 

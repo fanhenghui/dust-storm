@@ -422,9 +422,9 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         }
 
         std::shared_ptr<ImageDataHeader> pDataHeader;
-        std::shared_ptr<ImageData> pImgData;
+        std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecSTDFiles, pImgData , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, image_data , pDataHeader);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
@@ -439,7 +439,7 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         m_pVolumeInfos.reset(new VolumeInfos());
         m_pVolumeInfos->set_data_header(pDataHeader);
         //SharedWidget::instance()->makeCurrent();
-        m_pVolumeInfos->set_volume(pImgData);//load volume texture if has graphic card
+        m_pVolumeInfos->set_volume(image_data);//load volume texture if has graphic card
 
         create_model_observer_i();
 
@@ -646,19 +646,19 @@ void NoduleAnnotation::slot_save_nodule_i()
         }
     }
 
-    QString sFileCustom = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(m_pVolumeInfos->get_data_header()->m_sSeriesUID.c_str()), tr("NoduleSet(*.csv)"));
+    QString sFileCustom = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(m_pVolumeInfos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
     if (!sFileCustom.isEmpty())
     {
-        std::shared_ptr<NoduleSet> pNoduleSet(new NoduleSet());
+        std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
         const std::list<VOISphere>& voiList = m_pVOIModel->get_voi_spheres();
         for (auto it = voiList.begin() ; it != voiList.end() ; ++it)
         {
-            pNoduleSet->add_nodule(*it);
+            nodule_set->add_nodule(*it);
         }
 
         NoduleSetCSVParser parser;
-        std::string sFilePath(sFileCustom.toLocal8Bit());
-        IOStatus status = parser.save(sFilePath , pNoduleSet);
+        std::string file_path(sFileCustom.toLocal8Bit());
+        IOStatus status = parser.save(file_path , nodule_set);
 
         if (status == IO_SUCCESS)
         {
@@ -701,7 +701,7 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
     std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = m_pVOIModel->get_voi_sphere(row);
     const Matrix4 matP2W = m_pMPRScene00->get_camera_calculator()->get_patient_to_world_matrix();
-    m_pCrosshairModel->locate(matP2W.transform(voi.m_ptCenter));
+    m_pCrosshairModel->locate(matP2W.transform(voi.center));
     m_pCrosshairModel->notify();
 }
 
@@ -730,10 +730,10 @@ void NoduleAnnotation::slot_add_nodule_i()
         for (auto it = vecVOISphere.begin() ; it != vecVOISphere.end() ; ++it)
         {
             const VOISphere& voi = *it;
-            std::string sPos = converter.to_string_decimal(voi.m_ptCenter.x , iPrecision) + "," +
-                converter.to_string_decimal(voi.m_ptCenter.y , iPrecision) + "," +
-                converter.to_string_decimal(voi.m_ptCenter.z , iPrecision);
-            std::string sRadius = converter.to_string_decimal(voi.m_dDiameter , iPrecision);
+            std::string sPos = converter.to_string_decimal(voi.center.x , iPrecision) + "," +
+                converter.to_string_decimal(voi.center.y , iPrecision) + "," +
+                converter.to_string_decimal(voi.center.z , iPrecision);
+            std::string sRadius = converter.to_string_decimal(voi.diameter , iPrecision);
 
             QTableWidgetItem* pPos= new QTableWidgetItem(sPos.c_str());
             pPos->setFlags(pPos->flags() & ~Qt::ItemIsEnabled);

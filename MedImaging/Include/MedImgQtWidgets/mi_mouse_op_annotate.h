@@ -23,7 +23,7 @@ protected:
 private:
     bool m_bPin;
     medical_imaging::Point3 m_ptCenter;
-    double m_dDiameter;
+    double diameter;
     std::shared_ptr<VOIModel> m_pVOIModel;
 };
 

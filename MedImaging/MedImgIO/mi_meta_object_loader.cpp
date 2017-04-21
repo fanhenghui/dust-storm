@@ -6,43 +6,43 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 
 IOStatus MetaObjectLoader::load(
-const std::string& sInfoFile, 
-std::shared_ptr<ImageData> &pImgData , 
-std::shared_ptr<MetaObjectTag> & pMetaObjTag,
-std::shared_ptr<ImageDataHeader> & pImgDataHeader)
+const std::string& info_file, 
+std::shared_ptr<ImageData> &image_data , 
+std::shared_ptr<MetaObjectTag> & meta_obj_tag,
+std::shared_ptr<ImageDataHeader> & img_data_header)
 {
     //Get header
-    pMetaObjTag.reset(new MetaObjectTag());
+    meta_obj_tag.reset(new MetaObjectTag());
 
-    std::ifstream in(sInfoFile.c_str() , std::ios::in);
+    std::ifstream in(info_file.c_str() , std::ios::in);
     if (!in.is_open())
     {
         IO_THROW_EXCEPTION("Cant open meta file!");
     }
 
     std::string sLine;
-    std::string sTag;
+    std::string tag;
     std::string sEqual;
-    std::string sContent;
+    std::string context;
     while(std::getline(in , sLine))
     {
         std::stringstream ss(sLine);
-        ss >> sTag;
-        if (sTag == "ObjectType")
+        ss >> tag;
+        if (tag == "ObjectType")
         {
-            ss >> sEqual >> sContent;
-            if (sContent.empty())
+            ss >> sEqual >> context;
+            if (context.empty())
             {
-                pMetaObjTag->m_sObjectType = sContent;
+                meta_obj_tag->object_type = context;
             }
         }
-        else if (sTag == "ElementSpacing")
+        else if (tag == "ElementSpacing")
         {
-            ss >> sEqual >> pMetaObjTag->m_dSpacing[0] >> pMetaObjTag->m_dSpacing[1] >> pMetaObjTag->m_dSpacing[2];
+            ss >> sEqual >> meta_obj_tag->spacing[0] >> meta_obj_tag->spacing[1] >> meta_obj_tag->spacing[2];
         }
-        else if (sTag == "DimSize")
+        else if (tag == "DimSize")
         {
-            ss >> sEqual>>pMetaObjTag->m_uiDimSize[0] >>pMetaObjTag->m_uiDimSize[1]>>pMetaObjTag->m_uiDimSize[2];
+            ss >> sEqual>>meta_obj_tag->dim_size[0] >>meta_obj_tag->dim_size[1]>>meta_obj_tag->dim_size[2];
         }
 
     }

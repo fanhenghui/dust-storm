@@ -106,30 +106,30 @@ namespace
 
     std::vector<std::string> GetFiles()
     {
-        const std::string sFile = "D:/Data/AB_CTA_01/";
+        const std::string file_name = "D:/Data/AB_CTA_01/";
         unsigned int uiSliceCount = 734;
         const std::string sPrefix ="DICOM7_000";
         std::string sCurFile;
-        std::vector<std::string> vecFiles;
+        std::vector<std::string> files;
         for (unsigned int i = 0 ; i< uiSliceCount ; ++i)
         {
             std::stringstream ss;
             if (i<10)
             {
-                ss << sFile << sPrefix << "00" << i;
+                ss << file_name << sPrefix << "00" << i;
             }
             else if (i<100)
             {
-                ss << sFile << sPrefix << "0" << i;
+                ss << file_name << sPrefix << "0" << i;
             }
             else
             {
-                ss << sFile << sPrefix  << i;
+                ss << file_name << sPrefix  << i;
             }
-            vecFiles.push_back(ss.str());
+            files.push_back(ss.str());
         }
 
-        return vecFiles;
+        return files;
     }
 
     void CalculateBrickPool()
@@ -146,9 +146,9 @@ namespace
 
     void Init()
     {
-        std::vector<std::string> vecFiles = GetFiles();
+        std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecFiles , m_pImgData , m_pDataHeader);
+        IOStatus status = loader.load_series(files , m_pImgData , m_pDataHeader);
 
         m_pCamera.reset(new OrthoCamera());
         m_pCameraBrick.reset(new OrthoCamera());
@@ -208,7 +208,7 @@ namespace
     void DrawSingleBrick(Point3 ptMin , Point3 ptMax)
     {
 
-        float fDim[3] = {(float)m_pImgData->m_uiDim[0] , (float)m_pImgData->m_uiDim[1] , (float)m_pImgData->m_uiDim[2]};
+        float fDim[3] = {(float)m_pImgData->_dim[0] , (float)m_pImgData->_dim[1] , (float)m_pImgData->_dim[2]};
 
         glBegin(GL_QUADS);
 
@@ -310,7 +310,7 @@ namespace
             Point3 ptMax = ptMin + Vector3(uiBrickSize , uiBrickSize ,uiBrickSize);
             DrawSingleBrick(ptMin, ptMax);*/
 
-            //DrawSingleBrick(Point3(0,0,0), Point3(m_pImgData->m_uiDim[0] , m_pImgData->m_uiDim[1], m_pImgData->m_uiDim[2]));
+            //DrawSingleBrick(Point3(0,0,0), Point3(m_pImgData->_dim[0] , m_pImgData->_dim[1], m_pImgData->_dim[2]));
         }
     }
 

@@ -45,8 +45,8 @@ void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
 {
     if (!m_VOISphereList.empty())
     {
-        (--m_VOISphereList.end())->m_dDiameter = voi.m_dDiameter;
-        (--m_VOISphereList.end())->m_ptCenter = voi.m_ptCenter;
+        (--m_VOISphereList.end())->diameter = voi.diameter;
+        (--m_VOISphereList.end())->center = voi.center;
     }
     set_changed();
 }
@@ -58,7 +58,7 @@ void VOIModel::modify_voi_sphere_name(int id , std::string sName)
     {
         if (i++== id)
         {
-            it->m_sName = sName;
+            it->name = sName;
             return;
         }
     }
@@ -73,7 +73,7 @@ void VOIModel::modify_voi_sphere_diameter(int id , double dDiameter)
     {
         if (i++ == id)
         {
-            it->m_dDiameter= dDiameter;
+            it->diameter= dDiameter;
             set_changed();
             return;
         }

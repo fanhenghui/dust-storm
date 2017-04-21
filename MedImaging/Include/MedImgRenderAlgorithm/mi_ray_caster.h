@@ -49,8 +49,8 @@ public:
     //////////////////////////////////////////////////////////////////////////
 
     //Volume & mask texture/array
-    void set_volume_data(std::shared_ptr<ImageData> pImgData);
-    void set_mask_data(std::shared_ptr<ImageData> pImgData);
+    void set_volume_data(std::shared_ptr<ImageData> image_data);
+    void set_mask_data(std::shared_ptr<ImageData> image_data);
     void set_volume_data_texture(std::vector<GLTexture3DPtr> vecTex);
     void set_mask_data_texture(std::vector<GLTexture3DPtr> vecTex);
 

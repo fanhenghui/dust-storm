@@ -72,13 +72,13 @@ void MedicalImageDataModule::SlotActionOpenDICOMFolder()
         }
 
         std::shared_ptr<ImageDataHeader> pDataHeader;
-        std::shared_ptr<ImageData> pImgData;
+        std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecSTDFiles, pImgData , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, image_data , pDataHeader);
 
         m_pVolumeInfos.reset(new VolumeInfos());
         m_pVolumeInfos->set_data_header(pDataHeader);
-        m_pVolumeInfos->set_volume(pImgData);
+        m_pVolumeInfos->set_volume(image_data);
 
         std::shared_ptr<medical_imaging::MPRScene> pScene(new medical_imaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));
 
@@ -145,9 +145,9 @@ void MedicalImageDataModule::SlotActionOpenMetaFolder()
         {
             std::string s((*it).toLocal8Bit());
             std::cout << s << std::endl;
-            std::shared_ptr<MetaObjectTag> pMetaObjTag;
-            loader.load(s , pImg ,pMetaObjTag , pImgHeader );
-            vecMetaObjTag.push_back(pMetaObjTag);
+            std::shared_ptr<MetaObjectTag> meta_obj_tag;
+            loader.load(s , pImg ,meta_obj_tag , pImgHeader );
+            vecMetaObjTag.push_back(meta_obj_tag);
         }
     }
 
@@ -173,8 +173,8 @@ void MedicalImageDataModule::SlotActionOpenMetaFolder()
 
     for (size_t i = 0 ; i<vecMetaObjTag.size() ;++i)
     {
-        double dSpacingXY = vecMetaObjTag[i]->m_dSpacing[0];
-        double dSpacingZ = vecMetaObjTag[i]->m_dSpacing[2];
+        double dSpacingXY = vecMetaObjTag[i]->_spacing[0];
+        double dSpacingZ = vecMetaObjTag[i]->_spacing[2];
         double dFovXY = dSpacingXY*vecMetaObjTag[i]->m_uiDimSize[0];
         double dFovZ= dSpacingZ*vecMetaObjTag[i]->m_uiDimSize[2];
 

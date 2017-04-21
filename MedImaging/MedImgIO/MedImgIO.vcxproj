@@ -173,7 +173,6 @@
     <ClInclude Include="..\Include\MedImgIO\mi_image_data_header.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_image_data.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_io_stdafx.h" />
-    <ClInclude Include="..\Include\MedImgIO\mi_io_utils.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_csv_parser.h" />
@@ -185,7 +184,6 @@
     <ClCompile Include="mi_dicom_rt_struct_loader.cpp" />
     <ClCompile Include="mi_image_data.cpp" />
     <ClCompile Include="mi_io_stdafx.cpp" />
-    <ClCompile Include="mi_io_utils.cpp" />
     <ClCompile Include="mi_meta_object_loader.cpp" />
     <ClCompile Include="mi_nodule_set.cpp" />
     <ClCompile Include="mi_nodule_set_csv_parser.cpp" />

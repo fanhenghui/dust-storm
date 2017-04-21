@@ -14,16 +14,16 @@ public:
 
     ~BrickGenerator();
 
-    void calculate_brick_corner(std::shared_ptr<ImageData> pImgData , unsigned int uiBrickSize , unsigned int uiBrickExpand , BrickCorner* pBrickCorner);
+    void calculate_brick_corner(std::shared_ptr<ImageData> image_data , unsigned int uiBrickSize , unsigned int uiBrickExpand , BrickCorner* pBrickCorner);
 
-    void calculate_brick_unit( std::shared_ptr<ImageData> pImgData , BrickCorner* pBrickCorner , unsigned int uiBrickSize , unsigned int uiBrickExpand , BrickUnit* pBrickUnit);
+    void calculate_brick_unit( std::shared_ptr<ImageData> image_data , BrickCorner* pBrickCorner , unsigned int uiBrickSize , unsigned int uiBrickExpand , BrickUnit* pBrickUnit);
 
 private:
     template<typename T>
-    void calculate_brick_unit_i(BrickCorner& bc , BrickUnit& bu , std::shared_ptr<ImageData> pImgData , unsigned int uiBrickSize , unsigned int uiBrickExpand);
+    void calculate_brick_unit_i(BrickCorner& bc , BrickUnit& bu , std::shared_ptr<ImageData> image_data , unsigned int uiBrickSize , unsigned int uiBrickExpand);
 
     template<typename T>
-    void calculate_brick_unit_kernel_i(unsigned int uiBegin , unsigned int uiEnd , BrickCorner* pBrickCorner , BrickUnit* pBrickUnit , std::shared_ptr<ImageData> pImgData , unsigned int uiBrickSize , unsigned int uiBrickExpand);
+    void calculate_brick_unit_kernel_i(unsigned int uiBegin , unsigned int uiEnd , BrickCorner* pBrickCorner , BrickUnit* pBrickUnit , std::shared_ptr<ImageData> image_data , unsigned int uiBrickSize , unsigned int uiBrickExpand);
 };
 
 MED_IMAGING_END_NAMESPACE

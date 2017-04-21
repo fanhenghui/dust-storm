@@ -70,8 +70,8 @@ void RCStepMainFrag::set_gpu_parameter()
     glDisable(GL_TEXTURE_3D);
 
     //3 Volume dimension
-    glUniform3f(m_iLocVolumeDim , (float)pVolumeData->m_uiDim[0] , 
-        (float)pVolumeData->m_uiDim[1] , (float)pVolumeData->m_uiDim[2]);
+    glUniform3f(m_iLocVolumeDim , (float)pVolumeData->_dim[0] , 
+        (float)pVolumeData->_dim[1] , (float)pVolumeData->_dim[2]);
 
     //4 Sample rate
     glUniform1f(m_iLocSampleRate , pRayCaster->get_sample_rate());

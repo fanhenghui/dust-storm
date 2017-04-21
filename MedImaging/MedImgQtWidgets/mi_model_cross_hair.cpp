@@ -258,7 +258,7 @@ bool CrosshairModel::set_center_i(const Point3& ptCenterW)
     QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
     std::shared_ptr<ImageData> pVolume = pVolumeInfos->get_volume();
     QTWIDGETS_CHECK_NULL_EXCEPTION(pVolume);
-    unsigned int *uiDim = pVolume->m_uiDim;
+    unsigned int *uiDim = pVolume->_dim;
 
     Point3 ptV = m_pCameraCal->get_world_to_volume_matrix().transform(ptCenterW);
     if (!ArithmeticUtils::check_in_bound(ptV , Point3(uiDim[0] , uiDim[1] , uiDim[2])))

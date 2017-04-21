@@ -14,7 +14,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 const std::string ksNoduleTypeGGN = std::string("GGN");
 const std::string ksNoduleTypeAAH = std::string("AAH");
 
-MouseOpAnnotate::MouseOpAnnotate():m_bPin(false),m_dDiameter(0.0)
+MouseOpAnnotate::MouseOpAnnotate():m_bPin(false),diameter(0.0)
 {
 
 }
@@ -33,7 +33,7 @@ void MouseOpAnnotate::press(const QPoint& pt)
 
     m_ptPre = pt;
     m_bPin = false;
-    m_dDiameter = 0.0;
+    diameter = 0.0;
 
     //New voi
     std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
@@ -45,8 +45,8 @@ void MouseOpAnnotate::press(const QPoint& pt)
             //Get VOI center
             m_bPin = true;
             m_ptCenter = ptCenter;
-            m_dDiameter = 0.0;
-            m_pVOIModel->add_voi_sphere(medical_imaging::VOISphere(m_ptCenter , m_dDiameter , ksNoduleTypeGGN));
+            diameter = 0.0;
+            m_pVOIModel->add_voi_sphere(medical_imaging::VOISphere(m_ptCenter , diameter , ksNoduleTypeGGN));
             m_pVOIModel->notify();
         }
     }
@@ -67,9 +67,9 @@ void MouseOpAnnotate::move(const QPoint& pt)
         {
             //Get VOI center
             Vector3 v = ptFace - m_ptCenter;
-            m_dDiameter = v.magnitude()*2.0;
+            diameter = v.magnitude()*2.0;
 
-            m_pVOIModel->modify_voi_sphere_list_rear(medical_imaging::VOISphere(m_ptCenter , m_dDiameter));
+            m_pVOIModel->modify_voi_sphere_list_rear(medical_imaging::VOISphere(m_ptCenter , diameter));
             m_pVOIModel->notify();
         }
     }

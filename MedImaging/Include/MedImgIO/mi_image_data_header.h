@@ -79,102 +79,102 @@ public:
     //数据源
     //0 DICOM
     //1 Meta image
-    unsigned int m_uiDataSrouceUID;
+    unsigned int data_source_uid;
 
     //(0002,0010) UI Transfer Syntax UID
-    std::string m_sTransferSyntaxUID;
+    std::string transfer_syntax_uid;
 
     //(0008,0023) TM Content Time(formerly known as image date)
     //序列生成时间（年月日如：20120818）
-    std::string m_sImageDate;
+    std::string image_date;
 
     //(0008,0060) CS Modality(CT MRI PET)
-    Modality m_eModality;
+    Modality modality;
 
     //(0008,0070) LO Manufacturer 厂商（如Philps）
-    std::string m_sManufacturer;
+    std::string manufacturer;
 
     //(0008,1090) LO Manufacturer's Model Name 厂商的型号名称（如 Brilliance 64）
-    std::string m_sManufacturerModelName;
+    std::string manufacturer_model_name;
 
     //(0018,0060) DS KVP
     //KV 千伏 指电压 p 峰值(如120)
-    float m_kVp; 
+    float kvp; 
 
     //(0010,0010) PN Patient's Name 病人名字（如ZhangSan）
-    std::string m_sPatientName;
+    std::string patient_name;
 
     //(0010,0020) LO Patient's ID 病人ID（如AB_CTA_01）
-    std::string m_sPatientID;
+    std::string patient_id;
 
     //(0010,0040) CS Patient's Sex 病人性别（如M）
-    std::string m_sPatientSex;
+    std::string patient_sex;
 
     //(0010,1010) AS Age of Patient 病人年龄（格式：nnnD nnnW nnnM nnnY 表示 天周月岁 ， 如018M表示18个月）
-    std::string m_sPatientAge;
+    std::string patient_age;
 
     //(0018,5100) CS Patient Position 病人体位（如HFS）
-    PatientPosition m_ePatientPosition;
+    PatientPosition patient_position;
 
     //(0018,0050) DS Slice thickness  层间距
-    double m_dSliceThickness;
+    double slice_thickness;
 
     //(0028,0010) US Rows 扫描行数 对应dim[1]
-    unsigned int m_uiImgRows;
+    unsigned int rows;
 
     //(0028,0011) USColumns 扫描列数 对应dim[0]
-    unsigned int m_uiImgColumns;
+    unsigned int columns;
 
     //(0028,0030) DS Pixel Spacing 一张图像的spacing（每个slice应该一样）
-    double m_dPixelSpacing[2];//Rows and Columns spacing
+    double pixel_spacing[2];//Rows and Columns spacing
 
     //(0020,000D) UI Study instance UID
-    std::string m_sStudyUID;
+    std::string study_uid;
 
     //(0020,000E) UI Series instance UID
-    std::string m_sSeriesUID;
+    std::string series_uid;
 
     //(0020,0032) DS Image Position(Patient) 图像位置，图像左上角的第一个像素的空间坐标(每个slice都不同)
-    std::vector<Point3> m_ImgPositions;
+    std::vector<Point3> image_position;
 
     //(0020,1041) DS Slice Location 图像切面位置(每个slice都不同)
-    std::vector<double>  m_SliceLocations;
+    std::vector<double>  slice_location;
 
     //(0028,0002) US Samples per Pixel
-    unsigned int m_uiSamplePerPixel;
+    unsigned int sample_per_pixel;
 
     //(0028,0004) CS Photometric Interpretation  数据类型解释（单值 三通道值还是带有颜色表）
-    PhotometricInterpretation m_ePhotometricInterpretation;
+    PhotometricInterpretation photometric_interpretation;
 
     //(0028,0100) US Bits Allocated 数据的存储位数
-    unsigned int m_uiBitsAllocated;
+    unsigned int bits_allocated;
 
     //(0028,0103) US Pixel Representation 数据符号位
     // 0 unsigned
     // 1 2s complement (signed)
-    unsigned int m_uiPixelRepresentation;
+    unsigned int pixel_representation;
 
     ImageDataHeader()
     {
-        m_uiDataSrouceUID = 0;
+        data_source_uid = 0;
         const std::string sUD = std::string("Undefined");
-        m_sImageDate = sUD;
-        m_eModality = MODALITY_UNDEFINED;
-        m_sManufacturer = sUD;
-        m_sManufacturerModelName = sUD;
-        m_kVp = 0.0f;
-        m_sPatientName = sUD;
-        m_sPatientID = sUD;
-        m_sPatientSex = std::string("M");
-        m_sPatientAge = std::string("000D");
-        m_ePatientPosition = HFP;
-        m_dSliceThickness = 1.0;
-        m_sStudyUID = sUD;
-        m_sSeriesUID = sUD;
-        m_uiSamplePerPixel = 0;
-        m_ePhotometricInterpretation = PI_MONOCHROME2;
-        m_uiBitsAllocated = 0;
-        m_uiPixelRepresentation = 0;
+        image_date = sUD;
+        modality = MODALITY_UNDEFINED;
+        manufacturer = sUD;
+        manufacturer_model_name = sUD;
+        kvp = 0.0f;
+        patient_name = sUD;
+        patient_id = sUD;
+        patient_sex = std::string("M");
+        patient_age = std::string("000D");
+        patient_position = HFP;
+        slice_thickness = 1.0;
+        study_uid = sUD;
+        series_uid = sUD;
+        sample_per_pixel = 0;
+        photometric_interpretation = PI_MONOCHROME2;
+        bits_allocated = 0;
+        pixel_representation = 0;
     }
 
 };

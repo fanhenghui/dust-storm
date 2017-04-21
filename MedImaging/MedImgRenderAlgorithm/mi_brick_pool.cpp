@@ -34,7 +34,7 @@ void BrickPool::set_brick_size( unsigned int uiBrickSize )
 {
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolume);
     m_uiBrickSize= uiBrickSize;
-    BrickUtils::instance()->get_brick_dim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
+    BrickUtils::instance()->get_brick_dim(m_pVolume->_dim , m_uiBrickDim , m_uiBrickSize);
 }
 
 void BrickPool::set_brick_expand( unsigned int uiBrickExpand )
@@ -42,14 +42,14 @@ void BrickPool::set_brick_expand( unsigned int uiBrickExpand )
     m_uiBrickExpand = uiBrickExpand;
 }
 
-void BrickPool::set_volume( std::shared_ptr<ImageData> pImgData )
+void BrickPool::set_volume( std::shared_ptr<ImageData> image_data )
 {
-    m_pVolume = pImgData;
+    m_pVolume = image_data;
 }
 
-void BrickPool::set_mask( std::shared_ptr<ImageData> pImgData )
+void BrickPool::set_mask( std::shared_ptr<ImageData> image_data )
 {
-    m_pMask = pImgData;
+    m_pMask = image_data;
 }
 
 
@@ -92,7 +92,7 @@ void BrickPool::calculate_volume_brick()
     try
     {
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolume);
-        BrickUtils::instance()->get_brick_dim(m_pVolume->m_uiDim , m_uiBrickDim , m_uiBrickSize);
+        BrickUtils::instance()->get_brick_dim(m_pVolume->_dim , m_uiBrickDim , m_uiBrickSize);
         const unsigned int uiBrickCount = m_uiBrickDim[0]*m_uiBrickDim[1]*m_uiBrickDim[2];
         m_pBrickCorner.reset(new BrickCorner[uiBrickCount]);
         m_pVolumeBrickUnit.reset(new BrickUnit[uiBrickCount]);
@@ -100,7 +100,7 @@ void BrickPool::calculate_volume_brick()
 
         std::cout << "\n<><><><><><><><><><><><><>\n";
         std::cout << "Brick pool info : \n";
-        std::cout << "Volume dimension : " << m_pVolume->m_uiDim[0] << " " << m_pVolume->m_uiDim[1] << " "<<m_pVolume->m_uiDim[2] << std::endl;
+        std::cout << "Volume dimension : " << m_pVolume->_dim[0] << " " << m_pVolume->_dim[1] << " "<<m_pVolume->_dim[2] << std::endl;
         std::cout << "Brick size : " << m_uiBrickSize << std::endl;
         std::cout << "Brick expand : " << m_uiBrickExpand << std::endl;
         std::cout << "Brick dimension : " << m_uiBrickDim[0] << " " << m_uiBrickDim[1] << " "<<m_uiBrickDim[2] << std::endl;

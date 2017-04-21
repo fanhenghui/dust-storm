@@ -34,13 +34,13 @@ void VolumeInfos::finialize()
     release_volume_resource_i();
 }
 
-void VolumeInfos::set_volume(std::shared_ptr<ImageData> pImgData)
+void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
 {
     try
     {
-        RENDERALGO_CHECK_NULL_EXCEPTION(pImgData);
+        RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
 
-        m_pVolume = pImgData;
+        m_pVolume = image_data;
 
         //////////////////////////////////////////////////////////////////////////
         //Create camera calculator
@@ -75,14 +75,14 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> pImgData)
     }
 }
 
-void VolumeInfos::set_mask(std::shared_ptr<ImageData> pImgData)
+void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
 {
     try
     {
-        RENDERALGO_CHECK_NULL_EXCEPTION(pImgData);
+        RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pBrickPool);
 
-        m_pMask = pImgData;
+        m_pMask = image_data;
         m_pBrickPool->set_mask(m_pMask);
         m_pBrickPool->calculate_mask_brick();
     }
@@ -206,7 +206,7 @@ void VolumeInfos::load_volume_resource_i()
         GLTexture3DPtr pTex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
         if (m_pDataHeader)
         {
-            pTex->set_description("Volume : " + m_pDataHeader->m_sSeriesUID);
+            pTex->set_description("Volume : " + m_pDataHeader->series_uid);
         }
         else
         {
@@ -218,8 +218,8 @@ void VolumeInfos::load_volume_resource_i()
         GLTextureUtils::set_1d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
         GLenum internal_format , format , eType;
-        GLUtils::get_gray_texture_format(m_pVolume->m_eDataType , internal_format , format ,eType);
-        pTex->load(internal_format ,m_pVolume->m_uiDim[0] , m_pVolume->m_uiDim[1] , m_pVolume->m_uiDim[2] , format, eType , m_pVolume->get_pixel_pointer());
+        GLUtils::get_gray_texture_format(m_pVolume->_data_type , internal_format , format ,eType);
+        pTex->load(internal_format ,m_pVolume->_dim[0] , m_pVolume->_dim[1] , m_pVolume->_dim[2] , format, eType , m_pVolume->get_pixel_pointer());
         pTex->unbind();
 
         m_vecVolumeTex.push_back(pTex);
