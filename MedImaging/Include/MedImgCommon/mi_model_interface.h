@@ -15,16 +15,19 @@ class Common_Export IModel
 public:
     IModel();
     virtual ~IModel();
-    void add_observer(ObserverPtr pObserver);
-    void delete_observer(ObserverPtr pObserver);
+
+    void add_observer(ObserverPtr observer);
+    void delete_observer(ObserverPtr observer);
+
     void notify();
+
     void set_changed();
     void reset_changed();
     bool has_changed();
 
 private:
-    bool m_bIsChanged;
-    std::vector<ObserverPtr> m_Observers;
+    bool _is_changed;
+    std::vector<ObserverPtr> _observers;
 };
 
 MED_IMAGING_END_NAMESPACE

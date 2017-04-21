@@ -21,10 +21,10 @@ public:
         return v;
     }
 
-    std::string to_string_decimal( T i, int iPrecision)
+    std::string to_string_decimal( T i, int precision)
     {
         std::stringstream ss;
-        ss << std::setprecision(iPrecision) <<  std::fixed << i;
+        ss << std::setprecision(precision) <<  std::fixed << i;
         return ss.str();
     }
 

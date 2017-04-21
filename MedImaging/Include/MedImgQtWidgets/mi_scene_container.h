@@ -76,7 +76,7 @@ protected:
     std::map<int , IMouseOpPtrCollection> m_mapMouseOps;
     Qt::MouseButtons m_eButtons;
     std::unique_ptr<QPixmap> m_pPixelMap;
-    boost::mutex m_mutex;
+    boost::mutex _mutex;
 };
 
 #endif

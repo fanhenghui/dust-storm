@@ -61,8 +61,8 @@ public:
 private:
     GLResourceManagerContainer();
 private:
-    static GLResourceManagerContainer* m_instance;
-    static boost::mutex m_mutex;
+    static GLResourceManagerContainer* _s_instance;
+    static boost::mutex _mutex;
 private:
     GLProgramManagerPtr m_pProgramMag;
     GLBufferManagerPtr m_pBufferMag;

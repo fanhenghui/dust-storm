@@ -3,26 +3,26 @@
 
 //MED_IMAGING_BEGIN_NAMESPACE
 
-boost::mutex SharedWidget::m_mutex;
+boost::mutex SharedWidget::_mutex;
 
-SharedWidget* SharedWidget::m_instance = nullptr;
+SharedWidget* SharedWidget::_s_instance = nullptr;
 
 SharedWidget* SharedWidget::instance()
 {
-    if (!m_instance)
+    if (!_s_instance)
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
-        if (!m_instance)
+        boost::unique_lock<boost::mutex> locker(_mutex);
+        if (!_s_instance)
         {
-            m_instance= new SharedWidget();
-            //m_instance->setWindowFlags(m_instance->windowFlags() | Qt::FramelessWindowHint);
-            m_instance->resize(600,370);
-            m_instance->setFixedSize(600,370);
-            m_instance->show();
-            m_instance->hide();
+            _s_instance= new SharedWidget();
+            //_s_instance->setWindowFlags(_s_instance->windowFlags() | Qt::FramelessWindowHint);
+            _s_instance->resize(600,370);
+            _s_instance->setFixedSize(600,370);
+            _s_instance->show();
+            _s_instance->hide();
         }
     }
-    return m_instance;
+    return _s_instance;
 }
 
 SharedWidget::~SharedWidget()

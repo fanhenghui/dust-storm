@@ -14,16 +14,16 @@ public:
     static Configuration* instance();
     ~Configuration();
     ProcessingUnitType get_processing_unit_type();
-    void set_processing_unit_type(ProcessingUnitType eType);//For testing
+    void set_processing_unit_type(ProcessingUnitType type);//For testing
 protected:
 private:
     Configuration();
 
-    static Configuration* m_instance;
-    static boost::mutex m_mutex;
+    static Configuration* _s_instance;
+    static boost::mutex _s_mutex;
 
 private:
-    ProcessingUnitType m_ePUT;
+    ProcessingUnitType _processing_unit_type;
 };
 
 MED_IMAGING_END_NAMESPACE

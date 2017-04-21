@@ -46,7 +46,7 @@ void SceneContainer::initializeGL()
 
 void SceneContainer::paintEvent(QPaintEvent* pPainter)
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     if (!m_pScene)
     {
         makeCurrent();
@@ -177,7 +177,7 @@ void SceneContainer::keyReleaseEvent(QKeyEvent *key)
 
 void SceneContainer::resizeGL(int w, int h)
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     if (m_pScene)
     {
         m_pScene->set_display_size(w,h);

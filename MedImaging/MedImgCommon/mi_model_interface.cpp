@@ -3,7 +3,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-IModel::IModel():m_bIsChanged(false)
+IModel::IModel():_is_changed(false)
 {
 
 }
@@ -13,33 +13,33 @@ IModel::~IModel()
 
 }
 
-void IModel::add_observer( ObserverPtr pObserver )
+void IModel::add_observer( ObserverPtr observer )
 {
-    bool bIsRegistered = false;
-    auto it = m_Observers.begin();
-    while(it != m_Observers.end())
+    bool has_registered = false;
+    auto it = _observers.begin();
+    while(it != _observers.end())
     {
-        if (*it == pObserver)
+        if (*it == observer)
         {
-            bIsRegistered = true;
+            has_registered = true;
             break;
         }
         ++it;
     }
-    if (!bIsRegistered)
+    if (!has_registered)
     {
-        m_Observers.push_back(pObserver);
+        _observers.push_back(observer);
     }
 }
 
-void IModel::delete_observer( ObserverPtr pObserver )
+void IModel::delete_observer( ObserverPtr observer )
 {
-    auto it = m_Observers.begin();
-    while(it != m_Observers.end())
+    auto it = _observers.begin();
+    while(it != _observers.end())
     {
-        if (*it == pObserver)
+        if (*it == observer)
         {
-            m_Observers.erase(it);
+            _observers.erase(it);
             break;
         }
         ++it;
@@ -48,31 +48,31 @@ void IModel::delete_observer( ObserverPtr pObserver )
 
 void IModel::notify()
 {
-    if (m_bIsChanged)
+    if (_is_changed)
     {
 
-        for (auto it = m_Observers.begin() ; it != m_Observers.end() ; ++it)
+        for (auto it = _observers.begin() ; it != _observers.end() ; ++it)
         {
             (*it)->update();
         }
 
-        m_bIsChanged = false;
+        _is_changed = false;
     }
 }
 
 void IModel::set_changed()
 {
-    m_bIsChanged = true;
+    _is_changed = true;
 }
 
 void IModel::reset_changed()
 {
-    m_bIsChanged = false;
+    _is_changed = false;
 }
 
 bool IModel::has_changed()
 {
-    return m_bIsChanged;
+    return _is_changed;
 }
 
 MED_IMAGING_END_NAMESPACE

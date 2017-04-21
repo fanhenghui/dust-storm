@@ -2,21 +2,21 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-boost::mutex Configuration::m_mutex;
+boost::mutex Configuration::_s_mutex;
 
-Configuration* Configuration::m_instance = nullptr;
+Configuration* Configuration::_s_instance = nullptr;
 
 Configuration* Configuration::instance()
 {
-    if (!m_instance)
+    if (!_s_instance)
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
-        if (!m_instance)
+        boost::unique_lock<boost::mutex> locker(_s_mutex);
+        if (!_s_instance)
         {
-            m_instance= new Configuration();
+            _s_instance= new Configuration();
         }
     }
-    return m_instance;
+    return _s_instance;
 }
 
 Configuration::~Configuration()
@@ -26,17 +26,17 @@ Configuration::~Configuration()
 
 ProcessingUnitType Configuration::get_processing_unit_type()
 {
-    return m_ePUT;
+    return _processing_unit_type;
 }
 
-Configuration::Configuration():m_ePUT(CPU)
+Configuration::Configuration():_processing_unit_type(CPU)
 {
     //Check hardware processing unit . Check if has GPU
 }
 
-void Configuration::set_processing_unit_type(ProcessingUnitType eType)
+void Configuration::set_processing_unit_type(ProcessingUnitType type)
 {
-    m_ePUT = eType;
+    _processing_unit_type = type;
 }
 
 MED_IMAGING_END_NAMESPACE

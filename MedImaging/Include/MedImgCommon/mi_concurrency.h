@@ -11,19 +11,19 @@ class Common_Export Concurrency
 public:
     static Concurrency* instance();
     ~Concurrency();
-    void set_app_concurrency(unsigned int uiValue);
+    void set_app_concurrency(unsigned int value);
     unsigned int get_app_concurrency();
     unsigned int get_hardware_concurrency();
 private:
     Concurrency();
 private:
-    static boost::mutex m_mutexStatic;
-    static Concurrency* m_instance;
+    static boost::mutex _s_mutex;
+    static Concurrency* _s_instance;
 
 private:
-    boost::mutex m_mutex;
-    unsigned int m_uiAppConcurrency;
-    unsigned int m_uiHardwareConcurrency;
+    boost::mutex _mutex;
+    unsigned int _app_concurrency;
+    unsigned int _hardware_concurrency;
 };
 
 MED_IMAGING_END_NAMESPACE

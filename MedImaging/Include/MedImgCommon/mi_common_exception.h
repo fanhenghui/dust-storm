@@ -12,7 +12,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Common_Export Exception : public std::exception
 {
 public:
-    Exception(const std::string &sModule, const std::string& sFile, long iLine, const std::string& sFunction, const std::string& sDes);
+    Exception(const std::string &module, const std::string& file, long line, const std::string& func, const std::string& des);
 
     Exception(const Exception& e);
 
@@ -34,12 +34,12 @@ public:
 
 protected:
 private:
-    std::string m_sModule;
-    long m_iLine;
-    std::string m_sFunction;
-    std::string m_sFile;
-    std::string m_sDescription;
-    mutable std::string m_sFullDescription;
+    std::string _module;
+    long _line;
+    std::string _function;
+    std::string _file;
+    std::string _description;
+    mutable std::string _full_description;
 };
 
 

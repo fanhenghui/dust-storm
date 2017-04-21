@@ -3,21 +3,21 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-Concurrency* Concurrency::m_instance = nullptr;
+Concurrency* Concurrency::_s_instance = nullptr;
 
-boost::mutex Concurrency::m_mutexStatic;
+boost::mutex Concurrency::_s_mutex;
 
 Concurrency* Concurrency::instance()
 {
-    if (!m_instance)
+    if (!_s_instance)
     {
-        boost::unique_lock<boost::mutex> locker(m_mutexStatic);
-        if (!m_instance)
+        boost::unique_lock<boost::mutex> locker(_s_mutex);
+        if (!_s_instance)
         {
-            m_instance = new Concurrency();
+            _s_instance = new Concurrency();
         }
     }
-    return m_instance;
+    return _s_instance;
 }
 
 Concurrency::~Concurrency()
@@ -27,23 +27,23 @@ Concurrency::~Concurrency()
 
 Concurrency::Concurrency()
 {
-    m_uiHardwareConcurrency = boost::thread::hardware_concurrency();
-    m_uiAppConcurrency = m_uiHardwareConcurrency;
+    _hardware_concurrency = boost::thread::hardware_concurrency();
+    _app_concurrency = _hardware_concurrency;
 }
 
-void Concurrency::set_app_concurrency(unsigned int uiValue)
+void Concurrency::set_app_concurrency(unsigned int value)
 {
-    m_uiAppConcurrency = uiValue > m_uiHardwareConcurrency ? m_uiHardwareConcurrency : uiValue;
+    _app_concurrency = value > _hardware_concurrency ? _hardware_concurrency : value;
 }
 
 unsigned int Concurrency::get_app_concurrency()
 {
-    return m_uiAppConcurrency;
+    return _app_concurrency;
 }
 
 unsigned int Concurrency::get_hardware_concurrency()
 {
-    return m_uiHardwareConcurrency;
+    return _hardware_concurrency;
 }
 
 MED_IMAGING_END_NAMESPACE

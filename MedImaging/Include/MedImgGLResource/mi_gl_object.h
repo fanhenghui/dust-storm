@@ -23,19 +23,19 @@ public:
 
     void reset()
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
+        boost::unique_lock<boost::mutex> locker(_mutex);
         m_base = 0;
     }
 
     UIDType tick()
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
+        boost::unique_lock<boost::mutex> locker(_mutex);
         return m_base++;
     }
 
 private:
     UIDType m_base;
-    boost::mutex m_mutex;
+    boost::mutex _mutex;
 };
 
 class GLResource_Export GLObject
@@ -66,12 +66,12 @@ public:
 
     std::string get_description() const
     {
-        return m_sDescription;
+        return _description;
     }
 
     void set_description(const std::string& sDes)
     {
-        m_sDescription = sDes;
+        _description = sDes;
     }
 
     virtual void initialize() = 0;
@@ -80,7 +80,7 @@ public:
 private:
     UIDType m_uid;
     std::string m_sType;
-    std::string m_sDescription;
+    std::string _description;
 };
 
 MED_IMAGING_END_NAMESPACE

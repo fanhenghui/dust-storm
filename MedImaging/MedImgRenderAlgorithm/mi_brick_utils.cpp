@@ -5,9 +5,9 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-boost::mutex BrickUtils::m_mutex;
+boost::mutex BrickUtils::_mutex;
 
-BrickUtils* BrickUtils::m_instance = nullptr;
+BrickUtils* BrickUtils::_s_instance = nullptr;
 
 BrickUtils::~BrickUtils()
 {
@@ -21,15 +21,15 @@ BrickUtils::BrickUtils():m_uiBrickSize(32),m_uiBrickExpand(2)
 
 BrickUtils* BrickUtils::instance()
 {
-    if (nullptr == m_instance)
+    if (nullptr == _s_instance)
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
-        if (nullptr == m_instance)
+        boost::unique_lock<boost::mutex> locker(_mutex);
+        if (nullptr == _s_instance)
         {
-            m_instance = new BrickUtils();
+            _s_instance = new BrickUtils();
         }
     }
-    return m_instance;
+    return _s_instance;
 }
 
 void BrickUtils::set_brick_size( unsigned int uiSize )

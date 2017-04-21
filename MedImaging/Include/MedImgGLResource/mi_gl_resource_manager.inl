@@ -8,7 +8,7 @@ GLResourceManager<ResourceType>::GLResourceManager():m_pUIDGen(new GLUIDGenerato
 template<class ResourceType>
 void GLResourceManager<ResourceType>::update()
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     for (auto it = m_Discard.begin() ; it != m_Discard.end() ; )
     {
         if ((*it).use_count() > 1)
@@ -27,7 +27,7 @@ void GLResourceManager<ResourceType>::update()
 template<class ResourceType>
 void GLResourceManager<ResourceType>::remove_all()
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     for (auto it = m_Objects.begin() ; it != m_Objects.end() ; ++it)
     {
         m_Discard.push_back(it->second);
@@ -38,7 +38,7 @@ void GLResourceManager<ResourceType>::remove_all()
 template<class ResourceType>
 void GLResourceManager<ResourceType>::remove_object(UIDType uid)
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     auto it = m_Objects.find(uid);
     if (it != m_Objects.end())
     {
@@ -50,7 +50,7 @@ void GLResourceManager<ResourceType>::remove_object(UIDType uid)
 template<class ResourceType>
 std::shared_ptr<ResourceType> GLResourceManager<ResourceType>::get_object(UIDType uid)
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     auto it = m_Objects.find(uid);
     if (it == m_Objects.end())
     {
@@ -65,7 +65,7 @@ std::shared_ptr<ResourceType> GLResourceManager<ResourceType>::get_object(UIDTyp
 template<class ResourceType>
 std::shared_ptr<ResourceType> GLResourceManager<ResourceType>::create_object(UIDType &uid)
 {
-    boost::unique_lock<boost::mutex> locker(m_mutex);
+    boost::unique_lock<boost::mutex> locker(_mutex);
     uid = m_pUIDGen->tick();
     if (m_Objects.find(uid) != m_Objects.end())
     {

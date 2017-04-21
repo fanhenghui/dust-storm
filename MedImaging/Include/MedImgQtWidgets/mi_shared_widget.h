@@ -19,8 +19,8 @@ protected:
     virtual void initializeGL();
 private:
     SharedWidget(QWidget* parent = 0  , QGLWidget* shared = 0);
-    static SharedWidget* m_instance;
-    static boost::mutex m_mutex;
+    static SharedWidget* _s_instance;
+    static boost::mutex _mutex;
 
 };
 //MED_IMAGING_END_NAMESPACE

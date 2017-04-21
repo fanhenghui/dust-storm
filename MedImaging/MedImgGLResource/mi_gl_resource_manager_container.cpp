@@ -4,21 +4,21 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-    boost::mutex GLResourceManagerContainer::m_mutex;
+    boost::mutex GLResourceManagerContainer::_mutex;
 
-GLResourceManagerContainer* GLResourceManagerContainer::m_instance = nullptr;
+GLResourceManagerContainer* GLResourceManagerContainer::_s_instance = nullptr;
 
 GLResourceManagerContainer* GLResourceManagerContainer::instance()
 {
-    if (nullptr == m_instance)
+    if (nullptr == _s_instance)
     {
-        boost::unique_lock<boost::mutex> locker(m_mutex);
-        if (nullptr == m_instance)
+        boost::unique_lock<boost::mutex> locker(_mutex);
+        if (nullptr == _s_instance)
         {
-            m_instance = new GLResourceManagerContainer();
+            _s_instance = new GLResourceManagerContainer();
         }
     }
-    return m_instance;
+    return _s_instance;
 }
 
 GLResourceManagerContainer::~GLResourceManagerContainer()

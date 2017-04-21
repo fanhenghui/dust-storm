@@ -30,8 +30,8 @@ private:
     BrickUtils();
 
 private:
-    static BrickUtils* m_instance;
-    static boost::mutex m_mutex;
+    static BrickUtils* _s_instance;
+    static boost::mutex _mutex;
 
     unsigned int m_uiBrickSize;
     unsigned int m_uiBrickExpand;

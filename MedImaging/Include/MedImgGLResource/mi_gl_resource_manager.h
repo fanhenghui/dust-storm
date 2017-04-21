@@ -30,7 +30,7 @@ private:
     std::map<UIDType, std::shared_ptr<ResourceType>> m_Objects;
     std::vector<std::shared_ptr<ResourceType>> m_Discard;
     std::unique_ptr<GLUIDGenerator> m_pUIDGen;
-    boost::mutex m_mutex;
+    boost::mutex _mutex;
 };
 
 #include "MedImgGLResource/mi_gl_resource_manager.inl"
