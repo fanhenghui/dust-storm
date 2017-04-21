@@ -14,8 +14,8 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
     RayCastingCPU::RayCastingCPU(std::shared_ptr<RayCaster> pRayCaster):m_pRayCaster(pRayCaster),
-    m_iWidth(32),
-    m_iHeight(32),
+    _width(32),
+    _height(32),
     m_pEntryPoints(nullptr),
     m_pExitPoints(nullptr),
     m_pVolumeDataRaw(nullptr),
@@ -39,7 +39,7 @@ void RayCastingCPU::render(int iTestCode )
 
         //Volume info
         RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pEntryExitPoints);
-        pRayCaster->m_pEntryExitPoints->get_display_size(m_iWidth , m_iHeight);
+        pRayCaster->m_pEntryExitPoints->get_display_size(_width , _height);
 
         std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
@@ -152,15 +152,15 @@ template<class T>
 void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = m_iWidth*m_iHeight;
+    const int iTotalPixelNum = _width*_height;
 
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
     for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
     {
-        const int iY = idx / m_iWidth;
-        const int iX = idx - iY*m_iWidth;
+        const int iY = idx / _width;
+        const int iX = idx - iY*_width;
 
         //1 Get entry exit points
         const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
@@ -218,13 +218,13 @@ template<class T>
 void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = m_iWidth*m_iHeight;
+    const int iTotalPixelNum = _width*_height;
 
 #pragma omp parallel for
     for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
     {
-        const int iY = idx / m_iWidth;
-        const int iX = idx - iY*m_iWidth;
+        const int iY = idx / _width;
+        const int iX = idx - iY*_width;
 
         //1 Get entry exit points
         const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
@@ -278,13 +278,13 @@ template<class T>
 void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = m_iWidth*m_iHeight;
+    const int iTotalPixelNum = _width*_height;
 
 #pragma omp parallel for
     for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
     {
-        const int iY = idx / m_iWidth;
-        const int iX = idx - iY*m_iWidth;
+        const int iY = idx / _width;
+        const int iX = idx - iY*_width;
 
         //1 Get entry exit points
         const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
@@ -337,7 +337,7 @@ void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
 void RayCastingCPU::render_entry_exit_points_i( int iTestCode)
 {
     Vector3f vDimR(1.0f/m_uiDim[0] , 1.0f/m_uiDim[1] , 1.0f/m_uiDim[2]);
-    const int iTotalPixelNum = m_iWidth*m_iHeight;
+    const int iTotalPixelNum = _width*_height;
     if (1 == iTestCode)
     {
         for (int i = 0 ; i < iTotalPixelNum ; ++i)

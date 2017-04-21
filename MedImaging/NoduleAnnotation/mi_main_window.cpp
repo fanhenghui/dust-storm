@@ -767,10 +767,10 @@ void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
     QComboBox* pBox= dynamic_cast<QComboBox*>(pWidget);
     if (pBox)
     {
-        std::string sType = pBox->currentText().toStdString();
-        std::cout << id <<'\t' << sType << std::endl;
+        std::string type = pBox->currentText().toStdString();
+        std::cout << id <<'\t' << type << std::endl;
 
-        m_pVOIModel->modify_voi_sphere_name(id , sType);
+        m_pVOIModel->modify_voi_sphere_name(id , type);
     }
 }
 

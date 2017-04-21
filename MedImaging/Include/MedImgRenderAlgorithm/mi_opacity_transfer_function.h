@@ -42,7 +42,7 @@ protected:
 private:
     std::vector<OpacityTFPoint> m_vecTFPoint;
     std::vector<OpacityTFPoint> m_vecResultList;
-    int m_iWidth;
+    int _width;
     bool m_bIsDataDirty;
 };
 

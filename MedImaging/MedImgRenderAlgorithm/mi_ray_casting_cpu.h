@@ -39,8 +39,8 @@ private:
 private:
     std::weak_ptr<RayCaster> m_pRayCaster;
     //Cache
-    int m_iWidth;
-    int m_iHeight;
+    int _width;
+    int _height;
     Vector4f* m_pEntryPoints;
     Vector4f* m_pExitPoints;
     unsigned int m_uiDim[3];

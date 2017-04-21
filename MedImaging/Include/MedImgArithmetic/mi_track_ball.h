@@ -10,7 +10,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export TrackBall
 {
 public:
-    /// \ Mouse position coordinate (0 ~ m_iWidth-1 , 0 ~ m_iHeight - 1)
+    /// \ Mouse position coordinate (0 ~ _width-1 , 0 ~ _height - 1)
     static Quat4 mouse_motion_to_rotation(
         const Point2& ptMouseFrom, const Point2& ptMouseTo,
         double width, double height, const Point2& ptBottomLeftCorner = Point2::S_ZERO_POINT);

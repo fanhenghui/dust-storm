@@ -6,7 +6,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-RayCasterCanvas::RayCasterCanvas():m_bInit(false),m_iWidth(32),m_iHeight(32)
+RayCasterCanvas::RayCasterCanvas():m_bInit(false),_width(32),_height(32)
 {
 
 }
@@ -33,7 +33,7 @@ void RayCasterCanvas::initialize()
         m_pColorAttach0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        m_pColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         UIDType idTexDepth = 0;
         m_pDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexDepth);
@@ -41,7 +41,7 @@ void RayCasterCanvas::initialize()
         m_pDepthAttach->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
         //bind texture to FBO
         m_pFBO->bind();
@@ -55,7 +55,7 @@ void RayCasterCanvas::initialize()
         CHECK_GL_ERROR;
 
         //Create array
-        m_pColorArray.reset(new RGBAUnit[m_iWidth*m_iHeight]);
+        m_pColorArray.reset(new RGBAUnit[_width*_height]);
 
         m_bInit = true;
     }
@@ -77,8 +77,8 @@ void RayCasterCanvas::finialize()
 
 void RayCasterCanvas::set_display_size( int iWidth , int iHeight )
 {
-    m_iWidth = iWidth;
-    m_iHeight = iHeight;
+    _width = iWidth;
+    _height = iHeight;
 }
 
 GLFBOPtr RayCasterCanvas::get_fbo()
@@ -96,10 +96,10 @@ void RayCasterCanvas::update_fbo()
     if (m_bInit)
     {
         m_pColorAttach0->bind();
-        m_pColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        m_pColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         m_pDepthAttach->bind();
-        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+        m_pDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
     }
 }
@@ -108,7 +108,7 @@ void RayCasterCanvas::update_color_array()
 {
     CHECK_GL_ERROR
     m_pColorAttach0->bind();
-    m_pColorAttach0->update(0,0,m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , m_pColorArray.get());
+    m_pColorAttach0->update(0,0,_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , m_pColorArray.get());
     CHECK_GL_ERROR
 }
 
@@ -120,21 +120,21 @@ GLTexture2DPtr RayCasterCanvas::get_color_attach_texture()
 void RayCasterCanvas::debug_output_color(const std::string& sFileName)
 {
     m_pColorAttach0->bind();
-    std::unique_ptr<unsigned char[]> pRGBA(new unsigned char[m_iWidth*m_iHeight*4]);
+    std::unique_ptr<unsigned char[]> pRGBA(new unsigned char[_width*_height*4]);
     m_pColorAttach0->download(GL_RGBA , GL_UNSIGNED_BYTE , pRGBA.get());
 
     std::ofstream out(sFileName , std::ios::out | std::ios::binary);
     if (out.is_open())
     {
-        out.write((char*)pRGBA.get(), m_iWidth*m_iHeight*4);
+        out.write((char*)pRGBA.get(), _width*_height*4);
     }
     out.close();
 }
 
 void RayCasterCanvas::get_display_size(int& iWidth, int& iHeight) const
 {
-    iWidth = m_iWidth;
-    iHeight = m_iHeight;
+    iWidth = _width;
+    iHeight = _height;
 }
 
 MED_IMAGING_END_NAMESPACE

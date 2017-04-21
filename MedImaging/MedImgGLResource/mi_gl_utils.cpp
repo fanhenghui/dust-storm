@@ -9,13 +9,13 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 bool GLUtils::check_framebuffer_state()
 {
-    bool bFBOStatusComplete = false;
-    GLenum eFBOStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    switch (eFBOStatus)
+    bool fbo_status_complete = false;
+    GLenum fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    switch (fbo_status)
     {
     case GL_FRAMEBUFFER_COMPLETE:
         {
-            bFBOStatusComplete = true;
+            fbo_status_complete = true;
             break;
         }
     case GL_FRAMEBUFFER_UNDEFINED:
@@ -55,34 +55,34 @@ bool GLUtils::check_framebuffer_state()
         }
     }
 
-    return bFBOStatusComplete;
+    return fbo_status_complete;
 }
 
-void GLUtils::get_gray_texture_format( DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType )
+void GLUtils::get_gray_texture_format( DataType data_type , GLenum &internal_format , GLenum &format , GLenum &type )
 {
-    switch(eDataType)
+    switch(data_type)
     {
     case CHAR:
     case UCHAR:
         {
-            eInternalFormat = GL_R8;
-            eFormat = GL_RED;
-            eType = GL_UNSIGNED_BYTE;
+            internal_format = GL_R8;
+            format = GL_RED;
+            type = GL_UNSIGNED_BYTE;
             break;
         }
     case SHORT:
     case USHORT:
         {
-            eInternalFormat = GL_R16;
-            eFormat = GL_RED;
-            eType = GL_UNSIGNED_SHORT;
+            internal_format = GL_R16;
+            format = GL_RED;
+            type = GL_UNSIGNED_SHORT;
             break;
         }
     case FLOAT:
         {
-            eInternalFormat = GL_R32F;
-            eFormat = GL_RED;
-            eType = GL_FLOAT;
+            internal_format = GL_R32F;
+            format = GL_RED;
+            type = GL_FLOAT;
             break;
         }
     default:
@@ -91,9 +91,9 @@ void GLUtils::get_gray_texture_format( DataType eDataType , GLenum &eInternalFor
     }
 }
 
-unsigned int GLUtils::get_byte_by_data_type(DataType eDataType)
+unsigned int GLUtils::get_byte_by_data_type(DataType data_type)
 {
-    switch(eDataType)
+    switch(data_type)
     {
     case CHAR:
     case UCHAR:
@@ -183,32 +183,32 @@ std::string GLUtils::get_gl_enum_description(GLenum e)
     }
 }
 
-bool GLUtils::m_bCheckGLFlag = true;
-void GLUtils::set_check_gl_flag(bool bFlag)
+bool GLUtils::_s_check_gl_flag = true;
+void GLUtils::set_check_gl_flag(bool flag)
 {
-    m_bCheckGLFlag = bFlag;
+    _s_check_gl_flag = flag;
 }
 
 bool GLUtils::get_check_gl_flag()
 {
-    return m_bCheckGLFlag;
+    return _s_check_gl_flag;
 }
 
 DrawFBOStack::DrawFBOStack()
 {
     //Push draw frame buffer
-    m_iCurDrawFBO = 0;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING , &m_iCurDrawFBO);
+    _current_draw_fbo = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING , &_current_draw_fbo);
 
-    m_iCurDrawBufferCount = 0;
-    memset(m_iCurDrawBufferArray , 0 , sizeof(int)*8 );
+    _current_draw_buffer_count = 0;
+    memset(_current_draw_buffer_array , 0 , sizeof(int)*8 );
 
     for (int i = 0 ; i< 8 ; ++i)
     {
-        glGetIntegerv(GL_DRAW_BUFFER0+i , (m_iCurDrawBufferArray + i));
-        if (0 == m_iCurDrawBufferArray[i])
+        glGetIntegerv(GL_DRAW_BUFFER0+i , (_current_draw_buffer_array + i));
+        if (0 == _current_draw_buffer_array[i])
         {
-            m_iCurDrawBufferCount = i;
+            _current_draw_buffer_count = i;
             break;
         }
     }
@@ -219,14 +219,14 @@ DrawFBOStack::DrawFBOStack()
 DrawFBOStack::~DrawFBOStack()
 {
     //Pop draw frame buffer
-    GLenum eDrawBufferArray[8];
+    GLenum draw_buffer_array[8];
     for (int i = 0 ; i<8 ; ++i)
     {
-        eDrawBufferArray[i] = (GLenum)m_iCurDrawBufferArray[i];
+        draw_buffer_array[i] = (GLenum)_current_draw_buffer_array[i];
     }
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER , m_iCurDrawFBO);
-    glDrawBuffers(m_iCurDrawBufferCount , eDrawBufferArray);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER , _current_draw_fbo);
+    glDrawBuffers(_current_draw_buffer_count , draw_buffer_array);
 
 
     CHECK_GL_ERROR;
@@ -236,8 +236,8 @@ DrawFBOStack::~DrawFBOStack()
 ReadFBOStack::ReadFBOStack()
 {
     //Push read frame buffer
-    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING , &m_iCurReadFBO);
-    glGetIntegerv(GL_READ_BUFFER,  &m_iCurReadBuffer);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING , &_current_read_fbo);
+    glGetIntegerv(GL_READ_BUFFER,  &_current_read_buffer);
 
 
     CHECK_GL_ERROR;
@@ -246,8 +246,8 @@ ReadFBOStack::ReadFBOStack()
 ReadFBOStack::~ReadFBOStack()
 {
     //Pop read frame buffer
-    glBindFramebuffer(GL_READ_FRAMEBUFFER , m_iCurReadFBO);
-    glReadBuffer((GLenum)m_iCurReadBuffer);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER , _current_read_fbo);
+    glReadBuffer((GLenum)_current_read_buffer);
 
 
     CHECK_GL_ERROR;
@@ -256,25 +256,25 @@ ReadFBOStack::~ReadFBOStack()
 FBOStack::FBOStack()
 {
     //Push draw frame buffer
-    m_iCurDrawFBO = 0;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING , &m_iCurDrawFBO);
+    _current_draw_fbo = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING , &_current_draw_fbo);
 
-    m_iCurDrawBufferCount = 0;
-    memset(m_iCurDrawBufferArray , 0 , sizeof(int)*8 );
+    _current_draw_buffer_count = 0;
+    memset(_current_draw_buffer_array , 0 , sizeof(int)*8 );
 
     for (int i = 0 ; i< 8 ; ++i)
     {
-        glGetIntegerv(GL_DRAW_BUFFER0+i , (m_iCurDrawBufferArray + i));
-        if (0 == m_iCurDrawBufferArray[i])
+        glGetIntegerv(GL_DRAW_BUFFER0+i , (_current_draw_buffer_array + i));
+        if (0 == _current_draw_buffer_array[i])
         {
-            m_iCurDrawBufferCount = i;
+            _current_draw_buffer_count = i;
             break;
         }
     }
 
     //Push read frame buffer
-    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING , &m_iCurReadFBO);
-    glGetIntegerv(GL_READ_BUFFER,  &m_iCurReadBuffer);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING , &_current_read_fbo);
+    glGetIntegerv(GL_READ_BUFFER,  &_current_read_buffer);
 
 
     CHECK_GL_ERROR;
@@ -283,24 +283,24 @@ FBOStack::FBOStack()
 FBOStack::~FBOStack()
 {
     //Pop draw frame buffer
-    GLenum eDrawBufferArray[8];
+    GLenum draw_buffer_array[8];
     for (int i = 0 ; i<8 ; ++i)
     {
-        eDrawBufferArray[i] = (GLenum)m_iCurDrawBufferArray[i];
+        draw_buffer_array[i] = (GLenum)_current_draw_buffer_array[i];
     }
 
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER , m_iCurDrawFBO);
-    glDrawBuffers(m_iCurDrawBufferCount , eDrawBufferArray);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER , _current_draw_fbo);
+    glDrawBuffers(_current_draw_buffer_count , draw_buffer_array);
 
     //Pop read frame buffer
-    glBindFramebuffer(GL_READ_FRAMEBUFFER , m_iCurReadFBO);
-    glReadBuffer((GLenum)m_iCurReadBuffer);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER , _current_read_fbo);
+    glReadBuffer((GLenum)_current_read_buffer);
 
 
     CHECK_GL_ERROR;
 }
 
-GLActiveTextureCounter::GLActiveTextureCounter():m_iCurActiveTexID(0)
+GLActiveTextureCounter::GLActiveTextureCounter():_current_active_texture_id(0)
 {}
 
 GLActiveTextureCounter::~GLActiveTextureCounter()
@@ -308,16 +308,16 @@ GLActiveTextureCounter::~GLActiveTextureCounter()
 
 int GLActiveTextureCounter::tick()
 {
-    if (m_iCurActiveTexID > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS  - 1)
+    if (_current_active_texture_id > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS  - 1)
     {
         throw std::exception("Combined texture count is beyond limitation!");
     }
-    return m_iCurActiveTexID++;
+    return _current_active_texture_id++;
 }
 
 void GLActiveTextureCounter::reset()
 {
-    m_iCurActiveTexID = 0;
+    _current_active_texture_id = 0;
 }
 
 bool GLContextHelper::has_gl_context()
@@ -331,43 +331,43 @@ bool GLContextHelper::has_gl_context()
 #endif
 }
 
-void GLTextureUtils::set_1d_wrap_s( GLint iWrapType )
+void GLTextureUtils::set_1d_wrap_s( GLint wrap_type )
 {
-    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, iWrapType);
-    if (GL_CLAMP_TO_BORDER == iWrapType)
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, wrap_type);
+    if (GL_CLAMP_TO_BORDER == wrap_type)
     {
-        const float fBoard[4] = {0.0f,0.0f,0.0f,0.0f};
-        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , fBoard);
+        const float board[4] = {0.0f,0.0f,0.0f,0.0f};
+        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , board);
     }
 }
 
-void GLTextureUtils::set_2d_wrap_s_t( GLint iWrapType )
+void GLTextureUtils::set_2d_wrap_s_t( GLint wrap_type )
 {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, iWrapType); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, iWrapType); 
-    if (GL_CLAMP_TO_BORDER == iWrapType)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_type); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_type); 
+    if (GL_CLAMP_TO_BORDER == wrap_type)
     {
-        const float fBoard[4] = {0.0f,0.0f,0.0f,0.0f};
-        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , fBoard);
+        const float board[4] = {0.0f,0.0f,0.0f,0.0f};
+        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , board);
     }
 }
 
-void GLTextureUtils::set_1d_wrap_s_t_r( GLint iWrapType )
+void GLTextureUtils::set_1d_wrap_s_t_r( GLint wrap_type )
 {
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, iWrapType); 
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, iWrapType); 
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, iWrapType); 
-    if (GL_CLAMP_TO_BORDER == iWrapType)
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrap_type); 
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrap_type); 
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, wrap_type); 
+    if (GL_CLAMP_TO_BORDER == wrap_type)
     {
-        const float fBoard[4] = {0.0f,0.0f,0.0f,0.0f};
-        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , fBoard);
+        const float board[4] = {0.0f,0.0f,0.0f,0.0f};
+        glTexParameterfv(GL_TEXTURE_1D, GL_TEXTURE_BORDER_COLOR , board);
     }
 }
 
-void GLTextureUtils::set_filter( GLenum eTexTarget , GLint iFilterType )
+void GLTextureUtils::set_filter( GLenum texture_target , GLint filter_type )
 {
-    glTexParameteri(eTexTarget, GL_TEXTURE_MIN_FILTER, iFilterType); 
-    glTexParameteri(eTexTarget, GL_TEXTURE_MAG_FILTER, iFilterType); 
+    glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, filter_type); 
+    glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, filter_type); 
 }
 
 MED_IMAGING_END_NAMESPACE

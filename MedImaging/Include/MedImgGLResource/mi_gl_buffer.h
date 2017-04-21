@@ -29,8 +29,8 @@ public:
     void load(GLsizei size, const void* data, GLenum usage);
 
 private:
-    GLenum m_eTarget;
-    unsigned int m_uiBufferID;
+    GLenum _target;
+    unsigned int _buffer_id;
 };
 
 MED_IMAGING_END_NAMESPACE

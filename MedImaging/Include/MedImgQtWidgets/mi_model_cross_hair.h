@@ -55,7 +55,7 @@ public:
 
     bool locate_focus(const Point3& ptCenterW);
 
-    void set_visibility(bool bFlag);
+    void set_visibility(bool flag);
 
     bool get_visibility() const;
 

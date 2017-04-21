@@ -3,11 +3,11 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 GLTexture1DArray::GLTexture1DArray(UIDType uid): GLTextureBase(uid),
-m_iWidth(0),
-m_iArraySize(0),
-m_eFormat(GL_RGBA),
-m_eInternalFormat(GL_RGBA8),
-m_eType(GL_UNSIGNED_BYTE)
+_width(0),
+_array_size(0),
+_format(GL_RGBA),
+_internal_format(GL_RGBA8),
+_type(GL_UNSIGNED_BYTE)
 {
     set_type("GLTexture1DArray");
 }
@@ -19,7 +19,7 @@ GLTexture1DArray::~GLTexture1DArray()
 
 void GLTexture1DArray::bind()
 {
-    glBindTexture(GL_TEXTURE_1D_ARRAY , m_uiTextueID);
+    glBindTexture(GL_TEXTURE_1D_ARRAY , _texture_id);
 }
 
 void GLTexture1DArray::unbind()
@@ -30,11 +30,11 @@ void GLTexture1DArray::unbind()
 void GLTexture1DArray::load(GLint internalformat , GLsizei width, GLsizei arraysize , GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
 {
     glTexImage2D(GL_TEXTURE_1D_ARRAY , level , internalformat , width ,arraysize , 0 , format , type , data);
-    m_iWidth = width;
-    m_iArraySize = arraysize;
-    m_eFormat = format;
-    m_eInternalFormat = internalformat;
-    m_eType= type;
+    _width = width;
+    _array_size = arraysize;
+    _format = format;
+    _internal_format = internalformat;
+    _type= type;
 }
 
 void GLTexture1DArray::update(GLint xoffset , GLsizei width , GLsizei arrayidx, GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
@@ -49,17 +49,17 @@ void GLTexture1DArray::download(GLenum format , GLenum type , void* buffer , GLi
 
 int GLTexture1DArray::get_width()
 {
-    return m_iWidth;
+    return _width;
 }
 
 int GLTexture1DArray::get_array_size()
 {
-    return m_iArraySize;
+    return _array_size;
 }
 
 GLenum GLTexture1DArray::get_format()
 {
-    return m_eFormat;
+    return _format;
 }
 
 MED_IMAGING_END_NAMESPACE

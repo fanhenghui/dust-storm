@@ -125,8 +125,8 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
         const Point3 pt00 = matMVPInv.transform(Point3(-1.0,-1.0,0));
         const Point3 pt01 = matMVPInv.transform(Point3(-1.0,1.0,0));
         const Point3 pt10 = matMVPInv.transform(Point3(1.0,-1.0,0));
-        const Vector3 vXDelta = (pt10 - pt00) * (1.0/(m_iWidth-1));
-        const Vector3 vYDelta = (pt01 - pt00) * (1.0/(m_iHeight-1));
+        const Vector3 vXDelta = (pt10 - pt00) * (1.0/(_width-1));
+        const Vector3 vYDelta = (pt01 - pt00) * (1.0/(_height-1));
 
         Vector3 vViewDir = m_pCamera->get_look_at() - m_pCamera->get_eye();
         vViewDir = matV2W.get_transpose().transform(vViewDir);
@@ -157,7 +157,7 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
         }
         //////////////////////////////////////////////////////////////////////////
 
-        const int iTotalPixelNum = m_iWidth*m_iHeight;
+        const int iTotalPixelNum = _width*_height;
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
@@ -169,8 +169,8 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
             Vector3f ptEntryIntersection;
             Vector3f ptExitIntersection;
 
-            int iY = idx / m_iWidth;
-            int iX = idx - iY*m_iWidth;
+            int iY = idx / _width;
+            int iX = idx - iY*_width;
 
             ptCurF = pt00F + vXDeltaF*(float)iX + vYDeltaF*(float)iY;
             ptEntryF = ptCurF - vRayDir*fThicknessHalf;
@@ -222,10 +222,10 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
 
         /*initialize();
         m_pEntryTex->bind();
-        m_pEntryTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
+        m_pEntryTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
 
         m_pExitTex->bind();
-        m_pExitTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
+        m_pExitTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , m_pExitBuffer.get());
 
         m_pEntryTex->bind();
         m_pEntryTex->download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());
@@ -326,7 +326,7 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         CHECK_GL_ERROR;
 
-        glProgramUniform2ui(uiProgram , DISPLAY_SIZE , (GLuint)m_iWidth , (GLuint)m_iHeight);
+        glProgramUniform2ui(uiProgram , DISPLAY_SIZE , (GLuint)_width , (GLuint)_height);
 
         CHECK_GL_ERROR;
 
@@ -360,12 +360,12 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
         CHECK_GL_ERROR;
 
         const unsigned int aLocalWorkGroupCount[2] = {4,4};
-        unsigned int aWorkGroupsNum[2] = {(unsigned int)m_iWidth/aLocalWorkGroupCount[0], (unsigned int)m_iHeight/aLocalWorkGroupCount[1]};
-        if (aWorkGroupsNum[0]*aLocalWorkGroupCount[0] != (unsigned int)m_iWidth)
+        unsigned int aWorkGroupsNum[2] = {(unsigned int)_width/aLocalWorkGroupCount[0], (unsigned int)_height/aLocalWorkGroupCount[1]};
+        if (aWorkGroupsNum[0]*aLocalWorkGroupCount[0] != (unsigned int)_width)
         {
             aWorkGroupsNum[0] +=1;
         }
-        if (aWorkGroupsNum[1]*aLocalWorkGroupCount[1] != (unsigned int)m_iHeight)
+        if (aWorkGroupsNum[1]*aLocalWorkGroupCount[1] != (unsigned int)_height)
         {
             aWorkGroupsNum[1] +=1;
         }
@@ -379,7 +379,7 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         //////////////////////////////////////////////////////////////////////////
         //For testing
-        /*std::cout << "Size : " << m_iWidth << " " << m_iHeight << std::endl;
+        /*std::cout << "Size : " << _width << " " << _height << std::endl;
         m_pEntryTex->bind();
         m_pEntryTex->download(GL_RGBA , GL_FLOAT , m_pEntryBuffer.get());*/
 

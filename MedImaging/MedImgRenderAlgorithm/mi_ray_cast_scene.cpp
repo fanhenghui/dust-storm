@@ -82,7 +82,7 @@ void RayCastScene::initialize()
     SceneBase::initialize();
 
     //Canvas
-    m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+    m_pCanvas->set_display_size(_width , _height);
     m_pCanvas->initialize();
 }
 
@@ -118,7 +118,7 @@ void RayCastScene::render(int iTestCode)
     CHECK_GL_ERROR;
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    glViewport(0,0,m_iWidth , m_iHeight);
+    glViewport(0,0,_width , _height);
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -132,7 +132,7 @@ void RayCastScene::render(int iTestCode)
     //2 Mapping ray casting result to Scene FBO
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    glViewport(0,0,m_iWidth , m_iHeight);
+    glViewport(0,0,_width , _height);
 
     m_pSceneFBO->bind();
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -182,7 +182,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
         //Entry exit points
         m_pEntryExitPoints->set_image_data(pVolume);
         m_pEntryExitPoints->set_camera(m_pCamera);
-        m_pEntryExitPoints->set_display_size(m_iWidth , m_iHeight);
+        m_pEntryExitPoints->set_display_size(_width , _height);
         m_pEntryExitPoints->set_camera_calculator(m_pCameraCalculator);
         m_pEntryExitPoints->initialize();
 

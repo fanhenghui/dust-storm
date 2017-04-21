@@ -5,9 +5,9 @@ MED_IMAGING_BEGIN_NAMESPACE
 
     namespace
 {
-    std::string GetShaderTypeString(GLuint uiType)
+    std::string GetShaderTypeString(GLenum type)
     {
-        switch (uiType)
+        switch (type)
         {
         case GL_VERTEX_SHADER:
             {
@@ -39,7 +39,7 @@ MED_IMAGING_BEGIN_NAMESPACE
     }
 }
 
-GLProgram::GLProgram(UIDType uid):GLObject(uid),m_uiProgramID(0)
+GLProgram::GLProgram(UIDType uid):GLObject(uid),_program_id(0)
 {
     set_type("GLProgram");
 }
@@ -51,115 +51,109 @@ GLProgram::~GLProgram()
 
 void GLProgram::initialize()
 {
-    if (0 == m_uiProgramID)
+    if (0 == _program_id)
     {
-        m_uiProgramID = glCreateProgram();
+        _program_id = glCreateProgram();
     }
 }
 
 void GLProgram::finalize()
 {
-    if (0 != m_uiProgramID)
+    if (0 != _program_id)
     {
-        glDeleteProgram(m_uiProgramID);
-        m_uiProgramID = 0;
+        glDeleteProgram(_program_id);
+        _program_id = 0;
     }
 }
 
 unsigned int GLProgram::get_id() const
 {
-    return m_uiProgramID;
+    return _program_id;
 }
 
 void GLProgram::compile()
 {
-    if (m_Shaders.empty())
+    if (_shaders.empty())
     {
         GLRESOURCE_THROW_EXCEPTION("Shaders is empty!");
     }
 
     initialize();
 
-    for (auto it = m_Shaders.begin(); it != m_Shaders.end(); ++it)
+    for (auto it = _shaders.begin(); it != _shaders.end(); ++it)
     {
-        GLuint uiShader = glCreateShader((*it).m_eType);
-        (*it).m_uiShaderID = uiShader;
-        glShaderSource(uiShader, 1, &((*it).m_ksContext), NULL);
+        GLuint shader = glCreateShader((*it).type);
+        (*it).shader_id = shader;
+        glShaderSource(shader, 1, &((*it).context), NULL);
 
-        glCompileShader(uiShader);
+        glCompileShader(shader);
 
         //ºÏ≤È±‡“Î◊¥Ã¨
-        GLint iComplied(-1);
-        glGetShaderiv(uiShader, GL_COMPILE_STATUS, &iComplied);
-        if (!iComplied)
+        GLint compile_status(-1);
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_status);
+        if (!compile_status)
         {
             //ªÒ»°±‡“Î¥ÌŒÛ–≈œ¢µƒ≥§∂»
-            GLsizei uiLen(0);
-            glGetShaderiv(uiShader, GL_INFO_LOG_LENGTH, &uiLen);
+            GLsizei log_length(0);
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
 
             //ªÒ»°±‡“Î¥ÌŒÛ–≈œ¢
-            GLchar *pLogInfo = new GLchar[uiLen + 1];
-            glGetShaderInfoLog(uiShader, uiLen, &uiLen, pLogInfo);
-            pLogInfo[uiLen] = '\0';
+            std::unique_ptr<GLchar[]> log_context(new GLchar[log_length + 1]);
+            glGetShaderInfoLog(shader, log_length, &log_length, log_context.get());
+            log_context[log_length] = '\0';
 
             //…æ≥˝ Shader “‘∑¿÷πœ‘¥Ê–π¬∂
-            for (auto itDelete = m_Shaders.begin(); itDelete != m_Shaders.end(); ++itDelete)
+            for (auto it_delete = _shaders.begin(); it_delete != _shaders.end(); ++it_delete)
             {
-                if (0 != (*itDelete).m_uiShaderID)
+                if (0 != (*it_delete).shader_id)
                 {
-                    glDeleteShader((*itDelete).m_uiShaderID);
-                    (*itDelete).m_uiShaderID = 0;
+                    glDeleteShader((*it_delete).shader_id);
+                    (*it_delete).shader_id = 0;
                 }
             }
 
             //¥Ú”°±‡“Î¥ÌŒÛ–≈œ¢ 
-            std::string sLogInfo = pLogInfo;
-            delete[] pLogInfo;
-
-            std::string strErrorInfo = GetShaderTypeString((*it).m_eType) + std::string(" \"") + (*it).m_sShaderName + std::string("\" compiled failed : ") + sLogInfo + std::string("\n");
-            std::cout << strErrorInfo;
-            GLRESOURCE_THROW_EXCEPTION(strErrorInfo);
+            std::string err_info = GetShaderTypeString((*it).type) + std::string(" \"") + (*it).shader_name + std::string("\" compiled failed : ") + std::string(log_context.get()) + std::string("\n");
+            std::cout << err_info;
+            GLRESOURCE_THROW_EXCEPTION(err_info);
         }
 
-        glAttachShader(m_uiProgramID, uiShader);
+        glAttachShader(_program_id, shader);
     }
 
-    glLinkProgram(m_uiProgramID);
+    glLinkProgram(_program_id);
 
-    GLint iLinked(-1);
-    glGetProgramiv(m_uiProgramID, GL_LINK_STATUS, &iLinked);
-    if (!iLinked)
+    GLint link_status(-1);
+    glGetProgramiv(_program_id, GL_LINK_STATUS, &link_status);
+    if (!link_status)
     {
-        GLsizei uiLen(0);
-        glGetProgramiv(m_uiProgramID, GL_INFO_LOG_LENGTH, &uiLen);
+        GLsizei log_length(0);
+        glGetProgramiv(_program_id, GL_INFO_LOG_LENGTH, &log_length);
 
-        GLchar* pLogInfo = new GLchar[uiLen + 1];
-        glGetProgramInfoLog(m_uiProgramID, uiLen, &uiLen, pLogInfo);
-        pLogInfo[uiLen] = '\0';
-
-        std::string sLogInfo = pLogInfo;
-        delete[] pLogInfo;
+        std::unique_ptr<GLchar[]> log_context(new GLchar[log_length + 1]);
+        glGetProgramInfoLog(_program_id, log_length, &log_length, log_context.get());
+        log_context[log_length] = '\0';
 
         //…æ≥˝Shader “‘º∞ Program ∑¿÷πœ‘¥Ê–π¬∂
-        for (auto itDelete = m_Shaders.begin(); itDelete != m_Shaders.end(); ++itDelete)
+        for (auto it_delete = _shaders.begin(); it_delete != _shaders.end(); ++it_delete)
         {
-            glDeleteShader((*itDelete).m_uiShaderID);
-            (*itDelete).m_uiShaderID = 0;
+            glDeleteShader((*it_delete).shader_id);
+            (*it_delete).shader_id = 0;
         }
 
-        glDeleteProgram(m_uiProgramID);
+        glDeleteProgram(_program_id);
 
         //¥Ú”°¡¥Ω”¥ÌŒÛ–≈œ¢
-        std::string strErrorInfo = std::string("Program link failed : ") + sLogInfo + std::string("\n");
-        std::cout << strErrorInfo;
-        COMMON_THROW_EXCEPTION(strErrorInfo.c_str());
+        std::string err_info = std::string("Program link failed : ") + std::string(log_context.get()) + std::string("\n");
+        std::cout << err_info;
+        COMMON_THROW_EXCEPTION(err_info.c_str());
 
     }
 
-    for (auto it = m_Shaders.begin(); it != m_Shaders.end(); ++it)
+    for (auto it = _shaders.begin(); it != _shaders.end(); ++it)
     {
-        glDeleteShader((*it).m_uiShaderID);
-        (*it).m_uiShaderID = 0;
+        glDeleteShader((*it).shader_id);
+        (*it).shader_id = 0;
     }
 
     CHECK_GL_ERROR;
@@ -167,12 +161,12 @@ void GLProgram::compile()
 
 void GLProgram::set_shaders(std::vector<GLShaderInfo> shaders)
 {
-    m_Shaders = shaders;
+    _shaders = shaders;
 }
 
 void GLProgram::bind()
 {
-    glUseProgram(m_uiProgramID);
+    glUseProgram(_program_id);
 }
 
 void GLProgram::unbind()
@@ -180,9 +174,9 @@ void GLProgram::unbind()
     glUseProgram(0);
 }
 
-int GLProgram::get_uniform_location(const char* sName)
+int GLProgram::get_uniform_location(const char* name)
 {
-    return glGetUniformLocation(m_uiProgramID, sName);
+    return glGetUniformLocation(_program_id, name);
 }
 
 MED_IMAGING_END_NAMESPACE

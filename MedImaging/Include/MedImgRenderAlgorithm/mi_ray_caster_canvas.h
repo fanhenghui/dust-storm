@@ -43,8 +43,8 @@ private:
     GLFBOPtr m_pFBO;
     GLTexture2DPtr m_pColorAttach0;//For RGBA Color
     GLTexture2DPtr m_pDepthAttach;
-    int m_iWidth;
-    int m_iHeight;
+    int _width;
+    int _height;
     std::unique_ptr<RGBAUnit[]> m_pColorArray;
     bool m_bInit;
 };

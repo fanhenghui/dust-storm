@@ -3,8 +3,8 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 GLBuffer::GLBuffer(UIDType uid):GLObject(uid)
-,m_eTarget(GL_ARRAY_BUFFER)
-,m_uiBufferID(0)
+,_target(GL_ARRAY_BUFFER)
+,_buffer_id(0)
 {
     set_type("GLBuffer");
 }
@@ -16,53 +16,53 @@ GLBuffer::~GLBuffer()
 
 void GLBuffer::set_buffer_target(GLenum target)
 {
-    m_eTarget = target;
+    _target = target;
 }
 
 GLenum GLBuffer::get_buffer_target() const
 {
-    return m_eTarget;
+    return _target;
 }
 
 void GLBuffer::initialize()
 {
-    if (0 == m_uiBufferID)
+    if (0 == _buffer_id)
     {
-        glGenBuffers(1 , &m_uiBufferID);
+        glGenBuffers(1 , &_buffer_id);
     }
 }
 
 void GLBuffer::finalize()
 {
-    if (0 != m_uiBufferID)
+    if (0 != _buffer_id)
     {  
-        glDeleteBuffers(1 , &m_uiBufferID);
-        m_uiBufferID = 0;
+        glDeleteBuffers(1 , &_buffer_id);
+        _buffer_id = 0;
     }
 }
 
 unsigned int GLBuffer::get_id() const
 {
-    return m_uiBufferID;
+    return _buffer_id;
 }
 
 void GLBuffer::bind()
 {
-    if (0 == m_uiBufferID)
+    if (0 == _buffer_id)
     {
         GLRESOURCE_THROW_EXCEPTION("Invalid buffer!");
     }
-    glBindBuffer(m_eTarget , m_uiBufferID);
+    glBindBuffer(_target , _buffer_id);
 }
 
 void GLBuffer::unbind()
 {
-    glBindBuffer(m_eTarget , 0);
+    glBindBuffer(_target , 0);
 }
 
 void GLBuffer::load(GLsizei size, const void* data, GLenum usage)
 {
-    glBufferData(m_eTarget , size , data, usage);
+    glBufferData(_target , size , data, usage);
 }
 
 

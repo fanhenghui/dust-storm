@@ -18,8 +18,8 @@ namespace
     std::shared_ptr<OrthoCameraInteractor> m_pCameraInteractor;
 
 
-    int m_iWidth = 512;
-    int m_iHeight = 512;
+    int _width = 512;
+    int _height = 512;
     int m_iButton = -1;
     Point2 m_ptPre;
 
@@ -38,7 +38,7 @@ namespace
 
     void Display()
     {
-        glViewport(0,0,m_iWidth , m_iHeight);
+        glViewport(0,0,_width , _height);
         glClearColor(0.0,0.0,0.0,0.0);
         glClear(GL_COLOR_BUFFER_BIT );
 
@@ -95,9 +95,9 @@ namespace
 
     void Resize(int x , int y)
     {
-        m_iWidth = x;
-        m_iHeight = y;
-        m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
+        _width = x;
+        _height = y;
+        m_pCameraInteractor->Resize(_width , _height);
     }
 
     void Idle()
@@ -132,15 +132,15 @@ namespace
         Point2 ptCur(x,y);
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , _width , _height);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , _width , _height);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , _width , _height);
         }
 
         m_ptPre = ptCur;
@@ -156,7 +156,7 @@ void UT_MeshRendering(int argc , char* argv[])
         glutInit(&argc , argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0,0);
-        glutInitWindowSize(m_iWidth,m_iHeight);
+        glutInitWindowSize(_width,_height);
 
         glutCreateWindow("Test Mesh Rendering");
 

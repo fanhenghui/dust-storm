@@ -91,11 +91,11 @@ namespace
 
     float m_fThickness =0.5;
 #ifdef _DEBUG
-    int m_iWidth = 512;
-    int m_iHeight = 512;
+    int _width = 512;
+    int _height = 512;
 #else
-    int m_iWidth = 1024;
-    int m_iHeight = 1024;
+    int _width = 1024;
+    int _height = 1024;
 #endif
     
     int m_iButton = -1;
@@ -161,7 +161,7 @@ namespace
         CalculateBrickPool();
 
         m_pMPREE.reset(new MPREntryExitPoints());
-        m_pMPREE->set_display_size(m_iWidth,m_iHeight);
+        m_pMPREE->set_display_size(_width,_height);
         m_pMPREE->set_camera(m_pCamera);
         m_pMPREE->set_camera_calculator(m_pCameraCal);
         m_pMPREE->set_strategy(m_eStrategy);
@@ -169,7 +169,7 @@ namespace
         m_pMPREE->set_thickness(1.0f);
 
         m_pCanvas.reset(new RayCasterCanvas());
-        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->set_display_size(_width , _height);
         m_pCanvas->initialize();
 
         m_pRayCaster.reset(new RayCaster());
@@ -198,7 +198,7 @@ namespace
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glBlitFramebuffer(0,0,m_iWidth, m_iHeight , 0,0,m_iWidth , m_iHeight , GL_COLOR_BUFFER_BIT , GL_LINEAR);
+        glBlitFramebuffer(0,0,_width, _height , 0,0,_width , _height , GL_COLOR_BUFFER_BIT , GL_LINEAR);
     }
 
 #define PER_VERTEX( x ,  y ,  z) \
@@ -318,7 +318,7 @@ namespace
     {
         CHECK_GL_ERROR
 
-        glViewport(0,0,m_iWidth , m_iHeight);
+        glViewport(0,0,_width , _height);
 
         glClearColor(0.0,0.0,0.0,0.0);
         glClearDepth(1.0);
@@ -356,7 +356,7 @@ namespace
 
         RayCasterCanvasToScreen();
 
-        //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->get_color_array());
+        //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->get_color_array());
 
         glutSwapBuffers();
     }
@@ -367,7 +367,7 @@ namespace
         {
         case 't':
             {
-                std::cout << "W H :" << m_iWidth << " " << m_iHeight << std::endl;
+                std::cout << "W H :" << _width << " " << _height << std::endl;
                 m_pMPREE->debug_output_entry_points("D:/temp/entry_points.rgb.raw");
                 m_pMPREE->debug_output_exit_points("D:/temp/exit_points.rgb.raw");
                 m_pCanvas->debug_output_color("D:/temp/out_put_rgba.raw");
@@ -405,21 +405,21 @@ namespace
             {
                 m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
-                m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
+                m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
         case 's':
             {
                 m_pCameraCal->init_mpr_placement(m_pCamera , SAGITTAL , Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
-                m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
+                m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
         case 'c':
             {
                 m_pCameraCal->init_mpr_placement(m_pCamera , CORONAL, Point3(0,0,0));
                 m_pCameraInteractor->SetInitialStatus(m_pCamera);
-                m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
+                m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
         case 'f':
@@ -489,13 +489,13 @@ namespace
 
     void Resize(int x , int y)
     {
-        m_iWidth = x;
-        m_iHeight = y;
-        m_pMPREE->set_display_size(m_iWidth , m_iHeight);
-        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        _width = x;
+        _height = y;
+        m_pMPREE->set_display_size(_width , _height);
+        m_pCanvas->set_display_size(_width , _height);
         m_pCanvas->update_fbo();
-        m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
-        m_pCameraInteractorBrick->Resize(m_iWidth , m_iHeight);
+        m_pCameraInteractor->Resize(_width , _height);
+        m_pCameraInteractorBrick->Resize(_width , _height);
         glutPostRedisplay();
     }
 
@@ -507,9 +507,9 @@ namespace
     void MouseClick(int button , int status , int x , int y)
     {
         x = x< 0 ? 0 : x;
-        x = x> m_iWidth-1 ?  m_iWidth-1 : x;
+        x = x> _width-1 ?  _width-1 : x;
         y = y< 0 ? 0 : y;
-        y = y> m_iHeight-1 ?  m_iHeight-1 : y;
+        y = y> _height-1 ?  _height-1 : y;
 
         m_iButton = button;
 
@@ -534,9 +534,9 @@ namespace
     void MouseMotion(int x , int y)
     {
         x = x< 0 ? 0 : x;
-        x = x> m_iWidth-1 ?  m_iWidth-1 : x;
+        x = x> _width-1 ?  _width-1 : x;
         y = y< 0 ? 0 : y;
-        y = y> m_iHeight-1 ?  m_iHeight-1 : y;
+        y = y> _height-1 ?  _height-1 : y;
 
         Point2 ptCur(x,y);
 
@@ -544,12 +544,12 @@ namespace
         //std::cout << "Cur : " << ptCur.x << " " <<ptCur.y << std::endl;
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            //m_pCameraInteractorBrick->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
-            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            //m_pCameraInteractorBrick->rotate(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , _width , _height);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , _width , _height);
             /*float fDeltaX = x - m_ptPre.x;
             float fDeltaY = m_ptPre.y - y;
             if (m_fWW + fDeltaX > 1.0f)
@@ -561,8 +561,8 @@ namespace
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            //m_pCameraInteractorBrick->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
-            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            //m_pCameraInteractorBrick->zoom(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , _width , _height);
         }
 
         m_ptPre = ptCur;
@@ -580,7 +580,7 @@ void UT_BrickPool(int argc , char* argv[])
         glutInit(&argc , argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0,0);
-        glutInitWindowSize(m_iWidth,m_iHeight);
+        glutInitWindowSize(_width,_height);
 
         glutCreateWindow("Test GL resource");
 

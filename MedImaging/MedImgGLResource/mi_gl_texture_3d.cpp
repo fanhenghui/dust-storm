@@ -3,12 +3,12 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 GLTexture3D::GLTexture3D(UIDType uid) : GLTextureBase(uid),
-m_iWidth(0),
-m_iHeight(0),
-m_iDepth(0),
-m_eFormat(GL_RGBA),
-m_eInternalFormat(GL_RGBA8),
-m_eType(GL_UNSIGNED_BYTE)
+_width(0),
+_height(0),
+_depth(0),
+_format(GL_RGBA),
+_internal_format(GL_RGBA8),
+_type(GL_UNSIGNED_BYTE)
 {
     set_type("GLTexture3D");
 }
@@ -20,7 +20,7 @@ GLTexture3D::~GLTexture3D()
 
 void GLTexture3D::bind()
 {
-    glBindTexture(GL_TEXTURE_3D , m_uiTextueID);
+    glBindTexture(GL_TEXTURE_3D , _texture_id);
 }
 
 void GLTexture3D::unbind()
@@ -31,12 +31,12 @@ void GLTexture3D::unbind()
 void GLTexture3D::load(GLint internalformat , GLsizei width, GLsizei height, GLsizei depth,GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
 {
     glTexImage3D(GL_TEXTURE_3D , level , internalformat ,width , height , depth , 0, format ,type ,data);
-    m_iWidth = width;
-    m_iHeight = height;
-    m_iDepth = depth;
-    m_eFormat = format;
-    m_eInternalFormat = internalformat;
-    m_eType= type;
+    _width = width;
+    _height = height;
+    _depth = depth;
+    _format = format;
+    _internal_format = internalformat;
+    _type= type;
 }
 
 void GLTexture3D::update(GLint xoffset , GLint yoffset ,GLint zoffset ,GLsizei width , GLsizei height, GLsizei depth,GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
@@ -51,22 +51,22 @@ void GLTexture3D::download(GLenum format , GLenum type , void* buffer , GLint le
 
 GLsizei GLTexture3D::get_width()
 {
-    return m_iWidth;
+    return _width;
 }
 
 GLsizei GLTexture3D::get_height()
 {
-    return m_iHeight;
+    return _height;
 }
 
 GLsizei GLTexture3D::get_depth()
 {
-    return m_iDepth;
+    return _depth;
 }
 
 GLenum GLTexture3D::get_format()
 {
-    return m_eFormat;
+    return _format;
 }
 
 MED_IMAGING_END_NAMESPACE

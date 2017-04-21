@@ -24,7 +24,7 @@ public:
 
 protected:
 private:
-    unsigned int m_uiVAOID;
+    unsigned int _vao_id;
 };
 
 MED_IMAGING_END_NAMESPACE

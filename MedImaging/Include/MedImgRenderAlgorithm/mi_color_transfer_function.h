@@ -64,7 +64,7 @@ protected:
 private:
     std::vector<ColorTFPoint> m_vecTFPoint;
     std::vector<ColorTFPoint> m_vecResultList;
-    int m_iWidth;
+    int _width;
     ColorType m_eInterpolationColorType;
     ColorType m_eInputColorType;
     bool m_bIsDataDirty;

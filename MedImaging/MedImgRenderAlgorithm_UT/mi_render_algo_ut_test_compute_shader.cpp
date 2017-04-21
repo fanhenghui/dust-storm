@@ -32,8 +32,8 @@ namespace
     unsigned int m_uiShader;
     GLProgram* m_pProgram;
 
-    int m_iWidth = 800;
-    int m_iHeight = 800;
+    int _width = 800;
+    int _height = 800;
     int m_iButton = -1;
     Point2 m_ptPre;
 
@@ -85,20 +85,20 @@ namespace
         CHECK_GL_ERROR;
         glGenTextures(1 , &m_uiTex);
         glBindTexture(GL_TEXTURE_2D , m_uiTex);
-        //glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, m_iWidth, m_iHeight);
-        /*RGBAUnit* pData = new RGBAUnit[m_iWidth*m_iHeight];
-        for (int i = 0 ; i<m_iWidth*m_iHeight ; ++i)
+        //glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, _width, _height);
+        /*RGBAUnit* pData = new RGBAUnit[_width*_height];
+        for (int i = 0 ; i<_width*_height ; ++i)
         {
             pData[i].r = 255;
             pData[i].g = 0;
             pData[i].b = 0;
             pData[i].a = 255;
         }*/
-        //glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA8 , m_iWidth , m_iHeight , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pData);
+        //glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA8 , _width , _height , 0 , GL_RGBA , GL_UNSIGNED_BYTE , pData);
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA32F , m_iWidth , m_iHeight , 0 , GL_RGBA , GL_FLOAT, NULL);
-        //glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_iWidth, m_iHeight);
+        glTexImage2D(GL_TEXTURE_2D , 0 , GL_RGBA32F , _width , _height , 0 , GL_RGBA , GL_FLOAT, NULL);
+        //glTexStorage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, _width, _height);
         //glBindTexture(GL_TEXTURE_2D , 0);
 
         //glDisable(GL_TEXTURE_2D);
@@ -126,7 +126,7 @@ namespace
 
     void Display()
     {
-        glViewport(0,0,m_iWidth , m_iHeight);
+        glViewport(0,0,_width , _height);
         glClearColor(0.0,0.0,0.0,1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -140,13 +140,13 @@ namespace
         CHECK_GL_ERROR;
 
         glBindTexture(GL_TEXTURE_2D , m_uiTex);
-        float *pData = new float[m_iWidth*m_iHeight*4];
+        float *pData = new float[_width*_height*4];
         glGetTexImage(GL_TEXTURE_2D , 0 , GL_RGBA , GL_FLOAT , pData);
         glBindTexture(GL_TEXTURE_2D , 0);
 
         CHECK_GL_ERROR;
 
-        //glDrawPixels(m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , pData);
+        //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , pData);
 
         delete [] pData;
 
@@ -162,8 +162,8 @@ namespace
 
     void Resize(int x , int y)
     {
-        m_iWidth = x;
-        m_iHeight = y;
+        _width = x;
+        _height = y;
         glutPostRedisplay();
     }
 
@@ -225,7 +225,7 @@ void UT_CompureShader(int argc , char* argv[])
         glutInit(&argc , argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0,0);
-        glutInitWindowSize(m_iWidth,m_iHeight);
+        glutInitWindowSize(_width,_height);
 
         glutCreateWindow("Test GL resource");
 
@@ -236,8 +236,8 @@ void UT_CompureShader(int argc , char* argv[])
         }
 
         GLEnvironment env;
-        int iMajor , iMinor;
-        env.get_gl_version(iMajor , iMinor);
+        int major , minor;
+        env.get_gl_version(major , minor);
 
         glutDisplayFunc(Display);
         glutReshapeFunc(Resize);

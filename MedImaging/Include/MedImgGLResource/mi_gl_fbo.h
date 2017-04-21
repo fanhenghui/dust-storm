@@ -23,16 +23,16 @@ public:
 
     void unbind();
 
-    void set_target(GLenum eTarget);
+    void set_target(GLenum target);
 
     GLenum get_target();
 
-    void attach_texture(GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D);
+    void attach_texture(GLenum attachment , std::shared_ptr<GLTexture2D> tex);
 
 protected:
 private:
-    unsigned int m_uiFBOID;
-    GLenum m_eTarget;
+    unsigned int _fbo_id;
+    GLenum _target;
 };
 
 MED_IMAGING_END_NAMESPACE

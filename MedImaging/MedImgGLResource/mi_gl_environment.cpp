@@ -15,28 +15,28 @@ GLEnvironment::~GLEnvironment()
 
 }
 
-void GLEnvironment::get_gl_version(int &iMajor , int &iMinor)
+void GLEnvironment::get_gl_version(int &major , int &minor)
 {
     std::stringstream ss;
     ss << glGetString(GL_VERSION);
-    std::string sVersionInfo = ss.str();
+    std::string version_info = ss.str();
 
-    StrNumConverter<int> strNumConv;
+    StrNumConverter<int> num_converter;
 
-    std::string sMajor;
-    sMajor.push_back(sVersionInfo[0]);
-    std::string sMinor;
-    sMinor.push_back(sVersionInfo[2]);
+    std::string s_major;
+    s_major.push_back(version_info[0]);
+    std::string s_minor;
+    s_minor.push_back(version_info[2]);
 
-    iMajor = strNumConv.to_num(sMajor);
-    iMinor = strNumConv.to_num(sMinor);
+    major = num_converter.to_num(s_major);
+    minor = num_converter.to_num(s_minor);
 }
 
 std::string GLEnvironment::get_gl_vendor()
 {
     std::stringstream ss;
     ss << glGetString(GL_VENDOR);
-    std::string sVendor = ss.str();
+    std::string vendor = ss.str();
     return ss.str();
 }
 

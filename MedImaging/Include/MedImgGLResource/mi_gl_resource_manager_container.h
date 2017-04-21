@@ -64,14 +64,14 @@ private:
     static GLResourceManagerContainer* _s_instance;
     static boost::mutex _mutex;
 private:
-    GLProgramManagerPtr m_pProgramMag;
-    GLBufferManagerPtr m_pBufferMag;
-    GLTexture1DManagerPtr m_pTex1DMag;
-    GLTexture2DManagerPtr m_pTex2DMag;
-    GLTexture3DManagerPtr m_pTex3DMag;
-    GLTexture1DArrayManagerPtr m_pTex1DArrayMag;
-    GLVAOManagerPtr m_pVAOMag;
-    GLFBOManagerPtr m_pFBOMag;
+    GLProgramManagerPtr _program_manager;
+    GLBufferManagerPtr _buffer_manager;
+    GLTexture1DManagerPtr _texture_1d_manager;
+    GLTexture2DManagerPtr _texture_2d_manager;
+    GLTexture3DManagerPtr _texture_3d_manager;
+    GLTexture1DArrayManagerPtr _texture_1d_array_manager;
+    GLVAOManagerPtr _vao_manager;
+    GLFBOManagerPtr _fbo_manager;
 };
 
 

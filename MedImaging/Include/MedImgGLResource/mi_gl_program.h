@@ -5,16 +5,17 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-typedef struct _ShaderInfo
+struct GLShaderInfo
 {
-    GLenum m_eType;
-    const char* m_ksContext;
-    std::string m_sShaderName;
-    GLuint m_uiShaderID;
-    _ShaderInfo(GLenum shaderType, const char* shaderContext, const std::string &sShaderName)
-        :m_uiShaderID(0), m_eType(shaderType), m_ksContext(shaderContext), m_sShaderName(sShaderName)
+    GLenum type;
+    const char* context;
+    std::string shader_name;
+    GLuint shader_id;
+
+    GLShaderInfo(GLenum shader_type, const char* shader_context, const std::string &shader_name):
+        shader_id(0), type(shader_type), context(shader_context), shader_name(shader_name)
     {}
-}GLShaderInfo;
+};
 
 class GLResource_Export GLProgram : public GLObject
 {
@@ -40,8 +41,8 @@ public:
     int get_uniform_location(const char* sName);
 
 private:
-    std::vector<GLShaderInfo> m_Shaders;
-    unsigned int m_uiProgramID;
+    std::vector<GLShaderInfo> _shaders;
+    unsigned int _program_id;
 };
 
 MED_IMAGING_END_NAMESPACE

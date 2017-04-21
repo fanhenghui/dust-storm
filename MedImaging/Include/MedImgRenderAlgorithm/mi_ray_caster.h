@@ -116,7 +116,7 @@ public:
     void set_ssd_gray(float fGray);
 
     //Jittering to prevent wooden artifacts
-    void set_jittering_enabled(bool bFlag);
+    void set_jittering_enabled(bool flag);
 
     //Bounding box
     void set_bounding(const Vector3f& vMin, const Vector3f& vMax);

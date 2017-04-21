@@ -32,8 +32,8 @@ namespace
     std::shared_ptr<RayCaster> m_pRayCaster;
     std::shared_ptr<RayCasterCanvas> m_pCanvas;
 
-    int m_iWidth = 512;
-    int m_iHeight = 512;
+    int _width = 512;
+    int _height = 512;
     int m_iButton = -1;
     Point2 m_ptPre;
     int m_iTestCode = 0;
@@ -79,7 +79,7 @@ namespace
         m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
 
         m_pMPREE.reset(new MPREntryExitPoints());
-        m_pMPREE->set_display_size(m_iWidth,m_iHeight);
+        m_pMPREE->set_display_size(_width,_height);
         m_pMPREE->set_camera(m_pCamera);
         m_pMPREE->set_camera_calculator(m_pCameraCal);
         m_pMPREE->set_strategy(CPU_BASE);
@@ -87,7 +87,7 @@ namespace
         m_pMPREE->set_thickness(1.0f);
 
         m_pCanvas.reset(new RayCasterCanvas());
-        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        m_pCanvas->set_display_size(_width , _height);
         m_pCanvas->initialize();
 
         m_pRayCaster.reset(new RayCaster());
@@ -106,17 +106,17 @@ namespace
 
     void RayCasterCanvasToScreen()
     {
-        //glViewport(0,0,m_iWidth, m_iHeight);
+        //glViewport(0,0,_width, _height);
         glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->get_fbo()->get_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , GL_BACK);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glBlitFramebuffer(0,0,m_iWidth, m_iHeight , 0,0,m_iWidth , m_iHeight , GL_COLOR_BUFFER_BIT , GL_LINEAR);
+        glBlitFramebuffer(0,0,_width, _height , 0,0,_width , _height , GL_COLOR_BUFFER_BIT , GL_LINEAR);
 
     }
 
     void Display()
     {
-        glViewport(0,0,m_iWidth , m_iHeight);
+        glViewport(0,0,_width , _height);
         glClearColor(1.0,0.0,0.0,1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -134,7 +134,7 @@ namespace
         {
         case 't':
             {
-                std::cout << "W H :" << m_iWidth << " " << m_iHeight << std::endl;
+                std::cout << "W H :" << _width << " " << _height << std::endl;
                 m_pMPREE->debug_output_exit_points("D:/entry_exit.rgb.raw");
                 break;
             }
@@ -152,12 +152,12 @@ namespace
 
     void Resize(int x , int y)
     {
-        m_iWidth = x;
-        m_iHeight = y;
-        m_pMPREE->set_display_size(m_iWidth , m_iHeight);
-        m_pCanvas->set_display_size(m_iWidth , m_iHeight);
+        _width = x;
+        _height = y;
+        m_pMPREE->set_display_size(_width , _height);
+        m_pCanvas->set_display_size(_width , _height);
         m_pCanvas->update_fbo();
-        m_pCameraInteractor->Resize(m_iWidth , m_iHeight);
+        m_pCameraInteractor->Resize(_width , _height);
         glutPostRedisplay();
     }
 
@@ -193,15 +193,15 @@ namespace
         Point2 ptCur(x,y);
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->rotate(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->rotate(m_ptPre , ptCur , _width , _height);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->pan(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->pan(m_ptPre , ptCur , _width , _height);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->zoom(m_ptPre , ptCur , m_iWidth , m_iHeight);
+            m_pCameraInteractor->zoom(m_ptPre , ptCur , _width , _height);
         }
 
         m_ptPre = ptCur;
@@ -217,7 +217,7 @@ void UT_CPUMPREntryExitPoints(int argc , char* argv[])
         glutInit(&argc , argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0,0);
-        glutInitWindowSize(m_iWidth,m_iHeight);
+        glutInitWindowSize(_width,_height);
 
         glutCreateWindow("Test GL resource");
 

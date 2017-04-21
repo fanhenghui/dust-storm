@@ -12,29 +12,29 @@ MED_IMAGING_BEGIN_NAMESPACE
 class GLUIDGenerator
 {
 public:
-    GLUIDGenerator():m_base(0)
+    GLUIDGenerator():_base(0)
     {
     }
 
     ~GLUIDGenerator()
     {
-        m_base = 0;
+        _base = 0;
     }
 
     void reset()
     {
         boost::unique_lock<boost::mutex> locker(_mutex);
-        m_base = 0;
+        _base = 0;
     }
 
     UIDType tick()
     {
         boost::unique_lock<boost::mutex> locker(_mutex);
-        return m_base++;
+        return _base++;
     }
 
 private:
-    UIDType m_base;
+    UIDType _base;
     boost::mutex _mutex;
 };
 
@@ -54,14 +54,14 @@ public:
         return m_uid;
     }
 
-    void set_type(const std::string& sType)
+    void set_type(const std::string& type)
     {
-        m_sType = sType;
+        m_type = type;
     }
 
     std::string get_type() const
     {
-        return m_sType;
+        return m_type;
     }
 
     std::string get_description() const
@@ -69,9 +69,9 @@ public:
         return _description;
     }
 
-    void set_description(const std::string& sDes)
+    void set_description(const std::string& des)
     {
-        _description = sDes;
+        _description = des;
     }
 
     virtual void initialize() = 0;
@@ -79,7 +79,7 @@ public:
 
 private:
     UIDType m_uid;
-    std::string m_sType;
+    std::string m_type;
     std::string _description;
 };
 

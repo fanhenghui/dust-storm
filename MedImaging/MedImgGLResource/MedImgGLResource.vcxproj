@@ -196,7 +196,6 @@
     <ClCompile Include="mi_gl_buffer.cpp" />
     <ClCompile Include="mi_gl_environment.cpp" />
     <ClCompile Include="mi_gl_fbo.cpp" />
-    <ClCompile Include="mi_gl_object.cpp" />
     <ClCompile Include="mi_gl_program.cpp" />
     <ClCompile Include="mi_gl_resource_manager.cpp" />
     <ClCompile Include="mi_gl_resource_manager_container.cpp" />

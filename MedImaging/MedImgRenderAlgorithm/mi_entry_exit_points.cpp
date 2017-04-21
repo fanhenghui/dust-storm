@@ -12,10 +12,10 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-EntryExitPoints::EntryExitPoints():m_iWidth(4),m_iHeight(4),m_bInit(false),m_eStrategy(CPU_BASE)
+EntryExitPoints::EntryExitPoints():_width(4),_height(4),m_bInit(false),m_eStrategy(CPU_BASE)
 {
-    m_pEntryBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
-    m_pExitBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
+    m_pEntryBuffer.reset(new Vector4f[_width*_height]);
+    m_pExitBuffer.reset(new Vector4f[_width*_height]);
     UIDType uid;
     m_pEntryTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
     m_pExitTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
@@ -49,10 +49,10 @@ EntryExitPoints::~EntryExitPoints()
 
 void EntryExitPoints::set_display_size(int iWidth , int iHeight)
 {
-    m_iWidth = iWidth;
-    m_iHeight = iHeight;
-    m_pEntryBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
-    m_pExitBuffer.reset(new Vector4f[m_iWidth*m_iHeight]);
+    _width = iWidth;
+    _height = iHeight;
+    m_pEntryBuffer.reset(new Vector4f[_width*_height]);
+    m_pExitBuffer.reset(new Vector4f[_width*_height]);
 
     //resize texture
     if (GPU_BASE == m_eStrategy)
@@ -64,13 +64,13 @@ void EntryExitPoints::set_display_size(int iWidth , int iHeight)
         m_pEntryTex->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pEntryTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
+        m_pEntryTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
         m_pEntryTex->unbind();
 
         m_pExitTex->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pExitTex->load(GL_RGBA32F , m_iWidth , m_iHeight , GL_RGBA , GL_FLOAT , NULL);
+        m_pExitTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
         m_pExitTex->unbind();
 
         CHECK_GL_ERROR;
@@ -79,8 +79,8 @@ void EntryExitPoints::set_display_size(int iWidth , int iHeight)
 
 void EntryExitPoints::get_display_size(int& iWidth , int& iHeight)
 {
-    iWidth = m_iWidth;
-    iHeight = m_iHeight;
+    iWidth = _width;
+    iHeight = _height;
 }
 
 std::shared_ptr<GLTexture2D> EntryExitPoints::get_entry_points_texture()
@@ -124,13 +124,13 @@ void EntryExitPoints::debug_output_entry_points(const std::string& sFileName)
     std::ofstream out(sFileName , std::ios::binary | std::ios::out);
     if (out.is_open())
     {
-        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[m_iWidth*m_iHeight*3]);
+        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
         unsigned int *uiDim = m_pImgData->m_uiDim;
         float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
         unsigned char r,g,b;
         float fR , fG , fB;
-        for (int i = 0 ; i < m_iWidth*m_iHeight ; ++i)
+        for (int i = 0 ; i < _width*_height ; ++i)
         {
             fR =pPoints[i]._m[0] *fDimR[0]*255.0f;
             fG =pPoints[i]._m[1] *fDimR[1]*255.0f;
@@ -155,7 +155,7 @@ void EntryExitPoints::debug_output_entry_points(const std::string& sFileName)
 
         }
 
-        out.write((char*)pRGB.get()  , m_iWidth*m_iHeight*3);
+        out.write((char*)pRGB.get()  , _width*_height*3);
         out.close();
     }
     else
@@ -171,13 +171,13 @@ void EntryExitPoints::debug_output_exit_points(const std::string& sFileName)
     std::ofstream out(sFileName , std::ios::binary | std::ios::out);
     if (out.is_open())
     {
-        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[m_iWidth*m_iHeight*3]);
+        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
         RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
         unsigned int *uiDim = m_pImgData->m_uiDim;
         float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
         unsigned char r,g,b;
         float fR , fG , fB;
-        for (int i = 0 ; i < m_iWidth*m_iHeight ; ++i)
+        for (int i = 0 ; i < _width*_height ; ++i)
         {
             fR =pPoints[i]._m[0] *fDimR[0]*255.0f;
             fG =pPoints[i]._m[1] *fDimR[1]*255.0f;
@@ -202,7 +202,7 @@ void EntryExitPoints::debug_output_exit_points(const std::string& sFileName)
 
         }
 
-        out.write((char*)pRGB.get()  , m_iWidth*m_iHeight*3);
+        out.write((char*)pRGB.get()  , _width*_height*3);
         out.close();
     }
     else

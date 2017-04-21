@@ -28,61 +28,61 @@ GLResourceManagerContainer::~GLResourceManagerContainer()
 
 GLProgramManagerPtr GLResourceManagerContainer::get_program_manager() const
 {
-    return m_pProgramMag;
+    return _program_manager;
 }
 
 GLBufferManagerPtr GLResourceManagerContainer::get_buffer_manager() const
 {
-    return m_pBufferMag;
+    return _buffer_manager;
 }
 
 void GLResourceManagerContainer::update_all()
 {
-    m_pProgramMag->update();
-    m_pBufferMag->update();
+    _program_manager->update();
+    _buffer_manager->update();
 }
 
 GLResourceManagerContainer::GLResourceManagerContainer():
-m_pProgramMag(new GLProgramManager()),
-    m_pBufferMag(new GLBufferManager()),
-    m_pTex1DMag(new GLTexture1DManager()),
-    m_pTex2DMag(new GLTexture2DManager()),
-    m_pTex3DMag(new GLTexture3DManager()),
-    m_pVAOMag(new GLVAOManager()),
-    m_pFBOMag(new GLFBOManager()),
-    m_pTex1DArrayMag(new GLTexture1DArrayManager())
+_program_manager(new GLProgramManager()),
+    _buffer_manager(new GLBufferManager()),
+    _texture_1d_manager(new GLTexture1DManager()),
+    _texture_2d_manager(new GLTexture2DManager()),
+    _texture_3d_manager(new GLTexture3DManager()),
+    _vao_manager(new GLVAOManager()),
+    _fbo_manager(new GLFBOManager()),
+    _texture_1d_array_manager(new GLTexture1DArrayManager())
 {
 
 }
 
 GLTexture1DManagerPtr GLResourceManagerContainer::get_texture_1d_manager() const
 {
-    return m_pTex1DMag;
+    return _texture_1d_manager;
 }
 
 GLTexture2DManagerPtr GLResourceManagerContainer::get_texture_2d_manager() const
 {
-    return m_pTex2DMag;
+    return _texture_2d_manager;
 }
 
 GLTexture3DManagerPtr GLResourceManagerContainer::get_texture_3d_manager() const
 {
-    return m_pTex3DMag;
+    return _texture_3d_manager;
 }
 
 GLVAOManagerPtr GLResourceManagerContainer::get_vao_manager() const
 {
-    return m_pVAOMag;
+    return _vao_manager;
 }
 
 GLFBOManagerPtr GLResourceManagerContainer::get_fbo_manager() const
 {
-    return m_pFBOMag;
+    return _fbo_manager;
 }
 
 GLTexture1DArrayManagerPtr GLResourceManagerContainer::get_texture_1d_array_manager() const
 {
-    return m_pTex1DArrayMag;
+    return _texture_1d_array_manager;
 }
 
 MED_IMAGING_END_NAMESPACE

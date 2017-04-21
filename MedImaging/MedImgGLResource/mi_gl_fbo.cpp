@@ -4,7 +4,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GLFBO::GLFBO(UIDType uid):GLObject(uid),m_uiFBOID(0),m_eTarget(GL_FRAMEBUFFER)
+GLFBO::GLFBO(UIDType uid):GLObject(uid),_fbo_id(0),_target(GL_FRAMEBUFFER)
 {
     set_type("GLFBO");
 }
@@ -16,48 +16,48 @@ GLFBO::~GLFBO()
 
 void GLFBO::initialize()
 {
-    if (0 == m_uiFBOID)
+    if (0 == _fbo_id)
     {
-        glGenFramebuffers(1 , &m_uiFBOID);
+        glGenFramebuffers(1 , &_fbo_id);
     }
 }
 
 void GLFBO::finalize()
 {
-    if (0 != m_uiFBOID)
+    if (0 != _fbo_id)
     {
-        glDeleteFramebuffers(1 , &m_uiFBOID);
+        glDeleteFramebuffers(1 , &_fbo_id);
     }
 }
 
 unsigned int GLFBO::get_id() const
 {
-    return m_uiFBOID;
+    return _fbo_id;
 }
 
 void GLFBO::bind()
 {
-    glBindFramebuffer(m_eTarget , m_uiFBOID);
+    glBindFramebuffer(_target , _fbo_id);
 }
 
 void GLFBO::unbind()
 {
-    glBindFramebuffer(m_eTarget , 0);
+    glBindFramebuffer(_target , 0);
 }
 
-void GLFBO::set_target(GLenum eTarget)
+void GLFBO::set_target(GLenum target)
 {
-    m_eTarget = eTarget;
+    _target = target;
 }
 
 GLenum GLFBO::get_target()
 {
-    return m_eTarget;
+    return _target;
 }
 
-void GLFBO::attach_texture( GLenum eAttach , std::shared_ptr<GLTexture2D> pTex2D )
+void GLFBO::attach_texture( GLenum attachment , std::shared_ptr<GLTexture2D> tex )
 {
-    glFramebufferTexture2D(m_eTarget , eAttach , GL_TEXTURE_2D , pTex2D->get_id() , 0);
+    glFramebufferTexture2D(_target , attachment , GL_TEXTURE_2D , tex->get_id() , 0);
 }
 
 MED_IMAGING_END_NAMESPACE

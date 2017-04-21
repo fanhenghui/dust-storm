@@ -83,9 +83,6 @@
     <ClCompile Include="mi_gl_buffer.cpp">
       <Filter>Resource</Filter>
     </ClCompile>
-    <ClCompile Include="mi_gl_object.cpp">
-      <Filter>Resource</Filter>
-    </ClCompile>
     <ClCompile Include="mi_gl_program.cpp">
       <Filter>Resource</Filter>
     </ClCompile>

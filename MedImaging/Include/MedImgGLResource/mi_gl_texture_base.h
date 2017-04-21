@@ -34,7 +34,7 @@ public:
     virtual void unbind() = 0;
 
 protected:
-    unsigned int m_uiTextueID;
+    unsigned int _texture_id;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -55,8 +55,8 @@ protected:
     std::shared_ptr<GLTexture2D> m_pExitTex;
     std::unique_ptr<Vector4f[]> m_pEntryBuffer;
     std::unique_ptr<Vector4f[]> m_pExitBuffer;
-    int m_iWidth;
-    int m_iHeight;
+    int _width;
+    int _height;
     std::shared_ptr<CameraBase> m_pCamera;
     std::shared_ptr<ImageData> m_pImgData;
     std::shared_ptr<CameraCalculator> m_pCameraCalculator;

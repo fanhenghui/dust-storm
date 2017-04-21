@@ -28,11 +28,11 @@ public:
     std::shared_ptr<CameraBase> get_camera();
     void render_to_back();
 
-    void set_dirty(bool bFlag);
+    void set_dirty(bool flag);
     bool get_dirty() const;
 
 protected:
-    int m_iWidth , m_iHeight;
+    int _width , _height;
     GLFBOPtr m_pSceneFBO;
     GLTexture2DPtr m_pSceneColorAttach0;
     GLTexture2DPtr m_pSceneDepthAttach;

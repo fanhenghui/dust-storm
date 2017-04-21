@@ -32,11 +32,11 @@ public:
 
 protected:
 private:
-    GLsizei m_iWidth;
-    GLsizei m_iHeight;
-    GLenum m_eFormat;
-    GLenum m_eInternalFormat;
-    GLenum m_eType;
+    GLsizei _width;
+    GLsizei _height;
+    GLenum _format;
+    GLenum _internal_format;
+    GLenum _type;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -217,9 +217,9 @@ void VolumeInfos::load_volume_resource_i()
         pTex->bind();
         GLTextureUtils::set_1d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
-        GLenum eInternalFormat , eFormat , eType;
-        GLUtils::get_gray_texture_format(m_pVolume->m_eDataType , eInternalFormat , eFormat ,eType);
-        pTex->load(eInternalFormat ,m_pVolume->m_uiDim[0] , m_pVolume->m_uiDim[1] , m_pVolume->m_uiDim[2] , eFormat, eType , m_pVolume->get_pixel_pointer());
+        GLenum internal_format , format , eType;
+        GLUtils::get_gray_texture_format(m_pVolume->m_eDataType , internal_format , format ,eType);
+        pTex->load(internal_format ,m_pVolume->m_uiDim[0] , m_pVolume->m_uiDim[1] , m_pVolume->m_uiDim[2] , format, eType , m_pVolume->get_pixel_pointer());
         pTex->unbind();
 
         m_vecVolumeTex.push_back(pTex);

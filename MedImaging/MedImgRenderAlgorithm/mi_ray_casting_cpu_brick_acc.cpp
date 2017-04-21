@@ -121,8 +121,8 @@ bool operator <(const BrickDistance& l , const BrickDistance& r)
 }
 
 RayCastingCPUBrickAcc::RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> pRayCaster):m_pRayCaster(pRayCaster),
-    m_iWidth(32),
-    m_iHeight(32),
+    _width(32),
+    _height(32),
     m_pEntryPoints(nullptr),
     m_pExitPoints(nullptr),
     m_pColorCanvas(nullptr),
@@ -158,7 +158,7 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
 
         //Volume info
         RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pEntryExitPoints);
-        pRayCaster->m_pEntryExitPoints->get_display_size(m_iWidth , m_iHeight);
+        pRayCaster->m_pEntryExitPoints->get_display_size(_width , _height);
 
         std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
@@ -182,9 +182,9 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
             m_vecBrickCenterDistance.resize(m_uiBrickCount);
         }
 
-        if (m_iRayCount != m_iWidth*m_iHeight)
+        if (m_iRayCount != _width*_height)
         {
-            m_iRayCount = m_iWidth*m_iHeight;
+            m_iRayCount = _width*_height;
             m_pRayResult.reset(new float[m_iRayCount]);
         }
         //memset(m_pRayResult.get() , 0 , sizeof(float)*m_iRayCount);
@@ -387,8 +387,8 @@ void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int uiBrickID ,  con
         Vector3f(ptMax._m[0],ptMax._m[1],ptMin._m[2]),
         ptMax};
 
-    const float fWidth = (float)m_iWidth;
-    const float fHeight = (float)m_iHeight;
+    const float fWidth = (float)_width;
+    const float fHeight = (float)_height;
     int iXBegin(65535), iXEnd(-65535) , iYBegin(65535) , iYEnd(-65535);
     int iCurX , iCurY;
     float fNormX , fNormY;
@@ -455,7 +455,7 @@ void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int uiBrickID ,  con
         }
     }
 
-    if (iYEnd > m_iHeight || iXEnd > m_iWidth)
+    if (iYEnd > _height || iXEnd > _width)
     {
         //std::cout <<"ERR\n";
     }
@@ -500,7 +500,7 @@ void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int uiBrickID ,  con
             int x = iPixelID - y*iXRange;
             x += iXBegin;
             y += iYBegin;
-            const int iRayID = y*m_iWidth + x;
+            const int iRayID = y*_width + x;
             if (x == m_iTestPixelX && y == m_iTestPixelY)
             {
                 std::cout <<"ERR";

@@ -3,7 +3,7 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 ColorTransFunc::ColorTransFunc(int iWidth /*= 512 */) :
-m_iWidth(iWidth), m_eInterpolationColorType(RGB), m_eInputColorType(RGB), m_bIsDataDirty(false)
+_width(iWidth), m_eInterpolationColorType(RGB), m_eInputColorType(RGB), m_bIsDataDirty(false)
 {}
 
 ColorTransFunc::~ColorTransFunc()
@@ -13,7 +13,7 @@ ColorTransFunc::~ColorTransFunc()
 
 void ColorTransFunc::set_width(int iWidth)
 {
-    m_iWidth = iWidth;
+    _width = iWidth;
     m_bIsDataDirty = true;
 }
 
@@ -99,7 +99,7 @@ void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
         //Expand point value to iWidth , make the interpolation step is 1
         float fMaxValue = m_vecTFPoint[uiTFPointSize - 1].v;
         float fMinValue = m_vecTFPoint[0].v;
-        float fExpandRatio = static_cast<float>(m_iWidth - 1) / (fMaxValue - fMinValue);
+        float fExpandRatio = static_cast<float>(_width - 1) / (fMaxValue - fMinValue);
         for (size_t i = 0; i < uiTFPointSize; ++i)
         {
             m_vecTFPoint[i].v = static_cast<float>(static_cast<int>((m_vecTFPoint[i].v - fMinValue)  * fExpandRatio + 0.5f));
@@ -156,7 +156,7 @@ void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
 
 int ColorTransFunc::get_width() const
 {
-    return m_iWidth;
+    return _width;
 }
 
 ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv)

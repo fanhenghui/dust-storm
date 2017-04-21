@@ -19,9 +19,9 @@ namespace
     void Test()
     {
         GLEnvironment env;
-        int iMajor(0) , iMinor(0);
-        env.get_gl_version(iMajor , iMinor);
-        std::cout << "OpenGL Version : " << iMajor << "." << iMinor << std::endl;
+        int major(0) , minor(0);
+        env.get_gl_version(major , minor);
+        std::cout << "OpenGL Version : " << major << "." << minor << std::endl;
         std::cout << "GL vendor : " << env.get_gl_vendor() << std::endl;
         std::cout << "GL renderer : " << env.get_gl_renderer() << std::endl;
     }

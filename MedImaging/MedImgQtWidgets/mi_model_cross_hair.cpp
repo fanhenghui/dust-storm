@@ -59,12 +59,12 @@ void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (
 
     //2 MPR plane intersected to a plane
     const Matrix4 matVP = pTargetMPRScene->get_camera()->get_view_projection_matrix();
-    Plane planeTarget = pTargetMPRScene->to_plane();
+    Plane plantarget = pTargetMPRScene->to_plane();
     for (int i = 0; i<2; ++i)
     {
         Plane p = aCrossScene[i]->to_plane();
         Line3D lineIntersect;
-        if( IntersectionTest::plane_to_plane(p, planeTarget,lineIntersect))
+        if( IntersectionTest::plane_to_plane(p, plantarget,lineIntersect))
         {
             //Project intersected line to screen
             Point3 ptScreen = matVP.transform(lineIntersect._pt);
@@ -314,9 +314,9 @@ void CrosshairModel::focus(MPRScenePtr pTargetMPRScene)
     }
 }
 
-void CrosshairModel::set_visibility(bool bFlag)
+void CrosshairModel::set_visibility(bool flag)
 {
-    m_bVisible = bFlag;
+    m_bVisible = flag;
 }
 
 bool CrosshairModel::get_visibility() const

@@ -57,26 +57,26 @@ void MPRScene::place_mpr(ScanSliceType eType)
     //Set initial camera to interactor
     m_pCameraInteractor->set_initial_status(m_pRayCastCamera);
     //resize because initial camera's ratio between width and height  is 1, but current ratio may not.
-    m_pCameraInteractor->resize(m_iWidth , m_iHeight);
+    m_pCameraInteractor->resize(_width , _height);
 
     set_dirty(true);
 }
 
 void MPRScene::rotate(const Point2& ptPre , const Point2& ptCur)
 {
-    m_pCameraInteractor->rotate(ptPre , ptCur , m_iWidth , m_iHeight );
+    m_pCameraInteractor->rotate(ptPre , ptCur , _width , _height );
     set_dirty(true);
 }
 
 void MPRScene::zoom(const Point2& ptPre , const Point2& ptCur)
 {
-    m_pCameraInteractor->zoom(ptPre , ptCur , m_iWidth , m_iHeight );
+    m_pCameraInteractor->zoom(ptPre , ptCur , _width , _height );
     set_dirty(true);
 }
 
 void MPRScene::pan(const Point2& ptPre , const Point2& ptCur)
 {
-    m_pCameraInteractor->pan(ptPre , ptCur , m_iWidth , m_iHeight );
+    m_pCameraInteractor->pan(ptPre , ptCur , _width , _height );
     set_dirty(true);
 }
 
@@ -86,7 +86,7 @@ bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
     std::shared_ptr<ImageData> pImg = m_pVolumeInfos->get_volume();
     RENDERALGO_CHECK_NULL_EXCEPTION(pImg);
 
-    Point2 pt = ArithmeticUtils::dc_to_ndc(pt_dc , m_iWidth , m_iHeight);
+    Point2 pt = ArithmeticUtils::dc_to_ndc(pt_dc , _width , _height);
 
     Matrix4 matMVP = m_pRayCastCamera->get_view_projection_matrix()*m_pCameraCalculator->get_volume_to_world_matrix();
     matMVP.inverse();

@@ -53,18 +53,18 @@ class GLResource_Export GLUtils
 public:
     static bool check_framebuffer_state();
 
-    static void get_gray_texture_format(DataType eDataType , GLenum &eInternalFormat , GLenum &eFormat , GLenum &eType );
+    static void get_gray_texture_format(DataType data_type , GLenum &internal_format , GLenum &format , GLenum &type );
 
-    static unsigned int get_byte_by_data_type(DataType eDataType);
+    static unsigned int get_byte_by_data_type(DataType data_type);
 
     static std::string get_gl_enum_description(GLenum e);
 
-    static void set_check_gl_flag(bool bFlag);
+    static void set_check_gl_flag(bool flag);
 
     static bool get_check_gl_flag();
 
 private:
-    static bool m_bCheckGLFlag;
+    static bool _s_check_gl_flag;
 };
 
 class GLResource_Export DrawFBOStack
@@ -73,9 +73,9 @@ public:
     DrawFBOStack();
     ~DrawFBOStack();
 private:
-    GLint m_iCurDrawFBO;
-    GLint m_iCurDrawBufferCount;
-    GLint m_iCurDrawBufferArray[8];
+    GLint _current_draw_fbo;
+    GLint _current_draw_buffer_count;
+    GLint _current_draw_buffer_array[8];
 };
 
 class GLResource_Export ReadFBOStack
@@ -84,8 +84,8 @@ public:
     ReadFBOStack();
     ~ReadFBOStack();
 private:
-    GLint m_iCurReadFBO;
-    GLint m_iCurReadBuffer;
+    GLint _current_read_fbo;
+    GLint _current_read_buffer;
 };
 
 class GLResource_Export FBOStack
@@ -94,11 +94,11 @@ public:
     FBOStack();
     ~FBOStack();
 private:
-    GLint m_iCurDrawFBO;
-    GLint m_iCurDrawBufferCount;
-    GLint m_iCurDrawBufferArray[8];
-    GLint m_iCurReadFBO;
-    GLint m_iCurReadBuffer;
+    GLint _current_draw_fbo;
+    GLint _current_draw_buffer_count;
+    GLint _current_draw_buffer_array[8];
+    GLint _current_read_fbo;
+    GLint _current_read_buffer;
 };
 
 class GLResource_Export GLActiveTextureCounter
@@ -113,7 +113,7 @@ public:
     void reset();
 
 private:
-    int m_iCurActiveTexID;
+    int _current_active_texture_id;
 };
 
 class GLResource_Export GLContextHelper
@@ -125,10 +125,10 @@ public:
 class GLResource_Export GLTextureUtils
 {
 public:
-    static void set_1d_wrap_s(GLint iWrapType);
-    static void set_2d_wrap_s_t(GLint iWrapType);
-    static void set_1d_wrap_s_t_r(GLint iWrapType);
-    static void set_filter(GLenum eTexTarget , GLint iFilterType);
+    static void set_1d_wrap_s(GLint wrap_type);
+    static void set_2d_wrap_s_t(GLint wrap_type);
+    static void set_1d_wrap_s_t_r(GLint wrap_type);
+    static void set_filter(GLenum texture_target , GLint filter_type);
 };
 
 

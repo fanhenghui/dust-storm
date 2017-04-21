@@ -7,11 +7,11 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-SceneBase::SceneBase():m_iWidth(128),m_iHeight(128),m_bDirty(true),m_sName("Scene")
+SceneBase::SceneBase():_width(128),_height(128),m_bDirty(true),m_sName("Scene")
 {
 }
 
-SceneBase::SceneBase(int iWidth , int iHeight):m_iWidth(iWidth) , m_iHeight(iHeight),m_bDirty(true)
+SceneBase::SceneBase(int iWidth , int iHeight):_width(iWidth) , _height(iHeight),m_bDirty(true)
 {
 }
 
@@ -26,7 +26,7 @@ void SceneBase::render_to_back()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glDrawBuffer(GL_BACK);
-    glBlitFramebuffer(0,0,m_iWidth, m_iHeight , 0,0,m_iWidth , m_iHeight , GL_COLOR_BUFFER_BIT , GL_NEAREST);
+    glBlitFramebuffer(0,0,_width, _height , 0,0,_width , _height , GL_COLOR_BUFFER_BIT , GL_NEAREST);
 }
 
 std::shared_ptr<CameraBase> SceneBase::get_camera()
@@ -54,7 +54,7 @@ void SceneBase::initialize()
         m_pSceneColorAttach0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pSceneColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         UIDType idTexDepth = 0;
         m_pSceneDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexDepth);
@@ -63,7 +63,7 @@ void SceneBase::initialize()
         m_pSceneDepthAttach->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+        m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
         //bind texture to FBO
         m_pSceneFBO->bind();
@@ -89,14 +89,14 @@ void SceneBase::finalize()
 
 void SceneBase::set_display_size(int iWidth , int iHeight)
 {
-    m_iWidth = iWidth;
-    m_iHeight = iHeight;
+    _width = iWidth;
+    _height = iHeight;
 
     m_pSceneColorAttach0->bind();
-    m_pSceneColorAttach0->load(GL_RGBA8 , m_iWidth , m_iHeight , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+    m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
     m_pSceneDepthAttach->bind();
-    m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , m_iWidth , m_iHeight , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+    m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
     set_dirty(true);
 }
@@ -123,13 +123,13 @@ void SceneBase::pan(const Point2& ptPre , const Point2& ptCur)
 
 void SceneBase::get_display_size(int& iWidth, int& iHeight) const
 {
-    iWidth = m_iWidth;
-    iHeight = m_iHeight;
+    iWidth = _width;
+    iHeight = _height;
 }
 
-void SceneBase::set_dirty(bool bFlag)
+void SceneBase::set_dirty(bool flag)
 {
-    m_bDirty = bFlag;
+    m_bDirty = flag;
 }
 
 bool SceneBase::get_dirty() const

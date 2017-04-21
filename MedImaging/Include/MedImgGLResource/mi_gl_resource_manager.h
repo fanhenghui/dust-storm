@@ -27,9 +27,9 @@ public:
     std::string get_type() const;
 
 private:
-    std::map<UIDType, std::shared_ptr<ResourceType>> m_Objects;
-    std::vector<std::shared_ptr<ResourceType>> m_Discard;
-    std::unique_ptr<GLUIDGenerator> m_pUIDGen;
+    std::map<UIDType, std::shared_ptr<ResourceType>> _objects;
+    std::vector<std::shared_ptr<ResourceType>> _discard;
+    std::unique_ptr<GLUIDGenerator> _uid_generator;
     boost::mutex _mutex;
 };
 

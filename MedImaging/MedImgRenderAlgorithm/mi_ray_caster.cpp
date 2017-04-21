@@ -232,9 +232,9 @@ void RayCaster::set_ssd_gray(float fGray)
     m_fSSDGray = fGray;
 }
 
-void RayCaster::set_jittering_enabled(bool bFlag)
+void RayCaster::set_jittering_enabled(bool flag)
 {
-    m_bJitteringEnabled = bFlag;
+    m_bJitteringEnabled = flag;
 }
 
 void RayCaster::set_bounding(const Vector3f& vMin, const Vector3f& vMax)
