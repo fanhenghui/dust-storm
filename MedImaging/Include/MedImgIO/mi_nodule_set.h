@@ -11,7 +11,10 @@ class IO_Export NoduleSet
 public:
     NoduleSet();
     ~NoduleSet();
+
     void add_nodule(const VOISphere& v);
+    void clear_nodule();
+
     const std::vector<VOISphere>& get_nodule_set() const;
     void get_nodule_set(std::vector<VOISphere>& nset) const;
 

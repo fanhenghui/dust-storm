@@ -42,7 +42,6 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
 {
     std::fstream out(file_path.c_str() , std::ios::out);
 
-
     return IO_SUCCESS;
 }
 
@@ -76,7 +75,100 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path , const std::
 IOStatus NoduleSetParser::load_as_rsa_binary(const std::string& file_path , const mbedtls_rsa_context& rsa , std::shared_ptr<NoduleSet>& nodule_set)
 {
     IO_CHECK_NULL_EXCEPTION(nodule_set);
+    nodule_set->clear_nodule();
 
+    std::fstream in(file_path , std::ios::in | std::ios::binary);
+    if (!in.is_open())
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    RSAUtils rsa_utils;
+    StrNumConverter<double> str_num_convertor;
+    int status(0);
+
+    //1 Read nodule number
+    unsigned char buffer[1024];
+    unsigned char input_nudule_num[512];
+    if(!in.read((char*)input_nudule_num , sizeof(input_nudule_num)))
+    {
+        in.close();
+        return IO_DATA_DAMAGE;
+    }
+
+    memset(buffer , 0 , sizeof(buffer));
+    status = rsa_utils.detrypt(rsa , 512 ,input_nudule_num , buffer );
+    if (status != 0)
+    {
+        in.close();
+        return IO_ENCRYPT_FAILED;
+    }
+
+    const int num =  static_cast<int>(str_num_convertor.to_num(std::string((char*)buffer)));
+    if (num < 0)//warning no nodule
+    {
+        in.close();
+        return IO_SUCCESS;
+    }
+
+    for (int i = 0 ; i < num ; ++i)
+    {
+        NoduleUnit nodule_unit;
+        if (!in.read((char*)(&nodule_unit) , sizeof(nodule_unit)))
+        {
+            break;
+        }
+
+        memset(buffer , 0 , sizeof(buffer));
+        status = rsa_utils.detrypt(rsa , 512 ,nodule_unit.pos_x , buffer );
+        if (status != 0)
+        {
+            in.close();
+            return IO_ENCRYPT_FAILED;
+        }
+        double pos_x=  static_cast<int>(str_num_convertor.to_num(std::string((char*)buffer)));
+
+        memset(buffer , 0 , sizeof(buffer));
+        status = rsa_utils.detrypt(rsa , 512 ,nodule_unit.pos_y , buffer );
+        if (status != 0)
+        {
+            in.close();
+            return IO_ENCRYPT_FAILED;
+        }
+        double pos_y=  static_cast<int>(str_num_convertor.to_num(std::string((char*)buffer)));
+
+        memset(buffer , 0 , sizeof(buffer));
+        status = rsa_utils.detrypt(rsa , 512 ,nodule_unit.pos_z , buffer );
+        if (status != 0)
+        {
+            in.close();
+            return IO_ENCRYPT_FAILED;
+        }
+        double pos_z=  static_cast<int>(str_num_convertor.to_num(std::string((char*)buffer)));
+
+        memset(buffer , 0 , sizeof(buffer));
+        status = rsa_utils.detrypt(rsa , 512 ,nodule_unit.diameter , buffer );
+        if (status != 0)
+        {
+            in.close();
+            return IO_ENCRYPT_FAILED;
+        }
+        double diameter=  static_cast<int>(str_num_convertor.to_num(std::string((char*)buffer)));
+
+        memset(buffer , 0 , sizeof(buffer));
+        status = rsa_utils.detrypt(rsa , 512 ,nodule_unit.type , buffer );
+        if (status != 0)
+        {
+            in.close();
+            return IO_ENCRYPT_FAILED;
+        }
+        std::string type =  std::string((char*)buffer);
+
+        nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , type));
+
+    }
+
+    in.close();
     return IO_SUCCESS;
 }
 

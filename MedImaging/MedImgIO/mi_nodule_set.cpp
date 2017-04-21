@@ -27,4 +27,9 @@ void NoduleSet::get_nodule_set(std::vector<VOISphere>& nset) const
     nset = nodule_set;
 }
 
+void NoduleSet::clear_nodule()
+{
+    std::vector<VOISphere>().swap(nodule_set);
+}
+
 MED_IMAGING_END_NAMESPACE
