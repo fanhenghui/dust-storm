@@ -51,14 +51,14 @@ void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
     set_changed();
 }
 
-void VOIModel::modify_voi_sphere_name(int id , std::string sName)
+void VOIModel::modify_voi_sphere_name(int id , std::string name)
 {
     int i = 0;
     for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
     {
         if (i++== id)
         {
-            it->name = sName;
+            it->name = name;
             return;
         }
     }

@@ -38,8 +38,8 @@ void VOIPainter::render()
         std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
         QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
+        std::shared_ptr<VolumeInfos> volume_infos = pScene->get_volume_infos();
+        QTWIDGETS_CHECK_NULL_EXCEPTION(volume_infos);
 
         int width(1),height(1);
         pScene->get_display_size(width , height);

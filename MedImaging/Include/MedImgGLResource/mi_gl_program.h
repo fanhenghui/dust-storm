@@ -38,7 +38,7 @@ public:
 
     void unbind();
 
-    int get_uniform_location(const char* sName);
+    int get_uniform_location(const char* name);
 
 private:
     std::vector<GLShaderInfo> _shaders;

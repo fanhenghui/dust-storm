@@ -36,10 +36,10 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         std::shared_ptr<RayCastScene> pScene = std::dynamic_pointer_cast<RayCastScene>(m_pScene);
         QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-        std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
+        std::shared_ptr<VolumeInfos> volume_infos = pScene->get_volume_infos();
+        QTWIDGETS_CHECK_NULL_EXCEPTION(volume_infos);
 
-        std::shared_ptr<ImageDataHeader> data_header = pVolumeInfos->get_data_header();
+        std::shared_ptr<ImageDataHeader> data_header = volume_infos->get_data_header();
         QTWIDGETS_CHECK_NULL_EXCEPTION(data_header );
 
         int width(1),height(1);

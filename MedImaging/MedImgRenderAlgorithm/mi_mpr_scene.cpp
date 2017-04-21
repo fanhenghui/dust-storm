@@ -53,48 +53,48 @@ void MPRScene::place_mpr(ScanSliceType eType)
 {
     RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
     //Calculate MPR placement camera
-    _camera_calculator->init_mpr_placement(m_pRayCastCamera , eType);
+    _camera_calculator->init_mpr_placement(_ray_cast_camera , eType);
     //Set initial camera to interactor
-    m_pCameraInteractor->set_initial_status(m_pRayCastCamera);
+    _camera_interactor->set_initial_status(_ray_cast_camera);
     //resize because initial camera's ratio between width and height  is 1, but current ratio may not.
-    m_pCameraInteractor->resize(_width , _height);
+    _camera_interactor->resize(_width , _height);
 
     set_dirty(true);
 }
 
 void MPRScene::rotate(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->rotate(pre_pt , cur_pt , _width , _height );
+    _camera_interactor->rotate(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
 void MPRScene::zoom(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->zoom(pre_pt , cur_pt , _width , _height );
+    _camera_interactor->zoom(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
 void MPRScene::pan(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->pan(pre_pt , cur_pt , _width , _height );
+    _camera_interactor->pan(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
-bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
+bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& pos_v)
 {
-    RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
-    std::shared_ptr<ImageData> pImg = m_pVolumeInfos->get_volume();
-    RENDERALGO_CHECK_NULL_EXCEPTION(pImg);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+    std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume_data);
 
     Point2 pt = ArithmeticUtils::dc_to_ndc(pt_dc , _width , _height);
 
-    Matrix4 mat_mvp = m_pRayCastCamera->get_view_projection_matrix()*_camera_calculator->get_volume_to_world_matrix();
+    Matrix4 mat_mvp = _ray_cast_camera->get_view_projection_matrix()*_camera_calculator->get_volume_to_world_matrix();
     mat_mvp.inverse();
 
-    Point3 ptVolume = mat_mvp.transform(Point3(pt.x , pt.y , 0.0));
-    if (ArithmeticUtils::check_in_bound(ptVolume , Point3(pImg->_dim[0] - 1.0 , pImg->_dim[1] - 1 , pImg->_dim[2] - 1)))
+    Point3 pos_v_temp = mat_mvp.transform(Point3(pt.x , pt.y , 0.0));
+    if (ArithmeticUtils::check_in_bound(pos_v_temp , Point3(volume_data->_dim[0] - 1.0 , volume_data->_dim[1] - 1 , volume_data->_dim[2] - 1)))
     {
-        ptPosV = ptVolume;
+        pos_v = pos_v_temp;
         return true;
     }
     else
@@ -103,12 +103,12 @@ bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
     }
 }
 
-bool MPRScene::get_world_position(const Point2& pt_dc , Point3& ptPosW)
+bool MPRScene::get_world_position(const Point2& pt_dc , Point3& pos_w)
 {
-    Point3 ptPosV;
-    if (get_volume_position(pt_dc , ptPosV))
+    Point3 pos_v;
+    if (get_volume_position(pt_dc , pos_v))
     {
-        ptPosW = _camera_calculator->get_volume_to_world_matrix().transform(ptPosV);
+        pos_w = _camera_calculator->get_volume_to_world_matrix().transform(pos_v);
         return true;
     }
     else
@@ -117,40 +117,40 @@ bool MPRScene::get_world_position(const Point2& pt_dc , Point3& ptPosW)
     }
 }
 
-void MPRScene::page(int iStep)
+void MPRScene::page(int step)
 {
     //TODO should consider oblique MPR
-    _camera_calculator->page_orthognal_mpr(m_pRayCastCamera , iStep);
+    _camera_calculator->page_orthognal_mpr(_ray_cast_camera , step);
     set_dirty(true);
 }
 
 void MPRScene::page_to(int page)
 {
-    _camera_calculator->page_orthognal_mpr_to(m_pRayCastCamera , page);
+    _camera_calculator->page_orthognal_mpr_to(_ray_cast_camera , page);
     set_dirty(true);
 }
 
 Plane MPRScene::to_plane() const
 {
-    Point3 ptEye = m_pRayCastCamera->get_eye();
-    Point3 ptLookAt = m_pRayCastCamera->get_look_at();
+    Point3 eye = _ray_cast_camera->get_eye();
+    Point3 look_at = _ray_cast_camera->get_look_at();
 
-    Vector3 vNorm = ptLookAt - ptEye;
-    vNorm.normalize();
+    Vector3 norm = look_at - eye;
+    norm.normalize();
 
     Plane p;
-    p._norm = vNorm;
-    p._distance = vNorm.dot_product(ptLookAt - Point3::S_ZERO_POINT);
+    p._norm = norm;
+    p._distance = norm.dot_product(look_at - Point3::S_ZERO_POINT);
 
     return p;
 }
 
-bool MPRScene::get_patient_position(const Point2& pt_dc, Point3& ptPosP)
+bool MPRScene::get_patient_position(const Point2& pt_dc, Point3& pos_p)
 {
-    Point3 ptW;
-    if (get_world_position(pt_dc , ptW))
+    Point3 pt_w;
+    if (get_world_position(pt_dc , pt_w))
     {
-        ptPosP = _camera_calculator->get_world_to_patient_matrix().transform(ptW);
+        pos_p = _camera_calculator->get_world_to_patient_matrix().transform(pt_w);
         return true;
     }
     else

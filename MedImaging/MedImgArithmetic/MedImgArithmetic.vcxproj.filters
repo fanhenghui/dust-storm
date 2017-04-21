@@ -25,6 +25,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{9ed2ff20-c1c5-40c5-8f5d-5707f5a5e009}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RSA">
+      <UniqueIdentifier>{8da70d21-72e3-4ffe-a848-1668d42db7c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -117,6 +120,9 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_rsa_utils.h">
+      <Filter>RSA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -190,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="mi_intersection_test.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rsa_utils.cpp">
+      <Filter>RSA</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -254,9 +254,9 @@ int CrosshairModel::get_page(const std::shared_ptr<MPRScene>& pTargetMPRScene)
 bool CrosshairModel::set_center_i(const Point3& ptCenterW)
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(m_aMPRScene[0]);
-    std::shared_ptr<VolumeInfos> pVolumeInfos = m_aMPRScene[0]->get_volume_infos();
-    QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
-    std::shared_ptr<ImageData> pVolume = pVolumeInfos->get_volume();
+    std::shared_ptr<VolumeInfos> volume_infos = m_aMPRScene[0]->get_volume_infos();
+    QTWIDGETS_CHECK_NULL_EXCEPTION(volume_infos);
+    std::shared_ptr<ImageData> pVolume = volume_infos->get_volume();
     QTWIDGETS_CHECK_NULL_EXCEPTION(pVolume);
     unsigned int *uiDim = pVolume->_dim;
 

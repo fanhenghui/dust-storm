@@ -158,7 +158,9 @@
     <ClInclude Include="mi_arithmetic_ut_stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mi_arithmetic_ut_rsa.cpp" />
     <ClCompile Include="mi_arithmetic_ut_main.cpp" />
+    <ClCompile Include="mi_arithmetic_ut_sampler.cpp" />
     <ClCompile Include="mi_arithmetic_ut_stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

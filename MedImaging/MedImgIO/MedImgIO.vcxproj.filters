@@ -42,7 +42,7 @@
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_csv_parser.h">
+    <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_parser.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="mi_nodule_set.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mi_nodule_set_csv_parser.cpp">
+    <ClCompile Include="mi_nodule_set_parser.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

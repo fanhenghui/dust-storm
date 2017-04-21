@@ -69,11 +69,11 @@ private slots:
     void slot_preset_wl_changed_i(QString s);
 
     //Min Max Hint
-    void slot_scene_min_max_hint_i(const std::string& sName);
+    void slot_scene_min_max_hint_i(const std::string& name);
 
     //focus In/Out Scene
-    void slot_focus_in_scene_i(QString sName);
-    void slot_focus_out_scene_i(QString sName);
+    void slot_focus_in_scene_i(QString name);
+    void slot_focus_out_scene_i(QString name);
 
     //Crosshair visible
     void slot_crosshair_visibility_i(int );

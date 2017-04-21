@@ -13,7 +13,7 @@
 #include "MedImgIO/mi_image_data_header.h"
 #include "MedImgIO/mi_meta_object_loader.h"
 #include "MedImgIO/mi_nodule_set.h"
-#include "MedImgIO/mi_nodule_set_csv_parser.h"
+#include "MedImgIO/mi_nodule_set_parser.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -656,9 +656,9 @@ void NoduleAnnotation::slot_save_nodule_i()
             nodule_set->add_nodule(*it);
         }
 
-        NoduleSetCSVParser parser;
+        NoduleSetParser parser;
         std::string file_path(sFileCustom.toLocal8Bit());
-        IOStatus status = parser.save(file_path , nodule_set);
+        IOStatus status = parser.save_as_csv(file_path , nodule_set);
 
         if (status == IO_SUCCESS)
         {
@@ -824,7 +824,7 @@ void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
     m_pSceneContainerOb->update();
 }
 
-void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& sName)
+void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
 {
     if (!m_bReady)
     {
@@ -835,17 +835,17 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& sName)
     QScrollBar* pTargetBar = nullptr;
     if (0 == m_iLayoutType)
     {
-        if (sName == m_pMPRScene00->get_name())
+        if (name == m_pMPRScene00->get_name())
         {
             pTragetContainer = m_pMPR00;
             pTargetBar = m_pMPR00ScrollBar;
         }
-        else if (sName == m_pMPRScene01->get_name())
+        else if (name == m_pMPRScene01->get_name())
         {
             pTragetContainer = m_pMPR01;
             pTargetBar = m_pMPR01ScrollBar;
         }
-        else if (sName == m_pMPRScene10->get_name())
+        else if (name == m_pMPRScene10->get_name())
         {
             pTragetContainer = m_pMPR10;
             pTargetBar = m_pMPR10ScrollBar;
@@ -894,17 +894,17 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
         return;
     }
 
-    const std::string sName(s.toLocal8Bit());
+    const std::string name(s.toLocal8Bit());
 
-    if (sName == m_pMPRScene00->get_name())
+    if (name == m_pMPRScene00->get_name())
     {
         m_pCrosshairModel->focus(m_pMPRScene00);
     }
-    else if (sName == m_pMPRScene01->get_name())
+    else if (name == m_pMPRScene01->get_name())
     {
         m_pCrosshairModel->focus(m_pMPRScene01);
     }
-    else if (sName == m_pMPRScene10->get_name())
+    else if (name == m_pMPRScene10->get_name())
     {
         m_pCrosshairModel->focus(m_pMPRScene10);
     }
@@ -914,7 +914,7 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
     }
 }
 
-void NoduleAnnotation::slot_focus_out_scene_i(QString sName)
+void NoduleAnnotation::slot_focus_out_scene_i(QString name)
 {
     if (!m_bReady)
     {

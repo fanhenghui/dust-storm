@@ -60,13 +60,13 @@ private:
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<ImageData> _mask_data;
     std::shared_ptr<ImageDataHeader> _data_header;
-    std::unique_ptr<BrickPool> m_pBrickPool;
+    std::unique_ptr<BrickPool> _brick_pool;
 
-    std::vector<GLTexture3DPtr> m_vecVolumeTex;//P.S here use vector for separate volume later
-    std::vector<GLTexture3DPtr> m_vecMaskTex;
+    std::vector<GLTexture3DPtr> _volume_textures;//P.S here use vector for separate volume later
+    std::vector<GLTexture3DPtr> _mask_textures;
 
-    GLBufferPtr m_pVolumeBrickInfoBuffer;
-    std::map<LabelKey , GLBufferPtr> m_mapMaskBrickInfoBuffers;
+    GLBufferPtr _volume_brick_info_buffer;
+    std::map<LabelKey , GLBufferPtr> _mask_brick_info_buffer_set;
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
 

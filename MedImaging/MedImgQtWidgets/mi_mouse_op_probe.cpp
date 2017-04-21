@@ -41,10 +41,10 @@ void MouseOpProbe::move(const QPoint& pt)
         Point3 ptV;
         if(pScene->get_volume_position(Point2(pt.x() , pt.y()) , ptV))
         {
-            std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
-            if (pVolumeInfos)
+            std::shared_ptr<VolumeInfos> volume_infos = pScene->get_volume_infos();
+            if (volume_infos)
             {
-                std::shared_ptr<ImageData> pImg = pVolumeInfos->get_volume();
+                std::shared_ptr<ImageData> pImg = volume_infos->get_volume();
                 if (pImg)
                 {
                     double dPixelValue(0);

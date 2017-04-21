@@ -84,7 +84,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;$(SolutionDir)Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>mi_arithmetic_stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -96,7 +96,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>MedImgCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;mbedTLS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -105,7 +105,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;$(SolutionDir)Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>mi_arithmetic_stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -117,7 +117,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>MedImgCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;mbedTLS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;$(SolutionDir)Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>mi_arithmetic_stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -142,7 +142,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>MedImgCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;mbedTLS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -153,7 +153,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include\;$(SolutionDir)Include\MedImgArithmetic;$(SolutionDir)Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>mi_arithmetic_stdafx.h</ForcedIncludeFiles>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -167,7 +167,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>MedImgCommon.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;mbedTLS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -192,6 +192,7 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_point3.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_quat4.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_rectangle.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_rsa_utils.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sampler.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_shape_interface.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sphere.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="mi_point2.cpp" />
     <ClCompile Include="mi_point3.cpp" />
     <ClCompile Include="mi_rectangle.cpp" />
+    <ClCompile Include="mi_rsa_utils.cpp" />
     <ClCompile Include="mi_sampler.cpp" />
     <ClCompile Include="mi_sphere.cpp" />
     <ClCompile Include="mi_track_ball.cpp" />

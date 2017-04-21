@@ -26,18 +26,18 @@ public:
     // Axial F->H
     // Sagittal R->L
     // Coronal A -> P
-    void page(int iStep);
+    void page(int step);
 
     void page_to(int page);
 
     //Call to initialize MPR placement
-    void place_mpr(ScanSliceType eType);
+    void place_mpr(ScanSliceType type);
 
-    bool get_volume_position(const Point2& pt_dc, Point3& ptPosV);
+    bool get_volume_position(const Point2& pt_dc, Point3& pos_v);
 
-    bool get_world_position(const Point2& pt_dc, Point3& ptPosW);
+    bool get_world_position(const Point2& pt_dc, Point3& pos_w);
 
-    bool get_patient_position(const Point2& pt_dc, Point3& ptPosP);
+    bool get_patient_position(const Point2& pt_dc, Point3& pos_p);
 
     Plane to_plane()const;
 

@@ -18,7 +18,7 @@ struct VOISphere
     VOISphere(const Point3& pt , double d):center(pt),diameter(d),name("")
     {}
 
-    VOISphere(const Point3& pt , double d , const std::string& sName):center(pt),diameter(d),name(sName)
+    VOISphere(const Point3& pt , double d , const std::string& name):center(pt),diameter(d),name(name)
     {}
 };
 

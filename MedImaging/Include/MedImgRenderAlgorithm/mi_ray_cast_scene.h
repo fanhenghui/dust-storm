@@ -23,11 +23,12 @@ public:
 
     virtual void initialize();
     virtual void finalize();
+
     virtual void set_display_size(int width , int height);
+
     virtual void render(int test_code);
 
-    void set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos);
-
+    void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
     std::shared_ptr<VolumeInfos> get_volume_infos() const;
 
     std::shared_ptr<CameraCalculator> get_camera_calculator() const;
@@ -36,37 +37,37 @@ public:
 
     //Mask label level
     //Default is L_8
-    void set_mask_label_level(LabelLevel eLabelLevel);
+    void set_mask_label_level(LabelLevel label_level);
 
     //Sample rate
-    void set_sample_rate(float fSampleRate);
+    void set_sample_rate(float sample_rate);
 
     //Label parameter
-    void set_visible_labels(std::vector<unsigned char> vecLabels);
+    void set_visible_labels(std::vector<unsigned char> labels);
 
     //Window level parameter ( unregulated)
     // EG: CT modality , the unit is HU
-    void set_window_level(float fWW , float fWL , unsigned char ucLabel);
-    void set_global_window_level(float fWW , float fWL);
-    void get_global_window_level(float& fWW , float& fWL) const;
+    void set_window_level(float ww , float wl , unsigned char label);
+    void set_global_window_level(float ww , float wl);
+    void get_global_window_level(float& ww , float& wl) const;
 
     //Ray casting mode parameter
-    void set_mask_mode(MaskMode eMode);
-    void set_composite_mode(CompositeMode eMode);
-    void set_interpolation_mode(InterpolationMode eMode);
-    void set_shading_mode(ShadingMode eMode);
-    void set_color_inverse_mode(ColorInverseMode eMode);
+    void set_mask_mode(MaskMode mode);
+    void set_composite_mode(CompositeMode mode);
+    void set_interpolation_mode(InterpolationMode mode);
+    void set_shading_mode(ShadingMode mode);
+    void set_color_inverse_mode(ColorInverseMode mode);
 
 protected:
-    std::shared_ptr<VolumeInfos> m_pVolumeInfos;
+    std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
     std::shared_ptr<RayCaster> _ray_caster;
     std::shared_ptr<RayCasterCanvas> _canvas;
 
-    std::shared_ptr<OrthoCamera> m_pRayCastCamera;
+    std::shared_ptr<OrthoCamera> _ray_cast_camera;
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
-    std::shared_ptr<OrthoCameraInteractor> m_pCameraInteractor;
+    std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
 
     //////////////////////////////////////////////////////////////////////////
     //TODO Temp for test
@@ -77,8 +78,8 @@ protected:
     //////////////////////////////////////////////////////////////////////////
     //TODO Temp default pseudo color texture 
     //should design a wrap to contain global pseudo colors because its constant
-    GLTexture1DPtr m_pPseudoColor;
-    int m_iTestCode;
+    GLTexture1DPtr _pseudo_color_texture;
+    int _test_code;
 
 };
 

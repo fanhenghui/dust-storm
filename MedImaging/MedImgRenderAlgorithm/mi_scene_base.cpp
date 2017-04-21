@@ -7,11 +7,11 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-SceneBase::SceneBase():_width(128),_height(128),m_bDirty(true),m_sName("Scene")
+SceneBase::SceneBase():_width(128),_height(128),_dirty(true),_name("Scene")
 {
 }
 
-SceneBase::SceneBase(int width , int height):_width(width) , _height(height),m_bDirty(true)
+SceneBase::SceneBase(int width , int height):_width(width) , _height(height),_dirty(true)
 {
 }
 
@@ -22,7 +22,7 @@ SceneBase::~SceneBase()
 
 void SceneBase::render_to_back()
 {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pSceneFBO->get_id());
+    glBindFramebuffer(GL_READ_FRAMEBUFFER , _scene_fbo->get_id());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glDrawBuffer(GL_BACK);
@@ -36,42 +36,42 @@ std::shared_ptr<CameraBase> SceneBase::get_camera()
 
 void SceneBase::initialize()
 {
-    if (!m_pSceneFBO)
+    if (!_scene_fbo)
     {
         //Init FBO
         CHECK_GL_ERROR;
 
         UIDType fbo_id=0;
-        m_pSceneFBO = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(fbo_id);
-        m_pSceneFBO->set_description("Scene base FBO");
-        m_pSceneFBO->initialize();
-        m_pSceneFBO->set_target(GL_FRAMEBUFFER);
+        _scene_fbo = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(fbo_id);
+        _scene_fbo->set_description("Scene base FBO");
+        _scene_fbo->initialize();
+        _scene_fbo->set_target(GL_FRAMEBUFFER);
 
         UIDType texture_color_id = 0;
-        m_pSceneColorAttach0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(texture_color_id);
-        m_pSceneColorAttach0->set_description("Scene base Color Attachment 0");
-        m_pSceneColorAttach0->initialize();
-        m_pSceneColorAttach0->bind();
+        _scene_color_attach_0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(texture_color_id);
+        _scene_color_attach_0->set_description("Scene base Color Attachment 0");
+        _scene_color_attach_0->initialize();
+        _scene_color_attach_0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        _scene_color_attach_0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         UIDType depth_color_id = 0;
-        m_pSceneDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(depth_color_id);
-        m_pSceneDepthAttach->set_description("Scene base Depth Attachment");
-        m_pSceneDepthAttach->initialize();
-        m_pSceneDepthAttach->bind();
+        _scene_depth_attach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(depth_color_id);
+        _scene_depth_attach->set_description("Scene base Depth Attachment");
+        _scene_depth_attach->initialize();
+        _scene_depth_attach->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+        _scene_depth_attach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
         //bind texture to FBO
-        m_pSceneFBO->bind();
+        _scene_fbo->bind();
 
-        m_pSceneFBO->attach_texture(GL_COLOR_ATTACHMENT0 , m_pSceneColorAttach0);
-        m_pSceneFBO->attach_texture(GL_DEPTH_ATTACHMENT , m_pSceneDepthAttach);
+        _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0 , _scene_color_attach_0);
+        _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT , _scene_depth_attach);
 
-        m_pSceneFBO->unbind();
+        _scene_fbo->unbind();
 
         CHECK_GL_ERROR;
     }
@@ -79,9 +79,9 @@ void SceneBase::initialize()
 
 void SceneBase::finalize()
 {
-    GLResourceManagerContainer::instance()->get_fbo_manager()->remove_object(m_pSceneFBO->get_uid());
-    GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pSceneColorAttach0->get_uid());
-    GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pSceneDepthAttach->get_uid());
+    GLResourceManagerContainer::instance()->get_fbo_manager()->remove_object(_scene_fbo->get_uid());
+    GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_scene_color_attach_0->get_uid());
+    GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_scene_depth_attach->get_uid());
 
     GLResourceManagerContainer::instance()->get_fbo_manager()->update();
     GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
@@ -92,11 +92,11 @@ void SceneBase::set_display_size(int width , int height)
     _width = width;
     _height = height;
 
-    m_pSceneColorAttach0->bind();
-    m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+    _scene_color_attach_0->bind();
+    _scene_color_attach_0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
-    m_pSceneDepthAttach->bind();
-    m_pSceneDepthAttach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+    _scene_depth_attach->bind();
+    _scene_depth_attach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
 
     set_dirty(true);
 }
@@ -129,22 +129,22 @@ void SceneBase::get_display_size(int& width, int& height) const
 
 void SceneBase::set_dirty(bool flag)
 {
-    m_bDirty = flag;
+    _dirty = flag;
 }
 
 bool SceneBase::get_dirty() const
 {
-    return m_bDirty;
+    return _dirty;
 }
 
-void SceneBase::set_name(const std::string& sName)
+void SceneBase::set_name(const std::string& name)
 {
-    m_sName = sName;
+    _name = name;
 }
 
 const std::string& SceneBase::get_name() const
 {
-    return m_sName;
+    return _name;
 }
 
 

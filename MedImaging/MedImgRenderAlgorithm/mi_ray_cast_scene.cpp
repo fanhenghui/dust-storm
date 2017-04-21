@@ -24,14 +24,12 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-RayCastScene::RayCastScene():SceneBase(),m_iTestCode(0),
-    _global_ww(0),
-    _global_wl(0)
+RayCastScene::RayCastScene():SceneBase(),_test_code(0),_global_ww(0),_global_wl(0)
 {
-    m_pRayCastCamera.reset(new OrthoCamera());
-    _camera = m_pRayCastCamera;
+    _ray_cast_camera.reset(new OrthoCamera());
+    _camera = _ray_cast_camera;
 
-    m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pRayCastCamera));
+    _camera_interactor.reset(new OrthoCameraInteractor(_ray_cast_camera));
 
     _ray_caster.reset(new RayCaster());
 
@@ -48,14 +46,14 @@ RayCastScene::RayCastScene():SceneBase(),m_iTestCode(0),
     }
 }
 
-RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),m_iTestCode(0),
+RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),_test_code(0),
     _global_ww(0),
     _global_wl(0)
 {
-    m_pRayCastCamera.reset(new OrthoCamera());
-    _camera = m_pRayCastCamera;
+    _ray_cast_camera.reset(new OrthoCamera());
+    _camera = _ray_cast_camera;
 
-    m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pRayCastCamera));
+    _camera_interactor.reset(new OrthoCameraInteractor(_ray_cast_camera));
 
     _ray_caster.reset(new RayCaster());
 
@@ -99,7 +97,7 @@ void RayCastScene::set_display_size(int width , int height)
     _canvas->set_display_size(width , height);
     _canvas->update_fbo();//update texture size
     _entry_exit_points->set_display_size(width , height);
-    m_pCameraInteractor->resize(width , height);
+    _camera_interactor->resize(width , height);
 }
 
 void RayCastScene::render(int test_code)
@@ -123,7 +121,7 @@ void RayCastScene::render(int test_code)
     glClear(GL_COLOR_BUFFER_BIT);
 
     _entry_exit_points->calculate_entry_exit_points();
-    _ray_caster->render(m_iTestCode);
+    _ray_caster->render(_test_code);
 
     glPopAttrib();
     CHECK_GL_ERROR;
@@ -134,7 +132,7 @@ void RayCastScene::render(int test_code)
 
     glViewport(0,0,_width , _height);
 
-    m_pSceneFBO->bind();
+    _scene_fbo->bind();
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
     CHECK_GL_ERROR;
@@ -163,21 +161,21 @@ void RayCastScene::render(int test_code)
     set_dirty(false);
 }
 
-void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
+void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
 {
     try
     {
-        RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeInfos);
-        m_pVolumeInfos = pVolumeInfos;
+        RENDERALGO_CHECK_NULL_EXCEPTION(volume_infos);
+        _volume_infos = volume_infos;
 
-        std::shared_ptr<ImageData> pVolume = m_pVolumeInfos->get_volume();
+        std::shared_ptr<ImageData> pVolume = _volume_infos->get_volume();
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolume);
 
-        std::shared_ptr<ImageDataHeader> data_header = m_pVolumeInfos->get_data_header();
+        std::shared_ptr<ImageDataHeader> data_header = _volume_infos->get_data_header();
         RENDERALGO_CHECK_NULL_EXCEPTION(data_header);
 
         //Camera calculator
-        _camera_calculator = pVolumeInfos->get_camera_calculator();
+        _camera_calculator = volume_infos->get_camera_calculator();
 
         //Entry exit points
         _entry_exit_points->set_image_data(pVolume);
@@ -197,22 +195,22 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
         if (GPU == Configuration::instance()->get_processing_unit_type())
         {
             //initialize gray pseudo color texture
-            if (!m_pPseudoColor)
+            if (!_pseudo_color_texture)
             {
                 UIDType uid;
-                m_pPseudoColor = GLResourceManagerContainer::instance()->get_texture_1d_manager()->create_object(uid);
-                m_pPseudoColor->set_description("Pseudo color texture gray");
-                m_pPseudoColor->initialize();
-                m_pPseudoColor->bind();
+                _pseudo_color_texture = GLResourceManagerContainer::instance()->get_texture_1d_manager()->create_object(uid);
+                _pseudo_color_texture->set_description("Pseudo color texture gray");
+                _pseudo_color_texture->initialize();
+                _pseudo_color_texture->bind();
                 GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_EDGE);
                 GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
                 unsigned char pData[] = {0,0,0,0,255,255,255,255};
-                m_pPseudoColor->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
+                _pseudo_color_texture->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
             }
-            _ray_caster->set_pseudo_color_texture(m_pPseudoColor , 2);
+            _ray_caster->set_pseudo_color_texture(_pseudo_color_texture , 2);
 
             //Volume texture
-            _ray_caster->set_volume_data_texture(pVolumeInfos->get_volume_texture());
+            _ray_caster->set_volume_data_texture(volume_infos->get_volume_texture());
         }
         _ray_caster->initialize();
 
@@ -227,98 +225,98 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
     }
 }
 
-void RayCastScene::set_mask_label_level(LabelLevel eLabelLevel)
+void RayCastScene::set_mask_label_level(LabelLevel label_level)
 {
-    _ray_caster->set_mask_label_level(eLabelLevel);
+    _ray_caster->set_mask_label_level(label_level);
     set_dirty(true);
 }
 
-void RayCastScene::set_sample_rate(float fSampleRate)
+void RayCastScene::set_sample_rate(float sample_rate)
 {
-    _ray_caster->set_sample_rate(fSampleRate);
+    _ray_caster->set_sample_rate(sample_rate);
     set_dirty(true);
 }
 
-void RayCastScene::set_visible_labels(std::vector<unsigned char> vecLabels)
+void RayCastScene::set_visible_labels(std::vector<unsigned char> labels)
 {
-    _ray_caster->set_visible_labels(vecLabels);
+    _ray_caster->set_visible_labels(labels);
     set_dirty(true);
 }
 
-void RayCastScene::set_window_level(float fWW , float fWL , unsigned char ucLabel)
+void RayCastScene::set_window_level(float ww , float wl , unsigned char label)
 {
-    RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
-    m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+    _volume_infos->get_volume()->regulate_wl(ww , wl);
 
-    _ray_caster->set_window_level(fWW , fWL , ucLabel);
-
-    set_dirty(true);
-}
-
-void RayCastScene::set_global_window_level(float fWW , float fWL)
-{
-    _global_ww = fWW;
-    _global_wl = fWL;
-
-    RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
-    m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
-
-    _ray_caster->set_global_window_level(fWW, fWL);
+    _ray_caster->set_window_level(ww , wl , label);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_mask_mode(MaskMode eMode)
+void RayCastScene::set_global_window_level(float ww , float wl)
 {
-    _ray_caster->set_mask_mode(eMode);
+    _global_ww = ww;
+    _global_wl = wl;
+
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+    _volume_infos->get_volume()->regulate_wl(ww , wl);
+
+    _ray_caster->set_global_window_level(ww, wl);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_composite_mode(CompositeMode eMode)
+void RayCastScene::set_mask_mode(MaskMode mode)
 {
-    _ray_caster->set_composite_mode(eMode);
+    _ray_caster->set_mask_mode(mode);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_interpolation_mode(InterpolationMode eMode)
+void RayCastScene::set_composite_mode(CompositeMode mode)
 {
-    _ray_caster->set_interpolation_mode(eMode);
+    _ray_caster->set_composite_mode(mode);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_shading_mode(ShadingMode eMode)
+void RayCastScene::set_interpolation_mode(InterpolationMode mode)
 {
-    _ray_caster->set_shading_mode(eMode);
+    _ray_caster->set_interpolation_mode(mode);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_color_inverse_mode(ColorInverseMode eMode)
+void RayCastScene::set_shading_mode(ShadingMode mode)
 {
-    _ray_caster->set_color_inverse_mode(eMode);
+    _ray_caster->set_shading_mode(mode);
+
+    set_dirty(true);
+}
+
+void RayCastScene::set_color_inverse_mode(ColorInverseMode mode)
+{
+    _ray_caster->set_color_inverse_mode(mode);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_test_code(int test_code)
 {
-    m_iTestCode = test_code;
+    _test_code = test_code;
 
     set_dirty(true);
 }
 
-void RayCastScene::get_global_window_level(float& fWW , float& fWL) const
+void RayCastScene::get_global_window_level(float& ww , float& wl) const
 {
-    fWW = _global_ww;
-    fWL = _global_wl;
+    ww = _global_ww;
+    wl = _global_wl;
 }
 
 std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const
 {
-    return m_pVolumeInfos;
+    return _volume_infos;
 }
 
 std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const

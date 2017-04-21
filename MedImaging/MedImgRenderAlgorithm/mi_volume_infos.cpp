@@ -80,11 +80,11 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
     try
     {
         RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
-        RENDERALGO_CHECK_NULL_EXCEPTION(m_pBrickPool);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_brick_pool);
 
         _mask_data = image_data;
-        m_pBrickPool->set_mask(_mask_data);
-        m_pBrickPool->calculate_mask_brick();
+        _brick_pool->set_mask(_mask_data);
+        _brick_pool->calculate_mask_brick();
     }
     catch (const Exception& e)
     {
@@ -101,17 +101,17 @@ void VolumeInfos::set_data_header(std::shared_ptr<ImageDataHeader> data_header)
 
 std::vector<GLTexture3DPtr> VolumeInfos::get_volume_texture()
 {
-    return m_vecVolumeTex;
+    return _volume_textures;
 }
 
 std::vector<GLTexture3DPtr> VolumeInfos::get_mask_texture()
 {
-    return m_vecMaskTex;
+    return _mask_textures;
 }
 
 GLBufferPtr VolumeInfos::get_volume_brick_info_buffer()
 {
-    return m_pVolumeBrickInfoBuffer;
+    return _volume_brick_info_buffer;
 }
 
 //GLBufferPtr VolumeInfos::GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vis_labels)
@@ -131,27 +131,27 @@ std::shared_ptr<ImageData> VolumeInfos::get_mask()
 
 BrickCorner* VolumeInfos::get_brick_corner()
 {
-    return m_pBrickPool->get_brick_corner();
+    return _brick_pool->get_brick_corner();
 }
 
 BrickUnit* VolumeInfos::get_volume_brick_unit()
 {
-    return m_pBrickPool->get_volume_brick_unit();
+    return _brick_pool->get_volume_brick_unit();
 }
 
 BrickUnit* VolumeInfos::get_mask_brick_unit()
 {
-    return m_pBrickPool->get_mask_brick_unit();
+    return _brick_pool->get_mask_brick_unit();
 }
 
 VolumeBrickInfo* VolumeInfos::get_volume_brick_info()
 {
-    return m_pBrickPool->get_volume_brick_info();
+    return _brick_pool->get_volume_brick_info();
 }
 
 MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>& vis_labels)
 {
-    return m_pBrickPool->get_mask_brick_info(vis_labels);
+    return _brick_pool->get_mask_brick_info(vis_labels);
 }
 
 void VolumeInfos::update_volume(unsigned int (&begin)[3] , unsigned int (&end)[3] , void* pData)
@@ -173,22 +173,22 @@ void VolumeInfos::update_mask(unsigned int (&begin)[3] , unsigned int (&end)[3] 
 void VolumeInfos::release_volume_resource_i()
 {
     //release volume textures
-    if (!m_vecVolumeTex.empty())
+    if (!_volume_textures.empty())
     {
-        for (auto it = m_vecVolumeTex.begin() ; it != m_vecVolumeTex.end() ; ++it)
+        for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
         {
             GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
         }
 
-        m_vecVolumeTex.clear();
+        _volume_textures.clear();
         GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
     }
 
     //release volume brick info
-    if (m_pVolumeBrickInfoBuffer)
+    if (_volume_brick_info_buffer)
     {
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(m_pVolumeBrickInfoBuffer->get_uid());
-        m_pVolumeBrickInfoBuffer.reset();
+        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
+        _volume_brick_info_buffer.reset();
         GLResourceManagerContainer::instance()->get_buffer_manager()->update();
     }
 }
@@ -199,30 +199,30 @@ void VolumeInfos::load_volume_resource_i()
     {
         //////////////////////////////////////////////////////////////////////////
         // 1 Volume texture
-        m_vecVolumeTex.clear();
+        _volume_textures.clear();
 
         //Single volume
         UIDType uid(0);
-        GLTexture3DPtr pTex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
+        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
         if (_data_header)
         {
-            pTex->set_description("Volume : " + _data_header->series_uid);
+            tex->set_description("Volume : " + _data_header->series_uid);
         }
         else
         {
-            pTex->set_description("Volume : Undefined series UID");
+            tex->set_description("Volume : Undefined series UID");
         }
 
-        pTex->initialize();
-        pTex->bind();
+        tex->initialize();
+        tex->bind();
         GLTextureUtils::set_1d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
-        GLenum internal_format , format , eType;
-        GLUtils::get_gray_texture_format(_volume_data->_data_type , internal_format , format ,eType);
-        pTex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, eType , _volume_data->get_pixel_pointer());
-        pTex->unbind();
+        GLenum internal_format , format , type;
+        GLUtils::get_gray_texture_format(_volume_data->_data_type , internal_format , format ,type);
+        tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
+        tex->unbind();
 
-        m_vecVolumeTex.push_back(pTex);
+        _volume_textures.push_back(tex);
 
         //TODO separate volumes
 
