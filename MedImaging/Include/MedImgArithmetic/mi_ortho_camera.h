@@ -38,18 +38,18 @@ protected:
     virtual void calculate_projection_matrix_i();
 
 private:
-    double m_Left;
-    double m_Right;
-    double m_Bottom;
-    double m_Top;
-    double m_Near;
-    double m_Far;
-    Matrix4 m_matProjection;
-    bool m_bIsPCalculated;
+    double _Left;
+    double _Right;
+    double _Bottom;
+    double _Top;
+    double _Near;
+    double _Far;
+    Matrix4 _matProjection;
+    bool _bIsPCalculated;
 
     //Zoom
-    double m_ZoomFactor;
-    Vector2 m_VecPan;
+    double _ZoomFactor;
+    Vector2 _VecPan;
 };
 
 MED_IMAGING_END_NAMESPACE

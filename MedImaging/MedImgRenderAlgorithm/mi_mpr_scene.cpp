@@ -80,13 +80,13 @@ void MPRScene::pan(const Point2& ptPre , const Point2& ptCur)
     set_dirty(true);
 }
 
-bool MPRScene::get_volume_position(const Point2& ptDC , Point3& ptPosV)
+bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
 {
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
     std::shared_ptr<ImageData> pImg = m_pVolumeInfos->get_volume();
     RENDERALGO_CHECK_NULL_EXCEPTION(pImg);
 
-    Point2 pt = ArithmeticUtils::dc_to_ndc(ptDC , m_iWidth , m_iHeight);
+    Point2 pt = ArithmeticUtils::dc_to_ndc(pt_dc , m_iWidth , m_iHeight);
 
     Matrix4 matMVP = m_pRayCastCamera->get_view_projection_matrix()*m_pCameraCalculator->get_volume_to_world_matrix();
     matMVP.inverse();
@@ -103,10 +103,10 @@ bool MPRScene::get_volume_position(const Point2& ptDC , Point3& ptPosV)
     }
 }
 
-bool MPRScene::get_world_position(const Point2& ptDC , Point3& ptPosW)
+bool MPRScene::get_world_position(const Point2& pt_dc , Point3& ptPosW)
 {
     Point3 ptPosV;
-    if (get_volume_position(ptDC , ptPosV))
+    if (get_volume_position(pt_dc , ptPosV))
     {
         ptPosW = m_pCameraCalculator->get_volume_to_world_matrix().transform(ptPosV);
         return true;
@@ -139,16 +139,16 @@ Plane MPRScene::to_plane() const
     vNorm.normalize();
 
     Plane p;
-    p.m_vNorm = vNorm;
-    p.m_dDistance = vNorm.dot_product(ptLookAt - Point3::kZeroPoint);
+    p._norm = vNorm;
+    p._distance = vNorm.dot_product(ptLookAt - Point3::S_ZERO_POINT);
 
     return p;
 }
 
-bool MPRScene::get_patient_position(const Point2& ptDC, Point3& ptPosP)
+bool MPRScene::get_patient_position(const Point2& pt_dc, Point3& ptPosP)
 {
     Point3 ptW;
-    if (get_world_position(ptDC , ptW))
+    if (get_world_position(pt_dc , ptW))
     {
         ptPosP = m_pCameraCalculator->get_world_to_patient_matrix().transform(ptW);
         return true;

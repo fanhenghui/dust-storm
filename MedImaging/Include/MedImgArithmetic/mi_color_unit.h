@@ -5,12 +5,10 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-class Arithmetic_Export RGBUnit
+struct RGBUnit
 {
-public:
     unsigned char r,g,b;
 
-public:
     RGBUnit():r(0),g(0),b(0)
     {}
 
@@ -18,42 +16,36 @@ public:
     {
     };
 
-    explicit RGBUnit(float fRNorm , float fGNorm, float fBNorm)
+    explicit RGBUnit(float r_norm , float g_norm, float b_norm)
     {
-        fRNorm*= 255.0f;
-        fGNorm*= 255.0f;
-        fBNorm*= 255.0f;
+        r_norm*= 255.0f;
+        g_norm*= 255.0f;
+        b_norm*= 255.0f;
 
-        fRNorm = fRNorm>255.0f ? 255.0f : fRNorm;
-        fRNorm = fRNorm < 0.0f ? 0.0f : fRNorm;
+        r_norm = r_norm>255.0f ? 255.0f : r_norm;
+        r_norm = r_norm < 0.0f ? 0.0f : r_norm;
 
-        fGNorm = fGNorm>255.0f ? 255.0f : fGNorm;
-        fGNorm = fGNorm < 0.0f ? 0.0f : fGNorm;
+        g_norm = g_norm>255.0f ? 255.0f : g_norm;
+        g_norm = g_norm < 0.0f ? 0.0f : g_norm;
 
-        fBNorm = fBNorm>255.0f ? 255.0f : fBNorm;
-        fBNorm = fBNorm < 0.0f ? 0.0f : fBNorm;
+        b_norm = b_norm>255.0f ? 255.0f : b_norm;
+        b_norm = b_norm < 0.0f ? 0.0f : b_norm;
 
-        r = (unsigned char)fRNorm;
-        g = (unsigned char)fGNorm;
-        b = (unsigned char)fBNorm;
+        r = (unsigned char)r_norm;
+        g = (unsigned char)g_norm;
+        b = (unsigned char)b_norm;
     }
-
-    ~RGBUnit() {};
 
     void print()
     {
         std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " )";
     }
-
-private:
 };
 
-class Arithmetic_Export RGBAUnit
+struct RGBAUnit
 {
-public:
     unsigned char r,g,b,a;
 
-public:
     explicit RGBAUnit():r(0),g(0),b(0),a(0)
     {}
 
@@ -61,24 +53,24 @@ public:
     {
     };
 
-    explicit RGBAUnit(float fRNorm , float fGNorm, float fBNorm)
+    explicit RGBAUnit(float r_norm , float g_norm, float b_norm)
     {
-        fRNorm*= 255.0f;
-        fGNorm*= 255.0f;
-        fBNorm*= 255.0f;
+        r_norm*= 255.0f;
+        g_norm*= 255.0f;
+        b_norm*= 255.0f;
 
-        fRNorm = fRNorm>255.0f ? 255.0f : fRNorm;
-        fRNorm = fRNorm < 0.0f ? 0.0f : fRNorm;
+        r_norm = r_norm>255.0f ? 255.0f : r_norm;
+        r_norm = r_norm < 0.0f ? 0.0f : r_norm;
 
-        fGNorm = fGNorm>255.0f ? 255.0f : fGNorm;
-        fGNorm = fGNorm < 0.0f ? 0.0f : fGNorm;
+        g_norm = g_norm>255.0f ? 255.0f : g_norm;
+        g_norm = g_norm < 0.0f ? 0.0f : g_norm;
 
-        fBNorm = fBNorm>255.0f ? 255.0f : fBNorm;
-        fBNorm = fBNorm < 0.0f ? 0.0f : fBNorm;
+        b_norm = b_norm>255.0f ? 255.0f : b_norm;
+        b_norm = b_norm < 0.0f ? 0.0f : b_norm;
 
-        r = (unsigned char)fRNorm;
-        g = (unsigned char)fGNorm;
-        b = (unsigned char)fBNorm;
+        r = (unsigned char)r_norm;
+        g = (unsigned char)g_norm;
+        b = (unsigned char)b_norm;
         a = 255;
     }
 
@@ -86,38 +78,34 @@ public:
     {
     };
 
-    explicit RGBAUnit(float fRNorm , float fGNorm, float fBNorm , float fANorm)
+    explicit RGBAUnit(float r_norm , float g_norm, float b_norm , float a_norm)
     {
-        fRNorm*= 255.0f;
-        fGNorm*= 255.0f;
-        fBNorm*= 255.0f;
+        r_norm*= 255.0f;
+        g_norm*= 255.0f;
+        b_norm*= 255.0f;
 
-        fRNorm = fRNorm>255.0f ? 255.0f : fRNorm;
-        fRNorm = fRNorm < 0.0f ? 0.0f : fRNorm;
+        r_norm = r_norm>255.0f ? 255.0f : r_norm;
+        r_norm = r_norm < 0.0f ? 0.0f : r_norm;
 
-        fGNorm = fGNorm>255.0f ? 255.0f : fGNorm;
-        fGNorm = fGNorm < 0.0f ? 0.0f : fGNorm;
+        g_norm = g_norm>255.0f ? 255.0f : g_norm;
+        g_norm = g_norm < 0.0f ? 0.0f : g_norm;
 
-        fBNorm = fBNorm>255.0f ? 255.0f : fBNorm;
-        fBNorm = fBNorm < 0.0f ? 0.0f : fBNorm;
+        b_norm = b_norm>255.0f ? 255.0f : b_norm;
+        b_norm = b_norm < 0.0f ? 0.0f : b_norm;
 
-        fANorm = fANorm>255.0f ? 255.0f : fANorm;
-        fANorm = fANorm < 0.0f ? 0.0f : fANorm;
+        a_norm = a_norm>255.0f ? 255.0f : a_norm;
+        a_norm = a_norm < 0.0f ? 0.0f : a_norm;
 
-        r = (unsigned char)fRNorm;
-        g = (unsigned char)fGNorm;
-        b = (unsigned char)fBNorm;
-        a = (unsigned char)fANorm;
+        r = (unsigned char)r_norm;
+        g = (unsigned char)g_norm;
+        b = (unsigned char)b_norm;
+        a = (unsigned char)a_norm;
     }
-
-    ~RGBAUnit() {};
 
     void print()
     {
         std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " , " << (int)a<< " )";
     }
-
-private:
 };
 
 

@@ -2,7 +2,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-const Point3 Point3::kZeroPoint = Point3(0, 0, 0);
+const Point3 Point3::S_ZERO_POINT = Point3(0, 0, 0);
 
 Point3 operator*(double scale, const Point3& p)
 {

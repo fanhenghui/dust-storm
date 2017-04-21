@@ -33,11 +33,11 @@ public:
     //Call to initialize MPR placement
     void place_mpr(ScanSliceType eType);
 
-    bool get_volume_position(const Point2& ptDC, Point3& ptPosV);
+    bool get_volume_position(const Point2& pt_dc, Point3& ptPosV);
 
-    bool get_world_position(const Point2& ptDC, Point3& ptPosW);
+    bool get_world_position(const Point2& pt_dc, Point3& ptPosW);
 
-    bool get_patient_position(const Point2& ptDC, Point3& ptPosP);
+    bool get_patient_position(const Point2& pt_dc, Point3& ptPosP);
 
     Plane to_plane()const;
 

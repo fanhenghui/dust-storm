@@ -67,15 +67,15 @@ void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (
         if( IntersectionTest::plane_to_plane(p, planeTarget,lineIntersect))
         {
             //Project intersected line to screen
-            Point3 ptScreen = matVP.transform(lineIntersect.m_pt);
-            lines[i].m_pt = Point2(ptScreen.x , ptScreen.y);
-            Vector3 vDir = matVP.get_inverse().get_transpose().transform(lineIntersect.m_vDir);
-            lines[i].m_vDir = Vector2(vDir.x , vDir.y).get_normalize();
+            Point3 ptScreen = matVP.transform(lineIntersect._pt);
+            lines[i]._pt = Point2(ptScreen.x , ptScreen.y);
+            Vector3 vDir = matVP.get_inverse().get_transpose().transform(lineIntersect._dir);
+            lines[i]._dir = Vector2(vDir.x , vDir.y).get_normalize();
         }
         else
         {
-            lines[i].m_pt = Point2::kZeroPoint;
-            lines[i].m_vDir = Vector2(0,0);
+            lines[i]._pt = Point2::S_ZERO_POINT;
+            lines[i]._dir = Vector2(0,0);
         }
     }
 }
@@ -146,11 +146,11 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int
     return true;
 }
 
-bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC)
+bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& pt_dc)
 {
     //1 Get latest location
     Point3 ptV;
-    if (!pTargetMPRScene->get_volume_position(ptDC , ptV))
+    if (!pTargetMPRScene->get_volume_position(pt_dc , ptV))
     {
         return false;
     }

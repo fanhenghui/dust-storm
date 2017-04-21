@@ -18,14 +18,14 @@ public:
 
     static Vector3f convert_vector(const Vector3& v);
 
-    static Vector3f ConvertPoint(const Point3& v);
+    static Vector3f convert_point(const Point3& v);
 
-    static Point2 dc_to_ndc(const Point2& ptDC ,  int iWidth , int iHeight);
+    static Point2 dc_to_ndc(const Point2& pt_dc ,  int width , int height);
 
-    //iSpillTag 1 X direction 2 Y direction 0 no spill
-    static Point2 ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight , int iSpillTag);
+    //spill_tag 1 X direction 2 Y direction 0 no spill
+    static Point2 ndc_to_dc(Point2 pt_ndc , int width , int height , int spill_tag);
 
-    static Point2 ndc_to_dc(Point2 ptNDC , int iWidth , int iHeight );
+    static Point2 ndc_to_dc(Point2 pt_ndc , int width , int height );
 
     //TODO 下面的几个输出并不对
     //static double FloorDouble(double x);
@@ -36,8 +36,8 @@ public:
 
     //static int RoundInt(double x);
 
-    //Check pt in [ (0,0,0) , vBound ]
-    static bool check_in_bound(const Point3& pt , const Point3& vBound);
+    //Check pt in [ (0,0,0) , bound ]
+    static bool check_in_bound(const Point3& pt , const Point3& bound);
 
 protected:
 private:

@@ -12,8 +12,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export Line2D : public IShape
 {
 public:
-    Point2 m_pt;
-    Vector2 m_vDir;
+    Point2 _pt;
+    Vector2 _dir;
 
 public:
     Line2D();
@@ -23,8 +23,8 @@ public:
 class Arithmetic_Export Line3D : public IShape
 {
 public:
-    Point3 m_pt;
-    Vector3 m_vDir;
+    Point3 _pt;
+    Vector3 _dir;
 
 public:
     Line3D();

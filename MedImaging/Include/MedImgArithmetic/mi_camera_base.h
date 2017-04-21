@@ -54,11 +54,11 @@ protected:
     virtual void calculate_projection_matrix_i() = 0;
 
 protected:
-    Point3 m_ptEye;
-    Point3 m_ptAt;
-    Vector3 m_vUp;
-    Matrix4 m_matView;
-    bool m_bIsVCalculated;
+    Point3 _eye;
+    Point3 _at;
+    Vector3 _up;
+    Matrix4 _mat_view;
+    bool _is_view_mat_cal;
 
 };
 

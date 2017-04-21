@@ -132,7 +132,7 @@ void CameraCalculator::calculate_matrix_i()
 
     //4 Calculate world to patient
     const Point3 &ptImgPosition = m_pImgData->m_ptImgPositon;
-    const Point3 &ptImgWorld = m_matVolume2Wolrd.transform(Point3::kZeroPoint);
+    const Point3 &ptImgWorld = m_matVolume2Wolrd.transform(Point3::S_ZERO_POINT);
     m_matWorld2Patient = make_translate(ptImgPosition - ptImgWorld);
     m_matPatient2World = m_matWorld2Patient.get_inverse();
 }

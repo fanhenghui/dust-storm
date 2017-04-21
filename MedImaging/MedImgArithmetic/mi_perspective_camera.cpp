@@ -4,15 +4,15 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 PerspectiveCamera::PerspectiveCamera() :CameraBase(),
-m_Fovy(0), m_Aspect(0), m_Near(0), m_Far(0), m_bIsPCalculated(false)
+_Fovy(0), _Aspect(0), _Near(0), _Far(0), _bIsPCalculated(false)
 {
-	m_matProjection = Matrix4::kIdentityMatrix;
+	_matProjection = Matrix4::S_IDENTITY_MATRIX;
 }
 
 PerspectiveCamera::PerspectiveCamera(double fovy, double aspect, double zNear, double zFar) :CameraBase(),
-m_Fovy(fovy), m_Aspect(aspect), m_Near(zNear), m_Far(zFar), m_bIsPCalculated(false)
+_Fovy(fovy), _Aspect(aspect), _Near(zNear), _Far(zFar), _bIsPCalculated(false)
 {
-	m_matProjection = Matrix4::kIdentityMatrix;
+	_matProjection = Matrix4::S_IDENTITY_MATRIX;
 }
 
 PerspectiveCamera::~PerspectiveCamera()
@@ -22,68 +22,68 @@ PerspectiveCamera::~PerspectiveCamera()
 
 void PerspectiveCamera::set_perspective(double fovy, double aspect, double zNear, double zFar)
 {
-	m_Fovy = fovy;
-	m_Aspect = aspect;
-	m_Near = zNear;
-	m_Far = zFar;
-	m_bIsPCalculated = false;
+	_Fovy = fovy;
+	_Aspect = aspect;
+	_Near = zNear;
+	_Far = zFar;
+	_bIsPCalculated = false;
 }
 
 void PerspectiveCamera::set_near_clip_distance(double zNear)
 {
-	m_Near = zNear;
-	m_bIsPCalculated = false;
+	_Near = zNear;
+	_bIsPCalculated = false;
 }
 
 void PerspectiveCamera::set_far_clip_distance(double zFar)
 {
-	m_Far = zFar;
-	m_bIsPCalculated = false;
+	_Far = zFar;
+	_bIsPCalculated = false;
 }
 
 void PerspectiveCamera::set_fovy(double fovy)
 {
-	m_Fovy = fovy;
-	m_bIsPCalculated = false;
+	_Fovy = fovy;
+	_bIsPCalculated = false;
 }
 
 void PerspectiveCamera::set_aspect_ratio(double aspect)
 {
-	m_Aspect = aspect;
-	m_bIsPCalculated = false;
+	_Aspect = aspect;
+	_bIsPCalculated = false;
 }
 
 Matrix4 PerspectiveCamera::get_projection_matrix()
 {
 	calculate_projection_matrix_i();
-	return m_matProjection;
+	return _matProjection;
 }
 
 Matrix4 PerspectiveCamera::get_view_projection_matrix()
 {
 	calculate_view_matrix_i();
 	calculate_projection_matrix_i();
-	return m_matProjection*m_matView;
+	return _matProjection*_mat_view;
 }
 
 void PerspectiveCamera::calculate_projection_matrix_i()
 {
-	if (!m_bIsPCalculated)
+	if (!_bIsPCalculated)
 	{
-		double range = tan(m_Fovy / 2.0f) * m_Near;
-		double left = -range * m_Aspect;
-		double right = range * m_Aspect;
+		double range = tan(_Fovy / 2.0f) * _Near;
+		double left = -range * _Aspect;
+		double right = range * _Aspect;
 		double bottom = -range;
 		double top = range;
 
-		m_matProjection = Matrix4::kIdentityMatrix;
-		m_matProjection[0][0] = (2.0f * m_Near) / (right - left);
-		m_matProjection[1][1] = (2.0f* m_Near) / (top - bottom);
-		m_matProjection[2][2] = -(m_Far + m_Near) / (m_Far - m_Near);
-		m_matProjection[2][3] = -1.0f;
-		m_matProjection[3][2] = -(2.0f* m_Far * m_Near) / (m_Far - m_Near);
+		_matProjection = Matrix4::S_IDENTITY_MATRIX;
+		_matProjection[0][0] = (2.0f * _Near) / (right - left);
+		_matProjection[1][1] = (2.0f* _Near) / (top - bottom);
+		_matProjection[2][2] = -(_Far + _Near) / (_Far - _Near);
+		_matProjection[2][3] = -1.0f;
+		_matProjection[3][2] = -(2.0f* _Far * _Near) / (_Far - _Near);
 
-		m_bIsPCalculated = true;
+		_bIsPCalculated = true;
 	}
 }
 
@@ -99,23 +99,23 @@ void PerspectiveCamera::pan(const Vector2& pan)
 
 double PerspectiveCamera::get_near_clip_distance() const
 {
-	return m_Near;
+	return _Near;
 }
 
 double PerspectiveCamera::get_far_clip_distance() const
 {
-	return m_Far;
+	return _Far;
 }
 
 PerspectiveCamera& PerspectiveCamera::operator=(const PerspectiveCamera& camera)
 {
 #define COPY_PARAMETER(p) this->p = camera.p
-    COPY_PARAMETER(m_Fovy);
-    COPY_PARAMETER(m_Aspect);
-    COPY_PARAMETER(m_Near);
-    COPY_PARAMETER(m_Far);
-    COPY_PARAMETER(m_matProjection);
-    COPY_PARAMETER(m_bIsPCalculated);
+    COPY_PARAMETER(_Fovy);
+    COPY_PARAMETER(_Aspect);
+    COPY_PARAMETER(_Near);
+    COPY_PARAMETER(_Far);
+    COPY_PARAMETER(_matProjection);
+    COPY_PARAMETER(_bIsPCalculated);
 #undef COPY_PARAMETER
     return *this;
 }

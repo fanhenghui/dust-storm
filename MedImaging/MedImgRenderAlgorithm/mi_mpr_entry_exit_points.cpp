@@ -272,8 +272,8 @@ void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
         const Point3 ptEntry = ptCenter - vRayDir*fThicknessHalf;
         const Point3 ptExit = ptCenter + vRayDir*fThicknessHalf;
 
-        double dDisEntry = vRayDir.dot_product(ptEntry - Point3::kZeroPoint);
-        double dDisExit = (-vRayDir).dot_product(ptExit - Point3::kZeroPoint);
+        double dDisEntry = vRayDir.dot_product(ptEntry - Point3::S_ZERO_POINT);
+        double dDisExit = (-vRayDir).dot_product(ptExit - Point3::S_ZERO_POINT);
 
         m_vEntryPlane = Vector4f((float)vRayDir.x ,(float)vRayDir.y , (float)vRayDir.z , (float)dDisEntry);
         m_vExitPlane = Vector4f(-(float)vRayDir.x ,-(float)vRayDir.y , -(float)vRayDir.z , (float)dDisExit);

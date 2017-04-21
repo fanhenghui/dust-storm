@@ -48,18 +48,18 @@ void CrosshairPainter::render()
     {
         //Convert to DC
         Line2D line = lines[i];
-        line.m_pt = ArithmeticUtils::ndc_to_dc(lines[i].m_pt , iWidth , iHeight);
-        line.m_vDir.y = -line.m_vDir.y;
+        line._pt = ArithmeticUtils::ndc_to_dc(lines[i]._pt , iWidth , iHeight);
+        line._dir.y = -line._dir.y;
 
         //Convert to line function a*x + b*y = c
-        const double a = -line.m_vDir.y;
-        const double b = line.m_vDir.x;
-        const double c = a*line.m_pt.x + b*line.m_pt.y;
+        const double a = -line._dir.y;
+        const double b = line._dir.x;
+        const double c = a*line._pt.x + b*line._pt.y;
 
         //std::cout << "Pt : ";
-        //line.m_pt.print();
+        //line._pt.print();
         //std::cout << "  Dir : ";
-        //line.m_vDir.print();
+        //line._dir.print();
         //std::cout << std::endl;
 
         QPoint pDC0 , pDC1;

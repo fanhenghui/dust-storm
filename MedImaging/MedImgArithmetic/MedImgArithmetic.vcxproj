@@ -209,7 +209,6 @@
     <ClCompile Include="mi_arithmetic_stdafx.cpp" />
     <ClCompile Include="mi_arithmetic_utils.cpp" />
     <ClCompile Include="mi_camera_base.cpp" />
-    <ClCompile Include="mi_color_unit.cpp" />
     <ClCompile Include="mi_intersection_test.cpp" />
     <ClCompile Include="mi_line.cpp" />
     <ClCompile Include="mi_line_segment.cpp" />

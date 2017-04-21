@@ -2,7 +2,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-const Vector3 Vector3::kZeroVector = Vector3(0, 0,0);
+const Vector3 Vector3::S_ZERO_VECTOR = Vector3(0, 0,0);
 
 Vector3 operator *(double scale, const Vector3& v)
 {

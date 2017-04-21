@@ -3,20 +3,20 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
     OrthoCamera::OrthoCamera() : CameraBase()
-    , m_bIsPCalculated(false)
-    , m_Left(0), m_Right(0), m_Bottom(0), m_Top(0), m_Near(0), m_Far(0), m_ZoomFactor(1.0)
+    , _bIsPCalculated(false)
+    , _Left(0), _Right(0), _Bottom(0), _Top(0), _Near(0), _Far(0), _ZoomFactor(1.0)
 {
-    m_matProjection = Matrix4::kIdentityMatrix;
-    m_VecPan = Vector2::kZeroVector;
+    _matProjection = Matrix4::S_IDENTITY_MATRIX;
+    _VecPan = Vector2::S_ZERO_VECTOR;
 }
 
 OrthoCamera::OrthoCamera(
     double left, double right, double bottom, double top, double near, double far) : CameraBase()
-    , m_Left(left), m_Right(right), m_Bottom(bottom), m_Top(top), m_Near(near), m_Far(far)
-    , m_bIsPCalculated(false)
+    , _Left(left), _Right(right), _Bottom(bottom), _Top(top), _Near(near), _Far(far)
+    , _bIsPCalculated(false)
 {
-    m_matProjection = Matrix4::kIdentityMatrix;
-    m_VecPan = Vector2::kZeroVector;
+    _matProjection = Matrix4::S_IDENTITY_MATRIX;
+    _VecPan = Vector2::S_ZERO_VECTOR;
 }
 
 OrthoCamera::~OrthoCamera()
@@ -26,52 +26,52 @@ OrthoCamera::~OrthoCamera()
 
 void OrthoCamera::set_ortho(double left, double right, double bottom, double top, double near, double far0)
 {
-    m_Left = left;
-    m_Right = right;
-    m_Bottom = bottom;
-    m_Top = top;
-    m_Near = near;
-    m_Far = far0;
-    m_bIsPCalculated = false;
+    _Left = left;
+    _Right = right;
+    _Bottom = bottom;
+    _Top = top;
+    _Near = near;
+    _Far = far0;
+    _bIsPCalculated = false;
 }
 
 void OrthoCamera::get_ortho(double& left, double& right, double& bottom, double& top, double& near, double& far0) const
 {
-    left= m_Left ;
-    right= m_Right ;
-    bottom= m_Bottom ;
-    top= m_Top ;
-    near= m_Near ;
-    far0= m_Far  ;
+    left= _Left ;
+    right= _Right ;
+    bottom= _Bottom ;
+    top= _Top ;
+    near= _Near ;
+    far0= _Far  ;
 }
 
 Matrix4 OrthoCamera::get_projection_matrix()
 {
     calculate_projection_matrix_i();
-    return m_matProjection;
+    return _matProjection;
 }
 
 Matrix4 OrthoCamera::get_view_projection_matrix()
 {
     calculate_view_matrix_i();
     calculate_projection_matrix_i();
-    return m_matProjection*m_matView;
+    return _matProjection*_mat_view;
 }
 
 void OrthoCamera::calculate_projection_matrix_i()
 {
-    if (!m_bIsPCalculated)
+    if (!_bIsPCalculated)
     {
-        m_matProjection = Matrix4::kIdentityMatrix;
-        m_matProjection[0][0] = 2.0f / ((m_Right - m_Left) * m_ZoomFactor);
-        m_matProjection[1][1] = 2.0f / ((m_Top - m_Bottom) * m_ZoomFactor);
-        m_matProjection[2][2] = -2.0f / (m_Far - m_Near);
-        //这里是因为m_Near和m_Far是距离视点的距离（负的），即认为近远平面都在视点的观察反方向，即左下角点(left , bottom , -near)
+        _matProjection = Matrix4::S_IDENTITY_MATRIX;
+        _matProjection[0][0] = 2.0f / ((_Right - _Left) * _ZoomFactor);
+        _matProjection[1][1] = 2.0f / ((_Top - _Bottom) * _ZoomFactor);
+        _matProjection[2][2] = -2.0f / (_Far - _Near);
+        //这里是因为_Near和_Far是距离视点的距离（负的），即认为近远平面都在视点的观察反方向，即左下角点(left , bottom , -near)
         //右上角点(right , top , -far) 则 -far < -near 即 far > near
-        m_matProjection[3][0] = -(m_Right + m_Left + m_VecPan.x*(m_Right - m_Left)) / (m_Right - m_Left);
-        m_matProjection[3][1] = -(m_Top + m_Bottom + m_VecPan.y*(m_Right - m_Left)) / (m_Top - m_Bottom);
-        m_matProjection[3][2] = -(m_Far + m_Near) / (m_Far - m_Near);
-        m_bIsPCalculated = true;
+        _matProjection[3][0] = -(_Right + _Left + _VecPan.x*(_Right - _Left)) / (_Right - _Left);
+        _matProjection[3][1] = -(_Top + _Bottom + _VecPan.y*(_Right - _Left)) / (_Top - _Bottom);
+        _matProjection[3][2] = -(_Far + _Near) / (_Far - _Near);
+        _bIsPCalculated = true;
     }
 }
 
@@ -80,42 +80,42 @@ void OrthoCamera::zoom(double rate)
     //Check if rate is (-1 ~ 1)
     if (rate < 1.0 && rate > -1.0)
     {
-        m_ZoomFactor *= (1.0 + rate);
-        m_bIsPCalculated = false;
+        _ZoomFactor *= (1.0 + rate);
+        _bIsPCalculated = false;
     }
 }
 
 void OrthoCamera::pan(const Vector2& pan)
 {
-    m_VecPan += pan;
+    _VecPan += pan;
     //只能移动一半窗口
-    //if (m_VecPan.x > 1.0)
+    //if (_VecPan.x > 1.0)
     //{
-    //    m_VecPan.x = 1.0;
+    //    _VecPan.x = 1.0;
     //}
-    //if (m_VecPan.x < -1.0)
+    //if (_VecPan.x < -1.0)
     //{
-    //    m_VecPan.x = -1.0;
+    //    _VecPan.x = -1.0;
     //}
-    //if (m_VecPan.y > 1.0)
+    //if (_VecPan.y > 1.0)
     //{
-    //    m_VecPan.y = 1.0;
+    //    _VecPan.y = 1.0;
     //}
-    //if (m_VecPan.y < -1.0)
+    //if (_VecPan.y < -1.0)
     //{
-    //    m_VecPan.y = -1.0;
+    //    _VecPan.y = -1.0;
     //}
-    m_bIsPCalculated = false;
+    _bIsPCalculated = false;
 }
 
 double OrthoCamera::get_near_clip_distance() const
 {
-    return m_Near;
+    return _Near;
 }
 
 double OrthoCamera::get_far_clip_distance() const
 {
-    return m_Far;
+    return _Far;
 }
 
 OrthoCamera& OrthoCamera::operator=(const OrthoCamera& camera)
@@ -123,16 +123,16 @@ OrthoCamera& OrthoCamera::operator=(const OrthoCamera& camera)
     CameraBase::operator=(camera);
 
 #define COPY_PARAMETER(p) this->p = camera.p
-    COPY_PARAMETER(m_Left);
-    COPY_PARAMETER(m_Right);
-    COPY_PARAMETER(m_Bottom);
-    COPY_PARAMETER(m_Top);
-    COPY_PARAMETER(m_Near);
-    COPY_PARAMETER(m_Far);
-    COPY_PARAMETER(m_matProjection);
-    COPY_PARAMETER(m_bIsPCalculated);
-    COPY_PARAMETER(m_ZoomFactor);
-    COPY_PARAMETER(m_VecPan);
+    COPY_PARAMETER(_Left);
+    COPY_PARAMETER(_Right);
+    COPY_PARAMETER(_Bottom);
+    COPY_PARAMETER(_Top);
+    COPY_PARAMETER(_Near);
+    COPY_PARAMETER(_Far);
+    COPY_PARAMETER(_matProjection);
+    COPY_PARAMETER(_bIsPCalculated);
+    COPY_PARAMETER(_ZoomFactor);
+    COPY_PARAMETER(_VecPan);
 #undef COPY_PARAMETER
     return *this;
 }

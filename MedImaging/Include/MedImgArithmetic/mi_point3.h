@@ -9,7 +9,7 @@ class Arithmetic_Export Point3
 {
 public:
     double x, y, z;
-    static const Point3 kZeroPoint;
+    static const Point3 S_ZERO_POINT;
 
 public:
     ~Point3() 

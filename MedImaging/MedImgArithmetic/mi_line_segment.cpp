@@ -20,8 +20,8 @@ LineSegment3D::LineSegment3D()
 
 LineSegment3D::LineSegment3D(const Point3& pt0 , const Point3& pt1)
 {
-    m_pt[0] = pt0;
-    m_pt[1] = pt1;
+    _pt[0] = pt0;
+    _pt[1] = pt1;
 }
 
 LineSegment3D::~LineSegment3D()

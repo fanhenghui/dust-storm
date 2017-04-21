@@ -9,8 +9,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export AABB : public IShape
 {
 public:
-    Point3 m_ptLLB;//Lower Left Back
-    Point3 m_ptURF;//Upper Right Front
+    Point3 _llb;//Lower Left Back
+    Point3 _urf;//Upper Right Front
 
 public:
     AABB();

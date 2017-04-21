@@ -158,9 +158,6 @@
     <ClCompile Include="mi_sampler.cpp">
       <Filter>Sampler</Filter>
     </ClCompile>
-    <ClCompile Include="mi_color_unit.cpp">
-      <Filter>Color Related</Filter>
-    </ClCompile>
     <ClCompile Include="mi_arithmetic_stdafx.cpp">
       <Filter>Config</Filter>
     </ClCompile>

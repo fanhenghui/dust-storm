@@ -49,7 +49,7 @@ public:
     int get_page(const std::shared_ptr<MPRScene>& pTargetMPRScene );
 
     //locate in one MPR will paging others 2
-    bool locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& ptDC);
+    bool locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& pt_dc);
 
     bool locate(const Point3& ptCenterW);
 

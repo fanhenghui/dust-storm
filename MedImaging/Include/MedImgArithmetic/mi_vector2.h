@@ -9,7 +9,7 @@ class Arithmetic_Export Vector2
 {
 public:
     double x, y;
-    static const Vector2 kZeroVector;
+    static const Vector2 S_ZERO_VECTOR;
 
 public:
     ~Vector2()

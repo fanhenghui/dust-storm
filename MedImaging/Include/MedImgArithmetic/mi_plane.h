@@ -15,8 +15,8 @@ class LineSegment;
 class Arithmetic_Export Plane : public IShape
 {
 public:
-    Vector3 m_vNorm;
-    double m_dDistance;
+    Vector3 _norm;
+    double _distance;
 
 public:
     Plane();

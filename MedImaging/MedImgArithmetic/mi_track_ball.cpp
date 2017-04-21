@@ -26,7 +26,7 @@ Quat4 TrackBall::mouse_motion_to_rotation( const Point2& ptMouseFrom, const Poin
         const Point3 ptMouseFrom3D = convert_screen_point_to_sphere_i(ptMouseFrom , width , height , ptBottomLeftCorner);
         const Point3 ptMouseTo3D = convert_screen_point_to_sphere_i(ptMouseTo , width , height , ptBottomLeftCorner);
 
-        Quat4 qRotation = calculate_track_ball_rotation(ptMouseFrom3D , ptMouseTo3D , Point3::kZeroPoint);
+        Quat4 qRotation = calculate_track_ball_rotation(ptMouseFrom3D , ptMouseTo3D , Point3::S_ZERO_POINT);
         return qRotation;
     }
     else

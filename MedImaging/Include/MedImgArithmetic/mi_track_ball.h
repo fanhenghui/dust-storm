@@ -13,7 +13,7 @@ public:
     /// \ Mouse position coordinate (0 ~ m_iWidth-1 , 0 ~ m_iHeight - 1)
     static Quat4 mouse_motion_to_rotation(
         const Point2& ptMouseFrom, const Point2& ptMouseTo,
-        double width, double height, const Point2& ptBottomLeftCorner = Point2::kZeroPoint);
+        double width, double height, const Point2& ptBottomLeftCorner = Point2::S_ZERO_POINT);
 
 protected:
     ///Convert 2D window coordinates to coordinates on the 3D unit sphere. 

@@ -3,28 +3,28 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Line3D& intersectingLine)
+bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Line3D& intersected_line)
 {
-    const Vector3 vNorm1 = plane1.m_vNorm;//Here should be normalised
-    const Vector3 vNorm2 = plane2.m_vNorm;
-    if( vNorm1 == vNorm2)
+    const Vector3 norm1 = plane1._norm;//Here should be normalized
+    const Vector3 norm2 = plane2._norm;
+    if( norm1 == norm2)
     {
         return false;
     }
     else
     {
-        Vector3 vDir = plane1.m_vNorm.cross_product(plane2.m_vNorm);
+        Vector3 vDir = plane1._norm.cross_product(plane2._norm);
         vDir.normalize();
-        intersectingLine.m_vDir = vDir;
-        const double a0 = plane1.m_vNorm.x;
-        const double b0 = plane1.m_vNorm.y;
-        const double c0 = plane1.m_vNorm.z;
-        const double d0 = plane1.m_dDistance;
+        intersected_line._dir = vDir;
+        const double a0 = plane1._norm.x;
+        const double b0 = plane1._norm.y;
+        const double c0 = plane1._norm.z;
+        const double d0 = plane1._distance;
 
-        const double a1 = plane2.m_vNorm.x;
-        const double b1 = plane2.m_vNorm.y;
-        const double c1 = plane2.m_vNorm.z;
-        const double d1 = plane2.m_dDistance;
+        const double a1 = plane2._norm.x;
+        const double b1 = plane2._norm.y;
+        const double c1 = plane2._norm.z;
+        const double d1 = plane2._distance;
 
         double x,y,z;
         if (std::abs(a0*b1 - a1*b0) > DOUBLE_EPSILON)
@@ -50,7 +50,7 @@ bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Li
             return false;
         }
 
-        intersectingLine.m_pt = Point3(x,y,z);
+        intersected_line._pt = Point3(x,y,z);
         return true;
     }
 }

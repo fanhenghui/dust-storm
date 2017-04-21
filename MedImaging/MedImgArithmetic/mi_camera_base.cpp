@@ -4,84 +4,84 @@ MED_IMAGING_BEGIN_NAMESPACE
 
     CameraBase::CameraBase()
 {
-    m_ptEye = Point3::kZeroPoint;
-    m_ptAt = Point3::kZeroPoint;
-    m_vUp = Vector3::kZeroVector;
-    m_matView = Matrix4::kIdentityMatrix;
-    m_bIsVCalculated = false;
+    _eye = Point3::S_ZERO_POINT;
+    _at = Point3::S_ZERO_POINT;
+    _up = Vector3::S_ZERO_VECTOR;
+    _mat_view = Matrix4::S_IDENTITY_MATRIX;
+    _is_view_mat_cal = false;
 }
 
 CameraBase::~CameraBase()
 {
 }
 
-void CameraBase::set_eye(const Point3& ptEye)
+void CameraBase::set_eye(const Point3& eye)
 {
-    m_ptEye = ptEye;
-    m_bIsVCalculated = false;
+    _eye = eye;
+    _is_view_mat_cal = false;
 }
 
-void CameraBase::set_look_at(const Point3& ptCenter)
+void CameraBase::set_look_at(const Point3& center)
 {
-    m_ptAt = ptCenter;
-    m_bIsVCalculated = false;
+    _at = center;
+    _is_view_mat_cal = false;
 }
 
-void CameraBase::set_up_direction(const Vector3& vecUp)
+void CameraBase::set_up_direction(const Vector3& up)
 {
-    m_vUp = vecUp;
-    m_bIsVCalculated = false;
+    _up = up;
+    _is_view_mat_cal = false;
 }
 
 Point3 CameraBase::get_eye() const
 {
-    return m_ptEye;
+    return _eye;
 }
 
 Point3 CameraBase::get_look_at() const
 {
-    return m_ptAt;
+    return _at;
 }
 
 Vector3 CameraBase::get_up_direction() const
 {
-    return m_vUp;
+    return _up;
 }
 
 Matrix4 CameraBase::get_view_matrix()
 {
     calculate_view_matrix_i();
-    return m_matView;
+    return _mat_view;
 }
 
 void CameraBase::calculate_view_matrix_i()
 {
-    if (!m_bIsVCalculated)
+    if (!_is_view_mat_cal)
     {
-        Vector3 vZ = m_ptEye - m_ptAt;
-        vZ.normalize();
-        Vector3 vX = m_vUp.cross_product(vZ);
-        vX.normalize();
-        Vector3 vY = vZ.cross_product(vX);
+        Vector3 v_z = _eye - _at;
+        v_z.normalize();
+        Vector3 v_x = _up.cross_product(v_z);
+        v_x.normalize();
+        Vector3 v_y = v_z.cross_product(v_x);
 
-        m_matView[0][0] = vX.x;
-        m_matView[1][0] = vX.y;
-        m_matView[2][0] = vX.z;
-        m_matView[3][0] = -(vX.dot_product(m_ptEye - Point3(0,0,0)));
-        m_matView[0][1] = vY.x;
-        m_matView[1][1] = vY.y;
-        m_matView[2][1] = vY.z;
-        m_matView[3][1] = -(vY.dot_product(m_ptEye - Point3(0,0,0)));
-        m_matView[0][2] = vZ.x;
-        m_matView[1][2] = vZ.y;
-        m_matView[2][2] = vZ.z;
-        m_matView[3][2] = -(vZ.dot_product(m_ptEye - Point3(0,0,0)));
-        m_matView[0][3] = 0;
-        m_matView[1][3] = 0;
-        m_matView[2][3] = 0;
-        m_matView[3][3] = 1;
+        _mat_view[0][0] = v_x.x;
+        _mat_view[1][0] = v_x.y;
+        _mat_view[2][0] = v_x.z;
+        _mat_view[3][0] = -(v_x.dot_product(_eye - Point3(0,0,0)));
+        _mat_view[0][1] = v_y.x;
+        _mat_view[1][1] = v_y.y;
+        _mat_view[2][1] = v_y.z;
+        _mat_view[3][1] = -(v_y.dot_product(_eye - Point3(0,0,0)));
+        _mat_view[0][2] = v_z.x;
+        _mat_view[1][2] = v_z.y;
+        _mat_view[2][2] = v_z.z;
+        _mat_view[3][2] = -(v_z.dot_product(_eye - Point3(0,0,0)));
+        _mat_view[0][3] = 0;
+        _mat_view[1][3] = 0;
+        _mat_view[2][3] = 0;
+        _mat_view[3][3] = 1;
 
-        m_bIsVCalculated = true;
+        _is_view_mat_cal = true;
     }
 }
 
@@ -90,21 +90,21 @@ void CameraBase::rotate(const Quat4& quat)
     rotate(quat.to_matrix());
 }
 
-void CameraBase::rotate(const Matrix4& matRotate)
+void CameraBase::rotate(const Matrix4& mat)
 {
-    Matrix4 matViewPre = get_view_matrix();
-    if (!matViewPre.has_inverse())
+    Matrix4 mat_pre_view = get_view_matrix();
+    if (!mat_pre_view.has_inverse())
     {
         return;
     }
     else
     {
-        matViewPre.prepend(make_translate(Point3(0,0,0) - matViewPre.transform(m_ptAt)));
-        matViewPre = matViewPre.get_inverse() * matRotate * matViewPre;
-        m_ptEye = matViewPre.transform(m_ptEye);
-        m_vUp = matViewPre.transform(m_vUp);
+        mat_pre_view.prepend(make_translate(Point3(0,0,0) - mat_pre_view.transform(_at)));
+        mat_pre_view = mat_pre_view.get_inverse() * mat * mat_pre_view;
+        _eye = mat_pre_view.transform(_eye);
+        _up = mat_pre_view.transform(_up);
 
-        m_bIsVCalculated = false;
+        _is_view_mat_cal = false;
     }
 
 }
@@ -112,18 +112,18 @@ void CameraBase::rotate(const Matrix4& matRotate)
 CameraBase& CameraBase::operator=(const CameraBase& camera)
 {
 #define COPY_PARAMETER(p) this->p = camera.p
-    COPY_PARAMETER(m_ptEye);
-    COPY_PARAMETER(m_ptAt);
-    COPY_PARAMETER(m_vUp);
-    COPY_PARAMETER(m_matView);
-    COPY_PARAMETER(m_bIsVCalculated);
+    COPY_PARAMETER(_eye);
+    COPY_PARAMETER(_at);
+    COPY_PARAMETER(_up);
+    COPY_PARAMETER(_mat_view);
+    COPY_PARAMETER(_is_view_mat_cal);
 #undef COPY_PARAMETER
     return *this;
 }
 
 Vector3 CameraBase::get_view_direction() const
 {
-    return (m_ptAt - m_ptEye).get_normalize();
+    return (_at - _eye).get_normalize();
 }
 
 MED_IMAGING_END_NAMESPACE

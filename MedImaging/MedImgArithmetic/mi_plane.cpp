@@ -14,7 +14,7 @@ Plane::~Plane()
 
 double Plane::distance_to_point(const Point3 &pt) const
 {
-     return m_vNorm.dot_product(pt - Point3::kZeroPoint) - m_dDistance;
+     return _norm.dot_product(pt - Point3::S_ZERO_POINT) - _distance;
 }
 
 MED_IMAGING_END_NAMESPACE

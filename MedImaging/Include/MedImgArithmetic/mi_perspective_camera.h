@@ -44,12 +44,12 @@ protected:
     virtual void calculate_projection_matrix_i();
 
 private:
-    double m_Fovy;
-    double m_Aspect;
-    double m_Near;
-    double m_Far;
-    Matrix4 m_matProjection;
-    bool m_bIsPCalculated;
+    double _Fovy;
+    double _Aspect;
+    double _Near;
+    double _Far;
+    Matrix4 _matProjection;
+    bool _bIsPCalculated;
 private:
 };
 

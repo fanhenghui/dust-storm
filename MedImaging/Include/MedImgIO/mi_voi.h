@@ -12,7 +12,7 @@ struct VOISphere
     double m_dDiameter;
     std::string m_sName;
 
-    VOISphere():m_ptCenter(Point3::kZeroPoint),m_dDiameter(0),m_sName("")
+    VOISphere():m_ptCenter(Point3::S_ZERO_POINT),m_dDiameter(0),m_sName("")
     {}
 
     VOISphere(const Point3& pt , double d):m_ptCenter(pt),m_dDiameter(d),m_sName("")

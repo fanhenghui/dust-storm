@@ -15,7 +15,7 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 RayCaster::RayCaster():m_pInnerBuffer(new RayCasterInnerBuffer()),
-m_matVolume2World(Matrix4::kIdentityMatrix),
+m_matVolume2World(Matrix4::S_IDENTITY_MATRIX),
 m_fSampleRate(0.5f),
 m_fGlobalWW(1.0f),
 m_fGlobalWL(0.0f),

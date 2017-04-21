@@ -10,7 +10,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export LineSegment2D : public IShape
 {
 public:
-    Point2 m_pt[2];
+    Point2 _pt[2];
 
 public:
     LineSegment2D();
@@ -20,7 +20,7 @@ public:
 class Arithmetic_Export LineSegment3D : public IShape
 {
 public:
-    Point3 m_pt[2];
+    Point3 _pt[2];
 
 public:
     LineSegment3D();

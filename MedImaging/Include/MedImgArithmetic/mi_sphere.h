@@ -10,8 +10,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export Sphere : public IShape
 {
 public:
-    Point3 m_ptCenter;
-    double m_dRadius;
+    Point3 _center;
+    double _radius;
 
 public:
     Sphere();
