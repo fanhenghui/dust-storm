@@ -17,9 +17,10 @@ class RayCaster;
 class RayCastingCPUBrickAcc
 {
 public:
-    RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> pRayCaster);
+    RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingCPUBrickAcc();
-    void render(int iTestCode = 0);
+
+    void render(int test_code = 0);
 
     //////////////////////////////////////////////////////////////////////////
     //For testing 
@@ -30,43 +31,43 @@ public:
 private:
     void sort_brick_i();//Just for orthogonal camera(same ray direction)
 
-    void ray_casting_in_brick_i(unsigned int id ,  const std::shared_ptr<RayCaster>& pRayCaster);
+    void ray_casting_in_brick_i(unsigned int id ,  const std::shared_ptr<RayCaster>& ray_caster);
 
 private:
-    std::weak_ptr<RayCaster> m_pRayCaster;
+    std::weak_ptr<RayCaster> _ray_caster;
     //Cache
     int _width;
     int _height;
-    Vector4f* m_pEntryPoints;
-    Vector4f* m_pExitPoints;
+    Vector4f* _entry_points;
+    Vector4f* _exit_points;
     unsigned int _dim[3];
-    RGBAUnit* m_pColorCanvas;
+    RGBAUnit* _canvas_array;
 
     //Brick struct
-    unsigned int m_uiBrickDim[3];
-    unsigned int m_uiBrickSize;
-    unsigned int m_uiBrickExpand;
-    unsigned int m_uiBrickCount;
-    BrickCorner* m_pBrickCorner;
-    BrickUnit* m_pVolumeBrickUnit;
-    VolumeBrickInfo* m_pVolumeBrickInfo;
-    BrickUnit* m_pMaskBrickUnit;
-    MaskBrickInfo* m_pMaskBrickInfo;
-    Matrix4f m_matMVP;
-    Matrix4f m_matMVPInv;
-    Matrix4 m_matMVPInv0;
+    unsigned int _brick_dim[3];
+    unsigned int _brick_size;
+    unsigned int _brick_expand;
+    unsigned int _brick_count;
+    BrickCorner* _brick_corner_array;
+    BrickUnit* _volume_brick_unit_array;
+    VolumeBrickInfo* _volume_brick_info_array;
+    BrickUnit* _mask_brick_unit_array;
+    MaskBrickInfo* _mask_brick_info_array;
+    Matrix4f _mat_mvp;
+    Matrix4f _mat_mvp_inv;
+    Matrix4 _mat_mvp_inv_double;
 
 
     //Brick cache
-    std::vector<BrickDistance> m_vecBrickCenterDistance;
-    unsigned int m_uiInterBrickNum;
-    std::unique_ptr<float[]> m_pRayResult;
-    int m_iRayCount;
-    Vector3f m_vRayDirNorm;
+    std::vector<BrickDistance> _brick_center_distance;
+    unsigned int _intersected_brick_num;
+    std::unique_ptr<float[]> _ray_result;
+    int _ray_count;
+    Vector3f _ray_dir_norm;
     //////////////////////////////////////////////////////////////////////////
     //Test 
-    int m_iTestPixelX;
-    int m_iTestPixelY;
+    int _test_pixel_x;
+    int _test_pixel_y;
 
 };
 

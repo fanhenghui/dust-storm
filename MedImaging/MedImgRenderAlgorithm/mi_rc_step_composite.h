@@ -8,8 +8,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepCompositeAverage : public RCStepBase
 {
 public:
-    RCStepCompositeAverage(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram)
+    RCStepCompositeAverage(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepCompositeAverage(){};
@@ -22,8 +22,8 @@ private:
 class RCStepCompositeMIP : public RCStepBase
 {
 public:
-    RCStepCompositeMIP(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram)
+    RCStepCompositeMIP(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
       {};
 
       virtual ~RCStepCompositeMIP(){};
@@ -36,8 +36,8 @@ private:
 class RCStepCompositeMinIP : public RCStepBase
 {
 public:
-    RCStepCompositeMinIP(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram),m_iLocCustomMinThreshold(-1)
+    RCStepCompositeMinIP(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program),_loc_custom_min_threshold(-1)
       {};
 
       virtual ~RCStepCompositeMinIP(){};
@@ -49,14 +49,14 @@ public:
       virtual void get_uniform_location();
 
 private:
-    int m_iLocCustomMinThreshold;
+    int _loc_custom_min_threshold;
 };
 
 class RCStepCompositeDVR : public RCStepBase
 {
 public:
-    RCStepCompositeDVR(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram)
+    RCStepCompositeDVR(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
       {};
 
       virtual ~RCStepCompositeDVR(){};

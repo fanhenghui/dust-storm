@@ -11,7 +11,7 @@ SceneBase::SceneBase():_width(128),_height(128),m_bDirty(true),m_sName("Scene")
 {
 }
 
-SceneBase::SceneBase(int iWidth , int iHeight):_width(iWidth) , _height(iHeight),m_bDirty(true)
+SceneBase::SceneBase(int width , int height):_width(width) , _height(height),m_bDirty(true)
 {
 }
 
@@ -31,7 +31,7 @@ void SceneBase::render_to_back()
 
 std::shared_ptr<CameraBase> SceneBase::get_camera()
 {
-    return m_pCamera;
+    return _camera;
 }
 
 void SceneBase::initialize()
@@ -41,14 +41,14 @@ void SceneBase::initialize()
         //Init FBO
         CHECK_GL_ERROR;
 
-        UIDType idFBO=0;
-        m_pSceneFBO = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(idFBO);
+        UIDType fbo_id=0;
+        m_pSceneFBO = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(fbo_id);
         m_pSceneFBO->set_description("Scene base FBO");
         m_pSceneFBO->initialize();
         m_pSceneFBO->set_target(GL_FRAMEBUFFER);
 
-        UIDType idTexColor = 0;
-        m_pSceneColorAttach0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexColor);
+        UIDType texture_color_id = 0;
+        m_pSceneColorAttach0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(texture_color_id);
         m_pSceneColorAttach0->set_description("Scene base Color Attachment 0");
         m_pSceneColorAttach0->initialize();
         m_pSceneColorAttach0->bind();
@@ -56,8 +56,8 @@ void SceneBase::initialize()
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
         m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
-        UIDType idTexDepth = 0;
-        m_pSceneDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(idTexDepth);
+        UIDType depth_color_id = 0;
+        m_pSceneDepthAttach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(depth_color_id);
         m_pSceneDepthAttach->set_description("Scene base Depth Attachment");
         m_pSceneDepthAttach->initialize();
         m_pSceneDepthAttach->bind();
@@ -87,10 +87,10 @@ void SceneBase::finalize()
     GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
 }
 
-void SceneBase::set_display_size(int iWidth , int iHeight)
+void SceneBase::set_display_size(int width , int height)
 {
-    _width = iWidth;
-    _height = iHeight;
+    _width = width;
+    _height = height;
 
     m_pSceneColorAttach0->bind();
     m_pSceneColorAttach0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
@@ -106,25 +106,25 @@ void SceneBase::render(int)
 
 }
 
-void SceneBase::rotate(const Point2& ptPre , const Point2& ptCur)
+void SceneBase::rotate(const Point2& pre_pt , const Point2& cur_pt)
 {
 
 }
 
-void SceneBase::zoom(const Point2& ptPre , const Point2& ptCur)
+void SceneBase::zoom(const Point2& pre_pt , const Point2& cur_pt)
 {
 
 }
 
-void SceneBase::pan(const Point2& ptPre , const Point2& ptCur)
+void SceneBase::pan(const Point2& pre_pt , const Point2& cur_pt)
 {
 
 }
 
-void SceneBase::get_display_size(int& iWidth, int& iHeight) const
+void SceneBase::get_display_size(int& width, int& height) const
 {
-    iWidth = _width;
-    iHeight = _height;
+    width = _width;
+    height = _height;
 }
 
 void SceneBase::set_dirty(bool flag)

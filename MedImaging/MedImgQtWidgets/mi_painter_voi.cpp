@@ -41,8 +41,8 @@ void VOIPainter::render()
         std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
         QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
 
-        int iWidth(1),iHeight(1);
-        pScene->get_display_size(iWidth , iHeight);
+        int width(1),height(1);
+        pScene->get_display_size(width , height);
 
         //1 Get MPR plane
         std::shared_ptr<CameraBase> pCamera = pScene->get_camera();
@@ -53,7 +53,7 @@ void VOIPainter::render()
         vNorm.normalize();
         Vector3 vUp = pCamera->get_up_direction();
 
-        const Matrix4 matVP = pCamera->get_view_projection_matrix();
+        const Matrix4 mat_vp = pCamera->get_view_projection_matrix();
         const Matrix4 matP2W = pCameraCal->get_patient_to_world_matrix();
 
         //2 Calculate sphere intersect with plane
@@ -72,11 +72,11 @@ void VOIPainter::render()
                 Point3 pt0 = ptCenter + dDis*vNorm;
                 double dRadius = sqrt(dDiameter*dDiameter*0.25 - dDis*dDis);
                 Point3 pt1 = pt0 + dRadius*vUp;
-                pt0 = matVP.transform(pt0);
-                pt1 = matVP.transform(pt1);
+                pt0 = mat_vp.transform(pt0);
+                pt1 = mat_vp.transform(pt1);
                 int iSpillTag =0;
-                Point2 pt0DC = ArithmeticUtils::ndc_to_dc(Point2(pt0.x , pt0.y) , iWidth , iHeight , iSpillTag);
-                Point2 pt1DC = ArithmeticUtils::ndc_to_dc(Point2(pt1.x , pt1.y) , iWidth , iHeight , iSpillTag);
+                Point2 pt0DC = ArithmeticUtils::ndc_to_dc(Point2(pt0.x , pt0.y) , width , height , iSpillTag);
+                Point2 pt1DC = ArithmeticUtils::ndc_to_dc(Point2(pt1.x , pt1.y) , width , height , iSpillTag);
                 int iRadius = (int)( (pt1DC - pt0DC).magnitude()+0.5);
                 if (iRadius > 1)
                 {

@@ -9,12 +9,12 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepRayCastingMIPBase : public RCStepBase
 {
 public:
-    RCStepRayCastingMIPBase(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram),
-          m_iLocPseudoColor(-1),
-          m_iLocPseudoColorSlope(-1),
-          m_iLocPseudoColorIntercept(-1),
-          m_iLocGlobalWL(-1)
+    RCStepRayCastingMIPBase(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program),
+          _loc_pseudo_color(-1),
+          _loc_pseudo_color_slope(-1),
+          _loc_pseudo_color_intercept(-1),
+          _loc_global_wl(-1)
       {};
 
       virtual ~RCStepRayCastingMIPBase(){};
@@ -25,17 +25,17 @@ public:
     
 
 private:
-    int m_iLocPseudoColor;
-    int m_iLocPseudoColorSlope;
-    int m_iLocPseudoColorIntercept;
-    int m_iLocGlobalWL;
+    int _loc_pseudo_color;
+    int _loc_pseudo_color_slope;
+    int _loc_pseudo_color_intercept;
+    int _loc_global_wl;
 };
 
 class RCStepRayCastingAverage : public RCStepRayCastingMIPBase
 {
 public:
-    RCStepRayCastingAverage(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepRayCastingMIPBase(pRayCaster , pProgram)
+    RCStepRayCastingAverage(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepRayCastingMIPBase(ray_caster , program)
     {};
 
     virtual ~RCStepRayCastingAverage(){};
@@ -48,8 +48,8 @@ private:
 class RCStepRayCastingMIPMinIP : public RCStepRayCastingMIPBase
 {
 public:
-    RCStepRayCastingMIPMinIP(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepRayCastingMIPBase(pRayCaster , pProgram)
+    RCStepRayCastingMIPMinIP(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepRayCastingMIPBase(ray_caster , program)
     {};
 
     virtual ~RCStepRayCastingMIPMinIP(){};

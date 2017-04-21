@@ -2,9 +2,9 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-bool operator <(const LabelKey& _Left, const LabelKey& _Right)
+bool operator <(const LabelKey& left, const LabelKey& right)
 {
-    return _Left.m_sKey < _Right.m_sKey;
+    return left.key < right.key;
 }
 
 MED_IMAGING_END_NAMESPACE

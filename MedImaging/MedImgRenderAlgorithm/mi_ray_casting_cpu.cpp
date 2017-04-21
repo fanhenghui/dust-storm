@@ -13,14 +13,15 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-    RayCastingCPU::RayCastingCPU(std::shared_ptr<RayCaster> pRayCaster):m_pRayCaster(pRayCaster),
-    _width(32),
-    _height(32),
-    m_pEntryPoints(nullptr),
-    m_pExitPoints(nullptr),
-    m_pVolumeDataRaw(nullptr),
-    m_pMaskDataRaw(nullptr),
-    m_pColorCanvas(nullptr)
+RayCastingCPU::RayCastingCPU(std::shared_ptr<RayCaster> ray_caster):
+        _ray_caster(ray_caster),
+        _width(32),
+        _height(32),
+        _entry_points(nullptr),
+        _exit_points(nullptr),
+        _volume_data_array(nullptr),
+        _mask_data_array(nullptr),
+        _canvas_array(nullptr)
 {
     _dim[0] = _dim[1] = _dim[2] = 32;
 }
@@ -30,60 +31,60 @@ RayCastingCPU::~RayCastingCPU()
 
 }
 
-void RayCastingCPU::render(int iTestCode )
+void RayCastingCPU::render(int test_code )
 {
     try
     {
-        std::shared_ptr<RayCaster> pRayCaster = m_pRayCaster.lock();
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster);
+        std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster);
 
         //Volume info
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pEntryExitPoints);
-        pRayCaster->m_pEntryExitPoints->get_display_size(_width , _height);
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster->_entry_exit_points);
+        ray_caster->_entry_exit_points->get_display_size(_width , _height);
 
-        std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
-        RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
-        memcpy(_dim , pVolumeData->_dim , sizeof(unsigned int)*3);
-        m_pVolumeDataRaw = pVolumeData->get_pixel_pointer();
+        std::shared_ptr<ImageData> volume_img = ray_caster->_volume_data;
+        RENDERALGO_CHECK_NULL_EXCEPTION(volume_img);
+        memcpy(_dim , volume_img->_dim , sizeof(unsigned int)*3);
+        _volume_data_array = volume_img->get_pixel_pointer();
 
         //Entry exit points
-        m_pEntryPoints = pRayCaster->m_pEntryExitPoints->get_entry_points_array();
-        m_pExitPoints = pRayCaster->m_pEntryExitPoints->get_exit_points_array();
+        _entry_points = ray_caster->_entry_exit_points->get_entry_points_array();
+        _exit_points = ray_caster->_entry_exit_points->get_exit_points_array();
 
         //Canvas
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pCanvas);
-        m_pColorCanvas = pRayCaster->m_pCanvas->get_color_array();
-        RENDERALGO_CHECK_NULL_EXCEPTION(m_pColorCanvas);
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster->_canvas);
+        _canvas_array = ray_caster->_canvas->get_color_array();
+        RENDERALGO_CHECK_NULL_EXCEPTION(_canvas_array);
 
         //////////////////////////////////////////////////////////////////////////
         //For testing entry & exit points
-        if (0 != iTestCode)
+        if (0 != test_code)
         {
-           render_entry_exit_points_i(iTestCode);
-            pRayCaster->m_pCanvas->update_color_array();
+           render_entry_exit_points_i(test_code);
+            ray_caster->_canvas->update_color_array();
             return;
         }
         //////////////////////////////////////////////////////////////////////////
 
 
 
-        switch(pVolumeData->_data_type)
+        switch(volume_img->_data_type)
         {
         case USHORT:
             {
-                ray_casting_i<unsigned short>( pRayCaster );
+                ray_casting_i<unsigned short>( ray_caster );
                 break;
             }
 
         case SHORT:
             {
-                ray_casting_i<short>( pRayCaster );
+                ray_casting_i<short>( ray_caster );
                 break;
             }
 
         case FLOAT:
             {
-                ray_casting_i<float>( pRayCaster );
+                ray_casting_i<float>( ray_caster );
                 break;
             }
         default:
@@ -92,11 +93,11 @@ void RayCastingCPU::render(int iTestCode )
 
         CHECK_GL_ERROR;
 
-        if (COMPOSITE_AVERAGE == pRayCaster->m_eCompositeMode ||
-            COMPOSITE_MIP == pRayCaster->m_eCompositeMode ||
-            COMPOSITE_MINIP == pRayCaster->m_eCompositeMode)
+        if (COMPOSITE_AVERAGE == ray_caster->_composite_mode ||
+            COMPOSITE_MIP == ray_caster->_composite_mode ||
+            COMPOSITE_MINIP == ray_caster->_composite_mode)
         {
-            pRayCaster->m_pCanvas->update_color_array();
+            ray_caster->_canvas->update_color_array();
         }
 
         CHECK_GL_ERROR;
@@ -124,23 +125,23 @@ void RayCastingCPU::render(int iTestCode )
 
 
 template<class T>
-void RayCastingCPU::ray_casting_i(std::shared_ptr<RayCaster> pRayCaster )
+void RayCastingCPU::ray_casting_i(std::shared_ptr<RayCaster> ray_caster )
 {
-    switch(pRayCaster->m_eCompositeMode)
+    switch(ray_caster->_composite_mode)
     {
     case COMPOSITE_AVERAGE:
         {
-            ray_casting_average_i<T>(pRayCaster);
+            ray_casting_average_i<T>(ray_caster);
             break;
         }
     case COMPOSITE_MIP:
         {
-            ray_casting_mip_i<T>(pRayCaster );
+            ray_casting_mip_i<T>(ray_caster );
             break;
         }
     case COMPOSITE_MINIP:
         {
-            ray_casting_minip_i<T>(pRayCaster);
+            ray_casting_minip_i<T>(ray_caster);
             break;
         }
     default:
@@ -149,211 +150,211 @@ void RayCastingCPU::ray_casting_i(std::shared_ptr<RayCaster> pRayCaster )
 }
 
 template<class T>
-void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> ray_caster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = _width*_height;
+    const int pixel_sum = _width*_height;
 
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
-    for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
+    for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
-        const int iY = idx / _width;
-        const int iX = idx - iY*_width;
+        const int y = idx / _width;
+        const int x = idx - y*_width;
 
         //1 Get entry exit points
-        const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
-        const Vector3f ptEnd(m_pExitPoints[idx].m_Vec128);
+        const Vector3f start_point(_entry_points[idx]._m128);
+        const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool bSkip = ptStart._m[3] < -0.5f; // -1.0 for skip , 0  for valid entry exit points
-        if (bSkip)
+        const bool skip = start_point._m[3] < -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        if (skip)
         {
-            m_pColorCanvas[idx] = RGBAUnit();
+            _canvas_array[idx] = RGBAUnit();
             continue;
         }
 
-        const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.magnitude();
-        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
-        const float fStep = fLength / pRayCaster->m_fSampleRate;
-        int iStep =(int)fStep;
-        if (iStep == 0)//保证至少积分一次
+        const Vector3f dir = end_point - start_point;
+        const float length = dir.magnitude();
+        const Vector3f dir_step = dir.get_normalize()*ray_caster->_sample_rate;
+        const float step_float = length / ray_caster->_sample_rate;
+        int step =(int)step_float;
+        if (step == 0)//保证至少积分一次
         {
-            iStep = 1;
+            step = 1;
         }
 
         //2 Integrate
-        const float fRatio =1000.0f;
-        const float fRatioR = 1.0f/1000.0f;
-        float fSum = 0.0f;
-        Vector3f ptSamplePos = ptStart;
+        const float ratio =1000.0f;
+        const float ratio_r = 1.0f/1000.0f;
+        float sum = 0.0f;
+        Vector3f sample_pos = start_point;
 
-        float fSampleValue = 0.0f;
-        for (int i = 0 ; i < iStep ; ++i)
+        float sample_value = 0.0f;
+        for (int i = 0 ; i < step ; ++i)
         {
-            ptSamplePos += ( vDirStep * float(i) );
+            sample_pos += ( dir_step * float(i) );
 
-            fSampleValue = sampler.sample_3d_linear(
-                ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
+            sample_value = sampler.sample_3d_linear(
+                sample_pos._m[0] , sample_pos._m[1] , sample_pos._m[2] , 
                 _dim[0], _dim[1], _dim[2],
-                (T*)m_pVolumeDataRaw);
+                (T*)_volume_data_array);
 
-            fSum += fSampleValue*fRatioR;
+            sum += sample_value*ratio_r;
         }
-        const float fResult  = fSum *(1.0f/iStep) * fRatio;
+        const float result_gray  = sum *(1.0f/step) * ratio;
 
         //3Apply window level
-        const float fMinGray = pRayCaster->m_fGlobalWL - pRayCaster->m_fGlobalWW*0.5f;
-        const float fGray = (fResult - fMinGray)/pRayCaster->m_fGlobalWW;
+        const float min_wl_gray = ray_caster->_global_wl - ray_caster->_global_ww*0.5f;
+        const float gray = (result_gray - min_wl_gray)/ray_caster->_global_ww;
 
         //4Apply pseudo color
         //TODO just gray
-        m_pColorCanvas[idx] = RGBAUnit(fGray , fGray , fGray);
+        _canvas_array[idx] = RGBAUnit(gray , gray , gray);
     }
 
 }
 
 template<class T>
-void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> ray_caster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = _width*_height;
+    const int pixel_sum = _width*_height;
 
 #pragma omp parallel for
-    for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
+    for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
-        const int iY = idx / _width;
-        const int iX = idx - iY*_width;
+        const int y = idx / _width;
+        const int x = idx - y*_width;
 
         //1 Get entry exit points
-        const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
-        const Vector3f ptEnd(m_pExitPoints[idx].m_Vec128);
+        const Vector3f start_point(_entry_points[idx]._m128);
+        const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool bSkip = ptStart._m[3] <  -0.5f; // -1.0 for skip , 0  for valid entry exit points
-        if (bSkip)
+        const bool skip = start_point._m[3] <  -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        if (skip)
         {
-            m_pColorCanvas[idx] = RGBAUnit();
+            _canvas_array[idx] = RGBAUnit();
             continue;
         }
 
-        const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.magnitude();
-        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
-        const float fStep = fLength / pRayCaster->m_fSampleRate;
-        int iStep =(int)fStep;
-        if (iStep == 0)//保证至少积分一次
+        const Vector3f dir = end_point - start_point;
+        const float length = dir.magnitude();
+        const Vector3f dir_step = dir.get_normalize()*ray_caster->_sample_rate;
+        const float step_float = length / ray_caster->_sample_rate;
+        int step =(int)step_float;
+        if (step == 0)//保证至少积分一次
         {
-            iStep = 1;
+            step = 1;
         }
 
         //2 Integrate
-        float fMaxGray = -65535.0f;
-        Vector3f ptSamplePos = ptStart;
+        float max_gray = -65535.0f;
+        Vector3f sample_pos = start_point;
 
-        float fSampleValue = 0.0f;
-        for (int i = 0 ; i < iStep ; ++i)
+        float sample_value = 0.0f;
+        for (int i = 0 ; i < step ; ++i)
         {
-            ptSamplePos += ( vDirStep * float(i) );
+            sample_pos += ( dir_step * float(i) );
 
-            fSampleValue = sampler.sample_3d_linear(
-                ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
+            sample_value = sampler.sample_3d_linear(
+                sample_pos._m[0] , sample_pos._m[1] , sample_pos._m[2] , 
                 _dim[0], _dim[1], _dim[2],
-                (T*)m_pVolumeDataRaw);
+                (T*)_volume_data_array);
 
-            fMaxGray = fSampleValue > fMaxGray ? fSampleValue : fMaxGray;
+            max_gray = sample_value > max_gray ? sample_value : max_gray;
         }
 
         //3Apply window level
-        const float fMinGray = pRayCaster->m_fGlobalWL - pRayCaster->m_fGlobalWW*0.5f;
-        const float fGray = (fMaxGray - fMinGray)/pRayCaster->m_fGlobalWW;
+        const float min_wl_gray = ray_caster->_global_wl - ray_caster->_global_ww*0.5f;
+        const float gray = (max_gray - min_wl_gray)/ray_caster->_global_ww;
 
         //4Apply pseudo color
         //TODO just gray
-        m_pColorCanvas[idx] = RGBAUnit(fGray , fGray , fGray);
+        _canvas_array[idx] = RGBAUnit(gray , gray , gray);
     }
 }
 
 template<class T>
-void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> pRayCaster)
+void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> ray_caster)
 {
     const Sampler<T> sampler;
-    const int iTotalPixelNum = _width*_height;
+    const int pixel_sum = _width*_height;
 
 #pragma omp parallel for
-    for (int idx = 0; idx<iTotalPixelNum  ; ++idx)
+    for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
-        const int iY = idx / _width;
-        const int iX = idx - iY*_width;
+        const int y = idx / _width;
+        const int x = idx - y*_width;
 
         //1 Get entry exit points
-        const Vector3f ptStart(m_pEntryPoints[idx].m_Vec128);
-        const Vector3f ptEnd(m_pExitPoints[idx].m_Vec128);
+        const Vector3f start_point(_entry_points[idx]._m128);
+        const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool bSkip = ptStart._m[3] < -0.5f; // -1.0 for skip , 0  for valid entry exit points
-        if (bSkip)
+        const bool skip = start_point._m[3] < -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        if (skip)
         {
-            m_pColorCanvas[idx] = RGBAUnit();
+            _canvas_array[idx] = RGBAUnit();
             continue;
         }
 
-        const Vector3f vDir = ptEnd - ptStart;
-        const float fLength = vDir.magnitude();
-        const Vector3f vDirStep = vDir.get_normalize()*pRayCaster->m_fSampleRate;
-        const float fStep = fLength / pRayCaster->m_fSampleRate;
-        int iStep =(int)fStep;
-        if (iStep == 0)//保证至少积分一次
+        const Vector3f dir = end_point - start_point;
+        const float length = dir.magnitude();
+        const Vector3f dir_step = dir.get_normalize()*ray_caster->_sample_rate;
+        const float step_float = length / ray_caster->_sample_rate;
+        int step =(int)step_float;
+        if (step == 0)//保证至少积分一次
         {
-            iStep = 1;
+            step = 1;
         }
 
         //2 Integrate
-        float fMaxGray = -65535.0f;
-        Vector3f ptSamplePos = ptStart;
+        float max_gray = -65535.0f;
+        Vector3f sample_pos = start_point;
 
-        float fSampleValue = 0.0f;
-        for (int i = 0 ; i < iStep ; ++i)
+        float sample_value = 0.0f;
+        for (int i = 0 ; i < step ; ++i)
         {
-            ptSamplePos += ( vDirStep * float(i) );
+            sample_pos += ( dir_step * float(i) );
 
-            fSampleValue = sampler.sample_3d_linear(
-                ptSamplePos._m[0] , ptSamplePos._m[1] , ptSamplePos._m[2] , 
+            sample_value = sampler.sample_3d_linear(
+                sample_pos._m[0] , sample_pos._m[1] , sample_pos._m[2] , 
                 _dim[0], _dim[1], _dim[2],
-                (T*)m_pVolumeDataRaw);
+                (T*)_volume_data_array);
 
-            fMaxGray = fSampleValue > fMaxGray ? fSampleValue : fMaxGray;
+            max_gray = sample_value > max_gray ? sample_value : max_gray;
         }
 
         //3Apply window level
-        const float fMinGray = pRayCaster->m_fGlobalWL - pRayCaster->m_fGlobalWW*0.5f;
-        const float fGray = (fMaxGray - fMinGray)/pRayCaster->m_fGlobalWW;
+        const float min_wl_gray = ray_caster->_global_wl - ray_caster->_global_ww*0.5f;
+        const float gray = (max_gray - min_wl_gray)/ray_caster->_global_ww;
 
         //4Apply pseudo color
         //TODO just gray
-        m_pColorCanvas[idx] = RGBAUnit(fGray , fGray , fGray);
+        _canvas_array[idx] = RGBAUnit(gray , gray , gray);
     }
 }
 
-void RayCastingCPU::render_entry_exit_points_i( int iTestCode)
+void RayCastingCPU::render_entry_exit_points_i( int test_code)
 {
     Vector3f vDimR(1.0f/_dim[0] , 1.0f/_dim[1] , 1.0f/_dim[2]);
-    const int iTotalPixelNum = _width*_height;
-    if (1 == iTestCode)
+    const int pixel_sum = _width*_height;
+    if (1 == test_code)
     {
-        for (int i = 0 ; i < iTotalPixelNum ; ++i)
+        for (int i = 0 ; i < pixel_sum ; ++i)
         {
-            Vector3f ptStart(m_pEntryPoints[i].m_Vec128);
-            ptStart =ptStart*vDimR;
-            m_pColorCanvas[i] = RGBAUnit(ptStart._m[0] , ptStart._m[1] , ptStart._m[2]);
+            Vector3f start_point(_entry_points[i]._m128);
+            start_point =start_point*vDimR;
+            _canvas_array[i] = RGBAUnit(start_point._m[0] , start_point._m[1] , start_point._m[2]);
         }
     }
     else
     {
-        for (int i = 0 ; i < iTotalPixelNum ; ++i)
+        for (int i = 0 ; i < pixel_sum ; ++i)
         {
-            Vector3f ptEnd(m_pExitPoints[i].m_Vec128);
-            ptEnd =ptEnd*vDimR;
-            m_pColorCanvas[i] = RGBAUnit(ptEnd._m[0] , ptEnd._m[1] , ptEnd._m[2]);
+            Vector3f end_point(_exit_points[i]._m128);
+            end_point =end_point*vDimR;
+            _canvas_array[i] = RGBAUnit(end_point._m[0] , end_point._m[1] , end_point._m[2]);
         }
     }
 

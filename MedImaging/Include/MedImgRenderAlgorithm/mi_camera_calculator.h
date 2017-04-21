@@ -27,14 +27,14 @@ enum CoordinateAxis
 //病人方位信息
 struct PatientAxisInfo
 {
-    //与该patient坐标系 最靠近 的 volume坐标系轴方向
+    //与该patient方位（head  left  posterior之一）最靠近 的 volume坐标系轴方向
     //EG：PatientAxisInfo leftAxisInfo; leftAxisInfo.eVolumeCoord = POSX 说明病人坐标系Left方向最近的体坐标系是正X方向
-    CoordinateAxis eVolumeCoord;
+    CoordinateAxis volume_coord;
 
-    //在patient坐标系 最靠近 的 volume坐标系轴方向 的实际patient方向
+    //在该patient方位（head  left  posterior之一） 最靠近 的 volume坐标系轴方向 所对应的实际patient方向
     //EG : 同上，leftAxisInfo.vecPatient = (0.9 0 0) , 说明和标准的 (1,0,0) 有偏移
-    // 这是为了在world 坐标系下（方向和病人坐标系相同）能够调整相机的位置（未必和病人坐标系轴平行）来观察volume的正方向（为了看扫描位），而非patient坐标的正方向
-    Vector3 vecInPatient;
+    // 这是为了在world 坐标系下（方向和病人坐标系相同），能够调整相机的位置（未必和病人坐标系轴平行）来观察volume的正方向（为了看扫描位），而非patient坐标系的正方向
+    Vector3 patient_orientation;
 };
 
 enum ScanSliceType
@@ -73,11 +73,11 @@ public:
 
     const Point3& get_default_mpr_center_world() const;
 
-    void init_mpr_placement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//实时获取
+    void init_mpr_placement(std::shared_ptr<OrthoCamera> camera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//实时获取
 
-    void init_mpr_placement(std::shared_ptr<OrthoCamera> pCamera , ScanSliceType eScanSliceType ) const;//Default replacement
+    void init_mpr_placement(std::shared_ptr<OrthoCamera> camera , ScanSliceType eScanSliceType ) const;//Default replacement
 
-    void init_vr_placement(std::shared_ptr<OrthoCamera> pCamera) const;
+    void init_vr_placement(std::shared_ptr<OrthoCamera> camera) const;
 
     PatientAxisInfo get_head_patient_axis_info() const;
 
@@ -101,7 +101,7 @@ public:
     // Coronal A -> P
     bool page_orthognal_mpr(std::shared_ptr<OrthoCamera> pMPRCamera , int iPageStep) const;
 
-    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , int iPage) const;
+    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , int page) const;
 
     int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> pMPRCamera) const;
 
@@ -130,26 +130,26 @@ private:
     void caluculate_orthogonal_mpr_placement_i();
 
 private:
-    std::shared_ptr<ImageData> m_pImgData;
+    std::shared_ptr<ImageData> _volume_data;
 
-    bool m_bVolumeOrthogonal;
+    bool _is_volume_orthogonal;
 
-    PatientAxisInfo m_headInfo;
-    PatientAxisInfo m_leftInfo;
-    PatientAxisInfo m_posteriorInfo;
+    PatientAxisInfo _headInfo;
+    PatientAxisInfo _leftInfo;
+    PatientAxisInfo _posteriorInfo;
 
-    Matrix4 m_matVolume2Physical;
-    Matrix4 m_matPhysical2World;
-    Matrix4 m_matWorld2Patient;
-    Matrix4 m_matPatient2World;
-    Matrix4 m_matVolume2Wolrd;
-    Matrix4 m_matWorld2Volume;
-    OrthoCamera m_VRPlacementCamera;
+    Matrix4 _mat_volume_to_physical;
+    Matrix4 _mat_physical_to_world;
+    Matrix4 _mat_world_to_patient;
+    Matrix4 _mat_patient_to_world;
+    Matrix4 _mat_volume_to_wolrd;
+    Matrix4 _mat_world_to_volume;
 
-    Point3 m_ptDefaultMPRCenter;
-    // SAGITTAL= 0, CORONAL = 1, TRANSVERSE = 2,
-    OrthoCamera m_OthogonalMPRCamera[3];
-    Vector3 m_OthogonalMPRNorm[3];
+    OrthoCamera _vr_placement_camera;
+
+    Point3 _default_mpr_center;
+    OrthoCamera _othogonal_mpr_camera[3];// SAGITTAL= 0, CORONAL = 1, TRANSVERSE = 2,
+    Vector3 _othogonal_mpr_norm[3];
 };
 
 MED_IMAGING_END_NAMESPACE

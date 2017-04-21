@@ -11,12 +11,12 @@ class RayCaster;
 class RCStepBase
 {
 public:
-    RCStepBase(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram)
+    RCStepBase(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program)
     {
-        RENDERALGO_CHECK_NULL_EXCEPTION(pProgram);
-        m_pProgram = pProgram;
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster);
-        m_pRayCaster = pRayCaster;
+        RENDERALGO_CHECK_NULL_EXCEPTION(program);
+        _program = program;
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster);
+        _ray_caster = ray_caster;
     };
 
     virtual ~RCStepBase(){};
@@ -33,8 +33,8 @@ public:
     }
 
 protected:
-    std::weak_ptr<GLProgram> m_pProgram;
-    std::weak_ptr<RayCaster> m_pRayCaster;
+    std::weak_ptr<GLProgram> _program;
+    std::weak_ptr<RayCaster> _ray_caster;
 };
 
 

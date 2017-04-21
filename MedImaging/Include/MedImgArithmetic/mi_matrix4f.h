@@ -229,10 +229,10 @@ public:
     {
         return Vector4f(
             _mm_add_ps(
-            _mm_add_ps(_mm_mul_ps(m_Col0.m_Vec128, _mm_shuffle_ps(vec.m_Vec128, vec.m_Vec128, _MM_SHUFFLE(0,0,0,0))), 
-            _mm_mul_ps(m_Col1.m_Vec128, _mm_shuffle_ps(vec.m_Vec128, vec.m_Vec128, _MM_SHUFFLE(1,1,1,1)))),
-            _mm_add_ps(_mm_mul_ps(m_Col2.m_Vec128, _mm_shuffle_ps(vec.m_Vec128, vec.m_Vec128, _MM_SHUFFLE(2,2,2,2))), 
-            _mm_mul_ps(m_Col3.m_Vec128, _mm_shuffle_ps(vec.m_Vec128, vec.m_Vec128, _MM_SHUFFLE(3,3,3,3)))))
+            _mm_add_ps(_mm_mul_ps(m_Col0._m128, _mm_shuffle_ps(vec._m128, vec._m128, _MM_SHUFFLE(0,0,0,0))), 
+            _mm_mul_ps(m_Col1._m128, _mm_shuffle_ps(vec._m128, vec._m128, _MM_SHUFFLE(1,1,1,1)))),
+            _mm_add_ps(_mm_mul_ps(m_Col2._m128, _mm_shuffle_ps(vec._m128, vec._m128, _MM_SHUFFLE(2,2,2,2))), 
+            _mm_mul_ps(m_Col3._m128, _mm_shuffle_ps(vec._m128, vec._m128, _MM_SHUFFLE(3,3,3,3)))))
             );
     }
 
@@ -353,7 +353,7 @@ public:
         const Matrix4f rotate( const float radians, const Vector3f &unitVec )
     {
         __m128 axis, s, c, oneMinusC, axisS, negAxisS, xxxx, yyyy, zzzz, tmp0, tmp1, tmp2;
-        axis = unitVec.m_Vec128;
+        axis = unitVec._m128;
         sincosf4( _mm_set1_ps(radians), &s, &c );
         xxxx = vec_splat( axis, 0 );
         yyyy = vec_splat( axis, 1 );
@@ -396,9 +396,9 @@ public:
         MCSF_3D_ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
         MCSF_3D_ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
         return Matrix4f(
-            Vector4f( vec_sel( zero, scaleVec.m_Vec128, select_x ) ),
-            Vector4f( vec_sel( zero, scaleVec.m_Vec128, select_y ) ),
-            Vector4f( vec_sel( zero, scaleVec.m_Vec128, select_z ) ),
+            Vector4f( vec_sel( zero, scaleVec._m128, select_x ) ),
+            Vector4f( vec_sel( zero, scaleVec._m128, select_y ) ),
+            Vector4f( vec_sel( zero, scaleVec._m128, select_z ) ),
             Vector4f(_mm_setr_ps(0.0f,0.0f,0.0f,1.0f))
             );
     }
@@ -441,10 +441,10 @@ public:
         void transpose()
     {
         __m128 tmp0, tmp1, tmp2, tmp3, res0, res1, res2, res3;
-        tmp0 = vec_mergeh( m_Col0.m_Vec128, m_Col2.m_Vec128 );
-        tmp1 = vec_mergeh( m_Col1.m_Vec128, m_Col3.m_Vec128 );
-        tmp2 = vec_mergel( m_Col0.m_Vec128, m_Col2.m_Vec128 );
-        tmp3 = vec_mergel( m_Col1.m_Vec128, m_Col3.m_Vec128 );
+        tmp0 = vec_mergeh( m_Col0._m128, m_Col2._m128 );
+        tmp1 = vec_mergeh( m_Col1._m128, m_Col3._m128 );
+        tmp2 = vec_mergel( m_Col0._m128, m_Col2._m128 );
+        tmp3 = vec_mergel( m_Col1._m128, m_Col3._m128 );
         res0 = vec_mergeh( tmp0, tmp1 );
         res1 = vec_mergel( tmp0, tmp1 );
         res2 = vec_mergeh( tmp2, tmp3 );
@@ -471,10 +471,10 @@ public:
         __m128 sum,Det,RDet;
         __m128 trns0,trns1,trns2,trns3;
 
-        __m128 _L1 = m_Col0.m_Vec128;
-        __m128 _L2 = m_Col1.m_Vec128;
-        __m128 _L3 = m_Col2.m_Vec128;
-        __m128 _L4 = m_Col3.m_Vec128;
+        __m128 _L1 = m_Col0._m128;
+        __m128 _L2 = m_Col1._m128;
+        __m128 _L3 = m_Col2._m128;
+        __m128 _L4 = m_Col3._m128;
         // Calculating the minterms for the first line.
 
         // _mm_ror_ps is just a macro using _mm_shuffle_ps().
@@ -572,7 +572,7 @@ public:
         dw = fabs(dw) > FLOAT_EPSILON ? dw : FLOAT_EPSILON;
         dw = 1.0f/dw;
         temp = temp * dw;
-        return Vector3f(temp.m_Vec128);
+        return Vector3f(temp._m128);
     }
 
     inline 
@@ -580,19 +580,19 @@ public:
     {
         __m128 res;
         __m128 xxxx, yyyy, zzzz;
-        xxxx = vec_splat( vec.m_Vec128, 0 );
-        yyyy = vec_splat( vec.m_Vec128, 1 );
-        zzzz = vec_splat( vec.m_Vec128, 2 );
-        res = vec_mul( m_Col0.m_Vec128, xxxx );
-        res = vec_madd( m_Col1.m_Vec128, yyyy, res );
-        res = vec_madd( m_Col2.m_Vec128, zzzz, res );
+        xxxx = vec_splat( vec._m128, 0 );
+        yyyy = vec_splat( vec._m128, 1 );
+        zzzz = vec_splat( vec._m128, 2 );
+        res = vec_mul( m_Col0._m128, xxxx );
+        res = vec_madd( m_Col1._m128, yyyy, res );
+        res = vec_madd( m_Col2._m128, zzzz, res );
         return Vector3f( res );
     }
 
     inline 
         void extract_translate( Vector3f &myVector) const
     {
-        myVector = Vector3f(m_Col3.m_Vec128);
+        myVector = Vector3f(m_Col3._m128);
     }
 
     inline 
@@ -602,10 +602,10 @@ public:
         __m128 r1,r2,r3,tt,tt2;
         __m128 sum,Det;
 
-        __m128 _L1 = m_Col0.m_Vec128;
-        __m128 _L2 = m_Col1.m_Vec128;
-        __m128 _L3 = m_Col2.m_Vec128;
-        __m128 _L4 = m_Col3.m_Vec128;
+        __m128 _L1 = m_Col0._m128;
+        __m128 _L2 = m_Col1._m128;
+        __m128 _L3 = m_Col2._m128;
+        __m128 _L4 = m_Col3._m128;
         // Calculating the minterms for the first line.
 
         // _mm_ror_ps is just a macro using _mm_shuffle_ps().

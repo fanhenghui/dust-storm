@@ -2,8 +2,8 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-OpacityTransFunc::OpacityTransFunc(int iWidth /*= 512*/) :
-_width(iWidth), m_bIsDataDirty(false)
+OpacityTransFunc::OpacityTransFunc(int width /*= 512*/) :
+_width(width), m_bIsDataDirty(false)
 {}
 
 OpacityTransFunc::~OpacityTransFunc()
@@ -11,9 +11,9 @@ OpacityTransFunc::~OpacityTransFunc()
 
 }
 
-void OpacityTransFunc::set_width(int iWidth)
+void OpacityTransFunc::set_width(int width)
 {
-    _width = iWidth;
+    _width = width;
     m_bIsDataDirty = true;
 }
 
@@ -50,7 +50,7 @@ void OpacityTransFunc::get_point_list(std::vector<OpacityTFPoint>& vecResultList
         }
 
         //2 Add to iWidht count points
-        //Expand point value to iWidth , make the interpolation step is 1
+        //Expand point value to width , make the interpolation step is 1
         float fMaxValue = m_vecTFPoint[uiTFPointSize - 1].v;
         float fMinValue = m_vecTFPoint[0].v;
         float fExpandRatio = static_cast<float>(_width - 1) / (fMaxValue - fMinValue);

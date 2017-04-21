@@ -39,11 +39,11 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         std::shared_ptr<VolumeInfos> pVolumeInfos = pScene->get_volume_infos();
         QTWIDGETS_CHECK_NULL_EXCEPTION(pVolumeInfos);
 
-        std::shared_ptr<ImageDataHeader> pDataHeader = pVolumeInfos->get_data_header();
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pDataHeader );
+        std::shared_ptr<ImageDataHeader> data_header = pVolumeInfos->get_data_header();
+        QTWIDGETS_CHECK_NULL_EXCEPTION(data_header );
 
-        int iWidth(1),iHeight(1);
-        pScene->get_display_size(iWidth , iHeight);
+        int width(1),height(1);
+        pScene->get_display_size(width , height);
 
         //1 Set font
         const int iPointSize = 12;
@@ -63,12 +63,12 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         //3.1 Left Top
         int iItem = 1;
         //3.1.1
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->manufacturer.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->manufacturer.c_str());
         //3.1.2
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->manufacturer_model_name.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->manufacturer_model_name.c_str());
         //3.1.3
         std::string sModality = "UnSupported";
-        switch(pDataHeader->modality)
+        switch(data_header->modality)
         {
         case CR:
             sModality = "CR";
@@ -87,32 +87,32 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         }
         m_pPainter->drawText(iBorder , (iItem++)*iMargin , sModality.c_str());
         //3.1.4
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , pDataHeader->image_date.c_str());
+        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->image_date.c_str());
 
         //////////////////////////////////////////////////////////////////////////
         //3.2 Right Top
         iItem = 1;
         int iX = 0;
         //3.2.1
-        QString sPatientName(pDataHeader->patient_name.c_str());
-        iX = iWidth - m_pPainter->fontMetrics().width(sPatientName) - iBorder;
+        QString sPatientName(data_header->patient_name.c_str());
+        iX = width - m_pPainter->fontMetrics().width(sPatientName) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientName);
 
         //3.2.2
-        QString sPatientID(pDataHeader->patient_id.c_str());
-        iX = iWidth - m_pPainter->fontMetrics().width(sPatientID) - iBorder;
+        QString sPatientID(data_header->patient_id.c_str());
+        iX = width - m_pPainter->fontMetrics().width(sPatientID) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientID);
 
         //3.2.3
-        QString sPatientSex(pDataHeader->patient_sex.c_str());
-        iX = iWidth - m_pPainter->fontMetrics().width(sPatientSex) - iBorder;
+        QString sPatientSex(data_header->patient_sex.c_str());
+        iX = width - m_pPainter->fontMetrics().width(sPatientSex) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientSex);
 
         //3.2.4
         std::stringstream ss;
-        ss << pDataHeader->columns << " " << pDataHeader->rows << " " << pDataHeader->slice_location.size();
+        ss << data_header->columns << " " << data_header->rows << " " << data_header->slice_location.size();
         QString sDim(ss.str().c_str());
-        iX = iWidth - m_pPainter->fontMetrics().width(sDim) - iBorder;
+        iX = width - m_pPainter->fontMetrics().width(sDim) - iBorder;
         m_pPainter->drawText(iX , (iItem++)*iMargin , sDim);
 
         //////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
             StrNumConverter<int> numToStr;
             std::string sWL = std::string("C : ") + numToStr.to_string(iWL) + std::string("  W : ") + numToStr.to_string(iWW); 
             iItem = 0;
-            m_pPainter->drawText(iBorder , iHeight - (iItem++)*iMargin - 2 , sWL.c_str());
+            m_pPainter->drawText(iBorder , height - (iItem++)*iMargin - 2 , sWL.c_str());
         }
         
 

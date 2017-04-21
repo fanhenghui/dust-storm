@@ -18,13 +18,13 @@ class RenderAlgo_Export RayCastScene : public SceneBase
 {
 public:
     RayCastScene();
-    RayCastScene(int iWidth , int iHeight);
+    RayCastScene(int width , int height);
     virtual ~RayCastScene();
 
     virtual void initialize();
     virtual void finalize();
-    virtual void set_display_size(int iWidth , int iHeight);
-    virtual void render(int iTestCode);
+    virtual void set_display_size(int width , int height);
+    virtual void render(int test_code);
 
     void set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos);
 
@@ -32,7 +32,7 @@ public:
 
     std::shared_ptr<CameraCalculator> get_camera_calculator() const;
 
-    void set_test_code(int iTestCode);
+    void set_test_code(int test_code);
 
     //Mask label level
     //Default is L_8
@@ -59,19 +59,19 @@ public:
 
 protected:
     std::shared_ptr<VolumeInfos> m_pVolumeInfos;
-    std::shared_ptr<EntryExitPoints> m_pEntryExitPoints;
-    std::shared_ptr<RayCaster> m_pRayCaster;
-    std::shared_ptr<RayCasterCanvas> m_pCanvas;
+    std::shared_ptr<EntryExitPoints> _entry_exit_points;
+    std::shared_ptr<RayCaster> _ray_caster;
+    std::shared_ptr<RayCasterCanvas> _canvas;
 
     std::shared_ptr<OrthoCamera> m_pRayCastCamera;
 
-    std::shared_ptr<CameraCalculator> m_pCameraCalculator;
+    std::shared_ptr<CameraCalculator> _camera_calculator;
     std::shared_ptr<OrthoCameraInteractor> m_pCameraInteractor;
 
     //////////////////////////////////////////////////////////////////////////
     //TODO Temp for test
-    float m_fGlobalWW;
-    float m_fGlobalWL;
+    float _global_ww;
+    float _global_wl;
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////

@@ -14,199 +14,199 @@ class Arithmetic_Export Vector4f
 public:
     union
     {
-        __m128 m_Vec128;
+        __m128 _m128;
         struct 
         {
             float x, y, z, w;
-        }m_Value;
+        }_value;
         float _m[4];
     };
 
 public:
     Vector4f::Vector4f()
     {
-        m_Vec128 = _mm_setzero_ps();
+        _m128 = _mm_setzero_ps();
     }
 
     Vector4f::Vector4f( const float x, const float y, const float z, const float w )
     {
-        m_Vec128 = _mm_setr_ps(x, y, z, w); 
+        _m128 = _mm_setr_ps(x, y, z, w); 
     }
 
     Vector4f::Vector4f( const Vector3f &xyz, const float w )
     {
-        m_Vec128 = xyz.m_Vec128;
-        _vmathVfSetElement(m_Vec128, w, 3);
+        _m128 = xyz._m128;
+        _vmathVfSetElement(_m128, w, 3);
     }
 
     Vector4f::Vector4f( const Vector3f &vec )
     {
-        m_Vec128 = vec.m_Vec128;
-        _vmathVfSetElement(m_Vec128, 0.0f, 3);
+        _m128 = vec._m128;
+        _vmathVfSetElement(_m128, 0.0f, 3);
     }
 
     Vector4f::Vector4f( const float scalar )
     {
-        m_Vec128 = _mm_set1_ps(scalar);
+        _m128 = _mm_set1_ps(scalar);
     }
 
     Vector4f::Vector4f( const __m128 vf4 )
     {
-        m_Vec128 = vf4;
+        _m128 = vf4;
     }
 
     inline const __m128 Vector4f::get_128() const
     {
-        return m_Vec128;
+        return _m128;
     }
 
     inline Vector4f & Vector4f::set_128( __m128 vf4 )
     {
-        m_Vec128 = vf4;
+        _m128 = vf4;
         return *this;
     }
 
     inline Vector4f & Vector4f::operator =( const Vector4f &vec )
     {
-        m_Vec128 = vec.m_Vec128;
+        _m128 = vec._m128;
         return *this;
     }
 
     inline Vector4f & Vector4f::set_xyz( const Vector3f &vec )
     {
         MCSF_3D_ALIGN16 unsigned int sw[4] = {0, 0, 0, 0xffffffff};
-        m_Vec128 = vec_sel( vec.m_Vec128, m_Vec128, sw );
+        _m128 = vec_sel( vec._m128, _m128, sw );
         return *this;
     }
 
     inline const Vector3f Vector4f::get_xyz() const
     {
-        return Vector3f(m_Vec128);
+        return Vector3f(_m128);
     }
 
     inline Vector4f & Vector4f::set_x( const float x )
     {
-        _vmathVfSetElement(m_Vec128, x, 0);
+        _vmathVfSetElement(_m128, x, 0);
         return *this;
     }
 
     inline Vector4f & Vector4f::set_y( const float y )
     {
-        _vmathVfSetElement(m_Vec128, y, 1);
+        _vmathVfSetElement(_m128, y, 1);
         return *this;
     }
 
     inline Vector4f & Vector4f::set_z( const float z )
     {
-        _vmathVfSetElement(m_Vec128, z, 2);
+        _vmathVfSetElement(_m128, z, 2);
         return *this;
     }
 
     inline Vector4f & Vector4f::set_w( const float w )
     {
-        _vmathVfSetElement(m_Vec128, w, 3);
+        _vmathVfSetElement(_m128, w, 3);
         return *this;
     }
 
     inline const float Vector4f::get_x() const
     {
-        return _vmathVfGetElement(m_Vec128, 0);
-        //return m_Value.x;
+        return _vmathVfGetElement(_m128, 0);
+        //return _value.x;
     }
 
     inline const float Vector4f::get_y() const
     {
-        return _vmathVfGetElement(m_Vec128, 1);
-        // return m_Value.y;
+        return _vmathVfGetElement(_m128, 1);
+        // return _value.y;
     }
 
     inline const float Vector4f::get_z() const
     {
-        return _vmathVfGetElement(m_Vec128, 2);
-        // return m_Value.z;
+        return _vmathVfGetElement(_m128, 2);
+        // return _value.z;
     }
 
     inline const float Vector4f::get_w() const
     {
-        return _vmathVfGetElement(m_Vec128, 3);
-        // return m_Value.w;
+        return _vmathVfGetElement(_m128, 3);
+        // return _value.w;
     }
 
     inline Vector4f & Vector4f::set_elem( const int idx, const float value )
     {
-        _vmathVfSetElement(m_Vec128, value, idx);
+        _vmathVfSetElement(_m128, value, idx);
         return *this;
     }
 
     inline const float Vector4f::get_elem( const int idx ) const
     {
-        return _vmathVfGetElement(m_Vec128, idx);
+        return _vmathVfGetElement(_m128, idx);
     }
 
     inline const float Vector4f::operator[]( const int idx ) const
     {
-        return _vmathVfGetElement(m_Vec128, idx);
+        return _vmathVfGetElement(_m128, idx);
     }
 
     inline const Vector4f Vector4f::operator+( const Vector4f &vec ) const
     {
-        return Vector4f( _mm_add_ps( m_Vec128, vec.m_Vec128 ) );
+        return Vector4f( _mm_add_ps( _m128, vec._m128 ) );
     }
 
     inline const Vector4f Vector4f::operator-( const Vector4f &vec ) const
     {
-        return Vector4f( _mm_sub_ps( m_Vec128, vec.m_Vec128 ) );
+        return Vector4f( _mm_sub_ps( _m128, vec._m128 ) );
     }
 
     inline const Vector4f Vector4f::operator*( const float scalar ) const
     {
-        return Vector4f( _mm_mul_ps( m_Vec128, _mm_set1_ps(scalar) ) );
+        return Vector4f( _mm_mul_ps( _m128, _mm_set1_ps(scalar) ) );
     }
 
     inline const Vector4f Vector4f::operator/( const float scalar ) const
     {
-        return Vector4f( _mm_div_ps( m_Vec128, _mm_set1_ps(scalar) ) );
+        return Vector4f( _mm_div_ps( _m128, _mm_set1_ps(scalar) ) );
     }
 
     inline Vector4f & Vector4f::operator+=( const Vector4f &vec )
     {
-        m_Vec128 = _mm_add_ps( m_Vec128, vec.m_Vec128 );
+        _m128 = _mm_add_ps( _m128, vec._m128 );
         return *this;
     }
 
     inline Vector4f & Vector4f::operator-=( const Vector4f &vec )
     {
-        m_Vec128 = _mm_sub_ps( m_Vec128, vec.m_Vec128 );
+        _m128 = _mm_sub_ps( _m128, vec._m128 );
         return *this;
     }
 
     inline Vector4f & Vector4f::operator*=( const float scalar )
     {
-        m_Vec128 = _mm_mul_ps( m_Vec128, _mm_set1_ps(scalar) );
+        _m128 = _mm_mul_ps( _m128, _mm_set1_ps(scalar) );
         return *this;
     }
 
     inline Vector4f & Vector4f::operator/=( const float scalar )
     {
-        m_Vec128 = _mm_div_ps( m_Vec128, _mm_set1_ps(scalar) );
+        _m128 = _mm_div_ps( _m128, _mm_set1_ps(scalar) );
         return *this;
     }
 
     inline const Vector4f Vector4f::operator-() const
     {
-        return Vector4f(_mm_sub_ps( _mm_setzero_ps(), m_Vec128 ) );
+        return Vector4f(_mm_sub_ps( _mm_setzero_ps(), _m128 ) );
     }
 
     inline bool Vector4f::operator!=( const Vector4f& vec ) const
     {
-        __m128 t = fabsf4(_mm_sub_ps(m_Vec128, vec.m_Vec128));
+        __m128 t = fabsf4(_mm_sub_ps(_m128, vec._m128));
         t = _mm_add_ps( _mm_add_ps(vec_splat(t, 0), vec_splat(t, 1)), _mm_add_ps(vec_splat(t, 2), vec_splat(t, 3)) );
         return _vmathVfGetElement(t , 0) > FLOAT_EPSILON;
     }
 
     inline bool Vector4f::operator==( const Vector4f& vec ) const
     {
-        __m128 t = fabsf4(_mm_sub_ps(m_Vec128, vec.m_Vec128));
+        __m128 t = fabsf4(_mm_sub_ps(_m128, vec._m128));
         t = _mm_add_ps( _mm_add_ps(vec_splat(t, 0), vec_splat(t, 1)), _mm_add_ps(vec_splat(t, 2), vec_splat(t, 3)) );
         return _vmathVfGetElement(t , 0) <= FLOAT_EPSILON;
     }
@@ -214,42 +214,42 @@ public:
     inline const float Vector4f::max_elem() const
     {
         __m128 t = _mm_max_ps(
-            _mm_max_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
-            _mm_max_ps( vec_splat( m_Vec128, 2 ), vec_splat( m_Vec128, 3 ) ) );
+            _mm_max_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) ),
+            _mm_max_ps( vec_splat( _m128, 2 ), vec_splat( _m128, 3 ) ) );
         return _vmathVfGetElement(t , 0); 
     }
 
     inline const float Vector4f::min_elem() const
     {
         __m128 t = _mm_min_ps(
-            _mm_min_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
-            _mm_min_ps( vec_splat( m_Vec128, 2 ), vec_splat( m_Vec128, 3 ) ) );
+            _mm_min_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) ),
+            _mm_min_ps( vec_splat( _m128, 2 ), vec_splat( _m128, 3 ) ) );
         return _vmathVfGetElement(t , 0); 
     }
 
     inline const float Vector4f::sum() const
     {
         __m128 t = _mm_add_ps(
-            _mm_add_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) ),
-            _mm_add_ps( vec_splat( m_Vec128, 2 ), vec_splat( m_Vec128, 3 ) ) );
+            _mm_add_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) ),
+            _mm_add_ps( vec_splat( _m128, 2 ), vec_splat( _m128, 3 ) ) );
         return _vmathVfGetElement(t , 0); 
     }
 
     inline float dot_product( const Vector4f& vec) const
     {
-        __m128 t = _vmathVfDot4( m_Vec128, vec.m_Vec128 );
+        __m128 t = _vmathVfDot4( _m128, vec._m128 );
         return _vmathVfGetElement(t, 0);
     }
 
     inline const float Vector4f::length() const
     {
-        __m128 temp = _mm_sqrt_ps(_vmathVfDot4( m_Vec128, m_Vec128 ));
+        __m128 temp = _mm_sqrt_ps(_vmathVfDot4( _m128, _m128 ));
         return _vmathVfGetElement(temp, 0);
     }
 
     inline const float Vector4f::length_sqr() const
     {
-        __m128 temp = _vmathVfDot4( m_Vec128, m_Vec128 );
+        __m128 temp = _vmathVfDot4( _m128, _m128 );
         return _vmathVfGetElement(temp, 0);
     }
 };

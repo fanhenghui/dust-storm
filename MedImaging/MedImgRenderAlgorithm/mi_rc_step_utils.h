@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepUtils : public RCStepBase
 {
 public:
-    RCStepUtils(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepUtils(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepUtils(){};

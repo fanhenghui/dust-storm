@@ -15,11 +15,11 @@ public:
 
     void calculate_brick_info(
         std::shared_ptr<ImageData> image_data , 
-        unsigned int uiBrickSize , 
-        unsigned int uiBrickExpand , 
-        BrickCorner* pBrickCorner , 
-        BrickUnit* pBrickUnit , 
-        VolumeBrickInfo* pBrickInfo);
+        unsigned int brick_size , 
+        unsigned int brick_expand , 
+        BrickCorner* _brick_corner_array , 
+        BrickUnit* brick_unit_array , 
+        VolumeBrickInfo* brick_info_array);
 protected:
     template<typename T>
     void calculate_brick_info_i(
@@ -27,19 +27,19 @@ protected:
         BrickUnit& bu ,
         VolumeBrickInfo& vbi,
         std::shared_ptr<ImageData> image_data , 
-        unsigned int uiBrickSize , 
-        unsigned int uiBrickExpand);
+        unsigned int brick_size , 
+        unsigned int brick_expand);
 
     template<typename T>
     void calculate_brick_info_kernel_i(
-        unsigned int uiBegin , 
-        unsigned int uiEnd , 
-        BrickCorner* pBrickCorner , 
-        BrickUnit* pBrickUnit , 
-        VolumeBrickInfo* pBrickInfo,
+        unsigned int begin , 
+        unsigned int end , 
+        BrickCorner* _brick_corner_array , 
+        BrickUnit* brick_unit_array , 
+        VolumeBrickInfo* brick_info_array,
         std::shared_ptr<ImageData> image_data , 
-        unsigned int uiBrickSize , 
-        unsigned int uiBrickExpand);
+        unsigned int brick_size , 
+        unsigned int brick_expand);
 private:
 };
 

@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepVolumeNearstSampler : public RCStepBase
 {
 public:
-    RCStepVolumeNearstSampler(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepVolumeNearstSampler(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepVolumeNearstSampler(){};
@@ -21,7 +21,7 @@ private:
 class RCStepVolumeLinearSampler : public RCStepBase
 {
 public:
-    RCStepVolumeLinearSampler(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepVolumeLinearSampler(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepVolumeLinearSampler(){};

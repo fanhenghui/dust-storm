@@ -41,14 +41,14 @@ void CrosshairPainter::render()
     //std::cout << "<><><><><><><><>\n";
     //std::cout << pScene->get_description() << std::endl;
 
-    int iWidth(1) , iHeight(1);
-    m_pScene->get_display_size(iWidth , iHeight);
+    int width(1) , height(1);
+    m_pScene->get_display_size(width , height);
 
     for (int i = 0 ; i< 2 ; ++i)
     {
         //Convert to DC
         Line2D line = lines[i];
-        line._pt = ArithmeticUtils::ndc_to_dc(lines[i]._pt , iWidth , iHeight);
+        line._pt = ArithmeticUtils::ndc_to_dc(lines[i]._pt , width , height);
         line._dir.y = -line._dir.y;
 
         //Convert to line function a*x + b*y = c
@@ -68,12 +68,12 @@ void CrosshairPainter::render()
             double y = c/b;
             int iY = (int)(y+0.5);
             iY = iY < 0 ? 0 : iY;
-            iY = iY > (iHeight-1) ? iHeight-1 : iY;
+            iY = iY > (height-1) ? height-1 : iY;
 
             pDC0.setX(0);
             pDC0.setY(iY);
 
-            pDC1.setX(iWidth -1);
+            pDC1.setX(width -1);
             pDC1.setY(iY);
         }
         else if (abs(b) < DOUBLE_EPSILON)
@@ -81,13 +81,13 @@ void CrosshairPainter::render()
             double x = c/a;
             int iX = (int)(x+0.5);
             iX = iX < 0 ? 0 : iX;
-            iX = iX > (iWidth-1) ? iWidth-1 : iX;
+            iX = iX > (width-1) ? width-1 : iX;
 
             pDC0.setX(iX);
             pDC0.setY(0);
 
             pDC1.setX(iX);
-            pDC1.setY(iHeight-1);
+            pDC1.setY(height-1);
         }
         else
         {

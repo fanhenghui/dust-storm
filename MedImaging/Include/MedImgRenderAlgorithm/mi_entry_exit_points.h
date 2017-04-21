@@ -19,11 +19,11 @@ public:
 
     virtual ~EntryExitPoints();
 
-    void set_display_size(int iWidth , int iHeight);
+    void set_display_size(int width , int height);
 
-    void get_display_size(int& iWidth , int& iHeight);
+    void get_display_size(int& width , int& height);
 
-    void set_strategy( RayCastingStrategy eStrategy );
+    void set_strategy( RayCastingStrategy strategy );
 
     virtual void initialize();
 
@@ -39,30 +39,30 @@ public:
 
     void set_image_data(std::shared_ptr<ImageData> image_data);
 
-    void set_camera(std::shared_ptr<CameraBase> pCamera);
+    void set_camera(std::shared_ptr<CameraBase> camera);
 
-    void set_camera_calculator(std::shared_ptr<CameraCalculator> pCameraCal);
+    void set_camera_calculator(std::shared_ptr<CameraCalculator> camera_cal);
 
     virtual void calculate_entry_exit_points() = 0;
 
 public:
-    void debug_output_entry_points(const std::string& sFileName);
+    void debug_output_entry_points(const std::string& file_name);
 
-    void debug_output_exit_points(const std::string& sFileName);
+    void debug_output_exit_points(const std::string& file_name);
 
 protected:
-    std::shared_ptr<GLTexture2D> m_pEntryTex;
-    std::shared_ptr<GLTexture2D> m_pExitTex;
-    std::unique_ptr<Vector4f[]> m_pEntryBuffer;
-    std::unique_ptr<Vector4f[]> m_pExitBuffer;
+    std::shared_ptr<GLTexture2D> _entry_points_texture;
+    std::shared_ptr<GLTexture2D> _exit_points_texture;
+    std::unique_ptr<Vector4f[]> _entry_points_buffer;
+    std::unique_ptr<Vector4f[]> _exit_points_buffer;
     int _width;
     int _height;
-    std::shared_ptr<CameraBase> m_pCamera;
-    std::shared_ptr<ImageData> m_pImgData;
-    std::shared_ptr<CameraCalculator> m_pCameraCalculator;
-    bool m_bInit;
+    std::shared_ptr<CameraBase> _camera;
+    std::shared_ptr<ImageData> _volume_data;
+    std::shared_ptr<CameraCalculator> _camera_calculator;
+    bool _has_init;
 
-    RayCastingStrategy m_eStrategy;
+    RayCastingStrategy _strategy;
 };
 
 MED_IMAGING_END_NAMESPACE

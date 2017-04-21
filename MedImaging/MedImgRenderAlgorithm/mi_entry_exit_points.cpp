@@ -12,33 +12,33 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-EntryExitPoints::EntryExitPoints():_width(4),_height(4),m_bInit(false),m_eStrategy(CPU_BASE)
+EntryExitPoints::EntryExitPoints():_width(4),_height(4),_has_init(false),_strategy(CPU_BASE)
 {
-    m_pEntryBuffer.reset(new Vector4f[_width*_height]);
-    m_pExitBuffer.reset(new Vector4f[_width*_height]);
+    _entry_points_buffer.reset(new Vector4f[_width*_height]);
+    _exit_points_buffer.reset(new Vector4f[_width*_height]);
     UIDType uid;
-    m_pEntryTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
-    m_pExitTex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+    _entry_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+    _exit_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
 }
 
 void EntryExitPoints::initialize()
 {
-    if (!m_bInit)
+    if (!_has_init)
     {
-        m_pEntryTex->initialize();
-        m_pExitTex->initialize();
-        m_bInit = true;
+        _entry_points_texture->initialize();
+        _exit_points_texture->initialize();
+        _has_init = true;
     }
 }
 
 void EntryExitPoints::finialize()
 {
-    if (m_bInit)
+    if (_has_init)
     {
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pEntryTex->get_uid());
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(m_pExitTex->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_entry_points_texture->get_uid());
+        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_exit_points_texture->get_uid());
         GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
-        m_bInit = false;
+        _has_init = false;
     }
 }
 
@@ -47,174 +47,174 @@ EntryExitPoints::~EntryExitPoints()
 
 }
 
-void EntryExitPoints::set_display_size(int iWidth , int iHeight)
+void EntryExitPoints::set_display_size(int width , int height)
 {
-    _width = iWidth;
-    _height = iHeight;
-    m_pEntryBuffer.reset(new Vector4f[_width*_height]);
-    m_pExitBuffer.reset(new Vector4f[_width*_height]);
+    _width = width;
+    _height = height;
+    _entry_points_buffer.reset(new Vector4f[_width*_height]);
+    _exit_points_buffer.reset(new Vector4f[_width*_height]);
 
     //resize texture
-    if (GPU_BASE == m_eStrategy)
+    if (GPU_BASE == _strategy)
     { 
         initialize();
 
         CHECK_GL_ERROR;
 
-        m_pEntryTex->bind();
+        _entry_points_texture->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pEntryTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
-        m_pEntryTex->unbind();
+        _entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
+        _entry_points_texture->unbind();
 
-        m_pExitTex->bind();
+        _exit_points_texture->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        m_pExitTex->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
-        m_pExitTex->unbind();
+        _exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
+        _exit_points_texture->unbind();
 
         CHECK_GL_ERROR;
     }
 }
 
-void EntryExitPoints::get_display_size(int& iWidth , int& iHeight)
+void EntryExitPoints::get_display_size(int& width , int& height)
 {
-    iWidth = _width;
-    iHeight = _height;
+    width = _width;
+    height = _height;
 }
 
 std::shared_ptr<GLTexture2D> EntryExitPoints::get_entry_points_texture()
 {
-    return m_pEntryTex;
+    return _entry_points_texture;
 }
 
 std::shared_ptr<GLTexture2D> EntryExitPoints::get_exit_points_texture()
 {
-    return m_pExitTex;
+    return _exit_points_texture;
 }
 
 Vector4f* EntryExitPoints::get_entry_points_array()
 {
-    return m_pEntryBuffer.get();
+    return _entry_points_buffer.get();
 }
 
 Vector4f* EntryExitPoints::get_exit_points_array()
 {
-    return m_pExitBuffer.get();
+    return _exit_points_buffer.get();
 }
 
 void EntryExitPoints::set_image_data(std::shared_ptr<ImageData> image_data)
 {
-    m_pImgData = image_data;
+    _volume_data = image_data;
 }
 
-void EntryExitPoints::set_camera(std::shared_ptr<CameraBase> pCamera)
+void EntryExitPoints::set_camera(std::shared_ptr<CameraBase> camera)
 {
-    m_pCamera = pCamera;
+    _camera = camera;
 }
 
-void EntryExitPoints::set_camera_calculator(std::shared_ptr<CameraCalculator> pCameraCal)
+void EntryExitPoints::set_camera_calculator(std::shared_ptr<CameraCalculator> camera_cal)
 {
-    m_pCameraCalculator = pCameraCal;
+    _camera_calculator = camera_cal;
 }
 
-void EntryExitPoints::debug_output_entry_points(const std::string& sFileName)
+void EntryExitPoints::debug_output_entry_points(const std::string& file_name)
 {
-    Vector4f* pPoints = m_pEntryBuffer.get();
-    std::ofstream out(sFileName , std::ios::binary | std::ios::out);
+    Vector4f* pPoints = _entry_points_buffer.get();
+    std::ofstream out(file_name , std::ios::binary | std::ios::out);
     if (out.is_open())
     {
-        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
-        RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
-        unsigned int *uiDim = m_pImgData->_dim;
-        float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
+        std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width*_height*3]);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
+        unsigned int *dim = _volume_data->_dim;
+        float dim_r[3] = { 1.0f/(float)dim[0],1.0f/(float)dim[1],1.0f/(float)dim[2]};
         unsigned char r,g,b;
-        float fR , fG , fB;
+        float rr , gg , bb;
         for (int i = 0 ; i < _width*_height ; ++i)
         {
-            fR =pPoints[i]._m[0] *fDimR[0]*255.0f;
-            fG =pPoints[i]._m[1] *fDimR[1]*255.0f;
-            fB =pPoints[i]._m[2] *fDimR[2]*255.0f;
+            rr =pPoints[i]._m[0] *dim_r[0]*255.0f;
+            gg =pPoints[i]._m[1] *dim_r[1]*255.0f;
+            bb =pPoints[i]._m[2] *dim_r[2]*255.0f;
 
-            fR = fR > 255.0f ? 255.0f : fR;
-            fR = fR <0.0f ? 0.0f : fR;
+            rr = rr > 255.0f ? 255.0f : rr;
+            rr = rr <0.0f ? 0.0f : rr;
 
-            fG = fG > 255.0f ? 255.0f : fG;
-            fG = fG <0.0f ? 0.0f : fG;
+            gg = gg > 255.0f ? 255.0f : gg;
+            gg = gg <0.0f ? 0.0f : gg;
 
-            fB = fB > 255.0f ? 255.0f : fB;
-            fB = fB <0.0f ? 0.0f : fB;
+            bb = bb > 255.0f ? 255.0f : bb;
+            bb = bb <0.0f ? 0.0f : bb;
 
-            r = unsigned char(fR);
-            g = unsigned char(fG);
-            b = unsigned char(fB);
+            r = unsigned char(rr);
+            g = unsigned char(gg);
+            b = unsigned char(bb);
 
-            pRGB[i*3] = r;
-            pRGB[i*3+1] = g;
-            pRGB[i*3+2] = b;
+            rgb_array[i*3] = r;
+            rgb_array[i*3+1] = g;
+            rgb_array[i*3+2] = b;
 
         }
 
-        out.write((char*)pRGB.get()  , _width*_height*3);
+        out.write((char*)rgb_array.get()  , _width*_height*3);
         out.close();
     }
     else
     {
         //TODO LOG
-        std::cout << "Open file " << sFileName << " failed!\n";
+        std::cout << "Open file " << file_name << " failed!\n";
     }
 }
 
-void EntryExitPoints::debug_output_exit_points(const std::string& sFileName)
+void EntryExitPoints::debug_output_exit_points(const std::string& file_name)
 {
-    Vector4f* pPoints = m_pExitBuffer.get();
-    std::ofstream out(sFileName , std::ios::binary | std::ios::out);
+    Vector4f* pPoints = _exit_points_buffer.get();
+    std::ofstream out(file_name , std::ios::binary | std::ios::out);
     if (out.is_open())
     {
-        std::unique_ptr<unsigned char[]> pRGB(new unsigned char[_width*_height*3]);
-        RENDERALGO_CHECK_NULL_EXCEPTION(m_pImgData);
-        unsigned int *uiDim = m_pImgData->_dim;
-        float fDimR[3] = { 1.0f/(float)uiDim[0],1.0f/(float)uiDim[1],1.0f/(float)uiDim[2]};
+        std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width*_height*3]);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
+        unsigned int *dim = _volume_data->_dim;
+        float dim_r[3] = { 1.0f/(float)dim[0],1.0f/(float)dim[1],1.0f/(float)dim[2]};
         unsigned char r,g,b;
-        float fR , fG , fB;
+        float rr , gg , bb;
         for (int i = 0 ; i < _width*_height ; ++i)
         {
-            fR =pPoints[i]._m[0] *fDimR[0]*255.0f;
-            fG =pPoints[i]._m[1] *fDimR[1]*255.0f;
-            fB =pPoints[i]._m[2] *fDimR[2]*255.0f;
+            rr =pPoints[i]._m[0] *dim_r[0]*255.0f;
+            gg =pPoints[i]._m[1] *dim_r[1]*255.0f;
+            bb =pPoints[i]._m[2] *dim_r[2]*255.0f;
 
-            fR = fR > 255.0f ? 255.0f : fR;
-            fR = fR <0.0f ? 0.0f : fR;
+            rr = rr > 255.0f ? 255.0f : rr;
+            rr = rr <0.0f ? 0.0f : rr;
 
-            fG = fG > 255.0f ? 255.0f : fG;
-            fG = fG <0.0f ? 0.0f : fG;
+            gg = gg > 255.0f ? 255.0f : gg;
+            gg = gg <0.0f ? 0.0f : gg;
 
-            fB = fB > 255.0f ? 255.0f : fB;
-            fB = fB <0.0f ? 0.0f : fB;
+            bb = bb > 255.0f ? 255.0f : bb;
+            bb = bb <0.0f ? 0.0f : bb;
 
-            r = unsigned char(fR);
-            g = unsigned char(fG);
-            b = unsigned char(fB);
+            r = unsigned char(rr);
+            g = unsigned char(gg);
+            b = unsigned char(bb);
 
-            pRGB[i*3] = r;
-            pRGB[i*3+1] = g;
-            pRGB[i*3+2] = b;
+            rgb_array[i*3] = r;
+            rgb_array[i*3+1] = g;
+            rgb_array[i*3+2] = b;
 
         }
 
-        out.write((char*)pRGB.get()  , _width*_height*3);
+        out.write((char*)rgb_array.get()  , _width*_height*3);
         out.close();
     }
     else
     {
         //TODO LOG
-        std::cout << "Open file " << sFileName << " failed!\n";
+        std::cout << "Open file " << file_name << " failed!\n";
     }
 }
 
-void EntryExitPoints::set_strategy( RayCastingStrategy eStrategy )
+void EntryExitPoints::set_strategy( RayCastingStrategy strategy )
 {
-    m_eStrategy = eStrategy;
+    _strategy = strategy;
 }
 
 

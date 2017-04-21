@@ -136,7 +136,7 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
 
     configure_i();
 
-    connectS_signal_slot_i();
+    connect_signal_slot_i();
 
 }
 
@@ -287,7 +287,7 @@ void NoduleAnnotation::create_scene_i()
     //////////////////////////////////////////////////////////////////////////
 }
 
-void NoduleAnnotation::connectS_signal_slot_i()
+void NoduleAnnotation::connect_signal_slot_i()
 {
     //Layout
     //connect(ui.action1x1 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout1x1_i()));
@@ -421,10 +421,10 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
             vecSTDFiles.push_back(s);
         }
 
-        std::shared_ptr<ImageDataHeader> pDataHeader;
+        std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecSTDFiles, image_data , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, image_data , data_header);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
@@ -437,7 +437,7 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
             m_pVolumeInfos->finialize();
         }
         m_pVolumeInfos.reset(new VolumeInfos());
-        m_pVolumeInfos->set_data_header(pDataHeader);
+        m_pVolumeInfos->set_data_header(data_header);
         //SharedWidget::instance()->makeCurrent();
         m_pVolumeInfos->set_volume(image_data);//load volume texture if has graphic card
 

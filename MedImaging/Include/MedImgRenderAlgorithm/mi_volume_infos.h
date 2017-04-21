@@ -24,7 +24,7 @@ public:
     //Set input
     void set_volume(std::shared_ptr<ImageData> image_data);
     void set_mask(std::shared_ptr<ImageData> image_data);
-    void set_data_header(std::shared_ptr<ImageDataHeader> pDataHeader);
+    void set_data_header(std::shared_ptr<ImageDataHeader> data_header);
 
     //Get camera calculator
     std::shared_ptr<CameraCalculator> get_camera_calculator();
@@ -34,7 +34,7 @@ public:
     std::vector<GLTexture3DPtr> get_mask_texture();
 
     GLBufferPtr get_volume_brick_info_buffer();
-    //GLBufferPtr GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vecVisLabels);
+    //GLBufferPtr GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vis_labels);
 
     //Get GPU resource
     std::shared_ptr<ImageData> get_volume();
@@ -45,11 +45,11 @@ public:
     BrickUnit* get_volume_brick_unit();
     BrickUnit* get_mask_brick_unit();
     VolumeBrickInfo* get_volume_brick_info();
-    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vecVisLabels);
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
 
     //update(should update to CPU and GPU)
-    void update_volume(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , void* pData);//Data size should match sizeof(Data type)*data length
-    void update_mask(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3] , unsigned char* pData);
+    void update_volume(unsigned int (&begin)[3] , unsigned int (&end)[3] , void* pData);//Data size should match sizeof(Data type)*data length
+    void update_mask(unsigned int (&begin)[3] , unsigned int (&end)[3] , unsigned char* pData);
 
 private:
     void load_volume_resource_i();
@@ -57,9 +57,9 @@ private:
     void update_volume_resource_i();
 
 private:
-    std::shared_ptr<ImageData> m_pVolume;
-    std::shared_ptr<ImageData> m_pMask;
-    std::shared_ptr<ImageDataHeader> m_pDataHeader;
+    std::shared_ptr<ImageData> _volume_data;
+    std::shared_ptr<ImageData> _mask_data;
+    std::shared_ptr<ImageDataHeader> _data_header;
     std::unique_ptr<BrickPool> m_pBrickPool;
 
     std::vector<GLTexture3DPtr> m_vecVolumeTex;//P.S here use vector for separate volume later
@@ -68,7 +68,7 @@ private:
     GLBufferPtr m_pVolumeBrickInfoBuffer;
     std::map<LabelKey , GLBufferPtr> m_mapMaskBrickInfoBuffers;
 
-    std::shared_ptr<CameraCalculator> m_pCameraCalculator;
+    std::shared_ptr<CameraCalculator> _camera_calculator;
 
 };
 

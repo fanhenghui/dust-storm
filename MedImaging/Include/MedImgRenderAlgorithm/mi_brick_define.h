@@ -12,47 +12,48 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 struct BrickCorner
 {
-    unsigned int m_Min[3];
+    unsigned int min[3];
 };
 
 struct BrickUnit
 {
-    void* m_pData;
+    void* data;
 
-    BrickUnit():m_pData(nullptr)
+    BrickUnit():data(nullptr)
     {}
+
     ~BrickUnit()
     {
-        if (nullptr != m_pData)
+        if (nullptr != data)
         {
-            delete [] m_pData;
-            m_pData = nullptr;
+            delete [] data;
+            data = nullptr;
         }
     }
 };
 
 struct VolumeBrickInfo
 {
-    float m_fMin;
-    float m_fMax;
+    float min;
+    float max;
 };
 
 struct MaskBrickInfo
 {
-    int m_iLabel;
+    int label;
 };
 
 struct LabelKey
 {
-    std::string m_sKey;
+    std::string key;
 
-    LabelKey():m_sKey("Empty")
+    LabelKey():key("Empty")
     {
     }
 
-    LabelKey(const std::vector<unsigned char>& vecLabels)
+    LabelKey(const std::vector<unsigned char>& labels)
     {
-        std::vector<unsigned char> v = vecLabels;
+        std::vector<unsigned char> v = labels;
         //std::sort(v.begin() , v.end() , std::less<unsigned char>());
         std::sort(v.begin() , v.end());
         std::stringstream ss;
@@ -63,61 +64,61 @@ struct LabelKey
                 ss << (int)(*it )<<'|';
             }
         }
-        std::string sLabel = ss.str();
-        if (sLabel.empty())
+        std::string label = ss.str();
+        if (label.empty())
         {
-            sLabel = "Empty";
+            label = "Empty";
         }
 
-        m_sKey = sLabel;
+        key = label;
     }
 
     std::vector<unsigned char> ExtractLabels() const
     {
-        if (m_sKey == "Empty")
+        if (key == "Empty")
         {
             return std::vector<unsigned char>();
         }
         else
         {
-            std::vector<std::string> sLabels;  
-            boost::split( sLabels, m_sKey , boost::is_any_of( "|") ); 
-            if (sLabels.empty())
+            std::vector<std::string> labels_string;  
+            boost::split( labels_string, key , boost::is_any_of( "|") ); 
+            if (labels_string.empty())
             {
                 return std::vector<unsigned char>();
             }
             else
             {
-                std::vector<unsigned char> vecLabel;
-                for (auto it = sLabels.begin() ; it != sLabels.end() ; ++it)
+                std::vector<unsigned char> labels;
+                for (auto it = labels_string.begin() ; it != labels_string.end() ; ++it)
                 {
                     if (!(*it).empty())
                     {
-                        vecLabel.push_back( (unsigned char)atoi((*it).c_str()));
+                        labels.push_back( (unsigned char)atoi((*it).c_str()));
                     }
                 }
-                return vecLabel;
+                return labels;
             }
         }
     }
 
     bool operator < (const LabelKey& lk)
     {
-        return this->m_sKey < lk.m_sKey;
+        return this->key < lk.key;
     }
 };
 
 struct BrickDistance
 {
-    unsigned int m_id;
-    float m_fDistance;
+    unsigned int id;
+    float distance;
 
-    BrickDistance():m_id(0),m_fDistance(0)
+    BrickDistance():id(0),distance(0)
     {}
 };
 
 
-RenderAlgo_Export bool operator <(const LabelKey& _Left, const LabelKey& _Right);
+RenderAlgo_Export bool operator <(const LabelKey& left, const LabelKey& right);
 
 MED_IMAGING_END_NAMESPACE
 

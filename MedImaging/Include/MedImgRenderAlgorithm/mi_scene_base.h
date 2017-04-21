@@ -10,20 +10,20 @@ class RenderAlgo_Export SceneBase
 {
 public:
     SceneBase();
-    SceneBase(int iWidth , int iHeight);
+    SceneBase(int width , int height);
     void set_name(const std::string& sName);
     const std::string& get_name() const;
 
     virtual ~SceneBase();
     virtual void initialize();
     virtual void finalize();
-    virtual void set_display_size(int iWidth , int iHeight);
-    void get_display_size(int& iWidth, int& iHeight) const;
-    virtual void render(int iTestCode);
+    virtual void set_display_size(int width , int height);
+    void get_display_size(int& width, int& height) const;
+    virtual void render(int test_code);
 
-    virtual void rotate(const Point2& ptPre , const Point2& ptCur);
-    virtual void zoom(const Point2& ptPre , const Point2& ptCur);
-    virtual void pan(const Point2& ptPre , const Point2& ptCur);
+    virtual void rotate(const Point2& pre_pt , const Point2& cur_pt);
+    virtual void zoom(const Point2& pre_pt , const Point2& cur_pt);
+    virtual void pan(const Point2& pre_pt , const Point2& cur_pt);
 
     std::shared_ptr<CameraBase> get_camera();
     void render_to_back();
@@ -36,7 +36,7 @@ protected:
     GLFBOPtr m_pSceneFBO;
     GLTexture2DPtr m_pSceneColorAttach0;
     GLTexture2DPtr m_pSceneDepthAttach;
-    std::shared_ptr<CameraBase> m_pCamera;
+    std::shared_ptr<CameraBase> _camera;
     bool m_bDirty;
     std::string m_sName;
 

@@ -20,9 +20,9 @@ public:
 
     virtual void finialize();
 
-    void set_thickness(float fThickness);// In volume coordinate
+    void set_thickness(float thickness);// In volume coordinate
 
-    void set_sample_rate(float fSampleRate);
+    void set_sample_rate(float sample_rate);
 
     virtual void calculate_entry_exit_points();
 
@@ -45,21 +45,19 @@ private:
 
 private:
     
-    float m_fThickness;
-    float m_fSampleRate;
+    float _thickness;
+    float _sample_rate;
 
     //Entry exit plane(orthogonal)
-    Vector4f m_vEntryPlane;
-    Vector4f m_vExitPlane;
-    Vector3f m_vRayDirNorm;
+    Vector4f _entry_plane;
+    Vector4f _exit_plane;
+    Vector3f _ray_dir_norm;
 
-    float m_fStandardSteps;
+    float _standard_steps;
 
     //GPU entry exit points cal
-    GLProgramPtr m_pProgram;
+    GLProgramPtr _program;
 
-    //
-    unsigned int m_uiTextTex;
 };
 
 

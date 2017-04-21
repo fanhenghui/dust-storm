@@ -25,50 +25,50 @@
 MED_IMAGING_BEGIN_NAMESPACE
 
 RayCastScene::RayCastScene():SceneBase(),m_iTestCode(0),
-    m_fGlobalWW(0),
-    m_fGlobalWL(0)
+    _global_ww(0),
+    _global_wl(0)
 {
     m_pRayCastCamera.reset(new OrthoCamera());
-    m_pCamera = m_pRayCastCamera;
+    _camera = m_pRayCastCamera;
 
     m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pRayCastCamera));
 
-    m_pRayCaster.reset(new RayCaster());
+    _ray_caster.reset(new RayCaster());
 
-    m_pCanvas.reset(new RayCasterCanvas());
+    _canvas.reset(new RayCasterCanvas());
 
 
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pRayCaster->set_strategy(CPU_BASE);
+        _ray_caster->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pRayCaster->set_strategy(GPU_BASE);
+        _ray_caster->set_strategy(GPU_BASE);
     }
 }
 
-RayCastScene::RayCastScene(int iWidth , int iHeight):SceneBase(iWidth , iHeight),m_iTestCode(0),
-    m_fGlobalWW(0),
-    m_fGlobalWL(0)
+RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),m_iTestCode(0),
+    _global_ww(0),
+    _global_wl(0)
 {
     m_pRayCastCamera.reset(new OrthoCamera());
-    m_pCamera = m_pRayCastCamera;
+    _camera = m_pRayCastCamera;
 
     m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pRayCastCamera));
 
-    m_pRayCaster.reset(new RayCaster());
+    _ray_caster.reset(new RayCaster());
 
-    m_pCanvas.reset(new RayCasterCanvas());
+    _canvas.reset(new RayCasterCanvas());
 
 
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pRayCaster->set_strategy(CPU_BASE);
+        _ray_caster->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pRayCaster->set_strategy(GPU_BASE);
+        _ray_caster->set_strategy(GPU_BASE);
     }
 }
 
@@ -82,27 +82,27 @@ void RayCastScene::initialize()
     SceneBase::initialize();
 
     //Canvas
-    m_pCanvas->set_display_size(_width , _height);
-    m_pCanvas->initialize();
+    _canvas->set_display_size(_width , _height);
+    _canvas->initialize();
 }
 
 void RayCastScene::finalize()
 {
-    m_pCanvas->finialize();
-    m_pEntryExitPoints->finialize();
-    m_pRayCaster->finialize();
+    _canvas->finialize();
+    _entry_exit_points->finialize();
+    _ray_caster->finialize();
 }
 
-void RayCastScene::set_display_size(int iWidth , int iHeight)
+void RayCastScene::set_display_size(int width , int height)
 {
-    SceneBase::set_display_size(iWidth ,iHeight);
-    m_pCanvas->set_display_size(iWidth , iHeight);
-    m_pCanvas->update_fbo();//update texture size
-    m_pEntryExitPoints->set_display_size(iWidth , iHeight);
-    m_pCameraInteractor->resize(iWidth , iHeight);
+    SceneBase::set_display_size(width ,height);
+    _canvas->set_display_size(width , height);
+    _canvas->update_fbo();//update texture size
+    _entry_exit_points->set_display_size(width , height);
+    m_pCameraInteractor->resize(width , height);
 }
 
-void RayCastScene::render(int iTestCode)
+void RayCastScene::render(int test_code)
 {
     //Skip render scene
     if (!get_dirty())
@@ -122,8 +122,8 @@ void RayCastScene::render(int iTestCode)
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_pEntryExitPoints->calculate_entry_exit_points();
-    m_pRayCaster->render(m_iTestCode);
+    _entry_exit_points->calculate_entry_exit_points();
+    _ray_caster->render(m_iTestCode);
 
     glPopAttrib();
     CHECK_GL_ERROR;
@@ -140,7 +140,7 @@ void RayCastScene::render(int iTestCode)
     CHECK_GL_ERROR;
 
     glEnable(GL_TEXTURE_2D);
-    m_pCanvas->get_color_attach_texture()->bind();
+    _canvas->get_color_attach_texture()->bind();
 
     CHECK_GL_ERROR;
 
@@ -173,26 +173,26 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
         std::shared_ptr<ImageData> pVolume = m_pVolumeInfos->get_volume();
         RENDERALGO_CHECK_NULL_EXCEPTION(pVolume);
 
-        std::shared_ptr<ImageDataHeader> pDataHeader = m_pVolumeInfos->get_data_header();
-        RENDERALGO_CHECK_NULL_EXCEPTION(pDataHeader);
+        std::shared_ptr<ImageDataHeader> data_header = m_pVolumeInfos->get_data_header();
+        RENDERALGO_CHECK_NULL_EXCEPTION(data_header);
 
         //Camera calculator
-        m_pCameraCalculator = pVolumeInfos->get_camera_calculator();
+        _camera_calculator = pVolumeInfos->get_camera_calculator();
 
         //Entry exit points
-        m_pEntryExitPoints->set_image_data(pVolume);
-        m_pEntryExitPoints->set_camera(m_pCamera);
-        m_pEntryExitPoints->set_display_size(_width , _height);
-        m_pEntryExitPoints->set_camera_calculator(m_pCameraCalculator);
-        m_pEntryExitPoints->initialize();
+        _entry_exit_points->set_image_data(pVolume);
+        _entry_exit_points->set_camera(_camera);
+        _entry_exit_points->set_display_size(_width , _height);
+        _entry_exit_points->set_camera_calculator(_camera_calculator);
+        _entry_exit_points->initialize();
 
         //Ray caster
-        m_pRayCaster->set_canvas(m_pCanvas);
-        m_pRayCaster->set_entry_exit_points(m_pEntryExitPoints);
-        m_pRayCaster->set_camera(m_pCamera);
-        m_pRayCaster->set_volume_to_world_matrix(m_pCameraCalculator->get_volume_to_world_matrix());
-        m_pRayCaster->set_volume_data(pVolume);
-        //m_pRayCaster->set_mask_data(pMask);
+        _ray_caster->set_canvas(_canvas);
+        _ray_caster->set_entry_exit_points(_entry_exit_points);
+        _ray_caster->set_camera(_camera);
+        _ray_caster->set_volume_to_world_matrix(_camera_calculator->get_volume_to_world_matrix());
+        _ray_caster->set_volume_data(pVolume);
+        //_ray_caster->set_mask_data(pMask);
 
         if (GPU == Configuration::instance()->get_processing_unit_type())
         {
@@ -209,12 +209,12 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
                 unsigned char pData[] = {0,0,0,0,255,255,255,255};
                 m_pPseudoColor->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
             }
-            m_pRayCaster->set_pseudo_color_texture(m_pPseudoColor , 2);
+            _ray_caster->set_pseudo_color_texture(m_pPseudoColor , 2);
 
             //Volume texture
-            m_pRayCaster->set_volume_data_texture(pVolumeInfos->get_volume_texture());
+            _ray_caster->set_volume_data_texture(pVolumeInfos->get_volume_texture());
         }
-        m_pRayCaster->initialize();
+        _ray_caster->initialize();
 
         set_dirty(true);
     }
@@ -229,19 +229,19 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> pVolumeInfos)
 
 void RayCastScene::set_mask_label_level(LabelLevel eLabelLevel)
 {
-    m_pRayCaster->set_mask_label_level(eLabelLevel);
+    _ray_caster->set_mask_label_level(eLabelLevel);
     set_dirty(true);
 }
 
 void RayCastScene::set_sample_rate(float fSampleRate)
 {
-    m_pRayCaster->set_sample_rate(fSampleRate);
+    _ray_caster->set_sample_rate(fSampleRate);
     set_dirty(true);
 }
 
 void RayCastScene::set_visible_labels(std::vector<unsigned char> vecLabels)
 {
-    m_pRayCaster->set_visible_labels(vecLabels);
+    _ray_caster->set_visible_labels(vecLabels);
     set_dirty(true);
 }
 
@@ -250,70 +250,70 @@ void RayCastScene::set_window_level(float fWW , float fWL , unsigned char ucLabe
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
     m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
 
-    m_pRayCaster->set_window_level(fWW , fWL , ucLabel);
+    _ray_caster->set_window_level(fWW , fWL , ucLabel);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_global_window_level(float fWW , float fWL)
 {
-    m_fGlobalWW = fWW;
-    m_fGlobalWL = fWL;
+    _global_ww = fWW;
+    _global_wl = fWL;
 
     RENDERALGO_CHECK_NULL_EXCEPTION(m_pVolumeInfos);
     m_pVolumeInfos->get_volume()->regulate_wl(fWW , fWL);
 
-    m_pRayCaster->set_global_window_level(fWW, fWL);
+    _ray_caster->set_global_window_level(fWW, fWL);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_mask_mode(MaskMode eMode)
 {
-    m_pRayCaster->set_mask_mode(eMode);
+    _ray_caster->set_mask_mode(eMode);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_composite_mode(CompositeMode eMode)
 {
-    m_pRayCaster->set_composite_mode(eMode);
+    _ray_caster->set_composite_mode(eMode);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_interpolation_mode(InterpolationMode eMode)
 {
-    m_pRayCaster->set_interpolation_mode(eMode);
+    _ray_caster->set_interpolation_mode(eMode);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_shading_mode(ShadingMode eMode)
 {
-    m_pRayCaster->set_shading_mode(eMode);
+    _ray_caster->set_shading_mode(eMode);
 
     set_dirty(true);
 }
 
 void RayCastScene::set_color_inverse_mode(ColorInverseMode eMode)
 {
-    m_pRayCaster->set_color_inverse_mode(eMode);
+    _ray_caster->set_color_inverse_mode(eMode);
 
     set_dirty(true);
 }
 
-void RayCastScene::set_test_code(int iTestCode)
+void RayCastScene::set_test_code(int test_code)
 {
-    m_iTestCode = iTestCode;
+    m_iTestCode = test_code;
 
     set_dirty(true);
 }
 
 void RayCastScene::get_global_window_level(float& fWW , float& fWL) const
 {
-    fWW = m_fGlobalWW;
-    fWL = m_fGlobalWL;
+    fWW = _global_ww;
+    fWL = _global_wl;
 }
 
 std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const
@@ -323,7 +323,7 @@ std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const
 
 std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const
 {
-    return m_pCameraCalculator;
+    return _camera_calculator;
 }
 
 

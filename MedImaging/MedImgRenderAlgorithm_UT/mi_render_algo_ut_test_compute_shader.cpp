@@ -30,7 +30,7 @@ namespace
     unsigned int m_uiTex;
     unsigned int m_uiProgram;
     unsigned int m_uiShader;
-    GLProgram* m_pProgram;
+    GLProgram* _program;
 
     int _width = 800;
     int _height = 800;
@@ -116,10 +116,10 @@ namespace
         //glAttachShader(m_uiProgram , uiShader);
         //glLinkProgram(m_uiProgram);
 
-        /*m_pProgram = new GLProgram(1);
-        m_pProgram->set_shaders(std::vector<GLShaderInfo>(1,s));
-        m_pProgram->initialize();
-        m_pProgram->compile();*/
+        /*_program = new GLProgram(1);
+        _program->set_shaders(std::vector<GLShaderInfo>(1,s));
+        _program->initialize();
+        _program->compile();*/
     }
 
     
@@ -196,7 +196,7 @@ namespace
 
     void MouseMotion(int x , int y)
     {
-        Point2 ptCur(x,y);
+        Point2 cur_pt(x,y);
 
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
@@ -212,7 +212,7 @@ namespace
 
         }
 
-        m_ptPre = ptCur;
+        m_ptPre = cur_pt;
         glutPostRedisplay();
 
     }

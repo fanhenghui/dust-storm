@@ -14,7 +14,7 @@ using namespace MED_IMAGING_NAMESPACE;
 
 namespace
 {
-    std::shared_ptr<OrthoCamera> m_pCamera;
+    std::shared_ptr<OrthoCamera> _camera;
     std::shared_ptr<OrthoCameraInteractor> m_pCameraInteractor;
 
 
@@ -25,13 +25,13 @@ namespace
 
     void Init()
     {
-        m_pCamera.reset(new OrthoCamera());
-        m_pCamera->set_eye(Point3(0,0,700));
-        m_pCamera->set_look_at(Point3(0,0,0));
-        m_pCamera->set_up_direction(Vector3(0,1,0));
-        m_pCamera->set_ortho(-175,175,-175,175,-700,2100);
+        _camera.reset(new OrthoCamera());
+        _camera->set_eye(Point3(0,0,700));
+        _camera->set_look_at(Point3(0,0,0));
+        _camera->set_up_direction(Vector3(0,1,0));
+        _camera->set_ortho(-175,175,-175,175,-700,2100);
 
-        m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
+        m_pCameraInteractor.reset(new OrthoCameraInteractor(_camera));
 
         
     }
@@ -54,10 +54,10 @@ namespace
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        Matrix4 matMVP = m_pCamera->get_view_projection_matrix();
+        Matrix4 mat_mvp = _camera->get_view_projection_matrix();
 
         
-        glLoadMatrixd(matMVP._m);
+        glLoadMatrixd(mat_mvp._m);
 
         glColor3d(1.0,1.0,0.0);
 
@@ -129,21 +129,21 @@ namespace
 
     void MouseMotion(int x , int y)
     {
-        Point2 ptCur(x,y);
+        Point2 cur_pt(x,y);
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->rotate(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->rotate(m_ptPre , cur_pt , _width , _height);
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->pan(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->pan(m_ptPre , cur_pt , _width , _height);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->zoom(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->zoom(m_ptPre , cur_pt , _width , _height);
         }
 
-        m_ptPre = ptCur;
+        m_ptPre = cur_pt;
         glutPostRedisplay();
 
     }

@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepMaskNoneSampler : public RCStepBase
 {
 public:
-    RCStepMaskNoneSampler(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepMaskNoneSampler(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepMaskNoneSampler(){};
@@ -21,7 +21,7 @@ private:
 class RCStepMaskNearstSampler : public RCStepBase
 {
 public:
-    RCStepMaskNearstSampler(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepMaskNearstSampler(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepMaskNearstSampler(){};

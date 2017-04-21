@@ -25,10 +25,10 @@ MED_IMAGING_BEGIN_NAMESPACE
     namespace//TODO 这个函数要移到碰撞检测算法去
 {
     //Return true if out
-    bool check_outside(Vector3f pt, Vector3f boundMin , Vector3f boundMax)
+    bool check_outside(Vector3f pt, Vector3f bound_min , Vector3f bound_max)
     {
-        if (pt._m[0] <= boundMin._m[0] || pt._m[1] <= boundMin._m[1] || pt._m[2] < boundMin._m[2]||
-            pt._m[0] > boundMax._m[0] || pt._m[1] > boundMax._m[1] || pt._m[2] > boundMax._m[2])
+        if (pt._m[0] <= bound_min._m[0] || pt._m[1] <= bound_min._m[1] || pt._m[2] < bound_min._m[2]||
+            pt._m[0] > bound_max._m[0] || pt._m[1] > bound_max._m[1] || pt._m[2] > bound_max._m[2])
         {
             return true;
         }
@@ -40,108 +40,106 @@ MED_IMAGING_BEGIN_NAMESPACE
 
     //////////////////////////////////////////////////////////////////////////
     //original
-    //bool RayIntersectAABB(Vector3f ptRayStart, Vector3f ptMin, Vector3f vBound, Vector3f vRay, 
-    //    float& fEntryStep, float& fExitStep)
+    //bool ray_intersect_aabb(Vector3f ray_start, Vector3f min, Vector3f bound, Vector3f ray_dir, 
+    //    float& entry_step, float& exit_step)
     //{
-    //    Vector3f vBottom =  (ptMin - ptRayStart);
-    //    Vector3f vTop =  (ptMin + vBound - ptRayStart);
+    //    Vector3f bottom_step =  (min - ray_start) / ray_dir;
+    //    Vector3f top_step = (min + bound - ray_start) / ray_dir;
 
-    //    Vector3f vBottomStep = vBottom / vRay;
-    //    Vector3f vTopStep = vTop / vRay;
+    //    Vector3f min_step = min_per_elem(bottom_step, top_step);
+    //    Vector3f max_step = max_per_elem(bottom_step, top_step);
+    //    float near_step = min_step.max_elem();
+    //    float far_step = max_step.min_elem();
 
-    //    Vector3f vMinStep = min_per_elem(vBottomStep, vTopStep);
-    //    Vector3f vMaxStep = max_per_elem(vBottomStep, vTopStep);
-    //    float fNearStep = vMinStep.max_elem();
-    //    float fFarStep = vMaxStep.min_elem();
+    //    entry_step = std::max(near_step, 0.0f);
+    //    exit_step = far_step;
 
-    //    fEntryStep = std::max(fNearStep, 0.0f);
-    //    fExitStep = fFarStep;
-
-    //    return fEntryStep < fExitStep;
+    //    return entry_step < exit_step;
     //}
     //////////////////////////////////////////////////////////////////////////
 
-    bool RayIntersectAABB(Vector3f ptRayStart, Vector3f ptMin, Vector3f vBound, Vector3f vRay, 
-        float& fEntryStep, float& fExitStep)
+    bool ray_intersect_aabb(Vector3f ray_start, Vector3f min, Vector3f bound, Vector3f ray_dir, 
+        float& entry_step, float& exit_step)
     {
-        Vector3f vBottomStep =  (ptMin - ptRayStart)/vRay;
-        Vector3f vTopStep =  (ptMin + vBound - ptRayStart)/vRay;
-        Vector3f vBottomStep2(vBottomStep);
-        Vector3f vTopStep2(vTopStep);
+        Vector3f bottom_step =  (min - ray_start)/ray_dir;
+        Vector3f top_step =  (min + bound - ray_start)/ray_dir;
+        Vector3f bottom_step2(bottom_step);
+        Vector3f top_step2(top_step);
         for (int i = 0 ; i< 3 ; ++i)
         {
-            if (fabs(vRay._m[i]) <= FLOAT_EPSILON)
+            if (fabs(ray_dir._m[i]) <= FLOAT_EPSILON)
             {
-                vBottomStep._m[i] = -std::numeric_limits<float>::max();
-                vTopStep._m[i] = -std::numeric_limits<float>::max();
-                vBottomStep2._m[i] = std::numeric_limits<float>::max();
-                vTopStep2._m[i] = std::numeric_limits<float>::max();
+                bottom_step._m[i] = -std::numeric_limits<float>::max();
+                top_step._m[i] = -std::numeric_limits<float>::max();
+                bottom_step2._m[i] = std::numeric_limits<float>::max();
+                top_step2._m[i] = std::numeric_limits<float>::max();
             }
         }
 
-        fEntryStep = vBottomStep.min_per_elem(vTopStep).max_elem();
-        fExitStep = vBottomStep2.max_per_elem(vTopStep2).min_elem();
+        entry_step = bottom_step.min_per_elem(top_step).max_elem();
+        exit_step = bottom_step2.max_per_elem(top_step2).min_elem();
 
         //////////////////////////////////////////////////////////////////////////
         //fNear > fFar not intersected
         //fNear >0  fFar > 0 fNear <= fFar intersected , start point not arrive AABB yet
         //fNear <0 fFar > 0 intersected , start point is in AABB
         //fNear <0 fFar < 0 fNear < fFar , intersected , but start point is outside AABB in extension ray 
-        return fEntryStep < fExitStep;
+        return entry_step < exit_step;
     }
 
     //If ray[i] < FLOAT_EPSLION then set ray[i] = 1 adjust[i] = std::numeric_limits<float>::max()*0.5f
-    bool RayIntersectAABBAcc(Vector3f ptRayStart, Vector3f ptMin, Vector3f vBound, Vector3f vRay, Vector3f vAdjust,
-        float& fEntryStep, float& fExitStep)
+    bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound, Vector3f ray_dir, Vector3f vAdjust,
+        float& entry_step, float& exit_step)
     {
-        Vector3f vBottomStep =  (ptMin - ptRayStart)/vRay;
-        Vector3f vTopStep =  (ptMin + vBound - ptRayStart)/vRay;
-        Vector3f vBottomStep2(vBottomStep);
-        Vector3f vTopStep2(vTopStep);
-        vBottomStep -= vAdjust;
-        vTopStep -= vAdjust;
-        vBottomStep2 += vAdjust;
-        vTopStep2 += vAdjust;
+        Vector3f bottom_step =  (min - ray_start)/ray_dir;
+        Vector3f top_step =  (min + bound - ray_start)/ray_dir;
+        Vector3f bottom_step2(bottom_step);
+        Vector3f top_step2(top_step);
+        bottom_step -= vAdjust;
+        top_step -= vAdjust;
+        bottom_step2 += vAdjust;
+        top_step2 += vAdjust;
 
-        fEntryStep = vBottomStep.min_per_elem(vTopStep).max_elem();
-        fExitStep = vBottomStep2.max_per_elem(vTopStep2).min_elem();
+        entry_step = bottom_step.min_per_elem(top_step).max_elem();
+        exit_step = bottom_step2.max_per_elem(top_step2).min_elem();
 
         //////////////////////////////////////////////////////////////////////////
         //fNear > fFar not intersected
         //fNear >0  fFar > 0 fNear <= fFar intersected , start point not arrive AABB yet
         //fNear <0 fFar > 0 intersected , start point is in AABB
         //fNear <0 fFar < 0 fNear < fFar , intersected , but start point is outside AABB in extension ray 
-        return fEntryStep < fExitStep;
+        return entry_step < exit_step;
     }
 }
 
 bool operator <(const BrickDistance& l , const BrickDistance& r)
 {
-    return l.m_fDistance < r.m_fDistance;
+    return l.distance < r.distance;
 }
 
-RayCastingCPUBrickAcc::RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> pRayCaster):m_pRayCaster(pRayCaster),
-    _width(32),
-    _height(32),
-    m_pEntryPoints(nullptr),
-    m_pExitPoints(nullptr),
-    m_pColorCanvas(nullptr),
-    m_pBrickCorner(nullptr),
-    m_pVolumeBrickUnit(nullptr),
-    m_pMaskBrickUnit(nullptr),
-    m_pVolumeBrickInfo(nullptr),
-    m_pMaskBrickInfo(nullptr),
-    m_uiBrickSize(32),
-    m_uiBrickExpand(2),
-    m_uiBrickCount(0),
-    m_uiInterBrickNum(0),
-    m_iRayCount(0)
+RayCastingCPUBrickAcc::RayCastingCPUBrickAcc(std::shared_ptr<RayCaster> ray_caster):
+        _ray_caster(ray_caster),
+        _width(32),
+        _height(32),
+        _entry_points(nullptr),
+        _exit_points(nullptr),
+        _canvas_array(nullptr),
+        _brick_corner_array(nullptr),
+        _volume_brick_unit_array(nullptr),
+        _mask_brick_unit_array(nullptr),
+        _volume_brick_info_array(nullptr),
+        _mask_brick_info_array(nullptr),
+        _brick_size(32),
+        _brick_expand(2),
+        _brick_count(0),
+        _intersected_brick_num(0),
+        _ray_count(0)
 {
     _dim[0] = _dim[1] = _dim[2] = 32;
-    m_uiBrickDim[0] = m_uiBrickDim[1] = m_uiBrickDim[2] = 0;
+    _brick_dim[0] = _brick_dim[1] = _brick_dim[2] = 0;
 
-    m_iTestPixelX = 123546;
-    m_iTestPixelY = 123546;
+    _test_pixel_x = 123546;
+    _test_pixel_y = 123546;
 }
 
 RayCastingCPUBrickAcc::~RayCastingCPUBrickAcc()
@@ -149,69 +147,69 @@ RayCastingCPUBrickAcc::~RayCastingCPUBrickAcc()
 
 }
 
-void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
+void RayCastingCPUBrickAcc::render(int test_code /*= 0*/)
 {
     try
     {
-        std::shared_ptr<RayCaster> pRayCaster = m_pRayCaster.lock();
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster);
+        std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster);
 
         //Volume info
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pEntryExitPoints);
-        pRayCaster->m_pEntryExitPoints->get_display_size(_width , _height);
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster->_entry_exit_points);
+        ray_caster->_entry_exit_points->get_display_size(_width , _height);
 
-        std::shared_ptr<ImageData> pVolumeData = pRayCaster->m_pVolumeData;
-        RENDERALGO_CHECK_NULL_EXCEPTION(pVolumeData);
-        memcpy(_dim , pVolumeData->_dim , sizeof(unsigned int)*3);
+        std::shared_ptr<ImageData> volume_img = ray_caster->_volume_data;
+        RENDERALGO_CHECK_NULL_EXCEPTION(volume_img);
+        memcpy(_dim , volume_img->_dim , sizeof(unsigned int)*3);
 
         //Brick struct
-        m_uiBrickSize = pRayCaster->m_uiBrickSize;
-        m_uiBrickExpand = pRayCaster->m_uiBrickExpand;
-        m_pBrickCorner = pRayCaster->m_pBrickCorner;
-        m_pVolumeBrickUnit = pRayCaster->m_pVolumeBrickUnit;
-        m_pMaskBrickUnit = pRayCaster->m_pMaskBrickUnit;
-        m_pVolumeBrickInfo = pRayCaster->m_pVolumeBrickInfo;
-        m_pMaskBrickInfo = pRayCaster->m_pMaskBrickInfo;
-        unsigned int uiBrickDim[3] = {1,1,1};
-        BrickUtils::instance()->get_brick_dim(_dim , uiBrickDim , m_uiBrickSize);
-        m_uiBrickCount = uiBrickDim[0]*uiBrickDim[1]*uiBrickDim[2];
-        if( !(m_uiBrickDim[0] ==uiBrickDim[0] && m_uiBrickDim[1] == uiBrickDim[1] && m_uiBrickDim[2] == uiBrickDim[2]) )
+        _brick_size = ray_caster->_brick_size;
+        _brick_expand = ray_caster->_brick_expand;
+        _brick_corner_array = ray_caster->_brick_corner_array;
+        _volume_brick_unit_array = ray_caster->_volume_brick_unit_array;
+        _mask_brick_unit_array = ray_caster->_mask_brick_unit_array;
+        _volume_brick_info_array = ray_caster->_volume_brick_info_array;
+        _mask_brick_info_array = ray_caster->_mask_brick_info_array;
+        unsigned int brick_dim[3] = {1,1,1};
+        BrickUtils::instance()->get_brick_dim(_dim , brick_dim , _brick_size);
+        _brick_count = brick_dim[0]*brick_dim[1]*brick_dim[2];
+        if( !(_brick_dim[0] ==brick_dim[0] && _brick_dim[1] == brick_dim[1] && _brick_dim[2] == brick_dim[2]) )
         {
-            memcpy(m_uiBrickDim , uiBrickDim , sizeof(unsigned int)*3);
-            m_vecBrickCenterDistance.clear();
-            m_vecBrickCenterDistance.resize(m_uiBrickCount);
+            memcpy(_brick_dim , brick_dim , sizeof(unsigned int)*3);
+            _brick_center_distance.clear();
+            _brick_center_distance.resize(_brick_count);
         }
 
-        if (m_iRayCount != _width*_height)
+        if (_ray_count != _width*_height)
         {
-            m_iRayCount = _width*_height;
-            m_pRayResult.reset(new float[m_iRayCount]);
+            _ray_count = _width*_height;
+            _ray_result.reset(new float[_ray_count]);
         }
-        //memset(m_pRayResult.get() , 0 , sizeof(float)*m_iRayCount);
+        //memset(_ray_result.get() , 0 , sizeof(float)*_ray_count);
 
 
         //Entry exit points
-        m_pEntryPoints = pRayCaster->m_pEntryExitPoints->get_entry_points_array();
-        m_pExitPoints = pRayCaster->m_pEntryExitPoints->get_exit_points_array();
+        _entry_points = ray_caster->_entry_exit_points->get_entry_points_array();
+        _exit_points = ray_caster->_entry_exit_points->get_exit_points_array();
 
         //Canvas
-        RENDERALGO_CHECK_NULL_EXCEPTION(pRayCaster->m_pCanvas);
-        m_pColorCanvas = pRayCaster->m_pCanvas->get_color_array();
-        RENDERALGO_CHECK_NULL_EXCEPTION(m_pColorCanvas);
-        memset(m_pColorCanvas , 0 , sizeof(RGBAUnit)*m_iRayCount);
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster->_canvas);
+        _canvas_array = ray_caster->_canvas->get_color_array();
+        RENDERALGO_CHECK_NULL_EXCEPTION(_canvas_array);
+        memset(_canvas_array , 0 , sizeof(RGBAUnit)*_ray_count);
         //if ()
         {
             //TODO memset gray
         }
 
         //Matrix
-        const Matrix4 matV2W = pRayCaster->m_matVolume2World;
-        const Matrix4 matVP = pRayCaster->m_pCamera->get_view_projection_matrix();
-        const Matrix4 matMVP = matVP*matV2W;
-        const Matrix4 matMVPInv = matMVP.get_inverse();
-        m_matMVP = ArithmeticUtils::convert_matrix(matMVP);
-        m_matMVPInv = ArithmeticUtils::convert_matrix(matMVPInv);
-        m_matMVPInv0 = matMVPInv;
+        const Matrix4 mat_v2w = ray_caster->_mat_v2w;
+        const Matrix4 mat_vp = ray_caster->_camera->get_view_projection_matrix();
+        const Matrix4 mat_mvp = mat_vp*mat_v2w;
+        const Matrix4 mat_mvp_inv = mat_mvp.get_inverse();
+        _mat_mvp = ArithmeticUtils::convert_matrix(mat_mvp);
+        _mat_mvp_inv = ArithmeticUtils::convert_matrix(mat_mvp_inv);
+        _mat_mvp_inv_double = mat_mvp_inv;
 
         //////////////////////////////////////////////////////////////////////////
         //1 Brick sort
@@ -222,9 +220,9 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
         std::cout << "Sort brick cost : " << double(t1 - t0) << " ms.\n";
 
         //2 Brick ray casting
-        for (unsigned int i = 0 ; i<m_uiInterBrickNum ; ++i)
+        for (unsigned int i = 0 ; i<_intersected_brick_num ; ++i)
         {
-            ray_casting_in_brick_i(m_vecBrickCenterDistance[i].m_id , pRayCaster);
+            ray_casting_in_brick_i(_brick_center_distance[i].id , ray_caster);
         }
         clock_t t2= clock();
         std::cout << "Ray casting cost : " << double(t2 - t1) << " ms.\n";
@@ -232,7 +230,7 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
 
         //////////////////////////////////////////////////////////////////////////
         //3 update color to texture
-        pRayCaster->m_pCanvas->update_color_array();
+        ray_caster->_canvas->update_color_array();
 
     }
     catch (const Exception& e)
@@ -248,108 +246,107 @@ void RayCastingCPUBrickAcc::render(int iTestCode /*= 0*/)
 
 void RayCastingCPUBrickAcc::sort_brick_i()
 {
-    std::shared_ptr<RayCaster> pRayCaster = m_pRayCaster.lock();
-    std::shared_ptr<MPREntryExitPoints> pMPREntryExitPoints = std::dynamic_pointer_cast<MPREntryExitPoints>(pRayCaster->m_pEntryExitPoints);
-    if (pMPREntryExitPoints)//MPR
+    std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
+    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points = std::dynamic_pointer_cast<MPREntryExitPoints>(ray_caster->_entry_exit_points);
+    if (mpr_entry_exit_points)//MPR
     {
         //1 Get bricks between entry and exit
-        const Matrix4 matW2V = pRayCaster->m_matVolume2World.get_inverse();
-        const Point3 ptEyeD = matW2V.transform(pRayCaster->m_pCamera->get_eye());
-        const Vector3f ptEye((float)ptEyeD.x , (float)ptEyeD.y ,(float)ptEyeD.z);
-        Vector3f ptCenter;
-        const float fBrickSize = (float)m_uiBrickSize;
-        Vector3f vHalfBrickBound(fBrickSize*0.5f);
+        const Matrix4 mat_w2v = ray_caster->_mat_v2w.get_inverse();
+        const Point3 eye_double = mat_w2v.transform(ray_caster->_camera->get_eye());
+        const Vector3f eye((float)eye_double.x , (float)eye_double.y ,(float)eye_double.z);
+        Vector3f center;
+        const float brick_size_f = (float)_brick_size;
+        Vector3f half_brick_bound(brick_size_f*0.5f);
 
-        Vector4f vEntryPlane;
-        Vector4f vExitPlane;
-        pMPREntryExitPoints->get_entry_exit_plane(vEntryPlane , vExitPlane, m_vRayDirNorm);
-        Vector4f ptMin , ptMax ;
+        Vector4f entry_plane;
+        Vector4f exit_plane;
+        mpr_entry_exit_points->get_entry_exit_plane(entry_plane , exit_plane, _ray_dir_norm);
+        Vector4f min , max ;
         Vector4f pt[8];
-        const Vector4f vBrickBound(fBrickSize ,fBrickSize ,fBrickSize , 0);
-        float fMinEntry(0.0f) , fMaxEntry(0.0f) , fMinExit(0.0f) , fMaxExit(0.0f);
-        m_uiInterBrickNum = 0;
-        for (unsigned int i = 0 ; i < m_uiBrickCount ; ++i)
+        const Vector4f brick_bound(brick_size_f ,brick_size_f ,brick_size_f , 0);
+        _intersected_brick_num = 0;
+        for (unsigned int i = 0 ; i < _brick_count ; ++i)
         {
-            const BrickCorner &bc = m_pBrickCorner[i];
-            ptMin = Vector4f((float)bc.m_Min[0] , (float)bc.m_Min[1] , (float)bc.m_Min[2] , -1.0f);
-            ptMax = ptMin + vBrickBound;
+            const BrickCorner &bc = _brick_corner_array[i];
+            min = Vector4f((float)bc.min[0] , (float)bc.min[1] , (float)bc.min[2] , -1.0f);
+            max = min + brick_bound;
 
-            pt[0] = ptMin;
-            pt[1] = Vector4f(ptMin._m[0],ptMin._m[1],ptMax._m[2], -1.0f);
-            pt[1] =Vector4f(ptMin._m[0],ptMin._m[1],ptMax._m[2], -1.0f);
-            pt[2] =Vector4f(ptMin._m[0],ptMax._m[1],ptMin._m[2], -1.0f);
-            pt[3] =Vector4f(ptMin._m[0],ptMax._m[1],ptMax._m[2], -1.0f);
-            pt[4] =Vector4f(ptMax._m[0],ptMin._m[1],ptMin._m[2], -1.0f);
-            pt[5] =Vector4f(ptMax._m[0],ptMin._m[1],ptMax._m[2], -1.0f);
-            pt[6] =Vector4f(ptMax._m[0],ptMax._m[1],ptMin._m[2], -1.0f);
-            pt[7] = ptMax;
+            pt[0] = min;
+            pt[1] = Vector4f(min._m[0],min._m[1],max._m[2], -1.0f);
+            pt[1] =Vector4f(min._m[0],min._m[1],max._m[2], -1.0f);
+            pt[2] =Vector4f(min._m[0],max._m[1],min._m[2], -1.0f);
+            pt[3] =Vector4f(min._m[0],max._m[1],max._m[2], -1.0f);
+            pt[4] =Vector4f(max._m[0],min._m[1],min._m[2], -1.0f);
+            pt[5] =Vector4f(max._m[0],min._m[1],max._m[2], -1.0f);
+            pt[6] =Vector4f(max._m[0],max._m[1],min._m[2], -1.0f);
+            pt[7] = max;
 
             //Intersect with entry plane
-            int iEntryPos = 0;
-            int iEntryNeg = 0;
+            int entry_positive = 0;
+            int entry_negative = 0;
             for ( int j = 0 ; j<8 ; ++j)
             {
-                if (pt[j].dot_product(vEntryPlane) > 0.0f)
+                if (pt[j].dot_product(entry_plane) > 0.0f)
                 {
-                    iEntryPos += 1;
+                    entry_positive += 1;
                 }
                 else
                 {
-                    iEntryNeg +=1;
+                    entry_negative +=1;
                 }
             }
 
-            if (8 != iEntryPos && 8 != iEntryNeg)//intersection
+            if (8 != entry_positive && 8 != entry_negative)//intersection
             {
-                ptCenter = Vector3f(ptMin.m_Vec128) + vHalfBrickBound;
+                center = Vector3f(min._m128) + half_brick_bound;
 
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_id = i;
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_fDistance = (ptCenter - ptEye).dot_product(vEntryPlane.get_128());
-                ++m_uiInterBrickNum;
+                _brick_center_distance[_intersected_brick_num].id = i;
+                _brick_center_distance[_intersected_brick_num].distance = (center - eye).dot_product(entry_plane.get_128());
+                ++_intersected_brick_num;
                 continue;
             }
 
-            int iExitPos = 0;
-            int iExitNeg = 0;
+            int exit_positive = 0;
+            int exit_negative = 0;
             for ( int j = 0 ; j<8 ; ++j)
             {
-                if (pt[j].dot_product(vExitPlane) > 0.0f)
+                if (pt[j].dot_product(exit_plane) > 0.0f)
                 {
-                    iExitPos += 1;
+                    exit_positive += 1;
                 }
                 else
                 {
-                    iExitNeg +=1;
+                    exit_negative +=1;
                 }
             }
 
-            if (8 != iExitPos && 8 != iExitNeg)//intersection
+            if (8 != exit_positive && 8 != exit_negative)//intersection
             {
-                ptCenter = Vector3f(ptMin.m_Vec128) + vHalfBrickBound;
+                center = Vector3f(min._m128) + half_brick_bound;
 
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_id = i;
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_fDistance = (ptCenter - ptEye).dot_product(vEntryPlane.get_128());
-                ++m_uiInterBrickNum;
+                _brick_center_distance[_intersected_brick_num].id = i;
+                _brick_center_distance[_intersected_brick_num].distance = (center - eye).dot_product(entry_plane.get_128());
+                ++_intersected_brick_num;
                 continue;
             }
 
-            if (8 == iEntryPos && 8 == iExitPos)
+            if (8 == entry_positive && 8 == exit_positive)
             {
-                ptCenter = Vector3f(ptMin.m_Vec128) + vHalfBrickBound;
+                center = Vector3f(min._m128) + half_brick_bound;
 
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_id = i;
-                m_vecBrickCenterDistance[m_uiInterBrickNum].m_fDistance = (ptCenter - ptEye).dot_product(vEntryPlane.get_128());
-                ++m_uiInterBrickNum;
+                _brick_center_distance[_intersected_brick_num].id = i;
+                _brick_center_distance[_intersected_brick_num].distance = (center - eye).dot_product(entry_plane.get_128());
+                ++_intersected_brick_num;
                 continue;
             }
         }
 
-        std::cout << "Intersect brick count : " << m_uiInterBrickNum << std::endl;
+        std::cout << "Intersect brick count : " << _intersected_brick_num << std::endl;
 
         //2 Sort bricks
-        if (m_uiInterBrickNum > 1)
+        if (_intersected_brick_num > 1)
         {
-            std::sort(m_vecBrickCenterDistance.begin() , m_vecBrickCenterDistance.begin() + m_uiInterBrickNum , std::less<BrickDistance>());
+            std::sort(_brick_center_distance.begin() , _brick_center_distance.begin() + _intersected_brick_num , std::less<BrickDistance>());
         }
 
     }
@@ -360,71 +357,71 @@ void RayCastingCPUBrickAcc::sort_brick_i()
 }
 const std::vector<BrickDistance>& RayCastingCPUBrickAcc::get_brick_distance() const
 {
-    return m_vecBrickCenterDistance;
+    return _brick_center_distance;
 }
 
 unsigned int RayCastingCPUBrickAcc::get_ray_casting_brick_count() const
 {
-    return m_uiInterBrickNum;
+    return _intersected_brick_num;
 }
 
-void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int uiBrickID ,  const std::shared_ptr<RayCaster>& pRayCaster)
+void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int brick_id ,  const std::shared_ptr<RayCaster>& ray_caster)
 {
     //1 inverse projection
-    const BrickCorner &bc = m_pBrickCorner[uiBrickID];
-    const Vector3f vBrickBound((float)m_uiBrickSize);
-    //const Vector3f vBrickExpand((float)m_uiBrickExpand);
-    const Vector3f ptMin = Vector3f((float)bc.m_Min[0] , (float)bc.m_Min[1] , (float)bc.m_Min[2]);
-    const Vector3f ptMax = ptMin + vBrickBound;
-    //const unsigned int uiBrickSampleSize = m_uiBrickExpand + m_uiBrickSize;
+    const BrickCorner &bc = _brick_corner_array[brick_id];
+    const Vector3f brick_bound((float)_brick_size);
+    //const Vector3f vBrickExpand((float)_brick_expand);
+    const Vector3f min = Vector3f((float)bc.min[0] , (float)bc.min[1] , (float)bc.min[2]);
+    const Vector3f max = min + brick_bound;
+    //const unsigned int uiBrickSampleSize = _brick_expand + _brick_size;
 
-    const Vector3f pt[8] = {ptMin , 
-        Vector3f(ptMin._m[0],ptMin._m[1],ptMax._m[2]),
-        Vector3f(ptMin._m[0],ptMax._m[1],ptMin._m[2]),
-        Vector3f(ptMin._m[0],ptMax._m[1],ptMax._m[2]),
-        Vector3f(ptMax._m[0],ptMin._m[1],ptMin._m[2]),
-        Vector3f(ptMax._m[0],ptMin._m[1],ptMax._m[2]),
-        Vector3f(ptMax._m[0],ptMax._m[1],ptMin._m[2]),
-        ptMax};
+    const Vector3f pt[8] = {min , 
+        Vector3f(min._m[0],min._m[1],max._m[2]),
+        Vector3f(min._m[0],max._m[1],min._m[2]),
+        Vector3f(min._m[0],max._m[1],max._m[2]),
+        Vector3f(max._m[0],min._m[1],min._m[2]),
+        Vector3f(max._m[0],min._m[1],max._m[2]),
+        Vector3f(max._m[0],max._m[1],min._m[2]),
+        max};
 
-    const float fWidth = (float)_width;
-    const float fHeight = (float)_height;
-    int iXBegin(65535), iXEnd(-65535) , iYBegin(65535) , iYEnd(-65535);
-    int iCurX , iCurY;
-    float fNormX , fNormY;
-    Vector3f vScreen;
-    int iOut = 1;//completely outside of screen
-    int iBrickVertexOut = 0;
+    const float width_float = (float)_width;
+    const float height_float = (float)_height;
+    int x_begin(65535), x_end(-65535) , y_begin(65535) , y_end(-65535);
+    int current_x , current_y;
+    float x_norm , nrom_y;
+    Vector3f screen_point;
+    int out_tag = 1;//completely outside of screen
+    int brick_vertex_out = 0;
     for (int i = 0 ; i< 8 ; ++i)
     {
-        vScreen = m_matMVP.transform_point(pt[i]);
-        fNormX = vScreen._m[0];
-        fNormY = vScreen._m[1];
+        screen_point = _mat_mvp.transform_point(pt[i]);
+        x_norm = screen_point._m[0];
+        nrom_y = screen_point._m[1];
 
-        iOut = 1;
-        if (fNormX < -1)
+        out_tag = 1;
+        if (x_norm < -1)
         {
-            fNormX = -1;
-            iOut+=1;
+            x_norm = -1;
+            out_tag+=1;
         }
-        else if (fNormX > 1)
+        else if (x_norm > 1)
         {
-            fNormX = 1;
-            iOut+=1;
-        }
-
-        if (fNormY < -1)
-        {
-            fNormY = -1;
-            iOut+=1;
-        }
-        else if (fNormY > 1)
-        {
-            fNormY = 1;
-            iOut+=1;
+            x_norm = 1;
+            out_tag+=1;
         }
 
-        iBrickVertexOut += (iOut>>1);
+        if (nrom_y < -1)
+        {
+            nrom_y = -1;
+            out_tag+=1;
+        }
+        else if (nrom_y > 1)
+        {
+            nrom_y = 1;
+            out_tag+=1;
+        }
+
+        brick_vertex_out += (out_tag>>1);
 
 
         //if (fNormX < -1 || fNormX > 1||
@@ -434,147 +431,147 @@ void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int uiBrickID ,  con
         //    continue;
         //}
 
-        iCurX = int( (fNormX+1.0f)*0.5f * fWidth + 0.5);
-        if (iCurX < iXBegin)
+        current_x = int( (x_norm+1.0f)*0.5f * width_float + 0.5);
+        if (current_x < x_begin)
         {
-            iXBegin = iCurX;
+            x_begin = current_x;
         }
-        if (iCurX > iXEnd)
+        if (current_x > x_end)
         {
-            iXEnd = iCurX;
+            x_end = current_x;
         }
 
-        iCurY = int( (fNormY+1.0f)*0.5f*fHeight + 0.5);
-        if (iCurY < iYBegin)
+        current_y = int( (nrom_y+1.0f)*0.5f*height_float + 0.5);
+        if (current_y < y_begin)
         {
-            iYBegin = iCurY;
+            y_begin = current_y;
         }
-        if (iCurY > iYEnd)
+        if (current_y > y_end)
         {
-            iYEnd = iCurY;
+            y_end = current_y;
         }
     }
 
-    if (iYEnd > _height || iXEnd > _width)
+    if (y_end > _height || x_end > _width)
     {
         //std::cout <<"ERR\n";
     }
 
-    if (iBrickVertexOut < 8)
+    if (brick_vertex_out < 8)
     {
         //Multi-thread
-        const int iXRange = iXEnd - iXBegin;
-        const int iYRange = iYEnd - iYBegin;
-        const int iPixelNum = iXRange*iYRange;
-        int iQuadRange[4] = {iXBegin ,iXRange , iYBegin , iYRange};
+        const int x_range = x_end - x_begin;
+        const int y_range = y_end - y_begin;
+        const int pixel_num = x_range*y_range;
+        int quad_range[4] = {x_begin ,x_range , y_begin , y_range};
 
 
-        const Vector3f vBrickBound((float)m_uiBrickSize);
-        const Vector3f vBrickExpand((float)m_uiBrickExpand);
-        const unsigned int uiBrickSampleSize = m_uiBrickSize + m_uiBrickExpand*2;
-        const Vector3f vRayDirSample(m_vRayDirNorm*pRayCaster->m_fSampleRate);
+        const Vector3f brick_bound((float)_brick_size);
+        const Vector3f brick_expand((float)_brick_expand);
+        const unsigned int brick_sample_size = _brick_size + _brick_expand*2;
+        const Vector3f ray_dir_sample(_ray_dir_norm*ray_caster->_sample_rate);
         Sampler<unsigned short> sampler;
-        unsigned short* pData = (unsigned short*)m_pVolumeBrickUnit[uiBrickID].m_pData;
+        unsigned short* data_array = (unsigned short*)_volume_brick_unit_array[brick_id].data;
 
         //////////////////////////////////////////////////////////////////////////
         //Adjust ray direction
-        Vector3f vRayBrick(vRayDirSample);
-        Vector3f vRayBrickAdjust(0,0,0);
+        Vector3f ray_brick(ray_dir_sample);
+        Vector3f ray_brick_adjust(0,0,0);
         for (int i = 0 ; i< 3 ; ++i)
         {
-            if (fabs(vRayBrick._m[i]) <= FLOAT_EPSILON)
+            if (fabs(ray_brick._m[i]) <= FLOAT_EPSILON)
             {
-                vRayBrick._m[i] = 1;//be divided
-                vRayBrickAdjust._m[i] = std::numeric_limits<float>::max()*0.5f;
+                ray_brick._m[i] = 1;//be divided
+                ray_brick_adjust._m[i] = std::numeric_limits<float>::max()*0.5f;
             }
         }
         //////////////////////////////////////////////////////////////////////////
 
-        const float fMinGray = pRayCaster->m_fGlobalWL - pRayCaster->m_fGlobalWW*0.5f;
-        const float fWWR = 1.0f/pRayCaster->m_fGlobalWW;
+        const float min_wl_gray = ray_caster->_global_wl - ray_caster->_global_ww*0.5f;
+        const float ww_r = 1.0f/ray_caster->_global_ww;
 
 #pragma omp parallel for 
-        for (int iPixelID = 0; iPixelID < iPixelNum ; ++iPixelID)
+        for (int pixel_id = 0; pixel_id < pixel_num ; ++pixel_id)
         {
-            int y = iPixelID / iXRange;
-            int x = iPixelID - y*iXRange;
-            x += iXBegin;
-            y += iYBegin;
-            const int iRayID = y*_width + x;
-            if (x == m_iTestPixelX && y == m_iTestPixelY)
+            int y = pixel_id / x_range;
+            int x = pixel_id - y*x_range;
+            x += x_begin;
+            y += y_begin;
+            const int ray_id = y*_width + x;
+            if (x == _test_pixel_x && y == _test_pixel_y)
             {
                 std::cout <<"ERR";
             }
 
-            float fLastStep , fEndStep , fCurBrickStep;
-            Vector3f ptStart;
-            float fEntryStep , fExitStep;
-            Vector3f vSamplePos;
-            float fMaxGray = -65535.0f;
-            float fSampleValue , fGray;
+            float last_step , end_step , current_brick_step;
+            Vector3f start_point;
+            float entry_step , exit_step;
+            Vector3f sample_pos;
+            float max_gray = -65535.0f;
+            float sample_value , gray;
 
-            Vector4f &ptEntryPoints = m_pEntryPoints[iRayID];//Use entry points array to store ray parameter
-            fLastStep = ptEntryPoints._m[3];
-            fEndStep = m_pExitPoints[iRayID]._m[3];
+            Vector4f &entry_point = _entry_points[ray_id];//Use entry points array to store ray parameter
+            last_step = entry_point._m[3];
+            end_step = _exit_points[ray_id]._m[3];
 
-            if (fLastStep >= fEndStep) //brick ray casting end
+            if (last_step >= end_step) //brick ray casting end
             {
                 continue;
             }
 
-            if (fLastStep < -0.5f) //Skip points which decided in entry points calculation
+            if (last_step < -0.5f) //Skip points which decided in entry points calculation
             {
-                m_pColorCanvas[iRayID] =RGBAUnit();
-                //const bool bIntersection = RayIntersectAABB(ptEntryF, Vector3f(0,0,0), vDim, vRayDir, fEntryStep, fExitStep);
+                _canvas_array[ray_id] =RGBAUnit();
+                //const bool bIntersection = RayIntersectAABB(ptEntryF, Vector3f(0,0,0), vDim, vRayDir, entry_step, exit_step);
             }
             else
             {
 
                 //1 Get entry exit points
-                ptStart.m_Vec128 = (m_pEntryPoints[iRayID].m_Vec128);
+                start_point._m128 = (_entry_points[ray_id]._m128);
 
-                if (fLastStep < FLOAT_EPSILON)//Zero step, the first step
+                if (last_step < FLOAT_EPSILON)//Zero step, the first step
                 {
-                    m_pRayResult[iRayID] = -65535.0f;//initialize max gray
+                    _ray_result[ray_id] = -65535.0f;//initialize max gray
                 }
                 else
                 {
-                    ptStart += vRayDirSample*(fLastStep + 1.0f);//Current point , step forward once
+                    start_point += ray_dir_sample*(last_step + 1.0f);//Current point , step forward once
                 }
 
-                if(check_outside(ptStart , ptMin , ptMin+vBrickBound))
+                if(check_outside(start_point , min , min+brick_bound))
                 {
                     continue;
                 }
 
-                if (RayIntersectAABBAcc(ptStart, ptMin, vBrickBound, vRayBrick, vRayBrickAdjust , fEntryStep, fExitStep))
+                if (ray_intersect_aabb_acc(start_point, min, brick_bound, ray_brick, ray_brick_adjust , entry_step, exit_step))
                 {
-                    fMaxGray = -65535.0f;
-                    fSampleValue = 0.0f;
+                    max_gray = -65535.0f;
+                    sample_value = 0.0f;
 
-                    fCurBrickStep = (float)(int(fExitStep - fEntryStep + 0.5f));
-                    if (fCurBrickStep + fLastStep > fEndStep)
+                    current_brick_step = (float)(int(exit_step - entry_step + 0.5f));
+                    if (current_brick_step + last_step > end_step)
                     {
-                        fCurBrickStep = fEndStep - fLastStep;
+                        current_brick_step = end_step - last_step;
                     }
 
-                    for (float fSampleStep = 0.0f ; fSampleStep < fCurBrickStep-0.001f ; fSampleStep+=1.0f)
+                    for (float fSampleStep = 0.0f ; fSampleStep < current_brick_step-0.001f ; fSampleStep+=1.0f)
                     {
-                        vSamplePos = ptStart + vRayDirSample*fSampleStep;
-                        vSamplePos = vSamplePos - ptMin + vBrickExpand; 
-                        fSampleValue = sampler.sample_3d_linear(vSamplePos._m[0] , vSamplePos._m[1] , vSamplePos._m[2] , 
-                            uiBrickSampleSize , uiBrickSampleSize , uiBrickSampleSize , pData);
-                        fMaxGray = fSampleValue > fMaxGray ?  fSampleValue : fMaxGray;
+                        sample_pos = start_point + ray_dir_sample*fSampleStep;
+                        sample_pos = sample_pos - min + brick_expand; 
+                        sample_value = sampler.sample_3d_linear(sample_pos._m[0] , sample_pos._m[1] , sample_pos._m[2] , 
+                            brick_sample_size , brick_sample_size , brick_sample_size , data_array);
+                        max_gray = sample_value > max_gray ?  sample_value : max_gray;
                     }
 
-                    if (fMaxGray > m_pRayResult[iRayID])
+                    if (max_gray > _ray_result[ray_id])
                     {
-                        m_pRayResult[iRayID] = fMaxGray;
-                        fGray = (fMaxGray - fMinGray)*fWWR;
-                        m_pColorCanvas[iRayID] = RGBAUnit(fGray , fGray , fGray);
+                        _ray_result[ray_id] = max_gray;
+                        gray = (max_gray - min_wl_gray)*ww_r;
+                        _canvas_array[ray_id] = RGBAUnit(gray , gray , gray);
                     }
 
-                    ptEntryPoints._m[3] = fLastStep + fCurBrickStep;
+                    entry_point._m[3] = last_step + current_brick_step;
                 }
             }
         }

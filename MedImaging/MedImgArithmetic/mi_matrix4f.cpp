@@ -51,10 +51,10 @@ MED_IMAGING_BEGIN_NAMESPACE
     const Matrix4f transpose( const Matrix4f & mat )
 {
     __m128 tmp0, tmp1, tmp2, tmp3, res0, res1, res2, res3;
-    tmp0 = vec_mergeh( mat.get_col0().m_Vec128, mat.get_col2().m_Vec128 );
-    tmp1 = vec_mergeh( mat.get_col1().m_Vec128, mat.get_col3().m_Vec128 );
-    tmp2 = vec_mergel( mat.get_col0().m_Vec128, mat.get_col2().m_Vec128 );
-    tmp3 = vec_mergel( mat.get_col1().m_Vec128, mat.get_col3().m_Vec128 );
+    tmp0 = vec_mergeh( mat.get_col0()._m128, mat.get_col2()._m128 );
+    tmp1 = vec_mergeh( mat.get_col1()._m128, mat.get_col3()._m128 );
+    tmp2 = vec_mergel( mat.get_col0()._m128, mat.get_col2()._m128 );
+    tmp3 = vec_mergel( mat.get_col1()._m128, mat.get_col3()._m128 );
     res0 = vec_mergeh( tmp0, tmp1 );
     res1 = vec_mergel( tmp0, tmp1 );
     res2 = vec_mergeh( tmp2, tmp3 );
@@ -75,10 +75,10 @@ MED_IMAGING_BEGIN_NAMESPACE
     __m128 sum,Det,RDet;
     __m128 trns0,trns1,trns2,trns3;
 
-    __m128 _L1 = mat.get_col0().m_Vec128;
-    __m128 _L2 = mat.get_col1().m_Vec128;
-    __m128 _L3 = mat.get_col2().m_Vec128;
-    __m128 _L4 = mat.get_col3().m_Vec128;
+    __m128 _L1 = mat.get_col0()._m128;
+    __m128 _L2 = mat.get_col1()._m128;
+    __m128 _L3 = mat.get_col2()._m128;
+    __m128 _L4 = mat.get_col3()._m128;
     // Calculating the minterms for the first line.
 
     // _mm_ror_ps is just a macro using _mm_shuffle_ps().
@@ -222,10 +222,10 @@ MED_IMAGING_BEGIN_NAMESPACE
     __m128 r1,r2,r3,tt,tt2;
     __m128 sum,Det;
 
-    __m128 _L1 = mat.get_col0().m_Vec128;
-    __m128 _L2 = mat.get_col1().m_Vec128;
-    __m128 _L3 = mat.get_col2().m_Vec128;
-    __m128 _L4 = mat.get_col3().m_Vec128;
+    __m128 _L1 = mat.get_col0()._m128;
+    __m128 _L2 = mat.get_col1()._m128;
+    __m128 _L3 = mat.get_col2()._m128;
+    __m128 _L4 = mat.get_col3()._m128;
     // Calculating the minterms for the first line.
 
     // _mm_ror_ps is just a macro using _mm_shuffle_ps().

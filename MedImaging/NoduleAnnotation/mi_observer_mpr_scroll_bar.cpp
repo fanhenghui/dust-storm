@@ -33,10 +33,10 @@ void MPRScrollBarObserver::update()
     {
         for (int i = 0; i<m_vecScenes.size() ; ++i)
         {
-            int iPage = pModel->get_page(m_vecScenes[i]);
-            if (iPage != m_vecScrollBars[i]->value())
+            int page = pModel->get_page(m_vecScenes[i]);
+            if (page != m_vecScrollBars[i]->value())
             {
-                m_vecScrollBars[i]->setValue(iPage);
+                m_vecScrollBars[i]->setValue(page);
             }
         }
     }

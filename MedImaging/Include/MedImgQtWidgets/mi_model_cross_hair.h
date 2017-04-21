@@ -42,7 +42,7 @@ public:
     Point3 get_cross_location_contineous_world() const;
 
     //page one MPR will change cross line in other 2
-    bool page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
+    bool page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene , int page);
 
     bool page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep);
 
@@ -60,7 +60,7 @@ public:
     bool get_visibility() const;
 
 private:
-    void set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage);
+    void set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int page);
 
     bool set_center_i(const Point3& ptCenterW);
 

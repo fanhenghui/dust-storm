@@ -34,7 +34,7 @@ public:
     NoduleAnnotation(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~NoduleAnnotation();
 
-protected slots:
+private slots:
     //Layout 
     void slot_change_layout2x2_i();
 
@@ -80,7 +80,7 @@ protected slots:
 
 
 private:
-    void connectS_signal_slot_i();
+    void connect_signal_slot_i();
     void configure_i();
     void create_scene_i();
     void create_model_observer_i();

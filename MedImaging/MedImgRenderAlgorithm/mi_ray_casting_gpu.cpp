@@ -1,11 +1,12 @@
 #include "mi_ray_casting_gpu.h"
-#include "mi_ray_caster.h"
+
 #include "MedImgGLResource/mi_gl_program.h"
 #include "MedImgGLResource/mi_gl_vao.h"
 #include "MedImgGLResource/mi_gl_buffer.h"
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
+#include "mi_ray_caster.h"
 #include "mi_rc_step_base.h"
 #include "mi_rc_step_main.h"
 #include "mi_rc_step_composite.h"
@@ -18,7 +19,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> pRayCaster):m_pRayCaster(pRayCaster)
+RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):_ray_caster(ray_caster)
 {
 
 }
@@ -28,7 +29,7 @@ RayCastingGPU::~RayCastingGPU()
 
 }
 
-void RayCastingGPU::render(int iTestCode)
+void RayCastingGPU::render(int test_code)
 {
     update_i();
 
@@ -39,18 +40,18 @@ void RayCastingGPU::render(int iTestCode)
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    m_pVAO->bind();
-    m_pProgram->bind();
+    _gl_vao->bind();
+    _program->bind();
 
-    for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
+    for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
     {
         (*it)->set_gpu_parameter();
     }
 
     glDrawArrays(GL_TRIANGLES , 0 , 6);
 
-    m_pVAO->unbind();
-    m_pProgram->unbind();
+    _gl_vao->unbind();
+    _program->unbind();
     glPopAttrib();
 
     CHECK_GL_ERROR;
@@ -61,59 +62,63 @@ void RayCastingGPU::update_i()
     CHECK_GL_ERROR;
 
     //Create VAO
-    if (!m_pVAO)
+    if (!_gl_vao)
     {
         UIDType uid;
-        m_pVAO = GLResourceManagerContainer::instance()->get_vao_manager()->create_object(uid);
-        m_pVAO->set_description("Ray casting GPU VAO");
-        m_pVAO->initialize();
+        _gl_vao = GLResourceManagerContainer::instance()->get_vao_manager()->create_object(uid);
+        _gl_vao->set_description("Ray casting GPU VAO");
+        _gl_vao->initialize();
 
-        m_pVertexBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        m_pVertexBuffer->set_description("Ray casting GPU vertex buffer (-1 -1)~ (1,1)");
-        m_pVertexBuffer->initialize();
-        m_pVertexBuffer->set_buffer_target(GL_ARRAY_BUFFER);
+        _gl_buffer_vertex = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+        _gl_buffer_vertex->set_description("Ray casting GPU vertex buffer (-1 -1)~ (1,1)");
+        _gl_buffer_vertex->initialize();
+        _gl_buffer_vertex->set_buffer_target(GL_ARRAY_BUFFER);
 
-        m_pVAO->bind();
-        m_pVertexBuffer->bind();
-        float pVertex[] = { -1,1,0 , -1,-1,0 , 1,-1,0,
-        1,-1,0, 1,1,0,-1,1,0 };
-        m_pVertexBuffer->load(sizeof(pVertex) , pVertex , GL_STATIC_DRAW);
+        _gl_vao->bind();
+        _gl_buffer_vertex->bind();
+        float vertex[] = {-1,1,0 , 
+            -1,-1,0 , 
+            1,-1,0,
+            1,-1,0,
+            1,1,0,
+            -1,1,0 };
+        _gl_buffer_vertex->load(sizeof(vertex) , vertex , GL_STATIC_DRAW);
         glVertexAttribPointer(0 , 3 , GL_FLOAT , GL_FALSE , 0 , NULL );
         glEnableVertexAttribArray(0);
 
-        m_pVAO->unbind();
-        m_pVertexBuffer->unbind();
+        _gl_vao->unbind();
+        _gl_buffer_vertex->unbind();
     }
 
     CHECK_GL_ERROR;
 
     //Create Program
-    if (!m_pProgram)
+    if (!_program)
     {
         UIDType uid;
-        m_pProgram = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
-        m_pProgram->set_description("Ray casting GPU program");
-        m_pProgram->initialize();
+        _program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
+        _program->set_description("Ray casting GPU program");
+        _program->initialize();
     }
 
-    std::shared_ptr<RayCaster> pRayCaster = m_pRayCaster.lock();
+    std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
 
-    if (m_vecSteps.empty() || 
-        m_eMaskMode != pRayCaster->m_eMaskMode ||
-        m_eCompositeMode != pRayCaster->m_eCompositeMode||
-        m_eInterpolationMode != pRayCaster->m_eInterpolationMode||
-        m_eShadingMode != pRayCaster->m_eShadingMode ||
-        m_eColorInverseMode != pRayCaster->m_eColorInverseMode)
+    if (_ray_casting_steps.empty() || 
+        _mask_mode != ray_caster->_mask_mode ||
+        _composite_mode != ray_caster->_composite_mode||
+        _interpolation_mode != ray_caster->_interpolation_mode||
+        _shading_mode != ray_caster->_shading_mode ||
+        _color_inverse_mode != ray_caster->_color_inverse_mode)
     {
-        m_vecSteps.clear();
-        m_eMaskMode = pRayCaster->m_eMaskMode;
-        m_eCompositeMode = pRayCaster->m_eCompositeMode;
-        m_eInterpolationMode = pRayCaster->m_eInterpolationMode;
-        m_eShadingMode = pRayCaster->m_eShadingMode;
-        m_eColorInverseMode = pRayCaster->m_eColorInverseMode;
+        _ray_casting_steps.clear();
+        _mask_mode = ray_caster->_mask_mode;
+        _composite_mode = ray_caster->_composite_mode;
+        _interpolation_mode = ray_caster->_interpolation_mode;
+        _shading_mode = ray_caster->_shading_mode;
+        _color_inverse_mode = ray_caster->_color_inverse_mode;
 
-#define STEP_PUSH_BACK(StepClassName) \
-        m_vecSteps.push_back(std::shared_ptr<StepClassName>(new StepClassName(pRayCaster , m_pProgram)));
+#define STEP_PUSH_BACK(step_class_name) \
+        _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _program)));
 
         //Main
         STEP_PUSH_BACK(RCStepMainVert);
@@ -123,66 +128,66 @@ void RayCastingGPU::update_i()
         STEP_PUSH_BACK(RCStepUtils);
 
         //Composite
-        if (m_eCompositeMode == COMPOSITE_DVR)
+        if (_composite_mode == COMPOSITE_DVR)
         {
 
         }
-        else if (m_eCompositeMode == COMPOSITE_AVERAGE)
+        else if (_composite_mode == COMPOSITE_AVERAGE)
         {
             STEP_PUSH_BACK(RCStepRayCastingAverage);
             STEP_PUSH_BACK(RCStepCompositeAverage);
         }
-        else if (m_eCompositeMode == COMPOSITE_MIP)
+        else if (_composite_mode == COMPOSITE_MIP)
         {
             STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
             STEP_PUSH_BACK(RCStepCompositeMIP);
         }
-        else if (m_eCompositeMode == COMPOSITE_MINIP)
+        else if (_composite_mode == COMPOSITE_MINIP)
         {
             STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
             STEP_PUSH_BACK(RCStepCompositeMinIP);
         }
 
         //Mask
-        if (m_eMaskMode == MASK_NONE)
+        if (_mask_mode == MASK_NONE)
         {
             STEP_PUSH_BACK(RCStepMaskNoneSampler);
         }
-        else if (m_eMaskMode == MASK_MULTI_LABEL)
+        else if (_mask_mode == MASK_MULTI_LABEL)
         {
             STEP_PUSH_BACK(RCStepMaskNearstSampler);
         }
 
         //Volume 
-        if (m_eInterpolationMode == LINEAR)
+        if (_interpolation_mode == LINEAR)
         {
             STEP_PUSH_BACK(RCStepVolumeLinearSampler);
         }
-        else if (m_eInterpolationMode == NEARST)
+        else if (_interpolation_mode == NEARST)
         {
             STEP_PUSH_BACK(RCStepVolumeNearstSampler);
         }
-        else if (m_eInterpolationMode == CUBIC)
+        else if (_interpolation_mode == CUBIC)
         {
             //TODO
         }
 
         //Shading
-        if (m_eShadingMode == SHADING_NONE)
+        if (_shading_mode == SHADING_NONE)
         {
             STEP_PUSH_BACK(RCStepShadingNone);
         }
-        else if (m_eShadingMode == SHADING_PHONG)
+        else if (_shading_mode == SHADING_PHONG)
         {
             STEP_PUSH_BACK(RCStepShadingPhong);
         }
 
         //Color inverse
-        if (m_eColorInverseMode == COLOR_INVERSE_DISABLE)
+        if (_color_inverse_mode == COLOR_INVERSE_DISABLE)
         {
             STEP_PUSH_BACK(RCStepColorInverseDisable);
         }
-        else //(m_eColorInverseMode == COLOR_INVERSE_ENABLE)
+        else //(_color_inverse_mode == COLOR_INVERSE_ENABLE)
         {
             STEP_PUSH_BACK(RCStepColorInverseEnable);
         }
@@ -192,15 +197,15 @@ void RayCastingGPU::update_i()
 
 
         //compile
-        std::vector<GLShaderInfo> vecShaders;
-        for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
+        std::vector<GLShaderInfo> shaders;
+        for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
         {
-            vecShaders.push_back((*it)->get_shader_info());
+            shaders.push_back((*it)->get_shader_info());
         }
-        m_pProgram->set_shaders(vecShaders);
-        m_pProgram->compile();
+        _program->set_shaders(shaders);
+        _program->compile();
 
-        for (auto it = m_vecSteps.begin() ; it != m_vecSteps.end() ; ++it)
+        for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
         {
             (*it)->get_uniform_location();
         }

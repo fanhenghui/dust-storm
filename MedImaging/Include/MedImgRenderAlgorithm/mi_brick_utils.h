@@ -16,25 +16,25 @@ public:
 
     ~BrickUtils();
 
-    void set_brick_size(unsigned int uiSize);
+    void set_brick_size(unsigned int size);
 
     unsigned int GetBrickSize();
 
-    void set_brick_expand(unsigned int uiSize);
+    void set_brick_expand(unsigned int size);
 
     unsigned int get_brick_expand();
 
-    void get_brick_dim(const unsigned int(&uiVolumeDim)[3] , unsigned int(&uiBrickDim)[3] , unsigned int uiBrickSize);
+    void get_brick_dim(const unsigned int(&volume_dim)[3] , unsigned int(&brick_dim)[3] , unsigned int brick_size);
 
 private:
     BrickUtils();
 
 private:
     static BrickUtils* _s_instance;
-    static boost::mutex _mutex;
+    static boost::mutex _s_mutex;
 
-    unsigned int m_uiBrickSize;
-    unsigned int m_uiBrickExpand;
+    unsigned int _brick_size;
+    unsigned int _brick_expand;
 
 };
 

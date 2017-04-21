@@ -193,7 +193,6 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_generator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h" />
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_corners_info_unit.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_entry_exit_points.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h" />

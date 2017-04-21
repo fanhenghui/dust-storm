@@ -13,40 +13,42 @@ class RayCaster;
 class RayCastingCPU
 {
 public:
-    RayCastingCPU(std::shared_ptr<RayCaster> pRayCaster);
+    RayCastingCPU(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingCPU();
-    void render(int iTestCode = 0);
+
+    void render(int test_code = 0);
+
 private:
     //For testing
-    void render_entry_exit_points_i(int iTestCode);
+    void render_entry_exit_points_i(int test_code);
 
     //Dispatch render mode
     template<class T>
-    void ray_casting_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_i(std::shared_ptr<RayCaster> ray_caster);
 
     //Average
     template<class T>
-    void ray_casting_average_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_average_i(std::shared_ptr<RayCaster> ray_caster);
 
     //MIP
     template<class T>
-    void ray_casting_mip_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_mip_i(std::shared_ptr<RayCaster> ray_caster);
 
     //MinIP
     template<class T>
-    void ray_casting_minip_i(std::shared_ptr<RayCaster> pRayCaster);
+    void ray_casting_minip_i(std::shared_ptr<RayCaster> ray_caster);
 
 private:
-    std::weak_ptr<RayCaster> m_pRayCaster;
+    std::weak_ptr<RayCaster> _ray_caster;
     //Cache
     int _width;
     int _height;
-    Vector4f* m_pEntryPoints;
-    Vector4f* m_pExitPoints;
+    Vector4f* _entry_points;
+    Vector4f* _exit_points;
     unsigned int _dim[3];
-    void* m_pVolumeDataRaw;
-    unsigned char* m_pMaskDataRaw;
-    RGBAUnit* m_pColorCanvas;
+    void* _volume_data_array;
+    unsigned char* _mask_data_array;
+    RGBAUnit* _canvas_array;
 
 };
 

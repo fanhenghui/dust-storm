@@ -35,11 +35,11 @@ struct ColorTFPoint
 class RenderAlgo_Export ColorTransFunc
 {
 public:
-    ColorTransFunc(int iWidth = 512);
+    ColorTransFunc(int width = 512);
 
     ~ColorTransFunc();
 
-    void set_width(int iWidth);
+    void set_width(int width);
 
     void set_color_type(ColorType eInputColorType, ColorType eInterpolationColorType);
 

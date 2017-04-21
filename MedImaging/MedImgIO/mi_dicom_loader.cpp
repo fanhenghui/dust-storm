@@ -325,7 +325,7 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
     }
 }
 
-IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> pDataHeader , std::shared_ptr<ImageData> image_data)
+IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> data_header , std::shared_ptr<ImageData> image_data)
 {
     const unsigned int uiSliceCount= static_cast<unsigned int>(file_format_set.size());
     DcmFileFormatPtr file_format_first = file_format_set[0];
@@ -337,8 +337,8 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     get_intercept_i(data_set_first , image_data->_intercept);
     get_slope_i(data_set_first , image_data->_slope);
 
-    pDataHeader->slice_location.resize(uiSliceCount);
-    pDataHeader->image_position.resize(uiSliceCount);
+    data_header->slice_location.resize(uiSliceCount);
+    data_header->image_position.resize(uiSliceCount);
     for (unsigned int i = 0 ; i<uiSliceCount ; ++i)
     {
         double slice_location = 0;
@@ -350,19 +350,19 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
         }
 
         get_slice_location_i(dataset , slice_location);
-        pDataHeader->slice_location[i] = slice_location;
+        data_header->slice_location[i] = slice_location;
 
         get_image_position_i(dataset , image_position);
-        pDataHeader->image_position[i] = image_position;
+        data_header->image_position[i] = image_position;
     }
 
     //Data channel
-    if (PI_RGB == pDataHeader->photometric_interpretation && 3 == pDataHeader->sample_per_pixel)
+    if (PI_RGB == data_header->photometric_interpretation && 3 == data_header->sample_per_pixel)
     {
         image_data->_channel_num = 3;
     }
-    else if( (PI_MONOCHROME1 == pDataHeader->photometric_interpretation ||
-        PI_MONOCHROME2 == pDataHeader->photometric_interpretation) && 1 == pDataHeader->sample_per_pixel)
+    else if( (PI_MONOCHROME1 == data_header->photometric_interpretation ||
+        PI_MONOCHROME2 == data_header->photometric_interpretation) && 1 == data_header->sample_per_pixel)
     {
         image_data->_channel_num = 1;
     }
@@ -372,10 +372,10 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     }
 
     //Data type
-    unsigned int uiImgSize = pDataHeader->rows*pDataHeader->columns;
-    if (8 == pDataHeader->bits_allocated)
+    unsigned int uiImgSize = data_header->rows*data_header->columns;
+    if (8 == data_header->bits_allocated)
     {
-        if (0 == pDataHeader->pixel_representation)
+        if (0 == data_header->pixel_representation)
         {
             image_data->_data_type = UCHAR;
         }
@@ -384,11 +384,11 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
             image_data->_data_type = CHAR;
         }
     }
-    else if (16 == pDataHeader->bits_allocated)
+    else if (16 == data_header->bits_allocated)
     {
         uiImgSize *= 2;
 
-        if (0 == pDataHeader->pixel_representation)
+        if (0 == data_header->pixel_representation)
         {
             image_data->_data_type = USHORT;
         }
@@ -403,19 +403,19 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     }
 
     //Dimension
-    image_data->_dim[0] = pDataHeader->columns;
-    image_data->_dim[1] = pDataHeader->rows;
+    image_data->_dim[0] = data_header->columns;
+    image_data->_dim[1] = data_header->rows;
     image_data->_dim[2] = uiSliceCount;
 
     //Spacing
-    image_data->_spacing[0] = pDataHeader->pixel_spacing[1];
-    image_data->_spacing[1] = pDataHeader->pixel_spacing[0];
-    const double dSliceLocFirst= pDataHeader->slice_location[0];
-    const double dSliceLocLast= pDataHeader->slice_location[uiSliceCount-1];
+    image_data->_spacing[0] = data_header->pixel_spacing[1];
+    image_data->_spacing[1] = data_header->pixel_spacing[0];
+    const double dSliceLocFirst= data_header->slice_location[0];
+    const double dSliceLocLast= data_header->slice_location[uiSliceCount-1];
     image_data->_spacing[2] = abs( (dSliceLocLast - dSliceLocFirst)/static_cast<double>(uiSliceCount-1));
 
     //Image position in patient
-    image_data->_image_position = pDataHeader->image_position[0];
+    image_data->_image_position = data_header->image_position[0];
 
     //Image Orientation in patient
     Vector3 vOriRow;
@@ -426,7 +426,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     }
     image_data->_image_orientation[0] = vOriRow;
     image_data->_image_orientation[1] = vOriColumn;
-    image_data->_image_orientation[2] = pDataHeader->image_position[uiSliceCount-1] - pDataHeader->image_position[0];
+    image_data->_image_orientation[2] = data_header->image_position[uiSliceCount-1] - data_header->image_position[0];
     image_data->_image_orientation[2].normalize();
 
     //Image data
@@ -446,7 +446,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     const std::string ksTSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
     const std::string ksTSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
 
-    const std::string& ksMyTSU = pDataHeader->transfer_syntax_uid;
+    const std::string& ksMyTSU = data_header->transfer_syntax_uid;
 
     if (ksMyTSU == ksTSU_LittleEndianImplicitTransferSyntax ||
         ksMyTSU == ksTSU_LittleEndianExplicitTransferSyntax ||

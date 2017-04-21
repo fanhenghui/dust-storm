@@ -12,173 +12,173 @@ class Arithmetic_Export Vector2f
 public:
     union
     {
-        __m128 m_Vec128;
+        __m128 _m128;
         struct
         {
             float x, y;
-        }m_Value;
+        }_value;
         float _m[2];
     };
 
 public:
     Vector2f()
     {
-        m_Vec128 = _mm_setzero_ps();
+        _m128 = _mm_setzero_ps();
     }
 
     inline Vector2f(const Vector2f& vec)
     {
-        m_Vec128 = vec.m_Vec128;
+        _m128 = vec._m128;
     }
 
     inline Vector2f( const float x, const float y )
     {
-        m_Vec128 = _mm_setr_ps(x, y, 0.0f, 0.0f);
+        _m128 = _mm_setr_ps(x, y, 0.0f, 0.0f);
     }
 
     inline Vector2f( const float scalar )
     {
-        m_Vec128 = _mm_set1_ps(scalar);
+        _m128 = _mm_set1_ps(scalar);
     }
 
     inline Vector2f( const __m128 vf4 )
     {
-        m_Vec128 = vf4;
+        _m128 = vf4;
     }
 
     inline Vector2f & operator =( const Vector2f &vec )
     {
-        m_Vec128 = vec.m_Vec128;
+        _m128 = vec._m128;
         return *this;
     }
 
     inline Vector2f & set_x( const float x )
     {
-        _vmathVfSetElement(m_Vec128, x, 0);
+        _vmathVfSetElement(_m128, x, 0);
         return *this;
     }
 
     inline Vector2f & set_y( const float y )
     {
-        _vmathVfSetElement(m_Vec128, y, 1);
+        _vmathVfSetElement(_m128, y, 1);
         return *this;
     }
 
     inline const float get_x( ) const
     {
-        return _vmathVfGetElement(m_Vec128, 0);
+        return _vmathVfGetElement(_m128, 0);
     }
 
     inline const float get_y( ) const
     {
-        return _vmathVfGetElement(m_Vec128, 1);
+        return _vmathVfGetElement(_m128, 1);
     }
 
     inline Vector2f & set_elem( const int idx, const float value )
     {
-        _vmathVfSetElement(m_Vec128, value, idx);
+        _vmathVfSetElement(_m128, value, idx);
         return *this;
     }
 
     inline const float get_elem( const int idx ) const
     {
-        return _vmathVfGetElement(m_Vec128, idx);
+        return _vmathVfGetElement(_m128, idx);
     }
 
     inline const float operator []( const int idx ) const
     {
-        return _vmathVfGetElement(m_Vec128, idx);
+        return _vmathVfGetElement(_m128, idx);
     }
 
     inline const __m128 get_128( ) const
     {
-        return m_Vec128;
+        return _m128;
     }
 
     inline Vector2f & set_128( __m128 vf4)
     {
-        m_Vec128 = vf4;
+        _m128 = vf4;
         return *this;
     }
 
     inline const Vector2f operator +( const Vector2f &vec ) const
     {
-        return Vector2f(_mm_add_ps(m_Vec128, vec.m_Vec128));
+        return Vector2f(_mm_add_ps(_m128, vec._m128));
     }
 
     inline Vector2f & operator +=( const Vector2f &vec )
     {
-        m_Vec128 = _mm_add_ps(m_Vec128, vec.m_Vec128);
+        _m128 = _mm_add_ps(_m128, vec._m128);
         return *this;
     }
 
     inline const Vector2f operator -( const Vector2f &vec ) const
     {
-        return Vector2f(_mm_sub_ps(m_Vec128, vec.m_Vec128));
+        return Vector2f(_mm_sub_ps(_m128, vec._m128));
     }
 
     inline Vector2f & operator -=( const Vector2f &vec )
     {
-        m_Vec128 = _mm_sub_ps(m_Vec128, vec.m_Vec128);
+        _m128 = _mm_sub_ps(_m128, vec._m128);
         return *this;
     }
 
     inline const Vector2f operator -( ) const
     {
-        return Vector2f(_mm_sub_ps(_mm_setzero_ps(), m_Vec128));
+        return Vector2f(_mm_sub_ps(_mm_setzero_ps(), _m128));
     }
 
     inline const Vector2f operator *( const float scalar ) const
     {
-        return Vector2f(_mm_mul_ps(m_Vec128, _mm_set1_ps(scalar)));
+        return Vector2f(_mm_mul_ps(_m128, _mm_set1_ps(scalar)));
     }
 
     inline Vector2f & operator *=( const float scalar )
     {
-        m_Vec128 = _mm_mul_ps(m_Vec128, _mm_set1_ps(scalar));
+        _m128 = _mm_mul_ps(_m128, _mm_set1_ps(scalar));
         return *this;
     }
 
     inline const Vector2f operator /( const float scalar ) const
     {
-        return Vector2f(_mm_div_ps(m_Vec128, _mm_set1_ps(scalar)));
+        return Vector2f(_mm_div_ps(_m128, _mm_set1_ps(scalar)));
     }
 
     inline Vector2f & operator /=( const float scalar )
     {
-        m_Vec128 = _mm_div_ps(m_Vec128, _mm_set1_ps(scalar));
+        _m128 = _mm_div_ps(_m128, _mm_set1_ps(scalar));
         return *this;
     }
 
     inline bool operator != ( const Vector2f& vec) const
     {
-        __m128 t = fabsf4(_mm_sub_ps(m_Vec128, vec.m_Vec128));
+        __m128 t = fabsf4(_mm_sub_ps(_m128, vec._m128));
         t = _mm_add_ps(vec_splat(t, 0), vec_splat(t, 1));
         return _vmathVfGetElement(t , 0) > FLOAT_EPSILON;
     }
 
     inline bool operator == ( const Vector2f& vec) const
     {
-        __m128 t = fabsf4(_mm_sub_ps(m_Vec128, vec.m_Vec128));
+        __m128 t = fabsf4(_mm_sub_ps(_m128, vec._m128));
         t = _mm_add_ps(vec_splat(t, 0), vec_splat(t, 1));
         return _vmathVfGetElement(t , 0) <= FLOAT_EPSILON;
     }
 
     inline const float max_elem() const
     {
-        __m128 t = _mm_max_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) );
+        __m128 t = _mm_max_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) );
         return _vmathVfGetElement(t , 0);
     }
 
     inline const float min_elem() const
     {
-        __m128 t = _mm_min_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) );
+        __m128 t = _mm_min_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) );
         return _vmathVfGetElement(t , 0);
     }
 
     inline const float sum() const
     {
-        __m128 t = _mm_add_ps( vec_splat( m_Vec128, 0 ), vec_splat( m_Vec128, 1 ) );
+        __m128 t = _mm_add_ps( vec_splat( _m128, 0 ), vec_splat( _m128, 1 ) );
         return _vmathVfGetElement(t , 0);
     }
 
@@ -192,19 +192,19 @@ public:
 
     inline float dot_product(const Vector2f& vec) const
     {
-        __m128 t = _vmathVfDot2( m_Vec128, vec.m_Vec128 );
+        __m128 t = _vmathVfDot2( _m128, vec._m128 );
         return _vmathVfGetElement(t, 0);
     }
 
     inline float magnitude() const
     {
-        __m128 t = _mm_sqrt_ps(_vmathVfDot2( m_Vec128, m_Vec128 ));
+        __m128 t = _mm_sqrt_ps(_vmathVfDot2( _m128, _m128 ));
         return _vmathVfGetElement(t, 0);
     }
 
     inline void normalize()
     {
-        m_Vec128 = _mm_mul_ps( m_Vec128, newtonrapson_rsqrt4( _vmathVfDot2( m_Vec128, m_Vec128 ) ) );
+        _m128 = _mm_mul_ps( _m128, newtonrapson_rsqrt4( _vmathVfDot2( _m128, _m128 ) ) );
     }
 };
 

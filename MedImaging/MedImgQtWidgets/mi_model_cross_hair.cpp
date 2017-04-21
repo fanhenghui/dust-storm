@@ -58,7 +58,7 @@ void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (
 
 
     //2 MPR plane intersected to a plane
-    const Matrix4 matVP = pTargetMPRScene->get_camera()->get_view_projection_matrix();
+    const Matrix4 mat_vp = pTargetMPRScene->get_camera()->get_view_projection_matrix();
     Plane plantarget = pTargetMPRScene->to_plane();
     for (int i = 0; i<2; ++i)
     {
@@ -67,9 +67,9 @@ void CrosshairModel::get_cross_line(const MPRScenePtr& pTargetMPRScene, Line2D (
         if( IntersectionTest::plane_to_plane(p, plantarget,lineIntersect))
         {
             //Project intersected line to screen
-            Point3 ptScreen = matVP.transform(lineIntersect._pt);
+            Point3 ptScreen = mat_vp.transform(lineIntersect._pt);
             lines[i]._pt = Point2(ptScreen.x , ptScreen.y);
-            Vector3 vDir = matVP.get_inverse().get_transpose().transform(lineIntersect._dir);
+            Vector3 vDir = mat_vp.get_inverse().get_transpose().transform(lineIntersect._dir);
             lines[i]._dir = Vector2(vDir.x , vDir.y).get_normalize();
         }
         else
@@ -92,23 +92,23 @@ RGBUnit CrosshairModel::get_border_color(MPRScenePtr pTargetMPRScene)
     return RGBUnit();
 }
 
-bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, int iPage)
+bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene, int page)
 {
     //1 page target MPR
     int iCurrentPage= get_page(pTargetMPRScene);
-    if (iCurrentPage == iPage)
+    if (iCurrentPage == page)
     {
         return false;
     }
 
     std::shared_ptr<OrthoCamera> pCamera = std::dynamic_pointer_cast<OrthoCamera>(pTargetMPRScene->get_camera());
-    if( !m_pCameraCal->page_orthognal_mpr_to(pCamera , iPage))
+    if( !m_pCameraCal->page_orthognal_mpr_to(pCamera , page))
     {
         return false;
     }
 
     pTargetMPRScene->set_dirty(true);
-    set_page_i(pTargetMPRScene , iPage);
+    set_page_i(pTargetMPRScene , page);
 
     //2 Change cross location
     const Point3 ptCenter = pTargetMPRScene->get_camera()->get_look_at();
@@ -155,9 +155,9 @@ bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , c
         return false;
     }
 
-    const Matrix4 matV2W = m_pCameraCal->get_volume_to_world_matrix();
-    m_ptLocationContineousW = matV2W.transform(ptV);
-    m_ptLocationDiscreteW = matV2W.transform(Point3( (double)( (int)ptV.x) , (double)( (int)ptV.y) ,(double)( (int)ptV.z) ));
+    const Matrix4 mat_v2w = m_pCameraCal->get_volume_to_world_matrix();
+    m_ptLocationContineousW = mat_v2w.transform(ptV);
+    m_ptLocationDiscreteW = mat_v2w.transform(Point3( (double)( (int)ptV.x) , (double)( (int)ptV.y) ,(double)( (int)ptV.z) ));
 
     //2 Choose crossed MPR
     QTWIDGETS_CHECK_NULL_EXCEPTION(pTargetMPRScene);
@@ -183,8 +183,8 @@ bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , c
         m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
         aCrossScene[i]->set_dirty(true);
-        int iPage = m_pCameraCal->get_orthognal_mpr_page(pCamera);
-        m_aPage[aIdx[i]] = iPage;
+        int page = m_pCameraCal->get_orthognal_mpr_page(pCamera);
+        m_aPage[aIdx[i]] = page;
     }
 
     set_changed();
@@ -208,8 +208,8 @@ bool CrosshairModel::locate(const Point3& ptCenterW)
         m_pCameraCal->translate_mpr_to(pCamera, m_ptLocationContineousW);
 
         m_aMPRScene[i]->set_dirty(true);
-        int iPage = m_pCameraCal->get_orthognal_mpr_page(pCamera);
-        m_aPage[i] = iPage;
+        int page = m_pCameraCal->get_orthognal_mpr_page(pCamera);
+        m_aPage[i] = page;
     }
 
     set_changed();
@@ -224,14 +224,14 @@ bool CrosshairModel::locate_focus(const Point3& ptCenterW)
     return true;
 }
 
-void CrosshairModel::set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPage)
+void CrosshairModel::set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int page)
 {
     for (int i = 0 ; i< 3; ++i)
     {
         QTWIDGETS_CHECK_NULL_EXCEPTION(m_aMPRScene[i]);
         if (m_aMPRScene[i] == pTargetMPRScene)
         {
-            m_aPage[i] = iPage;
+            m_aPage[i] = page;
             return;
         }
     }

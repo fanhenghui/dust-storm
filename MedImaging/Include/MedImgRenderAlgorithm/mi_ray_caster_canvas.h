@@ -19,9 +19,9 @@ public:
 
     void finialize();
 
-    void set_display_size(int iWidth , int iHeight);
+    void set_display_size(int width , int height);
 
-    void get_display_size(int& iWidth, int& iHeight) const;
+    void get_display_size(int& width, int& height) const;
 
     GLFBOPtr get_fbo();
 
@@ -35,18 +35,18 @@ public:
     void update_color_array();
 
 public:
-    void debug_output_color(const std::string& sFileName);
+    void debug_output_color(const std::string& file_name);
 
 protected:
 
 private:
-    GLFBOPtr m_pFBO;
-    GLTexture2DPtr m_pColorAttach0;//For RGBA Color
-    GLTexture2DPtr m_pDepthAttach;
+    GLFBOPtr _gl_fbo;
+    GLTexture2DPtr _color_attach_0;//For RGBA Color
+    GLTexture2DPtr _depth_attach;
     int _width;
     int _height;
-    std::unique_ptr<RGBAUnit[]> m_pColorArray;
-    bool m_bInit;
+    std::unique_ptr<RGBAUnit[]> _color_array;
+    bool _has_init;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -24,8 +24,8 @@ void MPRBorderPainter::render()
     std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
     QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
 
-    int iWidth(1) , iHeight(1);
-    pScene->get_display_size(iWidth , iHeight);
+    int width(1) , height(1);
+    pScene->get_display_size(width , height);
 
     RGBUnit color = m_pModel->get_border_color(pScene);
 
@@ -34,14 +34,14 @@ void MPRBorderPainter::render()
         QPen pen(QColor(0,255,255));
         pen.setWidth(7);
         m_pPainter->setPen(pen);
-        m_pPainter->drawRect(QRect(0 , 0 , iWidth, iHeight));
+        m_pPainter->drawRect(QRect(0 , 0 , width, height));
     }
     else
     {
         QPen pen(QColor(color.r ,color.g , color.b));
         pen.setWidth(4);
         m_pPainter->setPen(pen);
-        m_pPainter->drawRect(QRect(0 , 0 , iWidth, iHeight));
+        m_pPainter->drawRect(QRect(0 , 0 , width, height));
     }
 }
 

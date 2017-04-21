@@ -25,11 +25,11 @@ struct OpacityTFPoint
 class RenderAlgo_Export OpacityTransFunc
 {
 public:
-    OpacityTransFunc(int iWidth = 512);
+    OpacityTransFunc(int width = 512);
 
     ~OpacityTransFunc();
 
-    void set_width(int iWidth);
+    void set_width(int width);
 
     void add_point(float fRealValue, float a);
 

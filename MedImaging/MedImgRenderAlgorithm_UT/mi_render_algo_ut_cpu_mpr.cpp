@@ -27,14 +27,14 @@ using namespace MED_IMAGING_NAMESPACE;
 
 namespace
 {
-    std::shared_ptr<ImageDataHeader> m_pDataHeader;
-    std::shared_ptr<ImageData> m_pImgData;
-    std::shared_ptr<OrthoCamera> m_pCamera;
+    std::shared_ptr<ImageDataHeader> _data_header;
+    std::shared_ptr<ImageData> _volume_data;
+    std::shared_ptr<OrthoCamera> _camera;
     std::shared_ptr<OrthoCameraInteractor> m_pCameraInteractor;
     std::shared_ptr<CameraCalculator> m_pCameraCal;
     std::shared_ptr<MPREntryExitPoints> m_pMPREE;
-    std::shared_ptr<RayCaster> m_pRayCaster;
-    std::shared_ptr<RayCasterCanvas> m_pCanvas;
+    std::shared_ptr<RayCaster> _ray_caster;
+    std::shared_ptr<RayCasterCanvas> _canvas;
 
     int _width = 800;
     int _height = 800;
@@ -77,36 +77,36 @@ namespace
 
         std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
-        IOStatus status = loader.load_series(files , m_pImgData , m_pDataHeader);
+        IOStatus status = loader.load_series(files , _volume_data , _data_header);
 
-        m_pCamera.reset(new OrthoCamera());
-        m_pCameraCal.reset(new CameraCalculator(m_pImgData));
-        m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
+        _camera.reset(new OrthoCamera());
+        m_pCameraCal.reset(new CameraCalculator(_volume_data));
+        m_pCameraCal->init_mpr_placement(_camera , TRANSVERSE , Point3(0,0,0));
 
-        m_pCameraInteractor.reset(new OrthoCameraInteractor(m_pCamera));
+        m_pCameraInteractor.reset(new OrthoCameraInteractor(_camera));
 
         m_pMPREE.reset(new MPREntryExitPoints());
         m_pMPREE->set_display_size(_width,_height);
-        m_pMPREE->set_camera(m_pCamera);
+        m_pMPREE->set_camera(_camera);
         m_pMPREE->set_camera_calculator(m_pCameraCal);
         m_pMPREE->set_strategy(CPU_BASE);
-        m_pMPREE->set_image_data(m_pImgData);
+        m_pMPREE->set_image_data(_volume_data);
         m_pMPREE->set_thickness(1.0f);
 
-        m_pCanvas.reset(new RayCasterCanvas());
-        m_pCanvas->set_display_size(_width , _height);
-        m_pCanvas->initialize();
+        _canvas.reset(new RayCasterCanvas());
+        _canvas->set_display_size(_width , _height);
+        _canvas->initialize();
 
-        m_pRayCaster.reset(new RayCaster());
-        m_pRayCaster->set_entry_exit_points(m_pMPREE);
-        m_pRayCaster->set_canvas(m_pCanvas);
-        m_pRayCaster->set_camera(m_pCamera);
-        m_pRayCaster->set_volume_data(m_pImgData);
-        m_pRayCaster->set_volume_to_world_matrix(m_pCameraCal->get_volume_to_world_matrix());
-        m_pRayCaster->set_sample_rate(1.0);
-        m_pRayCaster->set_global_window_level(252,40+1024);
-        m_pRayCaster->set_strategy(CPU_BASE);
-        m_pRayCaster->set_composite_mode(COMPOSITE_AVERAGE);
+        _ray_caster.reset(new RayCaster());
+        _ray_caster->set_entry_exit_points(m_pMPREE);
+        _ray_caster->set_canvas(_canvas);
+        _ray_caster->set_camera(_camera);
+        _ray_caster->set_volume_data(_volume_data);
+        _ray_caster->set_volume_to_world_matrix(m_pCameraCal->get_volume_to_world_matrix());
+        _ray_caster->set_sample_rate(1.0);
+        _ray_caster->set_global_window_level(252,40+1024);
+        _ray_caster->set_strategy(CPU_BASE);
+        _ray_caster->set_composite_mode(COMPOSITE_AVERAGE);
 
 
         //Concurrency::instance()->set_app_concurrency(4);
@@ -114,7 +114,7 @@ namespace
 
     void RayCasterCanvasToScreen()
     {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER , m_pCanvas->get_fbo()->get_id());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER , _canvas->get_fbo()->get_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
         glDrawBuffer(GL_BACK);
         glReadBuffer(GL_COLOR_ATTACHMENT0);
@@ -122,7 +122,7 @@ namespace
 
 
         /* glEnable(GL_TEXTURE_2D);
-        m_pCanvas->get_color_attach_texture()->bind();
+        _canvas->get_color_attach_texture()->bind();
 
         glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0); 
@@ -140,7 +140,7 @@ namespace
         glEnd();
         glDisable(GL_TEXTURE_2D);
 
-        m_pCanvas->debug_output_color("D:/mpr_rgba.raw");*/
+        _canvas->debug_output_color("D:/mpr_rgba.raw");*/
     }
 
     void Display()
@@ -150,12 +150,12 @@ namespace
         glClear(GL_COLOR_BUFFER_BIT);
 
         m_pMPREE->calculate_entry_exit_points();
-        m_pRayCaster->render(m_iTestCode);
+        _ray_caster->render(m_iTestCode);
 
 
         RayCasterCanvasToScreen();
 
-        //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)m_pCanvas->get_color_array());
+        //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)_canvas->get_color_array());
 
         glutSwapBuffers();
     }
@@ -172,22 +172,22 @@ namespace
             }
         case 'a':
             {
-                m_pCameraCal->init_mpr_placement(m_pCamera , TRANSVERSE , Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(m_pCamera);
+                m_pCameraCal->init_mpr_placement(_camera , TRANSVERSE , Point3(0,0,0));
+                m_pCameraInteractor->SetInitialStatus(_camera);
                 m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
         case 's':
             {
-                m_pCameraCal->init_mpr_placement(m_pCamera , SAGITTAL , Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(m_pCamera);
+                m_pCameraCal->init_mpr_placement(_camera , SAGITTAL , Point3(0,0,0));
+                m_pCameraInteractor->SetInitialStatus(_camera);
                 m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
         case 'c':
             {
-                m_pCameraCal->init_mpr_placement(m_pCamera , CORONAL, Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(m_pCamera);
+                m_pCameraCal->init_mpr_placement(_camera , CORONAL, Point3(0,0,0));
+                m_pCameraInteractor->SetInitialStatus(_camera);
                 m_pCameraInteractor->Resize(_width , _height);
                 break;
             }
@@ -208,8 +208,8 @@ namespace
         _width = x;
         _height = y;
         m_pMPREE->set_display_size(_width , _height);
-        m_pCanvas->set_display_size(_width , _height);
-        m_pCanvas->update_fbo();
+        _canvas->set_display_size(_width , _height);
+        _canvas->update_fbo();
         m_pCameraInteractor->Resize(_width , _height);
         glutPostRedisplay();
     }
@@ -253,25 +253,25 @@ namespace
         y = y< 0 ? 0 : y;
         y = y> _height-1 ?  _height-1 : y;
 
-        Point2 ptCur(x,y);
+        Point2 cur_pt(x,y);
 
         //std::cout << "Pre : " << m_ptPre.x << " " <<m_ptPre.y << std::endl;
-        //std::cout << "Cur : " << ptCur.x << " " <<ptCur.y << std::endl;
+        //std::cout << "Cur : " << cur_pt.x << " " <<cur_pt.y << std::endl;
         if (m_iButton == GLUT_LEFT_BUTTON)
         {
-            m_pCameraInteractor->rotate(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->rotate(m_ptPre , cur_pt , _width , _height);
             
         }
         else if (m_iButton == GLUT_MIDDLE_BUTTON)
         {
-            m_pCameraInteractor->pan(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->pan(m_ptPre , cur_pt , _width , _height);
         }
         else if (m_iButton == GLUT_RIGHT_BUTTON)
         {
-            m_pCameraInteractor->zoom(m_ptPre , ptCur , _width , _height);
+            m_pCameraInteractor->zoom(m_ptPre , cur_pt , _width , _height);
         }
 
-        m_ptPre = ptCur;
+        m_ptPre = cur_pt;
         glutPostRedisplay();
 
     }

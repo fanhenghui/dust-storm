@@ -19,28 +19,28 @@ MED_IMAGING_BEGIN_NAMESPACE
 MPRScene::MPRScene():RayCastScene()
 {
     std::shared_ptr<MPREntryExitPoints> pMPREE(new MPREntryExitPoints());
-    m_pEntryExitPoints = pMPREE;
+    _entry_exit_points = pMPREE;
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pEntryExitPoints->set_strategy(CPU_BASE);
+        _entry_exit_points->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pEntryExitPoints->set_strategy(GPU_BASE);
+        _entry_exit_points->set_strategy(GPU_BASE);
     }
 }
 
-MPRScene::MPRScene(int iWidth , int iHeight):RayCastScene(iWidth , iHeight)
+MPRScene::MPRScene(int width , int height):RayCastScene(width , height)
 {
     std::shared_ptr<MPREntryExitPoints> pMPREE(new MPREntryExitPoints());
-    m_pEntryExitPoints = pMPREE;
+    _entry_exit_points = pMPREE;
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
-        m_pEntryExitPoints->set_strategy(CPU_BASE);
+        _entry_exit_points->set_strategy(CPU_BASE);
     }
     else
     {
-        m_pEntryExitPoints->set_strategy(GPU_BASE);
+        _entry_exit_points->set_strategy(GPU_BASE);
     }
 }
 
@@ -51,9 +51,9 @@ MPRScene::~MPRScene()
 
 void MPRScene::place_mpr(ScanSliceType eType)
 {
-    RENDERALGO_CHECK_NULL_EXCEPTION(m_pCameraCalculator);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
     //Calculate MPR placement camera
-    m_pCameraCalculator->init_mpr_placement(m_pRayCastCamera , eType);
+    _camera_calculator->init_mpr_placement(m_pRayCastCamera , eType);
     //Set initial camera to interactor
     m_pCameraInteractor->set_initial_status(m_pRayCastCamera);
     //resize because initial camera's ratio between width and height  is 1, but current ratio may not.
@@ -62,21 +62,21 @@ void MPRScene::place_mpr(ScanSliceType eType)
     set_dirty(true);
 }
 
-void MPRScene::rotate(const Point2& ptPre , const Point2& ptCur)
+void MPRScene::rotate(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->rotate(ptPre , ptCur , _width , _height );
+    m_pCameraInteractor->rotate(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
-void MPRScene::zoom(const Point2& ptPre , const Point2& ptCur)
+void MPRScene::zoom(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->zoom(ptPre , ptCur , _width , _height );
+    m_pCameraInteractor->zoom(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
-void MPRScene::pan(const Point2& ptPre , const Point2& ptCur)
+void MPRScene::pan(const Point2& pre_pt , const Point2& cur_pt)
 {
-    m_pCameraInteractor->pan(ptPre , ptCur , _width , _height );
+    m_pCameraInteractor->pan(pre_pt , cur_pt , _width , _height );
     set_dirty(true);
 }
 
@@ -88,10 +88,10 @@ bool MPRScene::get_volume_position(const Point2& pt_dc , Point3& ptPosV)
 
     Point2 pt = ArithmeticUtils::dc_to_ndc(pt_dc , _width , _height);
 
-    Matrix4 matMVP = m_pRayCastCamera->get_view_projection_matrix()*m_pCameraCalculator->get_volume_to_world_matrix();
-    matMVP.inverse();
+    Matrix4 mat_mvp = m_pRayCastCamera->get_view_projection_matrix()*_camera_calculator->get_volume_to_world_matrix();
+    mat_mvp.inverse();
 
-    Point3 ptVolume = matMVP.transform(Point3(pt.x , pt.y , 0.0));
+    Point3 ptVolume = mat_mvp.transform(Point3(pt.x , pt.y , 0.0));
     if (ArithmeticUtils::check_in_bound(ptVolume , Point3(pImg->_dim[0] - 1.0 , pImg->_dim[1] - 1 , pImg->_dim[2] - 1)))
     {
         ptPosV = ptVolume;
@@ -108,7 +108,7 @@ bool MPRScene::get_world_position(const Point2& pt_dc , Point3& ptPosW)
     Point3 ptPosV;
     if (get_volume_position(pt_dc , ptPosV))
     {
-        ptPosW = m_pCameraCalculator->get_volume_to_world_matrix().transform(ptPosV);
+        ptPosW = _camera_calculator->get_volume_to_world_matrix().transform(ptPosV);
         return true;
     }
     else
@@ -120,13 +120,13 @@ bool MPRScene::get_world_position(const Point2& pt_dc , Point3& ptPosW)
 void MPRScene::page(int iStep)
 {
     //TODO should consider oblique MPR
-    m_pCameraCalculator->page_orthognal_mpr(m_pRayCastCamera , iStep);
+    _camera_calculator->page_orthognal_mpr(m_pRayCastCamera , iStep);
     set_dirty(true);
 }
 
-void MPRScene::page_to(int iPage)
+void MPRScene::page_to(int page)
 {
-    m_pCameraCalculator->page_orthognal_mpr_to(m_pRayCastCamera , iPage);
+    _camera_calculator->page_orthognal_mpr_to(m_pRayCastCamera , page);
     set_dirty(true);
 }
 
@@ -150,7 +150,7 @@ bool MPRScene::get_patient_position(const Point2& pt_dc, Point3& ptPosP)
     Point3 ptW;
     if (get_world_position(pt_dc , ptW))
     {
-        ptPosP = m_pCameraCalculator->get_world_to_patient_matrix().transform(ptW);
+        ptPosP = _camera_calculator->get_world_to_patient_matrix().transform(ptW);
         return true;
     }
     else

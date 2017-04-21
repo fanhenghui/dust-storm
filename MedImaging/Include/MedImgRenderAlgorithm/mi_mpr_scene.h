@@ -12,15 +12,15 @@ class RenderAlgo_Export MPRScene : public RayCastScene
 public:
     MPRScene();
 
-    MPRScene(int iWidth , int iHeight);
+    MPRScene(int width , int height);
 
     virtual ~MPRScene();
 
-    virtual void rotate(const Point2& ptPre , const Point2& ptCur);
+    virtual void rotate(const Point2& pre_pt , const Point2& cur_pt);
 
-    virtual void zoom(const Point2& ptPre , const Point2& ptCur);
+    virtual void zoom(const Point2& pre_pt , const Point2& cur_pt);
 
-    virtual void pan(const Point2& ptPre , const Point2& ptCur);
+    virtual void pan(const Point2& pre_pt , const Point2& cur_pt);
 
     //Default positive direction
     // Axial F->H
@@ -28,7 +28,7 @@ public:
     // Coronal A -> P
     void page(int iStep);
 
-    void page_to(int iPage);
+    void page_to(int page);
 
     //Call to initialize MPR placement
     void place_mpr(ScanSliceType eType);

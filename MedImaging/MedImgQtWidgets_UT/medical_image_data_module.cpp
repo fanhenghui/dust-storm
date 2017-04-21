@@ -71,13 +71,13 @@ void MedicalImageDataModule::SlotActionOpenDICOMFolder()
             vecSTDFiles.push_back(s);
         }
 
-        std::shared_ptr<ImageDataHeader> pDataHeader;
+        std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecSTDFiles, image_data , pDataHeader);
+        IOStatus status = loader.load_series(vecSTDFiles, image_data , data_header);
 
         m_pVolumeInfos.reset(new VolumeInfos());
-        m_pVolumeInfos->set_data_header(pDataHeader);
+        m_pVolumeInfos->set_data_header(data_header);
         m_pVolumeInfos->set_volume(image_data);
 
         std::shared_ptr<medical_imaging::MPRScene> pScene(new medical_imaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));

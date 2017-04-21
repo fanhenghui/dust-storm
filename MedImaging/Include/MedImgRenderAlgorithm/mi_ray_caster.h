@@ -33,16 +33,16 @@ public:
 
     void finialize();
 
-    void render(int iTestCode = 0);
+    void render(int test_code = 0);
 
     //Ray casting strategy
-    void set_strategy(RayCastingStrategy eS);
+    void set_strategy(RayCastingStrategy strategy);
 
-    void set_canvas(std::shared_ptr<RayCasterCanvas> pCanvas);
+    void set_canvas(std::shared_ptr<RayCasterCanvas> canvas);
 
     //Mask label level
     //Default is L_8
-    void set_mask_label_level(LabelLevel eLabelLevel);
+    void set_mask_label_level(LabelLevel label_level);
 
     //////////////////////////////////////////////////////////////////////////
     //Input data
@@ -51,23 +51,23 @@ public:
     //Volume & mask texture/array
     void set_volume_data(std::shared_ptr<ImageData> image_data);
     void set_mask_data(std::shared_ptr<ImageData> image_data);
-    void set_volume_data_texture(std::vector<GLTexture3DPtr> vecTex);
-    void set_mask_data_texture(std::vector<GLTexture3DPtr> vecTex);
+    void set_volume_data_texture(std::vector<GLTexture3DPtr> volume_textures);
+    void set_mask_data_texture(std::vector<GLTexture3DPtr> mask_textures);
 
     std::shared_ptr<ImageData> get_volume_data();
     std::vector<GLTexture3DPtr> get_volume_data_texture( );
 
     //Brick acceleration
-    void set_brick_size(unsigned int uiBrickSize);
-    void set_brick_expand(unsigned int uiBrickExpand);
-    void set_brick_corner(BrickCorner* pBC);
-    void set_volume_brick_unit(BrickUnit* pBU);
-    void set_mask_brick_unit(BrickUnit* pBU);
-    void set_volume_brick_info(VolumeBrickInfo* pVBI);
-    void set_mask_brick_info(MaskBrickInfo* pMBI);//Here don't need label visibility status , just set current info
+    void set_brick_size(unsigned int brick_size);
+    void set_brick_expand(unsigned int brick_expand);
+    void set_brick_corner(BrickCorner* brick_corner_array);
+    void set_volume_brick_unit(BrickUnit* volume_brick_unit_array);
+    void set_mask_brick_unit(BrickUnit* mask_brick_unit_array);
+    void set_volume_brick_info(VolumeBrickInfo* volume_brick_info_array);
+    void set_mask_brick_info(MaskBrickInfo* mask_brick_info_array);//Here don't need label visibility status , just set current info
 
     //Entry exit points
-    void set_entry_exit_points(std::shared_ptr<EntryExitPoints> pEEPs);
+    void set_entry_exit_points(std::shared_ptr<EntryExitPoints> entry_exit_points);
 
     std::shared_ptr<EntryExitPoints> get_entry_exit_points() const;
 
@@ -77,31 +77,31 @@ public:
     //////////////////////////////////////////////////////////////////////////
 
     //Volume modeling parameter
-    void set_camera(std::shared_ptr<CameraBase> pCamera);
+    void set_camera(std::shared_ptr<CameraBase> camera);
     void set_volume_to_world_matrix(const Matrix4& mat);
 
     //Sample rate
-    void set_sample_rate(float fSampleRate);
+    void set_sample_rate(float sample_rate);
 
     float get_sample_rate() const;
 
     //Label parameter
-    void set_visible_labels(std::vector<unsigned char> vecLabels);
+    void set_visible_labels(std::vector<unsigned char> labels);
 
     //Window level parameter
     //Here
-    void set_window_level(float fWW , float fWL , unsigned char ucLabel);
-    void set_global_window_level(float fWW , float fWL);
+    void set_window_level(float ww , float wl , unsigned char label);
+    void set_global_window_level(float ww , float wl);
 
-    void get_global_window_level(float& fWW , float& fWL) const;
+    void get_global_window_level(float& ww , float& wl) const;
 
     //Transfer function & pseudo color parameter
-    void set_pseudo_color_texture(GLTexture1DPtr pTex , unsigned int uiLength);
-    GLTexture1DPtr get_pseudo_color_texture(unsigned int& uiLength) const;
+    void set_pseudo_color_texture(GLTexture1DPtr tex , unsigned int length);
+    GLTexture1DPtr get_pseudo_color_texture(unsigned int& length) const;
 
     //RGB8 array
-    void set_pseudo_color_array(unsigned char* pArray , unsigned int uiLength);
-    void set_transfer_function_texture(GLTexture1DArrayPtr pTexArray);
+    void set_pseudo_color_array(unsigned char* color_array , unsigned int length);
+    void set_transfer_function_texture(GLTexture1DArrayPtr tex_array);
 
     //Enhancement parameter
     void set_sillhouette_enhancement();
@@ -113,98 +113,99 @@ public:
     void set_light_factor();
 
     //SSD gray value
-    void set_ssd_gray(float fGray);
+    void set_ssd_gray(float ssd_gray);
 
     //Jittering to prevent wooden artifacts
     void set_jittering_enabled(bool flag);
 
     //Bounding box
-    void set_bounding(const Vector3f& vMin, const Vector3f& vMax);
+    void set_bounding(const Vector3f& min, const Vector3f& max);
 
     //Clipping plane
-    void set_clipping_plane_function(const std::vector<Vector4f> &vecFunc);
+    void set_clipping_plane_function(const std::vector<Vector4f> &funcs);
 
     //Ray casting mode parameter
-    void set_mask_mode(MaskMode eMode);
-    void set_composite_mode(CompositeMode eMode);
-    void set_interpolation_mode(InterpolationMode eMode);
-    void set_shading_mode(ShadingMode eMode);
-    void set_color_inverse_mode(ColorInverseMode eMode);
+    void set_mask_mode(MaskMode mode);
+    void set_composite_mode(CompositeMode mode);
+    void set_interpolation_mode(InterpolationMode mode);
+    void set_shading_mode(ShadingMode mode);
+    void set_color_inverse_mode(ColorInverseMode mode);
 
 
     //////////////////////////////////////////////////////////////////////////
     //For testing
     const std::vector<BrickDistance>& get_brick_distance() const;
     unsigned int get_ray_casting_brick_count() const;
+
 protected:
     //Input data
-    std::shared_ptr<ImageData> m_pVolumeData;
-    std::vector<GLTexture3DPtr> m_vecVolumeDataTex;
+    std::shared_ptr<ImageData> _volume_data;
+    std::vector<GLTexture3DPtr> _volume_textures;
 
-    std::shared_ptr<ImageData> m_pMaskData;
-    std::vector<GLTexture3DPtr> m_vecMaskDataTex;
+    std::shared_ptr<ImageData> _mask_data;
+    std::vector<GLTexture3DPtr> _mask_textures;
 
     //Brick acceleration
-    BrickCorner* m_pBrickCorner;
-    BrickUnit* m_pVolumeBrickUnit;
-    BrickUnit* m_pMaskBrickUnit;
-    VolumeBrickInfo* m_pVolumeBrickInfo;
-    MaskBrickInfo* m_pMaskBrickInfo;
-    unsigned int m_uiBrickSize;
-    unsigned int m_uiBrickExpand;
+    BrickCorner* _brick_corner_array;
+    BrickUnit* _volume_brick_unit_array;
+    BrickUnit* _mask_brick_unit_array;
+    VolumeBrickInfo* _volume_brick_info_array;
+    MaskBrickInfo* _mask_brick_info_array;
+    unsigned int _brick_size;
+    unsigned int _brick_expand;
 
     //Entry exit points
-    std::shared_ptr<EntryExitPoints> m_pEntryExitPoints;
+    std::shared_ptr<EntryExitPoints> _entry_exit_points;
 
-    std::shared_ptr<CameraBase> m_pCamera;
+    std::shared_ptr<CameraBase> _camera;
 
-    Matrix4 m_matVolume2World;
+    Matrix4 _mat_v2w;
 
     //Data sample rate(DVR 0.5 , MIPs 1.0) 
-    float m_fSampleRate;
+    float _sample_rate;
 
     //Global window level for MIPs mode
-    float m_fGlobalWW;
-    float m_fGlobalWL;
+    float _global_ww;
+    float _global_wl;
 
     //Transfer function & pseudo color 
-    GLTexture1DArrayPtr m_pTransferFunction;
-    GLTexture1DPtr m_pPseudoColorTexture;
-    unsigned char* m_pPseudoColorArray;
-    unsigned int m_uiPseudoColorLength;
+    GLTexture1DArrayPtr _transfer_function;
+    GLTexture1DPtr _pseudo_color_texture;
+    unsigned char* _pseudo_color_array;
+    unsigned int _pseudo_color_length;
 
     //Inner buffer to contain label based parameter
-    std::shared_ptr<RayCasterInnerBuffer> m_pInnerBuffer;
+    std::shared_ptr<RayCasterInnerBuffer> _inner_buffer;
 
     //SSD gray value
-    float m_fSSDGray;
+    float _ssd_gray;
 
     //DVR jittering flag
-    bool m_bJitteringEnabled;
+    bool _enable_jittering;
 
     //Bounding
-    Vector3f m_vBoundingMin;
-    Vector3f m_vBoundingMax;
+    Vector3f _bound_min;
+    Vector3f _bound_max;
 
     //Clipping plane
-    std::vector<Vector4f> m_vClippingPlaneFunc;
+    std::vector<Vector4f> _clipping_planes;
 
     //Ray casting mode
-    MaskMode m_eMaskMode;
-    CompositeMode m_eCompositeMode;
-    InterpolationMode m_eInterpolationMode;
-    ShadingMode m_eShadingMode;
-    ColorInverseMode m_eColorInverseMode;
+    MaskMode _mask_mode;
+    CompositeMode _composite_mode;
+    InterpolationMode _interpolation_mode;
+    ShadingMode _shading_mode;
+    ColorInverseMode _color_inverse_mode;
 
     //Processing unit type
-    RayCastingStrategy m_eStrategy;
+    RayCastingStrategy _strategy;
 
-    std::shared_ptr<RayCastingCPU> m_pRayCastingCPU;
-    std::shared_ptr<RayCastingGPU> m_pRayCastingGPU;
-    std::shared_ptr<RayCastingCPUBrickAcc> m_pRayCastingCPUBrickAcc;
+    std::shared_ptr<RayCastingCPU> _ray_casting_cpu;
+    std::shared_ptr<RayCastingGPU> _ray_casting_gpu;
+    std::shared_ptr<RayCastingCPUBrickAcc> _ray_casting_cpu_brick_acc;
 
     //Canvas for rendering
-    std::shared_ptr<RayCasterCanvas> m_pCanvas;
+    std::shared_ptr<RayCasterCanvas> _canvas;
 };
 
 MED_IMAGING_END_NAMESPACE

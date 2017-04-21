@@ -8,8 +8,8 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepColorInverseEnable : public RCStepBase
 {
 public:
-    RCStepColorInverseEnable(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram)
+    RCStepColorInverseEnable(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
       {};
 
       virtual ~RCStepColorInverseEnable(){};
@@ -22,8 +22,8 @@ private:
 class RCStepColorInverseDisable : public RCStepBase
 {
 public:
-    RCStepColorInverseDisable(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):
-      RCStepBase(pRayCaster , pProgram)
+    RCStepColorInverseDisable(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
       {};
 
       virtual ~RCStepColorInverseDisable(){};

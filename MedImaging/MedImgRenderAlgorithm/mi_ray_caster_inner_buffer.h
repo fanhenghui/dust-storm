@@ -13,16 +13,16 @@ class RayCasterInnerBuffer
 public:
     enum BufferType
     {
-        WindowLevelBucket = 0,
-        VisibleLabelBucket,
-        TypeEnd,
+        WINDOW_LEVEL_BUCKET = 0,
+        VISIBLE_LABEL_BUCKET,
+        TYPE_END,
     };
 
-    LabelLevel m_eLabelLevel;
+    LabelLevel _label_level;
 
-    std::vector<unsigned char> m_vecVisibleLabel;
+    std::vector<unsigned char> _labels;
 
-    std::map<unsigned char, Vector2f> m_mapWindowLevel;
+    std::map<unsigned char, Vector2f> _window_levels;
 
 public:
     RayCasterInnerBuffer();
@@ -31,19 +31,19 @@ public:
 
     void release_buffer();
 
-    GLBufferPtr get_buffer(BufferType eType);
+    GLBufferPtr get_buffer(BufferType type);
 
-    void set_mask_label_level(LabelLevel eLevel);
+    void set_mask_label_level(LabelLevel level);
 
-    void set_window_level(float fWW , float fWL , unsigned char ucLabel);
+    void set_window_level(float ww , float wl , unsigned char label);
 
-    void set_visible_labels(std::vector<unsigned char> vecLabels);
+    void set_visible_labels(std::vector<unsigned char> labels);
 
 private:
     struct GLResource;
-    std::unique_ptr<GLResource> m_pRes;
+    std::unique_ptr<GLResource> _inner_resource;
 
-    std::unique_ptr<char[]> m_pSharedBufferArray;
+    std::unique_ptr<char[]> _shared_buffer_array;
 };
 
 MED_IMAGING_END_NAMESPACE

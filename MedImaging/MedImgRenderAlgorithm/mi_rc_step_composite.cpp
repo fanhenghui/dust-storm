@@ -33,10 +33,10 @@ void RCStepCompositeMinIP::set_gpu_parameter()
 
 void RCStepCompositeMinIP::get_uniform_location()
 {
-    GLProgramPtr pProgram = m_pProgram.lock();
-    m_iLocCustomMinThreshold = pProgram->get_uniform_location("fCustomMinThreshold");
+    GLProgramPtr program = _program.lock();
+    _loc_custom_min_threshold = program->get_uniform_location("fCustomMinThreshold");
 
-    if (-1 == m_iLocCustomMinThreshold)
+    if (-1 == _loc_custom_min_threshold)
     {
         RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
     }

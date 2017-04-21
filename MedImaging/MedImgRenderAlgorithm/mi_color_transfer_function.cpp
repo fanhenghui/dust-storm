@@ -2,8 +2,8 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-ColorTransFunc::ColorTransFunc(int iWidth /*= 512 */) :
-_width(iWidth), m_eInterpolationColorType(RGB), m_eInputColorType(RGB), m_bIsDataDirty(false)
+ColorTransFunc::ColorTransFunc(int width /*= 512 */) :
+_width(width), m_eInterpolationColorType(RGB), m_eInputColorType(RGB), m_bIsDataDirty(false)
 {}
 
 ColorTransFunc::~ColorTransFunc()
@@ -11,9 +11,9 @@ ColorTransFunc::~ColorTransFunc()
 
 }
 
-void ColorTransFunc::set_width(int iWidth)
+void ColorTransFunc::set_width(int width)
 {
-    _width = iWidth;
+    _width = width;
     m_bIsDataDirty = true;
 }
 
@@ -96,7 +96,7 @@ void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
         }
 
         //2 Add to iWidht count points
-        //Expand point value to iWidth , make the interpolation step is 1
+        //Expand point value to width , make the interpolation step is 1
         float fMaxValue = m_vecTFPoint[uiTFPointSize - 1].v;
         float fMinValue = m_vecTFPoint[0].v;
         float fExpandRatio = static_cast<float>(_width - 1) / (fMaxValue - fMinValue);

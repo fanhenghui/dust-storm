@@ -38,12 +38,12 @@ namespace
 
 void IOUT_LoadSeries()
 {
-    std::shared_ptr<ImageDataHeader> pDataHeader;
+    std::shared_ptr<ImageDataHeader> data_header;
     std::shared_ptr<ImageData> image_data;
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
-    IOStatus status = loader.load_series(files , image_data , pDataHeader);
+    IOStatus status = loader.load_series(files , image_data , data_header);
 
     if (IO_SUCCESS == status)
     {

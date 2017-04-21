@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RCStepShadingNone : public RCStepBase
 {
 public:
-    RCStepShadingNone(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepShadingNone(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepShadingNone(){};
@@ -21,7 +21,7 @@ private:
 class RCStepShadingPhong : public RCStepBase
 {
 public:
-    RCStepShadingPhong(std::shared_ptr<RayCaster> pRayCaster , std::shared_ptr<GLProgram>  pProgram):RCStepBase(pRayCaster , pProgram)
+    RCStepShadingPhong(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):RCStepBase(ray_caster , program)
     {};
 
     virtual ~RCStepShadingPhong(){};

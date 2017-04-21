@@ -22,11 +22,11 @@ public:
 
     void set_mask(std::shared_ptr<ImageData> image_data);
 
-    void set_brick_size(unsigned int uiBrickSize);
+    void set_brick_size(unsigned int brick_size);
 
-    void set_brick_expand(unsigned int uiBrickExpand);
+    void set_brick_expand(unsigned int brick_expand);
 
-    void get_brick_dim(unsigned int (&uiBrickDim)[3]);
+    void get_brick_dim(unsigned int (&brick_dim)[3]);
 
     BrickCorner* get_brick_corner();
 
@@ -36,31 +36,31 @@ public:
 
     VolumeBrickInfo* get_volume_brick_info();
 
-    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vecVisLabels);
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
 
     void calculate_volume_brick();
 
     void calculate_mask_brick();
 
-    void update_mask_brick(unsigned int (&uiBegin)[3] , unsigned int (&uiEnd)[3]);
+    void update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3]);
 
 protected:
 
 private:
-    std::shared_ptr<ImageData> m_pVolume;
-    std::shared_ptr<ImageData> m_pMask;
+    std::shared_ptr<ImageData> _volume_data;
+    std::shared_ptr<ImageData> _mask_data;
 
-    unsigned int m_uiBrickSize;
-    unsigned int m_uiBrickExpand;
-    unsigned int m_uiBrickDim[3];
+    unsigned int _brick_size;
+    unsigned int _brick_expand;
+    unsigned int _brick_dim[3];
 
-    std::unique_ptr<BrickCorner[]> m_pBrickCorner;
-    std::unique_ptr<BrickUnit[]> m_pVolumeBrickUnit;
-    std::unique_ptr<BrickUnit[]> m_pMaskBrickUnit;
+    std::unique_ptr<BrickCorner[]> _brick_corner_array;
+    std::unique_ptr<BrickUnit[]> _volume_brick_unit_array;
+    std::unique_ptr<BrickUnit[]> _mask_brick_unit_array;
 
-    std::unique_ptr<VolumeBrickInfo[]> m_pVolumeBrickInfo;
+    std::unique_ptr<VolumeBrickInfo[]> _volume_brick_info_array;
 
-    std::map<LabelKey , std::unique_ptr<MaskBrickInfo[]>> m_mapMaskBrickInfos;
+    std::map<LabelKey , std::unique_ptr<MaskBrickInfo[]>> _mask_brick_info_array_set;
 
     //TODO Brick cluster for VR entry&exit points rendering
 };

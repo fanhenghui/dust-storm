@@ -5,9 +5,9 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-OrthoCameraInteractor::OrthoCameraInteractor(std::shared_ptr<OrthoCamera> pCamera )
+OrthoCameraInteractor::OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera )
 {
-    set_initial_status(pCamera);
+    set_initial_status(camera);
 }
 
 OrthoCameraInteractor::~OrthoCameraInteractor()
@@ -15,83 +15,83 @@ OrthoCameraInteractor::~OrthoCameraInteractor()
 
 }
 
-void OrthoCameraInteractor::set_initial_status(std::shared_ptr<OrthoCamera> pCamera)
+void OrthoCameraInteractor::set_initial_status(std::shared_ptr<OrthoCamera> camera)
 {
-    RENDERALGO_CHECK_NULL_EXCEPTION(pCamera);
-    m_CameraInitial = *(pCamera.get());
-    m_pCamera = pCamera;
+    RENDERALGO_CHECK_NULL_EXCEPTION(camera);
+    _camera_init = *(camera.get());
+    _camera = camera;
 }
 
 void OrthoCameraInteractor::reset_camera()
 {
-    *(m_pCamera.get()) = m_CameraInitial;
+    *(_camera.get()) = _camera_init;
 }
 
-void OrthoCameraInteractor::resize(int iWidth , int iHeight)
+void OrthoCameraInteractor::resize(int width , int height)
 {
-    double dLeft , dRight , dBottom , dTop , dFar , dNear;
-    m_CameraInitial.get_ortho(dLeft , dRight , dBottom , dTop , dNear , dFar);
+    double left , right , bottom , top , far , near;
+    _camera_init.get_ortho(left , right , bottom , top , near , far);
 
-    const double dRatio = (double)iWidth / (double)iHeight;
-    if (dRatio > 1.0)
+    const double ratio = (double)width / (double)height;
+    if (ratio > 1.0)
     {
-        double dLength = (dRight - dLeft)*dRatio;//Choose initial length
-        m_pCamera->get_ortho(dLeft , dRight , dBottom , dTop , dNear , dFar);
-        double dCenter = (dRight + dLeft)*0.5;//Choose current center
+        double length = (right - left)*ratio;//Choose initial length
+        _camera->get_ortho(left , right , bottom , top , near , far);
+        double center = (right + left)*0.5;//Choose current center
 
-        dLeft = dCenter - dLength*0.5;
-        dRight = dCenter + dLength*0.5;
+        left = center - length*0.5;
+        right = center + length*0.5;
     }
-    else if (dRatio < 1.0)
+    else if (ratio < 1.0)
     {
         //Adjust bottom and top
-        double dLength = (dTop - dBottom)/dRatio;//Choose initial length
-        m_pCamera->get_ortho(dLeft , dRight , dBottom , dTop , dNear , dFar);
-        double dCenter = (dTop + dBottom)*0.5;//Choose current center
+        double length = (top - bottom)/ratio;//Choose initial length
+        _camera->get_ortho(left , right , bottom , top , near , far);
+        double center = (top + bottom)*0.5;//Choose current center
 
-        dBottom = dCenter - dLength*0.5;
-        dTop = dCenter + dLength*0.5;
+        bottom = center - length*0.5;
+        top = center + length*0.5;
     }
-    m_pCamera->set_ortho(dLeft , dRight , dBottom , dTop , dNear , dFar);
+    _camera->set_ortho(left , right , bottom , top , near , far);
 }
 
-void OrthoCameraInteractor::zoom(double dScale)
+void OrthoCameraInteractor::zoom(double scale)
 {
-    m_pCamera->zoom(dScale);
+    _camera->zoom(scale);
 }
 
-void OrthoCameraInteractor::zoom(const Point2& ptPre , const Point2& ptCur, int iWidth, int iHeight)
+void OrthoCameraInteractor::zoom(const Point2& pre_pt , const Point2& cur_pt, int width, int height)
 {
-    const double dScale = (ptCur.y -ptPre.y)/(double)iHeight;
-    this->zoom(dScale);
+    const double scale = (cur_pt.y -pre_pt.y)/(double)height;
+    this->zoom(scale);
 }
 
-void OrthoCameraInteractor::pan(const Vector2& vPan)
+void OrthoCameraInteractor::pan(const Vector2& pan)
 {
-    m_pCamera->pan(vPan);
+    _camera->pan(pan);
 }
 
-void OrthoCameraInteractor::pan(const Point2& ptPre , const Point2& ptCur, int iWidth, int iHeight)
+void OrthoCameraInteractor::pan(const Point2& pre_pt , const Point2& cur_pt, int width, int height)
 {
-    Vector2 vecT = (ptPre - ptCur);
-    vecT.x /= iWidth;
-    vecT.y /= -iHeight;
-    vecT *= 2.0;//归一化坐标是-1 ~ 1 需要乘以2
-    this->pan(vecT);
+    Vector2 delta = (pre_pt - cur_pt);
+    delta.x /= width;
+    delta.y /= -height;
+    delta *= 2.0;//归一化坐标是-1 ~ 1 需要乘以2
+    this->pan(delta);
 }
 
 void OrthoCameraInteractor::rotate(const Matrix4& mat)
 {
-    m_pCamera->rotate(mat);
+    _camera->rotate(mat);
 }
 
-void OrthoCameraInteractor::rotate(const Point2& ptPre , const Point2& ptCur, int iWidth, int iHeight)
+void OrthoCameraInteractor::rotate(const Point2& pre_pt , const Point2& cur_pt, int width, int height)
 {
-    if (ptPre == ptCur)
+    if (pre_pt == cur_pt)
     {
         return;
     }
-    this->rotate(TrackBall::mouse_motion_to_rotation(ptPre , ptCur , iWidth , iHeight  , Point2(0,0)).to_matrix());
+    this->rotate(TrackBall::mouse_motion_to_rotation(pre_pt , cur_pt , width , height  , Point2::S_ZERO_POINT).to_matrix());
 }
 
 

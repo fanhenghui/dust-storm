@@ -12,29 +12,32 @@ class GLActiveTextureCounter;
 class RayCastingGPU
 {
 public:
-    RayCastingGPU(std::shared_ptr<RayCaster> pRayCaster);
+    RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingGPU();
-    void render(int iTestCode = 0);
+
+    void render(int test_code = 0);
+
 private:
     void update_i();
+
 private:
-    std::weak_ptr<RayCaster> m_pRayCaster;
-    GLProgramPtr m_pProgram;
-    std::shared_ptr<GLActiveTextureCounter> m_pGLActTexCounter;
+    std::weak_ptr<RayCaster> _ray_caster;
+    GLProgramPtr _program;
+    std::shared_ptr<GLActiveTextureCounter> _gl_act_tex_counter;
 
     //render steps
-    std::vector<std::shared_ptr<RCStepBase>> m_vecSteps;
+    std::vector<std::shared_ptr<RCStepBase>> _ray_casting_steps;
 
     //Ray casting mode cache
-    MaskMode m_eMaskMode;
-    CompositeMode m_eCompositeMode;
-    InterpolationMode m_eInterpolationMode;
-    ShadingMode m_eShadingMode;
-    ColorInverseMode m_eColorInverseMode;
+    MaskMode _mask_mode;
+    CompositeMode _composite_mode;
+    InterpolationMode _interpolation_mode;
+    ShadingMode _shading_mode;
+    ColorInverseMode _color_inverse_mode;
 
     //VAO
-    GLVAOPtr m_pVAO;
-    GLBufferPtr m_pVertexBuffer;
+    GLVAOPtr _gl_vao;
+    GLBufferPtr _gl_buffer_vertex;
 };
 
 MED_IMAGING_END_NAMESPACE

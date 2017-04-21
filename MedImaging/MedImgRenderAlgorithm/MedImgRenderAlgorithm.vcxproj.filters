@@ -34,9 +34,6 @@
     <Filter Include="Volume Infos">
       <UniqueIdentifier>{c8211b3a-a08f-4ce4-aecb-c35f98a1b141}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Corner Infos">
-      <UniqueIdentifier>{3fd804f5-5f9b-4e25-a050-7c9e2a3ed223}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{cd4e76cb-2465-475d-b9b6-c5008a802f34}</UniqueIdentifier>
     </Filter>
@@ -107,9 +104,6 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h">
       <Filter>Brick ACC</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_corners_info_unit.h">
-      <Filter>Corner Infos</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_proxy_geometry_cube.h">
       <Filter>Entry Exit Points</Filter>

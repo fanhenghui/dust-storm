@@ -7,44 +7,44 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 struct RayCasterInnerBuffer::GLResource
 {
-    std::map<BufferType , GLBufferPtr> m_mapBufferID;
-    bool m_DirtyFlag[TypeEnd];
+    std::map<BufferType , GLBufferPtr> buffer_ids;
+    bool dirty_flag[TYPE_END];
 
     GLResource()
     {
-        memset(m_DirtyFlag , 1 , sizeof(bool)*TypeEnd);
+        memset(dirty_flag , 1 , sizeof(bool)*TYPE_END);
     }
 
     void release()
     {
-        for (auto it = m_mapBufferID.begin() ; it != m_mapBufferID.end() ; ++it)
+        for (auto it = buffer_ids.begin() ; it != buffer_ids.end() ; ++it)
         {
             GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it->second->get_uid());
         }
-        m_mapBufferID.clear();
-        memset(m_DirtyFlag , 0 , sizeof(bool)*TypeEnd);
+        buffer_ids.clear();
+        memset(dirty_flag , 0 , sizeof(bool)*TYPE_END);
     }
 
-    GLBufferPtr GetBuffer(BufferType eType)
+    GLBufferPtr GetBuffer(BufferType type)
     {
-        auto it = m_mapBufferID.find(eType);
-        if (it != m_mapBufferID.end())
+        auto it = buffer_ids.find(type);
+        if (it != buffer_ids.end())
         {
             return it->second;
         }
         else
         {
-            UIDType uidBuffer= 0;
-            GLBufferPtr pBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uidBuffer);
-            pBuffer->initialize();
-            pBuffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-            m_mapBufferID[eType] = pBuffer;
-            return pBuffer;
+            UIDType buffer_id= 0;
+            GLBufferPtr buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(buffer_id);
+            buffer->initialize();
+            buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+            buffer_ids[type] = buffer;
+            return buffer;
         }
     }
 };
 
-RayCasterInnerBuffer::RayCasterInnerBuffer():m_pRes(new GLResource())
+RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource())
 {
 
 }
@@ -56,69 +56,69 @@ RayCasterInnerBuffer::~RayCasterInnerBuffer()
 
 void RayCasterInnerBuffer::release_buffer()
 {
-    m_pRes->release();
+    _inner_resource->release();
 }
 
-GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType eType)
+GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
 {
     try
     {
-        GLBufferPtr pBuffer = m_pRes->GetBuffer(eType);
+        GLBufferPtr buffer = _inner_resource->GetBuffer(type);
 
         CHECK_GL_ERROR;
 
-        switch(eType)
+        switch(type)
         {
-        case WindowLevelBucket:
+        case WINDOW_LEVEL_BUCKET:
             {
-                if (m_pRes->m_DirtyFlag[WindowLevelBucket])
+                if (_inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET])
                 {
-                    float* pWL = (float*)m_pSharedBufferArray.get();
-                    memset(pWL , 0 , sizeof(float)*static_cast<int>(m_eLabelLevel)*2);
+                    float* wl_array = (float*)_shared_buffer_array.get();
+                    memset(wl_array , 0 , sizeof(float)*static_cast<int>(_label_level)*2);
 
-                    for (auto it = m_mapWindowLevel.begin() ; it != m_mapWindowLevel.end() ; ++it)
+                    for (auto it = _window_levels.begin() ; it != _window_levels.end() ; ++it)
                     {
-                        const unsigned char uLabel = it->first;
-                        if (uLabel > static_cast<int>(m_eLabelLevel) - 1)
+                        const unsigned char label = it->first;
+                        if (label > static_cast<int>(_label_level) - 1)
                         {
                             std::stringstream ss;
-                            ss << "Input window level label : " << (int)(uLabel) << " is greater than the limit : " << static_cast<int>(m_eLabelLevel) - 1 << " !";
+                            ss << "Input window level label : " << (int)(label) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
                             RENDERALGO_THROW_EXCEPTION(ss.str());
                         }
-                        pWL[uLabel*2] = it->second.m_Value.x;
-                        pWL[uLabel*2+1] = it->second.m_Value.y;
+                        wl_array[label*2] = it->second._value.x;
+                        wl_array[label*2+1] = it->second._value.y;
                     }
 
-                    pBuffer->bind();
-                    pBuffer->load(static_cast<int>(m_eLabelLevel)*sizeof(float)*2 , pWL, GL_DYNAMIC_DRAW);
+                    buffer->bind();
+                    buffer->load(static_cast<int>(_label_level)*sizeof(float)*2 , wl_array, GL_DYNAMIC_DRAW);
 
-                    m_pRes->m_DirtyFlag[WindowLevelBucket] = false;
+                    _inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET] = false;
                 }
                 break;
             }
 
-        case VisibleLabelBucket:
+        case VISIBLE_LABEL_BUCKET:
             {
-                if (m_pRes->m_DirtyFlag[VisibleLabelBucket])
+                if (_inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET])
                 {
-                    int* pLabel = (int*)m_pSharedBufferArray.get();
-                    memset(pLabel , 0 , sizeof(int)*static_cast<int>(m_eLabelLevel));
+                    int* label_array = (int*)_shared_buffer_array.get();
+                    memset(label_array , 0 , sizeof(int)*static_cast<int>(_label_level));
 
-                    for (auto it = m_vecVisibleLabel.begin() ; it != m_vecVisibleLabel.end() ; ++it)
+                    for (auto it = _labels.begin() ; it != _labels.end() ; ++it)
                     {
-                        if (*it > static_cast<int>(m_eLabelLevel) - 1)
+                        if (*it > static_cast<int>(_label_level) - 1)
                         {
                             std::stringstream ss;
-                            ss << "Input visible label : " << (int)(*it ) << " is greater than the limit : " << static_cast<int>(m_eLabelLevel) - 1 << " !";
+                            ss << "Input visible label : " << (int)(*it ) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
                             RENDERALGO_THROW_EXCEPTION(ss.str());
                         }
-                        pLabel[*it] = 1;
+                        label_array[*it] = 1;
                     }
 
-                    pBuffer->bind();
-                    pBuffer->load(static_cast<int>(m_eLabelLevel)*sizeof(int) , pLabel , GL_STATIC_DRAW);
+                    buffer->bind();
+                    buffer->load(static_cast<int>(_label_level)*sizeof(int) , label_array , GL_STATIC_DRAW);
 
-                    m_pRes->m_DirtyFlag[VisibleLabelBucket] = false;
+                    _inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET] = false;
                 }
                 break;
             }
@@ -131,7 +131,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType eType)
 
         CHECK_GL_ERROR;
 
-        return pBuffer;
+        return buffer;
 
     }
     catch (Exception& e)
@@ -146,39 +146,39 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType eType)
 
 void RayCasterInnerBuffer::set_mask_label_level(LabelLevel eLevel)
 {
-    if (m_eLabelLevel != eLevel)
+    if (_label_level != eLevel)
     {
-        m_eLabelLevel = eLevel;
-        memset(m_pRes->m_DirtyFlag , 1 , sizeof(bool)*TypeEnd);
-        m_pSharedBufferArray.reset(new char[static_cast<int>(m_eLabelLevel)*2*4]);
+        _label_level = eLevel;
+        memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
+        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*2*4]);
     }
 }
 
-void RayCasterInnerBuffer::set_window_level(float fWW , float fWL , unsigned char ucLabel)
+void RayCasterInnerBuffer::set_window_level(float ww , float wl , unsigned char label)
 {
-    const Vector2f vWL(fWW , fWL);
-    auto it = m_mapWindowLevel.find(ucLabel);
-    if (it == m_mapWindowLevel.end())
+    const Vector2f wl_v2(ww , wl);
+    auto it = _window_levels.find(label);
+    if (it == _window_levels.end())
     {
-        m_mapWindowLevel.insert(std::make_pair(ucLabel ,vWL));
-        m_pRes->m_DirtyFlag[WindowLevelBucket] = true;
+        _window_levels.insert(std::make_pair(label ,wl_v2));
+        _inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET] = true;
     }
     else
     {
-        if (vWL != it->second)
+        if (wl_v2 != it->second)
         {
-            it->second = vWL;
-            m_pRes->m_DirtyFlag[WindowLevelBucket] = true;
+            it->second = wl_v2;
+            _inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET] = true;
         }
     }
 }
 
-void RayCasterInnerBuffer::set_visible_labels(std::vector<unsigned char> vecLabels)
+void RayCasterInnerBuffer::set_visible_labels(std::vector<unsigned char> labels)
 {
-    if (m_vecVisibleLabel != vecLabels)
+    if (_labels != labels)
     {
-        m_vecVisibleLabel =vecLabels;
-        m_pRes->m_DirtyFlag[VisibleLabelBucket] = true;
+        _labels =labels;
+        _inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET] = true;
     }
 }
 
