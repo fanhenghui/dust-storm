@@ -522,7 +522,7 @@ void RayCastingCPUBrickAcc::ray_casting_in_brick_i(unsigned int brick_id ,  cons
             if (last_step < -0.5f) //Skip points which decided in entry points calculation
             {
                 _canvas_array[ray_id] =RGBAUnit();
-                //const bool bIntersection = RayIntersectAABB(ptEntryF, Vector3f(0,0,0), vDim, vRayDir, entry_step, exit_step);
+                //const bool bIntersection = RayIntersectAABB(ptEntryF, Vector3f(0,0,0), vDim, ray_dir, entry_step, exit_step);
             }
             else
             {

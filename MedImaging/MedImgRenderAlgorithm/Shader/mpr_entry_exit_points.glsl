@@ -10,109 +10,109 @@
 
 layout (local_size_x = 4 , local_size_y = 4) in;
 
-layout (binding = IMAGE_ENTRY_POINT, rgba32f) uniform image2D imgEntryPoints;
-layout (binding = IMAGE_EXIT_POINT, rgba32f) uniform image2D imgExitPoints;
+layout (binding = IMAGE_ENTRY_POINT, rgba32f) uniform image2D image_entry_points;
+layout (binding = IMAGE_EXIT_POINT, rgba32f) uniform image2D image_exit_points;
 
-layout (location = DISPLAY_SIZE) uniform uvec2 vDisplaySize;
-layout (location = VOLUME_DIM) uniform vec3 vVolumeDim;
-layout (location = MVP_INVERSE) uniform mat4 matMVPInverse;
-layout (location = THICKNESS) uniform float fThickness;
-layout (location = RAY_DIRECTION) uniform vec3 vRayDir;
+layout (location = DISPLAY_SIZE) uniform uvec2 display_size;
+layout (location = VOLUME_DIM) uniform vec3 volume_dim;
+layout (location = MVP_INVERSE) uniform mat4 mat_mvp_inv;
+layout (location = THICKNESS) uniform float thickness;
+layout (location = RAY_DIRECTION) uniform vec3 ray_dir;
 
 /// Get exaclty point
-float ray_intersect_brick(vec3 initialPt, vec3 brickMin, vec3 brickDim, vec3 rayDir, 
-    out float startStep, out float endStep)
+float ray_intersect_brick(vec3 initialPt, vec3 brick_min, vec3 brick_dim, vec3 ray_dir, 
+    out float start_step, out float end_step)
 {
-    vec3 invR = 1.0 / (rayDir); 
+    vec3 invR = 1.0 / (ray_dir); 
 
-    vec3 vecBot =  (brickMin - initialPt);
-    vec3 vecTop =  (brickMin + brickDim - initialPt);
-    vec3 tbot = invR * vecBot;
-    vec3 ttop = invR * vecTop; 
+    vec3 bottom =  (brick_min - initialPt);
+    vec3 top =  (brick_min + brick_dim - initialPt);
+    vec3 tbot = invR * bottom;
+    vec3 ttop = invR * top; 
 
     vec3 tmin = min(tbot, ttop);
     vec3 tmax = max(tbot, ttop);
     float tnear = max(max(tmin.x,tmin.y),tmin.z);
     float tfar = min(min(tmax.x,tmax.y),tmax.z);
 
-    startStep = tnear;   
-    startStep = max(startStep, 0.0);
-    endStep = tfar;
+    start_step = tnear;   
+    start_step = max(start_step, 0.0);
+    end_step = tfar;
 
-    return tnear - startStep;
+    return tnear - start_step;
 }
 
 bool check_outside(vec3 point, vec3 boundary)
 {
-    bvec3 bCompareMin = lessThan(point, vec3(0.0, 0.0, 0.0));
-    bvec3 bCompareMax = greaterThan(point, boundary);
-    return any(bCompareMin) || any(bCompareMax);
+    bvec3 compare_min = lessThan(point, vec3(0.0, 0.0, 0.0));
+    bvec3 compare_max = greaterThan(point, boundary);
+    return any(compare_min) || any(compare_max);
 }
 
 void main()
 {
-    const ivec2 vImgCoord = ivec2(gl_GlobalInvocationID.xy);
-    if(vImgCoord.x > vDisplaySize.x -1  || vImgCoord.y > vDisplaySize.y -1)
+    const ivec2 img_coord = ivec2(gl_GlobalInvocationID.xy);
+    if(img_coord.x > display_size.x -1  || img_coord.y > display_size.y -1)
     {
         return;
     }
 
-    //imageStore(imgEntryPoints , vImgCoord , vec4(vImgCoord.x,vImgCoord.y,100, 255));
+    //imageStore(image_entry_points , img_coord , vec4(img_coord.x,img_coord.y,100, 255));
     //return;
 
-    float x = (float(vImgCoord.x) +0.5)/float(vDisplaySize.x);
-    float y = (float(vImgCoord.y) +0.5)/float(vDisplaySize.y);
+    float x = (float(img_coord.x) +0.5)/float(display_size.x);
+    float y = (float(img_coord.y) +0.5)/float(display_size.y);
 
-    vec3 vPosNDC = vec3(x*2.0-1.0 , y*2.0-1.0 , 0.0);//not DC to NDC , just NDC to memory
+    vec3 pos_ndc = vec3(x*2.0-1.0 , y*2.0-1.0 , 0.0);//not DC to NDC , just NDC to memory
 
-    vec4 vCentral4 = matMVPInverse * vec4(vPosNDC,1.0);
-    vec3 vCentral = vCentral4.xyz / vCentral4.w;
+    vec4 central4 = mat_mvp_inv * vec4(pos_ndc,1.0);
+    vec3 central = central4.xyz / central4.w;
 
-    vec3 vEntry = vCentral - vRayDir * fThickness *0.5 ;
-    vec3 vExit  = vCentral + vRayDir * fThickness * 0.5 ;
+    vec3 entry_point = central - ray_dir * thickness *0.5 ;
+    vec3 exit_point  = central + ray_dir * thickness * 0.5 ;
 
-    //imageStore(imgEntryPoints , vImgCoord , vec4(vEntry, 1.0f));
-    //imageStore(imgExitPoints , vImgCoord , vec4(vExit, 1.0f));
+    //imageStore(image_entry_points , img_coord , vec4(entry_point, 1.0f));
+    //imageStore(image_exit_points , img_coord , vec4(exit_point, 1.0f));
     //return;
 
-    float fEntryStep = 0.0;
-    float fExitStep = 0.0;
+    float entry_step = 0.0;
+    float exit_step = 0.0;
 
-    vec3 vEntryIntersection = vEntry;
-    vec3 vExitIntersection = vExit;
+    vec3 entry_intersection = entry_point;
+    vec3 exit_intersection = exit_point;
 
-    ray_intersect_brick(vEntry, vec3(0,0,0),vVolumeDim, vRayDir, fEntryStep, fExitStep);
+    ray_intersect_brick(entry_point, vec3(0,0,0),volume_dim, ray_dir, entry_step, exit_step);
 
     //Entry point outside
-    if( check_outside(vEntry, vVolumeDim) )
+    if( check_outside(entry_point, volume_dim) )
     {
-        if(fEntryStep >= fExitStep || fEntryStep < 0 || fEntryStep > fThickness)// check entry points in range of thickness and volume
+        if(entry_step >= exit_step || entry_step < 0 || entry_step > thickness)// check entry points in range of thickness and volume
         {
-            fExitStep = -1.0;
-            imageStore(imgEntryPoints , vImgCoord , vec4(0,0,0, -1.0f));
-            imageStore(imgExitPoints , vImgCoord , vec4(0,0,0, -1.0f));
+            exit_step = -1.0;
+            imageStore(image_entry_points , img_coord , vec4(0,0,0, -1.0f));
+            imageStore(image_exit_points , img_coord , vec4(0,0,0, -1.0f));
             return;
         }
-        vEntryIntersection = vEntry + fEntryStep * vRayDir;
+        entry_intersection = entry_point + entry_step * ray_dir;
     }
 
     //Exit point outside
-    if( check_outside(vExit, vVolumeDim) )
+    if( check_outside(exit_point, volume_dim) )
     {
-        if(fEntryStep >= fExitStep)
+        if(entry_step >= exit_step)
         {
-            fExitStep = -1.0;
-            imageStore(imgEntryPoints , vImgCoord , vec4(0,0,0, -1.0f));
-            imageStore(imgExitPoints , vImgCoord , vec4(0,0,0, -1.0f));
+            exit_step = -1.0;
+            imageStore(image_entry_points , img_coord , vec4(0,0,0, -1.0f));
+            imageStore(image_exit_points , img_coord , vec4(0,0,0, -1.0f));
             return;
         }
-        vExitIntersection= vEntry + fExitStep * vRayDir;
+        exit_intersection= entry_point + exit_step * ray_dir;
     }
 
-    imageStore(imgEntryPoints , vImgCoord , vec4(vEntryIntersection, 1.0f));
-    imageStore(imgExitPoints , vImgCoord , vec4(vExitIntersection, 1.0f));
+    imageStore(image_entry_points , img_coord , vec4(entry_intersection, 1.0f));
+    imageStore(image_exit_points , img_coord , vec4(exit_intersection, 1.0f));
 
-    //imageStore(imgEntryPoints , vImgCoord , vec4(255,0,0, 1.0f));
-    //imageStore(imgExitPoints , vImgCoord , vec4(vExitIntersection, 1.0f));
+    //imageStore(image_entry_points , img_coord , vec4(255,0,0, 1.0f));
+    //imageStore(image_exit_points , img_coord , vec4(exit_intersection, 1.0f));
 
 }

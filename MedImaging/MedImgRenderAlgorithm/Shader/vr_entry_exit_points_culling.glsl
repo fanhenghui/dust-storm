@@ -7,13 +7,13 @@ layout (binding = IMAGE_EXIT_POINT, rgba32f) uniform image2D imgExitPoint;
 
 void main()
 {
-    const ivec2 vImgCoord = ivec2(gl_GlobalInvocationID.xy);
-    if(vImgCoord.x > vDisplaySize.x -1  || vImgCoord.y > vDisplaySize.y -1)
+    const ivec2 img_coord = ivec2(gl_GlobalInvocationID.xy);
+    if(img_coord.x > display_size.x -1  || img_coord.y > display_size.y -1)
     {
         return;
     }
 
-    vec4 vEntryPoint = imageLoad(imgEntryPoint , vImgCoord).xyzw;
-    vec4 vExitPoint = imageLoad(imgExitPoint , vImgCoord).xyzw;
+    vec4 vEntryPoint = imageLoad(imgEntryPoint , img_coord).xyzw;
+    vec4 vExitPoint = imageLoad(imgExitPoint , img_coord).xyzw;
 
 }

@@ -17,9 +17,9 @@ layout (std430 , binding = BUFFER_BINDING_WINDOW_LEVEL_BUCKET) buffer WindowLeve
 bool access_mask(vec3 vPos, sampler3D sampler , out int iOutLabel);
 float access_volume(sampler3D sampler , vec3 vPos);
 
-vec4 shade(vec3 vSamplePos, vec4 vOutputColor, vec3 vRayDir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel);
+vec4 shade(vec3 vSamplePos, vec4 vOutputColor, vec3 ray_dir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel);
 
-void composite(vec3 vSamplePos,vec3 vRayDir, in out vec4 vIntegralColor, 
+void composite(vec3 vSamplePos,vec3 ray_dir, in out vec4 vIntegralColor, 
 sampler3D sVolume , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift)
 {
     int iLabel = 0;
@@ -38,7 +38,7 @@ sampler3D sVolume , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset , v
         vCurColor = texture1DArray(sColorTableArray, vec2(fGray + fColorTableTexShift , iLabel) );
         if(vCurColor.a >0.0)
         {
-            vec4 vShading = shade(vActualSamplePos, vCurColor, vRayDir , sVolume , vSamplePos , vSampleShift , iLabel);
+            vec4 vShading = shade(vActualSamplePos, vCurColor, ray_dir , sVolume , vSamplePos , vSampleShift , iLabel);
             vShading.a = 1 - pow(1 - vShading.a, fSampleRate/fOpacityCompensation);
             vIntegralColor.rgb += vShading.rgb * (1.0 - vIntegralColor.a) * vShading.a;
             vIntegralColor.a += vShading.a * (1.0 - vIntegralColor.a);

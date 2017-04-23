@@ -138,8 +138,8 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
         const Vector3f x_delta_float((float)x_delta.x,(float)x_delta.y,(float)x_delta.z);
         const Vector3f y_delta_float((float)y_delta.x,(float)y_delta.y,(float)y_delta.z);
 
-        const float fThickness = _thickness;
-        const float fThicknessHalf = fThickness*0.5f;
+        const float thickness = _thickness;
+        const float fThicknessHalf = thickness*0.5f;
         Vector4f* pEntryPoints = _entry_points_buffer.get();
         Vector4f* pExitPoints = _exit_points_buffer.get();
 
@@ -180,19 +180,19 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
             ptExitIntersection = ptExitF;
 
             //Intersect volume AABB to get intersected entry&exit points
-            float fEntryStep(0), fExitStep(0);
-            const bool bIntersection = ray_intersect_aabb_acc(ptEntryF, Vector3f(0,0,0), dim_vector, vRayBrick, vRayBrickAdjust , fEntryStep, fExitStep);
+            float entry_step(0), exit_step(0);
+            const bool bIntersection = ray_intersect_aabb_acc(ptEntryF, Vector3f(0,0,0), dim_vector, vRayBrick, vRayBrickAdjust , entry_step, exit_step);
 
             //Entry point outside
             if( check_outside(ptEntryF, dim_vector) )
             {
-                if(!bIntersection || fEntryStep < 0 || fEntryStep > fThickness ) // check entry points in range of thickness and volume
+                if(!bIntersection || entry_step < 0 || entry_step > thickness ) // check entry points in range of thickness and volume
                 {
                     pEntryPoints[idx] = Vector4f(0,0,0,-1.0f);
                     pExitPoints[idx] = Vector4f(0,0,0,-1.0f);
                     continue;
                 }
-                ptEntryIntersection = ptEntryF + ray_dir*fEntryStep;
+                ptEntryIntersection = ptEntryF + ray_dir*entry_step;
             }
 
             //Exit point outside
@@ -204,7 +204,7 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
                     pExitPoints[idx] = Vector4f(0,0,0,-1.0f);
                     continue;
                 }
-                ptExitIntersection= ptEntryF + ray_dir*fExitStep;
+                ptExitIntersection= ptEntryF + ray_dir*exit_step;
             }
 
             //////////////////////////////////////////////////////////////////////////
@@ -262,21 +262,21 @@ void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
         Vector3 view_dir = _camera->get_look_at() - _camera->get_eye();
         view_dir = mat_v2w.get_transpose().transform(view_dir);
         view_dir.normalize();
-        const Vector3 vRayDir = view_dir;
-        _ray_dir_norm = ArithmeticUtils::convert_vector(vRayDir);
+        const Vector3 ray_dir = view_dir;
+        _ray_dir_norm = ArithmeticUtils::convert_vector(ray_dir);
 
         const float thickness = _thickness;
         const float thickness_half = thickness*0.5f;
 
         const Point3 ptCenter = mat_mvp_inv.transform(Point3(0.0,0.0,0));
-        const Point3 ptEntry = ptCenter - vRayDir*thickness_half;
-        const Point3 ptExit = ptCenter + vRayDir*thickness_half;
+        const Point3 ptEntry = ptCenter - ray_dir*thickness_half;
+        const Point3 ptExit = ptCenter + ray_dir*thickness_half;
 
-        double dDisEntry = vRayDir.dot_product(ptEntry - Point3::S_ZERO_POINT);
-        double dDisExit = (-vRayDir).dot_product(ptExit - Point3::S_ZERO_POINT);
+        double dDisEntry = ray_dir.dot_product(ptEntry - Point3::S_ZERO_POINT);
+        double dDisExit = (-ray_dir).dot_product(ptExit - Point3::S_ZERO_POINT);
 
-        _entry_plane = Vector4f((float)vRayDir.x ,(float)vRayDir.y , (float)vRayDir.z , (float)dDisEntry);
-        _exit_plane = Vector4f(-(float)vRayDir.x ,-(float)vRayDir.y , -(float)vRayDir.z , (float)dDisExit);
+        _entry_plane = Vector4f((float)ray_dir.x ,(float)ray_dir.y , (float)ray_dir.z , (float)dDisEntry);
+        _exit_plane = Vector4f(-(float)ray_dir.x ,-(float)ray_dir.y , -(float)ray_dir.z , (float)dDisExit);
 
     }
     catch (const Exception& e)
@@ -287,10 +287,10 @@ void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
     }
 }
 
-void MPREntryExitPoints::get_entry_exit_plane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm)
+void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point , Vector4f& exit_point , Vector3f& vRayDirNorm)
 {
-    vEntry = _entry_plane;
-    vExit = _exit_plane;
+    entry_point = _entry_plane;
+    exit_point = _exit_plane;
     vRayDirNorm = _ray_dir_norm;
 }
 

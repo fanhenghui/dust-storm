@@ -34,7 +34,7 @@ public:
     ///\ Exit plane's normal is form exit to entry
     /// \In volume coordinate
     //////////////////////////////////////////////////////////////////////////
-    void get_entry_exit_plane(Vector4f& vEntry , Vector4f& vExit , Vector3f& vRayDirNorm);
+    void get_entry_exit_plane(Vector4f& entry_point , Vector4f& exit_point , Vector3f& vRayDirNorm);
 
 private:
     void cal_entry_exit_points_cpu_i();
