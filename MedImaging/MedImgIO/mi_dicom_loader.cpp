@@ -25,6 +25,7 @@ DICOMLoader::~DICOMLoader()
 
 IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
+    clock_t start_time = clock();
     if (files.empty())
     {
         return IO_EMPTY_INPUT;
@@ -85,6 +86,9 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         return data_imaging_status;
     }
 
+    clock_t end_time = clock();
+
+    std::cout << "Load DICOM cost : " << double(end_time - start_time) << " ms\n";
     return IO_SUCCESS;
 }
 

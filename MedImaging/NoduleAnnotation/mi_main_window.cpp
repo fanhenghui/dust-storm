@@ -82,57 +82,57 @@ const float kfPresetCTChestWL = 40;
 
 NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags),
-    m_iLayoutType(0),
-    m_bReady(false),
-    m_pNoduleObject(nullptr),
-    m_pNoduleTypeSignalMapper(nullptr)
+    _layout_tag(0),
+    _is_ready(false),
+    _object_nodule(nullptr),
+    _single_manager_nodule_type(nullptr)
 {
     ui.setupUi(this);
 
     ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    m_pMPR00 = new SceneContainer(SharedWidget::instance());
-    m_pMPR00->setMinimumSize(100,100);
+    _mpr_00 = new SceneContainer(SharedWidget::instance());
+    _mpr_00->setMinimumSize(100,100);
 
-    m_pMPR01 = new SceneContainer(SharedWidget::instance());
-    m_pMPR01->setMinimumSize(100,100);
+    _mpr_01 = new SceneContainer(SharedWidget::instance());
+    _mpr_01->setMinimumSize(100,100);
 
-    m_pMPR10 = new SceneContainer(SharedWidget::instance());
-    m_pMPR10->setMinimumSize(100,100);
+    _mpr10 = new SceneContainer(SharedWidget::instance());
+    _mpr10->setMinimumSize(100,100);
 
-    m_pVR11 = new SceneContainer(SharedWidget::instance());
-    m_pVR11->setMinimumSize(100,100);
+    _vr_11 = new SceneContainer(SharedWidget::instance());
+    _vr_11->setMinimumSize(100,100);
 
-    m_pMPR00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
-    m_pMPR01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
-    m_pMPR10->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
-    m_pVR11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
-
-
-    m_pMPR00ScrollBar = new QScrollBar(ui.centralWidget);
-    m_pMPR00ScrollBar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR00"));
-    m_pMPR00ScrollBar->setOrientation(Qt::Vertical);
-
-    m_pMPR01ScrollBar = new QScrollBar(ui.centralWidget);
-    m_pMPR01ScrollBar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR01"));
-    m_pMPR01ScrollBar->setOrientation(Qt::Vertical);
-
-    m_pMPR10ScrollBar = new QScrollBar(ui.centralWidget);
-    m_pMPR10ScrollBar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR10"));
-    m_pMPR10ScrollBar->setOrientation(Qt::Vertical);
+    _mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
+    _mpr_01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    _mpr10->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    _vr_11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
 
 
-    ui.gridLayout_6->addWidget(m_pMPR00 , 0 ,0);
-    ui.gridLayout_6->addWidget(m_pMPR00ScrollBar , 0 ,1,1,1);
-    ui.gridLayout_6->addWidget(m_pMPR01 , 0 ,2);
-    ui.gridLayout_6->addWidget(m_pMPR01ScrollBar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(m_pMPR10 , 1 ,0);
-    ui.gridLayout_6->addWidget(m_pMPR10ScrollBar , 1 ,1,1,1);
-    ui.gridLayout_6->addWidget(m_pVR11 , 1 ,2);
+    _mpr_00_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_00_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR00"));
+    _mpr_00_scroll_bar->setOrientation(Qt::Vertical);
 
-    m_pNoduleObject = new QNoduleObject(this);
-    m_pMinMaxHintObject = new QMinMaxHintObject(this);
+    _mpr_01_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_01_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR01"));
+    _mpr_01_scroll_bar->setOrientation(Qt::Vertical);
+
+    _mpr_10_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_10_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR10"));
+    _mpr_10_scroll_bar->setOrientation(Qt::Vertical);
+
+
+    ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    ui.gridLayout_6->addWidget(_mpr10 , 1 ,0);
+    ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
+
+    _object_nodule = new QNoduleObject(this);
+    _object_min_max_hint = new QMinMaxHintObject(this);
 
     configure_i();
 
@@ -154,136 +154,136 @@ void NoduleAnnotation::configure_i()
 
 void NoduleAnnotation::create_scene_i()
 {
-    m_pMPRScene00.reset(new MPRScene(m_pMPR00->width() , m_pMPR00->height()));
-    m_pMPRScene01.reset(new MPRScene(m_pMPR01->width() , m_pMPR01->height()));
-    m_pMPRScene10.reset(new MPRScene(m_pMPR10->width() , m_pMPR10->height()));
+    _mpr_scene_00.reset(new MPRScene(_mpr_00->width() , _mpr_00->height()));
+    _mpr_scene_01.reset(new MPRScene(_mpr_01->width() , _mpr_01->height()));
+    _mpr_scene_10.reset(new MPRScene(_mpr10->width() , _mpr10->height()));
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
         //1 Set Scene
-        vecMPRs[i]->set_scene(vecMPRScenes[i]);
+        mpr_containers[i]->set_scene(mpr_scenes[i]);
 
         //2 Set scene parameter
-        vecMPRScenes[i]->set_volume_infos(m_pVolumeInfos);
-        vecMPRScenes[i]->set_sample_rate(1.0);
-        vecMPRScenes[i]->set_global_window_level(kfPresetCTLungsWW,kfPresetCTLungsWL);
-        vecMPRScenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
-        vecMPRScenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
-        vecMPRScenes[i]->set_mask_mode(MASK_NONE);
-        vecMPRScenes[i]->set_interpolation_mode(LINEAR);
+        mpr_scenes[i]->set_volume_infos(_volume_infos);
+        mpr_scenes[i]->set_sample_rate(1.0);
+        mpr_scenes[i]->set_global_window_level(kfPresetCTLungsWW,kfPresetCTLungsWL);
+        mpr_scenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
+        mpr_scenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+        mpr_scenes[i]->set_mask_mode(MASK_NONE);
+        mpr_scenes[i]->set_interpolation_mode(LINEAR);
 
         //3 Add painter list
-        std::vector<std::shared_ptr<PainterBase>> vecPainterList;
-        std::shared_ptr<CornersInfoPainter> pCornerInfo(new CornersInfoPainter());
-        pCornerInfo->set_scene(vecMPRScenes[i]);
-        vecPainterList.push_back(pCornerInfo);
+        std::vector<std::shared_ptr<PainterBase>> painter_list;
+        std::shared_ptr<CornersInfoPainter> painter_corner_info(new CornersInfoPainter());
+        painter_corner_info->set_scene(mpr_scenes[i]);
+        painter_list.push_back(painter_corner_info);
 
-        std::shared_ptr<VOIPainter> pVOI(new VOIPainter());
-        pVOI->set_scene(vecMPRScenes[i]);
-        pVOI->set_voi_model(m_pVOIModel);
-        vecPainterList.push_back(pVOI);
+        std::shared_ptr<VOIPainter> painter_voi(new VOIPainter());
+        painter_voi->set_scene(mpr_scenes[i]);
+        painter_voi->set_voi_model(_model_voi);
+        painter_list.push_back(painter_voi);
 
-        std::shared_ptr<CrosshairPainter> pCrosshair(new CrosshairPainter());
-        pCrosshair->set_scene(vecMPRScenes[i]);
-        pCrosshair->set_crosshair_model(m_pCrosshairModel);
-        vecPainterList.push_back(pCrosshair);
+        std::shared_ptr<CrosshairPainter> painter_crosshair(new CrosshairPainter());
+        painter_crosshair->set_scene(mpr_scenes[i]);
+        painter_crosshair->set_crosshair_model(_model_crosshari);
+        painter_list.push_back(painter_crosshair);
 
-        std::shared_ptr<MPRBorderPainter> pMPRBorder(new MPRBorderPainter());
-        pMPRBorder->set_scene(vecMPRScenes[i]);
-        pMPRBorder->set_crosshair_model(m_pCrosshairModel);
-        vecPainterList.push_back(pMPRBorder);
+        std::shared_ptr<MPRBorderPainter> painter_mpr_border(new MPRBorderPainter());
+        painter_mpr_border->set_scene(mpr_scenes[i]);
+        painter_mpr_border->set_crosshair_model(_model_crosshari);
+        painter_list.push_back(painter_mpr_border);
 
-        vecMPRs[i]->add_painter_list(vecPainterList);
+        mpr_containers[i]->add_painter_list(painter_list);
 
         //4 Add operation 
-        std::shared_ptr<MouseOpLocate> pMPRLocate(new MouseOpLocate());
-        pMPRLocate->set_scene(vecMPRScenes[i]);
-        pMPRLocate->set_crosshair_model(m_pCrosshairModel);
+        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
+        op_mpr_locate->set_scene(mpr_scenes[i]);
+        op_mpr_locate->set_crosshair_model(_model_crosshari);
 
-        std::shared_ptr<MouseOpMinMaxHint> pMinMaxHint(new MouseOpMinMaxHint());
-        pMinMaxHint->set_scene(vecMPRScenes[i]);
-        pMinMaxHint->set_min_max_hint_object(m_pMinMaxHintObject);
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
 
-        IMouseOpPtrCollection vecOpsLBtn(2);
-        vecOpsLBtn[0] = pMPRLocate;
-        vecOpsLBtn[1] = pMinMaxHint;
-        vecMPRs[i]->register_mouse_operation(vecOpsLBtn, Qt::LeftButton , Qt::NoModifier);
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_mpr_locate;
+        left_btn_ops[1] = op_min_max_hint;
+        mpr_containers[i]->register_mouse_operation(left_btn_ops, Qt::LeftButton , Qt::NoModifier);
 
-        std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pZoom , Qt::RightButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
+        op_zoom->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(op_zoom , Qt::RightButton , Qt::NoModifier);
 
         /*std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
+        pWindowing->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
 */
-        std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pPan , Qt::LeftButton | Qt::RightButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
+        op_pan->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton | Qt::RightButton , Qt::NoModifier);
 
     }
 
     //////////////////////////////////////////////////////////////////////////
     //Placement orthogonal MPR
-    std::shared_ptr<CameraCalculator> pCameraCal = m_pVolumeInfos->get_camera_calculator();
-    ScanSliceType aScanType[3] = {SAGITTAL ,CORONAL , TRANSVERSE};
-    const std::string aScanTypeString[3] = {"Sagittal_MPR_scene_00" ,"Coronal_MPR_scene_01" , "Transverse_MPR_scene_10"};
-    MPRScenePtr aScenes[3] = {m_pMPRScene00 , m_pMPRScene01 , m_pMPRScene10};
-    RGBUnit aColors[3] ={kColorSagittal, kColorCoronal , kColorTransverse};
-    QScrollBar* aScrollBar[3] = {m_pMPR00ScrollBar , m_pMPR01ScrollBar , m_pMPR10ScrollBar};
+    std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
+    ScanSliceType scan_types[3] = {SAGITTAL ,CORONAL , TRANSVERSE};
+    const std::string scan_types_string[3] = {"Sagittal_MPR_scene_00" ,"Coronal_MPR_scene_01" , "Transverse_MPR_scene_10"};
+    MPRScenePtr scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
+    RGBUnit colors[3] ={kColorSagittal, kColorCoronal , kColorTransverse};
+    QScrollBar* scroll_bars[3] = {_mpr_00_scroll_bar , _mpr_01_scroll_bar , _mpr_10_scroll_bar};
 
     //Model set scenes
-    m_pCrosshairModel->set_mpr_scene(aScanType , aScenes , aColors);
+    _model_crosshari->set_mpr_scene(scan_types , scenes , colors);
 
-    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene00 , m_pMPR00ScrollBar);
-    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene01 , m_pMPR01ScrollBar);
-    m_pMPRScrollBarOb->add_scroll_bar(m_pMPRScene10 , m_pMPR10ScrollBar);
+    _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_00 , _mpr_00_scroll_bar);
+    _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_01 , _mpr_01_scroll_bar);
+    _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_10 , _mpr_10_scroll_bar);
 
     for (int i = 0 ; i<3 ; ++i)
     {
-        aScenes[i]->place_mpr(aScanType[i]);
-        aScenes[i]->set_name(aScanTypeString[i]);
+        scenes[i]->place_mpr(scan_types[i]);
+        scenes[i]->set_name(scan_types_string[i]);
 
         //Init page
-        aScrollBar[i]->setMaximum(pCameraCal->get_page_maximum(aScanType[i])-1);
-        aScrollBar[i]->setMinimum(0);
-        aScrollBar[i]->setPageStep(1);
-        aScrollBar[i]->setValue(pCameraCal->get_default_page(aScanType[i]));
+        scroll_bars[i]->setMaximum(camera_cal->get_page_maximum(scan_types[i])-1);
+        scroll_bars[i]->setMinimum(0);
+        scroll_bars[i]->setPageStep(1);
+        scroll_bars[i]->setValue(camera_cal->get_default_page(scan_types[i]));
     }
 
     //////////////////////////////////////////////////////////////////////////
     //focus in/out scene signal mapper
-    QSignalMapper* pFocusInSignalMapper = new QSignalMapper();
+    QSignalMapper* focus_in_singal_mapper = new QSignalMapper();
 
-    connect(m_pMPR00 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->get_name().c_str()));
-    connect(m_pMPR01 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->get_name().c_str()));
-    connect(m_pMPR10 , SIGNAL(focusInScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusInSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->get_name().c_str()));
+    connect(_mpr_00 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_in_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
+    connect(_mpr_01 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_in_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
+    connect(_mpr10 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_in_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
-    connect(pFocusInSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
+    connect(focus_in_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
 
-    QSignalMapper* pFocusOutSignalMapper = new QSignalMapper();
+    QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
 
-    connect(m_pMPR00 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR00 , QString(m_pMPR00->get_name().c_str()));
-    connect(m_pMPR01 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR01 , QString(m_pMPR01->get_name().c_str()));
-    connect(m_pMPR10 , SIGNAL(focusOutScene()) , pFocusInSignalMapper , SLOT(map()));
-    pFocusOutSignalMapper->setMapping(m_pMPR10 , QString(m_pMPR10->get_name().c_str()));
+    connect(_mpr_00 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_out_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
+    connect(_mpr_01 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_out_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
+    connect(_mpr10 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_out_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
-    connect(pFocusOutSignalMapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));
+    connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));
     //////////////////////////////////////////////////////////////////////////
 }
 
@@ -297,12 +297,13 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
     connect(ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
     connect(ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(slot_open_raw_i()));
-    connect(ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_i()));
+    connect(ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_file_i()));
+    connect(ui.actionLoad_Nodule , SIGNAL(triggered()) , this , SLOT(slot_open_nodule_file_i()));
 
     //MPR scroll bar
-    connect(m_pMPR00ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
-    connect(m_pMPR01ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr01_i(int)));
-    connect(m_pMPR10ScrollBar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr10_i(int)));
+    connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
+    connect(_mpr_01_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr01_i(int)));
+    connect(_mpr_10_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr10_i(int)));
 
     //Common tools
     connect(ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
@@ -316,13 +317,13 @@ void NoduleAnnotation::connect_signal_slot_i()
     //VOI list
     connect(ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
     connect(ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem *)));
-    connect(m_pNoduleObject , SIGNAL(nodule_added()) , this , SLOT(slot_add_nodule_i()));
+    connect(_object_nodule , SIGNAL(nodule_added()) , this , SLOT(slot_add_nodule_i()));
 
     //Preset WL
     connect(ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(slot_preset_wl_changed_i(QString)));
 
     //Scene Min Max hint
-    connect(m_pMinMaxHintObject , SIGNAL(triggered(const std::string&)) , this , SLOT(slot_scene_min_max_hint_i(const std::string&)));
+    connect(_object_min_max_hint , SIGNAL(triggered(const std::string&)) , this , SLOT(slot_scene_min_max_hint_i(const std::string&)));
 
     //Crosshair visibility
     connect(ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
@@ -331,100 +332,100 @@ void NoduleAnnotation::connect_signal_slot_i()
 void NoduleAnnotation::create_model_observer_i()
 {
     //VOI
-    m_pVOIModel.reset(new VOIModel());
+    _model_voi.reset(new VOIModel());
 
-    m_pVOITableOb.reset(new VOITableObserver());
-    m_pVOITableOb->set_nodule_object(m_pNoduleObject);
+    _ob_voi_table.reset(new VOITableObserver());
+    _ob_voi_table->set_nodule_object(_object_nodule);
 
-    m_pSceneContainerOb.reset(new SceneContainerObserver());//万能 observer
-    m_pSceneContainerOb->add_scene_container(m_pMPR00);
-    m_pSceneContainerOb->add_scene_container(m_pMPR01);
-    m_pSceneContainerOb->add_scene_container(m_pMPR10);
+    _ob_scene_container.reset(new SceneContainerObserver());//万能 observer
+    _ob_scene_container->add_scene_container(_mpr_00);
+    _ob_scene_container->add_scene_container(_mpr_01);
+    _ob_scene_container->add_scene_container(_mpr10);
 
-    m_pVOIModel->add_observer(m_pVOITableOb);
-    //m_pVOIModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
+    _model_voi->add_observer(_ob_voi_table);
+    //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 
     //Crosshair & cross location
-    m_pCrosshairModel.reset(new CrosshairModel());
+    _model_crosshari.reset(new CrosshairModel());
 
-    m_pMPRScrollBarOb.reset(new MPRScrollBarObserver());
-    m_pMPRScrollBarOb->set_crosshair_model(m_pCrosshairModel);
+    _ob_mpr_scroll_bar.reset(new MPRScrollBarObserver());
+    _ob_mpr_scroll_bar->set_crosshair_model(_model_crosshari);
 
-    m_pCrosshairModel->add_observer(m_pMPRScrollBarOb);
-    m_pCrosshairModel->add_observer(m_pSceneContainerOb);
+    _model_crosshari->add_observer(_ob_mpr_scroll_bar);
+    _model_crosshari->add_observer(_ob_scene_container);
 
-    if (!m_pNoduleTypeSignalMapper)
+    if (!_single_manager_nodule_type)
     {
-        delete m_pNoduleTypeSignalMapper;
-        m_pNoduleTypeSignalMapper = new QSignalMapper(this);
-        connect(m_pNoduleTypeSignalMapper , SIGNAL(mapped(int)) , this , SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
+        delete _single_manager_nodule_type;
+        _single_manager_nodule_type = new QSignalMapper(this);
+        connect(_single_manager_nodule_type , SIGNAL(mapped(int)) , this , SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
     }
 }
 
 void NoduleAnnotation::slot_change_layout2x2_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    m_pMPR00->hide();
-    m_pMPR00ScrollBar->hide();
-    m_pMPR01->hide();
-    m_pMPR01ScrollBar->hide();
-    m_pMPR10->hide();
-    m_pMPR10ScrollBar->hide();
-    m_pVR11->hide();
+    _mpr_00->hide();
+    _mpr_00_scroll_bar->hide();
+    _mpr_01->hide();
+    _mpr_01_scroll_bar->hide();
+    _mpr10->hide();
+    _mpr_10_scroll_bar->hide();
+    _vr_11->hide();
 
-    ui.gridLayout_6->removeWidget(m_pMPR00);
-    ui.gridLayout_6->removeWidget(m_pMPR00ScrollBar);
-    ui.gridLayout_6->removeWidget(m_pMPR01);
-    ui.gridLayout_6->removeWidget(m_pMPR01ScrollBar);
-    ui.gridLayout_6->removeWidget(m_pMPR10 );
-    ui.gridLayout_6->removeWidget(m_pMPR10ScrollBar);
-    ui.gridLayout_6->removeWidget(m_pVR11);
+    ui.gridLayout_6->removeWidget(_mpr_00);
+    ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+    ui.gridLayout_6->removeWidget(_mpr_01);
+    ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+    ui.gridLayout_6->removeWidget(_mpr10 );
+    ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+    ui.gridLayout_6->removeWidget(_vr_11);
 
-    ui.gridLayout_6->addWidget(m_pMPR00 , 0 ,0);
-    ui.gridLayout_6->addWidget(m_pMPR00ScrollBar , 0 ,1,1,1);
-    ui.gridLayout_6->addWidget(m_pMPR01 , 0 ,2);
-    ui.gridLayout_6->addWidget(m_pMPR01ScrollBar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(m_pMPR10 , 1 ,0);
-    ui.gridLayout_6->addWidget(m_pMPR10ScrollBar , 1 ,1,1,1);
-    ui.gridLayout_6->addWidget(m_pVR11 , 1 ,2);
+    ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    ui.gridLayout_6->addWidget(_mpr10 , 1 ,0);
+    ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
-    m_pMPR00->show();
-    m_pMPR00ScrollBar->show();
-    m_pMPR01->show();
-    m_pMPR01ScrollBar->show();
-    m_pMPR10->show();
-    m_pMPR10ScrollBar->show();
-    m_pVR11->show();
+    _mpr_00->show();
+    _mpr_00_scroll_bar->show();
+    _mpr_01->show();
+    _mpr_01_scroll_bar->show();
+    _mpr10->show();
+    _mpr_10_scroll_bar->show();
+    _vr_11->show();
 
-    m_iLayoutType = 0;
+    _layout_tag = 0;
 }
 
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
-    QStringList fileNames = QFileDialog::getOpenFileNames(
+    QStringList file_name_list = QFileDialog::getOpenFileNames(
         this ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
 
-    std::vector<QString> vecFileNames = fileNames.toVector().toStdVector();
-    if (!vecFileNames.empty())
+    std::vector<QString> file_name_vector = file_name_list.toVector().toStdVector();
+    if (!file_name_vector.empty())
     {
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
-        std::vector<std::string> vecSTDFiles;
-        for (auto it = vecFileNames.begin() ; it != vecFileNames.end() ; ++it)
+        std::vector<std::string> file_names_std;
+        for (auto it = file_name_vector.begin() ; it != file_name_vector.end() ; ++it)
         {
             std::string s((*it).toLocal8Bit());
             std::cout << s << std::endl;
-            vecSTDFiles.push_back(s);
+            file_names_std.push_back(s);
         }
 
         std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
-        IOStatus status = loader.load_series(vecSTDFiles, image_data , data_header);
+        IOStatus status = loader.load_series(file_names_std, image_data , data_header);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
@@ -432,14 +433,14 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
             return;
         }
 
-        if (m_pVolumeInfos)//Delete last one
+        if (_volume_infos)//Delete last one
         {
-            m_pVolumeInfos->finialize();
+            _volume_infos->finialize();
         }
-        m_pVolumeInfos.reset(new VolumeInfos());
-        m_pVolumeInfos->set_data_header(data_header);
+        _volume_infos.reset(new VolumeInfos());
+        _volume_infos->set_data_header(data_header);
         //SharedWidget::instance()->makeCurrent();
-        m_pVolumeInfos->set_volume(image_data);//load volume texture if has graphic card
+        _volume_infos->set_volume(image_data);//load volume texture if has graphic card
 
         create_model_observer_i();
 
@@ -447,11 +448,11 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
 
         QApplication::restoreOverrideCursor();
 
-        m_pMPR00->update();
-        m_pMPR01->update();
-        m_pMPR10->update();
+        _mpr_00->update();
+        _mpr_01->update();
+        _mpr10->update();
 
-        m_bReady = true;
+        _is_ready = true;
     }
     else
     {
@@ -471,173 +472,173 @@ void NoduleAnnotation::slot_open_raw_i()
 
 void NoduleAnnotation::slot_press_btn_annotate_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpAnnotate> pAnnotate(new MouseOpAnnotate());
-        pAnnotate->set_scene(vecMPRScenes[i]);
-        pAnnotate->set_voi_model(m_pVOIModel);//Set Model to annotate tools
-        vecMPRs[i]->register_mouse_operation(pAnnotate , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpAnnotate> op_annotate(new MouseOpAnnotate());
+        op_annotate->set_scene(mpr_scenes[i]);
+        op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools
+        mpr_containers[i]->register_mouse_operation(op_annotate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_arrow_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpLocate> pMPRLocate(new MouseOpLocate());
-        pMPRLocate->set_scene(vecMPRScenes[i]);
-        pMPRLocate->set_crosshair_model(m_pCrosshairModel);
-        vecMPRs[i]->register_mouse_operation(pMPRLocate , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
+        op_mpr_locate->set_scene(mpr_scenes[i]);
+        op_mpr_locate->set_crosshair_model(_model_crosshari);
+        mpr_containers[i]->register_mouse_operation(op_mpr_locate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_rotate_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpRotate> pRotate(new MouseOpRotate());
-        pRotate->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
+        pRotate->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_aoom_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pZoom , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
+        op_zoom->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(op_zoom , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_pan_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pPan , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
+        op_pan->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_windowing_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::vector<MPRScenePtr> vecMPRScenes;
-    vecMPRScenes.push_back(m_pMPRScene00);
-    vecMPRScenes.push_back(m_pMPRScene01);
-    vecMPRScenes.push_back(m_pMPRScene10);
+    std::vector<MPRScenePtr> mpr_scenes;
+    mpr_scenes.push_back(_mpr_scene_00);
+    mpr_scenes.push_back(_mpr_scene_01);
+    mpr_scenes.push_back(_mpr_scene_10);
 
-    std::vector<SceneContainer*> vecMPRs;
-    vecMPRs.push_back(m_pMPR00);
-    vecMPRs.push_back(m_pMPR01);
-    vecMPRs.push_back(m_pMPR10);
+    std::vector<SceneContainer*> mpr_containers;
+    mpr_containers.push_back(_mpr_00);
+    mpr_containers.push_back(_mpr_01);
+    mpr_containers.push_back(_mpr10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
         std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->set_scene(vecMPRScenes[i]);
-        vecMPRs[i]->register_mouse_operation(pWindowing , Qt::LeftButton , Qt::NoModifier);
+        pWindowing->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(pWindowing , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
 void NoduleAnnotation::slot_press_btn_fit_window_i()
 {
     //TODO
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 }
 
-void NoduleAnnotation::slot_save_nodule_i()
+void NoduleAnnotation::slot_save_nodule_file_i()
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    if (m_pVOIModel->get_voi_spheres().empty())
+    if (_model_voi->get_voi_spheres().empty())
     {
         if(QMessageBox::No == QMessageBox::warning(
             this , tr("Save Nodule") , tr("Nodule count is zero. If you still want to save to file?"),QMessageBox::Yes |QMessageBox::No))
@@ -646,19 +647,19 @@ void NoduleAnnotation::slot_save_nodule_i()
         }
     }
 
-    QString sFileCustom = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(m_pVolumeInfos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
-    if (!sFileCustom.isEmpty())
+    QString file_name = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-        const std::list<VOISphere>& voiList = m_pVOIModel->get_voi_spheres();
-        for (auto it = voiList.begin() ; it != voiList.end() ; ++it)
+        const std::list<VOISphere>& vois = _model_voi->get_voi_spheres();
+        for (auto it = vois.begin() ; it != vois.end() ; ++it)
         {
             nodule_set->add_nodule(*it);
         }
 
         NoduleSetParser parser;
-        std::string file_path(sFileCustom.toLocal8Bit());
-        IOStatus status = parser.save_as_csv(file_path , nodule_set);
+        std::string file_name_std(file_name.toLocal8Bit());
+        IOStatus status = parser.save_as_csv(file_name_std , nodule_set);
 
         if (status == IO_SUCCESS)
         {
@@ -672,37 +673,82 @@ void NoduleAnnotation::slot_save_nodule_i()
     }
 }
 
+void NoduleAnnotation::slot_open_nodule_file_i()
+{
+    if (!_is_ready)
+    {
+        return;
+    }
+
+    if (!_model_voi->get_voi_spheres().empty())
+    {
+        if (QMessageBox::No == QMessageBox::warning(
+            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
+            QMessageBox::Yes | QMessageBox::No))
+        {
+            return;
+        }
+    }
+
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    if (!file_name.isEmpty())
+    {
+        std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
+        NoduleSetParser parser;
+        std::string file_name_std(file_name.toLocal8Bit());
+        IOStatus status = parser.load_as_csv(file_name_std , nodule_set);
+
+        if (status == IO_SUCCESS)
+        {
+            const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
+            for (auto it = vois.begin() ; it != vois.end() ; ++it)
+            {
+                _model_voi->add_voi_sphere(*it);
+            }
+            _model_voi->notify();
+            QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);
+        }
+        else
+        {
+            QMessageBox::warning(this , tr("Load Nodule") , tr("Load nodule file failed."),QMessageBox::Ok);
+        }
+        //TODO check status
+    }
+
+    
+}
+
 void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value)
 {
-    if(m_pCrosshairModel->page_to(m_pMPRScene00 , value))
+    if(_model_crosshari->page_to(_mpr_scene_00 , value))
     {
-        m_pCrosshairModel->notify();
+        _model_crosshari->notify();
     }
 }
 
 void NoduleAnnotation::slot_sliding_bar_mpr01_i(int value)
 {
-    if(m_pCrosshairModel->page_to(m_pMPRScene01 , value))
+    if(_model_crosshari->page_to(_mpr_scene_01 , value))
     {
-        m_pCrosshairModel->notify();
+        _model_crosshari->notify();
     }
 }
 
 void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
 {
-    if(m_pCrosshairModel->page_to(m_pMPRScene10 , value))
+    if(_model_crosshari->page_to(_mpr_scene_10 , value))
     {
-        m_pCrosshairModel->notify();
+        _model_crosshari->notify();
     }
 }
 
 void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
 {
     std::cout << "CellSelect "<< row << " " << column<< std::endl; 
-    VOISphere voi = m_pVOIModel->get_voi_sphere(row);
-    const Matrix4 matP2W = m_pMPRScene00->get_camera_calculator()->get_patient_to_world_matrix();
-    m_pCrosshairModel->locate(matP2W.transform(voi.center));
-    m_pCrosshairModel->notify();
+    VOISphere voi = _model_voi->get_voi_sphere(row);
+    const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
+    _model_crosshari->locate(mat_p2w.transform(voi.center));
+    _model_crosshari->notify();
 }
 
 void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *item)
@@ -713,21 +759,21 @@ void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *it
     {
         std::string sDiameter =  (item->text()).toLocal8Bit();
         StrNumConverter<double> con;
-        m_pVOIModel->modify_voi_sphere_diameter(row , con.to_num(sDiameter));
-        m_pSceneContainerOb->update();
+        _model_voi->modify_voi_sphere_diameter(row , con.to_num(sDiameter));
+        _ob_scene_container->update();
     }
 }
 
 void NoduleAnnotation::slot_add_nodule_i()
 {
-    const std::list<VOISphere>& vecVOISphere = m_pVOIModel->get_voi_spheres();
-    if (!vecVOISphere.empty())
+    const std::list<VOISphere>& vois = _model_voi->get_voi_spheres();
+    if (!vois.empty())
     {
-        ui.tableWidgetNoduleList->setRowCount(vecVOISphere.size());//Set row count , otherwise set item useless
+        ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
         StrNumConverter<double> converter;
         const int iPrecision = 2;
         int iRow = 0;
-        for (auto it = vecVOISphere.begin() ; it != vecVOISphere.end() ; ++it)
+        for (auto it = vois.begin() ; it != vois.end() ; ++it)
         {
             const VOISphere& voi = *it;
             std::string sPos = converter.to_string_decimal(voi.center.x , iPrecision) + "," +
@@ -747,8 +793,8 @@ void NoduleAnnotation::slot_add_nodule_i()
             //m_pTableWidgetVOI->setItem(iRow,2, new QTableWidgetItem("AAH"));
             ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
 
-            connect(pNoduleType , SIGNAL(currentIndexChanged(int)) , m_pNoduleTypeSignalMapper , SLOT(map()));
-            m_pNoduleTypeSignalMapper->setMapping(pNoduleType , iRow);
+            connect(pNoduleType , SIGNAL(currentIndexChanged(int)) , _single_manager_nodule_type , SLOT(map()));
+            _single_manager_nodule_type->setMapping(pNoduleType , iRow);
 
             ++iRow;
         }
@@ -762,123 +808,123 @@ void NoduleAnnotation::slot_delete_nodule_i(int id)
 
 void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
 {
-    QWidget* pWidget = ui.tableWidgetNoduleList->cellWidget(id , 2);
+    QWidget* widget = ui.tableWidgetNoduleList->cellWidget(id , 2);
 
-    QComboBox* pBox= dynamic_cast<QComboBox*>(pWidget);
+    QComboBox* pBox= dynamic_cast<QComboBox*>(widget);
     if (pBox)
     {
         std::string type = pBox->currentText().toStdString();
         std::cout << id <<'\t' << type << std::endl;
 
-        m_pVOIModel->modify_voi_sphere_name(id , type);
+        _model_voi->modify_voi_sphere_name(id , type);
     }
 }
 
 void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    std::string sWindow = std::string(s.toLocal8Bit());
-    float fWW(1) , fWL(0);
-    if (sWindow == std::string("CT_Lungs"))
+    std::string wl_preset = std::string(s.toLocal8Bit());
+    float ww(1) , wl(0);
+    if (wl_preset == std::string("CT_Lungs"))
     {
-        fWW = kfPresetCTLungsWW;
-        fWL   = kfPresetCTLungsWL;
+        ww = kfPresetCTLungsWW;
+        wl   = kfPresetCTLungsWL;
     }
-    else if (sWindow == std::string("CT_Chest"))
+    else if (wl_preset == std::string("CT_Chest"))
     {
-        fWW = kfPresetCTChestWW;
-        fWL   = kfPresetCTChestWL;
+        ww = kfPresetCTChestWW;
+        wl   = kfPresetCTChestWL;
     }
-    else if (sWindow == std::string("CT_Bone"))
+    else if (wl_preset == std::string("CT_Bone"))
     {
-        fWW = kfPresetCTBoneWW;
-        fWL   = kfPresetCTBoneWL;
+        ww = kfPresetCTBoneWW;
+        wl   = kfPresetCTBoneWL;
     }
-    else if (sWindow == std::string("CT_Angio"))
+    else if (wl_preset == std::string("CT_Angio"))
     {
-        fWW = kfPresetCTAngioWW;
-        fWL   = kfPresetCTAngioWL;
+        ww = kfPresetCTAngioWW;
+        wl   = kfPresetCTAngioWL;
     }
-    else if (sWindow == std::string("CT_Abdomen"))
+    else if (wl_preset == std::string("CT_Abdomen"))
     {
-        fWW = kfPresetCTAbdomenWW;
-        fWL   = kfPresetCTAbdomenWL;
+        ww = kfPresetCTAbdomenWW;
+        wl   = kfPresetCTAbdomenWL;
     }
-    else if (sWindow == std::string("CT_Brain"))
+    else if (wl_preset == std::string("CT_Brain"))
     {
-        fWW = kfPresetCTBrainWW;
-        fWL   = kfPresetCTBrainWL;
+        ww = kfPresetCTBrainWW;
+        wl   = kfPresetCTBrainWL;
     }
     else 
     {
         return;
     }
 
-    m_pMPRScene00->set_global_window_level(fWW , fWL);
-    m_pMPRScene01->set_global_window_level(fWW , fWL);
-    m_pMPRScene10->set_global_window_level(fWW , fWL);
-    m_pSceneContainerOb->update();
+    _mpr_scene_00->set_global_window_level(ww , wl);
+    _mpr_scene_01->set_global_window_level(ww , wl);
+    _mpr_scene_10->set_global_window_level(ww , wl);
+    _ob_scene_container->update();
 }
 
 void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    SceneContainer* pTragetContainer = nullptr;
-    QScrollBar* pTargetBar = nullptr;
-    if (0 == m_iLayoutType)
+    SceneContainer* target_container = nullptr;
+    QScrollBar* target_scroll_bar = nullptr;
+    if (0 == _layout_tag)
     {
-        if (name == m_pMPRScene00->get_name())
+        if (name == _mpr_scene_00->get_name())
         {
-            pTragetContainer = m_pMPR00;
-            pTargetBar = m_pMPR00ScrollBar;
+            target_container = _mpr_00;
+            target_scroll_bar = _mpr_00_scroll_bar;
         }
-        else if (name == m_pMPRScene01->get_name())
+        else if (name == _mpr_scene_01->get_name())
         {
-            pTragetContainer = m_pMPR01;
-            pTargetBar = m_pMPR01ScrollBar;
+            target_container = _mpr_01;
+            target_scroll_bar = _mpr_01_scroll_bar;
         }
-        else if (name == m_pMPRScene10->get_name())
+        else if (name == _mpr_scene_10->get_name())
         {
-            pTragetContainer = m_pMPR10;
-            pTargetBar = m_pMPR10ScrollBar;
+            target_container = _mpr10;
+            target_scroll_bar = _mpr_10_scroll_bar;
         }
         else
         {
             return;
         }
 
-        m_pMPR00->hide();
-        m_pMPR00ScrollBar->hide();
-        m_pMPR01->hide();
-        m_pMPR01ScrollBar->hide();
-        m_pMPR10->hide();
-        m_pMPR10ScrollBar->hide();
-        m_pVR11->hide();
+        _mpr_00->hide();
+        _mpr_00_scroll_bar->hide();
+        _mpr_01->hide();
+        _mpr_01_scroll_bar->hide();
+        _mpr10->hide();
+        _mpr_10_scroll_bar->hide();
+        _vr_11->hide();
 
-        ui.gridLayout_6->removeWidget(m_pMPR00);
-        ui.gridLayout_6->removeWidget(m_pMPR00ScrollBar);
-        ui.gridLayout_6->removeWidget(m_pMPR01);
-        ui.gridLayout_6->removeWidget(m_pMPR01ScrollBar);
-        ui.gridLayout_6->removeWidget(m_pMPR10 );
-        ui.gridLayout_6->removeWidget(m_pMPR10ScrollBar);
-        ui.gridLayout_6->removeWidget(m_pVR11);
+        ui.gridLayout_6->removeWidget(_mpr_00);
+        ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+        ui.gridLayout_6->removeWidget(_mpr_01);
+        ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+        ui.gridLayout_6->removeWidget(_mpr10 );
+        ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+        ui.gridLayout_6->removeWidget(_vr_11);
 
-        ui.gridLayout_6->addWidget(pTragetContainer , 0 ,0);
-        ui.gridLayout_6->addWidget(pTargetBar , 0 ,1,1,1);
+        ui.gridLayout_6->addWidget(target_container , 0 ,0);
+        ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
 
-        pTragetContainer->show();
-        pTargetBar->show();
-        pTragetContainer->updateGL();
+        target_container->show();
+        target_scroll_bar->show();
+        target_container->updateGL();
 
-        m_iLayoutType = 1;
+        _layout_tag = 1;
 
     }
     else
@@ -889,24 +935,24 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
 
 void NoduleAnnotation::slot_focus_in_scene_i(QString s)
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
     const std::string name(s.toLocal8Bit());
 
-    if (name == m_pMPRScene00->get_name())
+    if (name == _mpr_scene_00->get_name())
     {
-        m_pCrosshairModel->focus(m_pMPRScene00);
+        _model_crosshari->focus(_mpr_scene_00);
     }
-    else if (name == m_pMPRScene01->get_name())
+    else if (name == _mpr_scene_01->get_name())
     {
-        m_pCrosshairModel->focus(m_pMPRScene01);
+        _model_crosshari->focus(_mpr_scene_01);
     }
-    else if (name == m_pMPRScene10->get_name())
+    else if (name == _mpr_scene_10->get_name())
     {
-        m_pCrosshairModel->focus(m_pMPRScene10);
+        _model_crosshari->focus(_mpr_scene_10);
     }
     else
     {
@@ -916,63 +962,63 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
 
 void NoduleAnnotation::slot_focus_out_scene_i(QString name)
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    m_pCrosshairModel->focus(nullptr);
+    _model_crosshari->focus(nullptr);
 
 }
 
 void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 {
-    if (!m_bReady)
+    if (!_is_ready)
     {
         return;
     }
 
-    m_pCrosshairModel->set_visibility(iFlag != 0);
+    _model_crosshari->set_visibility(iFlag != 0);
 
-    SceneContainer* aContainers[3] = {m_pMPR00 , m_pMPR01 , m_pMPR10};
-    std::shared_ptr<MPRScene> aScenes[3] = {m_pMPRScene00 , m_pMPRScene01 , m_pMPRScene10};
+    SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr10};
+    std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
     if (0 == iFlag)
     {
         for (int i = 0 ;i<3 ; ++i)
         {
-            IMouseOpPtrCollection vecOps = aContainers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
-            IMouseOpPtrCollection vecOpsNew;
-            for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
+            IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
+            IMouseOpPtrCollection ops_new;
+            for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
                 if (typeid(*it).name() != typeid(MouseOpLocate*).name())
                 {
-                    vecOpsNew.push_back(*it);
+                    ops_new.push_back(*it);
                 }
             }
-            aContainers[i]->register_mouse_operation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
+            containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
         }
     }
     else
     {
         for (int i = 0 ;i<3 ; ++i)
         {
-            IMouseOpPtrCollection vecOps = aContainers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
-            IMouseOpPtrCollection vecOpsNew;
-            for (auto it = vecOps.begin() ; it != vecOps.end() ; ++it)
+            IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
+            IMouseOpPtrCollection ops_new;
+            for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
                 if (typeid(*it).name() != typeid(std::shared_ptr<MouseOpLocate>).name())
                 {
-                    vecOpsNew.push_back(*it);
+                    ops_new.push_back(*it);
                 }
             }
-            std::shared_ptr<MouseOpLocate> pOpLocate(new MouseOpLocate());
-            pOpLocate->set_scene(aScenes[i]);
-            pOpLocate->set_crosshair_model(m_pCrosshairModel);
-            vecOpsNew.push_back(pOpLocate);
-            aContainers[i]->register_mouse_operation(vecOpsNew , Qt::LeftButton , Qt::NoModifier);
+            std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
+            op_locate->set_scene(scenes[i]);
+            op_locate->set_crosshair_model(_model_crosshari);
+            ops_new.push_back(op_locate);
+            containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
         }
     }
-    m_pSceneContainerOb->update();
+    _ob_scene_container->update();
 }
 
 

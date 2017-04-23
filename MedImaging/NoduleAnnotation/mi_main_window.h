@@ -42,7 +42,8 @@ private slots:
     void slot_open_dicom_folder_i();
     void slot_open_meta_image_i();
     void slot_open_raw_i();
-    void slot_save_nodule_i();
+    void slot_save_nodule_file_i();
+    void slot_open_nodule_file_i();
 
     //Common tools
     void slot_press_btn_arrow_i();
@@ -89,42 +90,42 @@ private:
     Ui::NoduleAnnotationClass ui;
 
 private:
-    bool m_bReady;
+    bool _is_ready;
 
-    SceneContainer* m_pMPR00;
-    SceneContainer* m_pMPR01;
-    SceneContainer* m_pMPR10;
-    SceneContainer* m_pVR11;
+    SceneContainer* _mpr_00;
+    SceneContainer* _mpr_01;
+    SceneContainer* _mpr10;
+    SceneContainer* _vr_11;
 
-    QScrollBar * m_pMPR00ScrollBar;
-    QScrollBar * m_pMPR01ScrollBar;
-    QScrollBar * m_pMPR10ScrollBar;
+    QScrollBar * _mpr_00_scroll_bar;
+    QScrollBar * _mpr_01_scroll_bar;
+    QScrollBar * _mpr_10_scroll_bar;
 
-    std::shared_ptr<medical_imaging::VolumeInfos> m_pVolumeInfos;
-    MPRScenePtr m_pMPRScene00;
-    MPRScenePtr m_pMPRScene01;
-    MPRScenePtr m_pMPRScene10;
+    std::shared_ptr<medical_imaging::VolumeInfos> _volume_infos;
+    MPRScenePtr _mpr_scene_00;
+    MPRScenePtr _mpr_scene_01;
+    MPRScenePtr _mpr_scene_10;
 
     //Layout Type
     //0 2x2
     //1 1x1
-    int m_iLayoutType;
+    int _layout_tag;
 
     //Model
-    std::shared_ptr<medical_imaging::VOIModel> m_pVOIModel;
-    std::shared_ptr<medical_imaging::CrosshairModel> m_pCrosshairModel;
+    std::shared_ptr<medical_imaging::VOIModel> _model_voi;
+    std::shared_ptr<medical_imaging::CrosshairModel> _model_crosshari;
 
     //Observer
-    std::shared_ptr<VOITableObserver> m_pVOITableOb;
-    std::shared_ptr<medical_imaging::SceneContainerObserver> m_pSceneContainerOb;
-    std::shared_ptr<MPRScrollBarObserver> m_pMPRScrollBarOb;
+    std::shared_ptr<VOITableObserver> _ob_voi_table;
+    std::shared_ptr<medical_imaging::SceneContainerObserver> _ob_scene_container;
+    std::shared_ptr<MPRScrollBarObserver> _ob_mpr_scroll_bar;
 
     //Nodule VOI list
-    QSignalMapper* m_pNoduleTypeSignalMapper;
-    QNoduleObject* m_pNoduleObject;
+    QSignalMapper* _single_manager_nodule_type;
+    QNoduleObject* _object_nodule;
 
     //Scene min max hint
-    QMinMaxHintObject* m_pMinMaxHintObject;
+    QMinMaxHintObject* _object_min_max_hint;
 };
 
 #endif // MI_MAIN_WINDOW_H

@@ -1,8 +1,13 @@
 #include "mi_nodule_set_parser.h"
-#include "mi_nodule_set.h"
+
+#include "boost/format.hpp"
+#include "boost/tokenizer.hpp"
+#include "boost/algorithm/string.hpp"  
 
 #include "MedImgArithmetic/mi_rsa_utils.h"
 #include "MedImgCommon/mi_string_number_converter.h"
+
+#include "mi_nodule_set.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -40,7 +45,40 @@ NoduleSetParser::~NoduleSetParser()
 
 IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared_ptr<NoduleSet>& nodule_set)
 {
-    std::fstream out(file_path.c_str() , std::ios::out);
+    std::fstream in(file_path.c_str() , std::ios::in);
+
+    if (!in.is_open())
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    nodule_set->clear_nodule();
+    //id,coordX,coordY,coordZ,diameter_mm,Type
+    std::string line;
+    std::getline(in , line);
+    double id , pos_x , pos_y , pos_z , diameter;
+    std::string separate;
+    std::string type;
+    StrNumConverter<double> str_num_converter;
+    while(std::getline(in , line))
+    {
+        std::vector<std::string> infos;
+        boost::split(infos , line , boost::is_any_of(","));
+        if (infos.size() != 6)
+        {
+            in.close();
+            return IO_DATA_DAMAGE;
+        }
+        id = str_num_converter.to_num(infos[0]);
+        pos_x = str_num_converter.to_num(infos[1]);
+        pos_y = str_num_converter.to_num(infos[2]);
+        pos_z = str_num_converter.to_num(infos[3]);
+        diameter = str_num_converter.to_num(infos[4]);
+        type = infos[5];
+        nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , type));
+    }
+
+    in.close();
 
     return IO_SUCCESS;
 }
@@ -169,7 +207,7 @@ IOStatus NoduleSetParser::load_as_rsa_binary(const std::string& file_path , cons
     }
 
     in.close();
-    return IO_SUCCESS;
+    return IO_SUCCESS; 
 }
 
 IOStatus NoduleSetParser::save_as_rsa_binary(const std::string& file_path , const mbedtls_rsa_context& rsa , const std::shared_ptr<NoduleSet>& nodule_set)
