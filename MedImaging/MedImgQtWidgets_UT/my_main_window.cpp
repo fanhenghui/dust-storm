@@ -94,7 +94,7 @@ MyMainWindow::~MyMainWindow()
 
 void MyMainWindow::closeEvent( QCloseEvent * pEvent )
 {
-    if (m_pTextEditerModule->CloseWindow())
+    if (m_pTextEditerModule->close_window())
     {
         pEvent->accept();
     }

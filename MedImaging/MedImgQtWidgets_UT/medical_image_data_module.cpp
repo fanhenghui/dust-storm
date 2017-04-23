@@ -41,22 +41,22 @@
 using namespace medical_imaging;
 
 MedicalImageDataModule::MedicalImageDataModule(
-    MyMainWindow*pMainWindow , 
-    SceneContainer* pScene , 
-    QAction* pOpenDICOMFolder , 
-    QAction* pOpenMetaFolder,
+    MyMainWindow*main_window , 
+    SceneContainer* scene , 
+    QAction* action_open_dicom , 
+    QAction* action_open_meta,
     QObject* parent):QObject(parent)
 {
-    m_pMainWindow = pMainWindow;
-    m_pMPRScene = pScene;
-    connect(pOpenDICOMFolder , SIGNAL(triggered()) , this , SLOT(SlotActionOpenDICOMFolder()));
-    connect(pOpenMetaFolder , SIGNAL(triggered()) , this , SLOT(SlotActionOpenMetaFolder()));
+    _main_window = main_window;
+    m_pMPRScene = scene;
+    connect(action_open_dicom , SIGNAL(triggered()) , this , SLOT(slot_action_open_dicom_folder()));
+    connect(action_open_meta , SIGNAL(triggered()) , this , SLOT(slot_action_open_meta_folder()));
 }
 
-void MedicalImageDataModule::SlotActionOpenDICOMFolder()
+void MedicalImageDataModule::slot_action_open_dicom_folder()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(
-        m_pMainWindow ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
+        _main_window ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
 
     std::vector<QString> vecFileNames = fileNames.toVector().toStdVector();
     if (!vecFileNames.empty())
@@ -80,57 +80,57 @@ void MedicalImageDataModule::SlotActionOpenDICOMFolder()
         m_pVolumeInfos->set_data_header(data_header);
         m_pVolumeInfos->set_volume(image_data);
 
-        std::shared_ptr<medical_imaging::MPRScene> pScene(new medical_imaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));
+        std::shared_ptr<medical_imaging::MPRScene> scene(new medical_imaging::MPRScene(m_pMPRScene->width() , m_pMPRScene->height()));
 
         //m_pMPRScene->makeCurrent();
-        pScene->set_volume_infos(m_pVolumeInfos);
-        pScene->set_sample_rate(1.0);
-        pScene->set_global_window_level(252,40);
-        pScene->set_composite_mode(COMPOSITE_AVERAGE);
-        pScene->place_mpr(TRANSVERSE);
-        m_pMPRScene->set_scene(pScene);
+        scene->set_volume_infos(m_pVolumeInfos);
+        scene->set_sample_rate(1.0);
+        scene->set_global_window_level(252,40);
+        scene->set_composite_mode(COMPOSITE_AVERAGE);
+        scene->place_mpr(TRANSVERSE);
+        m_pMPRScene->set_scene(scene);
 
 
         //Add painter list
         std::shared_ptr<CornersInfoPainter> pPatientInfo(new CornersInfoPainter());
-        pPatientInfo->set_scene(pScene);
+        pPatientInfo->set_scene(scene);
         m_pMPRScene->add_painter_list(std::vector<std::shared_ptr<PainterBase>>(1 , pPatientInfo));
 
 
         //Add operation 
         std::shared_ptr<MouseOpZoom> pZoom(new MouseOpZoom());
-        pZoom->set_scene(pScene);
+        pZoom->set_scene(scene);
         m_pMPRScene->register_mouse_operation(pZoom , Qt::RightButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpRotate> pRotate(new MouseOpRotate());
-        pRotate->set_scene(pScene);
+        pRotate->set_scene(scene);
         m_pMPRScene->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->set_scene(pScene);
+        pWindowing->set_scene(scene);
         m_pMPRScene->register_mouse_operation(pWindowing , Qt::MiddleButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpPan> pPan(new MouseOpPan());
-        pPan->set_scene(pScene);
+        pPan->set_scene(scene);
         m_pMPRScene->register_mouse_operation(pPan , Qt::MiddleButton , Qt::ControlModifier);
 
         std::shared_ptr<MouseOpProbe> pProbe(new MouseOpProbe());
-        pProbe->set_scene(pScene);
+        pProbe->set_scene(scene);
         m_pMPRScene->register_mouse_operation(pProbe , Qt::NoButton, Qt::NoModifier);
 
 
         QApplication::restoreOverrideCursor();
 
 
-        m_pMainWindow->setWindowTitle(tr("MPR Scene"));
+        _main_window->setWindowTitle(tr("MPR Scene"));
         m_pMPRScene->update();
     }
 }
 
-void MedicalImageDataModule::SlotActionOpenMetaFolder()
+void MedicalImageDataModule::slot_action_open_meta_folder()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(
-        m_pMainWindow ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
+        _main_window ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
 
     std::vector<QString> vecFileNames = fileNames.toVector().toStdVector();
     std::vector<std::shared_ptr<MetaObjectTag>> vecMetaObjTag;
@@ -173,10 +173,10 @@ void MedicalImageDataModule::SlotActionOpenMetaFolder()
 
     for (size_t i = 0 ; i<vecMetaObjTag.size() ;++i)
     {
-        double dSpacingXY = vecMetaObjTag[i]->_spacing[0];
-        double dSpacingZ = vecMetaObjTag[i]->_spacing[2];
-        double dFovXY = dSpacingXY*vecMetaObjTag[i]->m_uiDimSize[0];
-        double dFovZ= dSpacingZ*vecMetaObjTag[i]->m_uiDimSize[2];
+        double dSpacingXY = vecMetaObjTag[i]->spacing[0];
+        double dSpacingZ = vecMetaObjTag[i]->spacing[2];
+        double dFovXY = dSpacingXY*vecMetaObjTag[i]->dim_size[0];
+        double dFovZ= dSpacingZ*vecMetaObjTag[i]->dim_size[2];
 
         dSpacingXYMin = dSpacingXYMin < dSpacingXY ? dSpacingXYMin : dSpacingXY;
         dSpacingXYMax = dSpacingXYMax > dSpacingXY ? dSpacingXYMax : dSpacingXY;

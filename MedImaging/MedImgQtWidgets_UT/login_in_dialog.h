@@ -13,7 +13,7 @@ public:
 protected:
 
 private slots:
-    void SlotsPushButtonOKClicked();
+    void slot_push_button_ok_clicked();
 
 private:
     Ui::Dialog ui;

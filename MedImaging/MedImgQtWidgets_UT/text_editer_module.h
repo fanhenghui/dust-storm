@@ -11,79 +11,79 @@ class TextEditerModule : public QObject
     Q_OBJECT
 public:
     TextEditerModule(
-        MyMainWindow*pMainWindow , 
-        QAction* pActionNew , 
-        QAction* pActionOpen , 
-        QAction* pActionSave, 
-        QAction* pActionSaveAs , 
-        QAction* pActionUndo,
-        QAction* pActionRedo,
-        QAction* pActionCut,
-        QAction* pActionCopy,
-        QAction* pActionPaste,
-        QPlainTextEdit* pTextEdit ,
+        MyMainWindow*main_window , 
+        QAction* action_new , 
+        QAction* action_open , 
+        QAction* action_save, 
+        QAction* action_save_as , 
+        QAction* action_undo,
+        QAction* action_redo,
+        QAction* action_cut,
+        QAction* action_copy,
+        QAction* action_paste,
+        QPlainTextEdit* text_edit ,
         QObject* parent = nullptr );
     ~TextEditerModule();
 
-    bool CloseWindow();
+    bool close_window();
 
 protected:
 
 private slots:
-    void SlotActionNew();
-    void SlotActionOpen();
-    void SlotActionSave();
-    void SlotActionSaveAs();
-    void SlotActionUndo();
-    void SlotActionRedo();
-    void SlotActionCut();
-    void SlotActionCopy();
-    void SlotActionPaste();
-    void SlotDocumentWasModified();
+    void slot_action_new();
+    void slot_action_open();
+    void slot_action_save();
+    void slot_action_save_as();
+    void slot_action_undo();
+    void slot_action_redo();
+    void slot_action_cut();
+    void slot_action_copy();
+    void slot_action_paste();
+    void slot_document_was_modified();
 
 private:
-    void OpenFile_i();
+    void open_file_i();
 
-    void NewFile_i();
+    void new_file_i();
 
-    bool SaveFile_i(const QString& file_name);
+    bool save_file_i(const QString& file_name);
 
-    bool Save_i();
+    bool save_i();
 
-    bool SaveAs_i();
+    bool save_as_i();
 
-    bool MaybeSave_i();
+    bool maybe_save_i();
 
-    void Undo_i();
+    void undo_i();
 
-    void Redo_i();
+    void redo_i();
 
-    void Cut_i();
+    void cut_i();
 
-    void Copy_i();
+    void copy_i();
 
-    void Paste_i();
+    void paste_i();
 
-    void SetWindowTitle_i(const QString& sTitle);
+    void set_window_title_i(const QString& title);
 
-    void ResetTitile_i(bool bUntitled );
+    void reset_titile_i(bool is_untitled );
 
 
 private:
-    MyMainWindow* m_pMainWindow;
-    QAction *m_pActionNew;
-    QAction *m_pActionOpen;
-    QAction *m_pActionSave;
-    QAction *m_pActionSaveAs;
-    QAction* m_pActionUndo;
-    QAction* m_pActionRedo;
-    QAction* m_pActionCut;
-    QAction* m_pActionCopy;
-    QAction* m_pActionPaste;
-    QPlainTextEdit *m_pPlainTextEdit;
+    MyMainWindow* _main_window;
+    QAction *_action_new;
+    QAction *_action_open;
+    QAction *_action_save;
+    QAction *_action_save_as;
+    QAction* _action_undo;
+    QAction* _action_redo;
+    QAction* _action_cut;
+    QAction* _action_copy;
+    QAction* _action_paste;
+    QPlainTextEdit *_plain_text_rdit;
 
-    QString m_sCurFileName;
-    bool m_bIsUntitled;
+    QString _cur_file_name;
+    bool _is_untitled;
 };
 
 #endif

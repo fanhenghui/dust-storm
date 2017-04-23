@@ -6,7 +6,7 @@
 LoginInDialog::LoginInDialog(QDialog* parent) : QDialog(parent)
 {
     ui.setupUi(this);
-    connect(ui.okButton , SIGNAL(clicked()) , this , SLOT(SlotsPushButtonOKClicked()));
+    connect(ui.okButton , SIGNAL(clicked()) , this , SLOT(slot_push_button_ok_clicked()));
 
     ui.nameEdit->document()->setPlainText(tr("wangrui"));
     ui.passwordEdit->document()->setPlainText(tr("12345"));
@@ -17,7 +17,7 @@ LoginInDialog::~LoginInDialog()
 
 }
 
-void LoginInDialog::SlotsPushButtonOKClicked()
+void LoginInDialog::slot_push_button_ok_clicked()
 {
     if (ui.nameEdit->document()->toPlainText() == tr("wangrui") &&
         ui.passwordEdit->document()->toPlainText() == tr("12345"))

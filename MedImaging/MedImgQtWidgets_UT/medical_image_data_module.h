@@ -19,19 +19,19 @@ class MedicalImageDataModule : public QObject
     Q_OBJECT
 public:
     MedicalImageDataModule(
-        MyMainWindow*pMainWindow , 
-        SceneContainer* pScene  , 
-        QAction* pOpenDICOMFolder , 
-        QAction* pOpenMetaFolder,
+        MyMainWindow*main_window , 
+        SceneContainer* scene  , 
+        QAction* action_open_dicom , 
+        QAction* action_open_meta,
         QObject* parent = 0);
 
 protected slots:
-    void SlotActionOpenDICOMFolder();
-    void SlotActionOpenMetaFolder();
+    void slot_action_open_dicom_folder();
+    void slot_action_open_meta_folder();
 protected:
 
 private:
-    MyMainWindow* m_pMainWindow;
+    MyMainWindow* _main_window;
     SceneContainer* m_pMPRScene;
     std::shared_ptr<medical_imaging::VolumeInfos> m_pVolumeInfos;
 };
