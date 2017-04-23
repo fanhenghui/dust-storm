@@ -83,22 +83,22 @@ void TextEditerModule::slot_action_save_as()
 
 void TextEditerModule::open_file_i()
 {
-    QString sCurFile = QFileDialog::getOpenFileName(_main_window , tr("Open file") ,tr("./") , tr("text (*.txt)"));
-    if (!sCurFile.isEmpty())
+    QString file_name = QFileDialog::getOpenFileName(_main_window , tr("Open file") ,tr("./") , tr("text (*.txt)"));
+    if (!file_name.isEmpty())
     {
-        QFile qFile(sCurFile);
-        if (qFile.open(QFile::ReadOnly | QFile::Text))
+        QFile q_file(file_name);
+        if (q_file.open(QFile::ReadOnly | QFile::Text))
         {
-            QTextStream in(&qFile);
+            QTextStream in(&q_file);
             QApplication::setOverrideCursor(Qt::WaitCursor);
             _plain_text_rdit->setPlainText(in.readAll());
-            _cur_file_name = QFileInfo(sCurFile).canonicalFilePath();
+            _cur_file_name = QFileInfo(file_name).canonicalFilePath();
             reset_titile_i(false);
             QApplication::restoreOverrideCursor();
         }
         else
         {
-            QMessageBox::warning(_main_window , tr("Open File") , tr("Open file %1 failed!").arg(sCurFile));
+            QMessageBox::warning(_main_window , tr("Open File") , tr("Open file %1 failed!").arg(file_name));
         }
     }
     else
@@ -117,15 +117,15 @@ void TextEditerModule::new_file_i()
 
 bool TextEditerModule::save_file_i(const QString& file_name)
 {
-    QFile qFile(file_name);
-    if (!qFile.open(QFile::WriteOnly  | QFile::Text))
+    QFile q_file(file_name);
+    if (!q_file.open(QFile::WriteOnly  | QFile::Text))
     {
         QMessageBox::warning(_main_window , tr("Save file") , tr("Cant open file : %1").arg(file_name));
         return false;
     }
     else
     {
-        QTextStream out(&qFile);
+        QTextStream out(&q_file);
         out << _plain_text_rdit->toPlainText();
 
         QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -150,10 +150,10 @@ bool TextEditerModule::save_i()
 
 bool TextEditerModule::save_as_i()
 {
-    QString sChooseFile = QFileDialog::getSaveFileName(_main_window, tr("Save As") , _cur_file_name , tr("text(*.txt)"));
-    if (!sChooseFile.isEmpty())
+    QString file_name = QFileDialog::getSaveFileName(_main_window, tr("Save As") , _cur_file_name , tr("text(*.txt)"));
+    if (!file_name.isEmpty())
     {
-        return save_file_i(sChooseFile);
+        return save_file_i(file_name);
     }
     else
     {
@@ -170,23 +170,23 @@ bool TextEditerModule::maybe_save_i()
         box.setWindowTitle("Warning");
         box.setIcon(QMessageBox::Warning);
         box.setText(_cur_file_name + " save or not?");
-        QPushButton* pYesBtn = new QPushButton(tr("Yes"));
-        box.addButton(pYesBtn , QMessageBox::YesRole);
-        QPushButton* pNoBtn = new QPushButton(tr("No"));
-        box.addButton(pNoBtn , QMessageBox::NoRole);
-        QPushButton* pCancelBtn = new QPushButton(tr("Cancel"));
-        box.addButton(pCancelBtn , QMessageBox::RejectRole);
+        QPushButton* yes_btn = new QPushButton(tr("Yes"));
+        box.addButton(yes_btn , QMessageBox::YesRole);
+        QPushButton* no_btn = new QPushButton(tr("No"));
+        box.addButton(no_btn , QMessageBox::NoRole);
+        QPushButton* cancel_btn = new QPushButton(tr("Cancel"));
+        box.addButton(cancel_btn , QMessageBox::RejectRole);
         box.exec();
 
-        if (box.clickedButton()  == pYesBtn)
+        if (box.clickedButton()  == yes_btn)
         {
             return save_i();
         }
-        else if(box.clickedButton() == pCancelBtn)
+        else if(box.clickedButton() == cancel_btn)
         {
             return false;
         }
-        else if (box.clickedButton() == pNoBtn)
+        else if (box.clickedButton() == no_btn)
         {
             
         }

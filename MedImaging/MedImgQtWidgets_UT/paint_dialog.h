@@ -15,8 +15,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *);
     virtual void mouseReleaseEvent(QMouseEvent *);
 private:
-    QPoint m_ptPre;
-    QPoint m_ptCur;
+    QPoint _pre_point;
+    QPoint _cur_point;
 };
 
 #endif

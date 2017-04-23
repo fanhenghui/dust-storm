@@ -26,22 +26,22 @@ public:
     ~MyMainWindow();
 
 protected:
-    virtual void closeEvent(QCloseEvent * pEvent);
+    virtual void closeEvent(QCloseEvent * event);
 
 protected slots: 
     void SlotAddDcmPostfix_i();
 
 private:
     Ui::MedImgQtWidgets_UTClass ui;
-    std::shared_ptr<TextEditerModule> m_pTextEditerModule;
-    std::shared_ptr<MedicalImageDataModule> m_pMedImgModule;
-    QGridLayout* m_pGridLayout;
-    QHBoxLayout* m_pHBoxLayout;
-    MyGLWidget* m_pMyGLWidget;
-    QPlainTextEdit* m_pPlainTextEdit;
+    std::shared_ptr<TextEditerModule> _text_editer_module;
+    std::shared_ptr<MedicalImageDataModule> _med_img_module;
+    QGridLayout* _grid_layout;
+    QHBoxLayout* _hbox_layout;
+    MyGLWidget* _my_gl_widget;
+    QPlainTextEdit* _plain_text_edit;
 
     //Scene
-    SceneContainer* m_pMPRScene;
+    SceneContainer* _mpr_container;
 
 };
 

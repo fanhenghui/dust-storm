@@ -29,7 +29,7 @@ void MyGLWidget::initializeGL()
     }
 }
 
-void MyGLWidget::paintEvent( QPaintEvent* pPainter )
+void MyGLWidget::paintEvent( QPaintEvent* event )
 {
     makeCurrent();
     glFrontFace( GL_CW );

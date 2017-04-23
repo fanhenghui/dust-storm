@@ -43,28 +43,28 @@ void PaintDialog::paintEvent( QPaintEvent * )
     //新建QPainter类对象，在pix上进行绘图
     QPainter pp(&pix);
     //在pix上的（0，0）点和（50，50）点之间绘制直线
-    double x = m_ptCur.x() - m_ptPre.x();
-    double y = m_ptCur.y() - m_ptPre.y();
-    double dRadius = sqrt(x*x + y*y);
-    pp.drawEllipse(m_ptPre , int(dRadius) , int(dRadius) );
+    double x = _cur_point.x() - _pre_point.x();
+    double y = _cur_point.y() - _pre_point.y();
+    double radius = sqrt(x*x + y*y);
+    pp.drawEllipse(_pre_point , int(radius) , int(radius) );
     painter.drawPixmap(0, 0, pix);
 }
 
 void PaintDialog::mouseMoveEvent( QMouseEvent * event)
 {
-    m_ptCur = event->pos(); 
+    _cur_point = event->pos(); 
     this->update();
 }
 
 void PaintDialog::mousePressEvent( QMouseEvent * event)
 {
-    m_ptPre = event->pos();
-    m_ptCur = event->pos(); 
+    _pre_point = event->pos();
+    _cur_point = event->pos(); 
     this->update();
 }
 
 void PaintDialog::mouseReleaseEvent( QMouseEvent * event)
 {
-    m_ptCur = event->pos(); 
+    _cur_point = event->pos(); 
     this->update();
 }

@@ -10,7 +10,7 @@ public:
     MyGLWidget(QWidget *parent = 0);
     ~MyGLWidget();
 protected:
-    void paintEvent(QPaintEvent* pPainter);
+    void paintEvent(QPaintEvent* event);
     virtual void resizeGL(int w, int h);
     virtual void initializeGL();
 private:

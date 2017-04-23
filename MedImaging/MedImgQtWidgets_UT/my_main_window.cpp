@@ -38,36 +38,36 @@ MyMainWindow::MyMainWindow(QWidget *parent, Qt::WFlags flags)
 
     //this->setCentralWidget(ui.plainTextEdit);
 
-    m_pMyGLWidget = new MyGLWidget();
-    m_pMyGLWidget->setMinimumSize(100,100);
-    m_pMyGLWidget->resize(200,200);
-    m_pMyGLWidget->setFixedSize(300,300);
+    _my_gl_widget = new MyGLWidget();
+    _my_gl_widget->setMinimumSize(100,100);
+    _my_gl_widget->resize(200,200);
+    _my_gl_widget->setFixedSize(300,300);
 
-    m_pPlainTextEdit = new QPlainTextEdit();
-    m_pPlainTextEdit->setMinimumSize(100,100);
+    _plain_text_edit = new QPlainTextEdit();
+    _plain_text_edit->setMinimumSize(100,100);
     //m_pPlainTextEdit->setFixedSize(200,200);
 
-    m_pGridLayout= new QGridLayout();
-    m_pHBoxLayout = new QHBoxLayout();
+    _grid_layout= new QGridLayout();
+    _hbox_layout = new QHBoxLayout();
     /*m_pGridLayout->setSpacing(2);
     m_pGridLayout->setMargin(2);
     m_pGridLayout->addLayout(m_pHBoxLayout);*/
 
     QPushButton* pTest = new QPushButton();
 
-    m_pMPRScene = new SceneContainer(SharedWidget::instance());
-    m_pMPRScene->setMinimumSize(500,500);
+    _mpr_container = new SceneContainer(SharedWidget::instance());
+    _mpr_container->setMinimumSize(500,500);
     //m_pMPRScene->setFixedSize(300,300);
 
     //m_pGridLayout->addWidget(m_pPlainTextEdit , 0 ,0);
     //m_pGridLayout->addWidget(m_pMyGLWidget,0,1);
     //m_pGridLayout->addWidget(pTest , 1,0);
     //m_pGridLayout->addWidget(m_pMPRScene , 1 , 1);
-    m_pGridLayout->addWidget(m_pMPRScene , 0 , 0);
+    _grid_layout->addWidget(_mpr_container , 0 , 0);
 
-    ui.centralWidget->setLayout(m_pGridLayout);
+    ui.centralWidget->setLayout(_grid_layout);
 
-    m_pTextEditerModule.reset(new TextEditerModule(this , 
+    _text_editer_module.reset(new TextEditerModule(this , 
         ui.actionNew,
         ui.actionOpen,
         ui.actionSave,
@@ -77,10 +77,10 @@ MyMainWindow::MyMainWindow(QWidget *parent, Qt::WFlags flags)
         ui.actionCut,
         ui.actionCopy,
         ui.actionPaste,
-        m_pPlainTextEdit));
+        _plain_text_edit));
 
-    m_pMedImgModule.reset( new MedicalImageDataModule(this ,
-        m_pMPRScene , 
+    _med_img_module.reset( new MedicalImageDataModule(this ,
+        _mpr_container , 
         ui.actionOpen_DICOM_floder,
         ui.actionOpen_Meta_Folder));
 
@@ -92,33 +92,33 @@ MyMainWindow::~MyMainWindow()
 
 }
 
-void MyMainWindow::closeEvent( QCloseEvent * pEvent )
+void MyMainWindow::closeEvent( QCloseEvent * event )
 {
-    if (m_pTextEditerModule->close_window())
+    if (_text_editer_module->close_window())
     {
-        pEvent->accept();
+        event->accept();
     }
     else
     {
-        pEvent->ignore();
+        event->ignore();
     }
 }
 
 void MyMainWindow::SlotAddDcmPostfix_i()
 {
-    QStringList fileNames = QFileDialog::getOpenFileNames(
+    QStringList file_name_list = QFileDialog::getOpenFileNames(
         this ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
 
-    std::vector<QString> vecFileNames = fileNames.toVector().toStdVector();
-    if (!vecFileNames.empty())
+    std::vector<QString> file_names = file_name_list.toVector().toStdVector();
+    if (!file_names.empty())
     {
 
-        std::vector<std::string> vecSTDFiles;
-        for (auto it = vecFileNames.begin() ; it != vecFileNames.end() ; ++it)
+        std::vector<std::string> file_names_std;
+        for (auto it = file_names.begin() ; it != file_names.end() ; ++it)
         {
             std::string s((*it).toLocal8Bit());
             std::cout << s << std::endl;
-            vecSTDFiles.push_back(s);
+            file_names_std.push_back(s);
             rename(s.c_str() , (s+".dcm").c_str());
         }
     }
