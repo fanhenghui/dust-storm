@@ -287,11 +287,11 @@ void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
     }
 }
 
-void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point , Vector4f& exit_point , Vector3f& vRayDirNorm)
+void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point , Vector4f& exit_point , Vector3f& ray_dir_norm)
 {
     entry_point = _entry_plane;
     exit_point = _exit_plane;
-    vRayDirNorm = _ray_dir_norm;
+    ray_dir_norm = _ray_dir_norm;
 }
 
 void MPREntryExitPoints::cal_entry_exit_points_gpu_i()

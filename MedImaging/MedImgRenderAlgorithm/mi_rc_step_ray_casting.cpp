@@ -29,6 +29,7 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
     glUniform1i(_loc_pseudo_color , 2);
     glDisable(GL_TEXTURE_1D);
 
+    //Linear change: discrete array (0 ~ length -1) to texture coordinate(0 ~ 1)
     glUniform1f(_loc_pseudo_color_slope,  (uiLength- 1.0f)/uiLength);
     glUniform1f(_loc_pseudo_color_intercept,  0.5f/uiLength);
 
@@ -36,10 +37,10 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
     std::shared_ptr<ImageData> pVolume = ray_caster->get_volume_data();
     RENDERALGO_CHECK_NULL_EXCEPTION(pVolume);
 
-    float fWW(1), fWL(0);
-    ray_caster->get_global_window_level(fWW , fWL);
-    pVolume->normalize_wl(fWW, fWL);
-    glUniform2f(_loc_global_wl , fWW, fWL);
+    float ww(1), wl(0);
+    ray_caster->get_global_window_level(ww , wl);
+    pVolume->normalize_wl(ww, wl);
+    glUniform2f(_loc_global_wl , ww, wl);
 
     CHECK_GL_ERROR;
 }
@@ -47,10 +48,10 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
 void RCStepRayCastingMIPBase::get_uniform_location()
 {
     GLProgramPtr program = _program.lock();
-    _loc_pseudo_color = program->get_uniform_location("sPseudoColor");
-    _loc_pseudo_color_slope =  program->get_uniform_location("fPseudoColorSlope");
-    _loc_pseudo_color_intercept = program->get_uniform_location("fPseudoColorIntercept");
-    _loc_global_wl = program->get_uniform_location("vGlobalWL");
+    _loc_pseudo_color = program->get_uniform_location("pseudo_color");
+    _loc_pseudo_color_slope =  program->get_uniform_location("pseudo_color_slope");
+    _loc_pseudo_color_intercept = program->get_uniform_location("pseudo_color_intercept");
+    _loc_global_wl = program->get_uniform_location("global_wl");
 
     if (-1 == _loc_pseudo_color ||
         -1 == _loc_pseudo_color_slope ||

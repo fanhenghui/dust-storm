@@ -168,15 +168,15 @@ void RayCaster::set_visible_labels(std::vector<unsigned char> labels)
     _inner_buffer->set_visible_labels(labels);
 }
 
-void RayCaster::set_window_level(float ww , float fWL , unsigned char label)
+void RayCaster::set_window_level(float ww , float wl , unsigned char label)
 {
-    _inner_buffer->set_window_level(ww , fWL , label);
+    _inner_buffer->set_window_level(ww , wl , label);
 }
 
-void RayCaster::set_global_window_level(float ww , float fWL)
+void RayCaster::set_global_window_level(float ww , float wl)
 {
     _global_ww = ww;
-    _global_wl = fWL;
+    _global_wl = wl;
 }
 
 void RayCaster::set_pseudo_color_texture(GLTexture1DPtr tex , unsigned int length)
@@ -343,10 +343,10 @@ float RayCaster::get_sample_rate() const
     return _sample_rate;
 }
 
-void RayCaster::get_global_window_level(float& ww , float& fWL) const
+void RayCaster::get_global_window_level(float& ww , float& wl) const
 {
     ww = _global_ww;
-    fWL = _global_wl;
+    wl = _global_wl;
 }
 
 std::shared_ptr<EntryExitPoints> RayCaster::get_entry_exit_points() const

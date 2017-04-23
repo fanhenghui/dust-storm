@@ -1,6 +1,6 @@
 #version 430
 
-void color_inverse(in out float fGray)
+void color_inverse(in out float gray)
 {
-    fGray = 1.0 - fGray;
+    gray = 1.0 - gray;
 }

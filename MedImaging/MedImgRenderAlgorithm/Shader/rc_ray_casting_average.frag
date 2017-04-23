@@ -2,66 +2,66 @@
 
 #define BUFFER_BINDING_WINDOW_LEVEL_BUCKET 5
 
-uniform sampler1D sPseudoColor;
-uniform float fPseudoColorSlope;
-uniform float fPseudoColorIntercept;
+uniform sampler1D pseudo_color;
+uniform float pseudo_color_slope;
+uniform float pseudo_color_intercept;
 
-uniform vec2 vGlobalWL;
+uniform vec2 global_wl;
 
-void composite(vec3 samplePosVolume, vec3 ray_dir, in out vec4 vIntegralColor,
-    sampler3D sVolume  , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset,  vec3 vSampleShift);
+void composite(vec3 sample_pos_volume, vec3 ray_dir, in out vec4 integral_color,
+    sampler3D volume_sampler  , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub_data_offset,  vec3 sample_shift);
 
-void color_inverse(in out float fGray);
+void color_inverse(in out float gray);
 
-vec4 raycast(vec3 vRayStart, vec3 ray_dir, float fStartStep, float fEndStep, vec4 vIntegralColor,
-    sampler3D sVolume,  sampler3D sMask,   vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift , int iRayCastStepCode)
+vec4 raycast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
+    sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift , int ray_cast_step_code)
 {
-    float fSumGray = 0.0;
-    float fSumNum = 0.0;
+    float sum_gray = 0.0;
+    float sum_num = 0.0;
 
-    if(0 != (iRayCastStepCode & 0x0001))//First sub data
+    if(0 != (ray_cast_step_code & 0x0001))//First sub data
     {
-        fSumGray = 0.0;
-        fSumNum = 0.0;
+        sum_gray = 0.0;
+        sum_num = 0.0;
     }
 
-    if(0 != (iRayCastStepCode & 0x0002))//Middle sub data
+    if(0 != (ray_cast_step_code & 0x0002))//Middle sub data
     {
-        fSumGray = vIntegralColor.r;
-        fSumNum = vIntegralColor.g;
+        sum_gray = integral_color.r;
+        sum_num = integral_color.g;
     }
 
-    vec3 vSamplePos;
-    vec4 vCurIntegralColor =  vIntegralColor;
+    vec3 sample_pos;
+    vec4 current_integral_color =  integral_color;
 
-    for (float i = fStartStep ; i <= fEndStep ; ++i)
+    for (float i = start_step ; i <= end_step ; ++i)
     {
-        vSamplePos = vRayStart + ray_dir * i;
-        composite(vSamplePos , ray_dir, vCurIntegralColor , sVolume , sMask , vSubDataDim ,vSubDataOffset ,vSampleShift );
-        fSumGray += vCurIntegralColor.r*100.0;
-        ++fSumNum;
+        sample_pos = ray_start + ray_dir * i;
+        composite(sample_pos , ray_dir, current_integral_color , volume_sampler , mask_sampler , sub_data_dim ,sub_data_offset ,sample_shift );
+        sum_gray += current_integral_color.r*100.0;
+        ++sum_num;
     }
 
-    vCurIntegralColor = vec4(fSumGray , fSumNum , 0 ,0);
+    current_integral_color = vec4(sum_gray , sum_num , 0 ,0);
 
     //Last sub data transfer gray to color
-    if(0 != (iRayCastStepCode & 0x0004))
+    if(0 != (ray_cast_step_code & 0x0004))
     {
-        float fWW = vGlobalWL.x;
-        float fWL = vGlobalWL.y;
-        float fResultGray = fSumGray/fSumNum/100.0;
-        float fMinGray = fWL - 0.5 * fWW;
-        fResultGray= (fResultGray - fMinGray) / fWW;
-        fResultGray = clamp(fResultGray, 0.0, 1.0);
-        if(fResultGray < 0.000001)
+        float ww = global_wl.x;
+        float wl = global_wl.y;
+        float result_gray = sum_gray/sum_num/100.0;
+        float wl_min_gray = wl - 0.5 * ww;
+        result_gray= (result_gray - wl_min_gray) / ww;
+        result_gray = clamp(result_gray, 0.0, 1.0);
+        if(result_gray < 0.000001)
         {
             discard;
         }
 
-        color_inverse(fResultGray);
-        vCurIntegralColor = vec4(texture(sPseudoColor, (fResultGray*fPseudoColorSlope + fPseudoColorIntercept)).rgb, 1.0);
+        color_inverse(result_gray);
+        current_integral_color = vec4(texture(pseudo_color, (result_gray*pseudo_color_slope + pseudo_color_intercept)).rgb, 1.0);
     }
 
-    return vCurIntegralColor;
+    return current_integral_color;
 
 }

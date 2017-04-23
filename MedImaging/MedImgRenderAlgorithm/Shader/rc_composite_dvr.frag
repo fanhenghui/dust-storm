@@ -3,10 +3,10 @@
 
 #define BUFFER_BINDING_WINDOW_LEVEL_BUCKET 5
 
-uniform sampler1DArray sColorTableArray; 
-uniform float fColorTableTexShift;
-uniform float fOpacityCompensation; 
-uniform float fSampleRate;
+uniform sampler1DArray color_table_array; 
+uniform float color_table_texture_shift;
+uniform float opacity_compensation; 
+uniform float sample_rate;
 
 //Window level buffer
 layout (std430 , binding = BUFFER_BINDING_WINDOW_LEVEL_BUCKET) buffer WindowLevelBucket
@@ -14,34 +14,34 @@ layout (std430 , binding = BUFFER_BINDING_WINDOW_LEVEL_BUCKET) buffer WindowLeve
     vec2 windowing[];
 };
 
-bool access_mask(vec3 vPos, sampler3D sampler , out int iOutLabel);
-float access_volume(sampler3D sampler , vec3 vPos);
+bool access_mask(vec3 pos, sampler3D sampler , out int out_label);
+float access_volume(sampler3D sampler , vec3 pos);
 
-vec4 shade(vec3 vSamplePos, vec4 vOutputColor, vec3 ray_dir , sampler3D sampler , vec3 vPosInVolume , vec3 vSampleShift , int iLabel);
+vec4 shade(vec3 sample_pos, vec4 output_color, vec3 ray_dir , sampler3D sampler , vec3 pos_in_volume , vec3 sample_shift , int label);
 
-void composite(vec3 vSamplePos,vec3 ray_dir, in out vec4 vIntegralColor, 
-sampler3D sVolume , sampler3D sMask , vec3 vSubDataDim , vec3 vSubDataOffset , vec3 vSampleShift)
+void composite(vec3 sample_pos,vec3 ray_dir, in out vec4 integral_color, 
+sampler3D volume_sampler , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift)
 {
-    int iLabel = 0;
-    vec4 vCurColor = vec4(0.0,0.0,0.0,0.0);
-    float fMinGray;
-    float fGray;
+    int label = 0;
+    vec4 current_color = vec4(0.0,0.0,0.0,0.0);
+    float wl_min_gray;
+    float gray;
 
-    vec3 vActualSamplePos = (vSamplePos + vSubDataOffset )/vSubDataDim;//Actual SamplePos in sampler
-    if(access_mask(sMask , vActualSamplePos , iLabel))
+    vec3 actual_sample_pos = (sample_pos + sub_data_offset )/sub_data_dim;//Actual SamplePos in sampler
+    if(access_mask(mask_sampler , actual_sample_pos , label))
     {
-        fMinGray = windowing[iLabel].y - 0.5 * windowing[iLabel].x;
+        wl_min_gray = windowing[label].y - 0.5 * windowing[label].x;
 
-        fGray = access_volume(sVolume, vActualSamplePos);
-        fGray = (fGray - fMinGray) / windowing[iLabel].x;
+        gray = access_volume(volume_sampler, actual_sample_pos);
+        gray = (gray - wl_min_gray) / windowing[label].x;
 
-        vCurColor = texture1DArray(sColorTableArray, vec2(fGray + fColorTableTexShift , iLabel) );
-        if(vCurColor.a >0.0)
+        current_color = texture1DArray(color_table_array, vec2(gray + color_table_texture_shift , label) );
+        if(current_color.a >0.0)
         {
-            vec4 vShading = shade(vActualSamplePos, vCurColor, ray_dir , sVolume , vSamplePos , vSampleShift , iLabel);
-            vShading.a = 1 - pow(1 - vShading.a, fSampleRate/fOpacityCompensation);
-            vIntegralColor.rgb += vShading.rgb * (1.0 - vIntegralColor.a) * vShading.a;
-            vIntegralColor.a += vShading.a * (1.0 - vIntegralColor.a);
+            vec4 shading_color = shade(actual_sample_pos, current_color, ray_dir , volume_sampler , sample_pos , sample_shift , label);
+            shading_color.a = 1 - pow(1 - shading_color.a, sample_rate/opacity_compensation);
+            integral_color.rgb += shading_color.rgb * (1.0 - integral_color.a) * shading_color.a;
+            integral_color.a += shading_color.a * (1.0 - integral_color.a);
          }
     }
 }

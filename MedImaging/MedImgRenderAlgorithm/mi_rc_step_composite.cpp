@@ -34,7 +34,7 @@ void RCStepCompositeMinIP::set_gpu_parameter()
 void RCStepCompositeMinIP::get_uniform_location()
 {
     GLProgramPtr program = _program.lock();
-    _loc_custom_min_threshold = program->get_uniform_location("fCustomMinThreshold");
+    _loc_custom_min_threshold = program->get_uniform_location("custom_min_threshold");
 
     if (-1 == _loc_custom_min_threshold)
     {

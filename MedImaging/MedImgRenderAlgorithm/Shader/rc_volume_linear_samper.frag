@@ -1,6 +1,6 @@
 #version 430
 
-float access_volume(sampler3D sampler , vec3 vPos)
+float access_volume(sampler3D sampler , vec3 pos)
 {
-    return texture(sampler , vPos).r;
+    return texture(sampler , pos).r;
 }

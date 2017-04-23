@@ -15,46 +15,46 @@ bool check_opacity(in out float opacity)
 
 
 //Encoding label to intger array 4*32 can contain 0~127 labels
-void label_encode(int iLabel , in out int maskFlag[4])
+void label_encode(int label , in out int mask_flag[4])
 {
-    if(iLabel < 32)
+    if(label < 32)
     {
-        maskFlag[0] = maskFlag[0] | ( 1 << iLabel );
+        mask_flag[0] = mask_flag[0] | ( 1 << label );
     }
-    else if(iLabel < 64)
+    else if(label < 64)
     {
-        maskFlag[1] = maskFlag[1] | ( 1 << (iLabel-32) );
+        mask_flag[1] = mask_flag[1] | ( 1 << (label-32) );
     }
-    else if(iLabel < 96)
+    else if(label < 96)
     {
-        maskFlag[2] = maskFlag[2] | ( 1 << (iLabel-64) );
+        mask_flag[2] = mask_flag[2] | ( 1 << (label-64) );
     }
     else
     {
-        maskFlag[3] = maskFlag[3] | ( 1 << (iLabel-96) );
+        mask_flag[3] = mask_flag[3] | ( 1 << (label-96) );
     }
 }
 
 //Decoding label from intger array 4*32 can contain 0~127 labels
-bool label_decode(int iLabel , int maskFlag[4])
+bool label_decode(int label , int mask_flag[4])
 {
 
-    bool bHitted = false;
-    if(iLabel < 32)
+    bool is_hitted = false;
+    if(label < 32)
     {
-        bHitted = ( ( 1 << iLabel ) & maskFlag[0] ) != 0;
+        is_hitted = ( ( 1 << label ) & mask_flag[0] ) != 0;
     }
-    else if(iLabel < 64)
+    else if(label < 64)
     {
-        bHitted = ( ( 1 << (iLabel - 32) ) & maskFlag[1] ) != 0;
+        is_hitted = ( ( 1 << (label - 32) ) & mask_flag[1] ) != 0;
     }
-    else if(iLabel < 96)
+    else if(label < 96)
     {
-        bHitted = ( ( 1 << (iLabel - 64) ) & maskFlag[2] ) != 0;
+        is_hitted = ( ( 1 << (label - 64) ) & mask_flag[2] ) != 0;
     }
     else
     {
-        bHitted = ( ( 1 << (iLabel - 96) ) & maskFlag[3] ) != 0;
+        is_hitted = ( ( 1 << (label - 96) ) & mask_flag[3] ) != 0;
     }
-    return bHitted;
+    return is_hitted;
 }

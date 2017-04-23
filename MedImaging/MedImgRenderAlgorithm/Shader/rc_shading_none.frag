@@ -1,6 +1,6 @@
 #version 430
 
-vec4 shade(vec3 sampleCoord, vec4 sampleColor, vec3 ray_dir , sampler3D vDataVolume , vec3 samplePosVolume , vec3 vSampleShift , int idx)
+vec4 shade(vec3 sample_coord, vec4 sample_color, vec3 ray_dir , sampler3D volume_sampler , vec3 sample_pos_volume , vec3 sample_shift , int idx)
 {
-    return sampleColor;
+    return sample_color;
 }
