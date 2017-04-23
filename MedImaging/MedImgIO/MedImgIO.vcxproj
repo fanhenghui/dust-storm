@@ -177,6 +177,7 @@
     <ClInclude Include="..\Include\MedImgIO\mi_image_data_header.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_image_data.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_io_stdafx.h" />
+    <ClInclude Include="..\Include\MedImgIO\mi_model_progress.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_parser.h" />

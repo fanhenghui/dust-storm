@@ -116,6 +116,9 @@
     <ClCompile Include="mi_mouse_op_probe.cpp">
       <Filter>Src\Operation</Filter>
     </ClCompile>
+    <ClCompile Include="mi_observer_progress.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
@@ -171,6 +174,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_probe.h">
       <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_progress.h">
+      <Filter>Src\Model Observer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

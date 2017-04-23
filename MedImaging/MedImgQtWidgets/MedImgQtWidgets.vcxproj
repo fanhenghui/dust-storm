@@ -174,6 +174,7 @@
     <ClCompile Include="mi_model_cross_hair.cpp" />
     <ClCompile Include="mi_model_voi.cpp" />
     <ClCompile Include="mi_mouse_op_locate.cpp" />
+    <ClCompile Include="mi_observer_progress.cpp" />
     <ClCompile Include="mi_observer_scene_container.cpp" />
     <ClCompile Include="mi_painter_cross_hair.cpp" />
     <ClCompile Include="mi_mouse_op_annotate.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_cross_hair.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_voi.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_locate.h" />
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_progress.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_scene_container.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_cross_hair.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_annotate.h" />

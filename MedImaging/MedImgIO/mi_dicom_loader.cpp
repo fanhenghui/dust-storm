@@ -11,9 +11,11 @@
 #include "dcmtk/dcmdata/dcpxitem.h" 
 #include "dcmtk/dcmjpeg/djdecode.h"
 
+#include "mi_model_progress.h"
+
 MED_IMAGING_BEGIN_NAMESPACE
 
-DICOMLoader::DICOMLoader()
+DICOMLoader::DICOMLoader():_progress(0.0f)
 {
 
 }
@@ -25,9 +27,12 @@ DICOMLoader::~DICOMLoader()
 
 IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
+    set_progress_i(0);
+
     clock_t start_time = clock();
     if (files.empty())
     {
+        set_progress_i(100);
         return IO_EMPTY_INPUT;
     }
 
@@ -43,6 +48,7 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         OFCondition status = file_format->loadFile(file_name.c_str());
         if (status.bad())
         {
+            set_progress_i(100);
             return IO_FILE_OPEN_FAILED;
         }
         data_format_set.push_back(file_format);
@@ -53,11 +59,13 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
     IOStatus checking_status = data_check_i(data_format_set);
     if(IO_SUCCESS !=  checking_status)
     {
+        set_progress_i(100);
         return checking_status;
     }
 
     if (uiSliceCount < 16)//不支持少于16张的数据进行三维可视化 // TODO 这一步在这里做不太合适
     {
+        set_progress_i(100);
         return IO_UNSUPPORTED_YET;
     }
 
@@ -71,9 +79,12 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
     IOStatus data_heading_status = construct_data_header_i(data_format_set , img_data_header);
     if(IO_SUCCESS !=  data_heading_status)
     {
+        set_progress_i(100);
         img_data_header.reset();
         return data_heading_status;
     }
+
+    set_progress_i(10);
 
     //////////////////////////////////////////////////////////////////////////
     //5 Construct image data
@@ -81,6 +92,7 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
     IOStatus data_imaging_status = construct_image_data_i(data_format_set , img_data_header , image_data);
     if(IO_SUCCESS !=  data_imaging_status)
     {
+        set_progress_i(100);
         img_data_header.reset();
         image_data.reset();
         return data_imaging_status;
@@ -89,6 +101,8 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
     clock_t end_time = clock();
 
     std::cout << "Load DICOM cost : " << double(end_time - start_time) << " ms\n";
+
+    set_progress_i(100);
     return IO_SUCCESS;
 }
 
@@ -452,6 +466,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
 
     const std::string& my_tsu = data_header->transfer_syntax_uid;
 
+    const float progress_step = 1.0f/static_cast<float>(slice_count) * 90.0f;
     if (my_tsu == TSU_LittleEndianImplicitTransferSyntax ||
         my_tsu == TSU_LittleEndianExplicitTransferSyntax ||
         my_tsu == TSU_DeflatedExplicitVRLittleEndianTransferSyntax ||
@@ -465,6 +480,8 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
                 return IO_DATA_DAMAGE;
             }
             get_pixel_data_i(file_format_set[i] , dataset , data_array + image_size*i , image_size);
+
+            add_progress_i(progress_step);
         }
     }
     else if (my_tsu == TSU_JPEGProcess14SV1TransferSyntax ||
@@ -478,6 +495,8 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
                 return IO_DATA_DAMAGE;
             }
             get_jpeg_compressed_pixel_data_i(file_format_set[i] , dataset , data_array + image_size*i , image_size);
+
+            add_progress_i(progress_step);
         }
     }
     else if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
@@ -889,6 +908,33 @@ bool DICOMLoader::get_jpeg_compressed_pixel_data_i(DcmFileFormatPtr file_format 
     DcmDataset* dataset = file_format->getDataset();
 
     return get_pixel_data_i(file_format , dataset , data_array , length);
+}
+
+void DICOMLoader::set_progress_model( std::shared_ptr<ProgressModel> model )
+{
+    _model = model;
+}
+
+void DICOMLoader::add_progress_i( float value )
+{
+    if (_model)
+    {
+        _progress += value;
+        int progress = static_cast<int>(_progress);
+        progress = progress > 100 ? 100: progress;
+        _model->set_progress(progress);
+        _model->notify();
+    }
+}
+
+void DICOMLoader::set_progress_i( int value )
+{
+    if (_model)
+    {
+        _progress = static_cast<float>(value);
+        _model->set_progress(value);
+        _model->notify();
+    }
 }
 
 MED_IMAGING_END_NAMESPACE

@@ -45,6 +45,9 @@
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_parser.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgIO\mi_model_progress.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_io_stdafx.cpp">

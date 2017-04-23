@@ -15,6 +15,7 @@
 #include "MedImgIO/mi_meta_object_loader.h"
 #include "MedImgIO/mi_nodule_set.h"
 #include "MedImgIO/mi_nodule_set_parser.h"
+#include "MedImgIO/mi_model_progress.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -43,6 +44,7 @@
 #include "MedImgQtWidgets/mi_model_voi.h"
 #include "MedImgQtWidgets/mi_model_cross_hair.h"
 #include "MedImgQtWidgets/mi_observer_scene_container.h"
+#include "MedImgQtWidgets/mi_observer_progress.h"
 
 
 #include "mi_observer_voi_table.h"
@@ -50,12 +52,13 @@
 #include "mi_mouse_op_min_max_hint.h"
 #include "mi_my_rsa.h"
 
-#include "qevent.h"
-#include "qsizepolicy.h"
-#include "qscrollbar.h"
-#include "qfiledialog.h"
-#include "qmessagebox.h"
-#include "qsignalmapper.h"
+#include <QEvent>
+#include <QSizePolicy>
+#include <QScrollBar>
+#include <QFileDialog>
+#include <QMessagebox>
+#include <QSignalMapper>
+#include <QProgressDialog>
 
 using namespace medical_imaging;
 
@@ -135,6 +138,9 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
 
     _object_nodule = new QNoduleObject(this);
     _object_min_max_hint = new QMinMaxHintObject(this);
+
+    //progress model
+    _model_progress.reset( new ProgressModel());
 
     configure_i();
 
@@ -429,11 +435,23 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> image_data;
         DICOMLoader loader;
+
+        _model_progress->clear_observer();
+        std::shared_ptr<ProgressObserver> progress_ob(new ProgressObserver());
+        progress_ob->set_progress_model(_model_progress);
+        _model_progress->add_observer(progress_ob);
+        loader.set_progress_model(_model_progress);
+
+        QProgressDialog progress_dialog(tr("Loading DICOM series >>>>>>") ,0 , 0 , 100 , this );
+        progress_ob->set_progress_dialog(&progress_dialog);
+        progress_dialog.show();
+
         IOStatus status = loader.load_series(file_names_std, image_data , data_header);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
             QMessageBox::warning(this , tr("load DICOM Folder") , tr("load DICOM folder failed!"));
+            _model_progress->clear_observer();
             return;
         }
 
@@ -455,6 +473,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         _mpr_00->update();
         _mpr_01->update();
         _mpr10->update();
+
+        _model_progress->clear_observer();
 
         _is_ready = true;
     }

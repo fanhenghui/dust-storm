@@ -17,6 +17,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 class ImageData;
 class ImageDataHeader;
+class ProgressModel;
 
 class  DICOMLoader
 {
@@ -26,6 +27,8 @@ public:
     IO_Export ~DICOMLoader();
 
     IO_Export IOStatus load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> & img_data_header);
+
+    IO_Export void set_progress_model(std::shared_ptr<ProgressModel> model);
 
 private:
     IOStatus data_check_i(DcmFileFormatSet& file_format_set);
@@ -90,6 +93,13 @@ private:
     bool get_pixel_data_i(DcmFileFormatPtr pFileFormat , DcmDataset*data_set , char* data_array , unsigned int length);
 
     bool get_jpeg_compressed_pixel_data_i(DcmFileFormatPtr pFileFormat , DcmDataset*data_set , char* data_array , unsigned int length);
+
+private:
+    void add_progress_i(float value);
+    void set_progress_i(int value);
+
+    float _progress;
+    std::shared_ptr<ProgressModel> _model;
 };
 
 MED_IMAGING_END_NAMESPACE

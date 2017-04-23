@@ -18,6 +18,7 @@ public:
 
     void add_observer(ObserverPtr observer);
     void delete_observer(ObserverPtr observer);
+    void clear_observer();
 
     void notify();
 

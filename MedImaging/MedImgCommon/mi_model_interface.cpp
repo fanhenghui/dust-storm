@@ -75,4 +75,9 @@ bool IModel::has_changed()
     return _is_changed;
 }
 
+void IModel::clear_observer()
+{
+    _observers.clear();
+}
+
 MED_IMAGING_END_NAMESPACE

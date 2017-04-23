@@ -13,6 +13,7 @@ namespace medical_imaging
     class VOIObserver;
     class CrosshairModel;
     class SceneContainerObserver;
+    class ProgressModel;
 }
 typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
@@ -114,6 +115,7 @@ private:
     //Model
     std::shared_ptr<medical_imaging::VOIModel> _model_voi;
     std::shared_ptr<medical_imaging::CrosshairModel> _model_crosshari;
+    std::shared_ptr<medical_imaging::ProgressModel> _model_progress;
 
     //Observer
     std::shared_ptr<VOITableObserver> _ob_voi_table;
@@ -126,6 +128,7 @@ private:
 
     //Scene min max hint
     QMinMaxHintObject* _object_min_max_hint;
+
 };
 
 #endif // MI_MAIN_WINDOW_H
