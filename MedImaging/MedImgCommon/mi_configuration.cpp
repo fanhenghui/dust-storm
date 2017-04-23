@@ -29,7 +29,7 @@ ProcessingUnitType Configuration::get_processing_unit_type()
     return _processing_unit_type;
 }
 
-Configuration::Configuration():_processing_unit_type(CPU)
+Configuration::Configuration():_processing_unit_type(CPU),_is_nodule_file_rsa(false)
 {
     //Check hardware processing unit . Check if has GPU
 }
@@ -37,6 +37,16 @@ Configuration::Configuration():_processing_unit_type(CPU)
 void Configuration::set_processing_unit_type(ProcessingUnitType type)
 {
     _processing_unit_type = type;
+}
+
+void Configuration::set_nodule_file_rsa( bool b )
+{
+    _is_nodule_file_rsa = b;
+}
+
+bool Configuration::get_nodule_file_rsa()
+{
+    return _is_nodule_file_rsa;
 }
 
 MED_IMAGING_END_NAMESPACE

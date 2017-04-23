@@ -235,8 +235,8 @@
     <addaction name="actionOpen_DICOM_Folder"/>
     <addaction name="actionOpen_Meta_Image"/>
     <addaction name="actionOpen_Raw"/>
-    <addaction name="actionLoad_Nodule"/>
     <addaction name="actionSave_Nodule"/>
+    <addaction name="actionLoad_Nodule"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">

@@ -6,6 +6,7 @@
 #include "MedImgCommon/mi_configuration.h"
 #include "MedImgCommon/mi_string_number_converter.h"
 
+#include "MedImgArithmetic/mi_rsa_utils.h"
 #include "MedImgArithmetic/mi_ortho_camera.h"
 
 #include "MedImgIO/mi_dicom_loader.h"
@@ -47,6 +48,7 @@
 #include "mi_observer_voi_table.h"
 #include "mi_observer_mpr_scroll_bar.h"
 #include "mi_mouse_op_min_max_hint.h"
+#include "mi_my_rsa.h"
 
 #include "qevent.h"
 #include "qsizepolicy.h"
@@ -149,6 +151,8 @@ void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
     Configuration::instance()->set_processing_unit_type(GPU);
+    Configuration::instance()->set_nodule_file_rsa(true);
+
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -659,7 +663,26 @@ void NoduleAnnotation::slot_save_nodule_file_i()
 
         NoduleSetParser parser;
         std::string file_name_std(file_name.toLocal8Bit());
-        IOStatus status = parser.save_as_csv(file_name_std , nodule_set);
+
+        IOStatus status;
+        if (Configuration::instance()->get_nodule_file_rsa())
+        {
+            RSAUtils rsa_utils;
+            mbedtls_rsa_context rsa;
+            if(rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0)
+            {
+                status = IO_ENCRYPT_FAILED;
+            }
+            else
+            {
+                status = parser.save_as_rsa_binary(file_name_std , rsa , nodule_set);
+            }
+        }
+        else
+        {
+            status = parser.save_as_csv(file_name_std , nodule_set);
+        }
+        
 
         if (status == IO_SUCCESS)
         {
@@ -696,7 +719,25 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
         NoduleSetParser parser;
         std::string file_name_std(file_name.toLocal8Bit());
-        IOStatus status = parser.load_as_csv(file_name_std , nodule_set);
+
+        IOStatus status ;
+        if (Configuration::instance()->get_nodule_file_rsa())
+        {
+            RSAUtils rsa_utils;
+            mbedtls_rsa_context rsa;
+            if(rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0)
+            {
+                status = IO_ENCRYPT_FAILED;
+            }
+            else
+            {
+                status = parser.load_as_rsa_binary(file_name_std , rsa , nodule_set);
+            }
+        }
+        else
+        {
+            status = parser.load_as_csv(file_name_std , nodule_set);
+        }
 
         if (status == IO_SUCCESS)
         {

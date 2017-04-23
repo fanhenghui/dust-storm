@@ -16,6 +16,17 @@ public:
     ~RSAUtils();
 
     int gen_key(mbedtls_rsa_context& rsa , int key_size = 2048 , int exponent = 65537);
+    int to_rsa_context(
+        const char* n , 
+        const char* e , 
+        const char* d , 
+        const char* p , 
+        const char* q , 
+        const char* dp ,
+        const char* dq ,
+        const char* qp ,
+        mbedtls_rsa_context& rsa);
+
 
     int key_to_file(const mbedtls_rsa_context& rsa , const std::string& file_public , const std::string& file_private);
     int file_to_pubilc_key(const std::string& file_public , mbedtls_rsa_context& rsa );

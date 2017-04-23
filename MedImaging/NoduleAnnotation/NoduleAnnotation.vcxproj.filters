@@ -96,5 +96,8 @@
     <ClInclude Include="mi_observer_mpr_scroll_bar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="mi_my_rsa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

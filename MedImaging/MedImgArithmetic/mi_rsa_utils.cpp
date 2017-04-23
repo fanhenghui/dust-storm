@@ -234,5 +234,36 @@ int RSAUtils::file_to_pubilc_key(const std::string& file_public , mbedtls_rsa_co
     return 0;
 }
 
+int RSAUtils::to_rsa_context( 
+    const char* n , 
+    const char* e , 
+    const char* d , 
+    const char* p , 
+    const char* q , 
+    const char* dp , 
+    const char* dq , 
+    const char* qp ,
+    mbedtls_rsa_context& rsa)
+{
+    mbedtls_rsa_init( &rsa, MBEDTLS_RSA_PKCS_V15, 0 );
+
+    int status = -1;
+    if( ( status = mbedtls_mpi_read_string( &rsa.N , 16, n ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.E , 16, e ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.D , 16, d ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.P , 16, p ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.Q , 16, q ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.DP, 16, dp ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.DQ, 16, dq ) ) != 0 ||
+        ( status = mbedtls_mpi_read_string( &rsa.QP, 16, qp ) ) != 0 )
+    {
+        return -1;
+    }
+
+    rsa.len = ( mbedtls_mpi_bitlen( &rsa.N ) + 7 ) >> 3;
+
+    return 0;
+}
+
 
 MED_IMAGING_END_NAMESPACE
