@@ -31,19 +31,19 @@ public:
 
     void set_width(int width);
 
-    void add_point(float fRealValue, float a);
+    void add_point(float real_value, float a);
 
-    void get_point_list(std::vector<OpacityTFPoint>& vecResultList);
+    void get_point_list(std::vector<OpacityTFPoint>& result_list);
 
     int get_width() const;
 
 protected:
 
 private:
-    std::vector<OpacityTFPoint> m_vecTFPoint;
-    std::vector<OpacityTFPoint> m_vecResultList;
+    std::vector<OpacityTFPoint> _tp_points;
+    std::vector<OpacityTFPoint> _result_points;
     int _width;
-    bool m_bIsDataDirty;
+    bool _is_dirty;
 };
 
 MED_IMAGING_END_NAMESPACE

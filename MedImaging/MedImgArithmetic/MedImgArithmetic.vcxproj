@@ -176,7 +176,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl" />
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_aabb.h" />

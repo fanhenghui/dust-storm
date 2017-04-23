@@ -169,9 +169,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\Include\MedImgCommon\mi_configuration.h" />
     <ClInclude Include="..\Include\MedImgCommon\mi_concurrency.h" />
     <ClInclude Include="..\Include\MedImgCommon\mi_common_define.h" />

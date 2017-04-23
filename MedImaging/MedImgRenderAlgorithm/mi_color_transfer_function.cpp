@@ -2,8 +2,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-ColorTransFunc::ColorTransFunc(int width /*= 512 */) :
-_width(width), m_eInterpolationColorType(RGB), m_eInputColorType(RGB), m_bIsDataDirty(false)
+ColorTransFunc::ColorTransFunc(int width /*= 512 */) :_width(width), _interpolation_type(RGB), _input_type(RGB), _is_dirty(false)
 {}
 
 ColorTransFunc::~ColorTransFunc()
@@ -14,17 +13,17 @@ ColorTransFunc::~ColorTransFunc()
 void ColorTransFunc::set_width(int width)
 {
     _width = width;
-    m_bIsDataDirty = true;
+    _is_dirty = true;
 }
 
-void ColorTransFunc::set_color_type(ColorType eInputColorType, ColorType eInterpolationColorType)
+void ColorTransFunc::set_color_type(ColorType input_type, ColorType interpolation_type)
 {
-    m_eInterpolationColorType = eInterpolationColorType;
-    m_eInputColorType = eInputColorType;
-    m_bIsDataDirty = true;
+    _interpolation_type = interpolation_type;
+    _input_type = input_type;
+    _is_dirty = true;
 }
 
-void ColorTransFunc::add_rgb_point(float fRealValue, float x, float y, float z)
+void ColorTransFunc::add_rgb_point(float real_value, float x, float y, float z)
 {
     //     if(x > 1.0f)
     //     {
@@ -38,39 +37,39 @@ void ColorTransFunc::add_rgb_point(float fRealValue, float x, float y, float z)
     //     {
     //         z /= 255.0f;
     //     }
-    m_vecTFPoint.push_back(ColorTFPoint(fRealValue, x, y, z));
-    m_bIsDataDirty = true;
+    _tp_points.push_back(ColorTFPoint(real_value, x, y, z));
+    _is_dirty = true;
 }
 
-void ColorTransFunc::add_hsv_point(float fRealValue, float x, float y, float z)
+void ColorTransFunc::add_hsv_point(float real_value, float x, float y, float z)
 {
-    m_vecTFPoint.push_back(ColorTFPoint(fRealValue, x, y, z));
-    m_bIsDataDirty = true;
+    _tp_points.push_back(ColorTFPoint(real_value, x, y, z));
+    _is_dirty = true;
 }
 
-void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
+void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& result_list)
 {
-    if (m_bIsDataDirty)//Point changed
+    if (_is_dirty)//Point changed
     {
-        if (m_vecTFPoint.empty())
+        if (_tp_points.empty())
         {
-            m_vecResultList.clear();
-            vecResultList = m_vecResultList;
+            _result_points.clear();
+            result_list = _result_points;
         }
         //Check input type and interpolation type
-        if (m_eInterpolationColorType != m_eInputColorType)
+        if (_interpolation_type != _input_type)
         {
-            if (RGB == m_eInputColorType)
+            if (RGB == _input_type)
             {
-                for (auto it = m_vecTFPoint.begin(); it != m_vecTFPoint.end(); ++it)
+                for (auto it = _tp_points.begin(); it != _tp_points.end(); ++it)
                 {
                     //Convert RGB tot HSV
                     *it = hsv_to_rgb(*it);
                 }
             }
-            if (HSV == m_eInputColorType)
+            if (HSV == _input_type)
             {
-                for (auto it = m_vecTFPoint.begin(); it != m_vecTFPoint.end(); ++it)
+                for (auto it = _tp_points.begin(); it != _tp_points.end(); ++it)
                 {
                     //Convert HSV tot RGB
                     *it = hsv_to_rgb(*it);
@@ -81,76 +80,76 @@ void ColorTransFunc::get_point_list(std::vector<ColorTFPoint>& vecResultList)
         //Interpolation
         //1 Sort the TFPoint from small to large
         //Bubble sort
-        size_t uiTFPointSize = m_vecTFPoint.size();
-        for (size_t i = 0; i < uiTFPointSize; ++i)
+        size_t tp_point_size = _tp_points.size();
+        for (size_t i = 0; i < tp_point_size; ++i)
         {
-            for (size_t j = 0; j < uiTFPointSize - 1 - i; ++j)
+            for (size_t j = 0; j < tp_point_size - 1 - i; ++j)
             {
-                if (m_vecTFPoint[j].v > m_vecTFPoint[j + 1].v)
+                if (_tp_points[j].v > _tp_points[j + 1].v)
                 {
-                    ColorTFPoint temp(m_vecTFPoint[j].v, m_vecTFPoint[j].x, m_vecTFPoint[j].y, m_vecTFPoint[j].z);
-                    m_vecTFPoint[j] = m_vecTFPoint[j + 1];
-                    m_vecTFPoint[j + 1] = temp;
+                    ColorTFPoint temp(_tp_points[j].v, _tp_points[j].x, _tp_points[j].y, _tp_points[j].z);
+                    _tp_points[j] = _tp_points[j + 1];
+                    _tp_points[j + 1] = temp;
                 }
             }
         }
 
         //2 Add to iWidht count points
         //Expand point value to width , make the interpolation step is 1
-        float fMaxValue = m_vecTFPoint[uiTFPointSize - 1].v;
-        float fMinValue = m_vecTFPoint[0].v;
-        float fExpandRatio = static_cast<float>(_width - 1) / (fMaxValue - fMinValue);
-        for (size_t i = 0; i < uiTFPointSize; ++i)
+        float max_value = _tp_points[tp_point_size - 1].v;
+        float min_value = _tp_points[0].v;
+        float expand_ratio = static_cast<float>(_width - 1) / (max_value - min_value);
+        for (size_t i = 0; i < tp_point_size; ++i)
         {
-            m_vecTFPoint[i].v = static_cast<float>(static_cast<int>((m_vecTFPoint[i].v - fMinValue)  * fExpandRatio + 0.5f));
+            _tp_points[i].v = static_cast<float>(static_cast<int>((_tp_points[i].v - min_value)  * expand_ratio + 0.5f));
         }
 
         //Interpolation
-        m_vecResultList.clear();
-        for (size_t i = 0; i < uiTFPointSize - 1; ++i)
+        _result_points.clear();
+        for (size_t i = 0; i < tp_point_size - 1; ++i)
         {
-            int iGap = static_cast<int>(fabs(m_vecTFPoint[i + 1].v - m_vecTFPoint[i].v));
-            if (0 == iGap)
+            int gap = static_cast<int>(fabs(_tp_points[i + 1].v - _tp_points[i].v));
+            if (0 == gap)
             {
                 continue;
             }
-            float fStepX = (m_vecTFPoint[i + 1].x - m_vecTFPoint[i].x) / static_cast<float>(iGap);
-            float fStepY = (m_vecTFPoint[i + 1].y - m_vecTFPoint[i].y) / static_cast<float>(iGap);
-            float fStepZ = (m_vecTFPoint[i + 1].z - m_vecTFPoint[i].z) / static_cast<float>(iGap);
-            float fBeginX = m_vecTFPoint[i].x - fStepX;
-            float fBeginY = m_vecTFPoint[i].y - fStepY;
-            float fBeginZ = m_vecTFPoint[i].z - fStepZ;
-            float fBeginValue = m_vecTFPoint[i].v - 1.0f;
-            for (int j = 0; j < iGap; ++j)
+            float step_x = (_tp_points[i + 1].x - _tp_points[i].x) / static_cast<float>(gap);
+            float step_y = (_tp_points[i + 1].y - _tp_points[i].y) / static_cast<float>(gap);
+            float step_z = (_tp_points[i + 1].z - _tp_points[i].z) / static_cast<float>(gap);
+            float begin_x = _tp_points[i].x - step_x;
+            float begin_y = _tp_points[i].y - step_y;
+            float begin_z = _tp_points[i].z - step_z;
+            float begin_value = _tp_points[i].v - 1.0f;
+            for (int j = 0; j < gap; ++j)
             {
-                fBeginX += fStepX;
-                fBeginY += fStepY;
-                fBeginZ += fStepZ;
-                fBeginValue += 1.0f;
-                m_vecResultList.push_back(ColorTFPoint(
-                    fBeginValue,
-                    fBeginX,
-                    fBeginY,
-                    fBeginZ));
+                begin_x += step_x;
+                begin_y += step_y;
+                begin_z += step_z;
+                begin_value += 1.0f;
+                _result_points.push_back(ColorTFPoint(
+                    begin_value,
+                    begin_x,
+                    begin_y,
+                    begin_z));
             }
         }
-        m_vecResultList.push_back(m_vecTFPoint[uiTFPointSize - 1]);//Add last one
+        _result_points.push_back(_tp_points[tp_point_size - 1]);//Add last one
 
         //Transfer HSV interpolation to RGB
-        if (HSV == m_eInterpolationColorType)
+        if (HSV == _interpolation_type)
         {
-            for (size_t i = 0; i < m_vecResultList.size(); ++i)
+            for (size_t i = 0; i < _result_points.size(); ++i)
             {
-                m_vecResultList[i] = hsv_to_rgb(m_vecResultList[i]);
+                _result_points[i] = hsv_to_rgb(_result_points[i]);
             }
         }
 
-        vecResultList = m_vecResultList;
-        m_bIsDataDirty = false;
+        result_list = _result_points;
+        _is_dirty = false;
     }
     else
     {
-        vecResultList = m_vecResultList;
+        result_list = _result_points;
     }
 }
 

@@ -30,7 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
       <Filter>Sampler</Filter>
     </None>
