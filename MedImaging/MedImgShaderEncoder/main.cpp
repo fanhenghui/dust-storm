@@ -6,8 +6,8 @@
 
 namespace
 {
-    static const std::string sTagEcoderDst = "EncoderDst";
-    static const std::string sTagEcoderItem = "EncoderItem";
+    static const std::string S_TAG_ENCODER_DST = "EncoderDst";
+    static const std::string S_TAG_ECODER_ITEM = "EncoderItem";
 }
 void main(int argc , char* argv[])
 {
@@ -18,85 +18,85 @@ void main(int argc , char* argv[])
     }
 
     //1 Parse config file
-    const char* pConfigFile = argv[1];
-    std::fstream inConfig(pConfigFile , std::ios::in);
-    if (!inConfig.is_open())
+    const char* config_file = argv[1];
+    std::fstream in_config(config_file , std::ios::in);
+    if (!in_config.is_open())
     {
-        std::cout <<"Cant open config file " << inConfig << std::endl;
+        std::cout <<"Cant open config file " << in_config << std::endl;
         return;
     }
 
-    std::string sLine;
-    std::ofstream outEncodDstFile;
-    bool bDstFileValid = false;
-    while(std::getline(inConfig , sLine))
+    std::string line;
+    std::ofstream out_encod_dst_file;
+    bool is_dst_file_valid = false;
+    while(std::getline(in_config , line))
     {
-        if (sLine.empty())
+        if (line.empty())
         {
             continue;
         }
 
-        std::stringstream ss(sLine);
-        std::string sTag;
-        std::string sEqualSymbol;
-        std::string sContext0;
-        std::string sContext1;
-        ss >> sTag ;
-        if (sTag == sTagEcoderDst)//Begin a encoding to file sContext0
+        std::stringstream ss(line);
+        std::string tag;
+        std::string equal_symbol;
+        std::string context0;
+        std::string context1;
+        ss >> tag ;
+        if (tag == S_TAG_ENCODER_DST)//Begin a encoding to file sContext0
         {
-            ss >> sEqualSymbol >> sContext0;
-            outEncodDstFile.clear();
-            outEncodDstFile.close();
-            bDstFileValid = false;
-            outEncodDstFile.open(sContext0 , std::ios::out);
-            if (!outEncodDstFile.is_open())
+            ss >> equal_symbol >> context0;
+            out_encod_dst_file.clear();
+            out_encod_dst_file.close();
+            is_dst_file_valid = false;
+            out_encod_dst_file.open(context0 , std::ios::out);
+            if (!out_encod_dst_file.is_open())
             {
-                std::cout << "Cant open encoding dst file : " << sContext0<< std::endl;
+                std::cout << "Cant open encoding dst file : " << context0<< std::endl;
                 continue;
             }
             //Write header
-            outEncodDstFile << "#pragma  once\n\n";
-            bDstFileValid = true;
+            out_encod_dst_file << "#pragma  once\n\n";
+            is_dst_file_valid = true;
         }
-        else if (sTag == sTagEcoderItem)//Encoder shader file sContext0 to opened dst file
+        else if (tag == S_TAG_ECODER_ITEM)//Encoder shader file sContext0 to opened dst file
         {
-            ss >> sEqualSymbol >> sContext0 >> sContext1;
-            if (!bDstFileValid)
+            ss >> equal_symbol >> context0 >> context1;
+            if (!is_dst_file_valid)
             {
                 continue;
             }
 
             //Read shader file and write to dst file
-            if (sContext1.empty() || sContext0.empty())
+            if (context1.empty() || context0.empty())
             {
                 continue;
             }
 
-            std::ifstream inShader(sContext0.c_str() , std::ios::in);
-            if (!inShader.is_open())
+            std::ifstream in_shader(context0.c_str() , std::ios::in);
+            if (!in_shader.is_open())
             {
-                std::cout << "Cant open shader file " << sContext0 << std::endl;
+                std::cout << "Cant open shader file " << context0 << std::endl;
                 continue;
             }
 
             //Write item variable
-            outEncodDstFile << "static const char* " << sContext1 <<" = \"\\\n";
+            out_encod_dst_file << "static const char* " << context1 <<" = \"\\\n";
 
-            std::string sShaderLine;
-            while(std::getline(inShader, sShaderLine))
+            std::string shader_line;
+            while(std::getline(in_shader, shader_line))
             {
-                outEncodDstFile << sShaderLine <<"\\n" << "\\\n";
+                out_encod_dst_file << shader_line <<"\\n" << "\\\n";
             }
             //Write item end;
-            outEncodDstFile << "\";\n\n";
-            inShader.close();
+            out_encod_dst_file << "\";\n\n";
+            in_shader.close();
         }
         else//print as annotation
         {
-            outEncodDstFile <<"//" << sLine << std::endl;
+            out_encod_dst_file <<"//" << line << std::endl;
         }
     }
-    outEncodDstFile.clear();
-    outEncodDstFile.close();
-    inConfig.close();
+    out_encod_dst_file.clear();
+    out_encod_dst_file.close();
+    in_config.close();
 }

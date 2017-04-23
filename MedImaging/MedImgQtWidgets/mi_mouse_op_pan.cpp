@@ -16,41 +16,41 @@ MouseOpPan::~MouseOpPan()
 
 void MouseOpPan::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpPan::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_pScene->pan(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
-    m_ptPre = pt;
+    _scene->pan(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
+    _pre_point = pt;
 }
 
 void MouseOpPan::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpPan::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 MED_IMAGING_END_NAMESPACE

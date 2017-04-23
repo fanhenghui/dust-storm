@@ -14,21 +14,21 @@ CrosshairPainter::~CrosshairPainter()
 
 }
 
-void CrosshairPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
+void CrosshairPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
 {
-    m_pModel = pModel;
+    _model = model;
 }
 
 void CrosshairPainter::render()
 {
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pModel);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pScene);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pPainter);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_model);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_painter);
 
-    std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
+    std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
 
-    if (!m_pModel->get_visibility())
+    if (!_model->get_visibility())
     {
         return;
     }
@@ -36,13 +36,13 @@ void CrosshairPainter::render()
 
     Line2D lines[2];
     RGBUnit colors[2];
-    m_pModel->get_cross_line(pScene , lines , colors);
+    _model->get_cross_line(scene , lines , colors);
 
     //std::cout << "<><><><><><><><>\n";
-    //std::cout << pScene->get_description() << std::endl;
+    //std::cout << scene->get_description() << std::endl;
 
     int width(1) , height(1);
-    m_pScene->get_display_size(width , height);
+    _scene->get_display_size(width , height);
 
     for (int i = 0 ; i< 2 ; ++i)
     {
@@ -62,7 +62,7 @@ void CrosshairPainter::render()
         //line._dir.print();
         //std::cout << std::endl;
 
-        QPoint pDC0 , pDC1;
+        QPoint pt_dc_0 , pt_dc_1;
         if (abs(a) < DOUBLE_EPSILON)
         {
             double y = c/b;
@@ -70,24 +70,24 @@ void CrosshairPainter::render()
             iY = iY < 0 ? 0 : iY;
             iY = iY > (height-1) ? height-1 : iY;
 
-            pDC0.setX(0);
-            pDC0.setY(iY);
+            pt_dc_0.setX(0);
+            pt_dc_0.setY(iY);
 
-            pDC1.setX(width -1);
-            pDC1.setY(iY);
+            pt_dc_1.setX(width -1);
+            pt_dc_1.setY(iY);
         }
         else if (abs(b) < DOUBLE_EPSILON)
         {
             double x = c/a;
-            int iX = (int)(x+0.5);
-            iX = iX < 0 ? 0 : iX;
-            iX = iX > (width-1) ? width-1 : iX;
+            int x_int = (int)(x+0.5);
+            x_int = x_int < 0 ? 0 : x;
+            x_int = x_int > (width-1) ? width-1 : x;
 
-            pDC0.setX(iX);
-            pDC0.setY(0);
+            pt_dc_0.setX(x_int);
+            pt_dc_0.setY(0);
 
-            pDC1.setX(iX);
-            pDC1.setY(height-1);
+            pt_dc_1.setX(x_int);
+            pt_dc_1.setY(height-1);
         }
         else
         {
@@ -96,8 +96,8 @@ void CrosshairPainter::render()
             continue;
         }
 
-        m_pPainter->setPen(QColor(colors[i].r , colors[i].g , colors[i].b));
-        m_pPainter->drawLine(pDC0 , pDC1);
+        _painter->setPen(QColor(colors[i].r , colors[i].g , colors[i].b));
+        _painter->drawLine(pt_dc_0 , pt_dc_1);
 
 
     }

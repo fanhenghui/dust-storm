@@ -11,10 +11,10 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-const std::string ksNoduleTypeGGN = std::string("GGN");
-const std::string ksNoduleTypeAAH = std::string("AAH");
+const std::string NODULE_TYPE_GGN = std::string("GGN");
+const std::string NODULE_TYPE_AAH = std::string("AAH");
 
-MouseOpAnnotate::MouseOpAnnotate():m_bPin(false),diameter(0.0)
+MouseOpAnnotate::MouseOpAnnotate():_is_pin(false),_diameter(0.0)
 {
 
 }
@@ -26,78 +26,78 @@ MouseOpAnnotate::~MouseOpAnnotate()
 
 void MouseOpAnnotate::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
-    m_bPin = false;
-    diameter = 0.0;
+    _pre_point = pt;
+    _is_pin = false;
+    _diameter = 0.0;
 
     //New voi
-    std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    if (pScene&&m_pVOIModel)
+    std::shared_ptr<MPRScene>  scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (scene&&_model)
     {
-        Point3 ptCenter;
-        if(pScene->get_patient_position(Point2(pt.x() , pt.y()) , ptCenter))
+        Point3 sphere_center;
+        if(scene->get_patient_position(Point2(pt.x() , pt.y()) , sphere_center))
         {
             //Get VOI center
-            m_bPin = true;
-            m_ptCenter = ptCenter;
-            diameter = 0.0;
-            m_pVOIModel->add_voi_sphere(medical_imaging::VOISphere(m_ptCenter , diameter , ksNoduleTypeGGN));
-            m_pVOIModel->notify();
+            _is_pin = true;
+            _center = sphere_center;
+            _diameter = 0.0;
+            _model->add_voi_sphere(medical_imaging::VOISphere(_center , _diameter , NODULE_TYPE_GGN));
+            _model->notify();
         }
     }
 }
 
 void MouseOpAnnotate::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    if (m_bPin&&m_pVOIModel)
+    if (_is_pin&&_model)
     {
-        Point3 ptFace;
-        std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-        if(pScene->get_patient_position(Point2(pt.x() , pt.y()) , ptFace))
+        Point3 pt_mpr;
+        std::shared_ptr<MPRScene>  scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+        if(scene->get_patient_position(Point2(pt.x() , pt.y()) , pt_mpr))
         {
             //Get VOI center
-            Vector3 v = ptFace - m_ptCenter;
-            diameter = v.magnitude()*2.0;
+            Vector3 v = pt_mpr - _center;
+            _diameter = v.magnitude()*2.0;
 
-            m_pVOIModel->modify_voi_sphere_list_rear(medical_imaging::VOISphere(m_ptCenter , diameter));
-            m_pVOIModel->notify();
+            _model->modify_voi_sphere_list_rear(medical_imaging::VOISphere(_center , _diameter));
+            _model->notify();
         }
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpAnnotate::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpAnnotate::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
-void MouseOpAnnotate::set_voi_model(std::shared_ptr<VOIModel> pVOIModel)
+void MouseOpAnnotate::set_voi_model(std::shared_ptr<VOIModel> model)
 {
-    m_pVOIModel = pVOIModel;
+    _model = model;
 }
 
 MED_IMAGING_END_NAMESPACE

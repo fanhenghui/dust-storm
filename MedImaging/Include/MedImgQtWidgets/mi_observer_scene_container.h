@@ -12,13 +12,16 @@ class QtWidgets_Export SceneContainerObserver : public IObserver
 public: 
     SceneContainerObserver();
     virtual ~SceneContainerObserver();
+
     virtual void update();
-    void add_scene_container(SceneContainer* pContainer);
-    void set_scene_container(const std::vector<SceneContainer*>& vecConainers);
+
+    void add_scene_container(SceneContainer* container);
+    void set_scene_container(const std::vector<SceneContainer*>& containers);
+
     void clear_scene_container();
 protected:
 private:
-    std::vector<SceneContainer*> m_vecContainers; 
+    std::vector<SceneContainer*> _scene_containers; 
 };
 
 MED_IMAGING_END_NAMESPACE

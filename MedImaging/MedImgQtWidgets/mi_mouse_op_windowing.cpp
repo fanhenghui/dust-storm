@@ -17,56 +17,56 @@ MouseOpWindowing::~MouseOpWindowing()
 
 void MouseOpWindowing::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpWindowing::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
     //TODO MPR VR diverse strategy
-    std::shared_ptr<RayCastScene>  pScene = std::dynamic_pointer_cast<RayCastScene>(m_pScene);
-    if (pScene)
+    std::shared_ptr<RayCastScene>  scene = std::dynamic_pointer_cast<RayCastScene>(_scene);
+    if (scene)
     {
-        float fWW , fWL;
-        pScene->get_global_window_level(fWW, fWL);
-        float fDeltaWW = pt.x() - m_ptPre.x();
-        float fDeltaWL = m_ptPre.y() - pt.y();
-        if (fWW + fDeltaWW > 1.0f)
+        float ww , wl;
+        scene->get_global_window_level(ww, wl);
+        float delta_ww = pt.x() - _pre_point.x();
+        float delta_wl = _pre_point.y() - pt.y();
+        if (ww + delta_ww > 1.0f)
         {
-            fWW += fDeltaWW;
+            ww += delta_ww;
         }
-        fWL += fDeltaWL;
-        pScene->set_global_window_level(fWW , fWL);
+        wl += delta_wl;
+        scene->set_global_window_level(ww , wl);
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpWindowing::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpWindowing::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 MED_IMAGING_END_NAMESPACE

@@ -17,37 +17,37 @@ MPRBorderPainter::~MPRBorderPainter()
 
 void MPRBorderPainter::render()
 {
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pModel);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pScene);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pPainter);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_model);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_painter);
 
-    std::shared_ptr<MPRScene> pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
+    std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
 
     int width(1) , height(1);
-    pScene->get_display_size(width , height);
+    scene->get_display_size(width , height);
 
-    RGBUnit color = m_pModel->get_border_color(pScene);
+    RGBUnit color = _model->get_border_color(scene);
 
-    if (m_pModel->check_focus(pScene))
+    if (_model->check_focus(scene))
     {
         QPen pen(QColor(0,255,255));
         pen.setWidth(7);
-        m_pPainter->setPen(pen);
-        m_pPainter->drawRect(QRect(0 , 0 , width, height));
+        _painter->setPen(pen);
+        _painter->drawRect(QRect(0 , 0 , width, height));
     }
     else
     {
         QPen pen(QColor(color.r ,color.g , color.b));
         pen.setWidth(4);
-        m_pPainter->setPen(pen);
-        m_pPainter->drawRect(QRect(0 , 0 , width, height));
+        _painter->setPen(pen);
+        _painter->drawRect(QRect(0 , 0 , width, height));
     }
 }
 
-void MPRBorderPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
+void MPRBorderPainter::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
 {
-    m_pModel = pModel;
+    _model = model;
 }
 
 MED_IMAGING_END_NAMESPACE

@@ -19,62 +19,62 @@ MouseOpProbe::~MouseOpProbe()
 
 void MouseOpProbe::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpProbe::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
     //TODO MPR VR diverse strategy
-    std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    if (pScene)
+    std::shared_ptr<MPRScene>  scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (scene)
     {
-        Point3 ptV;
-        if(pScene->get_volume_position(Point2(pt.x() , pt.y()) , ptV))
+        Point3 pt_v;
+        if(scene->get_volume_position(Point2(pt.x() , pt.y()) , pt_v))
         {
-            std::shared_ptr<VolumeInfos> volume_infos = pScene->get_volume_infos();
+            std::shared_ptr<VolumeInfos> volume_infos = scene->get_volume_infos();
             if (volume_infos)
             {
                 std::shared_ptr<ImageData> pImg = volume_infos->get_volume();
                 if (pImg)
                 {
-                    double dPixelValue(0);
-                    pImg->get_pixel_value(ptV , dPixelValue);
-                    dPixelValue =dPixelValue*pImg->_slope + pImg->_intercept;
-                    std::cout <<dPixelValue << " " << ptV.x << " " << ptV.y << " " << ptV.z << std::endl;
+                    double pixel_value(0);
+                    pImg->get_pixel_value(pt_v , pixel_value);
+                    pixel_value =pixel_value*pImg->_slope + pImg->_intercept;
+                    std::cout <<pixel_value << " " << pt_v.x << " " << pt_v.y << " " << pt_v.z << std::endl;
                 }
             }
             
         }
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpProbe::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpProbe::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 MED_IMAGING_END_NAMESPACE

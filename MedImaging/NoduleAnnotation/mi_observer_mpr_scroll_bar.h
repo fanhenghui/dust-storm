@@ -17,14 +17,17 @@ class MPRScrollBarObserver : public medical_imaging::IObserver
 public:
     MPRScrollBarObserver();
     virtual ~MPRScrollBarObserver();
-    void set_crosshair_model(std::shared_ptr<medical_imaging::CrosshairModel> pModel);
-    void add_scroll_bar(std::shared_ptr<medical_imaging::MPRScene> pScene, QScrollBar* pWidget);
+
+    void set_crosshair_model(std::shared_ptr<medical_imaging::CrosshairModel> model);
+
+    void add_scroll_bar(std::shared_ptr<medical_imaging::MPRScene> scene, QScrollBar* widget);
+
     virtual void update();
 protected:
 private:
-    std::weak_ptr<medical_imaging::CrosshairModel> m_pModel;
-    std::vector<std::shared_ptr<medical_imaging::MPRScene>> m_vecScenes;
-    std::vector<QScrollBar*> m_vecScrollBars;
+    std::weak_ptr<medical_imaging::CrosshairModel> _model;
+    std::vector<std::shared_ptr<medical_imaging::MPRScene>> _scenes;
+    std::vector<QScrollBar*> _scoll_bars;
 };
 
 #endif

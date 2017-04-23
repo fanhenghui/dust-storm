@@ -24,58 +24,58 @@ public:
 
     virtual ~CrosshairModel();
 
-    void set_mpr_scene(const ScanSliceType (&aScanType)[3] , const MPRScenePtr (&aMPRScenes)[3] , const RGBUnit (aMPRColors)[3]);
+    void set_mpr_scene(const ScanSliceType (&scan_type)[3] , const MPRScenePtr (&scenes)[3] , const RGBUnit (colors)[3]);
 
     void get_cross_line(
-        const MPRScenePtr& pTragetMPRScene, 
+        const MPRScenePtr& target_mpr_scene, 
         Line2D (&lines)[2],
         RGBUnit (&color)[2]);
 
-    RGBUnit get_border_color(MPRScenePtr pTargetMPRScene);
+    RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 
-    bool check_focus(MPRScenePtr pTargetMPRScene);
+    bool check_focus(MPRScenePtr target_mpr_scene);
 
-    void focus(MPRScenePtr pTargetMPRScene);
+    void focus(MPRScenePtr target_mpr_scene);
 
     Point3 get_cross_location_discrete_world() const;
 
     Point3 get_cross_location_contineous_world() const;
 
     //page one MPR will change cross line in other 2
-    bool page_to(const std::shared_ptr<MPRScene>& pTargetMPRScene , int page);
+    bool page_to(const std::shared_ptr<MPRScene>& target_mpr_scene , int page);
 
-    bool page(const std::shared_ptr<MPRScene>& pTargetMPRScene , int iPageStep);
+    bool page(const std::shared_ptr<MPRScene>& target_mpr_scene , int step);
 
-    int get_page(const std::shared_ptr<MPRScene>& pTargetMPRScene );
+    int get_page(const std::shared_ptr<MPRScene>& target_mpr_scene );
 
     //locate in one MPR will paging others 2
-    bool locate(const std::shared_ptr<MPRScene>& pTargetMPRScene , const Point2& pt_dc);
+    bool locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc);
 
-    bool locate(const Point3& ptCenterW);
+    bool locate(const Point3& center_w);
 
-    bool locate_focus(const Point3& ptCenterW);
+    bool locate_focus(const Point3& center_w);
 
     void set_visibility(bool flag);
 
     bool get_visibility() const;
 
 private:
-    void set_page_i(const std::shared_ptr<MPRScene>& pTargetMPRScene , int page);
+    void set_page_i(const std::shared_ptr<MPRScene>& target_mpr_scene , int page);
 
-    bool set_center_i(const Point3& ptCenterW);
+    bool set_center_i(const Point3& center_w);
 
 private:
-    MPRScenePtr m_aMPRScene[3];
-    RGBUnit m_aMPRColor[3];
-    int m_aPage[3];
-    int m_iForceID;
+    MPRScenePtr _mpr_scenes[3];
+    RGBUnit _mpr_colors[3];
+    int _pages[3];
+    int _focus_id;
 
-    Point3 m_ptLocationDiscreteW;
-    Point3 m_ptLocationContineousW;
+    Point3 _location_discrete_w;
+    Point3 _location_contineous_w;
 
-    std::shared_ptr<CameraCalculator> m_pCameraCal;
+    std::shared_ptr<CameraCalculator> _camera_calculator;
 
-    bool m_bVisible;
+    bool _is_visible;
 };
 
 MED_IMAGING_END_NAMESPACE

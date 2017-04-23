@@ -17,57 +17,57 @@ MouseOpMPRPaging::~MouseOpMPRPaging()
 
 void MouseOpMPRPaging::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpMPRPaging::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
+    std::shared_ptr<MPRScene>  scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
 
-    const int iStep = int(pt.y() - m_ptPre.y());
+    const int iStep = int(pt.y() - _pre_point.y());
 
-    if (m_pModel)
+    if (_model)
     {
-        m_pModel->page(pScene , iStep);
+        _model->page(scene , iStep);
     }
     else
     {
-        pScene->page(iStep);
+        scene->page(iStep);
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpMPRPaging::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpMPRPaging::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
-void MouseOpMPRPaging::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
+void MouseOpMPRPaging::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
 {
-    m_pModel = pModel;
+    _model = model;
 }
 
 MED_IMAGING_END_NAMESPACE

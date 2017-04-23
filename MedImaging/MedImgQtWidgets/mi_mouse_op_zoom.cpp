@@ -16,41 +16,41 @@ MouseOpZoom::~MouseOpZoom()
 
 void MouseOpZoom::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpZoom::move(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    m_pScene->zoom(Point2(m_ptPre.x() , m_ptPre.y()) , Point2(pt.x() , pt.y()));
-    m_ptPre = pt;
+    _scene->zoom(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
+    _pre_point = pt;
 }
 
 void MouseOpZoom::release(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpZoom::double_click(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 MED_IMAGING_END_NAMESPACE

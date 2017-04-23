@@ -14,12 +14,14 @@ class QNoduleObject : public QObject
     Q_OBJECT
 public:
     QNoduleObject(QObject* parent =0);
+
     void add_nodule();
     void delete_nodule(int id);
 
 signals:
     void nodule_added();
     void nodule_deleted(int id);
+
 protected:
 private:
 };
@@ -29,11 +31,13 @@ class VOITableObserver : public medical_imaging::IObserver
 public:
     VOITableObserver();
     virtual ~VOITableObserver();
-    void set_nodule_object(QNoduleObject* pNoduleObj);
+
+    void set_nodule_object(QNoduleObject* obj);
+
     virtual void update();
 protected:
 private:
-    QNoduleObject* m_pNoduleObject;
+    QNoduleObject* _nodule_object;
 };
 
 #endif

@@ -12,24 +12,24 @@ MED_IMAGING_BEGIN_NAMESPACE
 class QtWidgets_Export PainterBase
 {
 public:
-    PainterBase():m_pPainter(nullptr)
+    PainterBase():_painter(nullptr)
     {};
 
     virtual ~PainterBase() {};
 
-    void set_painter(QPainter* pPainter) {m_pPainter = pPainter;};
+    void set_painter(QPainter* painter) {_painter = painter;};
 
-    void set_scene(std::shared_ptr<SceneBase> pScene)
+    void set_scene(std::shared_ptr<SceneBase> scene)
     {
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
-        m_pScene = pScene;
+        QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
+        _scene = scene;
     }
 
     virtual void render() = 0;
 
 protected:
-    QPainter* m_pPainter;
-    std::shared_ptr<SceneBase> m_pScene;
+    QPainter* _painter;
+    std::shared_ptr<SceneBase> _scene;
 };
 
 MED_IMAGING_END_NAMESPACE

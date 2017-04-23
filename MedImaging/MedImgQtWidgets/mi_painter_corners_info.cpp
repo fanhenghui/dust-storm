@@ -30,30 +30,30 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
 {
     try
     {
-        QTWIDGETS_CHECK_NULL_EXCEPTION(m_pScene);
-        QTWIDGETS_CHECK_NULL_EXCEPTION(m_pPainter);
+        QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+        QTWIDGETS_CHECK_NULL_EXCEPTION(_painter);
 
-        std::shared_ptr<RayCastScene> pScene = std::dynamic_pointer_cast<RayCastScene>(m_pScene);
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
+        std::shared_ptr<RayCastScene> scene = std::dynamic_pointer_cast<RayCastScene>(_scene);
+        QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
 
-        std::shared_ptr<VolumeInfos> volume_infos = pScene->get_volume_infos();
+        std::shared_ptr<VolumeInfos> volume_infos = scene->get_volume_infos();
         QTWIDGETS_CHECK_NULL_EXCEPTION(volume_infos);
 
         std::shared_ptr<ImageDataHeader> data_header = volume_infos->get_data_header();
         QTWIDGETS_CHECK_NULL_EXCEPTION(data_header );
 
         int width(1),height(1);
-        pScene->get_display_size(width , height);
+        scene->get_display_size(width , height);
 
         //1 Set font
-        const int iPointSize = 12;
-        const int iMargin = iPointSize+2;
-        const int iBorder = 3;
-        QFont serifFont("Times" , iPointSize , QFont::Bold);
-        m_pPainter->setFont(serifFont);
+        const int point_size = 12;
+        const int margin = point_size+2;
+        const int border = 3;
+        QFont font("Times" , point_size , QFont::Bold);
+        _painter->setFont(font);
 
         //2 Set color
-        m_pPainter->setPen(QColor(220,220,220));
+        _painter->setPen(QColor(220,220,220));
 
         //////////////////////////////////////////////////////////////////////////
         //3 Patient four corners info
@@ -63,73 +63,73 @@ void CornersInfoPainter::render()//TODO patient four corners info by configurati
         //3.1 Left Top
         int iItem = 1;
         //3.1.1
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->manufacturer.c_str());
+        _painter->drawText(border , (iItem++)*margin , data_header->manufacturer.c_str());
         //3.1.2
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->manufacturer_model_name.c_str());
+        _painter->drawText(border , (iItem++)*margin , data_header->manufacturer_model_name.c_str());
         //3.1.3
-        std::string sModality = "UnSupported";
+        std::string modality = "UnSupported";
         switch(data_header->modality)
         {
         case CR:
-            sModality = "CR";
+            modality = "CR";
             break;
         case CT:
-            sModality = "CT";
+            modality = "CT";
             break;
         case MR:
-            sModality = "MR";
+            modality = "MR";
             break;
         case PT:
-            sModality = "PT";
+            modality = "PT";
             break;
         default:
             break;
         }
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , sModality.c_str());
+        _painter->drawText(border , (iItem++)*margin , modality.c_str());
         //3.1.4
-        m_pPainter->drawText(iBorder , (iItem++)*iMargin , data_header->image_date.c_str());
+        _painter->drawText(border , (iItem++)*margin , data_header->image_date.c_str());
 
         //////////////////////////////////////////////////////////////////////////
         //3.2 Right Top
         iItem = 1;
-        int iX = 0;
+        int x = 0;
         //3.2.1
-        QString sPatientName(data_header->patient_name.c_str());
-        iX = width - m_pPainter->fontMetrics().width(sPatientName) - iBorder;
-        m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientName);
+        QString patient_name(data_header->patient_name.c_str());
+        x = width - _painter->fontMetrics().width(patient_name) - border;
+        _painter->drawText(x , (iItem++)*margin , patient_name);
 
         //3.2.2
-        QString sPatientID(data_header->patient_id.c_str());
-        iX = width - m_pPainter->fontMetrics().width(sPatientID) - iBorder;
-        m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientID);
+        QString patient_id(data_header->patient_id.c_str());
+        x = width - _painter->fontMetrics().width(patient_id) - border;
+        _painter->drawText(x , (iItem++)*margin , patient_id);
 
         //3.2.3
-        QString sPatientSex(data_header->patient_sex.c_str());
-        iX = width - m_pPainter->fontMetrics().width(sPatientSex) - iBorder;
-        m_pPainter->drawText(iX , (iItem++)*iMargin , sPatientSex);
+        QString patient_sex(data_header->patient_sex.c_str());
+        x = width - _painter->fontMetrics().width(patient_sex) - border;
+        _painter->drawText(x , (iItem++)*margin , patient_sex);
 
         //3.2.4
         std::stringstream ss;
         ss << data_header->columns << " " << data_header->rows << " " << data_header->slice_location.size();
-        QString sDim(ss.str().c_str());
-        iX = width - m_pPainter->fontMetrics().width(sDim) - iBorder;
-        m_pPainter->drawText(iX , (iItem++)*iMargin , sDim);
+        QString dim(ss.str().c_str());
+        x = width - _painter->fontMetrics().width(dim) - border;
+        _painter->drawText(x , (iItem++)*margin , dim);
 
         //////////////////////////////////////////////////////////////////////////
         //3.3 Left Bottom
 
         //Window level
-        std::shared_ptr<MPRScene> pMPRScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-        if (pMPRScene)
+        std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+        if (mpr_scene)
         {
-            float fWW(1) , fWL(0);
-            pMPRScene->get_global_window_level(fWW , fWL);
-            int iWL = (int)fWL;
-            int iWW = (int)fWW;
-            StrNumConverter<int> numToStr;
-            std::string sWL = std::string("C : ") + numToStr.to_string(iWL) + std::string("  W : ") + numToStr.to_string(iWW); 
+            float ww(1) , wl(0);
+            mpr_scene->get_global_window_level(ww , wl);
+            int wl_int = (int)wl;
+            int ww_int = (int)ww;
+            StrNumConverter<int> num_to_str;
+            std::string wl_string = std::string("C : ") + num_to_str.to_string(wl_int) + std::string("  W : ") + num_to_str.to_string(ww_int); 
             iItem = 0;
-            m_pPainter->drawText(iBorder , height - (iItem++)*iMargin - 2 , sWL.c_str());
+            _painter->drawText(border , height - (iItem++)*margin - 2 , wl_string.c_str());
         }
         
 

@@ -11,11 +11,13 @@ class QtWidgets_Export CrosshairPainter : public PainterBase
 public:
     CrosshairPainter();
     virtual ~CrosshairPainter();
-    void set_crosshair_model(std::shared_ptr<CrosshairModel> pModel);
+
+    void set_crosshair_model(std::shared_ptr<CrosshairModel> model);
+
     virtual void render();
 protected:
 private:
-    std::shared_ptr<CrosshairModel> m_pModel;
+    std::shared_ptr<CrosshairModel> _model;
 };
 
 MED_IMAGING_END_NAMESPACE

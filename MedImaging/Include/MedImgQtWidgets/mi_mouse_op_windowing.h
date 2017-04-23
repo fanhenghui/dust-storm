@@ -10,6 +10,7 @@ class QtWidgets_Export MouseOpWindowing : public IMouseOp
 public:
     MouseOpWindowing();
     virtual ~MouseOpWindowing();
+
     virtual void press(const QPoint& pt);
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);

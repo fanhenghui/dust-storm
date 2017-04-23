@@ -16,18 +16,21 @@ class QtWidgets_Export IMouseOp
 public:
     IMouseOp() {};
     virtual ~IMouseOp() {};
-    void set_scene(std::shared_ptr<SceneBase> pScene) 
+
+    void set_scene(std::shared_ptr<SceneBase> scene) 
     {
-        QTWIDGETS_CHECK_NULL_EXCEPTION(pScene);
-        m_pScene = pScene;
+        QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
+        _scene = scene;
     };
+
     virtual void press(const QPoint& pt) = 0;
     virtual void move(const QPoint& pt) = 0;
     virtual void release(const QPoint& pt) = 0;
     virtual void double_click(const QPoint& pt) = 0;
+
 protected:
-    QPoint m_ptPre;
-    std::shared_ptr<medical_imaging::SceneBase> m_pScene;
+    QPoint _pre_point;
+    std::shared_ptr<medical_imaging::SceneBase> _scene;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -11,14 +11,15 @@ class QtWidgets_Export MouseOpLocate : public IMouseOp
 public:
     MouseOpLocate();
     virtual ~MouseOpLocate();
+
     virtual void press(const QPoint& pt);
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
-    void set_crosshair_model(std::shared_ptr<CrosshairModel> pModel);
+    void set_crosshair_model(std::shared_ptr<CrosshairModel> model);
 protected:
 private:
-    std::shared_ptr<CrosshairModel> m_pModel;
+    std::shared_ptr<CrosshairModel> _model;
 };
 
 MED_IMAGING_END_NAMESPACE

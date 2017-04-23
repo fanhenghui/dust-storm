@@ -13,11 +13,13 @@ class QtWidgets_Export VOIPainter : public PainterBase
 public:
     VOIPainter();
     virtual ~VOIPainter();
-    void set_voi_model(std::shared_ptr<VOIModel> pModel);
+
+    void set_voi_model(std::shared_ptr<VOIModel> model);
+
     virtual void render();
 protected:
 private:
-    std::shared_ptr<VOIModel> m_pModel;
+    std::shared_ptr<VOIModel> _model;
 };
 
 MED_IMAGING_END_NAMESPACE

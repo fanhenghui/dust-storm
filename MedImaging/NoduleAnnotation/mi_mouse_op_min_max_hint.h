@@ -32,10 +32,10 @@ public:
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
-    void set_min_max_hint_object(QMinMaxHintObject* pObj);
+    void set_min_max_hint_object(QMinMaxHintObject* obj);
 protected:
 private:
-    QMinMaxHintObject* m_pMinMaxHintObject;
+    QMinMaxHintObject* _min_max_hint_object;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -17,23 +17,23 @@ MouseOpLocate::~MouseOpLocate()
 
 void MouseOpLocate::press(const QPoint& pt)
 {
-    if (!m_pScene)
+    if (!_scene)
     {
         return;
     }
 
-    QTWIDGETS_CHECK_NULL_EXCEPTION(m_pModel);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_model);
 
-    std::shared_ptr<MPRScene>  pScene = std::dynamic_pointer_cast<MPRScene>(m_pScene);
-    if (pScene)
+    std::shared_ptr<MPRScene>  scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (scene)
     {
-        if(m_pModel->locate(pScene , Point2(pt.x() , pt.y()) ))
+        if(_model->locate(scene , Point2(pt.x() , pt.y()) ))
         {
-            m_pModel->notify();
+            _model->notify();
         }
     }
 
-    m_ptPre = pt;
+    _pre_point = pt;
 }
 
 void MouseOpLocate::move(const QPoint& )
@@ -48,9 +48,9 @@ void MouseOpLocate::double_click(const QPoint& )
 {
 }
 
-void MouseOpLocate::set_crosshair_model(std::shared_ptr<CrosshairModel> pModel)
+void MouseOpLocate::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
 {
-    m_pModel= pModel;
+    _model= model;
 }
 
 MED_IMAGING_END_NAMESPACE

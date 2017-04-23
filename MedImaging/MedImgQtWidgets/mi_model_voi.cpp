@@ -14,18 +14,18 @@ VOIModel::~VOIModel()
 
 void VOIModel::add_voi_sphere(const VOISphere& voi)
 {
-    m_VOISphereList.push_back(voi);
+    _voi_sphere_list.push_back(voi);
     set_changed();
 }
 
 void VOIModel::remove_voi_sphere(int id)
 {
-    int iDelete = 0;
-    for (auto it = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
+    int delete_id = 0;
+    for (auto it = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
     {
-        if (iDelete == id)
+        if (delete_id == id)
         {
-            m_VOISphereList.erase(it);
+            _voi_sphere_list.erase(it);
             break;
         }
     }
@@ -33,20 +33,20 @@ void VOIModel::remove_voi_sphere(int id)
 
 const std::list<VOISphere>& VOIModel::get_voi_spheres() const
 {
-    return m_VOISphereList;
+    return _voi_sphere_list;
 }
 
 void VOIModel::get_voi_spheres(std::list<VOISphere>& l) const
 {
-    l = m_VOISphereList;
+    l = _voi_sphere_list;
 }
 
 void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
 {
-    if (!m_VOISphereList.empty())
+    if (!_voi_sphere_list.empty())
     {
-        (--m_VOISphereList.end())->diameter = voi.diameter;
-        (--m_VOISphereList.end())->center = voi.center;
+        (--_voi_sphere_list.end())->diameter = voi.diameter;
+        (--_voi_sphere_list.end())->center = voi.center;
     }
     set_changed();
 }
@@ -54,7 +54,7 @@ void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
 void VOIModel::modify_voi_sphere_name(int id , std::string name)
 {
     int i = 0;
-    for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
+    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
     {
         if (i++== id)
         {
@@ -66,14 +66,14 @@ void VOIModel::modify_voi_sphere_name(int id , std::string name)
     //Find no
 }
 
-void VOIModel::modify_voi_sphere_diameter(int id , double dDiameter)
+void VOIModel::modify_voi_sphere_diameter(int id , double diameter)
 {
     int i = 0;
-    for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
+    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
     {
         if (i++ == id)
         {
-            it->diameter= dDiameter;
+            it->diameter= diameter;
             set_changed();
             return;
         }
@@ -84,7 +84,7 @@ void VOIModel::modify_voi_sphere_diameter(int id , double dDiameter)
 VOISphere VOIModel::get_voi_sphere(int id)
 {
     int i = 0;
-    for (auto it  = m_VOISphereList.begin() ; it != m_VOISphereList.end() ; ++it)
+    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
     {
         if (i++ == id)
         {

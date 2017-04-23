@@ -10,6 +10,7 @@ class QtWidgets_Export CornersInfoPainter : public PainterBase
 public:
     CornersInfoPainter();
     virtual ~CornersInfoPainter();
+
     virtual void render();
 protected:
 private:

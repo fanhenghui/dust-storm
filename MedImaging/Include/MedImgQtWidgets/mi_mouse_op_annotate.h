@@ -18,13 +18,13 @@ public:
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
     void set_type();//TODO type 
-    void set_voi_model(std::shared_ptr<VOIModel> pVOIModel);
+    void set_voi_model(std::shared_ptr<VOIModel> model);
 protected:
 private:
-    bool m_bPin;
-    medical_imaging::Point3 m_ptCenter;
-    double diameter;
-    std::shared_ptr<VOIModel> m_pVOIModel;
+    bool _is_pin;
+    medical_imaging::Point3 _center;
+    double _diameter;
+    std::shared_ptr<VOIModel> _model;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -10,6 +10,7 @@ class QtWidgets_Export MouseOpZoom : public IMouseOp
 public:
     MouseOpZoom();
     virtual ~MouseOpZoom();
+
     virtual void press(const QPoint& pt);
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);

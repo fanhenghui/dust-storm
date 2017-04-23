@@ -23,7 +23,7 @@ void QMinMaxHintObject::trigger(const std::string& s)
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-MouseOpMinMaxHint::MouseOpMinMaxHint():m_pMinMaxHintObject(nullptr)
+MouseOpMinMaxHint::MouseOpMinMaxHint():_min_max_hint_object(nullptr)
 {
 
 }
@@ -50,15 +50,15 @@ void MouseOpMinMaxHint::release(const QPoint& pt)
 
 void MouseOpMinMaxHint::double_click(const QPoint& pt)
 {
-    if (m_pMinMaxHintObject)
+    if (_min_max_hint_object)
     {
-        m_pMinMaxHintObject->trigger(m_pScene->get_name());
+        _min_max_hint_object->trigger(_scene->get_name());
     }
 }
 
-void MouseOpMinMaxHint::set_min_max_hint_object(QMinMaxHintObject* pObj)
+void MouseOpMinMaxHint::set_min_max_hint_object(QMinMaxHintObject* obj)
 {
-    m_pMinMaxHintObject = pObj;
+    _min_max_hint_object = obj;
 }
 
 MED_IMAGING_END_NAMESPACE

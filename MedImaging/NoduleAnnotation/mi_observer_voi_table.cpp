@@ -1,10 +1,8 @@
 #include "mi_observer_voi_table.h"
 
 using namespace medical_imaging;
-const std::string ksNoduleTypeGGN = std::string("GGN");
-const std::string ksNoduleTypeAAH = std::string("AAH");
 
-VOITableObserver::VOITableObserver():m_pNoduleObject(nullptr)
+VOITableObserver::VOITableObserver():_nodule_object(nullptr)
 {
 
 }
@@ -16,16 +14,16 @@ VOITableObserver::~VOITableObserver()
 
 void VOITableObserver::update()
 {
-    if (m_pNoduleObject)
+    if (_nodule_object)
     {
-        m_pNoduleObject->add_nodule();
+        _nodule_object->add_nodule();
     }
 }
 
 
-void VOITableObserver::set_nodule_object(QNoduleObject* pAddNodule)
+void VOITableObserver::set_nodule_object(QNoduleObject* obj)
 {
-    m_pNoduleObject = pAddNodule;
+    _nodule_object = obj;
 }
 
 QNoduleObject::QNoduleObject(QObject* parent /*=0*/)

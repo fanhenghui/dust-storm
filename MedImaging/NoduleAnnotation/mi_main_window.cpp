@@ -60,27 +60,27 @@
 using namespace medical_imaging;
 
 //Nodule type
-const std::string ksNoduleTypeGGN = std::string("GGN");
-const std::string ksNoduleTypeAAH = std::string("AAH");
+const std::string NODULE_TYPE_GGN = std::string("GGN");
+const std::string NODULE_TYPE_AAH = std::string("AAH");
 
 //Preset WL
-const float kfPresetCTAbdomenWW = 400;
-const float kfPresetCTAbdomenWL = 60;
+const float PRESET_CT_ABDOMEN_WW = 400;
+const float PRESET_CT_ABDOMEN_WL = 60;
 
-const float kfPresetCTLungsWW = 1500;
-const float kfPresetCTLungsWL = -400;
+const float PRESET_CT_LUNGS_WW = 1500;
+const float PRESET_CT_LUNGS_WL = -400;
 
-const float kfPresetCTBrainWW = 80;
-const float kfPresetCTBrainWL = 40;
+const float PRESET_CT_BRAIN_WW = 80;
+const float PRESET_CT_BRAIN_WL = 40;
 
-const float kfPresetCTAngioWW = 600;
-const float kfPresetCTAngioWL = 300;
+const float PRESET_CT_ANGIO_WW = 600;
+const float PRESET_CT_ANGIO_WL = 300;
 
-const float kfPresetCTBoneWW = 1500;
-const float kfPresetCTBoneWL = 300;
+const float PRESET_CT_BONE_WW = 1500;
+const float PRESET_CT_BONE_WL = 300;
 
-const float kfPresetCTChestWW = 400;
-const float kfPresetCTChestWL = 40;
+const float PRESET_CT_CHEST_WW = 400;
+const float PRESET_CT_CHEST_WL = 40;
 
 NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags),
@@ -180,7 +180,7 @@ void NoduleAnnotation::create_scene_i()
         //2 Set scene parameter
         mpr_scenes[i]->set_volume_infos(_volume_infos);
         mpr_scenes[i]->set_sample_rate(1.0);
-        mpr_scenes[i]->set_global_window_level(kfPresetCTLungsWW,kfPresetCTLungsWL);
+        mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
         mpr_scenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
         mpr_scenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         mpr_scenes[i]->set_mask_mode(MASK_NONE);
@@ -829,8 +829,8 @@ void NoduleAnnotation::slot_add_nodule_i()
 
             QComboBox * pNoduleType = new QComboBox();
             pNoduleType->clear();
-            pNoduleType->insertItem(0 ,  ksNoduleTypeGGN.c_str());
-            pNoduleType->insertItem(1 , ksNoduleTypeAAH.c_str());
+            pNoduleType->insertItem(0 ,  NODULE_TYPE_GGN.c_str());
+            pNoduleType->insertItem(1 , NODULE_TYPE_AAH.c_str());
             //m_pTableWidgetVOI->setItem(iRow,2, new QTableWidgetItem("AAH"));
             ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
 
@@ -872,33 +872,33 @@ void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
     float ww(1) , wl(0);
     if (wl_preset == std::string("CT_Lungs"))
     {
-        ww = kfPresetCTLungsWW;
-        wl   = kfPresetCTLungsWL;
+        ww = PRESET_CT_LUNGS_WW;
+        wl   = PRESET_CT_LUNGS_WL;
     }
     else if (wl_preset == std::string("CT_Chest"))
     {
-        ww = kfPresetCTChestWW;
-        wl   = kfPresetCTChestWL;
+        ww = PRESET_CT_CHEST_WW;
+        wl   = PRESET_CT_CHEST_WL;
     }
     else if (wl_preset == std::string("CT_Bone"))
     {
-        ww = kfPresetCTBoneWW;
-        wl   = kfPresetCTBoneWL;
+        ww = PRESET_CT_BONE_WW;
+        wl   = PRESET_CT_BONE_WL;
     }
     else if (wl_preset == std::string("CT_Angio"))
     {
-        ww = kfPresetCTAngioWW;
-        wl   = kfPresetCTAngioWL;
+        ww = PRESET_CT_ANGIO_WW;
+        wl   = PRESET_CT_ANGIO_WL;
     }
     else if (wl_preset == std::string("CT_Abdomen"))
     {
-        ww = kfPresetCTAbdomenWW;
-        wl   = kfPresetCTAbdomenWL;
+        ww = PRESET_CT_ABDOMEN_WW;
+        wl   = PRESET_CT_ABDOMEN_WL;
     }
     else if (wl_preset == std::string("CT_Brain"))
     {
-        ww = kfPresetCTBrainWW;
-        wl   = kfPresetCTBrainWL;
+        ww = PRESET_CT_BRAIN_WW;
+        wl   = PRESET_CT_BRAIN_WL;
     }
     else 
     {

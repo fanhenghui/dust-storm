@@ -15,7 +15,7 @@ SceneContainerObserver::~SceneContainerObserver()
 
 void SceneContainerObserver::update()
 {
-    for (auto it = m_vecContainers.begin() ; it != m_vecContainers.end() ; ++it)
+    for (auto it = _scene_containers.begin() ; it != _scene_containers.end() ; ++it)
     {
         if( (*it))
         {
@@ -24,19 +24,19 @@ void SceneContainerObserver::update()
     }
 }
 
-void SceneContainerObserver::add_scene_container(SceneContainer* pContainer)
+void SceneContainerObserver::add_scene_container(SceneContainer* container)
 {
-    m_vecContainers.push_back(pContainer);
+    _scene_containers.push_back(container);
 }
 
-void SceneContainerObserver::set_scene_container(const std::vector<SceneContainer*>& vecConainers)
+void SceneContainerObserver::set_scene_container(const std::vector<SceneContainer*>& containers)
 {
-    m_vecContainers = vecConainers;
+    _scene_containers = containers;
 }
 
 void SceneContainerObserver::clear_scene_container()
 {
-    m_vecContainers.clear();
+    _scene_containers.clear();
 }
 
 MED_IMAGING_END_NAMESPACE
