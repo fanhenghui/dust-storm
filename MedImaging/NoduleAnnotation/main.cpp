@@ -15,6 +15,8 @@ int main(int argc, char *argv[])
     try
     {
         QApplication a(argc, argv);
+        a.setDoubleClickInterval(200);
+
         NoduleAnnotation w;
         w.show();
         return a.exec();

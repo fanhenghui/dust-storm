@@ -90,9 +90,6 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h">
       <Filter>MPR&amp;VR replacement</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
-      <Filter>Brick ACC</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h">
       <Filter>Brick ACC</Filter>
     </ClInclude>
@@ -161,6 +158,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_volume_infos.h">
       <Filter>Volume Infos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
+      <Filter>Brick ACC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

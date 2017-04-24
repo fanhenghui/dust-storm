@@ -36,8 +36,9 @@ void OrthoCameraInteractor::resize(int width , int height)
     if (ratio > 1.0)
     {
         double length = (right - left)*ratio;//Choose initial length
-        _camera->get_ortho(left , right , bottom , top , near , far);
-        double center = (right + left)*0.5;//Choose current center
+        double left0 , right0 , bottom0 , top0 , far0 , near0;
+        _camera->get_ortho(left0 , right0 , bottom0 , top0 , near0 , far0);
+        double center = (right0 + left0)*0.5;//Choose current center
 
         left = center - length*0.5;
         right = center + length*0.5;
@@ -46,8 +47,9 @@ void OrthoCameraInteractor::resize(int width , int height)
     {
         //Adjust bottom and top
         double length = (top - bottom)/ratio;//Choose initial length
-        _camera->get_ortho(left , right , bottom , top , near , far);
-        double center = (top + bottom)*0.5;//Choose current center
+        double left0 , right0 , bottom0 , top0 , far0 , near0;
+        _camera->get_ortho(left0 , right0 , bottom0 , top0 , near0 , far0);
+        double center = (top0 + bottom0)*0.5;//Choose current center
 
         bottom = center - length*0.5;
         top = center + length*0.5;

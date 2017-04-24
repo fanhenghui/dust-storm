@@ -280,22 +280,22 @@ void NoduleAnnotation::create_scene_i()
     //focus in/out scene signal mapper
     QSignalMapper* focus_in_singal_mapper = new QSignalMapper();
 
-    connect(_mpr_00 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_00 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
-    connect(_mpr_01 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_01 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
-    connect(_mpr10 , SIGNAL(focusInScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr10 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
     connect(focus_in_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
 
     QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
 
-    connect(_mpr_00 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_00 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
-    connect(_mpr_01 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_01 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
-    connect(_mpr10 , SIGNAL(focusOutScene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr10 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
     connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));

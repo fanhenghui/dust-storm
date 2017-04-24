@@ -47,8 +47,8 @@ public:
     void add_painter_list(std::vector<PainterPtr> painters);
 
 signals:
-    void focusInScene();
-    void focusOutScene();
+    void focus_in_scene();
+    void focus_out_scene();
 
 protected:
     //////////////////////////////////////////////////////////////////////////
@@ -69,8 +69,11 @@ protected:
 
     void render_to_back_i();
 
+private slots:
+    void slot_mouse_click();
+
 private:
-    bool get_mouse_operation_i(QMouseEvent *event , IMouseOpPtrCollection& op);
+    bool get_mouse_operation_i(IMouseOpPtrCollection& op);
 
 protected:
     std::shared_ptr<medical_imaging::SceneBase> _scene;
@@ -78,8 +81,15 @@ protected:
     std::map<int , IMouseOpPtrCollection> _mouse_ops;
     IMouseOpPtrCollection _mouse_wheel_ops;
     Qt::MouseButtons _buttons;
+    Qt::KeyboardModifiers _modifiers;
+    QPoint _pre_point;
+
     std::unique_ptr<QPixmap> _pixel_map;
     boost::mutex _mutex;
+
+    int _mouse_press_time;
+    int _mouse_release_time;
+    Qt::MouseButtons _buttons_pre_press;
 };
 
 #endif
