@@ -27,7 +27,6 @@ DICOMLoader::~DICOMLoader()
 
 IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
-    clock_t start_time = clock();
     if (files.empty())
     {
         set_progress_i(100);
@@ -102,16 +101,81 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         return data_imaging_status;
     }
 
-    clock_t end_time = clock();
-
-    std::cout << "Load DICOM cost : " << double(end_time - start_time) << " ms\n";
-
     set_progress_i(100);
     return IO_SUCCESS;
 }
 
 IOStatus DICOMLoader::data_check_i(DcmFileFormatSet& file_format_set)
 {
+    std::map<std::string , std::vector<int>> series_separate;
+    std::string series_id;
+    int idx = 0;
+    for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++it , ++idx)
+    {
+        OFString context;
+        OFCondition status =(*it)->getDataset()->findAndGetOFString(DCM_SeriesInstanceUID , context);
+        if (status.bad())
+        {
+            return IO_DATA_CHECK_FAILED;
+        }
+        series_id = std::string(context.c_str());
+        auto it_sep = series_separate.find(series_id);
+        if (it_sep != series_separate.end())
+        {
+            it_sep->second.push_back(idx);
+        }
+        else
+        {
+            series_separate[series_id] = std::vector<int>(1 , idx);
+        }
+    }
+
+    if (series_separate.size() != 1)
+    {
+        //get majority series
+        auto it_sep = series_separate.begin();
+        std::string max_num_series_id = it_sep->first;
+        size_t max_size = it_sep->second.size();
+        ++it_sep;
+        for ( ; it_sep != series_separate.end() ; ++it_sep)
+        {
+            if (it_sep->second.size() > max_size)
+            {
+                max_size = it_sep->second.size();
+                max_num_series_id = it_sep->first;
+            }
+        }
+
+        //get to be delete minority series index
+        std::vector<int> to_be_delete;
+        for (auto it_sep = series_separate.begin() ; it_sep != series_separate.end() ; ++it_sep)
+        {
+            if (it_sep->first != max_num_series_id)
+            {
+                to_be_delete.insert(to_be_delete.end() , it_sep->second.begin() , it_sep->second.end());
+            }
+        }
+
+        std::sort(to_be_delete.begin() ,to_be_delete.end() , std::less<int>());
+
+        //delete minority series file format
+        auto it_delete = to_be_delete.begin();
+        int idx_delete = 0;
+        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete)
+        {
+            if (idx_delete == *it_delete)
+            {
+                it = file_format_set.erase(it);
+                ++it_delete;
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+    }
+
     return IO_SUCCESS;
 }
 

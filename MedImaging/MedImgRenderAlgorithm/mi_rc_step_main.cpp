@@ -15,7 +15,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 GLShaderInfo RCStepMainVert::get_shader_info()
 {
     
-    return GLShaderInfo(GL_VERTEX_SHADER , ksRCMainVert , "RCStepMainVert");
+    return GLShaderInfo(GL_VERTEX_SHADER , S_RC_MAIN_VERTEX , "RCStepMainVert");
 }
 
 void RCStepMainVert::set_gpu_parameter()
@@ -24,7 +24,7 @@ void RCStepMainVert::set_gpu_parameter()
 
 GLShaderInfo RCStepMainFrag::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCMainFrag , "RCStepMainFrag");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_MAIN_FRAGMENT , "RCStepMainFrag");
 }
 
 void RCStepMainFrag::set_gpu_parameter()

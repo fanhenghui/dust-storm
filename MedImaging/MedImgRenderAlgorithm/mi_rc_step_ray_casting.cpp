@@ -64,13 +64,13 @@ void RCStepRayCastingMIPBase::get_uniform_location()
 
 GLShaderInfo RCStepRayCastingAverage::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCRayCastingAverageFrag , "RCStepRayCastingAverage");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_RAY_CASTING_AVERAGE_FRAG , "RCStepRayCastingAverage");
 }
 
 
 GLShaderInfo RCStepRayCastingMIPMinIP::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCRayCastingMIPMinIPFrag , "RCStepRayCastingAverage");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_RAY_CASTING_MIP_MINIP_FRAG , "RCStepRayCastingAverage");
 }
 
 

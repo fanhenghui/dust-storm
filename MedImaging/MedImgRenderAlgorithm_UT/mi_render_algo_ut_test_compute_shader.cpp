@@ -108,9 +108,9 @@ namespace
         vglAttachShaderSource(m_uiProgram, GL_COMPUTE_SHADER, compute_shader_source);
         glLinkProgram(m_uiProgram);
 
-        //GLShaderInfo s(GL_COMPUTE_SHADER , ksMPREntryExitPointsComp , "");
+        //GLShaderInfo s(GL_COMPUTE_SHADER , S_MPR_ENTRY_EXIT_POINTS_COMP , "");
         //unsigned int uiShader = glCreateShader(GL_COMPUTE_SHADER);
-        //glShaderSource(uiShader , 1 , &ksMPREntryExitPointsComp , NULL);
+        //glShaderSource(uiShader , 1 , &S_MPR_ENTRY_EXIT_POINTS_COMP , NULL);
         //glCompileShader(uiShader);
         //m_uiProgram = glCreateProgram();
         //glAttachShader(m_uiProgram , uiShader);

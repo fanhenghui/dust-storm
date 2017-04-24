@@ -11,19 +11,19 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLShaderInfo RCStepCompositeAverage::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeAverageFrag , "RCStepCompositeAverage");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_COMPOSITE_AVERAGE_FRAG , "RCStepCompositeAverage");
 }
 
 
 GLShaderInfo RCStepCompositeMIP::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeMIPFrag , "RCStepCompositeMIP");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_COMPOSITE_MIP_FRAG , "RCStepCompositeMIP");
 }
 
 
 GLShaderInfo RCStepCompositeMinIP::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeMinIPFrag , "RCStepCompositeMinIP");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_COMPOSITE_MINIP_FRAG , "RCStepCompositeMinIP");
 }
 
 void RCStepCompositeMinIP::set_gpu_parameter()
@@ -45,7 +45,7 @@ void RCStepCompositeMinIP::get_uniform_location()
 
 GLShaderInfo RCStepCompositeDVR::get_shader_info()
 {
-    return GLShaderInfo(GL_FRAGMENT_SHADER , ksRCCompositeDVRFrag , "RCStepCompositeDVR");
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_COMPOSITE_DVR_FRAG , "RCStepCompositeDVR");
 }
 
 void RCStepCompositeDVR::set_gpu_parameter()

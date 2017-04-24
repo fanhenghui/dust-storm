@@ -156,7 +156,7 @@ NoduleAnnotation::~NoduleAnnotation()
 void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
-    Configuration::instance()->set_processing_unit_type(CPU);
+    Configuration::instance()->set_processing_unit_type(GPU);
     Configuration::instance()->set_nodule_file_rsa(true);
 
     GLUtils::set_check_gl_flag(false);
