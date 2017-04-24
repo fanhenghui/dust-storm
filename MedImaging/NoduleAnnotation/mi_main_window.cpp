@@ -1037,40 +1037,47 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 
     SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr10};
     std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
-    if (0 == iFlag)
+    if (0 == iFlag)//Hide
     {
-        for (int i = 0 ;i<3 ; ++i)
+        if (ui.pushButtonArrow->isChecked())
         {
-            IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
-            IMouseOpPtrCollection ops_new;
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
+            //Unregister mouse locate operation
+            for (int i = 0 ;i<3 ; ++i)
             {
-                if (typeid(*it).name() != typeid(MouseOpLocate*).name())
+                IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
+                IMouseOpPtrCollection ops_new;
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
                 {
-                    ops_new.push_back(*it);
+                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it) )
+                    {
+                        ops_new.push_back(*it);
+                    }
                 }
+                containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
             }
-            containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
         }
     }
-    else
+    else//Show
     {
-        for (int i = 0 ;i<3 ; ++i)
+        if (ui.pushButtonArrow->isChecked())
         {
-            IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
-            IMouseOpPtrCollection ops_new;
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
+            for (int i = 0 ;i<3 ; ++i)
             {
-                if (typeid(*it).name() != typeid(std::shared_ptr<MouseOpLocate>).name())
+                IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
+                IMouseOpPtrCollection ops_new;
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
                 {
-                    ops_new.push_back(*it);
+                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it) )
+                    {
+                        ops_new.push_back(*it);
+                    }
                 }
+                std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
+                op_locate->set_scene(scenes[i]);
+                op_locate->set_crosshair_model(_model_crosshari);
+                ops_new.push_back(op_locate);
+                containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
             }
-            std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
-            op_locate->set_scene(scenes[i]);
-            op_locate->set_crosshair_model(_model_crosshari);
-            ops_new.push_back(op_locate);
-            containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
         }
     }
     _ob_scene_container->update();
