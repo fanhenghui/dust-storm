@@ -199,6 +199,7 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sampler.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_shape_interface.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sphere.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_volume_statistician.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_track_ball.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_triangle.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_vector2.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="mi_rsa_utils.cpp" />
     <ClCompile Include="mi_sampler.cpp" />
     <ClCompile Include="mi_sphere.cpp" />
+    <ClCompile Include="mi_volume_statistician.cpp" />
     <ClCompile Include="mi_track_ball.cpp" />
     <ClCompile Include="mi_triangle.cpp" />
     <ClCompile Include="mi_vector2.cpp" />

@@ -28,6 +28,9 @@
     <Filter Include="RSA">
       <UniqueIdentifier>{8da70d21-72e3-4ffe-a848-1668d42db7c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Statistic">
+      <UniqueIdentifier>{4f77da27-3ac6-4c15-8300-a37c71e51783}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
@@ -122,6 +125,9 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_rsa_utils.h">
       <Filter>RSA</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_volume_statistician.h">
+      <Filter>Statistic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -198,6 +204,9 @@
     </ClCompile>
     <ClCompile Include="mi_rsa_utils.cpp">
       <Filter>RSA</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_volume_statistician.cpp">
+      <Filter>Statistic</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
