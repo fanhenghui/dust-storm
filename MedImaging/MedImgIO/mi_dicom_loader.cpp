@@ -27,8 +27,6 @@ DICOMLoader::~DICOMLoader()
 
 IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
-    set_progress_i(0);
-
     clock_t start_time = clock();
     if (files.empty())
     {
@@ -54,6 +52,8 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         data_format_set.push_back(file_format);
     }
 
+    add_progress_i(2);
+
     //////////////////////////////////////////////////////////////////////////
     //2 Data check
     IOStatus checking_status = data_check_i(data_format_set);
@@ -69,9 +69,13 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         return IO_UNSUPPORTED_YET;
     }
 
+    add_progress_i(3);
+
     //////////////////////////////////////////////////////////////////////////
     //3 Sort series
     sort_series_i(data_format_set);
+
+    add_progress_i(4);
 
     //////////////////////////////////////////////////////////////////////////
     //4 Construct image data header
@@ -84,7 +88,7 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
         return data_heading_status;
     }
 
-    set_progress_i(10);
+    add_progress_i(10);
 
     //////////////////////////////////////////////////////////////////////////
     //5 Construct image data

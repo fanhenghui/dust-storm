@@ -100,4 +100,9 @@ void MouseOpAnnotate::set_voi_model(std::shared_ptr<VOIModel> model)
     _model = model;
 }
 
+void MouseOpAnnotate::wheel_slide(int )
+{
+
+}
+
 MED_IMAGING_END_NAMESPACE

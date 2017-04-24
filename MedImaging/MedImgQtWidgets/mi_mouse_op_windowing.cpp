@@ -69,4 +69,8 @@ void MouseOpWindowing::double_click(const QPoint& pt)
     _pre_point = pt;
 }
 
+void MouseOpWindowing::wheel_slide(int )
+{
+}
+
 MED_IMAGING_END_NAMESPACE

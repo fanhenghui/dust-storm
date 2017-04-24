@@ -28,10 +28,13 @@ class MouseOpMinMaxHint : public IMouseOp
 public:
     MouseOpMinMaxHint();
     virtual ~MouseOpMinMaxHint();
+
     virtual void press(const QPoint& pt);
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
+    virtual void wheel_slide(int);
+
     void set_min_max_hint_object(QMinMaxHintObject* obj);
 protected:
 private:

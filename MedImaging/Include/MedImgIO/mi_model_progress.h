@@ -16,8 +16,11 @@ public:
 
     void set_progress(int value) 
     {
-        _progress = value;
-        set_changed();
+        if (value != _progress)
+        {
+            _progress = value;
+            set_changed();
+        }
     }
 
     int get_progress() const

@@ -65,7 +65,7 @@ private slots:
     void slot_voi_table_widget_item_changed_i(QTableWidgetItem *item);
     void slot_voi_table_widget_nodule_type_changed_i(int id);
     void slot_add_nodule_i();
-    void slot_delete_nodule_i(int id);
+    void slot_delete_nodule_i();
 
     //Preset WL
     void slot_preset_wl_changed_i(QString s);
@@ -86,6 +86,7 @@ private:
     void configure_i();
     void create_scene_i();
     void create_model_observer_i();
+    void refresh_nodule_list_i();
 
 private:
     Ui::NoduleAnnotationClass ui;
@@ -128,6 +129,9 @@ private:
 
     //Scene min max hint
     QMinMaxHintObject* _object_min_max_hint;
+
+    //Selected voi
+    int _select_vio_id;
 
 };
 

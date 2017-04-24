@@ -53,4 +53,9 @@ void MouseOpPan::double_click(const QPoint& pt)
     _pre_point = pt;
 }
 
+void MouseOpPan::wheel_slide(int)
+{
+
+}
+
 MED_IMAGING_END_NAMESPACE

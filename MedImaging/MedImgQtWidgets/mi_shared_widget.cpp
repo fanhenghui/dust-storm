@@ -16,6 +16,8 @@ SharedWidget* SharedWidget::instance()
         {
             _s_instance= new SharedWidget();
             //_s_instance->setWindowFlags(_s_instance->windowFlags() | Qt::FramelessWindowHint);
+            //_s_instance->setWindowFlags(Qt::FramelessWindowHint);
+            //_s_instance->setAttribute(Qt::WA_TranslucentBackground , true);
             _s_instance->resize(600,370);
             _s_instance->setFixedSize(600,370);
             _s_instance->show();

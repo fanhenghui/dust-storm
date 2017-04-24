@@ -113,6 +113,9 @@
          </item>
          <item row="0" column="3">
           <widget class="QPushButton" name="pushButtonRotate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Rotate</string>
            </property>
@@ -134,13 +137,19 @@
          </item>
          <item row="1" column="2">
           <widget class="QPushButton" name="pushButtonROI">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>ROI</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="4">
+         <item row="1" column="3">
           <widget class="QPushButton" name="pushButtonFitWindow">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
             <string>FitWindow</string>
            </property>

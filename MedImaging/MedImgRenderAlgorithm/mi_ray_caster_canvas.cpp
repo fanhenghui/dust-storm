@@ -79,6 +79,7 @@ void RayCasterCanvas::set_display_size( int width , int height )
 {
     _width = width;
     _height = height;
+    _color_array.reset(new RGBAUnit[_width*_height]);
 }
 
 GLFBOPtr RayCasterCanvas::get_fbo()

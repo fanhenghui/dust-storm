@@ -61,6 +61,11 @@ void MouseOpMinMaxHint::set_min_max_hint_object(QMinMaxHintObject* obj)
     _min_max_hint_object = obj;
 }
 
+void MouseOpMinMaxHint::wheel_slide(int)
+{
+
+}
+
 MED_IMAGING_END_NAMESPACE
 
     

@@ -27,6 +27,7 @@ public:
     virtual void move(const QPoint& pt) = 0;
     virtual void release(const QPoint& pt) = 0;
     virtual void double_click(const QPoint& pt) = 0;
+    virtual void wheel_slide(int value) = 0;
 
 protected:
     QPoint _pre_point;

@@ -53,4 +53,9 @@ void MouseOpZoom::double_click(const QPoint& pt)
     _pre_point = pt;
 }
 
+void MouseOpZoom::wheel_slide(int)
+{
+
+}
+
 MED_IMAGING_END_NAMESPACE

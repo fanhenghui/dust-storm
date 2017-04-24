@@ -23,9 +23,10 @@ void VOIModel::remove_voi_sphere(int id)
     int delete_id = 0;
     for (auto it = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
     {
-        if (delete_id == id)
+        if (delete_id++ == id)
         {
             _voi_sphere_list.erase(it);
+            set_changed();
             break;
         }
     }

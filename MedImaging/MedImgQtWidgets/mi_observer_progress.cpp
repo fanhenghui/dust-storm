@@ -23,7 +23,6 @@ void ProgressObserver::update()
         std::shared_ptr<ProgressModel> model = _model.lock();
         if (model)
         {
-            std::cout << model->get_progress() << std::endl;
             _progress_dialog->setValue(model->get_progress());
         }
         

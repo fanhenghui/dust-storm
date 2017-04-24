@@ -98,9 +98,6 @@
     <ClCompile Include="mi_painter_voi.cpp">
       <Filter>Src\Painter</Filter>
     </ClCompile>
-    <ClCompile Include="mi_mouse_op_mpr_paging.cpp">
-      <Filter>Src\Operation</Filter>
-    </ClCompile>
     <ClCompile Include="mi_model_cross_hair.cpp">
       <Filter>Src\Model Observer</Filter>
     </ClCompile>
@@ -118,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="mi_observer_progress.cpp">
       <Filter>Src\Model Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mouse_op_mpr_page.cpp">
+      <Filter>Src\Operation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,9 +157,6 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_voi.h">
       <Filter>Src\Painter</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_paging.h">
-      <Filter>Src\Operation</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_cross_hair.h">
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
@@ -177,6 +174,9 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_progress.h">
       <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_page.h">
+      <Filter>Src\Operation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

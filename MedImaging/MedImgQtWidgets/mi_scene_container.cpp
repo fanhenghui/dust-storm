@@ -161,9 +161,21 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
     update();
 }
 
-void SceneContainer::wheelEvent(QWheelEvent *)
+void SceneContainer::wheelEvent(QWheelEvent *event)
 {
+    if (_mouse_wheel_ops.empty())
+    {
+        return;
+    }
 
+    //滚轮向下是负数，向上是正数
+    const int degree = event->delta() / 8;//滚动的角度，*8就是鼠标滚动的距离
+    const int step = degree/ 15;//滚动的步数，*15就是鼠标滚动的角度
+
+    for (auto it = _mouse_wheel_ops.begin() ; it != _mouse_wheel_ops.end() ; ++it)
+    {
+        (*it)->wheel_slide(step);
+    }
 }
 
 void SceneContainer::keyPressEvent(QKeyEvent *key)
@@ -263,4 +275,14 @@ IMouseOpPtrCollection SceneContainer::get_mouse_operation(Qt::MouseButtons butto
     {
         return IMouseOpPtrCollection();
     }
+}
+
+void SceneContainer::register_mouse_wheel_operation(IMouseOpPtrCollection mouse_ops)
+{
+    _mouse_wheel_ops = mouse_ops;
+}
+
+void SceneContainer::register_mouse_wheel_operation(IMouseOpPtr mouse_op)
+{
+    IMouseOpPtrCollection(1 ,mouse_op).swap(_mouse_wheel_ops);
 }

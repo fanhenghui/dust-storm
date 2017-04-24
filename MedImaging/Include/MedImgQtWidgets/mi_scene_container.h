@@ -38,6 +38,8 @@ public:
 
     void register_mouse_operation(IMouseOpPtr mouse_op , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
     void register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
+    void register_mouse_wheel_operation(IMouseOpPtr mouse_op);
+    void register_mouse_wheel_operation(IMouseOpPtrCollection mouse_ops);
     IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier);
 
     void register_key_operation();
@@ -74,6 +76,7 @@ protected:
     std::shared_ptr<medical_imaging::SceneBase> _scene;
     std::vector<PainterPtr> _painters;
     std::map<int , IMouseOpPtrCollection> _mouse_ops;
+    IMouseOpPtrCollection _mouse_wheel_ops;
     Qt::MouseButtons _buttons;
     std::unique_ptr<QPixmap> _pixel_map;
     boost::mutex _mutex;

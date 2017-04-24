@@ -28,7 +28,7 @@
 #include "MedImgQtWidgets/mi_mouse_op_zoom.h"
 #include "MedImgQtWidgets/mi_mouse_op_pan.h"
 #include "MedImgQtWidgets/mi_mouse_op_rotate.h"
-#include "MedImgQtWidgets/mi_mouse_op_mpr_paging.h"
+#include "MedImgQtWidgets/mi_mouse_op_mpr_page.h"
 #include "MedImgQtWidgets/mi_mouse_op_windowing.h"
 #include "MedImgQtWidgets/mi_mouse_op_probe.h"
 

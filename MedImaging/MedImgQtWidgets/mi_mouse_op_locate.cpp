@@ -53,4 +53,9 @@ void MouseOpLocate::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
     _model= model;
 }
 
+void MouseOpLocate::wheel_slide(int)
+{
+
+}
+
 MED_IMAGING_END_NAMESPACE

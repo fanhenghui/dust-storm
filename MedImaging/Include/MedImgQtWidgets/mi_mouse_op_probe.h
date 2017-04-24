@@ -14,6 +14,7 @@ public:
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
+    virtual void wheel_slide(int);
 protected:
 private:
 };

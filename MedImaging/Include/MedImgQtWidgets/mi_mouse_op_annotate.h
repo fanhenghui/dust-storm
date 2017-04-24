@@ -17,6 +17,8 @@ public:
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
+    virtual void wheel_slide(int value);
+
     void set_type();//TODO type 
     void set_voi_model(std::shared_ptr<VOIModel> model);
 protected:

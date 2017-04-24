@@ -178,7 +178,7 @@
     <ClCompile Include="mi_observer_scene_container.cpp" />
     <ClCompile Include="mi_painter_cross_hair.cpp" />
     <ClCompile Include="mi_mouse_op_annotate.cpp" />
-    <ClCompile Include="mi_mouse_op_mpr_paging.cpp" />
+    <ClCompile Include="mi_mouse_op_mpr_page.cpp" />
     <ClCompile Include="mi_mouse_op_pan.cpp" />
     <ClCompile Include="mi_mouse_op_probe.cpp" />
     <ClCompile Include="mi_mouse_op_rotate.cpp" />
@@ -200,7 +200,7 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_cross_hair.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_annotate.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_interface.h" />
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_paging.h" />
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_page.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_pan.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_probe.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_rotate.h" />

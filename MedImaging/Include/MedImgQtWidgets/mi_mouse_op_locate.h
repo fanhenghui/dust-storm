@@ -16,6 +16,8 @@ public:
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
+    virtual void wheel_slide(int);
+
     void set_crosshair_model(std::shared_ptr<CrosshairModel> model);
 protected:
 private:

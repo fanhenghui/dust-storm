@@ -5,16 +5,18 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 class CrosshairModel;
-class QtWidgets_Export MouseOpMPRPaging : public IMouseOp
+class QtWidgets_Export MouseOpMPRPage : public IMouseOp
 {
 public:
-    MouseOpMPRPaging();
-    virtual ~MouseOpMPRPaging();
+    MouseOpMPRPage();
+    virtual ~MouseOpMPRPage();
 
     virtual void press(const QPoint& pt);
     virtual void move(const QPoint& pt);
     virtual void release(const QPoint& pt);
     virtual void double_click(const QPoint& pt);
+    virtual void wheel_slide(int);
+
     void set_crosshair_model(std::shared_ptr<CrosshairModel> model);
 protected:
 private:
