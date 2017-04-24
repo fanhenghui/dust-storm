@@ -23,6 +23,7 @@ public:
 
     void remove_voi_sphere_list_rear();
     void remove_voi_sphere(int id);
+    void remove_all();
 
     const std::list<VOISphere>& get_voi_spheres() const;
     void get_voi_spheres(std::list<VOISphere>& l) const;

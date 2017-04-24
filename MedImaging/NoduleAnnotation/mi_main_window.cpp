@@ -831,7 +831,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
 
         if (status == IO_SUCCESS)
         {
-            nodule_set->clear_nodule();
+            _model_voi->remove_all();
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {

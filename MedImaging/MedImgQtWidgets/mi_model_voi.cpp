@@ -104,4 +104,10 @@ void VOIModel::remove_voi_sphere_list_rear()
     }
 }
 
+void VOIModel::remove_all()
+{
+    std::list<VOISphere>().swap(_voi_sphere_list);
+    set_changed();
+}
+
 MED_IMAGING_END_NAMESPACE
