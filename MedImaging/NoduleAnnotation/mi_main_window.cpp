@@ -324,7 +324,7 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
     connect(ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_annotate_i()));
     connect(ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_rotate_i()));
-    connect(ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_aoom_i()));
+    connect(ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_zoom_i()));
     connect(ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
     connect(ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
     connect(ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
@@ -532,7 +532,16 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
         std::shared_ptr<MouseOpAnnotate> op_annotate(new MouseOpAnnotate());
         op_annotate->set_scene(mpr_scenes[i]);
         op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools
-        mpr_containers[i]->register_mouse_operation(op_annotate , Qt::LeftButton , Qt::NoModifier);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_annotate;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
@@ -558,7 +567,16 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
         op_mpr_locate->set_crosshair_model(_model_crosshari);
-        mpr_containers[i]->register_mouse_operation(op_mpr_locate , Qt::LeftButton , Qt::NoModifier);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_mpr_locate;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
@@ -581,13 +599,22 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpRotate> pRotate(new MouseOpRotate());
-        pRotate->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(pRotate , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpRotate> op_rotate(new MouseOpRotate());
+        op_rotate->set_scene(mpr_scenes[i]);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_rotate;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_aoom_i()
+void NoduleAnnotation::slot_press_btn_zoom_i()
 {
     if (!_is_ready)
     {
@@ -608,7 +635,16 @@ void NoduleAnnotation::slot_press_btn_aoom_i()
     {
         std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
         op_zoom->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(op_zoom , Qt::LeftButton , Qt::NoModifier);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_zoom;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
@@ -633,7 +669,16 @@ void NoduleAnnotation::slot_press_btn_pan_i()
     {
         std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
         op_pan->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton , Qt::NoModifier);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_pan;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
@@ -656,9 +701,18 @@ void NoduleAnnotation::slot_press_btn_windowing_i()
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpWindowing> pWindowing(new MouseOpWindowing());
-        pWindowing->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(pWindowing , Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpWindowing> op_windowing(new MouseOpWindowing());
+        op_windowing->set_scene(mpr_scenes[i]);
+
+        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
+        op_min_max_hint->set_scene(mpr_scenes[i]);
+        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+
+        IMouseOpPtrCollection left_btn_ops(2);
+        left_btn_ops[0] = op_windowing;
+        left_btn_ops[1] = op_min_max_hint;
+
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
     }
 }
 
@@ -777,6 +831,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
 
         if (status == IO_SUCCESS)
         {
+            nodule_set->clear_nodule();
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {

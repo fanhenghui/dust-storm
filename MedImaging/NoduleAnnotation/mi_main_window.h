@@ -50,7 +50,7 @@ private slots:
     void slot_press_btn_arrow_i();
     void slot_press_btn_annotate_i();
     void slot_press_btn_rotate_i();
-    void slot_press_btn_aoom_i();
+    void slot_press_btn_zoom_i();
     void slot_press_btn_pan_i();
     void slot_press_btn_windowing_i();
     void slot_press_btn_fit_window_i();

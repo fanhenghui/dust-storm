@@ -21,6 +21,7 @@ public:
 
     void modify_voi_sphere_list_rear(const VOISphere& voi);
 
+    void remove_voi_sphere_list_rear();
     void remove_voi_sphere(int id);
 
     const std::list<VOISphere>& get_voi_spheres() const;

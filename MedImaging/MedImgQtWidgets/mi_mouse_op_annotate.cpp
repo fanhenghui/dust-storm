@@ -83,6 +83,15 @@ void MouseOpAnnotate::release(const QPoint& pt)
     {
         return;
     }
+
+    if (!_model->get_voi_spheres().empty())
+    {
+        if( (--_model->get_voi_spheres().end())->diameter < 0.1f )
+        {
+            _model->remove_voi_sphere_list_rear();
+            _model->notify();
+        }
+    }
     _pre_point = pt;
 }
 

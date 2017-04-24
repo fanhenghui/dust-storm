@@ -95,4 +95,13 @@ VOISphere VOIModel::get_voi_sphere(int id)
     QTWIDGETS_THROW_EXCEPTION("Get voi sphere failed!");
 }
 
+void VOIModel::remove_voi_sphere_list_rear()
+{
+    if (!_voi_sphere_list.empty())
+    {
+        _voi_sphere_list.erase(--_voi_sphere_list.end());
+        set_changed();
+    }
+}
+
 MED_IMAGING_END_NAMESPACE

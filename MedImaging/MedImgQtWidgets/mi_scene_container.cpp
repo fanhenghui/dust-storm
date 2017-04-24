@@ -160,7 +160,7 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     if (1 == _mouse_press_time)
     {
         _buttons_pre_press = _buttons;
-        QTimer::singleShot(200 , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
+        QTimer::singleShot(150 , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
     }
 }
 
