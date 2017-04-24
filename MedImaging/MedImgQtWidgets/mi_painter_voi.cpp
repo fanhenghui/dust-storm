@@ -74,9 +74,8 @@ void VOIPainter::render()
                 Point3 pt1 = pt0 + radius*up;
                 pt0 = mat_vp.transform(pt0);
                 pt1 = mat_vp.transform(pt1);
-                int spill_tag =0;
-                Point2 pt_dc0 = ArithmeticUtils::ndc_to_dc(Point2(pt0.x , pt0.y) , width , height , spill_tag);
-                Point2 pt_dc1 = ArithmeticUtils::ndc_to_dc(Point2(pt1.x , pt1.y) , width , height , spill_tag);
+                Point2 pt_dc0 = ArithmeticUtils::ndc_to_dc(Point2(pt0.x , pt0.y) , width , height);
+                Point2 pt_dc1 = ArithmeticUtils::ndc_to_dc(Point2(pt1.x , pt1.y) , width , height);
                 int radius_int = (int)( (pt_dc1 - pt_dc0).magnitude()+0.5);
                 if (radius_int > 1)
                 {
