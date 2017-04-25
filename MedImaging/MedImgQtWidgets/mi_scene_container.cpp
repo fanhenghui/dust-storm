@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTimer>
+#include <QApplication>
 
 #include "MedImgGLResource/mi_gl_utils.h"
 #include "MedImgRenderAlgorithm/mi_scene_base.h"
@@ -160,7 +161,9 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     if (1 == _mouse_press_time)
     {
         _buttons_pre_press = _buttons;
-        QTimer::singleShot(150 , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
+        //const int interval = QApplication::doubleClickInterval();
+        const int interval = 150;
+        QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
     }
 }
 
