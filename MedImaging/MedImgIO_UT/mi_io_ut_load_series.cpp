@@ -9,7 +9,7 @@ namespace
 {
     std::vector<std::string> GetFiles()
     {
-        const std::string file_name = "D:/Data/MyData/AB_CTA_01/";
+        const std::string file_name = "E:/Data/MyData/AB_CTA_01/";
         unsigned int uiSliceCount = 734;
         const std::string sPrefix ="DICOM7_000";
         std::string sCurFile;
@@ -19,15 +19,15 @@ namespace
             std::stringstream ss;
             if (i<10)
             {
-                ss << file_name << sPrefix << "00" << i;
+                ss << file_name << sPrefix << "00" << i << ".dcm";
             }
             else if (i<100)
             {
-                ss << file_name << sPrefix << "0" << i;
+                ss << file_name << sPrefix << "0" << i<< ".dcm";
             }
             else
             {
-                ss << file_name << sPrefix  << i;
+                ss << file_name << sPrefix  << i<< ".dcm";
             }
             files.push_back(ss.str());
         }
@@ -47,7 +47,7 @@ void IOUT_LoadSeries()
 
     if (IO_SUCCESS == status)
     {
-        std::ofstream out("D:/Data/MyData/AB_CTA_01.raw" , std::ios::binary | std::ios::out);
+        std::ofstream out("D:/Temp/AB_CTA_01.raw" , std::ios::binary | std::ios::out);
         if (out.is_open())
         {
             out.write((char*)image_data->get_pixel_pointer() , image_data->_dim[0]*image_data->_dim[1]*image_data->_dim[2]*2);

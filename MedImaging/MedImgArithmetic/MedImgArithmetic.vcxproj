@@ -91,6 +91,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,6 +114,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,6 +139,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,6 +166,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,12 +180,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl" />
+    <None Include="..\Include\MedImgArithmetic\mi_volume_statistician.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_aabb.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_utils.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_camera_base.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_color_unit.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_line.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_line_segment.h" />
@@ -214,6 +220,7 @@
     <ClCompile Include="mi_arithmetic_stdafx.cpp" />
     <ClCompile Include="mi_arithmetic_utils.cpp" />
     <ClCompile Include="mi_camera_base.cpp" />
+    <ClCompile Include="mi_ellipsoid.cpp" />
     <ClCompile Include="mi_intersection_test.cpp" />
     <ClCompile Include="mi_line.cpp" />
     <ClCompile Include="mi_line_segment.cpp" />

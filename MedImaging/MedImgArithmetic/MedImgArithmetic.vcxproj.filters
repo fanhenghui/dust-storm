@@ -36,6 +36,9 @@
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
       <Filter>Sampler</Filter>
     </None>
+    <None Include="..\Include\MedImgArithmetic\mi_volume_statistician.inl">
+      <Filter>Statistic</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_camera_base.h">
@@ -128,6 +131,9 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_volume_statistician.h">
       <Filter>Statistic</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h">
+      <Filter>Shape</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -207,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="mi_volume_statistician.cpp">
       <Filter>Statistic</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_ellipsoid.cpp">
+      <Filter>Shape</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
