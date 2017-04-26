@@ -251,6 +251,8 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
         set_sphere(_pre_center , radius);
 
         update_circle_center_i();
+
+        update_sphere_diameter_i();
     }
 }
 
@@ -266,6 +268,8 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     }
     else if (event->button() == Qt::RightButton)
     {
+        update_sphere_diameter_i();
+
         frezze(false);
     }
 }
@@ -372,6 +376,61 @@ void GraphicsSphereItem::update_sphere_center_i()
     }
 }
 
+void GraphicsSphereItem::update_sphere_diameter_i()
+{
+    //////////////////////////////////////////////////////////////////////////
+    //Calculate new sphere diameter
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+
+    std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
+
+    std::shared_ptr<CameraBase> camera = scene->get_camera();
+
+    std::shared_ptr<VolumeInfos> volume_infos = scene->get_volume_infos();
+    QTWIDGETS_CHECK_NULL_EXCEPTION(volume_infos);
+
+    std::shared_ptr<CameraCalculator> cameraCal = scene->get_camera_calculator();
+    Point3 look_at = camera->get_look_at();
+    Point3 eye = camera->get_eye();
+    Vector3 norm = look_at - eye;
+    norm.normalize();
+    Vector3 up = camera->get_up_direction();
+
+    const Matrix4 mat_vp = camera->get_view_projection_matrix();
+    const Matrix4 mat_vp_inv = mat_vp.get_inverse();
+    const Matrix4 mat_p2w = cameraCal->get_patient_to_world_matrix();
+
+    int width(1),height(1);
+    scene->get_display_size(width , height);
+
+    //Calculate previous radius
+    VOISphere voi = _model->get_voi_sphere(_id);
+    const Point3 sphere_center = mat_p2w.transform(voi.center);
+    const double diameter = voi.diameter;
+    const double distance = norm.dot_product(look_at - sphere_center);
+    Point3 pt0 = sphere_center + distance*norm;
+    const double radius = sqrt(diameter*diameter*0.25 - distance*distance);
+    Point3 pt1 = pt0 + radius*up;
+    pt0 = mat_vp.transform(pt0);
+    pt1 = mat_vp.transform(pt1);
+    const Point2 pt_dc0 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt0.x , pt0.y) , width , height);
+    const Point2 pt_dc1 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt1.x , pt1.y) , width , height);
+    const float pre_radius = static_cast<float>( (pt_dc1 - pt_dc0).magnitude() );
+
+    //Get current circle radius
+    const float cur_radius = this->rect().width()*0.5f;
+
+    float radio = abs(cur_radius / pre_radius);
+    if (abs(radio - 1.0f) > FLOAT_EPSILON)
+    {
+        _model->modify_voi_sphere_diameter(_id , voi.diameter*radio);
+        _model->notify();
+    }
+
+}
+
+
 void GraphicsSphereItem::set_voi_model(std::shared_ptr<medical_imaging::VOIModel> model)
 {
     _model = model;
@@ -391,3 +450,4 @@ bool GraphicsSphereItem::is_frezze() const
 {
     return _is_frezze;
 }
+
