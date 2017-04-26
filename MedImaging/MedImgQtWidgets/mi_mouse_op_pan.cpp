@@ -14,7 +14,7 @@ MouseOpPan::~MouseOpPan()
 
 }
 
-void MouseOpPan::press(const QPoint& pt)
+void MouseOpPan::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -24,7 +24,7 @@ void MouseOpPan::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpPan::move(const QPoint& pt)
+void MouseOpPan::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -35,7 +35,7 @@ void MouseOpPan::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpPan::release(const QPoint& pt)
+void MouseOpPan::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -44,7 +44,7 @@ void MouseOpPan::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpPan::double_click(const QPoint& pt)
+void MouseOpPan::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

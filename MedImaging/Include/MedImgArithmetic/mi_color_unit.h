@@ -36,6 +36,11 @@ struct RGBUnit
         b = (unsigned char)b_norm;
     }
 
+    bool operator == (const RGBUnit& rgb)
+    {
+        return rgb.r == r && rgb.g ==g && rgb.b == b;
+    }
+
     void print()
     {
         std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " )";

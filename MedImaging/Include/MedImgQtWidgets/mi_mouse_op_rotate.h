@@ -11,10 +11,10 @@ public:
     MouseOpRotate();
     virtual ~MouseOpRotate();
 
-    virtual void press(const QPoint& pt);
-    virtual void move(const QPoint& pt);
-    virtual void release(const QPoint& pt);
-    virtual void double_click(const QPoint& pt);
+    virtual void press(const QPointF& pt);
+    virtual void move(const QPointF& pt);
+    virtual void release(const QPointF& pt);
+    virtual void double_click(const QPointF& pt);
     virtual void wheel_slide(int);
 protected:
 private:

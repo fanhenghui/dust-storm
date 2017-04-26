@@ -19,7 +19,7 @@ void SceneContainerObserver::update()
     {
         if( (*it))
         {
-            (*it)->update();
+            (*it)->update_scene();
         }
     }
 }

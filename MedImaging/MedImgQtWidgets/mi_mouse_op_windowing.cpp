@@ -15,7 +15,7 @@ MouseOpWindowing::~MouseOpWindowing()
 
 }
 
-void MouseOpWindowing::press(const QPoint& pt)
+void MouseOpWindowing::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -25,7 +25,7 @@ void MouseOpWindowing::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpWindowing::move(const QPoint& pt)
+void MouseOpWindowing::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -51,7 +51,7 @@ void MouseOpWindowing::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpWindowing::release(const QPoint& pt)
+void MouseOpWindowing::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -60,7 +60,7 @@ void MouseOpWindowing::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpWindowing::double_click(const QPoint& pt)
+void MouseOpWindowing::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

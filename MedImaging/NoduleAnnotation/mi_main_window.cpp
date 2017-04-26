@@ -29,10 +29,10 @@
 
 #include "MedImgQtWidgets/mi_shared_widget.h"
 #include "MedImgQtWidgets/mi_scene_container.h"
-#include "MedImgQtWidgets/mi_painter_corners_info.h"
-#include "MedImgQtWidgets/mi_painter_voi.h"
-#include "MedImgQtWidgets/mi_painter_cross_hair.h"
-#include "MedImgQtWidgets/mi_painter_mpr_border.h"
+#include "MedImgQtWidgets/mi_graphic_item_corners_info.h"
+#include "MedImgQtWidgets/mi_graphic_item_voi.h"
+#include "MedImgQtWidgets/mi_graphic_item_cross_hair.h"
+#include "MedImgQtWidgets/mi_graphic_item_mpr_border.h"
 #include "MedImgQtWidgets/mi_mouse_op_zoom.h"
 #include "MedImgQtWidgets/mi_mouse_op_pan.h"
 #include "MedImgQtWidgets/mi_mouse_op_rotate.h"
@@ -193,27 +193,24 @@ void NoduleAnnotation::create_scene_i()
         mpr_scenes[i]->set_interpolation_mode(LINEAR);
 
         //3 Add painter list
-        std::vector<std::shared_ptr<PainterBase>> painter_list;
-        std::shared_ptr<CornersInfoPainter> painter_corner_info(new CornersInfoPainter());
-        painter_corner_info->set_scene(mpr_scenes[i]);
-        painter_list.push_back(painter_corner_info);
+        std::shared_ptr<GraphicItemCornersInfo> graphic_item_corner_info(new GraphicItemCornersInfo());
+        graphic_item_corner_info->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->add_item(graphic_item_corner_info);
 
-        std::shared_ptr<VOIPainter> painter_voi(new VOIPainter());
-        painter_voi->set_scene(mpr_scenes[i]);
-        painter_voi->set_voi_model(_model_voi);
-        painter_list.push_back(painter_voi);
+        std::shared_ptr<GraphicItemVOI> graphic_item_voi(new GraphicItemVOI());
+        graphic_item_voi->set_scene(mpr_scenes[i]);
+        graphic_item_voi->set_voi_model(_model_voi);
+        mpr_containers[i]->add_item(graphic_item_voi);
 
-        std::shared_ptr<CrosshairPainter> painter_crosshair(new CrosshairPainter());
-        painter_crosshair->set_scene(mpr_scenes[i]);
-        painter_crosshair->set_crosshair_model(_model_crosshari);
-        painter_list.push_back(painter_crosshair);
+        std::shared_ptr<GraphicItemCrosshair> graphic_item_crosshair(new GraphicItemCrosshair());
+        graphic_item_crosshair->set_scene(mpr_scenes[i]);
+        graphic_item_crosshair->set_crosshair_model(_model_crosshari);
+        mpr_containers[i]->add_item(graphic_item_crosshair);
 
-        std::shared_ptr<MPRBorderPainter> painter_mpr_border(new MPRBorderPainter());
-        painter_mpr_border->set_scene(mpr_scenes[i]);
-        painter_mpr_border->set_crosshair_model(_model_crosshari);
-        painter_list.push_back(painter_mpr_border);
-
-        mpr_containers[i]->add_painter_list(painter_list);
+        std::shared_ptr<GraphicItemMPRBorder> graphic_item_mpr_border(new GraphicItemMPRBorder());
+        graphic_item_mpr_border->set_scene(mpr_scenes[i]);
+        graphic_item_mpr_border->set_crosshair_model(_model_crosshari);
+        mpr_containers[i]->add_item(graphic_item_mpr_border);
 
         //4 Add operation 
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
@@ -1032,7 +1029,7 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
 
         target_container->show();
         target_scroll_bar->show();
-        target_container->updateGL();
+        target_container->update_scene();
 
         _layout_tag = 1;
 

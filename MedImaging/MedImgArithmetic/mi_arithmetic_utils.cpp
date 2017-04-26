@@ -107,6 +107,16 @@ Point2 ArithmeticUtils::ndc_to_dc(Point2 pt_ndc , int width , int height)
     return Point2( (int)x , (int)y);
 }
 
+Point2 ArithmeticUtils::ndc_to_dc_decimal(Point2 pt_ndc , int width , int height)
+{
+    double x = (pt_ndc.x+1.0)*0.5;
+    double y = (-pt_ndc.y+1.0)*0.5;
+    x = x*(double)width;
+    y = y*(double)height;
+
+    return Point2( x , y);
+}
+
 bool ArithmeticUtils::check_in_bound(const Point3& pt , const Point3& bound)
 {
     if (pt.x < 0 || pt.x > bound.x || 

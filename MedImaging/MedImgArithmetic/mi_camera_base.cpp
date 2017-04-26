@@ -126,4 +126,9 @@ Vector3 CameraBase::get_view_direction() const
     return (_at - _eye).get_normalize();
 }
 
+bool CameraBase::operator==(const CameraBase& camera)
+{
+    return _mat_view == camera._mat_view;
+}
+
 MED_IMAGING_END_NAMESPACE

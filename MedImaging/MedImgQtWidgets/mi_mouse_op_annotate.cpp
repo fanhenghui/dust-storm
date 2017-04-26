@@ -24,7 +24,7 @@ MouseOpAnnotate::~MouseOpAnnotate()
 
 }
 
-void MouseOpAnnotate::press(const QPoint& pt)
+void MouseOpAnnotate::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -52,7 +52,7 @@ void MouseOpAnnotate::press(const QPoint& pt)
     }
 }
 
-void MouseOpAnnotate::move(const QPoint& pt)
+void MouseOpAnnotate::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -77,7 +77,7 @@ void MouseOpAnnotate::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpAnnotate::release(const QPoint& pt)
+void MouseOpAnnotate::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -95,7 +95,7 @@ void MouseOpAnnotate::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpAnnotate::double_click(const QPoint& pt)
+void MouseOpAnnotate::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

@@ -27,6 +27,8 @@ public:
 
     static Point2 ndc_to_dc(Point2 pt_ndc , int width , int height );
 
+    static Point2 ndc_to_dc_decimal(Point2 pt_ndc , int width , int height );
+
     //TODO 下面的几个输出并不对
     //static double FloorDouble(double x);
 

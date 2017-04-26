@@ -82,6 +82,20 @@ void VOIModel::modify_voi_sphere_diameter(int id , double diameter)
     //Find no
 }
 
+void VOIModel::modify_voi_sphere_center(int id , const Point3& center)
+{
+    int i = 0;
+    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    {
+        if (i++ == id)
+        {
+            it->center = center;
+            set_changed();
+            return;
+        }
+    }
+}
+
 VOISphere VOIModel::get_voi_sphere(int id)
 {
     int i = 0;

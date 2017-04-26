@@ -24,7 +24,7 @@
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
 
 #include "MedImgQtWidgets/mi_scene_container.h"
-#include "MedImgQtWidgets/mi_painter_corners_info.h"
+#include "MedImgQtWidgets/mi_graphic_item_corners_info.h"
 #include "MedImgQtWidgets/mi_mouse_op_zoom.h"
 #include "MedImgQtWidgets/mi_mouse_op_pan.h"
 #include "MedImgQtWidgets/mi_mouse_op_rotate.h"
@@ -92,9 +92,9 @@ void MedicalImageDataModule::slot_action_open_dicom_folder()
 
 
         //Add painter list
-        std::shared_ptr<CornersInfoPainter> pPatientInfo(new CornersInfoPainter());
+        std::shared_ptr<GraphicItemCornersInfo> pPatientInfo(new GraphicItemCornersInfo());
         pPatientInfo->set_scene(scene);
-        m_pMPRScene->add_painter_list(std::vector<std::shared_ptr<PainterBase>>(1 , pPatientInfo));
+        m_pMPRScene->add_item(pPatientInfo);
 
 
         //Add operation 

@@ -14,7 +14,7 @@ MouseOpZoom::~MouseOpZoom()
 
 }
 
-void MouseOpZoom::press(const QPoint& pt)
+void MouseOpZoom::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -24,7 +24,7 @@ void MouseOpZoom::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpZoom::move(const QPoint& pt)
+void MouseOpZoom::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -35,7 +35,7 @@ void MouseOpZoom::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpZoom::release(const QPoint& pt)
+void MouseOpZoom::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -44,7 +44,7 @@ void MouseOpZoom::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpZoom::double_click(const QPoint& pt)
+void MouseOpZoom::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

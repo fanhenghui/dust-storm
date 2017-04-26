@@ -16,10 +16,14 @@ MyTextItem::~MyTextItem()
 
 }
 
+void MyTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QGraphicsTextItem::paint(painter , option , widget);
+}
+
 MyEllipse::MyEllipse(QGraphicsItem *parent /*= 0 */, QGraphicsScene *scene /*= 0*/)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable);
-    //this->setFlag(QGraphicsItem::ItemIsSelectable);
     this->setPen(QPen(QColor(255,0,0)));
 }
 
@@ -58,11 +62,13 @@ void MyEllipse::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
         float y = abs(_pre_center.y() - this->mapToScene(event->pos()).y());
         float radius = sqrt(x*x + y*y);
 
-        QRectF rect = QRectF(0, 0, 2*radius ,2*radius);
+        set_sphere(_pre_center , radius);
+
+        /*QRectF rect = QRectF(0, 0, 2*radius ,2*radius);
         QPointF new_pos = _pre_center - QPointF(radius,radius);
 
         this->setRect( rect);
-        this->setPos(new_pos);
+        this->setPos(new_pos);*/
 
         update_center_i();
     }
@@ -120,4 +126,10 @@ void MyEllipse::update_center_i()
 {
     _pre_center = QPointF(this->pos().x() + this->rect().width()*0.5f , this->pos().y() + this->rect().height()*0.5f);
     std::cout  << "center : " << _pre_center.x()  << " , " << _pre_center.y() << std::endl;
+}
+
+void MyEllipse::set_sphere(const QPointF& center , float radius)
+{
+    this->setRect( QRectF(0, 0, 2*radius ,2*radius));
+    this->setPos(center - QPointF(radius,radius));
 }

@@ -18,6 +18,7 @@ public:
 
     void modify_voi_sphere_name(int id , std::string name);
     void modify_voi_sphere_diameter(int id , double diameter);
+    void modify_voi_sphere_center(int id , const Point3& center);
 
     void modify_voi_sphere_list_rear(const VOISphere& voi);
 

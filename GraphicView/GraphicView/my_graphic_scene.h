@@ -8,13 +8,17 @@ class MyGraphicScene : public QGraphicsScene
 public:
     MyGraphicScene(QObject* parent = 0);
     virtual ~MyGraphicScene();
+    bool no_item_selected();
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    virtual void wheelEvent(QGraphicsSceneWheelEvent *event);
 
 private:
+    bool _no_item_selected;
 };
 
 #endif

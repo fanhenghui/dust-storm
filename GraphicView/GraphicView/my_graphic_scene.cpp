@@ -4,7 +4,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 
-MyGraphicScene::MyGraphicScene(QObject* parent /*= 0*/)
+MyGraphicScene::MyGraphicScene(QObject* parent /*= 0*/):_no_item_selected(false)
 {
 
 }
@@ -16,14 +16,16 @@ MyGraphicScene::~MyGraphicScene()
 
 void MyGraphicScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    //std::cout << "mouse press\n";
+    std::cout << "mouse press\n";
 
     QGraphicsScene::mousePressEvent(event);
 
-    if (this->selectedItems().empty())
-    {
-        std::cout << "no selected\n";
-    }
+    _no_item_selected = (mouseGrabberItem() == nullptr);
+
+    //if (this->selectedItems().empty())
+    //{
+    //    std::cout << "no selected\n";
+    //}
 }
 
 void MyGraphicScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -44,12 +46,17 @@ void MyGraphicScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
-//void MyGraphicScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-//{
-//    std::cout << "mouse double click\n";
-//}
-//
-//void MyGraphicScene::wheelEvent(QGraphicsSceneWheelEvent *event)
-//{
-//    std::cout << "mouse wheel\n";
-//}
+void MyGraphicScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    std::cout << "mouse double click\n";
+}
+
+void MyGraphicScene::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    std::cout << "mouse wheel\n";
+}
+
+bool MyGraphicScene::no_item_selected()
+{
+    return _no_item_selected;
+}

@@ -53,28 +53,29 @@ MyWindow::MyWindow(QWidget *parent /*= 0*/):
 
     for (int i = 0  ; i< 4; ++i)
     {
-        _my_graphic_scene[i] = new MyGraphicScene(this);
-        _my_graphic_view[i] = new MyGraphicView(_my_graphic_scene[i] ,this);
+        //_my_graphic_scene[i] = new MyGraphicScene(this);
+        _my_graphic_view[i] = new MyGraphicView(this);
         _my_graphic_view[i]->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//×ÔÊÊÓ¦´°¿Ú
         _my_graphic_view[i]->setSceneRect(0,0 , _my_graphic_view[i]->width() , _my_graphic_view[i]->height());
 
         std::cout << _my_graphic_view[i]->width()/2 << " " << _my_graphic_view[i]->height()/2 << std::endl;
         //text item
         MyTextItem* text_item = new MyTextItem();
-        text_item->setPlainText(tr("Hello world"));
+        text_item->setPlainText(tr("Hello world \nNull"));
         text_item->setPos(_my_graphic_view[i]->width()/2 , _my_graphic_view[i]->height()/2);
-        _my_graphic_scene[i]->addItem(text_item);
+        _my_graphic_view[i]->get_graphics_scene()->addItem(text_item);
 
         //ellipse
-        MyEllipse* ellipse_item  = new MyEllipse(0 , _my_graphic_scene[i]);
+        MyEllipse* ellipse_item  = new MyEllipse();
         ellipse_item->setRect(0,0,50,50);
         ellipse_item->setPos(0,0);
-        _my_graphic_scene[i]->addItem(ellipse_item);
+        _my_graphic_view[i]->get_graphics_scene()->addItem(ellipse_item);
 
-        MyEllipse* ellipse_item2  = new MyEllipse(0 , _my_graphic_scene[i]);
+        MyEllipse* ellipse_item2  = new MyEllipse();
         ellipse_item2->setRect(0,0,50,50);
-        ellipse_item->setPos(25,25);
-        _my_graphic_scene[i]->addItem(ellipse_item2);
+        ellipse_item2->setPos(25,25);
+        //ellipse_item2->hide();
+        _my_graphic_view[i]->get_graphics_scene()->addItem(ellipse_item2);
     }
 
     ui.gridLayout->addWidget(_my_graphic_view[0] , 0 , 0);
@@ -182,7 +183,7 @@ void MyWindow::create_scenes()
 
     for (int i= 0 ; i< 3 ; ++i)
     {
-        _my_graphic_scene[i]->update();
+        _my_graphic_view[i]->update_scene();
     }
 }
 

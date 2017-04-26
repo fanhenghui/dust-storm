@@ -10,6 +10,7 @@ public:
     virtual ~MyTextItem();
 
 protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);  
 private:
 };
 
@@ -18,6 +19,9 @@ class MyEllipse : public QGraphicsEllipseItem
 public:
     MyEllipse(QGraphicsItem *parent = 0 , QGraphicsScene *scene = 0);
     virtual ~MyEllipse();
+
+    void set_sphere(const QPointF& center , float radius);
+
 
 protected:
     virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);

@@ -33,22 +33,22 @@ MouseOpMinMaxHint::~MouseOpMinMaxHint()
 
 }
 
-void MouseOpMinMaxHint::press(const QPoint& pt)
+void MouseOpMinMaxHint::press(const QPointF& pt)
 {
     //std::cout << "single click \n";
 }
 
-void MouseOpMinMaxHint::move(const QPoint& pt)
+void MouseOpMinMaxHint::move(const QPointF& pt)
 {
 
 }
 
-void MouseOpMinMaxHint::release(const QPoint& pt)
+void MouseOpMinMaxHint::release(const QPointF& pt)
 {
 
 }
 
-void MouseOpMinMaxHint::double_click(const QPoint& pt)
+void MouseOpMinMaxHint::double_click(const QPointF& pt)
 {
     //std::cout << "double click \n";
     if (_min_max_hint_object)

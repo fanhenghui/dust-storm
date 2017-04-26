@@ -14,7 +14,7 @@ MouseOpRotate::~MouseOpRotate()
 
 }
 
-void MouseOpRotate::press(const QPoint& pt)
+void MouseOpRotate::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -24,7 +24,7 @@ void MouseOpRotate::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpRotate::move(const QPoint& pt)
+void MouseOpRotate::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -35,7 +35,7 @@ void MouseOpRotate::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpRotate::release(const QPoint& pt)
+void MouseOpRotate::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -44,7 +44,7 @@ void MouseOpRotate::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpRotate::double_click(const QPoint& pt)
+void MouseOpRotate::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

@@ -15,7 +15,7 @@ MouseOpMPRPage::~MouseOpMPRPage()
 
 }
 
-void MouseOpMPRPage::press(const QPoint& pt)
+void MouseOpMPRPage::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -25,7 +25,7 @@ void MouseOpMPRPage::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpMPRPage::move(const QPoint& pt)
+void MouseOpMPRPage::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -48,7 +48,7 @@ void MouseOpMPRPage::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpMPRPage::release(const QPoint& pt)
+void MouseOpMPRPage::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -57,7 +57,7 @@ void MouseOpMPRPage::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpMPRPage::double_click(const QPoint& pt)
+void MouseOpMPRPage::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

@@ -15,7 +15,7 @@ MouseOpLocate::~MouseOpLocate()
 
 }
 
-void MouseOpLocate::press(const QPoint& pt)
+void MouseOpLocate::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -36,15 +36,15 @@ void MouseOpLocate::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpLocate::move(const QPoint& )
+void MouseOpLocate::move(const QPointF& )
 {
 }
 
-void MouseOpLocate::release(const QPoint& )
+void MouseOpLocate::release(const QPointF& )
 {
 }
 
-void MouseOpLocate::double_click(const QPoint& )
+void MouseOpLocate::double_click(const QPointF& )
 {
 }
 

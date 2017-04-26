@@ -34,18 +34,20 @@ public:
 
     OrthoCamera& operator =(const OrthoCamera& camera);
 
+    bool operator == (const OrthoCamera& camera); 
+
 protected:
     virtual void calculate_projection_matrix_i();
 
 private:
-    double _Left;
-    double _Right;
-    double _Bottom;
-    double _Top;
-    double _Near;
-    double _Far;
-    Matrix4 _matProjection;
-    bool _bIsPCalculated;
+    double _left;
+    double _right;
+    double _bottom;
+    double _top;
+    double _near;
+    double _far;
+    Matrix4 _mat_projection;
+    bool _is_proj_mat_cal;
 
     //Zoom
     double _ZoomFactor;

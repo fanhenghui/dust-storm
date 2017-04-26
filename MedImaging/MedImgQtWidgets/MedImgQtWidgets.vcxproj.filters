@@ -36,9 +36,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Src\Painter">
-      <UniqueIdentifier>{cc1f6545-8977-47b1-a633-53514fc006f9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Scene container">
       <UniqueIdentifier>{260efcb8-7d1e-484b-8c93-b9d030c2d6a0}</UniqueIdentifier>
     </Filter>
@@ -47,6 +44,9 @@
     </Filter>
     <Filter Include="Src\Model Observer">
       <UniqueIdentifier>{973684e5-3f2f-45ad-b387-e5bdbe97874f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Graphics Item">
+      <UniqueIdentifier>{cc1f6545-8977-47b1-a633-53514fc006f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -86,23 +86,11 @@
     <ClCompile Include="mi_mouse_op_annotate.cpp">
       <Filter>Src\Operation</Filter>
     </ClCompile>
-    <ClCompile Include="mi_painter_corners_info.cpp">
-      <Filter>Src\Painter</Filter>
-    </ClCompile>
-    <ClCompile Include="mi_painter_cross_hair.cpp">
-      <Filter>Src\Painter</Filter>
-    </ClCompile>
     <ClCompile Include="mi_model_voi.cpp">
       <Filter>Src\Model Observer</Filter>
     </ClCompile>
-    <ClCompile Include="mi_painter_voi.cpp">
-      <Filter>Src\Painter</Filter>
-    </ClCompile>
     <ClCompile Include="mi_model_cross_hair.cpp">
       <Filter>Src\Model Observer</Filter>
-    </ClCompile>
-    <ClCompile Include="mi_painter_mpr_border.cpp">
-      <Filter>Src\Painter</Filter>
     </ClCompile>
     <ClCompile Include="mi_mouse_op_locate.cpp">
       <Filter>Src\Operation</Filter>
@@ -119,13 +107,22 @@
     <ClCompile Include="mi_mouse_op_mpr_page.cpp">
       <Filter>Src\Operation</Filter>
     </ClCompile>
+    <ClCompile Include="mi_graphic_item_corners_info.cpp">
+      <Filter>Src\Graphics Item</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_graphic_item_cross_hair.cpp">
+      <Filter>Src\Graphics Item</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_graphic_item_mpr_border.cpp">
+      <Filter>Src\Graphics Item</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_graphic_item_voi.cpp">
+      <Filter>Src\Graphics Item</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
       <Filter>Src\Config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_base.h">
-      <Filter>Src\Painter</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_interface.h">
       <Filter>Src\Operation</Filter>
@@ -145,23 +142,11 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_annotate.h">
       <Filter>Src\Operation</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_corners_info.h">
-      <Filter>Src\Painter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_cross_hair.h">
-      <Filter>Src\Painter</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_voi.h">
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_voi.h">
-      <Filter>Src\Painter</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_cross_hair.h">
       <Filter>Src\Model Observer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_painter_mpr_border.h">
-      <Filter>Src\Painter</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_locate.h">
       <Filter>Src\Operation</Filter>
@@ -177,6 +162,21 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_mpr_page.h">
       <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_base.h">
+      <Filter>Src\Graphics Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_corners_info.h">
+      <Filter>Src\Graphics Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_cross_hair.h">
+      <Filter>Src\Graphics Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_mpr_border.h">
+      <Filter>Src\Graphics Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h">
+      <Filter>Src\Graphics Item</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

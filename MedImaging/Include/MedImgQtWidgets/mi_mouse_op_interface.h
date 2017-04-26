@@ -23,14 +23,14 @@ public:
         _scene = scene;
     };
 
-    virtual void press(const QPoint& pt) = 0;
-    virtual void move(const QPoint& pt) = 0;
-    virtual void release(const QPoint& pt) = 0;
-    virtual void double_click(const QPoint& pt) = 0;
+    virtual void press(const QPointF& pt) = 0;
+    virtual void move(const QPointF& pt) = 0;
+    virtual void release(const QPointF& pt) = 0;
+    virtual void double_click(const QPointF& pt) = 0;
     virtual void wheel_slide(int value) = 0;
 
 protected:
-    QPoint _pre_point;
+    QPointF _pre_point;
     std::shared_ptr<medical_imaging::SceneBase> _scene;
 };
 

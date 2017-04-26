@@ -165,7 +165,7 @@ public:
         kvp = 0.0f;
         patient_name = sUD;
         patient_id = sUD;
-        patient_sex = std::string("M");
+        patient_sex = std::string("");
         patient_age = std::string("000D");
         patient_position = HFP;
         slice_thickness = 1.0;

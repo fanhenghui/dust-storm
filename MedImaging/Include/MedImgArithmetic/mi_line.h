@@ -18,6 +18,11 @@ public:
 public:
     Line2D();
     virtual ~Line2D();
+
+    bool operator == (const Line2D& l)
+    {
+        return l._pt == _pt && l._dir == _dir;
+    }
 };
 
 class Arithmetic_Export Line3D : public IShape

@@ -35,7 +35,7 @@ private:
 
 private:
     MyGraphicView* _my_graphic_view[4];
-    MyGraphicScene* _my_graphic_scene[4];
+    //MyGraphicScene* _my_graphic_scene[4];
 
     std::shared_ptr<medical_imaging::VolumeInfos> _volume_infos;
 

@@ -17,7 +17,7 @@ MouseOpProbe::~MouseOpProbe()
 
 }
 
-void MouseOpProbe::press(const QPoint& pt)
+void MouseOpProbe::press(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -27,7 +27,7 @@ void MouseOpProbe::press(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpProbe::move(const QPoint& pt)
+void MouseOpProbe::move(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -59,7 +59,7 @@ void MouseOpProbe::move(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpProbe::release(const QPoint& pt)
+void MouseOpProbe::release(const QPointF& pt)
 {
     if (!_scene)
     {
@@ -68,7 +68,7 @@ void MouseOpProbe::release(const QPoint& pt)
     _pre_point = pt;
 }
 
-void MouseOpProbe::double_click(const QPoint& pt)
+void MouseOpProbe::double_click(const QPointF& pt)
 {
     if (!_scene)
     {

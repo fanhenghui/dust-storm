@@ -1,102 +1,157 @@
 #include "mi_scene_container.h"
 
 #include <QMouseEvent>
+#include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QTimer>
 #include <QApplication>
 
-#include "MedImgGLResource/mi_gl_utils.h"
 #include "MedImgRenderAlgorithm/mi_scene_base.h"
 
 #include "mi_shared_widget.h"
-#include "mi_painter_base.h"
 #include "mi_mouse_op_interface.h"
+#include "mi_graphic_item_base.h"
 
 using namespace medical_imaging;
 
-SceneContainer::SceneContainer(SharedWidget* shared , QWidget* parent /*= 0*/):
-        QGLWidget(parent , shared),_buttons(Qt::NoButton),_modifiers(Qt::NoModifier),_pixel_map(new QPixmap(256,256)),_mouse_press_time(0),_mouse_release_time(0)
-{
-    makeCurrent();
 
-    setAutoBufferSwap( false );
-    setAutoFillBackground( false );
-    //setMouseTracking(true);
+Graphics2DScene::Graphics2DScene(QObject* parent /*= 0*/):
+QGraphicsScene(parent)
+{
+
+}
+
+Graphics2DScene::~Graphics2DScene()
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+SceneContainer::SceneContainer(QWidget* parent /*= 0*/):
+        QGraphicsView(parent),
+        _buttons(Qt::NoButton),
+        _modifiers(Qt::NoModifier),
+        _mouse_press_time(0),
+        _mouse_release_time(0),
+        _pre_point(0,0),
+        _buttons_pre_press(Qt::NoButton)
+{
+    _inner_graphic_scene = new Graphics2DScene();
+    this->setScene(_inner_graphic_scene);
+
+    _inner_gl_widget = new QGLWidget(0 , SharedWidget::instance() );
+    this->setViewport(_inner_gl_widget );
+
+    //this->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 }
 
 SceneContainer::~SceneContainer()
 {
-    makeCurrent();
 
-    /*if (_scene)
-    {
-        _scene->finalize();
-    }*/
 }
 
-void SceneContainer::initializeGL()
+void SceneContainer::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    if (GLEW_OK != glewInit())
-    {
-        QTWIDGETS_THROW_EXCEPTION("Glew init failed!");
-    }
+    static int idx = 0;
+    std::cout << "draw background " << idx++ << std::endl;
 
-    if (_scene)
-    {
-        _scene->initialize();
-    }
-}
-
-void SceneContainer::paintEvent(QPaintEvent* painter)
-{
-    boost::unique_lock<boost::mutex> locker(_mutex);
+    //Render scene
     if (!_scene)
     {
-        makeCurrent();
-
-        glViewport(0,0,this->width() , this->height());
-        glFrontFace( GL_CW );
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        glClearColor(0,0,0,0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        QPainter painter(this);
-        painter.setPen(Qt::red);
-        painter.drawText(this->width()/2,this->height()/2,tr("NULL"));
-        swapBuffers();
-
-        return;
+        glClearColor(0.5,0.5,0.5,0);
+        glClear(GL_COLOR_BUFFER_BIT );
     }
     else
     {
-        makeCurrent();
+        //_gl_widget->makeCurrent();
 
-        CHECK_GL_ERROR;
-        if (_scene)
-        {
-            _scene->initialize();
-        }
-        CHECK_GL_ERROR;
-        //1 Scene rendering
+        _scene->initialize();
         _scene->render(0);
         _scene->render_to_back();
 
-        //2 Painter drawing
-        _pixel_map->fill(Qt::transparent);
-        QPainter painter(_pixel_map.get());
-        for (auto it = _painters.begin() ; it != _painters.end()  ;++it)
+        //_gl_widget->doneCurrent();
+    }
+}
+
+void SceneContainer::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    //do nothing
+}
+
+void SceneContainer::resizeEvent(QResizeEvent *event)
+{
+    QGraphicsView::resizeEvent(event);
+    this->setSceneRect(0,0,event->size().width() , event->size().height());
+
+    if (_scene)
+    {
+        _scene->set_display_size(event->size().width() , event->size().height());
+    }
+}
+
+void SceneContainer::paintEvent(QPaintEvent *event)
+{
+    //Update graphic item
+    for (auto it = _graphic_items.begin() ; it != _graphic_items.end() ; ++it)
+    {
+        std::vector<QGraphicsItem*> to_be_add;
+        std::vector<QGraphicsItem*> to_be_remove;
+        (*it)->update(to_be_add , to_be_remove);
+
+        //Remove
+        for (auto it_remove = to_be_remove.begin() ; it_remove != to_be_remove.end() ; ++it_remove)
         {
-            (*it)->set_painter(&painter);
-            (*it)->render();
+            _inner_graphic_scene->removeItem(*it_remove);
         }
 
-        QPainter p(this);
-        p.drawPixmap(0,0,*_pixel_map);
+        //Add
+        for (auto it_add = to_be_add.begin() ; it_add != to_be_add.end() ; ++it_add)
+        {
+            _inner_graphic_scene->addItem(*it_add);
+        }
 
-
-        //3 Swap buffers
-        swapBuffers( );
+        //Post update
+        (*it)->post_update();
     }
+
+    QGraphicsView::paintEvent(event);
+}
+
+void SceneContainer::set_scene(std::shared_ptr<medical_imaging::SceneBase> scene)
+{
+    _scene = scene;
+}
+
+std::shared_ptr<medical_imaging::SceneBase> SceneContainer::get_scene()
+{
+    return _scene;
+}
+
+void SceneContainer::set_name(const std::string& des)
+{
+    if (_scene)
+    {
+        _scene->set_name(des);
+    }
+}
+
+std::string SceneContainer::get_name() const
+{
+    if (_scene)
+    {
+        return _scene->get_name();
+    }
+    else
+    {
+        return "";
+    }
+}
+
+void SceneContainer::update_scene()
+{
+    _inner_graphic_scene->update();
+    std::cout << "update scene" << std::endl;
 }
 
 void SceneContainer::slot_mouse_click()
@@ -145,7 +200,7 @@ void SceneContainer::slot_mouse_click()
     }
 
     _mouse_press_time = 0;
-    update();
+    update_scene();
 }
 
 void SceneContainer::mousePressEvent(QMouseEvent *event)
@@ -153,114 +208,144 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     //focus
     this->setFocus();
 
-    _buttons = event->buttons();
-    _pre_point = event->pos();
-    _modifiers = event->modifiers();
+    //1 Graphic item(Qt 2D) interaction
+    QGraphicsView::mousePressEvent(event);
 
-    ++_mouse_press_time;
-    if (1 == _mouse_press_time)
+    //2 TODO Graphic primitive(3D) interaction
+
+    //3 Mouse operation
+    if (no_graphics_item_grab_i())
     {
-        _buttons_pre_press = _buttons;
-        //const int interval = QApplication::doubleClickInterval();
-        const int interval = 150;
-        QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
-    }
-}
-
-void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (0 == _mouse_press_time)
-    {
-        _mouse_release_time = 0;
-
-        IMouseOpPtrCollection ops;
+        _buttons = event->buttons();
+        _pre_point = event->pos();
         _modifiers = event->modifiers();
-        if(get_mouse_operation_i(ops))
-        {
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
-            {
-                (*it)->release(event->pos());
-            }
-        }
 
-        _buttons = Qt::NoButton;
-        update();
-    }
-    else
-    {
-        _mouse_release_time = 1;
+        ++_mouse_press_time;
+        if (1 == _mouse_press_time)
+        {
+            _buttons_pre_press = _buttons;
+            //const int interval = QApplication::doubleClickInterval();
+            const int interval = 150;
+            QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
+        }
     }
 }
 
 void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 {
-    if (0 == _mouse_press_time)//mouse after press 
+    //1 Graphic item(Qt 2D) interaction
+    QGraphicsView::mouseMoveEvent(event);
+
+    //2 TODO Graphic primitive(3D) interaction
+
+    //3 Mouse operation
+    if (no_graphics_item_grab_i())
     {
-        IMouseOpPtrCollection ops;
-        _modifiers = event->modifiers();
-        if(get_mouse_operation_i( ops))
+        if (_buttons == Qt::NoButton)
         {
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
-            {
-                (*it)->move(event->pos());
-            }
+            return;
         }
 
-        update();
+        if (0 == _mouse_press_time)//mouse after press 
+        {
+            IMouseOpPtrCollection ops;
+            _modifiers = event->modifiers();
+            if(get_mouse_operation_i( ops))
+            {
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
+                {
+                    (*it)->move(event->pos());
+                }
+            }
+
+            update_scene();
+        }
+    }
+}
+
+void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
+{
+    //1 Graphic item(Qt 2D) interaction
+    QGraphicsView::mouseReleaseEvent(event);
+
+    //2 TODO Graphic primitive(3D) interaction
+
+    //3 Mouse operation
+    if (no_graphics_item_grab_i())
+    {
+        if (0 == _mouse_press_time)
+        {
+            _mouse_release_time = 0;
+
+            IMouseOpPtrCollection ops;
+            _modifiers = event->modifiers();
+            if(get_mouse_operation_i(ops))
+            {
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
+                {
+                    (*it)->release(event->pos());
+                }
+            }
+
+            _buttons = Qt::NoButton;
+            update_scene();
+        }
+        else
+        {
+            _mouse_release_time = 1;
+        }
     }
 }
 
 void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    ++_mouse_press_time;
-    _buttons = event->buttons();
+    //1 Graphic item(Qt 2D) interaction
+    QGraphicsView::mouseDoubleClickEvent(event);
+
+    //2 TODO Graphic primitive(3D) interaction
+
+    //3 Mouse operation
+    if (no_graphics_item_grab_i())
+    {
+        ++_mouse_press_time;
+        _buttons = event->buttons();
+    }
 }
 
 void SceneContainer::wheelEvent(QWheelEvent *event)
 {
-    if (_mouse_wheel_ops.empty())
-    {
-        return;
-    }
+    //1 Graphic item(Qt 2D) interaction
+    QGraphicsView::wheelEvent(event);
 
-    //滚轮向下是负数，向上是正数
-    const int degree = event->delta() / 8;//滚动的角度，*8就是鼠标滚动的距离
-    const int step = degree/ 15;//滚动的步数，*15就是鼠标滚动的角度
+    //2 TODO Graphic primitive(3D) interaction
 
-    for (auto it = _mouse_wheel_ops.begin() ; it != _mouse_wheel_ops.end() ; ++it)
+    //3 Mouse operation
+    if (no_graphics_item_grab_i())
     {
-        (*it)->wheel_slide(step);
+        if (_mouse_wheel_ops.empty())
+        {
+            return;
+        }
+
+        //滚轮向下是负数，向上是正数
+        const int degree = event->delta() / 8;//滚动的角度，*8就是鼠标滚动的距离
+        const int step = degree/ 15;//滚动的步数，*15就是鼠标滚动的角度
+
+        for (auto it = _mouse_wheel_ops.begin() ; it != _mouse_wheel_ops.end() ; ++it)
+        {
+            (*it)->wheel_slide(step);
+        }
     }
 }
 
 void SceneContainer::keyPressEvent(QKeyEvent *key)
 {
-    
+
 }
 
 void SceneContainer::keyReleaseEvent(QKeyEvent *key)
 {
 
-}
-
-void SceneContainer::resizeGL(int w, int h)
-{
-    boost::unique_lock<boost::mutex> locker(_mutex);
-    if (_scene)
-    {
-        _scene->set_display_size(w,h);
-    }
-    _pixel_map.reset(new QPixmap(w,h));
-}
-
-void SceneContainer::set_scene(std::shared_ptr<medical_imaging::SceneBase> scene)
-{
-    _scene = scene;
-}
-
-void SceneContainer::add_painter_list(std::vector<std::shared_ptr<PainterBase>> painters)
-{
-    _painters = painters;
 }
 
 void SceneContainer::register_mouse_operation(std::shared_ptr<IMouseOp> mouse_op , Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier)
@@ -285,26 +370,6 @@ bool SceneContainer::get_mouse_operation_i(IMouseOpPtrCollection& op)
     else
     {
         return false;
-    }
-}
-
-void SceneContainer::set_name(const std::string& des)
-{
-    if (_scene)
-    {
-        _scene->set_name(des);
-    }
-}
-
-std::string SceneContainer::get_name() const
-{
-    if (_scene)
-    {
-        return _scene->get_name();
-    }
-    else
-    {
-        return "";
     }
 }
 
@@ -341,3 +406,23 @@ void SceneContainer::register_mouse_wheel_operation(IMouseOpPtr mouse_op)
 {
     IMouseOpPtrCollection(1 ,mouse_op).swap(_mouse_wheel_ops);
 }
+
+bool SceneContainer::no_graphics_item_grab_i()
+{
+    return _inner_graphic_scene->mouseGrabberItem() == nullptr;
+}
+
+void SceneContainer::add_item(GraphicItemPtr item)
+{
+    _graphic_items.push_back(item);
+    std::vector<QGraphicsItem*> items = item->get_init_items();
+    
+    for (auto it = items.begin() ; it != items.end() ; ++it)
+    {
+        _inner_graphic_scene->addItem(*it);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+
