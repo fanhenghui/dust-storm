@@ -58,6 +58,7 @@ RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),_te
     _ray_caster.reset(new RayCaster());
 
     _canvas.reset(new RayCasterCanvas());
+    _canvas->set_display_size(_width , _height);
 
 
     if (CPU == Configuration::instance()->get_processing_unit_type())
@@ -80,7 +81,6 @@ void RayCastScene::initialize()
     SceneBase::initialize();
 
     //Canvas
-    _canvas->set_display_size(_width , _height);
     _canvas->initialize();
 }
 
