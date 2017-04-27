@@ -100,21 +100,19 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
 
     _mpr_00 = new SceneContainer(SharedWidget::instance());
-    _mpr_00->setMinimumSize(100,100);
-
     _mpr_01 = new SceneContainer(SharedWidget::instance());
-    _mpr_01->setMinimumSize(100,100);
-
     _mpr10 = new SceneContainer(SharedWidget::instance());
-    _mpr10->setMinimumSize(100,100);
-
     _vr_11 = new SceneContainer(SharedWidget::instance());
+
+    _mpr10->setMinimumSize(100,100);
+    _mpr_01->setMinimumSize(100,100);
+    _mpr_00->setMinimumSize(100,100);
     _vr_11->setMinimumSize(100,100);
 
-    _mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
-    _mpr_01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
-    _mpr10->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
-    _vr_11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    //_mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
+    //_mpr_01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    //_mpr10->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
+    //_vr_11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
 
 
     _mpr_00_scroll_bar = new QScrollBar(ui.centralWidget);
@@ -157,7 +155,7 @@ NoduleAnnotation::~NoduleAnnotation()
 void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
-    Configuration::instance()->set_processing_unit_type(CPU);
+    Configuration::instance()->set_processing_unit_type(GPU);
     Configuration::instance()->set_nodule_file_rsa(true);
 
     GLUtils::set_check_gl_flag(false);
@@ -205,18 +203,18 @@ void NoduleAnnotation::create_scene_i()
 
         std::shared_ptr<GraphicItemCrosshair> graphic_item_crosshair(new GraphicItemCrosshair());
         graphic_item_crosshair->set_scene(mpr_scenes[i]);
-        graphic_item_crosshair->set_crosshair_model(_model_crosshari);
+        graphic_item_crosshair->set_crosshair_model(_model_crosshair);
         mpr_containers[i]->add_item(graphic_item_crosshair);
 
         std::shared_ptr<GraphicItemMPRBorder> graphic_item_mpr_border(new GraphicItemMPRBorder());
         graphic_item_mpr_border->set_scene(mpr_scenes[i]);
-        graphic_item_mpr_border->set_crosshair_model(_model_crosshari);
+        graphic_item_mpr_border->set_crosshair_model(_model_crosshair);
         mpr_containers[i]->add_item(graphic_item_mpr_border);
 
         //4 Add operation 
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
-        op_mpr_locate->set_crosshair_model(_model_crosshari);
+        op_mpr_locate->set_crosshair_model(_model_crosshair);
 
         std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
         op_min_max_hint->set_scene(mpr_scenes[i]);
@@ -241,7 +239,7 @@ void NoduleAnnotation::create_scene_i()
 
         std::shared_ptr<MouseOpMPRPage> op_page(new MouseOpMPRPage());
         op_page->set_scene(mpr_scenes[i]);
-        op_page->set_crosshair_model(_model_crosshari);
+        op_page->set_crosshair_model(_model_crosshair);
         mpr_containers[i]->register_mouse_wheel_operation(op_page);
 
     }
@@ -256,7 +254,7 @@ void NoduleAnnotation::create_scene_i()
     QScrollBar* scroll_bars[3] = {_mpr_00_scroll_bar , _mpr_01_scroll_bar , _mpr_10_scroll_bar};
 
     //Model set scenes
-    _model_crosshari->set_mpr_scene(scan_types , scenes , colors);
+    _model_crosshair->set_mpr_scene(scan_types , scenes , colors);
 
     _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_00 , _mpr_00_scroll_bar);
     _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_01 , _mpr_01_scroll_bar);
@@ -289,11 +287,11 @@ void NoduleAnnotation::create_scene_i()
 
     QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
 
-    connect(_mpr_00 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_00 , SIGNAL(focus_out_scene()) , focus_out_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
-    connect(_mpr_01 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr_01 , SIGNAL(focus_out_scene()) , focus_out_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
-    connect(_mpr10 , SIGNAL(focus_out_scene()) , focus_in_singal_mapper , SLOT(map()));
+    connect(_mpr10 , SIGNAL(focus_out_scene()) , focus_out_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
     connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));
@@ -366,13 +364,13 @@ void NoduleAnnotation::create_model_observer_i()
     //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 
     //Crosshair & cross location
-    _model_crosshari.reset(new CrosshairModel());
+    _model_crosshair.reset(new CrosshairModel());
 
     _ob_mpr_scroll_bar.reset(new MPRScrollBarObserver());
-    _ob_mpr_scroll_bar->set_crosshair_model(_model_crosshari);
+    _ob_mpr_scroll_bar->set_crosshair_model(_model_crosshair);
 
-    _model_crosshari->add_observer(_ob_mpr_scroll_bar);
-    _model_crosshari->add_observer(_ob_scene_container);
+    _model_crosshair->add_observer(_ob_mpr_scroll_bar);
+    _model_crosshair->add_observer(_ob_scene_container);
 
     if (!_single_manager_nodule_type)
     {
@@ -413,6 +411,13 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
     ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
+    //Set min size to fix size bug
+    _mpr_00->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
+    _mpr_01->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
+    _mpr10->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
+    _vr_11->setMinimumSize(_pre_2x2_width ,_pre_2x2_height);
+    
+
     _mpr_00->show();
     _mpr_00_scroll_bar->show();
     _mpr_01->show();
@@ -420,6 +425,12 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _mpr10->show();
     _mpr_10_scroll_bar->show();
     _vr_11->show();
+
+    //Recover min size to expanding
+    _mpr10->setMinimumSize(100,100);
+    _mpr_01->setMinimumSize(100,100);
+    _mpr_00->setMinimumSize(100,100);
+    _vr_11->setMinimumSize(100,100);
 
     _layout_tag = 0;
 }
@@ -482,6 +493,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         create_model_observer_i();
 
         create_scene_i();
+
+        save_layout2x2_parameter_i();
 
         QApplication::restoreOverrideCursor();
 
@@ -570,7 +583,7 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
     {
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
-        op_mpr_locate->set_crosshair_model(_model_crosshari);
+        op_mpr_locate->set_crosshair_model(_model_crosshair);
 
         std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
         op_min_max_hint->set_scene(mpr_scenes[i]);
@@ -727,6 +740,28 @@ void NoduleAnnotation::slot_press_btn_fit_window_i()
     {
         return;
     }
+
+    if (_mpr_00->hasFocus())
+    {
+        _mpr_scene_00->place_mpr(SAGITTAL);
+        _model_crosshair->set_changed();
+        _model_voi->set_changed();
+    }
+    else if (_mpr_01->hasFocus())
+    {
+        _mpr_scene_01->place_mpr(CORONAL);
+        _model_crosshair->set_changed();
+        _model_voi->set_changed();
+    }
+    else if (_mpr10->hasFocus())
+    {
+        _mpr_scene_10->place_mpr(TRANSVERSE);
+        _model_crosshair->set_changed();
+        _model_voi->set_changed();
+    }
+
+    _model_crosshair->notify();
+    _model_voi->notify();
 }
 
 void NoduleAnnotation::slot_save_nodule_file_i()
@@ -853,25 +888,25 @@ void NoduleAnnotation::slot_open_nodule_file_i()
 
 void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value)
 {
-    if(_model_crosshari->page_to(_mpr_scene_00 , value))
+    if(_model_crosshair->page_to(_mpr_scene_00 , value))
     {
-        _model_crosshari->notify();
+        _model_crosshair->notify();
     }
 }
 
 void NoduleAnnotation::slot_sliding_bar_mpr01_i(int value)
 {
-    if(_model_crosshari->page_to(_mpr_scene_01 , value))
+    if(_model_crosshair->page_to(_mpr_scene_01 , value))
     {
-        _model_crosshari->notify();
+        _model_crosshair->notify();
     }
 }
 
 void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
 {
-    if(_model_crosshari->page_to(_mpr_scene_10 , value))
+    if(_model_crosshair->page_to(_mpr_scene_10 , value))
     {
-        _model_crosshari->notify();
+        _model_crosshair->notify();
     }
 }
 
@@ -880,8 +915,8 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
     //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = _model_voi->get_voi_sphere(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
-    _model_crosshari->locate(mat_p2w.transform(voi.center));
-    _model_crosshari->notify();
+    _model_crosshair->locate(mat_p2w.transform(voi.center));
+    _model_crosshair->notify();
     _select_vio_id = row;
 }
 
@@ -992,6 +1027,8 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
     QScrollBar* target_scroll_bar = nullptr;
     if (0 == _layout_tag)
     {
+        save_layout2x2_parameter_i();
+
         if (name == _mpr_scene_00->get_name())
         {
             target_container = _mpr_00;
@@ -1055,15 +1092,15 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
 
     if (name == _mpr_scene_00->get_name())
     {
-        _model_crosshari->focus(_mpr_scene_00);
+        _model_crosshair->focus(_mpr_scene_00);
     }
     else if (name == _mpr_scene_01->get_name())
     {
-        _model_crosshari->focus(_mpr_scene_01);
+        _model_crosshair->focus(_mpr_scene_01);
     }
     else if (name == _mpr_scene_10->get_name())
     {
-        _model_crosshari->focus(_mpr_scene_10);
+        _model_crosshair->focus(_mpr_scene_10);
     }
     else
     {
@@ -1077,8 +1114,7 @@ void NoduleAnnotation::slot_focus_out_scene_i(QString name)
     {
         return;
     }
-
-    _model_crosshari->focus(nullptr);
+    _model_crosshair->focus(nullptr);
 
 }
 
@@ -1089,7 +1125,7 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
         return;
     }
 
-    _model_crosshari->set_visibility(iFlag != 0);
+    _model_crosshair->set_visibility(iFlag != 0);
 
     SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr10};
     std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
@@ -1130,7 +1166,7 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
                 }
                 std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
                 op_locate->set_scene(scenes[i]);
-                op_locate->set_crosshair_model(_model_crosshari);
+                op_locate->set_crosshair_model(_model_crosshair);
                 ops_new.push_back(op_locate);
                 containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
             }
@@ -1178,6 +1214,12 @@ void NoduleAnnotation::refresh_nodule_list_i()
             ++iRow;
         }
     }
+}
+
+void NoduleAnnotation::save_layout2x2_parameter_i()
+{
+    _pre_2x2_width = _mpr_00->width();
+    _pre_2x2_height = _mpr_00->height();
 }
 
 

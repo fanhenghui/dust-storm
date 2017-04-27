@@ -87,6 +87,7 @@ private:
     void create_scene_i();
     void create_model_observer_i();
     void refresh_nodule_list_i();
+    void save_layout2x2_parameter_i();
 
 private:
     Ui::NoduleAnnotationClass ui;
@@ -115,7 +116,7 @@ private:
 
     //Model
     std::shared_ptr<medical_imaging::VOIModel> _model_voi;
-    std::shared_ptr<medical_imaging::CrosshairModel> _model_crosshari;
+    std::shared_ptr<medical_imaging::CrosshairModel> _model_crosshair;
     std::shared_ptr<medical_imaging::ProgressModel> _model_progress;
 
     //Observer
@@ -134,6 +135,8 @@ private:
     //Selected voi
     int _select_vio_id;
 
+    int _pre_2x2_width;
+    int _pre_2x2_height;
 };
 
 #endif // MI_MAIN_WINDOW_H
