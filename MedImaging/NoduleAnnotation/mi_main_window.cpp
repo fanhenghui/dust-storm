@@ -1,6 +1,8 @@
 #include "mi_main_window.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "MedImgCommon/mi_concurrency.h"
 #include "MedImgCommon/mi_configuration.h"
@@ -156,9 +158,38 @@ NoduleAnnotation::~NoduleAnnotation()
 void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
-    Configuration::instance()->set_processing_unit_type(GPU);
-    Configuration::instance()->set_nodule_file_rsa(true);
+    //Open config file
+    std::fstream in("../../../config/configure.txt" , std::ios::in);
+    if (!in.is_open())
+    {
+        Configuration::instance()->set_processing_unit_type(GPU);
+    }
+    else
+    {
+        std::string line;
+        std::string tag;
+        std::string equal;
+        std::string context;
+        while(std::getline(in,line))
+        {
+            std::stringstream ss(line);
+            ss >> tag >> equal >> context;
+            if (tag == std::string("ProcessingUnit"))
+            {
+                if (context == "GPU")
+                {
+                    Configuration::instance()->set_processing_unit_type(GPU);
+                }
+                else
+                {
+                    Configuration::instance()->set_processing_unit_type(CPU);
+                }
+            }
+        }
+        in.close();
+    }
 
+    Configuration::instance()->set_nodule_file_rsa(true);
     GLUtils::set_check_gl_flag(false);
 }
 
