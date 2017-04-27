@@ -14,54 +14,57 @@ VOIModel::~VOIModel()
 
 void VOIModel::add_voi_sphere(const VOISphere& voi)
 {
-    _voi_sphere_list.push_back(voi);
+    _vois.push_back(voi);
+    _voi_intensity_infos.push_back(IntensityInfo());
+    _voi_intensity_infos_dirty.push_back(false);
     set_changed();
 }
 
 void VOIModel::remove_voi_sphere(int id)
 {
-    int delete_id = 0;
-    for (auto it = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    if (id < _vois.size())
     {
-        if (delete_id++ == id)
+        auto it = _vois.begin();
+        auto it2 = _voi_intensity_infos.begin();
+        int i = 0;
+        while(i != id)
         {
-            _voi_sphere_list.erase(it);
-            set_changed();
-            break;
+            ++it;
+            ++it2;
+            ++i;
         }
+
+        _vois.erase(it);
+        _voi_intensity_infos.erase(it2);
+        set_changed();
     }
 }
 
-const std::list<VOISphere>& VOIModel::get_voi_spheres() const
+const std::vector<VOISphere>& VOIModel::get_voi_spheres() const
 {
-    return _voi_sphere_list;
+    return _vois;
 }
 
-void VOIModel::get_voi_spheres(std::list<VOISphere>& l) const
+void VOIModel::get_voi_spheres(std::vector<VOISphere>& l) const
 {
-    l = _voi_sphere_list;
+    l = _vois;
 }
 
 void VOIModel::modify_voi_sphere_list_rear(const VOISphere& voi)
 {
-    if (!_voi_sphere_list.empty())
+    if (!_vois.empty())
     {
-        (--_voi_sphere_list.end())->diameter = voi.diameter;
-        (--_voi_sphere_list.end())->center = voi.center;
+        _vois[_vois.size() - 1].diameter = voi.diameter;
+        _vois[_vois.size() - 1].center = voi.center;
     }
     set_changed();
 }
 
 void VOIModel::modify_voi_sphere_name(int id , std::string name)
 {
-    int i = 0;
-    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    if (id < _vois.size())
     {
-        if (i++== id)
-        {
-            it->name = name;
-            return;
-        }
+        _vois[id].name = name;
     }
 
     //Find no
@@ -69,59 +72,110 @@ void VOIModel::modify_voi_sphere_name(int id , std::string name)
 
 void VOIModel::modify_voi_sphere_diameter(int id , double diameter)
 {
-    int i = 0;
-    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    if (id < _vois.size())
     {
-        if (i++ == id)
-        {
-            it->diameter= diameter;
-            set_changed();
-            return;
-        }
+        _vois[id].diameter = diameter;
+        set_changed();
     }
     //Find no
 }
 
 void VOIModel::modify_voi_sphere_center(int id , const Point3& center)
 {
-    int i = 0;
-    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    if (id < _vois.size())
     {
-        if (i++ == id)
-        {
-            it->center = center;
-            set_changed();
-            return;
-        }
+        _vois[id].center = center;
+        set_changed();
     }
 }
 
 VOISphere VOIModel::get_voi_sphere(int id)
 {
-    int i = 0;
-    for (auto it  = _voi_sphere_list.begin() ; it != _voi_sphere_list.end() ; ++it)
+    if (id < _vois.size())
     {
-        if (i++ == id)
+        auto it = _vois.begin();
+        int i = 0;
+        while(i != id)
         {
-            return *it;
+            ++it;
+            ++i;
         }
+        return *it;
     }
-    QTWIDGETS_THROW_EXCEPTION("Get voi sphere failed!");
+    else
+    {
+        QTWIDGETS_THROW_EXCEPTION("Get voi sphere failed!");
+    }
 }
+
+void VOIModel::modify_voi_sphere_intensity_info(int id , IntensityInfo info)
+{
+    if (id < _voi_intensity_infos.size())
+    {
+        _voi_intensity_infos[id] = info;
+    }
+}
+
+bool VOIModel::is_voi_sphere_intensity_info_dirty(int id)
+{
+    if (id < _voi_intensity_infos_dirty.size())
+    {
+        return _voi_intensity_infos_dirty[id];
+    }
+    else
+    {
+        QTWIDGETS_THROW_EXCEPTION("Get voi sphere failed!");
+    }
+}
+
+IntensityInfo VOIModel::get_voi_sphere_intensity_info(int id)
+{
+    if (id < _voi_intensity_infos.size())
+    {
+        return _voi_intensity_infos[id];
+    }
+    else
+    {
+        QTWIDGETS_THROW_EXCEPTION("Get voi sphere intensity info failed!");
+    }
+}
+
 
 void VOIModel::remove_voi_sphere_list_rear()
 {
-    if (!_voi_sphere_list.empty())
+    if (!_vois.empty())
     {
-        _voi_sphere_list.erase(--_voi_sphere_list.end());
+        _vois.erase(--_vois.end());
+        _voi_intensity_infos.erase(--_voi_intensity_infos.end());
         set_changed();
     }
 }
 
 void VOIModel::remove_all()
 {
-    std::list<VOISphere>().swap(_voi_sphere_list);
+    std::vector<VOISphere>().swap(_vois);
+    std::vector<IntensityInfo>().swap(_voi_intensity_infos);
     set_changed();
 }
+
+int VOIModel::get_voi_number() const
+{
+    return _vois.size();
+}
+
+void VOIModel::set_voi_sphere_intensity_info_dirty(int id , bool flag)
+{
+    if (id < _voi_intensity_infos_dirty.size())
+    {
+        _voi_intensity_infos_dirty[id] = flag;
+    }
+}
+
+const std::vector<IntensityInfo>& VOIModel::get_voi_sphere_intensity_infos() const
+{
+    return _voi_intensity_infos;
+}
+
+
 
 MED_IMAGING_END_NAMESPACE

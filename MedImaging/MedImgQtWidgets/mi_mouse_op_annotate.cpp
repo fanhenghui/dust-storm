@@ -91,6 +91,13 @@ void MouseOpAnnotate::release(const QPointF& pt)
             _model->remove_voi_sphere_list_rear();
             _model->notify();
         }
+        else
+        {
+            _model->set_voi_sphere_intensity_info_dirty(_model->get_voi_spheres().size() - 1 , true);
+            _model->set_changed();
+            _model->notify();
+        }
+
     }
     _pre_point = pt;
 }

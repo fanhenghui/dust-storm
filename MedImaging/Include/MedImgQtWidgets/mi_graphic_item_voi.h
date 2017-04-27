@@ -1,18 +1,62 @@
 #ifndef MED_IMAGING_VOI_PAINTER_H_
 #define MED_IMAGING_VOI_PAINTER_H_
 
-#include <list>
+#include <vector>
 
 #include "MedImgQtWidgets/mi_graphic_item_base.h"
 #include "MedImgIO/mi_voi.h"
 #include "MedImgArithmetic/mi_ortho_camera.h"
+#include "MedImgArithmetic/mi_volume_statistician.h"
+
 #include <QGraphicsEllipseItem>
+#include <QGraphicsTextItem>
+#include <QGraphicsLineItem>
+#include <QObject>
+
 
 namespace medical_imaging
 {
     class VOIModel;
     class SceneBase;
 }
+
+
+class GraphicsLineItem : public QObject , public QGraphicsLineItem
+{
+    Q_OBJECT
+public:
+    GraphicsLineItem();
+    virtual ~GraphicsLineItem();
+
+protected slots:
+    void slot_info_position_changed(QPointF info_pos);
+
+private:
+};
+
+class GraphicsTextItem : public QGraphicsTextItem
+{
+    Q_OBJECT
+public:
+    GraphicsTextItem(GraphicsLineItem* line_item);
+    virtual ~GraphicsTextItem();
+
+    void set_id(int id) {_id = id;};
+    int get_id() const {return _id;};
+
+    bool is_grabbed() {return _is_grabbed;};
+
+signals:
+    void position_changed(QPointF info_pos);
+
+protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+private:
+    int _id;
+    bool _is_grabbed;
+};
+
 
 //Mouse left change position , and right change size
 class GraphicsSphereItem : public QGraphicsEllipseItem
@@ -33,10 +77,8 @@ public:
     void frezze(bool flag);
     bool is_frezze() const;
 
+
 protected:
-    virtual void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-    virtual void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
-    virtual void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -68,15 +110,17 @@ public:
     virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 
     virtual void post_update();
-private:
 
 private:
     std::shared_ptr<VOIModel> _model;
-    std::list<GraphicsSphereItem*> _items;
+    std::vector<GraphicsSphereItem*> _items_spheres;//Circle on MPR plane
+    std::vector<GraphicsTextItem*> _items_infos;//Intensity info
+    std::vector<GraphicsLineItem*> _items_lines;//Circle to info line
     int _pre_item_num;
-    std::list<GraphicsSphereItem*> _items_to_be_delete;
+    std::vector<QGraphicsItem*> _items_to_be_delete;
 
-    std::list<VOISphere> _pre_voi_list;
+    std::vector<VOISphere> _pre_vois;
+    std::vector<IntensityInfo> _pre_intensity_infos;
     OrthoCamera _pre_camera;
 };
 

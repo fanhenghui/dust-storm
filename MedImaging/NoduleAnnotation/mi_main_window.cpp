@@ -45,6 +45,7 @@
 #include "MedImgQtWidgets/mi_model_cross_hair.h"
 #include "MedImgQtWidgets/mi_observer_scene_container.h"
 #include "MedImgQtWidgets/mi_observer_progress.h"
+#include "MedImgQtWidgets/mi_observer_voi_statistic.h"
 
 
 #include "mi_observer_voi_table.h"
@@ -156,7 +157,7 @@ NoduleAnnotation::~NoduleAnnotation()
 void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
-    Configuration::instance()->set_processing_unit_type(GPU);
+    Configuration::instance()->set_processing_unit_type(CPU);
     Configuration::instance()->set_nodule_file_rsa(true);
 
     GLUtils::set_check_gl_flag(false);
@@ -355,7 +356,13 @@ void NoduleAnnotation::create_model_observer_i()
     _ob_scene_container->add_scene_container(_mpr_01);
     _ob_scene_container->add_scene_container(_mpr10);
 
+    _ob_voi_statistic.reset(new VOIStatisticObserver());
+    _ob_voi_statistic->set_model(_model_voi);
+    _ob_voi_statistic->set_volume_infos(_volume_infos);
+
+    _model_voi->add_observer(_ob_voi_statistic);
     _model_voi->add_observer(_ob_voi_table);
+
     //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 
     //Crosshair & cross location
@@ -742,11 +749,8 @@ void NoduleAnnotation::slot_save_nodule_file_i()
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-        const std::list<VOISphere>& vois = _model_voi->get_voi_spheres();
-        for (auto it = vois.begin() ; it != vois.end() ; ++it)
-        {
-            nodule_set->add_nodule(*it);
-        }
+        const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();
+        nodule_set->set_nodule(vois);
 
         NoduleSetParser parser;
         std::string file_name_std(file_name.toLocal8Bit());
@@ -1142,7 +1146,7 @@ void NoduleAnnotation::refresh_nodule_list_i()
     ui.tableWidgetNoduleList->setRowCount(0);
     _select_vio_id = -1;
 
-    const std::list<VOISphere>& vois = _model_voi->get_voi_spheres();
+    const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();
     if (!vois.empty())
     {
         ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless

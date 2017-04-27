@@ -14,22 +14,27 @@ NoduleSet::~NoduleSet()
 
 void NoduleSet::add_nodule(const VOISphere& v)
 {
-    nodule_set.push_back(v);
+    _nodule_set.push_back(v);
 }
 
 const std::vector<VOISphere>& NoduleSet::get_nodule_set() const
 {
-    return nodule_set;
+    return _nodule_set;
 }
 
 void NoduleSet::get_nodule_set(std::vector<VOISphere>& nset) const
 {
-    nset = nodule_set;
+    nset = _nodule_set;
 }
 
 void NoduleSet::clear_nodule()
 {
-    std::vector<VOISphere>().swap(nodule_set);
+    std::vector<VOISphere>().swap(_nodule_set);
+}
+
+void NoduleSet::set_nodule(const std::vector<VOISphere>& nset)
+{
+    _nodule_set = nset;
 }
 
 MED_IMAGING_END_NAMESPACE

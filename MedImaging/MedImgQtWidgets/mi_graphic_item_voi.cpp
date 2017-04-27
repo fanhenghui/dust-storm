@@ -12,8 +12,10 @@
 
 //Qt
 #include <QPen>
+#include <QFont>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneDragDropEvent>
+#include <QTextDocument>
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -53,8 +55,8 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
         //////////////////////////////////////////////////////////////////////////
         //Check voi firstly
-        const std::list<VOISphere>& voi_list = _model->get_voi_spheres();
-        const int voi_count = voi_list.size();
+        const std::vector<VOISphere>& vois = _model->get_voi_spheres();
+        const int voi_count = vois.size();
 
         //graphics item number changed
         if (_pre_item_num != voi_count)
@@ -66,54 +68,88 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
                 const int add_num = voi_count - _pre_item_num;
                 for(int i = 0; i<add_num ; ++i)
                 {
+                    //sphere
                     GraphicsSphereItem* item = new GraphicsSphereItem();
                     item->set_scene(_scene);
                     item->set_voi_model(_model);
                     item->setPen(QPen(QColor(220,50,50)));
                     item->hide();
-                    _items.push_back(item);
+
+                    //line
+                    GraphicsLineItem* item_line = new GraphicsLineItem();
+                    QPen pen(QColor(0,255,128) , 2 , Qt::DotLine);
+                    item_line->setPen(pen);
+
+                    //info
+                    GraphicsTextItem* item_info = new GraphicsTextItem(item_line);
+                    item_info->setDefaultTextColor(QColor(0,255,128));
+                    QFont font("Times" , 10 , QFont::Bold);
+                    item_info->setFont(font);
+                    item_info->setFlags(QGraphicsItem::ItemIsMovable);
+
+                    _items_spheres.push_back(item);
+                    _items_infos.push_back(item_info);
+                    _items_lines.push_back(item_line);
+
                     to_be_add.push_back(item);
+                    to_be_add.push_back(item_info);
+                    to_be_add.push_back(item_line);
                 }
             }
             //Delete item
             else
             {
-                //delete from head
+                //delete from rear
                 int delete_num = _pre_item_num - voi_count;
-                for (auto it_del = _items.begin() ; it_del !=  _items.end() ; --delete_num )
+                auto it_del_item = (--_items_spheres.end());
+                auto it_del_item_info = (--_items_infos.end());
+                auto it_del_item_line = (--_items_lines.end());
+
+                while(delete_num >0)
                 {
-                    if (delete_num <= 0)
-                    {
-                        break;
-                    }
-                    _items_to_be_delete.push_back(*it_del);
-                    to_be_remove.push_back(*it_del);
-                    it_del = _items.erase(it_del);
+                    _items_to_be_delete.push_back(*it_del_item);
+                    to_be_remove.push_back(*it_del_item);
+                    it_del_item = _items_spheres.erase(it_del_item);
+
+                    _items_to_be_delete.push_back(*it_del_item_info);
+                    to_be_remove.push_back(*it_del_item_info);
+                    it_del_item_info = _items_infos.erase(it_del_item_info);
+
+                    _items_to_be_delete.push_back(*it_del_item_line);
+                    to_be_remove.push_back(*it_del_item_line);
+                    it_del_item_line = _items_lines.erase(it_del_item_line);
+
+                    --delete_num;
                 }
             }
         }
         _pre_item_num = voi_count;
 
-        if (voi_list.empty())
+        if (vois.empty())
         {
             return;
         }
 
+        const std::vector<IntensityInfo>& intensity_infos = _model->get_voi_sphere_intensity_infos();
+
         //1 Get MPR plane
         std::shared_ptr<CameraBase> camera = scene->get_camera();
 
-        if (_pre_camera == *(std::dynamic_pointer_cast<OrthoCamera>(camera)) && _pre_voi_list == voi_list)
+        if (_pre_camera == *(std::dynamic_pointer_cast<OrthoCamera>(camera)) &&
+            _pre_vois == vois &&
+            _pre_intensity_infos == intensity_infos)
         {
             return;
         }
         else
         {
             _pre_camera = *(std::dynamic_pointer_cast<OrthoCamera>(camera));
-            _pre_voi_list = voi_list;
+            _pre_vois = vois;
+            _pre_intensity_infos = intensity_infos;
         }
 
 
-        std::shared_ptr<CameraCalculator> cameraCal = scene->get_camera_calculator();
+        std::shared_ptr<CameraCalculator> camera_cal = scene->get_camera_calculator();
         Point3 look_at = camera->get_look_at();
         Point3 eye = camera->get_eye();
         Vector3 norm = look_at - eye;
@@ -121,7 +157,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         Vector3 up = camera->get_up_direction();
 
         const Matrix4 mat_vp = camera->get_view_projection_matrix();
-        const Matrix4 mat_p2w = cameraCal->get_patient_to_world_matrix();
+        const Matrix4 mat_p2w = camera_cal->get_patient_to_world_matrix();
 
         //2 Calculate sphere intersect with plane
         std::vector<Point2> circle_center;
@@ -131,7 +167,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         double diameter(0.0);
 
         int idx = 0;
-        for (auto it = voi_list.begin() ; it != voi_list.end() ; ++it , ++idx)
+        for (auto it = vois.begin() ; it != vois.end() ; ++it , ++idx)
         {
             sphere_center = mat_p2w.transform(it->center);
             diameter = it->diameter;
@@ -156,24 +192,54 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         }
 
         //3 Draw intersect circle if intersected
-        auto item_draw = _items.begin();
-        for (; item_draw != _items.end() ; ++item_draw)
+        for (int i = 0 ; i < _items_spheres.size() ; ++i)
         {
-            if (!(*item_draw)->is_frezze())
+            if (!(_items_spheres[i]->is_frezze()))
             {
-                (*item_draw)->hide();
+                _items_spheres[i]->hide();
             }
+            _items_infos[i]->hide();
+            _items_lines[i]->hide();
         }
-        item_draw = _items.begin();
 
-        for (size_t i = 0 ; i <circle_center.size() ; ++i , ++item_draw)
+        auto item_sphere = _items_spheres.begin();
+        auto item_info = _items_infos.begin();
+        auto item_line = _items_lines.begin();
+
+        StrNumConverter<double> str_num_converter;
+        for (size_t i = 0 ; i <circle_center.size() ; ++i , ++item_sphere , ++item_info , ++item_line)
         {
-            if (!(*item_draw)->is_frezze())
+            //sphere
+            if (!(*item_sphere)->is_frezze())
             {
-                (*item_draw)->set_id(voi_id[i]);
-                (*item_draw)->set_sphere(QPointF(static_cast<float>(circle_center[i].x) , static_cast<float>(circle_center[i].y)) , radiuses[i]);
-                (*item_draw)->show();
+                (*item_sphere)->set_id(voi_id[i]);
+                (*item_sphere)->set_sphere(QPointF(static_cast<float>(circle_center[i].x) , static_cast<float>(circle_center[i].y)) , radiuses[i]);
+                (*item_sphere)->show();
             }
+
+            //info
+            IntensityInfo info = _model->get_voi_sphere_intensity_info(voi_id[i]);
+            std::string context = std::string("min : ")  + str_num_converter.to_string_decimal(info._min , 3) +
+                std::string(" max : ")  + str_num_converter.to_string_decimal(info._max , 3) + std::string("\n") +
+                std::string("mean : ")  + str_num_converter.to_string_decimal(info._mean , 3) + 
+                std::string(" std : ")  + str_num_converter.to_string_decimal(info._std, 3) + std::string("\n") +
+                std::string("pixel num : ")  + str_num_converter.to_string_decimal(static_cast<double>(info._num),0);
+            (*item_info)->setPlainText(context.c_str());
+
+            const float sphere_w = (*item_sphere)->rect().width();
+            const float sphere_h = (*item_sphere)->rect().height();
+            const QPointF sphere_pos = (*item_sphere)->pos();
+            QPointF info_pos = (*item_info)->pos();
+            if (!(*item_info)->is_grabbed())
+            {
+                info_pos = sphere_pos +  QPointF(  sphere_w , -sphere_h) + QPointF(30 , -10);
+                (*item_info)->setPos(info_pos);
+            }
+            (*item_info)->show();
+
+            //line
+            (*item_line)->setLine(QLineF(sphere_pos + QPointF(sphere_w , 0), info_pos+QPointF(0 , 10.0f*4.0f)));
+            (*item_line)->show();
         }
     }
     catch (const Exception& e)
@@ -195,7 +261,7 @@ void GraphicItemVOI::post_update()
     {
         delete *it;
     }
-    std::list<GraphicsSphereItem*>().swap(_items_to_be_delete);
+    std::vector<QGraphicsItem*>().swap(_items_to_be_delete);
 }
 
 MED_IMAGING_END_NAMESPACE
@@ -262,50 +328,21 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     {
         QGraphicsEllipseItem::mouseReleaseEvent(event);
 
+        _model->set_voi_sphere_intensity_info_dirty(_id , true);
+
         update_sphere_center_i();
 
         frezze(false);
+
+        
     }
     else if (event->button() == Qt::RightButton)
     {
+        _model->set_voi_sphere_intensity_info_dirty(_id , true);
+
         update_sphere_diameter_i();
 
         frezze(false);
-    }
-}
-
-void GraphicsSphereItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-    if (event->buttons() == Qt::LeftButton)
-    {
-        QGraphicsEllipseItem::dragEnterEvent(event);
-    }
-    else if (event->buttons() == Qt::RightButton)
-    {
-
-    }
-}
-
-void GraphicsSphereItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
-{
-    if (event->buttons() == Qt::LeftButton)
-    {
-        QGraphicsEllipseItem::dragLeaveEvent(event);
-    }
-    else if (event->buttons() == Qt::RightButton)
-    {
-
-    }
-}
-
-void GraphicsSphereItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-{
-    if (event->buttons() == Qt::LeftButton)
-    {
-
-    }
-    else if (event->buttons() == Qt::RightButton)
-    {
 
     }
 }
@@ -451,3 +488,44 @@ bool GraphicsSphereItem::is_frezze() const
     return _is_frezze;
 }
 
+
+GraphicsTextItem::GraphicsTextItem(GraphicsLineItem* line_item):_is_grabbed(false)
+{
+    connect(this , SIGNAL(position_changed(QPointF)) , line_item , SLOT(slot_info_position_changed(QPointF)));
+}
+
+GraphicsTextItem::~GraphicsTextItem()
+{
+
+}
+
+void GraphicsTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->buttons() == Qt::LeftButton)
+    {
+        _is_grabbed = true;
+    }
+    QGraphicsTextItem::mousePressEvent(event);
+}
+
+void GraphicsTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsTextItem::mouseMoveEvent(event);
+    emit position_changed(this->pos());
+}
+
+GraphicsLineItem::GraphicsLineItem()
+{
+
+}
+
+GraphicsLineItem::~GraphicsLineItem()
+{
+
+}
+
+void GraphicsLineItem::slot_info_position_changed(QPointF info_pos)
+{
+    QLineF pre_line = this->line();
+    this->setLine(QLineF(pre_line.p1() , info_pos +QPointF(0 , 10.0f*4.0f) ));
+}

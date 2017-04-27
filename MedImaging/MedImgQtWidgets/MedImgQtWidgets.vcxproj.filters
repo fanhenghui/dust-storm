@@ -119,6 +119,15 @@
     <ClCompile Include="mi_graphic_item_voi.cpp">
       <Filter>Src\Graphics Item</Filter>
     </ClCompile>
+    <ClCompile Include="mi_observer_voi_statistic.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_graphic_item_voi.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_graphic_item_voi.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
@@ -175,8 +184,8 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_mpr_border.h">
       <Filter>Src\Graphics Item</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h">
-      <Filter>Src\Graphics Item</Filter>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_statistic.h">
+      <Filter>Src\Model Observer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +194,9 @@
     </CustomBuild>
     <CustomBuild Include="..\Include\MedImgQtWidgets\mi_scene_container.h">
       <Filter>Src\Scene container</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h">
+      <Filter>Src\Graphics Item</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

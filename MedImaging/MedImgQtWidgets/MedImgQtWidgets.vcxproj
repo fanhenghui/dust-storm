@@ -155,6 +155,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_graphic_item_voi.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_mi_scene_container.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -162,6 +166,10 @@
     <ClCompile Include="GeneratedFiles\Debug\moc_mi_shared_widget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_graphic_item_voi.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_mi_scene_container.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -186,6 +194,7 @@
     <ClCompile Include="mi_mouse_op_zoom.cpp" />
     <ClCompile Include="mi_graphic_item_corners_info.cpp" />
     <ClCompile Include="mi_graphic_item_mpr_border.cpp" />
+    <ClCompile Include="mi_observer_voi_statistic.cpp" />
     <ClCompile Include="mi_qt_widgets_stdafx.cpp" />
     <ClCompile Include="mi_scene_container.cpp" />
     <ClCompile Include="mi_shared_widget.cpp" />
@@ -209,8 +218,26 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_base.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_corners_info.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_mpr_border.h" />
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_statistic.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h" />
-    <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h" />
+    <CustomBuild Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing mi_graphic_item_voi.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_XMLPATTERNS_LIB -DMEDIMGQTWIDGETS_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtXmlPatterns" "-I$(SolutionDir)Include" "-I$(SolutionDir)Include\Ext" "-I$(SolutionDir)Include\MedImgQtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing mi_graphic_item_voi.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_XMLPATTERNS_LIB -DMEDIMGQTWIDGETS_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtXmlPatterns" "-I$(SolutionDir)Include" "-I$(SolutionDir)Include\Ext" "-I$(SolutionDir)Include\MedImgQtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing mi_graphic_item_voi.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_XMLPATTERNS_LIB -DMEDIMGQTWIDGETS_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtXmlPatterns" "-I$(SolutionDir)Include" "-I$(SolutionDir)Include\Ext" "-I$(SolutionDir)Include\MedImgQtWidgets"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing mi_graphic_item_voi.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_OPENGL_LIB -DQT_XMLPATTERNS_LIB -DMEDIMGQTWIDGETS_LIB -D_WINDLL "-I.\GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtXml" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtXmlPatterns" "-I$(SolutionDir)Include" "-I$(SolutionDir)Include\Ext" "-I$(SolutionDir)Include\MedImgQtWidgets"</Command>
+    </CustomBuild>
     <CustomBuild Include="..\Include\MedImgQtWidgets\mi_scene_container.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing mi_scene_container.h...</Message>

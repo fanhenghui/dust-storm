@@ -7,6 +7,25 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
+struct IntensityInfo
+{
+    unsigned int _num;
+    double _min;
+    double _max;
+    double _mean;
+    double _var;
+    double _std;
+
+    IntensityInfo():_num(0),_min(0),_max(0),_mean(0),_var(0),_std(0)
+    {};
+
+    IntensityInfo(unsigned int num0 , double min0 , double max0 , double mean0 , double var0 , double std0):
+    _num(num0),_min(min0),_max(max0),_mean(mean0),_var(var0),_std(std0)
+    {};
+};
+
+bool Arithmetic_Export operator == (const IntensityInfo& l  , const IntensityInfo& r);
+
 template<class T>
 class VolumeStatistician
 {
@@ -14,12 +33,16 @@ public:
     VolumeStatistician() {};
     ~VolumeStatistician() {};
  
-    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Sphere& sphere, int& num , double& min , double& max , double& mean , double& var, double& std);
+    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Sphere& sphere, 
+        unsigned int& num , double& min , double& max , double& mean , double& var, double& std);
 
-    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Ellipsoid& ellipsiod, int& num , double& min , double& max , double& mean , double& var, double& std);
+    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Ellipsoid& ellipsiod, 
+        unsigned int& num , double& min , double& max , double& mean , double& var, double& std);
 
 protected:
 private:
+    void get_valid_region(const unsigned int (&dim)[3] , const Sphere& sphere, unsigned int (&begin)[3] , unsigned int (&end)[3]);
+    void get_valid_region(const unsigned int (&dim)[3] , const Ellipsoid& ellipsoid, unsigned int (&begin)[3] , unsigned int (&end)[3]);
 };
 
 #include "MedImgArithmetic/mi_volume_statistician.inl"

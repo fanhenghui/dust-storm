@@ -13,13 +13,14 @@ public:
     ~NoduleSet();
 
     void add_nodule(const VOISphere& v);
+    void set_nodule(const std::vector<VOISphere>& nset);
     void clear_nodule();
 
     const std::vector<VOISphere>& get_nodule_set() const;
     void get_nodule_set(std::vector<VOISphere>& nset) const;
 
 private:
-    std::vector<VOISphere> nodule_set;
+    std::vector<VOISphere> _nodule_set;
 };
 
 MED_IMAGING_END_NAMESPACE

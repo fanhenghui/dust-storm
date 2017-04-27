@@ -8,7 +8,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GraphicItemMPRBorder::GraphicItemMPRBorder():_pre_color(0,0,0),_pre_pen_width(0)
+GraphicItemMPRBorder::GraphicItemMPRBorder():_pre_color(0,0,0),_pre_pen_width(0),_pre_window_width(-1),_pre_window_height(-1)
 {
     _lines[0] = new QGraphicsLineItem();
     _lines[1] = new QGraphicsLineItem();
@@ -68,7 +68,8 @@ void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::
     pen.setWidth(pen_width);
     pen.setColor(color_qt);
 
-    if (_pre_color == color_qt && _pre_pen_width == pen_width)
+    if (_pre_color == color_qt && _pre_pen_width == pen_width &&
+        _pre_window_width == width && _pre_window_width== height)
     {
         return;
     }
@@ -76,6 +77,8 @@ void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::
     {
         _pre_color = color_qt;
         _pre_pen_width= pen_width;
+        _pre_window_width = width;
+        _pre_window_height = height;
     }
 
 

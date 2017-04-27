@@ -24,7 +24,7 @@ void UT_Statistic()
     sphere._radius = 100;
 
     double min , max , mean , var , std;
-    int num;
+    unsigned int num;
     const unsigned int dim[3] = {512,512,734};
     vs.get_intensity_analysis(dim , data_array , sphere , num , min , max , mean , var , std);
 

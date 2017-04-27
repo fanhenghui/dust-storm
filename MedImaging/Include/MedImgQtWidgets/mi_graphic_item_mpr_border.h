@@ -26,6 +26,8 @@ private:
 
     QColor _pre_color;
     int _pre_pen_width;
+    int _pre_window_width;
+    int _pre_window_height;
 };
 
 MED_IMAGING_END_NAMESPACE
