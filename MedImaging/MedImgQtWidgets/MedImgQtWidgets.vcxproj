@@ -180,6 +180,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="mi_model_cross_hair.cpp" />
+    <ClCompile Include="mi_model_focus.cpp" />
     <ClCompile Include="mi_model_voi.cpp" />
     <ClCompile Include="mi_mouse_op_locate.cpp" />
     <ClCompile Include="mi_observer_progress.cpp" />
@@ -202,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_cross_hair.h" />
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_focus.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_voi.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_locate.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_progress.h" />

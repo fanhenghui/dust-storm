@@ -128,6 +128,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_mi_graphic_item_voi.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="mi_model_focus.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
@@ -185,6 +188,9 @@
       <Filter>Src\Graphics Item</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_statistic.h">
+      <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_focus.h">
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
   </ItemGroup>

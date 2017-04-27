@@ -14,6 +14,7 @@ namespace medical_imaging
     class SceneContainerObserver;
     class ProgressModel;
     class VOIStatisticObserver;
+    class FocusModel;
 }
 typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
@@ -75,7 +76,7 @@ private slots:
 
     //focus In/Out Scene
     void slot_focus_in_scene_i(QString name);
-    void slot_focus_out_scene_i(QString name);
+    //void slot_focus_out_scene_i(QString name);
 
     //Crosshair visible
     void slot_crosshair_visibility_i(int );
@@ -97,7 +98,7 @@ private:
 
     SceneContainer* _mpr_00;
     SceneContainer* _mpr_01;
-    SceneContainer* _mpr10;
+    SceneContainer* _mpr_10;
     SceneContainer* _vr_11;
 
     QScrollBar * _mpr_00_scroll_bar;
@@ -118,6 +119,7 @@ private:
     std::shared_ptr<medical_imaging::VOIModel> _model_voi;
     std::shared_ptr<medical_imaging::CrosshairModel> _model_crosshair;
     std::shared_ptr<medical_imaging::ProgressModel> _model_progress;
+    std::shared_ptr<medical_imaging::FocusModel> _model_focus;
 
     //Observer
     std::shared_ptr<VOITableObserver> _ob_voi_table;

@@ -9,7 +9,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-CrosshairModel::CrosshairModel():_focus_id(0),_is_visible(true)
+CrosshairModel::CrosshairModel():_is_visible(true)
 {
     _pages[0] = 1;
     _pages[1] = 1;
@@ -217,12 +217,12 @@ bool CrosshairModel::locate(const Point3& center_w)
     return true;
 }
 
-bool CrosshairModel::locate_focus(const Point3& center_w)
-{
-    //Place MPR center to this center
-
-    return true;
-}
+//bool CrosshairModel::locate_focus(const Point3& center_w)
+//{
+//    //Place MPR center to this center
+//
+//    return true;
+//}
 
 void CrosshairModel::set_page_i(const std::shared_ptr<MPRScene>& target_mpr_scene , int page)
 {
@@ -272,46 +272,6 @@ bool CrosshairModel::set_center_i(const Point3& center_w)
         Point3(double((int)ptV.x) , double((int)ptV.y) , double((int)ptV.z) ));
 
     return true;
-}
-
-bool CrosshairModel::check_focus(MPRScenePtr target_mpr_scene)
-{
-    for (int i = 0 ; i< 3; ++i)
-    {
-        QTWIDGETS_CHECK_NULL_EXCEPTION(_mpr_scenes[i]);
-        if (_mpr_scenes[i] == target_mpr_scene)
-        {
-            if(_focus_id == i)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-    return false;
-}
-
-void CrosshairModel::focus(MPRScenePtr target_mpr_scene)
-{
-    if (!target_mpr_scene)
-    {
-        _focus_id = -1;
-    }
-    else
-    {
-        for (int i = 0 ; i< 3; ++i)
-        {
-            QTWIDGETS_CHECK_NULL_EXCEPTION(_mpr_scenes[i]);
-            if (_mpr_scenes[i] == target_mpr_scene)
-            {
-                _focus_id = i;
-                break;
-            }
-        }
-    }
 }
 
 void CrosshairModel::set_visibility(bool flag)

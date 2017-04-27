@@ -43,6 +43,7 @@
 #include "MedImgQtWidgets/mi_mouse_op_locate.h"
 #include "MedImgQtWidgets/mi_model_voi.h"
 #include "MedImgQtWidgets/mi_model_cross_hair.h"
+#include "MedImgQtWidgets/mi_model_focus.h"
 #include "MedImgQtWidgets/mi_observer_scene_container.h"
 #include "MedImgQtWidgets/mi_observer_progress.h"
 #include "MedImgQtWidgets/mi_observer_voi_statistic.h"
@@ -101,10 +102,10 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
 
     _mpr_00 = new SceneContainer(SharedWidget::instance());
     _mpr_01 = new SceneContainer(SharedWidget::instance());
-    _mpr10 = new SceneContainer(SharedWidget::instance());
+    _mpr_10 = new SceneContainer(SharedWidget::instance());
     _vr_11 = new SceneContainer(SharedWidget::instance());
 
-    _mpr10->setMinimumSize(100,100);
+    _mpr_10->setMinimumSize(100,100);
     _mpr_01->setMinimumSize(100,100);
     _mpr_00->setMinimumSize(100,100);
     _vr_11->setMinimumSize(100,100);
@@ -132,7 +133,7 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
     ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
     ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(_mpr10 , 1 ,0);
+    ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
     ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
     ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
@@ -165,7 +166,7 @@ void NoduleAnnotation::create_scene_i()
 {
     _mpr_scene_00.reset(new MPRScene(_mpr_00->width() , _mpr_00->height()));
     _mpr_scene_01.reset(new MPRScene(_mpr_01->width() , _mpr_01->height()));
-    _mpr_scene_10.reset(new MPRScene(_mpr10->width() , _mpr10->height()));
+    _mpr_scene_10.reset(new MPRScene(_mpr_10->width() , _mpr_10->height()));
 
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
@@ -175,7 +176,7 @@ void NoduleAnnotation::create_scene_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -209,6 +210,7 @@ void NoduleAnnotation::create_scene_i()
         std::shared_ptr<GraphicItemMPRBorder> graphic_item_mpr_border(new GraphicItemMPRBorder());
         graphic_item_mpr_border->set_scene(mpr_scenes[i]);
         graphic_item_mpr_border->set_crosshair_model(_model_crosshair);
+        graphic_item_mpr_border->set_focus_model(_model_focus);
         mpr_containers[i]->add_item(graphic_item_mpr_border);
 
         //4 Add operation 
@@ -274,18 +276,19 @@ void NoduleAnnotation::create_scene_i()
 
     //////////////////////////////////////////////////////////////////////////
     //focus in/out scene signal mapper
+    // Just connect focus in scene
     QSignalMapper* focus_in_singal_mapper = new QSignalMapper();
 
     connect(_mpr_00 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
     connect(_mpr_01 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr_01 , QString(_mpr_01->get_name().c_str()));
-    connect(_mpr10 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
-    focus_in_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
+    connect(_mpr_10 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
+    focus_in_singal_mapper->setMapping(_mpr_10 , QString(_mpr_10->get_name().c_str()));
 
     connect(focus_in_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
 
-    QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
+    /*QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
 
     connect(_mpr_00 , SIGNAL(focus_out_scene()) , focus_out_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr_00 , QString(_mpr_00->get_name().c_str()));
@@ -294,7 +297,7 @@ void NoduleAnnotation::create_scene_i()
     connect(_mpr10 , SIGNAL(focus_out_scene()) , focus_out_singal_mapper , SLOT(map()));
     focus_out_singal_mapper->setMapping(_mpr10 , QString(_mpr10->get_name().c_str()));
 
-    connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));
+    connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));*/
     //////////////////////////////////////////////////////////////////////////
 }
 
@@ -352,7 +355,7 @@ void NoduleAnnotation::create_model_observer_i()
     _ob_scene_container.reset(new SceneContainerObserver());//ÍòÄÜ observer
     _ob_scene_container->add_scene_container(_mpr_00);
     _ob_scene_container->add_scene_container(_mpr_01);
-    _ob_scene_container->add_scene_container(_mpr10);
+    _ob_scene_container->add_scene_container(_mpr_10);
 
     _ob_voi_statistic.reset(new VOIStatisticObserver());
     _ob_voi_statistic->set_model(_model_voi);
@@ -378,6 +381,10 @@ void NoduleAnnotation::create_model_observer_i()
         _single_manager_nodule_type = new QSignalMapper(this);
         connect(_single_manager_nodule_type , SIGNAL(mapped(int)) , this , SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
     }
+
+    //Focus model
+    _model_focus.reset(new FocusModel());
+    _model_focus->set_focus_scene_container(_mpr_00);//Default focus MPR00
 }
 
 void NoduleAnnotation::slot_change_layout2x2_i()
@@ -391,7 +398,7 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _mpr_00_scroll_bar->hide();
     _mpr_01->hide();
     _mpr_01_scroll_bar->hide();
-    _mpr10->hide();
+    _mpr_10->hide();
     _mpr_10_scroll_bar->hide();
     _vr_11->hide();
 
@@ -399,7 +406,7 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
     ui.gridLayout_6->removeWidget(_mpr_01);
     ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-    ui.gridLayout_6->removeWidget(_mpr10 );
+    ui.gridLayout_6->removeWidget(_mpr_10 );
     ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
     ui.gridLayout_6->removeWidget(_vr_11);
 
@@ -407,14 +414,14 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
     ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
     ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(_mpr10 , 1 ,0);
+    ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
     ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
     ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
     //Set min size to fix size bug
     _mpr_00->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _mpr_01->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
-    _mpr10->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
+    _mpr_10->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _vr_11->setMinimumSize(_pre_2x2_width ,_pre_2x2_height);
     
 
@@ -422,12 +429,12 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _mpr_00_scroll_bar->show();
     _mpr_01->show();
     _mpr_01_scroll_bar->show();
-    _mpr10->show();
+    _mpr_10->show();
     _mpr_10_scroll_bar->show();
     _vr_11->show();
 
     //Recover min size to expanding
-    _mpr10->setMinimumSize(100,100);
+    _mpr_10->setMinimumSize(100,100);
     _mpr_01->setMinimumSize(100,100);
     _mpr_00->setMinimumSize(100,100);
     _vr_11->setMinimumSize(100,100);
@@ -500,7 +507,7 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
 
         _mpr_00->update();
         _mpr_01->update();
-        _mpr10->update();
+        _mpr_10->update();
 
         _model_progress->clear_observer();
 
@@ -542,7 +549,7 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -577,7 +584,7 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -612,7 +619,7 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -646,7 +653,7 @@ void NoduleAnnotation::slot_press_btn_zoom_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -680,7 +687,7 @@ void NoduleAnnotation::slot_press_btn_pan_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -714,7 +721,7 @@ void NoduleAnnotation::slot_press_btn_windowing_i()
     std::vector<SceneContainer*> mpr_containers;
     mpr_containers.push_back(_mpr_00);
     mpr_containers.push_back(_mpr_01);
-    mpr_containers.push_back(_mpr10);
+    mpr_containers.push_back(_mpr_10);
 
     for (int i = 0 ; i < 3 ; ++i)
     {
@@ -741,19 +748,19 @@ void NoduleAnnotation::slot_press_btn_fit_window_i()
         return;
     }
 
-    if (_mpr_00->hasFocus())
+    if (_model_focus->get_focus_scene_container() == _mpr_00)
     {
         _mpr_scene_00->place_mpr(SAGITTAL);
         _model_crosshair->set_changed();
         _model_voi->set_changed();
     }
-    else if (_mpr_01->hasFocus())
+    else if (_model_focus->get_focus_scene_container() == _mpr_01)
     {
         _mpr_scene_01->place_mpr(CORONAL);
         _model_crosshair->set_changed();
         _model_voi->set_changed();
     }
-    else if (_mpr10->hasFocus())
+    else if (_model_focus->get_focus_scene_container() == _mpr_10)
     {
         _mpr_scene_10->place_mpr(TRANSVERSE);
         _model_crosshair->set_changed();
@@ -1041,7 +1048,7 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
         }
         else if (name == _mpr_scene_10->get_name())
         {
-            target_container = _mpr10;
+            target_container = _mpr_10;
             target_scroll_bar = _mpr_10_scroll_bar;
         }
         else
@@ -1053,7 +1060,7 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
         _mpr_00_scroll_bar->hide();
         _mpr_01->hide();
         _mpr_01_scroll_bar->hide();
-        _mpr10->hide();
+        _mpr_10->hide();
         _mpr_10_scroll_bar->hide();
         _vr_11->hide();
 
@@ -1061,7 +1068,7 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
         ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
         ui.gridLayout_6->removeWidget(_mpr_01);
         ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-        ui.gridLayout_6->removeWidget(_mpr10 );
+        ui.gridLayout_6->removeWidget(_mpr_10 );
         ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
         ui.gridLayout_6->removeWidget(_vr_11);
 
@@ -1092,15 +1099,15 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
 
     if (name == _mpr_scene_00->get_name())
     {
-        _model_crosshair->focus(_mpr_scene_00);
+        _model_focus->set_focus_scene_container(_mpr_00);
     }
     else if (name == _mpr_scene_01->get_name())
     {
-        _model_crosshair->focus(_mpr_scene_01);
+        _model_focus->set_focus_scene_container(_mpr_01);
     }
     else if (name == _mpr_scene_10->get_name())
     {
-        _model_crosshair->focus(_mpr_scene_10);
+        _model_focus->set_focus_scene_container(_mpr_10);
     }
     else
     {
@@ -1108,15 +1115,13 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s)
     }
 }
 
-void NoduleAnnotation::slot_focus_out_scene_i(QString name)
-{
-    if (!_is_ready)
-    {
-        return;
-    }
-    _model_crosshair->focus(nullptr);
-
-}
+//void NoduleAnnotation::slot_focus_out_scene_i(QString name)
+//{
+//    if (!_is_ready)
+//    {
+//        return;
+//    }
+//}
 
 void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 {
@@ -1127,7 +1132,7 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 
     _model_crosshair->set_visibility(iFlag != 0);
 
-    SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr10};
+    SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr_10};
     std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
     if (0 == iFlag)//Hide
     {

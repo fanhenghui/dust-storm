@@ -1,10 +1,12 @@
 #include "mi_graphic_item_mpr_border.h"
-
-#include "mi_model_cross_hair.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
 
 #include <QGraphicsLineItem>
 #include <QPen>
+
+#include "mi_model_cross_hair.h"
+#include "mi_model_focus.h"
+#include "mi_scene_container.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -23,7 +25,12 @@ GraphicItemMPRBorder::~GraphicItemMPRBorder()
 
 void GraphicItemMPRBorder::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
 {
-    _model = model;
+    _model_corsshair = model;
+}
+
+void GraphicItemMPRBorder::set_focus_model( std::shared_ptr<FocusModel> model )
+{
+    _model_focus = model;
 }
 
 std::vector<QGraphicsItem*> GraphicItemMPRBorder::get_init_items()
@@ -38,7 +45,8 @@ std::vector<QGraphicsItem*> GraphicItemMPRBorder::get_init_items()
 
 void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove)
 {
-    QTWIDGETS_CHECK_NULL_EXCEPTION(_model);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_model_corsshair);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_model_focus);
     QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
 
     std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);
@@ -47,13 +55,15 @@ void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::
     int width(1) , height(1);
     scene->get_display_size(width , height);
 
-    RGBUnit color = _model->get_border_color(scene);
+    RGBUnit color = _model_corsshair->get_border_color(scene);
 
     QPen pen;
     float border;
     int pen_width;
     QColor color_qt;
-    if (_model->check_focus(scene))
+
+    if (_model_focus->get_focus_scene_container() &&
+        _model_focus->get_focus_scene_container()->get_scene() == _scene )
     {
         pen_width = 4;
         border = 2.0f;

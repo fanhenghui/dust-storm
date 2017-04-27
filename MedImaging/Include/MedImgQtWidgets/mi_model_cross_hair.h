@@ -33,10 +33,6 @@ public:
 
     RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 
-    bool check_focus(MPRScenePtr target_mpr_scene);
-
-    void focus(MPRScenePtr target_mpr_scene);
-
     Point3 get_cross_location_discrete_world() const;
 
     Point3 get_cross_location_contineous_world() const;
@@ -53,7 +49,7 @@ public:
 
     bool locate(const Point3& center_w);
 
-    bool locate_focus(const Point3& center_w);
+    //bool locate_focus(const Point3& center_w);
 
     void set_visibility(bool flag);
 
@@ -68,7 +64,6 @@ private:
     MPRScenePtr _mpr_scenes[3];
     RGBUnit _mpr_colors[3];
     int _pages[3];
-    int _focus_id;
 
     Point3 _location_discrete_w;
     Point3 _location_contineous_w;
