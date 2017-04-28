@@ -53,8 +53,8 @@ SceneContainer::~SceneContainer()
 
 void SceneContainer::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    static int idx = 0;
-    std::cout << "draw background " << idx++ << std::endl;
+    //static int idx = 0;
+    //std::cout << "draw background " << idx++ << std::endl;
 
     //Render scene
     if (!_scene)
@@ -151,15 +151,17 @@ std::string SceneContainer::get_name() const
 void SceneContainer::update_scene()
 {
     _inner_graphic_scene->update();
-    std::cout << "update scene" << std::endl;
+    //std::cout << "update scene" << std::endl;
 }
 
 void SceneContainer::slot_mouse_click()
 {
+    //std::cout << "Slot click in >>\n";
     bool double_click_status = (_mouse_press_time>1) && (_buttons_pre_press == _buttons);
+    _mouse_press_time = 0;//Make mouse click decision
     if (!double_click_status)
     {
-        //std::cout << "single click in slot \n";
+        //std::cout << "Run single click in slot \n";
         IMouseOpPtrCollection ops;
         if(get_mouse_operation_i(ops))
         {
@@ -171,7 +173,7 @@ void SceneContainer::slot_mouse_click()
     }
     else
     {
-        //std::cout << "double click in slot \n";
+        //std::cout << "Run double click in slot \n";
         IMouseOpPtrCollection ops;
         if(get_mouse_operation_i( ops))
         {
@@ -185,6 +187,7 @@ void SceneContainer::slot_mouse_click()
     //Do previous release logic when decide the click type
     if (1 == _mouse_release_time)
     {
+        //std::cout << "Mouse release \n";
         IMouseOpPtrCollection ops;
         if(get_mouse_operation_i(ops))
         {
@@ -199,12 +202,14 @@ void SceneContainer::slot_mouse_click()
         //std::cout << "release in slot\n";
     }
 
-    _mouse_press_time = 0;
     update_scene();
+
+    //std::cout << "Slot click out <<\n";
 }
 
 void SceneContainer::mousePressEvent(QMouseEvent *event)
 {
+    //std::cout << "\nPress in >>\n";
     //focus
     this->setFocus();
 
@@ -216,19 +221,23 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
+        //std::cout << "No graphics grab \n";
         _buttons = event->buttons();
         _pre_point = event->pos();
         _modifiers = event->modifiers();
 
+        //std::cout << "Previous mouse press time : " << _mouse_press_time << std::endl;
         ++_mouse_press_time;
         if (1 == _mouse_press_time)
         {
+            //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
             //const int interval = QApplication::doubleClickInterval();
             const int interval = 150;
             QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
         }
     }
+    //std::cout << "Press out >>\n";
 }
 
 void SceneContainer::mouseMoveEvent(QMouseEvent *event)
@@ -265,6 +274,7 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 
 void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
 {
+    //std::cout << "Release in >>\n";
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseReleaseEvent(event);
 
@@ -273,6 +283,8 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
+        //std::cout << "No graphics grab \n";
+
         if (0 == _mouse_press_time)
         {
             _mouse_release_time = 0;
@@ -295,10 +307,12 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
             _mouse_release_time = 1;
         }
     }
+    //std::cout << "Release out <<\n";
 }
 
 void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    //std::cout << "Double click in >>\n";
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseDoubleClickEvent(event);
 
@@ -307,9 +321,19 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
-        ++_mouse_press_time;
-        _buttons = event->buttons();
+        //std::cout << "No graphics grab \n";
+        if (1 == _mouse_press_time)// In timer slot to wait to run
+        {
+            ++_mouse_press_time;
+            _buttons = event->buttons();
+        }
+        else
+        {
+            //std::cout << "Double click to be late......\n";
+        }
     }
+
+    //std::cout << "Double click out <<\n";
 }
 
 void SceneContainer::wheelEvent(QWheelEvent *event)
