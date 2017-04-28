@@ -45,6 +45,7 @@ public:
     int get_id() const {return _id;};
 
     bool is_grabbed() {return _is_grabbed;};
+    void grab(bool flag) {_is_grabbed = flag;};
 
 signals:
     void position_changed(QPointF info_pos);
@@ -119,9 +120,12 @@ private:
     int _pre_item_num;
     std::vector<QGraphicsItem*> _items_to_be_delete;
 
+    //cache
     std::vector<VOISphere> _pre_vois;
     std::vector<IntensityInfo> _pre_intensity_infos;
     OrthoCamera _pre_camera;
+    int _pre_width;
+    int _pre_height;
 };
 
 MED_IMAGING_END_NAMESPACE

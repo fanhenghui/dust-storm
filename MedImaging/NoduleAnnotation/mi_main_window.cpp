@@ -162,6 +162,11 @@ void NoduleAnnotation::configure_i()
     std::fstream in("../../../config/configure.txt" , std::ios::in);
     if (!in.is_open())
     {
+        in.open("./config/configure.txt" , std::ios::in);//second chance
+    }
+
+    if (!in.is_open())
+    {
         Configuration::instance()->set_processing_unit_type(GPU);
     }
     else
@@ -907,9 +912,11 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         {
             _model_voi->remove_all();
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
+            int idx = 0;
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {
                 _model_voi->add_voi_sphere(*it);
+                _model_voi->set_voi_sphere_intensity_info_dirty(idx++ , true);
             }
             _model_voi->notify();
             QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);

@@ -19,7 +19,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GraphicItemVOI::GraphicItemVOI():_pre_item_num(0)
+GraphicItemVOI::GraphicItemVOI():_pre_item_num(0),_pre_width(0),_pre_height(0)
 {
 }
 
@@ -77,12 +77,12 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
                     //line
                     GraphicsLineItem* item_line = new GraphicsLineItem();
-                    QPen pen(QColor(0,255,128) , 2 , Qt::DotLine);
+                    QPen pen(QColor(16,176,51) , 2 , Qt::DotLine);
                     item_line->setPen(pen);
 
                     //info
                     GraphicsTextItem* item_info = new GraphicsTextItem(item_line);
-                    item_info->setDefaultTextColor(QColor(0,255,128));
+                    item_info->setDefaultTextColor(QColor(16,176,51));
                     QFont font("Times" , 10 , QFont::Bold);
                     item_info->setFont(font);
                     item_info->setFlags(QGraphicsItem::ItemIsMovable);
@@ -137,7 +137,9 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
         if (_pre_camera == *(std::dynamic_pointer_cast<OrthoCamera>(camera)) &&
             _pre_vois == vois &&
-            _pre_intensity_infos == intensity_infos)
+            _pre_intensity_infos == intensity_infos &&
+            _pre_width == width &&
+            _pre_height == height)
         {
             return;
         }
@@ -146,6 +148,17 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             _pre_camera = *(std::dynamic_pointer_cast<OrthoCamera>(camera));
             _pre_vois = vois;
             _pre_intensity_infos = intensity_infos;
+
+            if (_pre_width != width || _pre_height != height)
+            {
+                //Adjust text
+                for (int i = 0 ; i<_items_infos.size() ; ++i)
+                {
+                    _items_infos[i]->grab(false);
+                }
+                _pre_width = width;
+                _pre_height = height;
+            }
         }
 
 
