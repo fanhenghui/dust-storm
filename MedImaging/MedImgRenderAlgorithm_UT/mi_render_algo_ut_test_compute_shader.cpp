@@ -160,7 +160,7 @@ namespace
         glutPostRedisplay();
     }
 
-    void Resize(int x , int y)
+    void resize(int x , int y)
     {
         _width = x;
         _height = y;
@@ -240,7 +240,7 @@ void UT_CompureShader(int argc , char* argv[])
         env.get_gl_version(major , minor);
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(Resize);
+        glutReshapeFunc(resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

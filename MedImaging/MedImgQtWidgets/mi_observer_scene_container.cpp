@@ -13,7 +13,7 @@ SceneContainerObserver::~SceneContainerObserver()
 
 }
 
-void SceneContainerObserver::update()
+void SceneContainerObserver::update(int)
 {
     for (auto it = _scene_containers.begin() ; it != _scene_containers.end() ; ++it)
     {

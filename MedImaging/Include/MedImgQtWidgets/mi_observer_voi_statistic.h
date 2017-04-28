@@ -17,7 +17,7 @@ public:
     void set_model(std::shared_ptr<VOIModel> model);
     void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
 
-    virtual void update();
+    virtual void update(int code_id = 0);
 
 protected:
 

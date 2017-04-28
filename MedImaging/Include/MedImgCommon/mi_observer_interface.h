@@ -11,7 +11,7 @@ public:
     IObserver(){}
     virtual ~IObserver(){}
 
-    virtual void update() = 0;
+    virtual void update(int code_id = 0) = 0;
 protected:
 private:
 };

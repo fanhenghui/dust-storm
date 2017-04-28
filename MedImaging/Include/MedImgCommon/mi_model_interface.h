@@ -20,7 +20,7 @@ public:
     void delete_observer(ObserverPtr observer);
     void clear_observer();
 
-    void notify();
+    void notify(int code_id = 0);
 
     void set_changed();
     void reset_changed();

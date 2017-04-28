@@ -16,7 +16,7 @@ ProgressObserver::~ProgressObserver()
 
 }
 
-void ProgressObserver::update()
+void ProgressObserver::update(int )
 {
     if (_progress_dialog)
     {

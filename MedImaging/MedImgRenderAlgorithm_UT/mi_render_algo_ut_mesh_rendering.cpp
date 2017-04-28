@@ -93,11 +93,11 @@ namespace
         }
     }
 
-    void Resize(int x , int y)
+    void resize(int x , int y)
     {
         _width = x;
         _height = y;
-        m_pCameraInteractor->Resize(_width , _height);
+        m_pCameraInteractor->resize(_width , _height);
     }
 
     void Idle()
@@ -167,7 +167,7 @@ void UT_MeshRendering(int argc , char* argv[])
         }
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(Resize);
+        glutReshapeFunc(resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

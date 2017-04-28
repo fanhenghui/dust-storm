@@ -13,7 +13,7 @@ public:
     SceneContainerObserver();
     virtual ~SceneContainerObserver();
 
-    virtual void update();
+    virtual void update(int code_id = 0);
 
     void add_scene_container(SceneContainer* container);
     void set_scene_container(const std::vector<SceneContainer*>& containers);

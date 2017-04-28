@@ -25,7 +25,7 @@ void MPRScrollBarObserver::add_scroll_bar(std::shared_ptr<medical_imaging::MPRSc
     _scoll_bars.push_back(widget);
 }
 
-void MPRScrollBarObserver::update()
+void MPRScrollBarObserver::update(int)
 {
     //TODO check null
     std::shared_ptr<medical_imaging::CrosshairModel> model = _model.lock();

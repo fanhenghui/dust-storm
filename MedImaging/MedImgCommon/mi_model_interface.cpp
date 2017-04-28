@@ -46,14 +46,14 @@ void IModel::delete_observer( ObserverPtr observer )
     }
 }
 
-void IModel::notify()
+void IModel::notify(int code_id /*= 0*/)
 {
     if (_is_changed)
     {
 
         for (auto it = _observers.begin() ; it != _observers.end() ; ++it)
         {
-            (*it)->update();
+            (*it)->update(code_id);
         }
 
         _is_changed = false;

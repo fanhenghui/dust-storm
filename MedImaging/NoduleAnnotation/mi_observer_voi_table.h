@@ -34,7 +34,7 @@ public:
 
     void set_nodule_object(QNoduleObject* obj);
 
-    virtual void update();
+    virtual void update(int code_id = 0);
 protected:
 private:
     QNoduleObject* _nodule_object;

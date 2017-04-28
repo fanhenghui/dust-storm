@@ -22,7 +22,7 @@ public:
 
     void add_scroll_bar(std::shared_ptr<medical_imaging::MPRScene> scene, QScrollBar* widget);
 
-    virtual void update();
+    virtual void update(int code_id = 0);
 protected:
 private:
     std::weak_ptr<medical_imaging::CrosshairModel> _model;

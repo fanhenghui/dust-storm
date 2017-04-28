@@ -31,7 +31,7 @@ void VOIStatisticObserver::set_volume_infos(std::shared_ptr<VolumeInfos> volume_
     _volume_infos = volume_infos;
 }
 
-void VOIStatisticObserver::update()
+void VOIStatisticObserver::update(int)
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(_volume_infos);
 

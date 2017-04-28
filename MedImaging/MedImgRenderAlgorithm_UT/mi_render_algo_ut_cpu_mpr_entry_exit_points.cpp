@@ -150,14 +150,14 @@ namespace
         glutPostRedisplay();
     }
 
-    void Resize(int x , int y)
+    void resize(int x , int y)
     {
         _width = x;
         _height = y;
         m_pMPREE->set_display_size(_width , _height);
         _canvas->set_display_size(_width , _height);
         _canvas->update_fbo();
-        m_pCameraInteractor->Resize(_width , _height);
+        m_pCameraInteractor->resize(_width , _height);
         glutPostRedisplay();
     }
 
@@ -228,7 +228,7 @@ void UT_CPUMPREntryExitPoints(int argc , char* argv[])
         }
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(Resize);
+        glutReshapeFunc(resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

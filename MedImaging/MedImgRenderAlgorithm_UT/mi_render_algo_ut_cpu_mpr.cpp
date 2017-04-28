@@ -173,22 +173,22 @@ namespace
         case 'a':
             {
                 m_pCameraCal->init_mpr_placement(_camera , TRANSVERSE , Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(_camera);
-                m_pCameraInteractor->Resize(_width , _height);
+                m_pCameraInteractor->set_initial_status(_camera);
+                m_pCameraInteractor->resize(_width , _height);
                 break;
             }
         case 's':
             {
                 m_pCameraCal->init_mpr_placement(_camera , SAGITTAL , Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(_camera);
-                m_pCameraInteractor->Resize(_width , _height);
+                m_pCameraInteractor->set_initial_status(_camera);
+                m_pCameraInteractor->resize(_width , _height);
                 break;
             }
         case 'c':
             {
                 m_pCameraCal->init_mpr_placement(_camera , CORONAL, Point3(0,0,0));
-                m_pCameraInteractor->SetInitialStatus(_camera);
-                m_pCameraInteractor->Resize(_width , _height);
+                m_pCameraInteractor->set_initial_status(_camera);
+                m_pCameraInteractor->resize(_width , _height);
                 break;
             }
         case 'f':
@@ -203,14 +203,14 @@ namespace
         glutPostRedisplay();
     }
 
-    void Resize(int x , int y)
+    void resize(int x , int y)
     {
         _width = x;
         _height = y;
         m_pMPREE->set_display_size(_width , _height);
         _canvas->set_display_size(_width , _height);
         _canvas->update_fbo();
-        m_pCameraInteractor->Resize(_width , _height);
+        m_pCameraInteractor->resize(_width , _height);
         glutPostRedisplay();
     }
 
@@ -299,7 +299,7 @@ void UT_CPUMPR(int argc , char* argv[])
         env.get_gl_version(major , minor);
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(Resize);
+        glutReshapeFunc(resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

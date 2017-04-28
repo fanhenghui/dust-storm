@@ -15,7 +15,7 @@ public:
     ProgressObserver();
     virtual ~ProgressObserver();
 
-    virtual void update();
+    virtual void update(int code_id = 0);
 
     void set_progress_model(std::shared_ptr<ProgressModel> model);
 

@@ -12,7 +12,7 @@ VOITableObserver::~VOITableObserver()
 
 }
 
-void VOITableObserver::update()
+void VOITableObserver::update(int)
 {
     if (_nodule_object)
     {
