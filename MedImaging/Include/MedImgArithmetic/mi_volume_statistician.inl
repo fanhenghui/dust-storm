@@ -1,80 +1,5 @@
 
 template<class T>
-void VolumeStatistician<T>::get_valid_region(const unsigned int (&dim)[3] , const Sphere& sphere , unsigned int (&begin)[3] , unsigned int (&end)[3])
-{
-    const Point3 min = sphere._center - Vector3(sphere._radius , sphere._radius , sphere._radius);
-    const Point3 max = sphere._center + Vector3(sphere._radius , sphere._radius , sphere._radius);
-
-    int tmp = static_cast<int>(min.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[0] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(min.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[1] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(min.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[2] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[0] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[1] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[2] = static_cast<unsigned int>(tmp);
-
-    for (int i = 0 ; i < 3 ; ++i)
-    {
-        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
-        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
-    }
-}
-
-template<class T>
-void VolumeStatistician<T>::get_valid_region(const unsigned int (&dim)[3] , const Ellipsoid& ellipsoid, unsigned int (&begin)[3] , unsigned int (&end)[3])
-{
-    const double radius = std::max(std::max(ellipsoid._a ,ellipsoid._b) , ellipsoid._c);
-    const Point3 min = ellipsoid._center - Vector3(radius , radius, radius);
-    const Point3 max = ellipsoid._center + Vector3(radius , radius, radius);
-
-    int tmp = static_cast<int>(min.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[0] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(min.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[1] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(min.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[2] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[0] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[1] = static_cast<unsigned int>(tmp);
-
-    tmp = static_cast<int>(max.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[2] = static_cast<unsigned int>(tmp);
-
-    for (int i = 0 ; i < 3 ; ++i)
-    {
-        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
-        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
-    }
-}
-
-template<class T>
 void VolumeStatistician<T>::get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Sphere& sphere, 
     unsigned int& num_out , double& min_out , double& max_out , double& mean_out , double& var_out, double& std_out)
 {
@@ -82,7 +7,7 @@ void VolumeStatistician<T>::get_intensity_analysis(const unsigned int (&dim)[3] 
     const double& radius = sphere._radius;
 
     unsigned int begin[3] , end[3];
-    get_valid_region(dim , sphere , begin , end);
+    ArithmeticUtils::get_valid_region(dim , sphere , begin , end);
 
     T min0 = (std::numeric_limits<T>::max)();
     T max0 = (std::numeric_limits<T>::min)();
@@ -159,7 +84,7 @@ void VolumeStatistician<T>::get_intensity_analysis(const unsigned int (&dim)[3] 
     const double& cc_r = 1.0 / (ellipsoid._c*ellipsoid._c);
 
     unsigned int begin[3] , end[3];
-    get_valid_region(dim , ellipsoid , begin , end);
+    ArithmeticUtils::get_valid_region(dim , ellipsoid , begin , end);
 
     T min0 = (std::numeric_limits<T>::max)();
     T max0 = (std::numeric_limits<T>::min)();

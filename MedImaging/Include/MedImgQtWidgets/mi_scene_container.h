@@ -28,6 +28,10 @@ public:
     virtual ~Graphics2DScene();
 };
 
+//这里我采用了Qt的QGraphicItem + QGraphicScene + QGraphicView 框架来做，原因是Qt自带了一套图元和鼠标交互的逻辑（如鼠标选择拖动圆 长方形 文字等）
+//所以二位图元交互的逻辑为：Qt改变该图元 -> 触发图元修改的逻辑（业务逻辑）
+//注意的是：Qt只有碰撞和拖动逻辑，因此类似改变图元形状这样的逻辑就需要自己扩展
+//目前Qt的碰撞热区是包含轮廓内的区域，如圆，则是圆内而非仅仅是圆圈
 class QtWidgets_Export SceneContainer : public QGraphicsView
 {
     Q_OBJECT
@@ -43,6 +47,7 @@ public:
     void update_scene();
 
     void add_item(GraphicItemPtr item);
+    void clear();
 
     void register_mouse_operation(IMouseOpPtr mouse_op , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
     void register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);

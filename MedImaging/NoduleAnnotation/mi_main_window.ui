@@ -92,6 +92,12 @@
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="1" column="0" colspan="5">
           <widget class="QTableWidget" name="tableWidgetNoduleList">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <column>
             <property name="text">
              <string>Position</string>
@@ -115,7 +121,7 @@
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>Mark ROI</string>
+            <string>Mark VOI</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -132,9 +138,9 @@
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="QCheckBox" name="checkBoxVOIIntensity">
+          <widget class="QCheckBox" name="checkBoxVOIAutoSegment">
            <property name="text">
-            <string>Intensity Information</string>
+            <string>VOI Auto Segment</string>
            </property>
            <property name="checked">
             <bool>true</bool>

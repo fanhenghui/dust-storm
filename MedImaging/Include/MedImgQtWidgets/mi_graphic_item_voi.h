@@ -83,6 +83,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
 private:
     void update_circle_center_i();
     void update_sphere_center_i();
@@ -96,7 +97,6 @@ private:
 
 
 MED_IMAGING_BEGIN_NAMESPACE
-
 
 class QtWidgets_Export GraphicItemVOI : public GraphicItemBase
 {

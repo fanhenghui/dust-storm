@@ -131,4 +131,77 @@ bool ArithmeticUtils::check_in_bound(const Point3& pt , const Point3& bound)
     }
 }
 
+void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3] , const Sphere& sphere, unsigned int (&begin)[3] , unsigned int (&end)[3])
+{
+    const Point3 min = sphere._center - Vector3(sphere._radius , sphere._radius , sphere._radius);
+    const Point3 max = sphere._center + Vector3(sphere._radius , sphere._radius , sphere._radius);
+
+    int tmp = static_cast<int>(min.x + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[0] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(min.y + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[1] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(min.z + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[2] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.x + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[0] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.y + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[1] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.z + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[2] = static_cast<unsigned int>(tmp);
+
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
+        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
+    }
+}
+
+void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3] , const Ellipsoid& ellipsoid, unsigned int (&begin)[3] , unsigned int (&end)[3])
+{
+    const double radius = std::max(std::max(ellipsoid._a ,ellipsoid._b) , ellipsoid._c);
+    const Point3 min = ellipsoid._center - Vector3(radius , radius, radius);
+    const Point3 max = ellipsoid._center + Vector3(radius , radius, radius);
+
+    int tmp = static_cast<int>(min.x + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[0] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(min.y + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[1] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(min.z + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    begin[2] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.x + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[0] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.y + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[1] = static_cast<unsigned int>(tmp);
+
+    tmp = static_cast<int>(max.z + 0.5);
+    tmp = tmp < 0 ? 0 : tmp;
+    end[2] = static_cast<unsigned int>(tmp);
+
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
+        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
+    }
+}
+
 MED_IMAGING_END_NAMESPACE

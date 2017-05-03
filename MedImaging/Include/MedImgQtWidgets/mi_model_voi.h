@@ -37,11 +37,15 @@ public:
     const std::vector<VOISphere>& get_voi_spheres() const;
     void get_voi_spheres(std::vector<VOISphere>& l) const;
 
+    //void focus(int id);
+    //int get_focus() const;
+
 protected:
 private:
     std::vector<VOISphere>      _vois;
     std::vector<IntensityInfo>   _voi_intensity_infos;
     std::vector<bool>   _voi_intensity_infos_dirty;
+    int _focus_id;
 };
 
 MED_IMAGING_END_NAMESPACE

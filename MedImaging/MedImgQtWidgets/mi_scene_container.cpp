@@ -447,4 +447,11 @@ void SceneContainer::add_item(GraphicItemPtr item)
     }
 }
 
+void SceneContainer::clear()
+{
+    _inner_graphic_scene->clear();
+    _graphic_items.clear();
+    _scene.reset();
+}
+
 //////////////////////////////////////////////////////////////////////////

@@ -5,10 +5,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Float">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Config">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -31,6 +27,13 @@
     <Filter Include="Statistic">
       <UniqueIdentifier>{4f77da27-3ac6-4c15-8300-a37c71e51783}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Float">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Segmentation">
+      <UniqueIdentifier>{89b9b355-916a-4a39-b414-d31a5df2e3f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
@@ -38,6 +41,9 @@
     </None>
     <None Include="..\Include\MedImgArithmetic\mi_volume_statistician.inl">
       <Filter>Statistic</Filter>
+    </None>
+    <None Include="..\Include\MedImgArithmetic\mi_segment_threshold.inl">
+      <Filter>Segmentation</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h">
       <Filter>Shape</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_interface.h">
+      <Filter>Segmentation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h">
+      <Filter>Segmentation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

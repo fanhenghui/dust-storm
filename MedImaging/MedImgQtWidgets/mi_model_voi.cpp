@@ -2,7 +2,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-VOIModel::VOIModel()
+VOIModel::VOIModel():_focus_id(-1)
 {
 
 }
@@ -175,6 +175,16 @@ const std::vector<IntensityInfo>& VOIModel::get_voi_sphere_intensity_infos() con
 {
     return _voi_intensity_infos;
 }
+
+//void VOIModel::focus(int id)
+//{
+//    _focus_id = id;
+//}
+//
+//int VOIModel::get_focus() const
+//{
+//    return _focus_id;
+//}
 
 
 

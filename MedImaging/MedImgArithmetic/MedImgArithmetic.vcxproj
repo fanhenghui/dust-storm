@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl" />
+    <None Include="..\Include\MedImgArithmetic\mi_segment_threshold.inl" />
     <None Include="..\Include\MedImgArithmetic\mi_volume_statistician.inl" />
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +204,8 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_rectangle.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_rsa_utils.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sampler.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_interface.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_shape_interface.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_sphere.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_volume_statistician.h" />

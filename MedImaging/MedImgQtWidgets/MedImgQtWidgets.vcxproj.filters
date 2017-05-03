@@ -23,9 +23,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h</Extensions>
     </Filter>
-    <Filter Include="Src\Config">
-      <UniqueIdentifier>{52f11276-b9cc-44f7-a5d5-546991b692ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Generated Files\Debug">
       <UniqueIdentifier>{f79f0364-9c7f-4eba-bbda-211da1e948c4}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
@@ -48,10 +45,13 @@
     <Filter Include="Src\Graphics Item">
       <UniqueIdentifier>{cc1f6545-8977-47b1-a633-53514fc006f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{52f11276-b9cc-44f7-a5d5-546991b692ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_qt_widgets_stdafx.cpp">
-      <Filter>Src\Config</Filter>
+      <Filter>Config</Filter>
     </ClCompile>
     <ClCompile Include="mi_shared_widget.cpp">
       <Filter>Src\Scene container</Filter>
@@ -134,7 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
-      <Filter>Src\Config</Filter>
+      <Filter>Config</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_interface.h">
       <Filter>Src\Operation</Filter>

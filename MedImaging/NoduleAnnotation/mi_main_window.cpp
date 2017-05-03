@@ -535,6 +535,10 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
 
         create_model_observer_i();
 
+        _mpr_00->clear();
+        _mpr_01->clear();
+        _mpr_10->clear();
+
         create_scene_i();
 
         save_layout2x2_parameter_i();
@@ -548,8 +552,7 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         _model_progress->clear_observer();
 
         //reset nodule list
-        ui.tableWidgetNoduleList->clear();
-        ui.tableWidgetNoduleList->setRowCount(0);
+        refresh_nodule_list_i();
         _select_vio_id = -1;
 
         _is_ready = true;
@@ -1223,6 +1226,21 @@ void NoduleAnnotation::refresh_nodule_list_i()
     //reset nodule list
     ui.tableWidgetNoduleList->clear();
     ui.tableWidgetNoduleList->setRowCount(0);
+
+    //set column header
+    QTableWidgetItem *qtablewidgetitem = new QTableWidgetItem();
+    QTableWidgetItem *qtablewidgetitem1 = new QTableWidgetItem();
+    QTableWidgetItem *qtablewidgetitem2 = new QTableWidgetItem();
+
+    qtablewidgetitem->setText(QApplication::translate("NoduleAnnotationClass", "Position", 0, QApplication::UnicodeUTF8));
+    qtablewidgetitem1->setText(QApplication::translate("NoduleAnnotationClass", "Diameter", 0, QApplication::UnicodeUTF8));
+    qtablewidgetitem2->setText(QApplication::translate("NoduleAnnotationClass", "Type", 0, QApplication::UnicodeUTF8));
+
+    ui.tableWidgetNoduleList->setHorizontalHeaderItem(0, qtablewidgetitem);
+    ui.tableWidgetNoduleList->setHorizontalHeaderItem(1, qtablewidgetitem1);
+    ui.tableWidgetNoduleList->setHorizontalHeaderItem(2, qtablewidgetitem2);
+
+    //reset selected voi id
     _select_vio_id = -1;
 
     const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();

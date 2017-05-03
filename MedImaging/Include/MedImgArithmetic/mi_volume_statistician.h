@@ -4,6 +4,7 @@
 #include "MedImgArithmetic/mi_arithmetic_stdafx.h"
 #include "MedImgArithmetic/mi_sphere.h"
 #include "MedImgArithmetic/mi_ellipsoid.h"
+#include "MedImgArithmetic/mi_arithmetic_utils.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -38,11 +39,6 @@ public:
 
     void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Ellipsoid& ellipsiod, 
         unsigned int& num , double& min , double& max , double& mean , double& var, double& std);
-
-protected:
-private:
-    void get_valid_region(const unsigned int (&dim)[3] , const Sphere& sphere, unsigned int (&begin)[3] , unsigned int (&end)[3]);
-    void get_valid_region(const unsigned int (&dim)[3] , const Ellipsoid& ellipsoid, unsigned int (&begin)[3] , unsigned int (&end)[3]);
 };
 
 #include "MedImgArithmetic/mi_volume_statistician.inl"
