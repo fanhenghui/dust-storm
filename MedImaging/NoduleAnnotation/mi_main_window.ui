@@ -94,10 +94,16 @@
           <widget class="QTableWidget" name="tableWidgetNoduleList">
            <property name="minimumSize">
             <size>
-             <width>150</width>
-             <height>0</height>
+             <width>300</width>
+             <height>200</height>
             </size>
            </property>
+           <attribute name="horizontalHeaderCascadingSectionResizes">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
            <column>
             <property name="text">
              <string>Position</string>

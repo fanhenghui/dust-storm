@@ -218,6 +218,7 @@
     <ClInclude Include="mi_rc_step_color_inverse.h" />
     <ClInclude Include="mi_rc_step_composite.h" />
     <ClInclude Include="mi_rc_step_main.h" />
+    <ClInclude Include="mi_rc_step_overlay_mask_label.h" />
     <ClInclude Include="mi_rc_step_ray_casting.h" />
     <ClInclude Include="mi_rc_step_mask_sampler.h" />
     <ClInclude Include="mi_rc_step_shading.h" />
@@ -249,6 +250,7 @@
     <ClCompile Include="mi_rc_step_color_inverse.cpp" />
     <ClCompile Include="mi_rc_step_composite.cpp" />
     <ClCompile Include="mi_rc_step_main.cpp" />
+    <ClCompile Include="mi_rc_step_overlay_mask_label.cpp" />
     <ClCompile Include="mi_rc_step_ray_casting.cpp" />
     <ClCompile Include="mi_rc_step_mask_sampler.cpp" />
     <ClCompile Include="mi_rc_step_shading.cpp" />
@@ -265,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\mpr_entry_exit_points.glsl" />
+    <None Include="Shader\rc_overlay_mask_label_disable.frag" />
     <None Include="Shader\rc_color_inverse_disable.frag" />
     <None Include="Shader\rc_color_inverse_enable.frag" />
     <None Include="Shader\rc_composite_average.frag" />
@@ -276,6 +279,7 @@
     <None Include="Shader\rc_main.vert" />
     <None Include="Shader\rc_mask_nearst_sampler.frag" />
     <None Include="Shader\rc_mask_none_sampler.frag" />
+    <None Include="Shader\rc_overlay_mask_label_enable.frag" />
     <None Include="Shader\rc_ray_casting_average.frag" />
     <None Include="Shader\rc_ray_casting_dvr.frag" />
     <None Include="Shader\rc_ray_casting_mip_minip.frag" />

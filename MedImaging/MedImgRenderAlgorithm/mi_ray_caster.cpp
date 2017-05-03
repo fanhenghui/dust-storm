@@ -30,6 +30,7 @@ _composite_mode(COMPOSITE_AVERAGE),
 _interpolation_mode(LINEAR),
 _shading_mode(SHADING_NONE),
 _color_inverse_mode(COLOR_INVERSE_DISABLE),
+_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE),
 _strategy(CPU_BASE),
 _brick_corner_array(nullptr),
 _volume_brick_unit_array(nullptr),
@@ -166,6 +167,11 @@ void RayCaster::set_mask_label_level(LabelLevel label_level)
 void RayCaster::set_visible_labels(std::vector<unsigned char> labels)
 {
     _inner_buffer->set_visible_labels(labels);
+}
+
+const std::vector<unsigned char>& RayCaster::get_visible_labels() const
+{
+    return _inner_buffer->get_visible_labels();
 }
 
 void RayCaster::set_window_level(float ww , float wl , unsigned char label)
@@ -352,6 +358,31 @@ void RayCaster::get_global_window_level(float& ww , float& wl) const
 std::shared_ptr<EntryExitPoints> RayCaster::get_entry_exit_points() const
 {
     return _entry_exit_points;
+}
+
+void RayCaster::set_mask_overlay_mode(MaskOverlayMode mode)
+{
+    _mask_overlay_mode = mode;
+}
+
+void RayCaster::set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors)
+{
+    _inner_buffer->set_mask_overlay_color(colors);
+}
+
+void RayCaster::set_mask_overlay_color(RGBAUnit color , unsigned char label)
+{
+    _inner_buffer->set_mask_overlay_color(color , label);
+}
+
+const std::map<unsigned char , RGBAUnit>& RayCaster::get_mask_overlay_color() const
+{
+    return _inner_buffer->get_mask_overlay_color();
+}
+
+std::shared_ptr<RayCasterInnerBuffer> RayCaster::get_inner_buffer()
+{
+    return _inner_buffer;
 }
 
 

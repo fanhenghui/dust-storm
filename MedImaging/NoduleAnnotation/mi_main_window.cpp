@@ -514,8 +514,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         }
 
         std::shared_ptr<ImageDataHeader> data_header;
-        std::shared_ptr<ImageData> image_data;
-        IOStatus status = loader.load_series(file_names_std, image_data , data_header);
+        std::shared_ptr<ImageData> volume_data;
+        IOStatus status = loader.load_series(file_names_std, volume_data , data_header);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
@@ -531,7 +531,16 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         _volume_infos.reset(new VolumeInfos());
         _volume_infos->set_data_header(data_header);
         //SharedWidget::instance()->makeCurrent();
-        _volume_infos->set_volume(image_data);//load volume texture if has graphic card
+        _volume_infos->set_volume(volume_data);//load volume texture if has graphic card
+
+        //Create empty mask
+        std::shared_ptr<ImageData> mask_data(new ImageData());
+        volume_data->shallow_copy(mask_data.get());
+        mask_data->_channel_num = 1;
+        mask_data->_data_type = medical_imaging::UCHAR;
+        mask_data->mem_allocate();
+        _volume_infos->set_mask(mask_data);
+
 
         create_model_observer_i();
 
@@ -1243,12 +1252,16 @@ void NoduleAnnotation::refresh_nodule_list_i()
     //reset selected voi id
     _select_vio_id = -1;
 
+    _mpr_scene_00->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
+    _mpr_scene_01->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
+    _mpr_scene_10->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
+
     const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();
     if (!vois.empty())
     {
         ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
         StrNumConverter<double> converter;
-        const int iPrecision = 2;
+        const int iPrecision = 1;
         int iRow = 0;
         for (auto it = vois.begin() ; it != vois.end() ; ++it)
         {
@@ -1274,6 +1287,18 @@ void NoduleAnnotation::refresh_nodule_list_i()
 
             ++iRow;
         }
+
+        int idx = 0;
+        for ( ; idx < vois.size() ; ++idx)
+        {
+            _mpr_scene_00->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
+            _mpr_scene_01->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
+            _mpr_scene_10->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
+        }
+
+        _mpr_scene_00->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
+        _mpr_scene_01->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
+        _mpr_scene_10->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
     }
 }
 

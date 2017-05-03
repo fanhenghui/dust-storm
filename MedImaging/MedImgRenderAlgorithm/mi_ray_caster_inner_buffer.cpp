@@ -123,6 +123,32 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                 break;
             }
 
+        case MASK_OVERLAY_COLOR_BUCKET:
+            {
+                if (_inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET])
+                {
+                    RGBAUnit* color_array = (RGBAUnit*)_shared_buffer_array.get();
+                    memset(color_array , 0 , sizeof(RGBAUnit)*static_cast<int>(_label_level));
+
+                    for (auto it = _mask_overlay_colors.begin() ; it != _mask_overlay_colors.end() ; ++it)
+                    {
+                        if (it->first > static_cast<int>(_label_level) - 1)
+                        {
+                            std::stringstream ss;
+                            ss << "Input visible label : " << (int)(it->first ) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
+                            RENDERALGO_THROW_EXCEPTION(ss.str());
+                        }
+                        color_array[it->first] = it->second;
+                    }
+
+                    buffer->bind();
+                    buffer->load(static_cast<int>(_label_level)*sizeof(RGBAUnit) , color_array , GL_STATIC_DRAW);
+
+                    _inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET] = false;
+                }
+                break;
+            }
+
         default:
             {
                 RENDERALGO_THROW_EXCEPTION("Invalid buffer type!");
@@ -150,7 +176,7 @@ void RayCasterInnerBuffer::set_mask_label_level(LabelLevel eLevel)
     {
         _label_level = eLevel;
         memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
-        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*2*4]);
+        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*2]);
     }
 }
 
@@ -179,7 +205,46 @@ void RayCasterInnerBuffer::set_visible_labels(std::vector<unsigned char> labels)
     {
         _labels =labels;
         _inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET] = true;
+        _inner_resource->dirty_flag[VISIBLE_LABEL_ARRAY] = true;
     }
 }
+
+const std::vector<unsigned char>& RayCasterInnerBuffer::get_visible_labels() const
+{
+    return _labels;
+}
+
+void RayCasterInnerBuffer::set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors)
+{
+    if (_mask_overlay_colors != colors)
+    {
+        _mask_overlay_colors = colors;
+        _inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET] = true;
+    }
+}
+
+void RayCasterInnerBuffer::set_mask_overlay_color(RGBAUnit color , unsigned char label)
+{
+    auto it = _mask_overlay_colors.find(label);
+    if (it != _mask_overlay_colors.end())
+    {
+        if (it->second != color)
+        {
+            it->second = color;
+            _inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET] = true;
+        }
+    }
+    else
+    {
+        _mask_overlay_colors[label] = color;
+        _inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET] = true;
+    }
+}
+
+const std::map<unsigned char , RGBAUnit>& RayCasterInnerBuffer::get_mask_overlay_color() const
+{
+    return _mask_overlay_colors;
+}
+
 
 MED_IMAGING_END_NAMESPACE

@@ -34,6 +34,7 @@ private:
     InterpolationMode _interpolation_mode;
     ShadingMode _shading_mode;
     ColorInverseMode _color_inverse_mode;
+    MaskOverlayMode _mask_overlay_mode;
 
     //VAO
     GLVAOPtr _gl_vao;

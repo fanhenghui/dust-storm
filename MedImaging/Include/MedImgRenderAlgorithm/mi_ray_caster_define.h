@@ -68,6 +68,15 @@ enum ColorInverseMode
     COLOR_INVERSE_ENABLE,
 };
 
+enum MaskOverlayMode
+{
+    OVERLAY_MASK_LABEL_DISABLE = 0,
+    OVERLAY_MASK_LABEL_ENABLE,
+};
+
+#define BUFFER_BINDING_VISIBLE_LABEL_BUCKET 1
+#define BUFFER_BINDING_VISIBLE_LABEL_ARRAY 2
+#define BUFFER_BINDING_MASK_OVERLAY_COLOR_BUCKET 3
 
 static const RGBUnit kColorTransverse = RGBUnit((unsigned char)237 , (unsigned char)25, (unsigned char)35);//ºá¶ÏÃæ ºìÉ«
 static const RGBUnit kColorCoronal = RGBUnit((unsigned char)255 , (unsigned char)128 , (unsigned char)0);//¹Ú×´Ãæ ½Û»ÆÉ«

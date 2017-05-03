@@ -32,6 +32,7 @@ bool ImageData::mem_allocate()
 {
     const size_t mem_size = get_data_size_i();
     _data_array.reset(new char[mem_size]);
+    memset(_data_array.get() , 0 , mem_size);
     _has_cal_min_max = false;
     return true;
 }
@@ -239,9 +240,9 @@ void* ImageData::get_pixel_pointer()
     return _data_array.get();
 }
 
-void ImageData::shallow_copy(ImageData *&image_data)
+void ImageData::shallow_copy(ImageData *image_data)
 {
-    image_data = new ImageData();
+    IO_CHECK_NULL_EXCEPTION(image_data);
 
 #define COPY_PARAMETER(p) image_data->p = p
     COPY_PARAMETER(_data_type);
@@ -264,7 +265,7 @@ void ImageData::shallow_copy(ImageData *&image_data)
 #undef COPY_PARAMETER
 }
 
-void ImageData::deep_copy(ImageData *&image_data)
+void ImageData::deep_copy(ImageData *image_data)
 {
     this->shallow_copy(image_data);
 

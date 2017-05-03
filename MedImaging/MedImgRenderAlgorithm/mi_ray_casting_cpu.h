@@ -38,6 +38,8 @@ private:
     template<class T>
     void ray_casting_minip_i(std::shared_ptr<RayCaster> ray_caster);
 
+    void overlay_mask_label_i(std::shared_ptr<RayCaster> ray_caster);
+
 private:
     std::weak_ptr<RayCaster> _ray_caster;
     //Cache

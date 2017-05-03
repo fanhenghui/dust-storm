@@ -14,7 +14,6 @@ MED_IMAGING_BEGIN_NAMESPACE
 
 GLShaderInfo RCStepMainVert::get_shader_info()
 {
-    
     return GLShaderInfo(GL_VERTEX_SHADER , S_RC_MAIN_VERTEX , "RCStepMainVert");
 }
 

@@ -162,6 +162,9 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
       <Filter>Brick ACC</Filter>
     </ClInclude>
+    <ClInclude Include="mi_rc_step_overlay_mask_label.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_render_algo_stdafx.cpp">
@@ -269,6 +272,9 @@
     <ClCompile Include="mi_volume_infos.cpp">
       <Filter>Volume Infos</Filter>
     </ClCompile>
+    <ClCompile Include="mi_rc_step_overlay_mask_label.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\rc_main.vert">
@@ -335,6 +341,12 @@
       <Filter>Shader\Entry exit points</Filter>
     </None>
     <None Include="Shader\rc_mask_nearst_sampler.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_overlay_mask_label_disable.frag">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="Shader\rc_overlay_mask_label_enable.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>
   </ItemGroup>

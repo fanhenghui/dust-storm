@@ -9,6 +9,7 @@
 #include "MedImgRenderAlgorithm/mi_camera_calculator.h"
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
 #include "MedImgRenderAlgorithm/mi_mpr_entry_exit_points.h"
+#include "MedImgRenderAlgorithm/mi_ray_caster.h"
 
 #include "mi_volume_infos.h"
 
@@ -157,6 +158,21 @@ bool MPRScene::get_patient_position(const Point2& pt_dc, Point3& pos_p)
     {
         return false;
     }
+}
+
+void MPRScene::set_mask_overlay_mode(MaskOverlayMode mode)
+{
+    _ray_caster->set_mask_overlay_mode(mode);
+}
+
+void MPRScene::set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors)
+{
+    _ray_caster->set_mask_overlay_color(colors);
+}
+
+void MPRScene::set_mask_overlay_color(RGBAUnit color , unsigned char label)
+{
+    _ray_caster->set_mask_overlay_color(color , label);
 }
 
 MED_IMAGING_END_NAMESPACE

@@ -35,9 +35,9 @@ public:
 
     void* get_pixel_pointer();
 
-    void shallow_copy(ImageData *&image_data);
+    void shallow_copy(ImageData *image_data);
 
-    void deep_copy(ImageData *&image_data);
+    void deep_copy(ImageData *image_data);
 
 public:
     DataType _data_type;

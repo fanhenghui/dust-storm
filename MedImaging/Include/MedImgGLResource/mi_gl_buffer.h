@@ -22,6 +22,8 @@ public:
 
     unsigned int get_id() const;
 
+    void bind_buffer_base(GLuint index);
+
     void bind();
 
     void unbind();

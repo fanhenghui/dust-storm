@@ -229,5 +229,8 @@
     <ClCompile Include="mi_ellipsoid.cpp">
       <Filter>Shape</Filter>
     </ClCompile>
+    <ClCompile Include="mi_color_unit.cpp">
+      <Filter>Color Related</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -87,6 +87,7 @@ public:
 
     //Label parameter
     void set_visible_labels(std::vector<unsigned char> labels);
+    const std::vector<unsigned char>& get_visible_labels() const; 
 
     //Window level parameter
     //Here
@@ -102,6 +103,11 @@ public:
     //RGB8 array
     void set_pseudo_color_array(unsigned char* color_array , unsigned int length);
     void set_transfer_function_texture(GLTexture1DArrayPtr tex_array);
+
+    //Mask overlay color
+    void set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors);
+    void set_mask_overlay_color(RGBAUnit color , unsigned char label);
+    const std::map<unsigned char , RGBAUnit>& get_mask_overlay_color() const;
 
     //Enhancement parameter
     void set_sillhouette_enhancement();
@@ -130,6 +136,10 @@ public:
     void set_interpolation_mode(InterpolationMode mode);
     void set_shading_mode(ShadingMode mode);
     void set_color_inverse_mode(ColorInverseMode mode);
+    void set_mask_overlay_mode(MaskOverlayMode mode);
+
+    //Inner buffer
+    std::shared_ptr<RayCasterInnerBuffer> get_inner_buffer();
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -196,6 +206,7 @@ protected:
     InterpolationMode _interpolation_mode;
     ShadingMode _shading_mode;
     ColorInverseMode _color_inverse_mode;
+    MaskOverlayMode _mask_overlay_mode;
 
     //Processing unit type
     RayCastingStrategy _strategy;

@@ -65,6 +65,11 @@ void GLBuffer::load(GLsizei size, const void* data, GLenum usage)
     glBufferData(_target , size , data, usage);
 }
 
+void GLBuffer::bind_buffer_base(GLuint index)
+{
+    glBindBufferBase(_target , index, _buffer_id);
+}
+
 
 
 MED_IMAGING_END_NAMESPACE

@@ -16,6 +16,7 @@
 #include "mi_rc_step_volume_sampler.h"
 #include "mi_rc_step_utils.h"
 #include "mi_rc_step_shading.h"
+#include "mi_rc_step_overlay_mask_label.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -108,7 +109,8 @@ void RayCastingGPU::update_i()
         _composite_mode != ray_caster->_composite_mode||
         _interpolation_mode != ray_caster->_interpolation_mode||
         _shading_mode != ray_caster->_shading_mode ||
-        _color_inverse_mode != ray_caster->_color_inverse_mode)
+        _color_inverse_mode != ray_caster->_color_inverse_mode ||
+        _mask_overlay_mode != ray_caster->_mask_overlay_mode)
     {
         _ray_casting_steps.clear();
         _mask_mode = ray_caster->_mask_mode;
@@ -116,6 +118,7 @@ void RayCastingGPU::update_i()
         _interpolation_mode = ray_caster->_interpolation_mode;
         _shading_mode = ray_caster->_shading_mode;
         _color_inverse_mode = ray_caster->_color_inverse_mode;
+        _mask_overlay_mode = ray_caster->_mask_overlay_mode;
 
 #define STEP_PUSH_BACK(step_class_name) \
         _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _program)));
@@ -190,6 +193,16 @@ void RayCastingGPU::update_i()
         else //(_color_inverse_mode == COLOR_INVERSE_ENABLE)
         {
             STEP_PUSH_BACK(RCStepColorInverseEnable);
+        }
+
+        //Overlay mask label
+        if (_mask_overlay_mode == OVERLAY_MASK_LABEL_DISABLE)
+        {
+            STEP_PUSH_BACK(RCStepOverlayMaskLabelDisable);
+        }
+        else
+        {
+            STEP_PUSH_BACK(RCStepOverlayMaskLabelEnable);
         }
 
 #undef STEP_PUSH_BACK

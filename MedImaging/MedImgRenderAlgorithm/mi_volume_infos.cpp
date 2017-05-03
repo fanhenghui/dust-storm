@@ -50,12 +50,12 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
         //Create brick pool & calculate volume brick
         //TODO brick info used in GPU , but brick unit useless 
         //////////////////////////////////////////////////////////////////////////
-        //m_pBrickPool.reset(new BrickPool());//Reset brick pool
-        //m_pBrickPool->set_volume(_volume_data);
-        //m_pBrickPool->set_brick_size(BrickUtils::instance()->GetBrickSize());
-        //m_pBrickPool->set_brick_expand(BrickUtils::instance()->get_brick_expand());
+        //_brick_pool.reset(new BrickPool());//Reset brick pool
+        //_brick_pool->set_volume(_volume_data);
+        //_brick_pool->set_brick_size(BrickUtils::instance()->GetBrickSize());
+        //_brick_pool->set_brick_expand(BrickUtils::instance()->get_brick_expand());
 
-        //m_pBrickPool->calculate_volume_brick();
+        //_brick_pool->calculate_volume_brick();
 
         //////////////////////////////////////////////////////////////////////////
         //Upload volume texture(TODO using data loader to wrap it . for separate volume later)
@@ -80,11 +80,12 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
     try
     {
         RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_brick_pool);
 
         _mask_data = image_data;
-        _brick_pool->set_mask(_mask_data);
-        _brick_pool->calculate_mask_brick();
+
+        //RENDERALGO_CHECK_NULL_EXCEPTION(_brick_pool);
+        //_brick_pool->set_mask(_mask_data);
+        //_brick_pool->calculate_mask_brick();
     }
     catch (const Exception& e)
     {
