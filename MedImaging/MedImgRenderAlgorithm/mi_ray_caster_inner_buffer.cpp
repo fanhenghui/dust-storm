@@ -44,9 +44,10 @@ struct RayCasterInnerBuffer::GLResource
     }
 };
 
-RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource())
+RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource()),_label_level(L_8)
 {
-
+    memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
+    _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*2]);
 }
 
 RayCasterInnerBuffer::~RayCasterInnerBuffer()
@@ -71,7 +72,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
         {
         case WINDOW_LEVEL_BUCKET:
             {
-                if (_inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET])
+                if (_inner_resource->dirty_flag[type])
                 {
                     float* wl_array = (float*)_shared_buffer_array.get();
                     memset(wl_array , 0 , sizeof(float)*static_cast<int>(_label_level)*2);
@@ -92,14 +93,14 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                     buffer->bind();
                     buffer->load(static_cast<int>(_label_level)*sizeof(float)*2 , wl_array, GL_DYNAMIC_DRAW);
 
-                    _inner_resource->dirty_flag[WINDOW_LEVEL_BUCKET] = false;
+                    _inner_resource->dirty_flag[type] = false;
                 }
                 break;
             }
 
         case VISIBLE_LABEL_BUCKET:
             {
-                if (_inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET])
+                if (_inner_resource->dirty_flag[type])
                 {
                     int* label_array = (int*)_shared_buffer_array.get();
                     memset(label_array , 0 , sizeof(int)*static_cast<int>(_label_level));
@@ -118,14 +119,41 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                     buffer->bind();
                     buffer->load(static_cast<int>(_label_level)*sizeof(int) , label_array , GL_STATIC_DRAW);
 
-                    _inner_resource->dirty_flag[VISIBLE_LABEL_BUCKET] = false;
+                    _inner_resource->dirty_flag[type] = false;
+                }
+                break;
+            }
+
+        case VISIBLE_LABEL_ARRAY:
+            {
+                if (_inner_resource->dirty_flag[type])
+                {
+                    int* label_array = (int*)_shared_buffer_array.get();
+                    memset(label_array , 0 , sizeof(int)*static_cast<int>(_label_level));
+
+                    int idx = 0;
+                    for (auto it = _labels.begin() ; it != _labels.end() ; ++it , ++idx)
+                    {
+                        if (*it > static_cast<int>(_label_level) - 1)
+                        {
+                            std::stringstream ss;
+                            ss << "Input visible label : " << (int)(*it ) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
+                            RENDERALGO_THROW_EXCEPTION(ss.str());
+                        }
+                        label_array[idx] = static_cast<int>(*it);
+                    }
+
+                    buffer->bind();
+                    buffer->load(idx*sizeof(int) , label_array , GL_STATIC_DRAW);
+
+                    _inner_resource->dirty_flag[type] = false;
                 }
                 break;
             }
 
         case MASK_OVERLAY_COLOR_BUCKET:
             {
-                if (_inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET])
+                if (_inner_resource->dirty_flag[type])
                 {
                     RGBAUnit* color_array = (RGBAUnit*)_shared_buffer_array.get();
                     memset(color_array , 0 , sizeof(RGBAUnit)*static_cast<int>(_label_level));
@@ -144,7 +172,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                     buffer->bind();
                     buffer->load(static_cast<int>(_label_level)*sizeof(RGBAUnit) , color_array , GL_STATIC_DRAW);
 
-                    _inner_resource->dirty_flag[MASK_OVERLAY_COLOR_BUCKET] = false;
+                    _inner_resource->dirty_flag[type] = false;
                 }
                 break;
             }

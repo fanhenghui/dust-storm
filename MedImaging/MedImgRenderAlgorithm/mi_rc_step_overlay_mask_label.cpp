@@ -23,10 +23,10 @@ void RCStepOverlayMaskLabelEnable::set_gpu_parameter()
     std::shared_ptr<RayCasterInnerBuffer> inner_buffer = ray_caster->get_inner_buffer();
 
     GLBufferPtr buffer_mask_overlay = inner_buffer->get_buffer(RayCasterInnerBuffer::MASK_OVERLAY_COLOR_BUCKET);
-    buffer_mask_overlay->bind_buffer_base(BUFFER_BINDING_MASK_OVERLAY_COLOR_BUCKET);
+    buffer_mask_overlay->bind_buffer_base(GL_SHADER_STORAGE_BUFFER , BUFFER_BINDING_MASK_OVERLAY_COLOR_BUCKET);
 
     GLBufferPtr buffer_visible_label = inner_buffer->get_buffer(RayCasterInnerBuffer::VISIBLE_LABEL_ARRAY);
-    buffer_visible_label->bind_buffer_base(BUFFER_BINDING_VISIBLE_LABEL_ARRAY);
+    buffer_visible_label->bind_buffer_base(GL_SHADER_STORAGE_BUFFER , BUFFER_BINDING_VISIBLE_LABEL_ARRAY);
 
     glUniform1i(_loc_visible_label_count , static_cast<int>(inner_buffer->get_visible_labels().size()));
 }

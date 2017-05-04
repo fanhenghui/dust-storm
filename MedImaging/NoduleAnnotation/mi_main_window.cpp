@@ -1288,13 +1288,19 @@ void NoduleAnnotation::refresh_nodule_list_i()
             ++iRow;
         }
 
-        int idx = 0;
-        for ( ; idx < vois.size() ; ++idx)
+        unsigned char idx = 0;
+        std::vector<unsigned char> visible_labels;
+        for (auto it = vois.begin() ; it != vois.end() ; ++it , ++idx)
         {
             _mpr_scene_00->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
             _mpr_scene_01->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
             _mpr_scene_10->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
+            visible_labels.push_back(idx);
         }
+
+        _mpr_scene_00->set_visible_labels(visible_labels);
+        _mpr_scene_01->set_visible_labels(visible_labels);
+        _mpr_scene_10->set_visible_labels(visible_labels);
 
         _mpr_scene_00->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
         _mpr_scene_01->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);

@@ -215,6 +215,8 @@ void RayCastingGPU::update_i()
         {
             shaders.push_back((*it)->get_shader_info());
         }
+        _program->finalize();
+        _program->initialize();
         _program->set_shaders(shaders);
         _program->compile();
 

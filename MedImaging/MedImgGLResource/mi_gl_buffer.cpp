@@ -65,9 +65,9 @@ void GLBuffer::load(GLsizei size, const void* data, GLenum usage)
     glBufferData(_target , size , data, usage);
 }
 
-void GLBuffer::bind_buffer_base(GLuint index)
+void GLBuffer::bind_buffer_base(GLenum target , GLuint index)
 {
-    glBindBufferBase(_target , index, _buffer_id);
+    glBindBufferBase(target , index, _buffer_id);
 }
 
 

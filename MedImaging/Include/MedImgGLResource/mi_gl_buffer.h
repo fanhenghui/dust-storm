@@ -22,7 +22,7 @@ public:
 
     unsigned int get_id() const;
 
-    void bind_buffer_base(GLuint index);
+    void bind_buffer_base(GLenum target , GLuint index);
 
     void bind();
 
