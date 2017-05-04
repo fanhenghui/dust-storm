@@ -5,9 +5,9 @@
 #include "MedImgCommon/mi_common_exception.h"
 
 //TODO this will be configured by config file
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #pragma comment( linker, "/subsystem:\"console\" /entry:\"mainCRTStartup\"" )
-#endif
+//#endif
 
 
 int main(int argc, char *argv[])

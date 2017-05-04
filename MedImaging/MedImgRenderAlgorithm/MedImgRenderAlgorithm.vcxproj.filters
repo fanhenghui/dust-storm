@@ -46,6 +46,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{b142b0b7-e051-434f-a3e9-e51dfca51604}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{d89217ed-654f-4c36-bd5f-900958885d0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="mi_rc_step_overlay_mask_label.h">
       <Filter>Ray Caster\GPU Ray Casting</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mask_label_store.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_render_algo_stdafx.cpp">
@@ -274,6 +280,9 @@
     </ClCompile>
     <ClCompile Include="mi_rc_step_overlay_mask_label.cpp">
       <Filter>Ray Caster\GPU Ray Casting</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_mask_label_store.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

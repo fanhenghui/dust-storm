@@ -195,6 +195,7 @@
     <ClCompile Include="mi_mouse_op_zoom.cpp" />
     <ClCompile Include="mi_graphic_item_corners_info.cpp" />
     <ClCompile Include="mi_graphic_item_mpr_border.cpp" />
+    <ClCompile Include="mi_observer_voi_segment.cpp" />
     <ClCompile Include="mi_observer_voi_statistic.cpp" />
     <ClCompile Include="mi_qt_widgets_stdafx.cpp" />
     <ClCompile Include="mi_scene_container.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_base.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_corners_info.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_graphic_item_mpr_border.h" />
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_segment.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_statistic.h" />
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h" />
     <CustomBuild Include="..\Include\MedImgQtWidgets\mi_graphic_item_voi.h">

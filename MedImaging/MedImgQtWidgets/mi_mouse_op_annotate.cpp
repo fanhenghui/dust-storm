@@ -6,15 +6,17 @@
 #include "MedImgRenderAlgorithm/mi_scene_base.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
+#include "MedImgRenderAlgorithm/mi_mask_label_store.h"
 
 #include "mi_model_voi.h"
+
 
 MED_IMAGING_BEGIN_NAMESPACE
 
 const std::string NODULE_TYPE_GGN = std::string("GGN");
 const std::string NODULE_TYPE_AAH = std::string("AAH");
 
-MouseOpAnnotate::MouseOpAnnotate():_is_pin(false),_diameter(0.0)
+MouseOpAnnotate::MouseOpAnnotate():_is_pin(false),_diameter(0.0),_current_label(0)
 {
 
 }
@@ -46,8 +48,9 @@ void MouseOpAnnotate::press(const QPointF& pt)
             _is_pin = true;
             _center = sphere_center;
             _diameter = 0.0;
-            _model->add_voi_sphere(medical_imaging::VOISphere(_center , _diameter , NODULE_TYPE_GGN));
-            _model->notify();
+            _current_label = MaskLabelStore::instance()->acquire_label();
+            _model->add_voi(medical_imaging::VOISphere(_center , _diameter , NODULE_TYPE_GGN) , _current_label);
+            _model->notify(VOIModel::ADD_VOI);
         }
     }
 }
@@ -69,8 +72,8 @@ void MouseOpAnnotate::move(const QPointF& pt)
             Vector3 v = pt_mpr - _center;
             _diameter = v.magnitude()*2.0;
 
-            _model->modify_voi_sphere_list_rear(medical_imaging::VOISphere(_center , _diameter));
-            _model->notify();
+            _model->modify_voi_list_rear(medical_imaging::VOISphere(_center , _diameter));
+            _model->notify(VOIModel::MODIFYING);
         }
     }
 
@@ -84,18 +87,19 @@ void MouseOpAnnotate::release(const QPointF& pt)
         return;
     }
 
-    if (!_model->get_voi_spheres().empty())
+    if (!_model->get_vois().empty())
     {
-        if( (--_model->get_voi_spheres().end())->diameter < 0.1f )
+        if( (--_model->get_vois().end())->diameter < 0.1f )
         {
-            _model->remove_voi_sphere_list_rear();
-            _model->notify();
+            MaskLabelStore::instance()->recycle_label(_current_label);
+            _current_label = 0;
+            _model->remove_voi_list_rear();
+            _model->notify(VOIModel::DELETE_VOI);
         }
         else
         {
-            _model->set_voi_sphere_intensity_info_dirty(_model->get_voi_spheres().size() - 1 , true);
             _model->set_changed();
-            _model->notify();
+            _model->notify(VOIModel::MODIFY_COMPLETED);
         }
 
     }

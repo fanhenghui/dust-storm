@@ -37,7 +37,7 @@ public:
 
     Vector4f* get_exit_points_array();
 
-    void set_image_data(std::shared_ptr<ImageData> image_data);
+    void set_volume_data(std::shared_ptr<ImageData> image_data);
 
     void set_camera(std::shared_ptr<CameraBase> camera);
 

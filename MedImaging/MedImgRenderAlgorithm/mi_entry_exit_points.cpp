@@ -103,7 +103,7 @@ Vector4f* EntryExitPoints::get_exit_points_array()
     return _exit_points_buffer.get();
 }
 
-void EntryExitPoints::set_image_data(std::shared_ptr<ImageData> image_data)
+void EntryExitPoints::set_volume_data(std::shared_ptr<ImageData> image_data)
 {
     _volume_data = image_data;
 }

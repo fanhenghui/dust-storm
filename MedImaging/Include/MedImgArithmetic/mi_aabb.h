@@ -9,12 +9,30 @@ MED_IMAGING_BEGIN_NAMESPACE
 class Arithmetic_Export AABB : public IShape
 {
 public:
-    Point3 _llb;//Lower Left Back
-    Point3 _urf;//Upper Right Front
+    Point3 _min;//Lower Left Back
+    Point3 _max;//Upper Right Front
 
 public:
     AABB();
     virtual ~AABB();
+
+    bool operator == (const AABB& aabb) const;
+    bool operator != (const AABB& aabb) const;
+};
+
+class Arithmetic_Export AABBUI : public IShape
+{
+public:
+    unsigned int _min[3];//Lower Left Back
+    unsigned int _max[3];//Upper Right Front
+
+public:
+    AABBUI();
+    AABBUI(const unsigned int (&min0)[3] , const unsigned int (&max0)[3]);
+    virtual ~AABBUI();
+
+    bool operator == (const AABBUI& aabb) const;
+    bool operator != (const AABBUI& aabb) const;
 };
 
 MED_IMAGING_END_NAMESPACE

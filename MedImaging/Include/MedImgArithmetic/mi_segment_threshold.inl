@@ -11,7 +11,6 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid , T threshold)
     ArithmeticUtils::get_valid_region(_dim , ellipsoid , begin , end);
 
     const unsigned int layer = _dim[0]*_dim[1];
-    T tmp;
 
 #ifndef _DEBUG
 #pragma omp parallel for
@@ -32,7 +31,7 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid , T threshold)
                 if ( !(pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r > 1.0) )
                 {
                     unsigned int idx  = z*layer + y*_dim[0] + x;
-                    tmp = _data_ref[idx];
+                    T tmp = _data_ref[idx];
                     if (tmp > threshold)
                     {
                         _mask_ref[idx] = _target_label;
@@ -41,4 +40,31 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid , T threshold)
             }
         }
     }
+}
+
+template<class T>
+void SegmentThreshold<T>::segment_auto_threshold(const Ellipsoid& ellipsoid)
+{
+    T threshold = get_auto_threshold_i(ellipsoid);
+    segment(ellipsoid , threshold);
+}
+
+template<class T>
+T SegmentThreshold<T>::get_auto_threshold_i(const Ellipsoid& ellipsoid)
+{
+    //double bound = (std::min)((std::min)(ellipsoid._a , ellipsoid._b) , ellipsoid._c);
+    //bound = bound > 4.0 ? 4.0 : bound;
+    //if (bound < 1.0)
+    //{
+    //    
+    //}
+    //else
+    //{
+    //    
+    //}
+
+    Sampler<T> sampler;
+    float v = sampler.sample_3d_linear(ellipsoid._center.x , ellipsoid._center.y , ellipsoid._center.z , _dim[0] , _dim[1] , _dim[2] , _data_ref);
+    v -= 200;
+    return static_cast<T>(v);
 }

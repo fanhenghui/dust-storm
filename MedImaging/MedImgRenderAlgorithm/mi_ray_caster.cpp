@@ -385,6 +385,36 @@ std::shared_ptr<RayCasterInnerBuffer> RayCaster::get_inner_buffer()
     return _inner_buffer;
 }
 
+MaskMode RayCaster::get_mask_mode() const
+{
+    return _mask_mode;
+}
+
+CompositeMode RayCaster::get_composite_mode() const
+{
+    return _composite_mode;
+}
+
+InterpolationMode RayCaster::get_interpolation_mode() const
+{
+    return _interpolation_mode;
+}
+
+ShadingMode RayCaster::get_shading_mode() const
+{
+    return _shading_mode;
+}
+
+ColorInverseMode RayCaster::get_color_inverse_mode() const
+{
+    return _color_inverse_mode;
+}
+
+MaskOverlayMode RayCaster::get_mask_overlay_mode() const
+{
+    return _mask_overlay_mode;
+}
+
 
 
 MED_IMAGING_END_NAMESPACE

@@ -55,7 +55,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
         //////////////////////////////////////////////////////////////////////////
         //Check voi firstly
-        const std::vector<VOISphere>& vois = _model->get_voi_spheres();
+        const std::vector<VOISphere>& vois = _model->get_vois();
         const int voi_count = vois.size();
 
         //graphics item number changed
@@ -130,7 +130,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             return;
         }
 
-        const std::vector<IntensityInfo>& intensity_infos = _model->get_voi_sphere_intensity_infos();
+        const std::vector<IntensityInfo>& intensity_infos = _model->get_intensity_infos();
 
         //1 Get MPR plane
         std::shared_ptr<CameraBase> camera = scene->get_camera();
@@ -231,7 +231,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             }
 
             //info
-            IntensityInfo info = _model->get_voi_sphere_intensity_info(voi_id[i]);
+            IntensityInfo info = _model->get_intensity_info(voi_id[i]);
             std::string context = std::string("min : ")  + str_num_converter.to_string_decimal(info._min , 3) +
                 std::string(" max : ")  + str_num_converter.to_string_decimal(info._max , 3) + std::string("\n") +
                 std::string("mean : ")  + str_num_converter.to_string_decimal(info._mean , 3) + 
@@ -319,7 +319,7 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 
         update_circle_center_i();
 
-        update_sphere_center_i();
+        update_sphere_center_i(VOIModel::MODIFYING);
     }
     else if (event->buttons() == Qt::RightButton)
     {
@@ -331,7 +331,7 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 
         update_circle_center_i();
 
-        update_sphere_diameter_i();
+        update_sphere_diameter_i(VOIModel::MODIFYING);
     }
 }
 
@@ -341,9 +341,7 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     {
         QGraphicsEllipseItem::mouseReleaseEvent(event);
 
-        _model->set_voi_sphere_intensity_info_dirty(_id , true);
-
-        update_sphere_center_i();
+        update_sphere_center_i(VOIModel::MODIFY_COMPLETED);
 
         frezze(false);
 
@@ -351,9 +349,7 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     }
     else if (event->button() == Qt::RightButton)
     {
-        _model->set_voi_sphere_intensity_info_dirty(_id , true);
-
-        update_sphere_diameter_i();
+        update_sphere_diameter_i(VOIModel::MODIFY_COMPLETED);
 
         frezze(false);
 
@@ -374,7 +370,7 @@ void GraphicsSphereItem::set_sphere(QPointF center , float radius)
     this->setPos(center - QPointF(radius,radius));
 }
 
-void GraphicsSphereItem::update_sphere_center_i()
+void GraphicsSphereItem::update_sphere_center_i(int code_id /*= 0*/)
 {
     //////////////////////////////////////////////////////////////////////////
     //Calculate new sphere center
@@ -407,7 +403,7 @@ void GraphicsSphereItem::update_sphere_center_i()
     Point3 cur_circle_center = mat_vp_inv.transform( Point3(cur_circle_center_ndc.x, cur_circle_center_ndc.y , 0.0));
 
     //Calculate previous circle center world
-    VOISphere voi = _model->get_voi_sphere(_id);
+    VOISphere voi = _model->get_voi(_id);
     Point3 sphere_center = mat_p2w.transform(voi.center);
     sphere_center = mat_vp.transform(sphere_center);
     sphere_center.z = 0.0;
@@ -421,12 +417,12 @@ void GraphicsSphereItem::update_sphere_center_i()
     else
     {
         Point3 new_center = voi.center + translate;
-        _model->modify_voi_sphere_center(_id , new_center);
-        _model->notify();
+        _model->modify_center(_id , new_center);
+        _model->notify(code_id);
     }
 }
 
-void GraphicsSphereItem::update_sphere_diameter_i()
+void GraphicsSphereItem::update_sphere_diameter_i(int code_id /*= 0*/)
 {
     //////////////////////////////////////////////////////////////////////////
     //Calculate new sphere diameter
@@ -455,7 +451,7 @@ void GraphicsSphereItem::update_sphere_diameter_i()
     scene->get_display_size(width , height);
 
     //Calculate previous radius
-    VOISphere voi = _model->get_voi_sphere(_id);
+    VOISphere voi = _model->get_voi(_id);
     const Point3 sphere_center = mat_p2w.transform(voi.center);
     const double diameter = voi.diameter;
     const double distance = norm.dot_product(look_at - sphere_center);
@@ -474,8 +470,8 @@ void GraphicsSphereItem::update_sphere_diameter_i()
     float radio = abs(cur_radius / pre_radius);
     if (abs(radio - 1.0f) > FLOAT_EPSILON)
     {
-        _model->modify_voi_sphere_diameter(_id , voi.diameter*radio);
-        _model->notify();
+        _model->modify_diameter(_id , voi.diameter*radio);
+        _model->notify(code_id);
     }
 
 }

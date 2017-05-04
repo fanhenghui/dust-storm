@@ -31,8 +31,13 @@ void VOIStatisticObserver::set_volume_infos(std::shared_ptr<VolumeInfos> volume_
     _volume_infos = volume_infos;
 }
 
-void VOIStatisticObserver::update(int)
+void VOIStatisticObserver::update(int code_id)
 {
+    if(1 == code_id)
+    {
+        return;
+    }
+
     QTWIDGETS_CHECK_NULL_EXCEPTION(_volume_infos);
 
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
@@ -61,46 +66,42 @@ void VOIStatisticObserver::update(int)
     double min , max , mean , var , std;
     for (int i = 0; i<voi_num ; ++i)
     {
-        if (model->is_voi_sphere_intensity_info_dirty(i))
+        VOISphere voi = model->get_voi(i);
+        Ellipsoid ellipsoid;
+        ellipsoid._center = mat_p2v.transform(voi.center);
+        double voi_abc[3] = {0,0,0};
+        voi_abc[head_info.volume_coord/2] = voi.diameter*0.5/basic_abc[head_info.volume_coord/2] ;
+        voi_abc[left_info.volume_coord/2] = voi.diameter*0.5/basic_abc[left_info.volume_coord/2] ;
+        voi_abc[posterior_info.volume_coord/2] = voi.diameter*0.5/basic_abc[posterior_info.volume_coord/2] ;
+        ellipsoid._a = voi_abc[0];
+        ellipsoid._b = voi_abc[1];
+        ellipsoid._c = voi_abc[2];
+
+        switch(volume_data->_data_type)
         {
-            VOISphere voi = model->get_voi_sphere(i);
-            Ellipsoid ellipsoid;
-            ellipsoid._center = mat_p2v.transform(voi.center);
-            double voi_abc[3] = {0,0,0};
-            voi_abc[head_info.volume_coord/2] = voi.diameter*0.5/basic_abc[head_info.volume_coord/2] ;
-            voi_abc[left_info.volume_coord/2] = voi.diameter*0.5/basic_abc[left_info.volume_coord/2] ;
-            voi_abc[posterior_info.volume_coord/2] = voi.diameter*0.5/basic_abc[posterior_info.volume_coord/2] ;
-            ellipsoid._a = voi_abc[0];
-            ellipsoid._b = voi_abc[1];
-            ellipsoid._c = voi_abc[2];
-
-            switch(volume_data->_data_type)
+        case SHORT:
             {
-            case SHORT:
-                {
-                    VolumeStatistician<short> sta;
-                    sta.get_intensity_analysis(volume_data->_dim , (short*)volume_data->get_pixel_pointer() ,ellipsoid, 
-                        pixel_num , min , max , mean , var , std);
+                VolumeStatistician<short> sta;
+                sta.get_intensity_analysis(volume_data->_dim , (short*)volume_data->get_pixel_pointer() ,ellipsoid, 
+                    pixel_num , min , max , mean , var , std);
 
-                    break;
-                }
-            case USHORT:
-                {
-                    VolumeStatistician<unsigned short> sta;
-                    sta.get_intensity_analysis(volume_data->_dim , (unsigned short*)volume_data->get_pixel_pointer() ,ellipsoid, 
-                        pixel_num , min , max , mean , var , std);
-
-                    break;
-                }
-            default:
-                {
-                    QTWIDGETS_THROW_EXCEPTION("Unsupported data type!");
-                }
+                break;
             }
+        case USHORT:
+            {
+                VolumeStatistician<unsigned short> sta;
+                sta.get_intensity_analysis(volume_data->_dim , (unsigned short*)volume_data->get_pixel_pointer() ,ellipsoid, 
+                    pixel_num , min , max , mean , var , std);
 
-            model->modify_voi_sphere_intensity_info(i ,IntensityInfo(pixel_num , min , max , mean , var , std));
-            model->set_voi_sphere_intensity_info_dirty(i , false);
+                break;
+            }
+        default:
+            {
+                QTWIDGETS_THROW_EXCEPTION("Unsupported data type!");
+            }
         }
+
+        model->modify_intensity_info(i ,IntensityInfo(pixel_num , min , max , mean , var , std));
     }
 }
 

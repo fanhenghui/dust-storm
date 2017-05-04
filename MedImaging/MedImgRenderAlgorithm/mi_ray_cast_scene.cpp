@@ -168,8 +168,11 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         RENDERALGO_CHECK_NULL_EXCEPTION(volume_infos);
         _volume_infos = volume_infos;
 
-        std::shared_ptr<ImageData> pVolume = _volume_infos->get_volume();
-        RENDERALGO_CHECK_NULL_EXCEPTION(pVolume);
+        std::shared_ptr<ImageData> volume = _volume_infos->get_volume();
+        RENDERALGO_CHECK_NULL_EXCEPTION(volume);
+
+        std::shared_ptr<ImageData> mask  = _volume_infos->get_mask();
+        RENDERALGO_CHECK_NULL_EXCEPTION(mask);
 
         std::shared_ptr<ImageDataHeader> data_header = _volume_infos->get_data_header();
         RENDERALGO_CHECK_NULL_EXCEPTION(data_header);
@@ -178,7 +181,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         _camera_calculator = volume_infos->get_camera_calculator();
 
         //Entry exit points
-        _entry_exit_points->set_image_data(pVolume);
+        _entry_exit_points->set_volume_data(volume);
         _entry_exit_points->set_camera(_camera);
         _entry_exit_points->set_display_size(_width , _height);
         _entry_exit_points->set_camera_calculator(_camera_calculator);
@@ -189,7 +192,8 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         _ray_caster->set_entry_exit_points(_entry_exit_points);
         _ray_caster->set_camera(_camera);
         _ray_caster->set_volume_to_world_matrix(_camera_calculator->get_volume_to_world_matrix());
-        _ray_caster->set_volume_data(pVolume);
+        _ray_caster->set_volume_data(volume);
+        _ray_caster->set_mask_data(mask);
         //_ray_caster->set_mask_data(pMask);
 
         if (GPU == Configuration::instance()->get_processing_unit_type())
@@ -239,8 +243,11 @@ void RayCastScene::set_sample_rate(float sample_rate)
 
 void RayCastScene::set_visible_labels(std::vector<unsigned char> labels)
 {
-    _ray_caster->set_visible_labels(labels);
-    set_dirty(true);
+    if(_ray_caster->get_visible_labels() != labels)
+    {
+        _ray_caster->set_visible_labels(labels);
+        set_dirty(true); 
+    }
 }
 
 void RayCastScene::set_window_level(float ww , float wl , unsigned char label)
@@ -268,37 +275,47 @@ void RayCastScene::set_global_window_level(float ww , float wl)
 
 void RayCastScene::set_mask_mode(MaskMode mode)
 {
-    _ray_caster->set_mask_mode(mode);
-
-    set_dirty(true);
+    if (_ray_caster->get_mask_mode() != mode)
+    {
+        _ray_caster->set_mask_mode(mode);
+        set_dirty(true);
+    }
 }
 
 void RayCastScene::set_composite_mode(CompositeMode mode)
 {
-    _ray_caster->set_composite_mode(mode);
-
-    set_dirty(true);
+    if (_ray_caster->get_composite_mode() != mode)
+    {
+        _ray_caster->set_composite_mode(mode);
+        set_dirty(true);
+    }
 }
 
 void RayCastScene::set_interpolation_mode(InterpolationMode mode)
 {
-    _ray_caster->set_interpolation_mode(mode);
-
-    set_dirty(true);
+    if (_ray_caster->get_interpolation_mode() != mode)
+    {
+        _ray_caster->set_interpolation_mode(mode);
+        set_dirty(true);
+    }
 }
 
 void RayCastScene::set_shading_mode(ShadingMode mode)
 {
-    _ray_caster->set_shading_mode(mode);
-
-    set_dirty(true);
+    if (_ray_caster->get_shading_mode() != mode)
+    {
+        _ray_caster->set_shading_mode(mode);
+        set_dirty(true);
+    }
 }
 
 void RayCastScene::set_color_inverse_mode(ColorInverseMode mode)
 {
-    _ray_caster->set_color_inverse_mode(mode);
-
-    set_dirty(true);
+    if (_ray_caster->get_color_inverse_mode() != mode)
+    {
+        _ray_caster->set_color_inverse_mode(mode);
+        set_dirty(true);
+    }
 }
 
 void RayCastScene::set_test_code(int test_code)

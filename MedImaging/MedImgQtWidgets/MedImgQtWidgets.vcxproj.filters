@@ -131,6 +131,9 @@
     <ClCompile Include="mi_model_focus.cpp">
       <Filter>Src\Model Observer</Filter>
     </ClCompile>
+    <ClCompile Include="mi_observer_voi_segment.cpp">
+      <Filter>Src\Model Observer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
@@ -191,6 +194,9 @@
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_model_focus.h">
+      <Filter>Src\Model Observer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_observer_voi_segment.h">
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
   </ItemGroup>

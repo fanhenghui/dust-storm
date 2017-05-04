@@ -28,6 +28,7 @@
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "MedImgRenderAlgorithm/mi_mask_label_store.h"
 
 #include "MedImgQtWidgets/mi_shared_widget.h"
 #include "MedImgQtWidgets/mi_scene_container.h"
@@ -49,6 +50,7 @@
 #include "MedImgQtWidgets/mi_observer_scene_container.h"
 #include "MedImgQtWidgets/mi_observer_progress.h"
 #include "MedImgQtWidgets/mi_observer_voi_statistic.h"
+#include "MedImgQtWidgets/mi_observer_voi_segment.h"
 
 
 #include "mi_observer_voi_table.h"
@@ -214,6 +216,9 @@ void NoduleAnnotation::create_scene_i()
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
+    //Set scenes
+    _ob_voi_segment->set_scenes(mpr_scenes);
+
     for (int i = 0 ; i < 3 ; ++i)
     {
         //1 Set Scene
@@ -335,6 +340,7 @@ void NoduleAnnotation::create_scene_i()
 
     connect(focus_out_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_out_scene_i(QString)));*/
     //////////////////////////////////////////////////////////////////////////
+
 }
 
 void NoduleAnnotation::connect_signal_slot_i()
@@ -397,8 +403,13 @@ void NoduleAnnotation::create_model_observer_i()
     _ob_voi_statistic->set_model(_model_voi);
     _ob_voi_statistic->set_volume_infos(_volume_infos);
 
+    _ob_voi_segment.reset(new VOISegmentObserver());
+    _ob_voi_segment->set_model(_model_voi);
+    _ob_voi_segment->set_volume_infos(_volume_infos);
+
     _model_voi->add_observer(_ob_voi_statistic);
     _model_voi->add_observer(_ob_voi_table);
+    _model_voi->add_observer(_ob_voi_segment);
 
     //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 
@@ -826,7 +837,7 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         return;
     }
 
-    if (_model_voi->get_voi_spheres().empty())
+    if (_model_voi->get_vois().empty())
     {
         if(QMessageBox::No == QMessageBox::warning(
             this , tr("Save Nodule") , tr("Nodule count is zero. If you still want to save to file?"),QMessageBox::Yes |QMessageBox::No))
@@ -839,7 +850,7 @@ void NoduleAnnotation::slot_save_nodule_file_i()
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-        const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();
+        const std::vector<VOISphere>& vois = _model_voi->get_vois();
         nodule_set->set_nodule(vois);
 
         NoduleSetParser parser;
@@ -884,7 +895,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         return;
     }
 
-    if (!_model_voi->get_voi_spheres().empty())
+    if (!_model_voi->get_vois().empty())
     {
         if (QMessageBox::No == QMessageBox::warning(
             this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
@@ -927,8 +938,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
             int idx = 0;
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {
-                _model_voi->add_voi_sphere(*it);
-                _model_voi->set_voi_sphere_intensity_info_dirty(idx++ , true);
+                _model_voi->add_voi(*it , MaskLabelStore::instance()->acquire_label());
             }
             _model_voi->notify();
             QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);
@@ -970,7 +980,7 @@ void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
 void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
 {
     //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
-    VOISphere voi = _model_voi->get_voi_sphere(row);
+    VOISphere voi = _model_voi->get_voi(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
     _model_crosshair->locate(mat_p2w.transform(voi.center));
     _model_crosshair->notify();
@@ -985,7 +995,7 @@ void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *it
     {
         std::string sDiameter =  (item->text()).toLocal8Bit();
         StrNumConverter<double> con;
-        _model_voi->modify_voi_sphere_diameter(row , con.to_num(sDiameter));
+        _model_voi->modify_diameter(row , con.to_num(sDiameter));
         _ob_scene_container->update();
     }
 }
@@ -997,9 +1007,9 @@ void NoduleAnnotation::slot_add_nodule_i()
 
 void NoduleAnnotation::slot_delete_nodule_i()
 {
-    if (_select_vio_id >= 0 && _select_vio_id < _model_voi->get_voi_spheres().size())
+    if (_select_vio_id >= 0 && _select_vio_id < _model_voi->get_vois().size())
     {
-        _model_voi->remove_voi_sphere(_select_vio_id);
+        _model_voi->remove_voi(_select_vio_id);
         _mpr_scene_00->set_dirty(true);
         _mpr_scene_01->set_dirty(true);
         _mpr_scene_10->set_dirty(true);
@@ -1019,7 +1029,7 @@ void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
         std::string type = pBox->currentText().toStdString();
         std::cout << id <<'\t' << type << std::endl;
 
-        _model_voi->modify_voi_sphere_name(id , type);
+        _model_voi->modify_name(id , type);
     }
 }
 
@@ -1251,12 +1261,7 @@ void NoduleAnnotation::refresh_nodule_list_i()
 
     //reset selected voi id
     _select_vio_id = -1;
-
-    _mpr_scene_00->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
-    _mpr_scene_01->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
-    _mpr_scene_10->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
-
-    const std::vector<VOISphere>& vois = _model_voi->get_voi_spheres();
+    const std::vector<VOISphere>& vois = _model_voi->get_vois();
     if (!vois.empty())
     {
         ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
@@ -1287,24 +1292,6 @@ void NoduleAnnotation::refresh_nodule_list_i()
 
             ++iRow;
         }
-
-        unsigned char idx = 0;
-        std::vector<unsigned char> visible_labels;
-        for (auto it = vois.begin() ; it != vois.end() ; ++it , ++idx)
-        {
-            _mpr_scene_00->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
-            _mpr_scene_01->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
-            _mpr_scene_10->set_mask_overlay_color( RGBAUnit(1.0f,0.0f,0.0f, 0.5f) , idx);
-            visible_labels.push_back(idx);
-        }
-
-        _mpr_scene_00->set_visible_labels(visible_labels);
-        _mpr_scene_01->set_visible_labels(visible_labels);
-        _mpr_scene_10->set_visible_labels(visible_labels);
-
-        _mpr_scene_00->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
-        _mpr_scene_01->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
-        _mpr_scene_10->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
     }
 }
 

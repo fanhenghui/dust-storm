@@ -165,7 +165,7 @@ namespace
         m_pMPREE->set_camera(_camera);
         m_pMPREE->set_camera_calculator(m_pCameraCal);
         m_pMPREE->set_strategy(_strategy);
-        m_pMPREE->set_image_data(_volume_data);
+        m_pMPREE->set_volume_data(_volume_data);
         m_pMPREE->set_thickness(1.0f);
 
         _canvas.reset(new RayCasterCanvas());

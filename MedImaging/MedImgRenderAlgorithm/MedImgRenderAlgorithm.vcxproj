@@ -196,6 +196,7 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_entry_exit_points.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mask_label_store.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_entry_exit_points.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mpr_scene.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_opacity_transfer_function.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="mi_entry_exit_points.cpp" />
     <ClCompile Include="mi_camera_calculator.cpp" />
     <ClCompile Include="mi_color_transfer_function.cpp" />
+    <ClCompile Include="mi_mask_label_store.cpp" />
     <ClCompile Include="mi_mpr_entry_exit_points.cpp" />
     <ClCompile Include="mi_mpr_scene.cpp" />
     <ClCompile Include="mi_opacity_transfer_function.cpp" />

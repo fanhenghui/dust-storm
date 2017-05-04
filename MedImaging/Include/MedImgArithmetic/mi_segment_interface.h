@@ -17,11 +17,11 @@ public:
         _dim[2] = 0;
     };
 
-    virtual ISegment() {};
+    virtual ~ISegment() {};
 
     void set_dim(const unsigned int (&dim)[3] )
     {
-        memcpy(_dim , dim ,3*sizeof*(unsigned int));
+        memcpy(_dim , dim ,3*sizeof(unsigned int));
     }
 
     void set_data_ref(T* data_array)

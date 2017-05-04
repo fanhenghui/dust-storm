@@ -68,9 +68,6 @@
     <ClCompile Include="mi_dicom_rt_struct.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mi_voi.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="mi_nodule_set.cpp">
       <Filter>源文件</Filter>
     </ClCompile>

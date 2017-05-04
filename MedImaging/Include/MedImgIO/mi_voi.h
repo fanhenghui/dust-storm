@@ -21,13 +21,16 @@ struct VOISphere
     VOISphere(const Point3& pt , double d , const std::string& name):center(pt),diameter(d),name(name)
     {}
 
-    bool operator == (const VOISphere& voi)
+    bool operator == (const VOISphere& voi) const
     {
         return voi.center == center && abs(voi.diameter - diameter) < DOUBLE_EPSILON;
     }
-};
 
-bool IO_Export operator == (const VOISphere& l , const VOISphere& r);
+    bool operator != (const VOISphere& voi) const
+    {
+        return abs(voi.diameter - diameter) > DOUBLE_EPSILON || voi.center != center;
+    }
+};
 
 
 MED_IMAGING_END_NAMESPACE

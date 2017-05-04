@@ -27,6 +27,7 @@ private:
     medical_imaging::Point3 _center;
     double _diameter;
     std::shared_ptr<VOIModel> _model;
+    unsigned char _current_label;
 };
 
 MED_IMAGING_END_NAMESPACE

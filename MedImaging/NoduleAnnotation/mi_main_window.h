@@ -15,6 +15,7 @@ namespace medical_imaging
     class ProgressModel;
     class VOIStatisticObserver;
     class FocusModel;
+    class VOISegmentObserver;
 }
 typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
@@ -124,6 +125,7 @@ private:
     //Observer
     std::shared_ptr<VOITableObserver> _ob_voi_table;
     std::shared_ptr<medical_imaging::VOIStatisticObserver> _ob_voi_statistic;
+    std::shared_ptr<medical_imaging::VOISegmentObserver> _ob_voi_segment;
     std::shared_ptr<medical_imaging::SceneContainerObserver> _ob_scene_container;
     std::shared_ptr<MPRScrollBarObserver> _ob_mpr_scroll_bar;
 

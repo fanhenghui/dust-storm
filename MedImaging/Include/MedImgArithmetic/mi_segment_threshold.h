@@ -3,6 +3,7 @@
 
 
 #include "MedImgArithmetic/mi_segment_interface.h"
+#include "MedImgArithmetic/mi_sampler.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -15,8 +16,10 @@ public:
 
     void segment(const Ellipsoid& region_ellipsoid , T threshold);
 
-protected:
+    void segment_auto_threshold(const Ellipsoid& region_ellipsoid);
+
 private:
+    T get_auto_threshold_i(const Ellipsoid& region_ellipsoid);
 };
 
 #include "MedImgArithmetic/mi_segment_threshold.inl"

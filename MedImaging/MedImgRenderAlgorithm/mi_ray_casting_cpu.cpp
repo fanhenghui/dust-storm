@@ -70,7 +70,7 @@ void RayCastingCPU::render(int test_code )
         //////////////////////////////////////////////////////////////////////////
 
 
-
+        std::cout << "before ray casting \n";
         switch(volume_data->_data_type)
         {
         case USHORT:
@@ -115,10 +115,10 @@ void RayCastingCPU::render(int test_code )
     }
     catch (const Exception& e)
     {
-#ifdef _DEBUG
+//#ifdef _DEBUG
         //TODO LOG
         std::cout << e.what();
-#endif
+//#endif
         assert(false);
         throw e;
     }
@@ -162,7 +162,6 @@ void RayCastingCPU::ray_casting_i(std::shared_ptr<RayCaster> ray_caster )
 template<class T>
 void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> ray_caster)
 {
-    const Sampler<T> sampler;
     const int pixel_sum = _width*_height;
 
 #ifndef _DEBUG
@@ -170,6 +169,8 @@ void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> ray_caster)
 #endif
     for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
+        const Sampler<T> sampler;
+
         const int y = idx / _width;
         const int x = idx - y*_width;
 
@@ -228,12 +229,15 @@ void RayCastingCPU::ray_casting_average_i(std::shared_ptr<RayCaster> ray_caster)
 template<class T>
 void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> ray_caster)
 {
-    const Sampler<T> sampler;
     const int pixel_sum = _width*_height;
 
+#ifndef _DEBUG
 #pragma omp parallel for
+#endif
     for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
+        const Sampler<T> sampler;
+
         const int y = idx / _width;
         const int x = idx - y*_width;
 
@@ -288,12 +292,15 @@ void RayCastingCPU::ray_casting_mip_i( std::shared_ptr<RayCaster> ray_caster)
 template<class T>
 void RayCastingCPU::ray_casting_minip_i( std::shared_ptr<RayCaster> ray_caster)
 {
-    const Sampler<T> sampler;
     const int pixel_sum = _width*_height;
 
+#ifndef _DEBUG
 #pragma omp parallel for
+#endif
     for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
+        const Sampler<T> sampler;
+
         const int y = idx / _width;
         const int x = idx - y*_width;
 
@@ -421,12 +428,17 @@ namespace
 
 void RayCastingCPU::overlay_mask_label_i(std::shared_ptr<RayCaster> ray_caster)
 {
-    const Sampler<unsigned char> sampler;
     const int pixel_sum = _width*_height;
 
+    const std::vector<unsigned char>& visible_labels = ray_caster->get_visible_labels();
+    const std::map<unsigned char , RGBAUnit>& mask_overlay_color = ray_caster->get_mask_overlay_color();
+
+#ifndef _DEBUG
 #pragma omp parallel for
+#endif
     for (int idx = 0; idx<pixel_sum  ; ++idx)
     {
+        Sampler<unsigned char> sampler;
         int active_mask_code[4] = {0,0,0,0};
 
         const int y = idx / _width;
@@ -475,30 +487,26 @@ void RayCastingCPU::overlay_mask_label_i(std::shared_ptr<RayCaster> ray_caster)
         //3 Apply mask overlay color
         Vector3f current_color(0,0,0);
         float current_alpha = 0;
-        const std::vector<unsigned char>& visible_labels = ray_caster->get_visible_labels();
-        const std::map<unsigned char , RGBAUnit>& mask_overlay_color = ray_caster->get_mask_overlay_color();
         for (auto it = visible_labels.begin() ; it != visible_labels.end() ;++it)
         {
             unsigned char vis_label = *it;
             if(label_decode(vis_label, active_mask_code))
             {
                 auto it = mask_overlay_color.find(vis_label);
-                if (it == mask_overlay_color.end())
+                if (it != mask_overlay_color.end())
                 {
-                    RENDERALGO_THROW_EXCEPTION("Cant find mask overlay color");
+                    Vector3f label_color((float)it->second.r ,(float)it->second.g , (float)it->second.b);
+                    float label_alpha = (float)it->second.a / 255.0f;
+
+                    current_color += label_color*((1- current_alpha)*label_alpha);
+                    current_alpha += (1- current_alpha)*label_alpha;
                 }
-
-                Vector3f label_color((float)it->second.r ,(float)it->second.g , (float)it->second.b);
-                float label_alpha = (float)it->second.a / 255.0f;
-
-                current_color += label_color*((1- current_alpha)*label_alpha);
-                current_alpha += (1- current_alpha)*label_alpha;
             }
         }
 
         //4 Blend
         RGBAUnit& previous_rgba =_canvas_array[idx];
-        current_color = Vector3f((float)previous_rgba.r , (float)previous_rgba.g , (float)previous_rgba.a) + current_color*current_alpha;
+        current_color = Vector3f((float)previous_rgba.r , (float)previous_rgba.g , (float)previous_rgba.b) + current_color*current_alpha;
 
         RGBAUnit current_rgba;
         current_rgba.r = current_color._m[0] > 255.0f ? 255 : static_cast<unsigned char>(current_color._m[0]);

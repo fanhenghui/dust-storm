@@ -138,6 +138,13 @@ public:
     void set_color_inverse_mode(ColorInverseMode mode);
     void set_mask_overlay_mode(MaskOverlayMode mode);
 
+    MaskMode get_mask_mode() const;
+    CompositeMode get_composite_mode() const;
+    InterpolationMode get_interpolation_mode() const;
+    ShadingMode get_shading_mode() const;
+    ColorInverseMode get_color_inverse_mode() const;
+    MaskOverlayMode get_mask_overlay_mode() const;
+
     //Inner buffer
     std::shared_ptr<RayCasterInnerBuffer> get_inner_buffer();
 
