@@ -415,6 +415,11 @@ MaskOverlayMode RayCaster::get_mask_overlay_mode() const
     return _mask_overlay_mode;
 }
 
+std::vector<GLTexture3DPtr> RayCaster::get_mask_data_texture()
+{
+    return _mask_textures;
+}
+
 
 
 MED_IMAGING_END_NAMESPACE

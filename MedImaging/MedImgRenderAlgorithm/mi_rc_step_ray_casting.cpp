@@ -22,11 +22,11 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
     RENDERALGO_CHECK_NULL_EXCEPTION(pPseudoColorTex);
 
     glEnable(GL_TEXTURE_1D);
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE3);
     pPseudoColorTex->bind();
     GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
-    glUniform1i(_loc_pseudo_color , 2);
+    glUniform1i(_loc_pseudo_color , 3);
     glDisable(GL_TEXTURE_1D);
 
     //Linear change: discrete array (0 ~ length -1) to texture coordinate(0 ~ 1)

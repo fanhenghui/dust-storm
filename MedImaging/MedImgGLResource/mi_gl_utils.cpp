@@ -352,7 +352,7 @@ void GLTextureUtils::set_2d_wrap_s_t( GLint wrap_type )
     }
 }
 
-void GLTextureUtils::set_1d_wrap_s_t_r( GLint wrap_type )
+void GLTextureUtils::set_3d_wrap_s_t_r( GLint wrap_type )
 {
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrap_type); 
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrap_type); 

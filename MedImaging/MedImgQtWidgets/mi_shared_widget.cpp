@@ -45,6 +45,7 @@ void SharedWidget::initializeGL()
         {
             QTWIDGETS_THROW_EXCEPTION("Glew init failed!");
         }
+        glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     }
     catch (const medical_imaging::Exception& e)
     {

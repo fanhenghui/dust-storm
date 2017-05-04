@@ -1,1 +1,1 @@
-ProcessingUnit = CPU
+ProcessingUnit = GPU

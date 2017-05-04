@@ -57,6 +57,8 @@ public:
     std::shared_ptr<ImageData> get_volume_data();
     std::vector<GLTexture3DPtr> get_volume_data_texture( );
 
+    std::vector<GLTexture3DPtr> get_mask_data_texture( );
+
     //Brick acceleration
     void set_brick_size(unsigned int brick_size);
     void set_brick_expand(unsigned int brick_expand);

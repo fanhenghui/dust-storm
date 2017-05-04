@@ -26,7 +26,8 @@ bool AABB::operator!=(const AABB& aabb) const
 
 AABBUI::AABBUI()
 {
-
+    memset(_min , 0 , sizeof(_min));
+    memset(_max , 0 , sizeof(_max));
 }
 
 AABBUI::AABBUI(const unsigned int (&min0)[3] , const unsigned int (&max0)[3])

@@ -37,6 +37,8 @@ private:
 
     void recover_i(const AABBUI& aabb , unsigned char label);
 
+    void update_aabb_i(const AABBUI& aabb);
+
 private:
     std::weak_ptr<VOIModel> _model;
     std::shared_ptr<VolumeInfos> _volume_infos;

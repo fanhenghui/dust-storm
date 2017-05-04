@@ -108,6 +108,8 @@ void RayCastScene::render(int test_code)
         return;
     }
 
+    _volume_infos->refresh();
+
     //////////////////////////////////////////////////////////////////////////
     //TODO other common graphic object rendering list
 
@@ -215,6 +217,9 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
 
             //Volume texture
             _ray_caster->set_volume_data_texture(volume_infos->get_volume_texture());
+
+            //Mask texture
+            _ray_caster->set_mask_data_texture(volume_infos->get_mask_texture());
         }
         _ray_caster->initialize();
 

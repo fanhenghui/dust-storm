@@ -60,10 +60,11 @@ void RCStepMainFrag::set_gpu_parameter()
     {
         RENDERALGO_THROW_EXCEPTION("Volume texture is empty!");
     }
+
     glEnable(GL_TEXTURE_3D);
     glActiveTexture(GL_TEXTURE1);
     volume_textures[0]->bind();
-    GLTextureUtils::set_1d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
+    GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
     glUniform1i(_loc_volume_data , 1);
     glDisable(GL_TEXTURE_3D);
@@ -75,8 +76,18 @@ void RCStepMainFrag::set_gpu_parameter()
     //4 Sample rate
     glUniform1f(_loc_sample_rate , ray_caster->get_sample_rate());
 
-    //TODO Mask related
-
+    //5 Mask texture
+    std::vector<GLTexture3DPtr> mask_textures = ray_caster->get_mask_data_texture();
+    if (!mask_textures.empty())
+    {
+        glEnable(GL_TEXTURE_3D);
+        glActiveTexture(GL_TEXTURE2);
+        mask_textures[0]->bind();
+        GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_NEAREST);
+        glUniform1i(_loc_mask_data , 2);
+        glDisable(GL_TEXTURE_3D);
+    }
 
 
     CHECK_GL_ERROR;

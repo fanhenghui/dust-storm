@@ -291,6 +291,15 @@ void VOISegmentObserver::recover_i(const AABBUI& aabb , unsigned char label)
             }
         }
     }
+
+    //Update to texture
+    if (GPU == Configuration::instance()->get_processing_unit_type())
+    {
+        if (aabb != AABBUI())
+        {
+            update_aabb_i(aabb);
+        }
+    }
 }
 
 void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aabb ,unsigned char label)
@@ -329,11 +338,41 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
         QTWIDGETS_THROW_EXCEPTION("Unsupported data type!");
     }
 
-    //Upload to texture
+    //Update to texture
     if (GPU == Configuration::instance()->get_processing_unit_type())
     {
-
+        if (aabb != AABBUI())
+        {
+            update_aabb_i(aabb);
+        }
     }
+}
+
+void VOISegmentObserver::update_aabb_i(const AABBUI& aabb)
+{
+    unsigned int dim_brick[3] = {aabb._max[0] - aabb._min[0],
+        aabb._max[1] - aabb._min[1],
+        aabb._max[2] - aabb._min[2]};
+    unsigned char* mask_updated = new unsigned char[dim_brick[0]*dim_brick[1]*dim_brick[2]];
+
+    std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
+    unsigned char* mask_array = (unsigned char*)mask_data->get_pixel_pointer();
+
+    const unsigned int layer_whole = mask_data->_dim[0]*mask_data->_dim[1];
+    const unsigned int layer_brick = dim_brick[0]*dim_brick[1];
+
+    for(unsigned int z = aabb._min[2] ; z < aabb._max[2] ; ++z)
+    {
+        for(unsigned int y = aabb._min[1] ; y < aabb._max[1] ; ++y)
+        {
+            memcpy( mask_updated + (z-aabb._min[2])*layer_brick + (y - aabb._min[1])*dim_brick[0],
+                mask_array + z*layer_whole + y*mask_data->_dim[0] + aabb._min[0] ,
+                dim_brick[0]);
+        }
+    }
+
+    _volume_infos->update_mask(aabb._min , aabb._max , mask_updated);
+
 }
 
 

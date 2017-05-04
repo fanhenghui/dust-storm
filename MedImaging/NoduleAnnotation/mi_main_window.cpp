@@ -197,7 +197,7 @@ void NoduleAnnotation::configure_i()
     }
 
     Configuration::instance()->set_nodule_file_rsa(true);
-    GLUtils::set_check_gl_flag(false);
+    GLUtils::set_check_gl_flag(true);
 }
 
 void NoduleAnnotation::create_scene_i()
@@ -550,7 +550,39 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         mask_data->_channel_num = 1;
         mask_data->_data_type = medical_imaging::UCHAR;
         mask_data->mem_allocate();
+
+        //////////////////////////////////////////////////////////////////////////
+        //Test
+        {
+            /*unsigned char* raw_mask = (unsigned char*)(mask_data->get_pixel_pointer());
+            unsigned int begin[3] = {200,200,200};
+            unsigned int end[3] = {250,250,250};
+            for (int z = begin[2] ; z < end[2]  ;++z)
+            {
+            for (int y = begin[1] ; y < end[1]  ;++y)
+            {
+            for (int x = begin[0] ; x < end[0]  ;++x)
+            {
+            raw_mask[z*mask_data->_dim[0]*mask_data->_dim[1] + y*mask_data->_dim[0] + x]  = 1;
+            }
+            }
+            }*/
+        }
+        //////////////////////////////////////////////////////////////////////////
         _volume_infos->set_mask(mask_data);
+
+        //////////////////////////////////////////////////////////////////////////
+        //Test
+        {
+            unsigned char* raw_mask = new unsigned char[50*50*50];
+            for (int i = 0; i<50*50*50 ;++i)
+            {
+                raw_mask[i] = 1;
+            }
+            unsigned int begin[3] = {200,200,200};
+            unsigned int end[3] = {250,250,250};
+            _volume_infos->update_mask(begin , end , raw_mask);
+        }
 
 
         create_model_observer_i();

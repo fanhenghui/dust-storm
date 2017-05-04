@@ -47,7 +47,7 @@ struct RayCasterInnerBuffer::GLResource
 RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource()),_label_level(L_8)
 {
     memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
-    _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*2]);
+    _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*4]);
 }
 
 RayCasterInnerBuffer::~RayCasterInnerBuffer()
@@ -155,22 +155,27 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
             {
                 if (_inner_resource->dirty_flag[type])
                 {
-                    RGBAUnit* color_array = (RGBAUnit*)_shared_buffer_array.get();
+                    float* color_array = (float*)_shared_buffer_array.get();
                     memset(color_array , 0 , sizeof(RGBAUnit)*static_cast<int>(_label_level));
 
+                    unsigned char label =  0;
                     for (auto it = _mask_overlay_colors.begin() ; it != _mask_overlay_colors.end() ; ++it)
                     {
-                        if (it->first > static_cast<int>(_label_level) - 1)
+                        label = it->first;
+                        if (label > static_cast<int>(_label_level) - 1)
                         {
                             std::stringstream ss;
                             ss << "Input visible label : " << (int)(it->first ) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
                             RENDERALGO_THROW_EXCEPTION(ss.str());
                         }
-                        color_array[it->first] = it->second;
+                        color_array[label*4] = it->second.r/255.0f;
+                        color_array[label*4+1] = it->second.g/255.0f;
+                        color_array[label*4+2] = it->second.b/255.0f;
+                        color_array[label*4+3] = it->second.a/255.0f;
                     }
 
                     buffer->bind();
-                    buffer->load(static_cast<int>(_label_level)*sizeof(RGBAUnit) , color_array , GL_STATIC_DRAW);
+                    buffer->load(static_cast<int>(_label_level)*sizeof(float)*4 , color_array , GL_STATIC_DRAW);
 
                     _inner_resource->dirty_flag[type] = false;
                 }

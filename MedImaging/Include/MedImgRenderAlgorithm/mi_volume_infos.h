@@ -4,6 +4,7 @@
 #include "MedImgRenderAlgorithm/mi_render_algo_stdafx.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
 #include "MedImgRenderAlgorithm/mi_brick_define.h"
+#include "MedImgArithmetic/mi_aabb.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -18,6 +19,8 @@ class RenderAlgo_Export VolumeInfos
 public:
     VolumeInfos();
     ~VolumeInfos();
+
+    void refresh();
 
     void finialize();
 
@@ -48,13 +51,14 @@ public:
     MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
 
     //update(should update to CPU and GPU)
-    void update_volume(unsigned int (&begin)[3] , unsigned int (&end)[3] , void* pData);//Data size should match sizeof(Data type)*data length
-    void update_mask(unsigned int (&begin)[3] , unsigned int (&end)[3] , unsigned char* pData);
+    void update_mask(const unsigned int (&begin)[3] ,const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed = true);
 
 private:
     void load_volume_resource_i();
     void release_volume_resource_i();
-    void update_volume_resource_i();
+
+    void load_mask_resource_i();
+    void release_mask_resource_i();
 
 private:
     std::shared_ptr<ImageData> _volume_data;
@@ -69,6 +73,9 @@ private:
     std::map<LabelKey , GLBufferPtr> _mask_brick_info_buffer_set;
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
+
+    std::vector<AABBUI> _mask_aabb_to_be_update;
+    std::vector<unsigned char*> _mask_array_to_be_update;
 
 };
 
