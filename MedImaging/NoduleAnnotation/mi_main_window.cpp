@@ -575,12 +575,13 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         //Test
         {
             unsigned char* raw_mask = new unsigned char[50*50*50];
-            for (int i = 0; i<50*50*50 ;++i)
+            memset(raw_mask , 1 , 50*50*50);
+            /*for (int i = 0; i<50*50*50 ;++i)
             {
                 raw_mask[i] = 1;
-            }
-            unsigned int begin[3] = {200,200,200};
-            unsigned int end[3] = {250,250,250};
+            }*/
+            unsigned int begin[3] = {0,0,0};
+            unsigned int end[3] = {50,50,50};
             _volume_infos->update_mask(begin , end , raw_mask);
         }
 

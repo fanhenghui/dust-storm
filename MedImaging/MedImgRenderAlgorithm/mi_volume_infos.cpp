@@ -176,23 +176,23 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
 
     //////////////////////////////////////////////////////////////////////////
     //Test
-    for (unsigned int i = 0 ; i< dim_brick[0]*dim_brick[1]*dim_brick[2] ; ++i)
-    {
-        if (data_updated[i] > 1)
-        {
-            std::cout << "Error segment\n";
-            break;
-            //assert(false);
-        }
-    }
-    std::fstream out("D:/temp/mask_updated.raw" , std::ios::binary | std::ios::out);
-    if (out.is_open())
-    {
-        std::cout << "Open mask updated success\n";
+    //for (unsigned int i = 0 ; i< dim_brick[0]*dim_brick[1]*dim_brick[2] ; ++i)
+    //{
+    //    if (data_updated[i] > 1)
+    //    {
+    //        std::cout << "Error segment\n";
+    //        break;
+    //        //assert(false);
+    //    }
+    //}
+    //std::fstream out("D:/temp/mask_updated.raw" , std::ios::binary | std::ios::out);
+    //if (out.is_open())
+    //{
+    //    std::cout << "Open mask updated success\n";
 
-        out.write((char*)data_updated ,dim_brick[0]*dim_brick[1]*dim_brick[2]);
-        out.close();
-    }
+    //    out.write((char*)data_updated ,dim_brick[0]*dim_brick[1]*dim_brick[2]);
+    //    out.close();
+    //}
     //////////////////////////////////////////////////////////////////////////
 
 
@@ -217,16 +217,41 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
     //_mask_array_to_be_update.push_back(data_updated);
 
     //update mask GPU
+    /*unsigned char* raw_mask2 = new unsigned char[50*50*50];
+    for (int i = 0; i<50*50*50 ;++i)
+    {
+    raw_mask2[i] = 1;
+    }
+    unsigned int begin2[3] = {100,100,20};
+    unsigned int end2[3] = {150,150,70};
+
+    CHECK_GL_ERROR;
+    glEnable(GL_TEXTURE_3D);
+    _mask_textures[0]->bind();
+    _mask_textures[0]->update(begin2[0] , begin2[1] , begin2[2] ,50 , 50, 50 , GL_RED, GL_UNSIGNED_BYTE , raw_mask2);
+    _mask_textures[0]->unbind();
+    glDisable(GL_TEXTURE_3D);
+    CHECK_GL_ERROR;
+
+    delete [] raw_mask2;*/
+
+    int ali = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT  , &ali);
+    std::cout << "GL_UNPACK_ALIGNMENT  : " << ali << std::endl;
+    glPixelStorei(GL_UNPACK_ALIGNMENT , 1);
     CHECK_GL_ERROR;
     glEnable(GL_TEXTURE_3D);
     _mask_textures[0]->bind();
     _mask_textures[0]->update(begin[0] , begin[1] , begin[2] , dim_brick[0] , dim_brick[1], dim_brick[2] , GL_RED, GL_UNSIGNED_BYTE , data_updated);
+    ::glFinish();
     _mask_textures[0]->unbind();
     glDisable(GL_TEXTURE_3D);
     delete [] data_updated;
     CHECK_GL_ERROR;
 
-    return;
+    glPixelStorei(GL_UNPACK_ALIGNMENT , ali);
+
+    //return;
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -250,6 +275,7 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
         }*/
 
     }
+
     {
         unsigned char* raw_mask = new unsigned char[_mask_data->_dim[0]*_mask_data->_dim[1]*_mask_data->_dim[2]];
         glEnable(GL_TEXTURE_3D);
@@ -266,7 +292,10 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
             //if (cpu_label != gpu_label)
             if(gpu_label > 1)
             {
-                std::cout << "Error download\n";
+                int z = i /(_mask_data->_dim[0]*_mask_data->_dim[1]);
+                int y = (i - z*_mask_data->_dim[0]*_mask_data->_dim[1])/_mask_data->_dim[0];
+                int x = i - z*_mask_data->_dim[0]*_mask_data->_dim[1] - y*_mask_data->_dim[0];
+                std::cout << "Error download : " << x << " " << y << " " << z << std::endl;
                 break;
             }
         }
