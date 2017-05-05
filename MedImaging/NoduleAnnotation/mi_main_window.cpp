@@ -197,7 +197,7 @@ void NoduleAnnotation::configure_i()
         in.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(true);
+    Configuration::instance()->set_nodule_file_rsa(false);
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -872,6 +872,7 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         nodule_set->set_nodule(vois);
 
         NoduleSetParser parser;
+        parser.set_series_id(_volume_infos->get_data_header()->series_uid);
         std::string file_name_std(file_name.toLocal8Bit());
 
         IOStatus status;
@@ -952,13 +953,16 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         if (status == IO_SUCCESS)
         {
             _model_voi->remove_all();
+            _model_voi->notify(VOIModel::DELETE_VOI);
+
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             int idx = 0;
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {
                 _model_voi->add_voi(*it , MaskLabelStore::instance()->acquire_label());
+                _model_voi->notify(VOIModel::ADD_VOI);
             }
-            _model_voi->notify();
+
             QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);
         }
         else

@@ -53,7 +53,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
     }
 
     nodule_set->clear_nodule();
-    //id,coordX,coordY,coordZ,diameter_mm,Type
+    //series uid,nodule uid,coordX,coordY,coordZ,diameter_mm,Type
     std::string line;
     std::getline(in , line);
     double id , pos_x , pos_y , pos_z , diameter;
@@ -64,17 +64,17 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
     {
         std::vector<std::string> infos;
         boost::split(infos , line , boost::is_any_of(","));
-        if (infos.size() != 6)
+        if (infos.size() != 7)
         {
             in.close();
             return IO_DATA_DAMAGE;
         }
-        id = str_num_converter.to_num(infos[0]);
-        pos_x = str_num_converter.to_num(infos[1]);
-        pos_y = str_num_converter.to_num(infos[2]);
-        pos_z = str_num_converter.to_num(infos[3]);
-        diameter = str_num_converter.to_num(infos[4]);
-        type = infos[5];
+        id = str_num_converter.to_num(infos[1]);
+        pos_x = str_num_converter.to_num(infos[2]);
+        pos_y = str_num_converter.to_num(infos[3]);
+        pos_z = str_num_converter.to_num(infos[4]);
+        diameter = str_num_converter.to_num(infos[5]);
+        type = infos[6];
         nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , type));
     }
 
@@ -95,13 +95,13 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path , const std::
     else
     {
         const std::vector<VOISphere>& nodules = nodule_set->get_nodule_set();
-        out << "id,coordX,coordY,coordZ,diameter_mm,Type\n";
+        out << "seriesuid,noduleuid,coordX,coordY,coordZ,diameter_mm,Type\n";
         out << std::fixed;
         int id = 0;
         for (auto it = nodules.begin() ; it != nodules.end() ; ++it)
         {
             const VOISphere& voi = *it;
-            out << id++  << "," << voi.center.x << "," << voi.center.y << ","
+            out << _series_id <<"," << id++  << "," << voi.center.x << "," << voi.center.y << ","
                 << voi.center.z << "," << voi.diameter<<","<<voi.name << std::endl;
         }
         out.close();
@@ -292,6 +292,11 @@ IOStatus NoduleSetParser::save_as_rsa_binary(const std::string& file_path , cons
     out.close();
 
     return IO_SUCCESS;
+}
+
+void NoduleSetParser::set_series_id(const std::string& series_id)
+{
+    _series_id = series_id;
 }
 
 MED_IMAGING_END_NAMESPACE

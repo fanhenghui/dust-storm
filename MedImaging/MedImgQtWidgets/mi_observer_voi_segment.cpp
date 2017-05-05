@@ -117,6 +117,11 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
         //Delete VOI
         if (VOIModel::DELETE_VOI == code_id)
         {
+            if (_pre_vois.empty())
+            {
+                return;
+            }
+
             //get deleted VOI from compare
             auto it_deleted = _pre_voi_aabbs.begin();
             for (; it_deleted != _pre_voi_aabbs.end() ; ++it_deleted)
