@@ -25,7 +25,6 @@ void ProgressObserver::update(int )
         {
             _progress_dialog->setValue(model->get_progress());
         }
-        
     }
 }
 

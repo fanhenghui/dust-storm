@@ -25,7 +25,7 @@ DICOMLoader::~DICOMLoader()
 
 }
 
-IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
+IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
     if (files.empty())
     {
@@ -55,7 +55,7 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
 
     //////////////////////////////////////////////////////////////////////////
     //2 Data check
-    IOStatus checking_status = data_check_i(data_format_set);
+    IOStatus checking_status = data_check_i(files, data_format_set);
     if(IO_SUCCESS !=  checking_status)
     {
         set_progress_i(100);
@@ -105,7 +105,7 @@ IOStatus DICOMLoader::load_series(const std::vector<std::string>& files , std::s
     return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::data_check_i(DcmFileFormatSet& file_format_set)
+IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileFormatSet& file_format_set)
 {
     std::map<std::string , std::vector<int>> series_separate;
     std::string series_id;
@@ -161,11 +161,13 @@ IOStatus DICOMLoader::data_check_i(DcmFileFormatSet& file_format_set)
         //delete minority series file format
         auto it_delete = to_be_delete.begin();
         int idx_delete = 0;
-        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete)
+        auto it_file = files.begin();
+        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete , ++it_file)
         {
             if (idx_delete == *it_delete)
             {
                 it = file_format_set.erase(it);
+                it_file = files.erase(it_file);
                 ++it_delete;
             }
             else
@@ -279,15 +281,15 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
         //4.8 Patient name
         if (!get_patient_name_i(data_set_first , img_data_header))
         {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PatientName failed!");
+            //io_status = IO_DATA_DAMAGE;
+            //IO_THROW_EXCEPTION("Parse tag PatientName failed!");
         }
 
         //4.9 Patient ID
         if (!get_patient_id_i(data_set_first , img_data_header))
         {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PatientID failed!");
+            //io_status = IO_DATA_DAMAGE;
+            //IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
         //4.10 Patient Sex(很多图像都没有这个Tag)

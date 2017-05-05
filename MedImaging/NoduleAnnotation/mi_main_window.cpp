@@ -57,6 +57,7 @@
 #include "mi_observer_mpr_scroll_bar.h"
 #include "mi_mouse_op_min_max_hint.h"
 #include "mi_my_rsa.h"
+#include "mi_dicom_anonymization_dialog.h"
 
 #include <QEvent>
 #include <QSizePolicy>
@@ -99,10 +100,10 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     _single_manager_nodule_type(nullptr),
     _select_vio_id(-1)
 {
-    ui.setupUi(this);
+    _ui.setupUi(this);
 
-    ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
+    _ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
+    _ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
 
     _mpr_00 = new SceneContainer(SharedWidget::instance());
     _mpr_01 = new SceneContainer(SharedWidget::instance());
@@ -120,26 +121,26 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     //_vr_11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
 
 
-    _mpr_00_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_00_scroll_bar = new QScrollBar(_ui.centralWidget);
     _mpr_00_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR00"));
     _mpr_00_scroll_bar->setOrientation(Qt::Vertical);
 
-    _mpr_01_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_01_scroll_bar = new QScrollBar(_ui.centralWidget);
     _mpr_01_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR01"));
     _mpr_01_scroll_bar->setOrientation(Qt::Vertical);
 
-    _mpr_10_scroll_bar = new QScrollBar(ui.centralWidget);
+    _mpr_10_scroll_bar = new QScrollBar(_ui.centralWidget);
     _mpr_10_scroll_bar->setObjectName(QString::fromUtf8("verticalScrollBar_MPR10"));
     _mpr_10_scroll_bar->setOrientation(Qt::Vertical);
 
 
-    ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
-    ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
-    ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
-    ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
-    ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
-    ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
     _object_nodule = new QNoduleObject(this);
     _object_min_max_hint = new QMinMaxHintObject(this);
@@ -347,14 +348,15 @@ void NoduleAnnotation::connect_signal_slot_i()
 {
     //Layout
     //connect(ui.action1x1 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout1x1_i()));
-    connect(ui.action2x2 , SIGNAL(triggered()) , this , SLOT(slot_change_layout2x2_i()));
+    connect(_ui.action2x2 , SIGNAL(triggered()) , this , SLOT(slot_change_layout2x2_i()));
 
     //File
-    connect(ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
-    connect(ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
-    connect(ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(slot_open_raw_i()));
-    connect(ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_file_i()));
-    connect(ui.actionLoad_Nodule , SIGNAL(triggered()) , this , SLOT(slot_open_nodule_file_i()));
+    connect(_ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
+    connect(_ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
+    connect(_ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(slot_open_raw_i()));
+    connect(_ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_file_i()));
+    connect(_ui.actionLoad_Nodule , SIGNAL(triggered()) , this , SLOT(slot_open_nodule_file_i()));
+    connect(_ui.actionAnonymization_DICOM , SIGNAL(triggered()) , this , SLOT(slot_dicom_anonymization_i()));
 
     //MPR scroll bar
     connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
@@ -362,28 +364,28 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_mpr_10_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr10_i(int)));
 
     //Common tools
-    connect(ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
-    connect(ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_annotate_i()));
-    connect(ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_rotate_i()));
-    connect(ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_zoom_i()));
-    connect(ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
-    connect(ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
-    connect(ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
+    connect(_ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
+    connect(_ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_annotate_i()));
+    connect(_ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_rotate_i()));
+    connect(_ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_zoom_i()));
+    connect(_ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
+    connect(_ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
+    connect(_ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
 
     //VOI list
-    connect(ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
-    connect(ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem *)));
+    connect(_ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
+    connect(_ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem *)));
     connect(_object_nodule , SIGNAL(nodule_added()) , this , SLOT(slot_add_nodule_i()));
-    connect(ui.pushButtonDeleteNodule , SIGNAL(pressed()) , this , SLOT(slot_delete_nodule_i()));
+    connect(_ui.pushButtonDeleteNodule , SIGNAL(pressed()) , this , SLOT(slot_delete_nodule_i()));
 
     //Preset WL
-    connect(ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(slot_preset_wl_changed_i(QString)));
+    connect(_ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(slot_preset_wl_changed_i(QString)));
 
     //Scene Min Max hint
     connect(_object_min_max_hint , SIGNAL(triggered(const std::string&)) , this , SLOT(slot_scene_min_max_hint_i(const std::string&)));
 
     //Crosshair visibility
-    connect(ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
+    connect(_ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
 }
 
 void NoduleAnnotation::create_model_observer_i()
@@ -449,21 +451,21 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _mpr_10_scroll_bar->hide();
     _vr_11->hide();
 
-    ui.gridLayout_6->removeWidget(_mpr_00);
-    ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
-    ui.gridLayout_6->removeWidget(_mpr_01);
-    ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-    ui.gridLayout_6->removeWidget(_mpr_10 );
-    ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
-    ui.gridLayout_6->removeWidget(_vr_11);
+    _ui.gridLayout_6->removeWidget(_mpr_00);
+    _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_01);
+    _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_10 );
+    _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_vr_11);
 
-    ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
-    ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
-    ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
-    ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
-    ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
-    ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
-    ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
     //Set min size to fix size bug
     _mpr_00->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
@@ -499,22 +501,19 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         //Init progress dialog
-        DICOMLoader loader;
-        _model_progress->clear_observer();
         std::shared_ptr<ProgressObserver> progress_ob(new ProgressObserver());
-        progress_ob->set_progress_model(_model_progress);
-        _model_progress->add_observer(progress_ob);
-        loader.set_progress_model(_model_progress);
+        QProgressDialog progress_dialog(tr("Loading DICOM series ......") ,0 , 0 , 100 );
 
-        QProgressDialog progress_dialog(tr("Loading DICOM series ......") ,0 , 0 , 100 , this );
+        _model_progress->clear_observer();
+        _model_progress->add_observer(progress_ob);
+        progress_ob->set_progress_model(_model_progress);
+        progress_ob->set_progress_dialog(&progress_dialog);
+
+
         progress_dialog.setWindowTitle(tr("please wait."));
         progress_dialog.setFixedWidth(300);
         progress_dialog.setWindowModality(Qt::WindowModal);
-        progress_ob->set_progress_dialog(&progress_dialog);
         progress_dialog.show();
-
-        _model_progress->set_progress(0);
-        _model_progress->notify();
 
         std::vector<std::string> file_names_std(file_name_list.size());
         int idx = 0;
@@ -526,6 +525,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
 
         std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> volume_data;
+        DICOMLoader loader;
+        loader.set_progress_model(_model_progress);
         IOStatus status = loader.load_series(file_names_std, volume_data , data_header);
         if (status != IO_SUCCESS)
         {
@@ -535,6 +536,12 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
             return;
         }
 
+        //Set DICOM series files
+        _dicom_series_files.clear();
+        _dicom_series_files = file_names_std;
+
+        //////////////////////////////////////////////////////////////////////////
+        //Initialize
         if (_volume_infos)//Delete last one
         {
             _volume_infos->finialize();
@@ -579,6 +586,18 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
     else
     {
         return;
+    }
+}
+
+void NoduleAnnotation::slot_dicom_anonymization_i()
+{
+    if (!_dicom_series_files.empty())
+    {
+        DICOMAnonymizationDlg *dlg = new DICOMAnonymizationDlg();
+        dlg->setWindowModality(Qt::WindowModal);
+        dlg->set_dicom_series_files(_dicom_series_files);
+        dlg->set_progress_model(_model_progress);
+        dlg->show();
     }
 }
 
@@ -1016,7 +1035,7 @@ void NoduleAnnotation::slot_delete_nodule_i()
 
 void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
 {
-    QWidget* widget = ui.tableWidgetNoduleList->cellWidget(id , 2);
+    QWidget* widget = _ui.tableWidgetNoduleList->cellWidget(id , 2);
 
     QComboBox* pBox= dynamic_cast<QComboBox*>(widget);
     if (pBox)
@@ -1119,16 +1138,16 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
         _mpr_10_scroll_bar->hide();
         _vr_11->hide();
 
-        ui.gridLayout_6->removeWidget(_mpr_00);
-        ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
-        ui.gridLayout_6->removeWidget(_mpr_01);
-        ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-        ui.gridLayout_6->removeWidget(_mpr_10 );
-        ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
-        ui.gridLayout_6->removeWidget(_vr_11);
+        _ui.gridLayout_6->removeWidget(_mpr_00);
+        _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+        _ui.gridLayout_6->removeWidget(_mpr_01);
+        _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+        _ui.gridLayout_6->removeWidget(_mpr_10 );
+        _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+        _ui.gridLayout_6->removeWidget(_vr_11);
 
-        ui.gridLayout_6->addWidget(target_container , 0 ,0);
-        ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
+        _ui.gridLayout_6->addWidget(target_container , 0 ,0);
+        _ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
 
         target_container->show();
         target_scroll_bar->show();
@@ -1191,7 +1210,7 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
     std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
     if (0 == iFlag)//Hide
     {
-        if (ui.pushButtonArrow->isChecked())
+        if (_ui.pushButtonArrow->isChecked())
         {
             //Unregister mouse locate operation
             for (int i = 0 ;i<3 ; ++i)
@@ -1211,7 +1230,7 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
     }
     else//Show
     {
-        if (ui.pushButtonArrow->isChecked())
+        if (_ui.pushButtonArrow->isChecked())
         {
             for (int i = 0 ;i<3 ; ++i)
             {
@@ -1238,8 +1257,8 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
 void NoduleAnnotation::refresh_nodule_list_i()
 {
     //reset nodule list
-    ui.tableWidgetNoduleList->clear();
-    ui.tableWidgetNoduleList->setRowCount(0);
+    _ui.tableWidgetNoduleList->clear();
+    _ui.tableWidgetNoduleList->setRowCount(0);
 
     //set column header
     QTableWidgetItem *qtablewidgetitem = new QTableWidgetItem();
@@ -1250,16 +1269,16 @@ void NoduleAnnotation::refresh_nodule_list_i()
     qtablewidgetitem1->setText(QApplication::translate("NoduleAnnotationClass", "Diameter", 0, QApplication::UnicodeUTF8));
     qtablewidgetitem2->setText(QApplication::translate("NoduleAnnotationClass", "Type", 0, QApplication::UnicodeUTF8));
 
-    ui.tableWidgetNoduleList->setHorizontalHeaderItem(0, qtablewidgetitem);
-    ui.tableWidgetNoduleList->setHorizontalHeaderItem(1, qtablewidgetitem1);
-    ui.tableWidgetNoduleList->setHorizontalHeaderItem(2, qtablewidgetitem2);
+    _ui.tableWidgetNoduleList->setHorizontalHeaderItem(0, qtablewidgetitem);
+    _ui.tableWidgetNoduleList->setHorizontalHeaderItem(1, qtablewidgetitem1);
+    _ui.tableWidgetNoduleList->setHorizontalHeaderItem(2, qtablewidgetitem2);
 
     //reset selected voi id
     _select_vio_id = -1;
     const std::vector<VOISphere>& vois = _model_voi->get_vois();
     if (!vois.empty())
     {
-        ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
+        _ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
         StrNumConverter<double> converter;
         const int iPrecision = 1;
         int iRow = 0;
@@ -1273,14 +1292,14 @@ void NoduleAnnotation::refresh_nodule_list_i()
 
             QTableWidgetItem* pPos= new QTableWidgetItem(sPos.c_str());
             pPos->setFlags(pPos->flags() & ~Qt::ItemIsEnabled);
-            ui.tableWidgetNoduleList->setItem(iRow,0, pPos);
-            ui.tableWidgetNoduleList->setItem(iRow,1, new QTableWidgetItem(sRadius.c_str()));
+            _ui.tableWidgetNoduleList->setItem(iRow,0, pPos);
+            _ui.tableWidgetNoduleList->setItem(iRow,1, new QTableWidgetItem(sRadius.c_str()));
 
-            QComboBox * pNoduleType = new QComboBox(ui.tableWidgetNoduleList);
+            QComboBox * pNoduleType = new QComboBox(_ui.tableWidgetNoduleList);
             pNoduleType->clear();
             pNoduleType->insertItem(0 ,  NODULE_TYPE_GGN.c_str());
             pNoduleType->insertItem(1 , NODULE_TYPE_AAH.c_str());
-            ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
+            _ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
 
             connect(pNoduleType , SIGNAL(currentIndexChanged(int)) , _single_manager_nodule_type , SLOT(map()));
             _single_manager_nodule_type->setMapping(pNoduleType , iRow);

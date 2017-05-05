@@ -61,6 +61,9 @@
            </item>
            <item row="1" column="0">
             <widget class="QCheckBox" name="checkBoxColorInverse">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>inverse</string>
              </property>
@@ -283,8 +286,12 @@
     <addaction name="actionOpen_DICOM_Folder"/>
     <addaction name="actionOpen_Meta_Image"/>
     <addaction name="actionOpen_Raw"/>
+    <addaction name="separator"/>
     <addaction name="actionSave_Nodule"/>
     <addaction name="actionLoad_Nodule"/>
+    <addaction name="separator"/>
+    <addaction name="actionAnonymization_DICOM"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
@@ -407,6 +414,11 @@
    </property>
    <property name="text">
     <string>2D 1x1</string>
+   </property>
+  </action>
+  <action name="actionAnonymization_DICOM">
+   <property name="text">
+    <string>DICOM Anonymization</string>
    </property>
   </action>
  </widget>

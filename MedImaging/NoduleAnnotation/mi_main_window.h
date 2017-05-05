@@ -47,6 +47,7 @@ private slots:
     void slot_open_raw_i();
     void slot_save_nodule_file_i();
     void slot_open_nodule_file_i();
+    void slot_dicom_anonymization_i();
 
     //Common tools
     void slot_press_btn_arrow_i();
@@ -92,7 +93,7 @@ private:
     void save_layout2x2_parameter_i();
 
 private:
-    Ui::NoduleAnnotationClass ui;
+    Ui::NoduleAnnotationClass _ui;
 
 private:
     bool _is_ready;
@@ -141,6 +142,9 @@ private:
 
     int _pre_2x2_width;
     int _pre_2x2_height;
+
+    //DICOM files cache
+    std::vector<std::string> _dicom_series_files;
 };
 
 #endif // MI_MAIN_WINDOW_H

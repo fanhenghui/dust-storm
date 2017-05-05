@@ -171,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Include\MedImgIO\mi_dicom_exporter.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_dicom_loader.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_dicom_rt_struct.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_dicom_rt_struct_loader.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="..\Include\MedImgIO\mi_voi.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mi_dicom_exporter.cpp" />
     <ClCompile Include="mi_dicom_loader.cpp" />
     <ClCompile Include="mi_dicom_rt_struct.cpp" />
     <ClCompile Include="mi_dicom_rt_struct_loader.cpp" />

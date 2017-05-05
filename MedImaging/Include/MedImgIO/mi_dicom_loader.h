@@ -26,12 +26,13 @@ public:
 
     IO_Export ~DICOMLoader();
 
-    IO_Export IOStatus load_series(const std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> & img_data_header);
+    //files will removal invalid file and keep majority series
+    IO_Export IOStatus load_series(std::vector<std::string>& files_in_out , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> & img_data_header);
 
     IO_Export void set_progress_model(std::shared_ptr<ProgressModel> model);
 
 private:
-    IOStatus data_check_i(DcmFileFormatSet& file_format_set);
+    IOStatus data_check_i(std::vector<std::string>& files , DcmFileFormatSet& file_format_set);
 
     void sort_series_i(DcmFileFormatSet& file_format_set);
 

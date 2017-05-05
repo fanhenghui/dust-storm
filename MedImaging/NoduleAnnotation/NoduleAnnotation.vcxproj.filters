@@ -71,6 +71,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_mi_mouse_op_min_max_hint.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="mi_dicom_anonymization_dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_dicom_anonymization_dialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_dicom_anonymization_dialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mi_main_window.h">
@@ -88,6 +97,12 @@
     <CustomBuild Include="mi_mouse_op_min_max_hint.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="mi_anonymization_dialog.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mi_dicom_anonymization_dialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_mi_main_window.h">
@@ -98,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="mi_my_rsa.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mi_anonymization_dialog.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
