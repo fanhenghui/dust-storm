@@ -169,148 +169,27 @@ MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>
 
 void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed /*= true*/)
 {
-    //return;
-
     //update mask CPU
     const unsigned int dim_brick[3] = {end[0] - begin[0] , end[1] - begin[1] , end[2] - begin[2]};
-
-    //////////////////////////////////////////////////////////////////////////
-    //Test
-    //for (unsigned int i = 0 ; i< dim_brick[0]*dim_brick[1]*dim_brick[2] ; ++i)
-    //{
-    //    if (data_updated[i] > 1)
-    //    {
-    //        std::cout << "Error segment\n";
-    //        break;
-    //        //assert(false);
-    //    }
-    //}
-    //std::fstream out("D:/temp/mask_updated.raw" , std::ios::binary | std::ios::out);
-    //if (out.is_open())
-    //{
-    //    std::cout << "Open mask updated success\n";
-
-    //    out.write((char*)data_updated ,dim_brick[0]*dim_brick[1]*dim_brick[2]);
-    //    out.close();
-    //}
-    //////////////////////////////////////////////////////////////////////////
-
-
-    //if (!has_data_array_changed)
-    //{
-    //    unsigned char* mask_array = (unsigned char*)_mask_data->get_pixel_pointer();
-    //    const unsigned int layer_whole = _mask_data->_dim[0]*_mask_data->_dim[1];
-    //    const unsigned int layer_brick = dim_brick[0]*dim_brick[1];
-
-    //    for(unsigned int z = begin[2] ; z < end[2] ; ++z)
-    //    {
-    //        for(unsigned int y = begin[1] ; y < end[1] ; ++y)
-    //        {
-    //            memcpy(mask_array + z*layer_whole + y*_mask_data->_dim[0] + begin[0] , 
-    //                data_updated + (z-begin[2])*layer_brick + (y - begin[1])*dim_brick[0] , 
-    //                dim_brick[0]);
-    //        }
-    //    }
-    //}
-
-    //_mask_aabb_to_be_update.push_back(AABBUI(begin , end));
-    //_mask_array_to_be_update.push_back(data_updated);
-
-    //update mask GPU
-    /*unsigned char* raw_mask2 = new unsigned char[50*50*50];
-    for (int i = 0; i<50*50*50 ;++i)
+    if (!has_data_array_changed)
     {
-    raw_mask2[i] = 1;
-    }
-    unsigned int begin2[3] = {100,100,20};
-    unsigned int end2[3] = {150,150,70};
-
-    CHECK_GL_ERROR;
-    glEnable(GL_TEXTURE_3D);
-    _mask_textures[0]->bind();
-    _mask_textures[0]->update(begin2[0] , begin2[1] , begin2[2] ,50 , 50, 50 , GL_RED, GL_UNSIGNED_BYTE , raw_mask2);
-    _mask_textures[0]->unbind();
-    glDisable(GL_TEXTURE_3D);
-    CHECK_GL_ERROR;
-
-    delete [] raw_mask2;*/
-
-    int ali = 4;
-    glGetIntegerv(GL_UNPACK_ALIGNMENT  , &ali);
-    std::cout << "GL_UNPACK_ALIGNMENT  : " << ali << std::endl;
-    glPixelStorei(GL_UNPACK_ALIGNMENT , 1);
-    CHECK_GL_ERROR;
-    glEnable(GL_TEXTURE_3D);
-    _mask_textures[0]->bind();
-    _mask_textures[0]->update(begin[0] , begin[1] , begin[2] , dim_brick[0] , dim_brick[1], dim_brick[2] , GL_RED, GL_UNSIGNED_BYTE , data_updated);
-    ::glFinish();
-    _mask_textures[0]->unbind();
-    glDisable(GL_TEXTURE_3D);
-    delete [] data_updated;
-    CHECK_GL_ERROR;
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT , ali);
-
-    //return;
-
-
-    //////////////////////////////////////////////////////////////////////////
-    //test
-    {
-
-        /*unsigned short* raw_volume = new unsigned short[_volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2]];
-        _volume_textures[0]->bind();
-        _volume_textures[0]->download(GL_RED , GL_UNSIGNED_SHORT , raw_volume);
-        ::glFinish();
-
-        unsigned short* volume_array = (unsigned short*)_volume_data->get_pixel_pointer();
-        for (unsigned int i = 0; i<_volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2] ; ++i)
-        {
-        unsigned short cpu_label = volume_array[i];
-        unsigned short gpu_label = raw_volume[i];
-        if (cpu_label != gpu_label)
-        {
-        std::cout << "Error\n";
-        }
-        }*/
-
-    }
-
-    {
-        unsigned char* raw_mask = new unsigned char[_mask_data->_dim[0]*_mask_data->_dim[1]*_mask_data->_dim[2]];
-        glEnable(GL_TEXTURE_3D);
-        _mask_textures[0]->bind();
-        _mask_textures[0]->download(GL_RED , GL_UNSIGNED_BYTE , raw_mask);
-        _mask_textures[0]->unbind();
-        glDisable(GL_TEXTURE_3D);
-
         unsigned char* mask_array = (unsigned char*)_mask_data->get_pixel_pointer();
-        for (unsigned int i = 0; i<_mask_data->_dim[0]*_mask_data->_dim[1]*_mask_data->_dim[2] ; ++i)
+        const unsigned int layer_whole = _mask_data->_dim[0]*_mask_data->_dim[1];
+        const unsigned int layer_brick = dim_brick[0]*dim_brick[1];
+
+        for(unsigned int z = begin[2] ; z < end[2] ; ++z)
         {
-            unsigned char cpu_label = mask_array[i];
-            unsigned char gpu_label = raw_mask[i];
-            //if (cpu_label != gpu_label)
-            if(gpu_label > 1)
+            for(unsigned int y = begin[1] ; y < end[1] ; ++y)
             {
-                int z = i /(_mask_data->_dim[0]*_mask_data->_dim[1]);
-                int y = (i - z*_mask_data->_dim[0]*_mask_data->_dim[1])/_mask_data->_dim[0];
-                int x = i - z*_mask_data->_dim[0]*_mask_data->_dim[1] - y*_mask_data->_dim[0];
-                std::cout << "Error download : " << x << " " << y << " " << z << std::endl;
-                break;
+                memcpy(mask_array + z*layer_whole + y*_mask_data->_dim[0] + begin[0] , 
+                    data_updated + (z-begin[2])*layer_brick + (y - begin[1])*dim_brick[0] , 
+                    dim_brick[0]);
             }
         }
-
-        std::fstream out("D:/temp/mask_seg.raw" , std::ios::binary | std::ios::out);
-        if (out.is_open())
-        {
-            std::cout << "Open mask file success\n";
-
-            out.write((char*)raw_mask , _mask_data->_dim[0]*_mask_data->_dim[1]*_mask_data->_dim[2]);
-            out.close();
-        }
-
-        delete [] raw_mask;
     }
+
+    _mask_aabb_to_be_update.push_back(AABBUI(begin , end));
+    _mask_array_to_be_update.push_back(data_updated);
 }
 
 void VolumeInfos::release_volume_resource_i()
@@ -452,23 +331,24 @@ void VolumeInfos::refresh()
 {
     if (!_mask_aabb_to_be_update.empty())
     {
-        unsigned int brick_dim[3];
+        CHECK_GL_ERROR;
+
+        unsigned int dim_brick[3];
+        glPixelStorei(GL_UNPACK_ALIGNMENT , 1);
         _mask_textures[0]->bind();
         for (int i = 0 ; i<_mask_aabb_to_be_update.size() ; ++i)
         {
             for (int j = 0 ; j < 3 ; ++j)
             {
-                brick_dim[j] = _mask_aabb_to_be_update[i]._max[j] - _mask_aabb_to_be_update[i]._min[j];
+                dim_brick[j] = _mask_aabb_to_be_update[i]._max[j] - _mask_aabb_to_be_update[i]._min[j];
             }
 
-            CHECK_GL_ERROR;
-            
             _mask_textures[0]->update(_mask_aabb_to_be_update[i]._min[0],
                 _mask_aabb_to_be_update[i]._min[1],
                 _mask_aabb_to_be_update[i]._min[2],
-                brick_dim[0],
-                brick_dim[1],
-                brick_dim[2],
+                dim_brick[0],
+                dim_brick[1],
+                dim_brick[2],
                 GL_RED,
                 GL_UNSIGNED_BYTE,
                 _mask_array_to_be_update[i]);
@@ -481,9 +361,6 @@ void VolumeInfos::refresh()
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
     }
-
-
-
 }
 
 MED_IMAGING_END_NAMESPACE

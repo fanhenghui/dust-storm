@@ -38,10 +38,10 @@ void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_rate, out float start
 //1 first sub data step 
 //2 middle sub data step 
 //4 last sub data step
-vec4 raycast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
+vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
     sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift , int ray_cast_step_code);
 
-vec4 overlay_mask_label(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
+vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
         sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , int ray_cast_step_code);
 
 void main()
@@ -55,7 +55,7 @@ void main()
 
     preprocess(ray_start, ray_dir_sample_rate, start_step, end_step);
 
-    integral_color = raycast(
+    integral_color = ray_cast(
         ray_start, 
         ray_dir_sample_rate, 
         start_step, 
@@ -68,7 +68,7 @@ void main()
         vec3(1.0)/volume_dim,
         5);
 
-    oFragColor = overlay_mask_label(
+    oFragColor = mask_overlay(
         ray_start, 
         ray_dir_sample_rate, 
         start_step, 

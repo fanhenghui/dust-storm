@@ -137,9 +137,16 @@ OrthoCamera& OrthoCamera::operator=(const OrthoCamera& camera)
     return *this;
 }
 
-bool OrthoCamera::operator==(const OrthoCamera& camera)
+bool OrthoCamera::operator==(const OrthoCamera& camera) const
 {
-    return _mat_view == camera._mat_view && _mat_projection == camera._mat_projection;
+    if (_is_proj_mat_cal && _is_view_mat_cal && camera._is_proj_mat_cal && camera._is_view_mat_cal)
+    {
+        return _mat_view == camera._mat_view && _mat_projection == camera._mat_projection;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 

@@ -25,7 +25,7 @@ int global_active_label_code[4];
 //1 first sub data step 
 //2 middle sub data step 
 //4 last sub data step
-vec4 overlay_mask_label(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
+vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
         sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , int ray_cast_step_code)
 {
     vec4 current_integral_color = integral_color;

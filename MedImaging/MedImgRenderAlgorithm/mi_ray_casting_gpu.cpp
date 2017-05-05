@@ -16,7 +16,7 @@
 #include "mi_rc_step_volume_sampler.h"
 #include "mi_rc_step_utils.h"
 #include "mi_rc_step_shading.h"
-#include "mi_rc_step_overlay_mask_label.h"
+#include "mi_rc_step_mask_overlay.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -196,13 +196,13 @@ void RayCastingGPU::update_i()
         }
 
         //Overlay mask label
-        if (_mask_overlay_mode == OVERLAY_MASK_LABEL_DISABLE)
+        if (_mask_overlay_mode == MASK_OVERLAY_DISABLE)
         {
-            STEP_PUSH_BACK(RCStepOverlayMaskLabelDisable);
+            STEP_PUSH_BACK(RCStepMaskOverlayDisable);
         }
         else
         {
-            STEP_PUSH_BACK(RCStepOverlayMaskLabelEnable);
+            STEP_PUSH_BACK(RCStepMaskOverlayEnable);
         }
 
 #undef STEP_PUSH_BACK

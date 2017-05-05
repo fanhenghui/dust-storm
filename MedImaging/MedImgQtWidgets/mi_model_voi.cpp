@@ -191,5 +191,37 @@ VOISphere VOIModel::get_voi_by_label(unsigned char id) const
     QTWIDGETS_THROW_EXCEPTION("Get voi by mask label failed!");
 }
 
+void VOIModel::print_code_id(int code_id)
+{
+    switch (code_id)
+    {
+    case MODIFYING:
+        {
+            std::cout << "modifying...\n";
+            break;
+        }
+    case MODIFY_COMPLETED:
+        {
+            std::cout << "modify completed...\n";
+            break;
+        }
+    case ADD_VOI:
+        {
+            std::cout << "add voi...\n";
+            break;
+        }
+    case DELETE_VOI:
+        {
+            std::cout << "delete voi...\n";
+            break;
+        }
+    default:
+        {
+            std::cout << "Unknown code id...\n";
+        }
+        
+    }
+}
+
 
 MED_IMAGING_END_NAMESPACE

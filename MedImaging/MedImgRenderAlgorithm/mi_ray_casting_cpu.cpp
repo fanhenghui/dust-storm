@@ -70,7 +70,6 @@ void RayCastingCPU::render(int test_code )
         //////////////////////////////////////////////////////////////////////////
 
 
-        std::cout << "before ray casting \n";
         switch(volume_data->_data_type)
         {
         case USHORT:
@@ -95,9 +94,9 @@ void RayCastingCPU::render(int test_code )
         }
 
         //mask label overlay
-        if (ray_caster->_mask_overlay_mode == OVERLAY_MASK_LABEL_ENABLE)
+        if (ray_caster->_mask_overlay_mode == MASK_OVERLAY_ENABLE)
         {
-            overlay_mask_label_i(ray_caster);
+            mask_overlay_i(ray_caster);
         }
 
 
@@ -426,7 +425,7 @@ namespace
     }
 }
 
-void RayCastingCPU::overlay_mask_label_i(std::shared_ptr<RayCaster> ray_caster)
+void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster)
 {
     const int pixel_sum = _width*_height;
 

@@ -37,6 +37,7 @@ void VOISegmentObserver::set_volume_infos(std::shared_ptr<VolumeInfos> volume_in
 
 void VOISegmentObserver::update(int code_id /*= 0*/)
 {
+    //VOIModel::print_code_id(code_id);
     try
     {
         QTWIDGETS_CHECK_NULL_EXCEPTION(_volume_infos);
@@ -60,14 +61,14 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             {
                 for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
                 {
-                    (*it)->set_mask_overlay_mode(OVERLAY_MASK_LABEL_DISABLE);
+                    (*it)->set_mask_overlay_mode(MASK_OVERLAY_DISABLE);
                 }
             }
             else
             {
                 for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
                 {
-                    (*it)->set_mask_overlay_mode(OVERLAY_MASK_LABEL_ENABLE);
+                    (*it)->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
                 }
             }
         }
@@ -118,7 +119,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
         {
             //get deleted VOI from compare
             auto it_deleted = _pre_voi_aabbs.begin();
-            for (auto it_deleted = _pre_voi_aabbs.begin() ; it_deleted != _pre_voi_aabbs.end() ; ++it_deleted)
+            for (; it_deleted != _pre_voi_aabbs.end() ; ++it_deleted)
             {
                 unsigned char temp_label = it_deleted->first;
                 bool constant = false;

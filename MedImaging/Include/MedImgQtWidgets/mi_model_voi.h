@@ -23,6 +23,7 @@ public:
         ADD_VOI = 2,
         DELETE_VOI = 3
     };
+    static void print_code_id(int code_id);
 
     VOIModel();
     virtual ~VOIModel();

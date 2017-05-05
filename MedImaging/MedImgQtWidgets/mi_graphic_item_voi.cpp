@@ -410,7 +410,7 @@ void GraphicsSphereItem::update_sphere_center_i(int code_id /*= 0*/)
     Point3 pre_circle_center = mat_vp_inv.transform(sphere_center);
 
     Vector3 translate = cur_circle_center - pre_circle_center;
-    if (translate == Vector3::S_ZERO_VECTOR)
+    if (translate == Vector3::S_ZERO_VECTOR && code_id != VOIModel::MODIFY_COMPLETED)
     {
         return;
     }
@@ -466,9 +466,12 @@ void GraphicsSphereItem::update_sphere_diameter_i(int code_id /*= 0*/)
 
     //Get current circle radius
     const float cur_radius = this->rect().width()*0.5f;
-
-    float radio = abs(cur_radius / pre_radius);
-    if (abs(radio - 1.0f) > FLOAT_EPSILON)
+    const float radio = abs(cur_radius / pre_radius);
+    if (abs(radio - 1.0f) < FLOAT_EPSILON && code_id != VOIModel::MODIFY_COMPLETED)
+    {
+        return;
+    }
+    else
     {
         _model->modify_diameter(_id , voi.diameter*radio);
         _model->notify(code_id);

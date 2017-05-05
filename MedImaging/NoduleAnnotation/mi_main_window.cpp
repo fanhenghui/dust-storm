@@ -197,7 +197,7 @@ void NoduleAnnotation::configure_i()
     }
 
     Configuration::instance()->set_nodule_file_rsa(true);
-    GLUtils::set_check_gl_flag(true);
+    GLUtils::set_check_gl_flag(false);
 }
 
 void NoduleAnnotation::create_scene_i()
@@ -550,41 +550,7 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         mask_data->_channel_num = 1;
         mask_data->_data_type = medical_imaging::UCHAR;
         mask_data->mem_allocate();
-
-        //////////////////////////////////////////////////////////////////////////
-        //Test
-        {
-            /*unsigned char* raw_mask = (unsigned char*)(mask_data->get_pixel_pointer());
-            unsigned int begin[3] = {200,200,200};
-            unsigned int end[3] = {250,250,250};
-            for (int z = begin[2] ; z < end[2]  ;++z)
-            {
-            for (int y = begin[1] ; y < end[1]  ;++y)
-            {
-            for (int x = begin[0] ; x < end[0]  ;++x)
-            {
-            raw_mask[z*mask_data->_dim[0]*mask_data->_dim[1] + y*mask_data->_dim[0] + x]  = 1;
-            }
-            }
-            }*/
-        }
-        //////////////////////////////////////////////////////////////////////////
         _volume_infos->set_mask(mask_data);
-
-        //////////////////////////////////////////////////////////////////////////
-        //Test
-        {
-            unsigned char* raw_mask = new unsigned char[50*50*50];
-            memset(raw_mask , 1 , 50*50*50);
-            /*for (int i = 0; i<50*50*50 ;++i)
-            {
-                raw_mask[i] = 1;
-            }*/
-            unsigned int begin[3] = {0,0,0};
-            unsigned int end[3] = {50,50,50};
-            _volume_infos->update_mask(begin , end , raw_mask);
-        }
-
 
         create_model_observer_i();
 
@@ -1043,11 +1009,7 @@ void NoduleAnnotation::slot_delete_nodule_i()
     if (_select_vio_id >= 0 && _select_vio_id < _model_voi->get_vois().size())
     {
         _model_voi->remove_voi(_select_vio_id);
-        _mpr_scene_00->set_dirty(true);
-        _mpr_scene_01->set_dirty(true);
-        _mpr_scene_10->set_dirty(true);
-        refresh_nodule_list_i();
-        _ob_scene_container->update();
+        _model_voi->notify(VOIModel::DELETE_VOI);
         _select_vio_id = -1;
     }
 }

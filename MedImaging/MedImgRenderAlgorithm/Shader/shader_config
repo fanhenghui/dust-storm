@@ -35,8 +35,8 @@ EncoderItem = shader/rc_color_inverse_disable.frag S_RC_COLOR_INVERSE_DISABLE_FR
 EncoderItem = shader/rc_color_inverse_enable.frag S_RC_COLOR_INVERSE_ENABLE_FRAG
 
 //7 Overlay mask label
-EncoderItem = shader/rc_overlay_mask_label_disable.frag S_RC_OVERLAY_MASK_LABEL_DISABLE_FRAG
-EncoderItem = shader/rc_overlay_mask_label_enable.frag S_RC_OVERLAY_MASK_LABEL_ENABLE_FRAG
+EncoderItem = shader/rc_mask_overlay_disable.frag S_RC_MASK_OVERLAY_DISABLE_FRAG
+EncoderItem = shader/rc_mask_overlay_enable.frag S_RC_MASK_OVERLAY_ENABLE_FRAG
 
 //8 Utils
 EncoderItem = shader/rc_utils.frag ksRCUtilsFrag

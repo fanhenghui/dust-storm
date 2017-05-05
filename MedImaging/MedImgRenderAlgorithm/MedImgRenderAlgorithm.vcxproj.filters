@@ -165,11 +165,11 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
       <Filter>Brick ACC</Filter>
     </ClInclude>
-    <ClInclude Include="mi_rc_step_overlay_mask_label.h">
-      <Filter>Ray Caster\GPU Ray Casting</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_mask_label_store.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_rc_step_mask_overlay.h">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -278,11 +278,11 @@
     <ClCompile Include="mi_volume_infos.cpp">
       <Filter>Volume Infos</Filter>
     </ClCompile>
-    <ClCompile Include="mi_rc_step_overlay_mask_label.cpp">
-      <Filter>Ray Caster\GPU Ray Casting</Filter>
-    </ClCompile>
     <ClCompile Include="mi_mask_label_store.cpp">
       <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_rc_step_mask_overlay.cpp">
+      <Filter>Ray Caster\GPU Ray Casting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -352,10 +352,10 @@
     <None Include="Shader\rc_mask_nearst_sampler.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>
-    <None Include="Shader\rc_overlay_mask_label_disable.frag">
+    <None Include="Shader\rc_mask_overlay_disable.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>
-    <None Include="Shader\rc_overlay_mask_label_enable.frag">
+    <None Include="Shader\rc_mask_overlay_enable.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>
   </ItemGroup>
