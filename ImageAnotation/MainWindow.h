@@ -45,10 +45,12 @@ public:
 public:
     MainWindow(QWidget *parent = 0, QFlag flags = 0);
     QString getMaskFile(int iMask, QString fileName) const;
+    QString getMaskFile(QString mask_type, QString fileName) const;
     QString currentDir() const;
     QString currentFile() const;
     QString currentObjFile() const;
     int currentObj() const;
+    int curent_mask_type() const;
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -60,10 +62,9 @@ private:
     void errorMessageMask();
     void saveMask();
     void updateUndoMenu();
+    QStringList getMaskFiles();
 
 private slots:
-    void onBoundingBoxTransformed(BoundingBox);
-    void onActiveBoundingBoxChanged(int);
     void onWheelTurnedInScrollArea(QWheelEvent *);
     void on_actionOpenDir_triggered();
     void on_actionQuit_triggered();
@@ -72,7 +73,6 @@ private slots:
     void on_actionRedo_triggered();
     void on_addObjButton_clicked();
     void on_delObjButton_clicked();
-    void on_duplicateObjButton_clicked();
     void on_transparencySlider_valueChanged(int i);
     void on_objTypeComboBox_currentIndexChanged(const QString &);
     void on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *);
@@ -111,6 +111,9 @@ private:
 
     bool keyShiftPressed;
     bool keyCtrlPressed;
+
+    //Current mask type
+    QString _current_mask_type;
 };
 
 #endif

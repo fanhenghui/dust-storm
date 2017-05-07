@@ -44,6 +44,19 @@ static const std::string S_IMRA = std::string("IMRA");
 static const std::string S_hemorrhages_spot = std::string("hemorrhages spot");
 static const std::string S_none = std::string("none");
 
+static const std::string S_mask_types[] = 
+{
+    "none",
+    "microaneurysms" , 
+    "exudates",
+    "hemorrhages",
+    "cotton wool spots",
+    "venous beading",
+    "neovascularization",
+    "IMRA"
+    "hemorrhages spot"
+};
+
 
 bool maskFileLessThan(const QString &f1, const QString &f2)
 {
@@ -126,6 +139,11 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     brushSizeComboBox->setCurrentIndex(1);
 }
 
+QString MainWindow::getMaskFile(QString mask_type, QString fileName) const
+{
+    return fileName.replace(".image.", ".").section(".", 0, -2) + ".mask." +  mask_type + ".png";
+}
+
 QString MainWindow::getMaskFile(int iMask, QString fileName) const
 {
     return fileName.replace(".image.", ".").section(".", 0, -2) + ".mask." + QString::number(iMask) + ".png";
@@ -153,7 +171,18 @@ QString MainWindow::currentFile() const
 
 QString MainWindow::currentObjFile() const
 {
-    return currentObjFilenames[currentObj()];
+    return currentObjFilenames[curent_mask_type()];
+}
+
+int MainWindow::curent_mask_type() const
+{
+    QString file = currentFile();
+    QString dir = currentDir();
+    if (file.isEmpty() || dir.isEmpty() || objListWidget->count() == 0)
+        return -1;
+
+    //return objListWidget->currentRow();
+    return objListWidget->currentRow();
 }
 
 int MainWindow::currentObj() const
@@ -164,39 +193,6 @@ int MainWindow::currentObj() const
         return -1;
 
     return objListWidget->currentRow();
-}
-
-void MainWindow::onBoundingBoxTransformed(BoundingBox newBox)
-{
-    // check wether dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
-    if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
-        return;
-
-    // set the new bounding box values
-    IAObj *obj = annotations.getObj(iDir, iFile, iObj);
-    if (obj) {
-        obj->box = newBox.box;
-        obj->fixPoints = newBox.fixPoints;
-    }
-}
-
-void MainWindow::onActiveBoundingBoxChanged(int newBox)
-{
-    // 	if (newBox == currentObj())
-    // 		return;
-    //
-    // 	if (newBox < 0) {
-    // 		objListWidget->setCurrentItem(NULL);
-    // 		objListWidget->clearSelection();
-    // 		tagListWidget->clearSelection();
-    // 	}
-    // 	else
-    // 		objListWidget->setCurrentRow(newBox);
-    //
-    // 	//refreshObjView();
 }
 
 void MainWindow::onWheelTurnedInScrollArea(QWheelEvent *event)
@@ -307,7 +303,7 @@ void MainWindow::on_actionUndo_triggered()
         QString iMask = currentObjFile();
         if (iFile.isEmpty() || iDir.isEmpty() || iMask.isEmpty())
             return;
-        QString objMaskFilename = getMaskFile(currentObj(), iFile);
+        QString objMaskFilename = getMaskFile(curent_mask_type(), iFile);
         //		iFile.section(".", 0, -2) + ".mask." + QString::number(currentObj()) + ".png";
 
         // save the image from the history
@@ -331,7 +327,7 @@ void MainWindow::on_actionRedo_triggered()
         QString iMask = currentObjFile();
         if (iFile.isEmpty() || iDir.isEmpty() || iMask.isEmpty())
             return;
-        QString objMaskFilename = getMaskFile(currentObj(), iFile);
+        QString objMaskFilename = getMaskFile(curent_mask_type(), iFile);
         //		iFile.section(".", 0, -2) + ".mask." + QString::number(currentObj()) + ".png";
 
         // save the image from the history
@@ -355,13 +351,16 @@ void MainWindow::on_addObjButton_clicked()
         return;
 
     // check the names of the object masks
-    for (int i = 0; i < currentObjFilenames.size(); i++) {
+    for (int i = 0; i < currentObjFilenames.size(); i++) 
+    {
         // rename the mask filename if it is named wrongly
         QString objMaskFilename = getMaskFile(i, iFile);
         // File.section(".", 0, -2) + ".mask." + QString::number(i) + ".png";
-        if (currentObjFilenames[i] != objMaskFilename) {
+        if (currentObjFilenames[i] != objMaskFilename) 
+        {
             QFile maskFile(currentlyOpenedDir + iDir + "/" + currentObjFilenames[i]);
-            if (!maskFile.rename(currentlyOpenedDir + iDir + "/" + objMaskFilename)) {
+            if (!maskFile.rename(currentlyOpenedDir + iDir + "/" + objMaskFilename)) 
+            {
                 errorMessageMask();
                 return;
             }
@@ -394,7 +393,7 @@ void MainWindow::on_delObjButton_clicked()
     // check wether dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (iFile.isEmpty() || iDir.isEmpty())
         return;
 
@@ -448,27 +447,6 @@ void MainWindow::on_delObjButton_clicked()
         objListWidget->setCurrentRow(iObj);
 }
 
-void MainWindow::on_duplicateObjButton_clicked()
-{
-    // check if dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
-    if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
-        return;
-
-    // copy the object mask file
-    QFile objMaskFile(currentlyOpenedDir + iDir + "/" + currentObjFilenames[iObj]);
-    QString newMaskFilename = currentlyOpenedDir + iDir + "/" + getMaskFile(currentObjFilenames.size(), iFile);
-    //iFile.section(".", 0, -2) + ".mask." + QString::number(currentObjFilenames.size()) + ".png";
-    if (!objMaskFile.copy(newMaskFilename))
-        QMessageBox::critical(this, "Writing Error", "Object could not make a copy of the mask image file.");
-
-    // refresh
-    refreshObjView();
-    objListWidget->setCurrentRow(currentObjFilenames.size() - 1);
-}
-
 void MainWindow::on_objTypeComboBox_currentIndexChanged(const QString &text)
 {
     //// check if dir/file/object have been selected
@@ -500,6 +478,8 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(const QString &text)
     else
     {
         pixmapWidget->setFloodFill(false);
+        std::string mask_type(text.toLocal8Bit());
+
     }
 
 
@@ -540,7 +520,7 @@ void MainWindow::on_objListWidget_currentItemChanged(QListWidgetItem *current, Q
     // check weather dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
         return;
 
@@ -580,7 +560,7 @@ void MainWindow::on_tagListWidget_itemSelectionChanged()
     // check weather dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
         return;
 
@@ -593,7 +573,7 @@ void MainWindow::onMaskDraw(QImage *mask)
     // check weather dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
         return;
 
@@ -614,7 +594,7 @@ void MainWindow::refreshTagView()
     // check weather dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (!iFile.isEmpty() && !iDir.isEmpty() && iObj >= 0) {
         // load the labels from the mask file
         QImage tmpImg(currentlyOpenedDir + iDir + "/" + currentObjFilenames[iObj]);
@@ -638,42 +618,32 @@ void MainWindow::refreshTagView()
 
 void MainWindow::refreshObjView()
 {
-    // check weather dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    if (iFile.isEmpty() || iDir.isEmpty())
+    getMaskFiles();
+    if (currentObjFilenames.empty())
+    {
         return;
-
-    // block the signals of the objListWidget
-    objListWidget->blockSignals(true);
-
-    // find all mask images for the current image .. they determine the
-    // number of objects for one image
-    QStringList nameFilters;
-    nameFilters << iFile.replace(".image.", ".").section(".", 0, -2) + ".mask.*.png";
-    QDir currentDir(currentlyOpenedDir + iDir);
-    currentDir.setFilter(QDir::Files);
-    currentDir.setNameFilters(nameFilters);
-    currentDir.setSorting(QDir::Name);
-    QStringList files = currentDir.entryList();
-    qSort(files.begin(), files.end(), maskFileLessThan);
-    currentObjFilenames = files;
-
-    // clear our QListWidget and add the objects of the current image to it
-    objListWidget->clear();
-    for (int i = 0; i < files.size(); i++) {
-        QImage tmpImg(currentlyOpenedDir + iDir + "/" + files[i]);
-        QString objType = tmpImg.text("annotationObjType").trimmed();
-        if (objType.isEmpty())
-            objType = objTypes[0];
-        objListWidget->addItem(objType);
-
-        /*if (objTypeComboBox->findText(objType) < 0)
-            objTypeComboBox->addItem(objType);*/
     }
+    else
+    {
+        QString iFile = currentFile();
+        QString iDir = currentDir();
 
-    // unblock the signals
-    objListWidget->blockSignals(false);
+        objListWidget->blockSignals(true);
+
+        objListWidget->clear();
+        for (int i = 0; i < currentObjFilenames.size(); i++) 
+        {
+            QImage tmpImg(currentlyOpenedDir + iDir + "/" + currentObjFilenames[i]);
+            QString objType = tmpImg.text("annotationObjType").trimmed();
+            if (objType.isEmpty())
+                objType = objTypes[0];
+            objListWidget->addItem(objType);
+        }
+
+        // unblock the signals
+        objListWidget->blockSignals(false);
+
+    }
 }
 
 void MainWindow::refreshImgView()
@@ -748,7 +718,7 @@ void MainWindow::refreshObjMask()
     // check wether dir/file/object have been selected
     QString iFile = currentFile();
     QString iDir = currentDir();
-    int iObj = currentObj();
+    int iObj = curent_mask_type();
     if (iFile.isEmpty() || iDir.isEmpty())
         return;
 
@@ -1001,4 +971,57 @@ void MainWindow::updateUndoMenu()
         actionRedo->setEnabled(true);
     else
         actionRedo->setEnabled(false);
+}
+
+QStringList MainWindow::getMaskFiles()
+{
+    // check weather dir/file/object have been selected
+    QString iFile = currentFile();
+    QString iDir = currentDir();
+    if (iFile.isEmpty() || iDir.isEmpty())
+        return QStringList();
+
+
+    // find all mask images for the current image .. they determine the
+    // number of objects for one image
+    QStringList nameFilters;
+    nameFilters << iFile.replace(".image.", ".").section(".", 0, -2) + ".mask.*.png";
+    QDir currentDir(currentlyOpenedDir + iDir);
+    currentDir.setFilter(QDir::Files);
+    currentDir.setNameFilters(nameFilters);
+    currentDir.setSorting(QDir::Name);
+    QStringList files = currentDir.entryList();
+    qSort(files.begin(), files.end(), maskFileLessThan);
+
+    currentObjFilenames = files;
+    return files;
+    //
+    //static const std::string S_microaneurysms = std::string("microaneurysms");
+    //static const std::string S_exudates  = std::string("exudates");
+    //static const std::string S_hemorrhages = std::string("hemorrhages");
+    //static const std::string S_cotton_wool_spots = std::string("cotton wool spots");
+    //static const std::string S_venous_beading = std::string("venous beading");
+    //static const std::string S_neovascularization = std::string("neovascularization");
+    //static const std::string S_IMRA = std::string("IMRA");
+    //static const std::string S_hemorrhages_spot = std::string("hemorrhages spot");
+    //static const std::string S_none = std::string("none");
+    //
+    currentObjFilenames.clear();
+    for (int i = 0 ; i<files.size()  ;++i)
+    {
+        std::string s(files[i].toLocal8Bit());
+        if (s.find(S_microaneurysms)!= std::string::npos ||
+            s.find(S_exudates)!= std::string::npos ||
+            s.find(S_hemorrhages)!= std::string::npos ||
+            s.find(S_cotton_wool_spots)!= std::string::npos ||
+            s.find(S_venous_beading)!= std::string::npos ||
+            s.find(S_neovascularization)!= std::string::npos ||
+            s.find(S_hemorrhages_spot)!= std::string::npos ||
+            s.find(S_IMRA)!= std::string::npos )
+        {
+            currentObjFilenames.push_back(files[i]);
+        }
+    }
+
+    return nameFilters;
 }
