@@ -55,6 +55,8 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
     maskTransparency = 0.5;
     isDrawing = false;
     isFloodFilling = false;
+    iMaskDrawOnColor= -1;
+
 
     setAttribute(Qt::WA_OpaquePaintEvent);
     setFocusPolicy(Qt::NoFocus);
@@ -341,7 +343,8 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
     // get the mouse coordinate in the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
     QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
-    if (event->button() == Qt::LeftButton )
+
+    if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
         // get the region of the mouse cursor
         QRect updateRectOrg;
@@ -355,6 +358,15 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
 
         if (iMaskDrawOnColor < 0) 
         {
+            if (event->button() == Qt::LeftButton)
+            {
+                iMaskEditColor = 1;
+            }
+            else 
+            {
+                iMaskEditColor = 0;
+            }
+
             // draw on the full image
             QPainter painter(&drawMask);
             setUpPainter(painter);
@@ -418,6 +430,8 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
     {
         return;
     }
+
+    iMaskEditColor = 1;
 
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
