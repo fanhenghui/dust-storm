@@ -22,19 +22,27 @@
 #include "PixmapWidget.h"
 
 #include <iostream>
+#include <math.h>
 
 #include "defines.h"
 #include <QPixmap>
 #include <QPainter>
 #include <QWheelEvent>
 #include <QPointF>
-#include <math.h>
 #include <QAbstractScrollArea>
 #include <QScrollBar>
 #include <QColor>
 #include <QVector>
 #include <QtDebug>
-#include <math.h>
+
+namespace
+{
+    int round(double number)
+    {
+        return (number > 0.0) ? floor(number + 0.5) : ceil(number - 0.5);
+    }
+}
+
 
 PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *parent )
     : QGLWidget( parent)
@@ -247,10 +255,10 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
         updateRectF.setHeight((vPageStep / vLength) * m_pm->height());
     }
     QRect updateRect;
-    updateRect.setLeft(floor(updateRectF.left()) - 1);
-    updateRect.setRight(floor(updateRectF.right()) + 1);
-    updateRect.setTop(floor(updateRectF.top()) - 1);
-    updateRect.setBottom(floor(updateRectF.bottom()) + 1);
+    updateRect.setLeft(round(updateRectF.left()) - 1);
+    updateRect.setRight(round(updateRectF.right()) + 1);
+    updateRect.setTop(round(updateRectF.top()) - 1);
+    updateRect.setBottom(round(updateRectF.bottom()) + 1);
 
     // save the scroll bar values
     lastVScrollValue = vValue;
