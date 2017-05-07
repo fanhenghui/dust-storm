@@ -53,7 +53,7 @@ class PixmapWidget : public QGLWidget
 
 private:
     QPixmap *m_pm;
-    QImage mask, drawMask, tmpDrawMask, drawOnColorMask;
+    QImage mask, drawMask;
     double zoomFactor;
     double maskTransparency;
     int iMaskEditColor, iMaskDrawOnColor;
@@ -76,7 +76,7 @@ public:
     int getMaskEditColor();
     QImage* getMask();
 
-    public slots:   
+    public slots:
         void setZoomFactor(double);
         void setPixmap(const QPixmap&);
         void setMask(QImage&);

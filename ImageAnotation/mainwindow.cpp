@@ -21,9 +21,9 @@
 */
 #include "MainWindow.h"
 #include <iostream>
+#include <string>
 
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QDir>
 #include <QFile>
 #include <QStringList>
@@ -31,7 +31,18 @@
 #include <stdio.h>
 #include "ScrollAreaNoWheel.h"
 #include <QtDebug>
+#include <QMessageBox>
 #include <QImageReader>
+
+static const std::string S_microaneurysms = std::string("microaneurysms");
+static const std::string S_exudates  = std::string("exudates");
+static const std::string S_hemorrhages = std::string("hemorrhages");
+static const std::string S_cotton_wool_spots = std::string("cotton wool spots");
+static const std::string S_venous_beading = std::string("venous beading");
+static const std::string S_neovascularization = std::string("neovascularization");
+static const std::string S_IMRA = std::string("IMRA");
+static const std::string S_hemorrhages_spot = std::string("hemorrhages spot");
+static const std::string S_none = std::string("none");
 
 
 bool maskFileLessThan(const QString &f1, const QString &f2)
@@ -89,13 +100,11 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     maxHistorySize = 10;
 
     // fill some widgets with data
-    for (int i = 0; i < objTypes.size(); i++)
-        objTypeComboBox->addItem(objTypes[i]);
+    /*for (int i = 0; i < objTypes.size(); i++)
+        objTypeComboBox->addItem(objTypes[i]);*/
+
     for (int i = 0; i < maskTypes.size(); i++)
         maskTypeComboBox->addItem(maskTypes[i]);
-    drawOnTypeComboBox->addItem("all");
-    for (int i = 0; i < maskTypes.size(); i++)
-        drawOnTypeComboBox->addItem(maskTypes[i]);
     for (int i = 0; i < brushSizes.size(); i++)
         brushSizeComboBox->addItem("Circle (" + QString::number(brushSizes[i]) + "x" + QString::number(brushSizes[i]) + ")");
     for (int i = 0; i < labels.size(); i++)
@@ -462,25 +471,38 @@ void MainWindow::on_duplicateObjButton_clicked()
 
 void MainWindow::on_objTypeComboBox_currentIndexChanged(const QString &text)
 {
-    // check if dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
-    if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
-        return;
+    //// check if dir/file/object have been selected
+    //QString iFile = currentFile();
+    //QString iDir = currentDir();
+    //int iObj = currentObj();
+    //if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
+    //    return;
 
-    // block the signals of the objListWidget
-    objListWidget->blockSignals(true);
+    //// block the signals of the objListWidget
+    //objListWidget->blockSignals(true);
 
-    // change the object type in the objList
-    QListWidgetItem *currentObj = objListWidget->currentItem();
-    currentObj->setText(text);
+    //// change the object type in the objList
+    //QListWidgetItem *currentObj = objListWidget->currentItem();9
+    //currentObj->setText(text);
 
-    // unblock the signals
-    objListWidget->blockSignals(false);
+    //// unblock the signals
+    //objListWidget->blockSignals(false);
 
-    // save the updated mask
-    saveMask();
+    //// save the updated mask
+    //saveMask();
+
+    std::cout  << text.toStdString() << std::endl;
+
+    if (text.toStdString() == std::string("none"))
+    {
+        pixmapWidget->setFloodFill(true);
+    }
+    else
+    {
+        pixmapWidget->setFloodFill(false);
+    }
+
+
 }
 
 void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
@@ -523,11 +545,11 @@ void MainWindow::on_objListWidget_currentItemChanged(QListWidgetItem *current, Q
         return;
 
     // set the right object type in the objTypeComboBox
-    objTypeComboBox->blockSignals(true);
+   /* objTypeComboBox->blockSignals(true);
     int index = objTypeComboBox->findText(current->text(), Qt::MatchExactly);
     if (index >= 0 && index < objTypeComboBox->count())
         objTypeComboBox->setCurrentIndex(index);
-    objTypeComboBox->blockSignals(false);
+    objTypeComboBox->blockSignals(false);*/
 
     // refresh
     refreshTagView();
@@ -564,11 +586,6 @@ void MainWindow::on_tagListWidget_itemSelectionChanged()
 
     // the updated mask
     saveMask();
-}
-
-void MainWindow::on_drawOnTypeComboBox_currentIndexChanged(int index)
-{
-    pixmapWidget->setMaskDrawOnColor(index - 1);
 }
 
 void MainWindow::onMaskDraw(QImage *mask)
@@ -650,8 +667,9 @@ void MainWindow::refreshObjView()
         if (objType.isEmpty())
             objType = objTypes[0];
         objListWidget->addItem(objType);
-        if (objTypeComboBox->findText(objType) < 0)
-            objTypeComboBox->addItem(objType);
+
+        /*if (objTypeComboBox->findText(objType) < 0)
+            objTypeComboBox->addItem(objType);*/
     }
 
     // unblock the signals
@@ -838,7 +856,7 @@ void MainWindow::keyPressEvent(QKeyEvent * event)
 {
     if (event->key() == Qt::Key_Control) {
         keyCtrlPressed = true;
-        pixmapWidget->setFloodFill(true);
+        //pixmapWidget->setFloodFill(true);
         statusBar()->showMessage("Use mouse wheel to increase/decrease brush size");
         event->accept();
     }
@@ -849,9 +867,6 @@ void MainWindow::keyPressEvent(QKeyEvent * event)
     }
     // keys to change the color
     else if (keyShiftPressed && event->key() >= Qt::Key_F1 && event->key() <= Qt::Key_F4) {
-        int index = event->key() - Qt::Key_F1;
-        if (index >= 0 && index < drawOnTypeComboBox->count())
-            drawOnTypeComboBox->setCurrentIndex(index);
         event->accept();
     }
     else if (event->key() >= Qt::Key_F1 && event->key() <= Qt::Key_F3) {
@@ -876,7 +891,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
     if (event->key() == Qt::Key_Control) {
         event->accept();
         keyCtrlPressed = false;
-        pixmapWidget->setFloodFill(false);
+        //pixmapWidget->setFloodFill(false);
         statusBar()->clearMessage();
     }
     else if (event->key() == Qt::Key_Shift) {

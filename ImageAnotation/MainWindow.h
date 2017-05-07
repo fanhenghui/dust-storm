@@ -79,7 +79,6 @@ private slots:
     void on_objListWidget_currentItemChanged(QListWidgetItem *, QListWidgetItem *);
     void on_brushSizeComboBox_currentIndexChanged(int);
     void on_tagListWidget_itemSelectionChanged();
-    void on_drawOnTypeComboBox_currentIndexChanged(int);
     void onMaskDraw(QImage *mask);
     void refreshImgView();
     void refreshObjView();

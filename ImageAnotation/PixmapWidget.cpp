@@ -122,9 +122,6 @@ void PixmapWidget::setMask(QImage& newMask)
         tmpMask.setColor(i, getColor(i));
     drawMask = tmpMask.convertToFormat(QImage::Format_RGB32);
 
-    // create the temporary draw mask
-    tmpDrawMask = QImage(newMask.size(), QImage::Format_RGB32);
-
     // we have to repaint
     repaint();
 }
@@ -137,6 +134,7 @@ void PixmapWidget::setPenWidth(int width)
 
 void PixmapWidget::setMaskEditColor(int iColor)
 {
+    std::cout << "Edti color : " << iColor << std::endl;
     iMaskEditColor = iColor;
 }
 
@@ -298,7 +296,11 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
         p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
 
         // draw the brush
-        if (!isFloodFilling) {
+        //std::cout << isFloodFilling << std::endl;
+        if (!isFloodFilling) 
+        {
+            setCursor(QCursor(Qt::BlankCursor));
+
             QPen penWhite(QColor(255, 255, 255, (int)(255 * maskTransparency + 0.5)));
             penWhite.setWidth(1 / zoomFactor);
             QPen penBlack(QColor(0, 0, 0, (int)(255 * maskTransparency + 0.5)));
@@ -314,6 +316,10 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
                 xyMouseFollowed.y() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
                 penWidth - 1 / zoomFactor, penWidth - 1 / zoomFactor));
         }
+        else
+        {
+            setCursor(QCursor(Qt::ArrowCursor));
+        }
 
         // draw a border around the image
         p.restore();
@@ -327,125 +333,35 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
 
 void PixmapWidget::mousePressEvent(QMouseEvent * event)
 {
+    if (isFloodFilling)
+    {
+        return;
+    }
+
     // get the mouse coordinate in the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
     QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
-    //	QPoint lastXyMouse = currentMatrixInv.map(lastXyMouseOrg);
-    //	QPoint lastXyDrawnMouse = currentMatrixInv.map(lastXyDrawnMouseOrg);
-
-    // floodfill the image with the current color
-    if (event->button() == Qt::LeftButton && isFloodFilling) {
-        int orgIColor = mask.pixelIndex(xyMouse.x(), xyMouse.y());
-        QList<QPoint> pointStack;
-        pointStack << xyMouse;
-        QList<QPoint> neighborPoints;
-        while (!pointStack.isEmpty()) {
-            QPoint point = pointStack.first();
-            pointStack.removeFirst();
-
-            // check whether the pixel has been processed in the meanwhile
-            QRgb tmpRgb = 0x00FFFFFF & tmpDrawMask.pixel(point);
-            if (tmpRgb != 0)
-                continue;
-
-            // fill the point and mark the point as filled
-            drawMask.setPixel(point, getColor(getMaskEditColor()));
-            tmpDrawMask.setPixel(point, Qt::white);
-
-            // add the points in a 4-neighborhood
-            for (int i = -1; i <= 1; ++i)
-                for (int j = -1; j <= 1; ++j) {
-                    if (i == j)
-                        continue;
-
-                    // the coordinates for the neighbor point
-                    int x = point.x() + i;
-                    int y = point.y() + j;
-
-                    // check whether point lies in the image
-                    if (x < 0 || x >= drawMask.width() || y < 0 || y >= drawMask.height())
-                        continue;
-
-                    // get the colors
-                    int iColor = mask.pixelIndex(x, y);
-                    QRgb tmpRgb = 0x00FFFFFF & tmpDrawMask.pixel(x, y);
-
-                    // check whether the color is the right one and
-                    // whether it has not been processed so far
-                    if (iColor != orgIColor || tmpRgb != 0)
-                        continue;
-
-                    // everything ok .. we'll add the point to the list
-                    pointStack << QPoint(x, y);
-                }
-        }
-
-        // reset the temporary mask
-        tmpDrawMask.fill(0);
-
-        // update
-        updateMask();
-        update();
-
-        // send the signal that the mask has been changed
-        emit( drawEvent( &mask ) );
-    }
-    // draw a line / point
-    else if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton) {
+    if (event->button() == Qt::LeftButton )
+    {
         // get the region of the mouse cursor
         QRect updateRectOrg;
         int penOffset = (int) ceil(zoomFactor * (0.5 * penWidth + 2));
-        if (event->button() == Qt::LeftButton) {
-            updateRectOrg.setLeft(xyMouseOrg.x() - penOffset);
-            updateRectOrg.setRight(xyMouseOrg.x() + penOffset);
-            updateRectOrg.setTop(xyMouseOrg.y() - penOffset);
-            updateRectOrg.setBottom(xyMouseOrg.y() + penOffset);
-        }
-        else if (event->button() == Qt::RightButton) {
-            QPoint mappedLastXyDrawMouse = currentMatrix.map(lastXyDrawnMouse);
-            updateRectOrg.setLeft(MIN(mappedLastXyDrawMouse.x(), xyMouseOrg.x()) - penOffset);
-            updateRectOrg.setRight(MAX(mappedLastXyDrawMouse.x(), xyMouseOrg.x()) + penOffset);
-            updateRectOrg.setTop(MIN(mappedLastXyDrawMouse.y(), xyMouseOrg.y()) - penOffset);
-            updateRectOrg.setBottom(MAX(mappedLastXyDrawMouse.y(), xyMouseOrg.y()) + penOffset);
-        }
+        updateRectOrg.setLeft(xyMouseOrg.x() - penOffset);
+        updateRectOrg.setRight(xyMouseOrg.x() + penOffset);
+        updateRectOrg.setTop(xyMouseOrg.y() - penOffset);
+        updateRectOrg.setBottom(xyMouseOrg.y() + penOffset);
+
         QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
 
-        if (iMaskDrawOnColor < 0) {
+        if (iMaskDrawOnColor < 0) 
+        {
             // draw on the full image
             QPainter painter(&drawMask);
             setUpPainter(painter);
-            if (event->button() == Qt::LeftButton)
-                painter.drawPoint(xyMouse);
-            else if (event->button() == Qt::RightButton)
-                painter.drawLine(lastXyDrawnMouse, xyMouse);
-        }
-        else {
-            // draw into the temporary mask
-            QPainter painter(&tmpDrawMask);
-            painter.setRenderHint(QPainter::Antialiasing, false);
-            painter.setPen(QPen(QBrush(Qt::white),
-                penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-            if (event->button() == Qt::LeftButton)
-                painter.drawPoint(xyMouse);
-            else if (event->button() == Qt::RightButton)
-                painter.drawLine(lastXyDrawnMouse, xyMouse);
-
-            // draw on a specific color
-            for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < drawMask.height(); y++)
-                for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < drawMask.width(); x++) {
-                    int iColor = mask.pixelIndex(x, y);
-                    int tmpColor = 0x00FFFFFF & tmpDrawMask.pixel(x, y);
-                    if (tmpColor != 0 && iColor == iMaskDrawOnColor)
-                        drawMask.setPixel(x, y, getColor(getMaskEditColor()));
-                }
-
-                // clear the region in the temporary mask that has been drawn to
-                painter.fillRect(updateRect, QBrush(Qt::black));
+            painter.drawPoint(xyMouse);
         }
 
-        // update
-        if (event->button() == Qt::LeftButton)
-            isDrawing = true;
+        isDrawing = true;
 
         // save the current position and perform an update in the
         // region of the mouse cousor
@@ -459,6 +375,11 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
 
 void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 {
+    if (isFloodFilling)
+    {
+        return;
+    }
+
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
     QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
@@ -473,32 +394,14 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
     updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
     QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
 
-    if (isDrawing) {
-        if (iMaskDrawOnColor < 0) {
+    if (isDrawing) 
+    {
+        if (iMaskDrawOnColor < 0) 
+        {
             // draw on the full image
             QPainter painter(&drawMask);
             setUpPainter(painter);
             painter.drawLine(lastXyMouse, xyMouse);
-        }
-        else {
-            // draw into the temporary mask
-            QPainter painter(&tmpDrawMask);
-            painter.setRenderHint(QPainter::Antialiasing, false);
-            painter.setPen(QPen(QBrush(Qt::white),
-                penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-            painter.drawLine(lastXyMouse, xyMouse);
-
-            // draw on a specific color
-            for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < drawMask.height(); y++)
-                for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < drawMask.width(); x++) {
-                    int iColor = mask.pixelIndex(x, y);
-                    int tmpColor = 0x00FFFFFF & tmpDrawMask.pixel(x, y);
-                    if (tmpColor != 0 && iColor == iMaskDrawOnColor)
-                        drawMask.setPixel(x, y, getColor(getMaskEditColor()));
-                }
-
-                // clear the region in the temporary mask that has been drawn to
-                painter.fillRect(updateRect, QBrush(Qt::black));
         }
 
     }
@@ -511,6 +414,11 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 
 void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 {
+    if (isFloodFilling)
+    {
+        return;
+    }
+
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
     QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
@@ -531,26 +439,6 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
             QPainter painter(&drawMask);
             setUpPainter(painter);
             painter.drawLine(lastXyMouse, xyMouse);
-        }
-        else {
-            // draw into the temporary mask
-            QPainter painter(&tmpDrawMask);
-            painter.setRenderHint(QPainter::Antialiasing, false);
-            painter.setPen(QPen(QBrush(Qt::white),
-                penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-            painter.drawLine(lastXyMouse, xyMouse);
-
-            // draw on a specific color
-            for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < drawMask.height(); y++)
-                for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < drawMask.width(); x++) {
-                    int iColor = mask.pixelIndex(x, y);
-                    int tmpColor = 0x00FFFFFF & tmpDrawMask.pixel(x, y);
-                    if (tmpColor != 0 && iColor == iMaskDrawOnColor)
-                        drawMask.setPixel(x, y, getColor(getMaskEditColor()));
-                }
-
-                // clear the region in the temporary mask that has been drawn to
-                painter.fillRect(updateRect, QBrush(Qt::black));
         }
 
         // update
