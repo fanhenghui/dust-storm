@@ -82,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     setupUi(this);
     scrollArea = new ScrollAreaNoWheel(this);
     pixmapWidget = new PixmapWidget(scrollArea, scrollArea);
+    pixmapWidget->setFloodFill(true);
+    
     scrollArea->setWidgetResizable(true);
     scrollArea->setWidget(pixmapWidget);
     setCentralWidget(scrollArea);
@@ -104,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     brushSizes << 1 << 3 << 5 << 7 << 9 << 11 << 13 << 15 << 18 << 20 << 25 << 30 << 50 << 100;
     maxHistorySize = 10;
 
+    currentHistoryImg = 0;
 
     for (int i = 0; i < brushSizes.size(); i++)
         brushSizeComboBox->addItem("Circle (" + QString::number(brushSizes[i]) + "x" + QString::number(brushSizes[i]) + ")");
@@ -401,6 +404,8 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
         ComboBox_ObjType->setCurrentIndex(current_obj_id);
         ComboBox_ObjType->blockSignals(false);
     }
+
+    currentHistoryImg = 0;
 
     refreshObjMask();
 }
