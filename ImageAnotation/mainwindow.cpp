@@ -498,7 +498,7 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
 
     // load new file
     QString filepath(absoluteDir + iDir + "/" + iFile);
-    pixmapWidget->setPixmap(QPixmap(filepath , "JPG" ));
+    pixmapWidget->setPixmap(QPixmap(filepath  ));
 
     // refresh the objListWidget
     refreshObjView();
