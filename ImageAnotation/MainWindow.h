@@ -45,12 +45,10 @@ public:
 public:
     MainWindow(QWidget *parent = 0, QFlag flags = 0);
     QString getMaskFile(int iMask, QString fileName) const;
-    QString getMaskFile(QString mask_type, QString fileName) const;
     QString currentDir() const;
     QString currentFile() const;
-    QString currentObjFile() const;
+    QString currentObjFile();
     int currentObj() const;
-    int curent_mask_type() const;
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -62,7 +60,7 @@ private:
     void errorMessageMask();
     void saveMask();
     void updateUndoMenu();
-    QStringList getMaskFiles();
+    std::map<int, QString> getMaskFiles();
 
 private slots:
     void onWheelTurnedInScrollArea(QWheelEvent *);
@@ -71,26 +69,26 @@ private slots:
     void on_actionShortcutHelp_triggered();
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
-    void on_addObjButton_clicked();
-    void on_delObjButton_clicked();
+
     void on_transparencySlider_valueChanged(int i);
-    void on_objTypeComboBox_currentIndexChanged(const QString &);
+    void on_ComboBox_ObjType_currentIndexChanged(int);
     void on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *);
-    void on_objListWidget_currentItemChanged(QListWidgetItem *, QListWidgetItem *);
+
     void on_brushSizeComboBox_currentIndexChanged(int);
-    void on_tagListWidget_itemSelectionChanged();
+
+
     void onMaskDraw(QImage *mask);
     void refreshImgView();
-    void refreshObjView();
-    void refreshTagView();
     void refreshObjMask();
+
     void nextPreviousFile(Direction);
 
 private:
     PixmapWidget *pixmapWidget;
     ScrollAreaNoWheel *scrollArea;
     QString currentlyOpenedDir;
-    QStringList currentObjFilenames;
+
+    std::map<int , QString> _current_obj_file_collection;
 
     ImgAnnotation annotations;
     QString lastObjType;
