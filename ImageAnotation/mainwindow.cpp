@@ -732,7 +732,7 @@ void MainWindow::saveMask()
 void MainWindow::updateUndoMenu()
 {
     // enable/disable the undo/redo menu items
-    if (currentHistoryImg < imgUndoHistory.size() - 1 && imgUndoHistory.size() > 1)
+    if (currentHistoryImg < imgUndoHistory.size()  && imgUndoHistory.size() > 1)
         actionUndo->setEnabled(true);
     else
         actionUndo->setEnabled(false);
