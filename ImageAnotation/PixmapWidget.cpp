@@ -271,26 +271,29 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     // draw the image
     p.drawPixmap(updateRect.topLeft(), *_pixmap, updateRect);
 
-    // draw the mask
-    p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
+    if (_enable_painting)
+    {
+        // draw the mask
+        p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
 
-    //TODO using cursor to replace bruch itself
-    // draw the brush
-    QPen penWhite(Qt::lightGray);
-    penWhite.setWidth(1 / _zoom_factor);
-    QPen penBlack(Qt::darkGray);
-    penBlack.setWidth(1 / _zoom_factor);
-    p.setPen(penWhite);
-    p.setRenderHint(QPainter::Antialiasing, true);
-    p.drawEllipse(QRectF(
-        xyMouseFollowed.x() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
-        xyMouseFollowed.y() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
-        _pen_width + 1 / _zoom_factor, _pen_width + 1 / _zoom_factor));
-    p.setPen(penBlack);
-    p.drawEllipse(QRectF(
-        xyMouseFollowed.x() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
-        xyMouseFollowed.y() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
-        _pen_width - 1 / _zoom_factor, _pen_width - 1 / _zoom_factor));
+        //TODO using cursor to replace bruch itself
+        // draw the brush
+        QPen penWhite(Qt::lightGray);
+        penWhite.setWidth(1 / _zoom_factor);
+        QPen penBlack(Qt::darkGray);
+        penBlack.setWidth(1 / _zoom_factor);
+        p.setPen(penWhite);
+        p.setRenderHint(QPainter::Antialiasing, true);
+        p.drawEllipse(QRectF(
+            xyMouseFollowed.x() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
+            xyMouseFollowed.y() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
+            _pen_width + 1 / _zoom_factor, _pen_width + 1 / _zoom_factor));
+        p.setPen(penBlack);
+        p.drawEllipse(QRectF(
+            xyMouseFollowed.x() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
+            xyMouseFollowed.y() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
+            _pen_width - 1 / _zoom_factor, _pen_width - 1 / _zoom_factor));
+    }
 
     // draw a border around the image
     p.restore();
@@ -431,46 +434,6 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 
 void PixmapWidget::updateMouseCursor()
 {
-}
-
-void PixmapWidget::updateMask()
-{
-    //// store the original color table and clear the original mask
-    //QVector<QRgb> orgColorTable = mask.colorTable();
-    //mask.fill(0);
-
-    //// convert the mask to the original format
-    //QRgb lastRgb = qRgb(0, 0, 0);
-    //int  lastI = 0;
-    //for (int y = 0; y < _drawMask.height(); y++)
-    //    for (int x = 0; x < _drawMask.width(); x++) {
-    //        QRgb rgb = _drawMask.pixel(x, y);
-
-    //        // see whether we have to find for the right color index or not
-    //        if (rgb == lastRgb)
-    //            mask.setPixel(x, y, lastI);
-    //        else {
-    //            // find the closest color
-    //            int bestI = -1;
-    //            double tmpDist, bestDist;
-    //            for (int j = 0; j < orgColorTable.size(); j++) {
-    //                tmpDist = pow(double(qRed(rgb) - qRed(orgColorTable[j])), 2)
-    //                    + pow(double(qGreen(rgb) - qGreen(orgColorTable[j])), 2)
-    //                    + pow(double(qBlue(rgb) - qBlue(orgColorTable[j])), 2);
-    //                if (bestI < 0 || tmpDist < bestDist) {
-    //                    bestI = j;
-    //                    bestDist = tmpDist;
-    //                    if (bestDist == 0)
-    //                        break;
-    //                }
-    //            }
-
-    //            // set the color and buffer the values
-    //            mask.setPixel(x, y, bestI);
-    //            lastI = bestI;
-    //            lastRgb = rgb;
-    //        }
-    //    }
 }
 
 void PixmapWidget::setup_current_painter_i(QPainter &painter)

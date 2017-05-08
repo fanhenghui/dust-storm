@@ -84,7 +84,6 @@ protected:
 
 private:
     void updateMouseCursor();
-    void updateMask();
     void setup_current_painter_i(QPainter &painter);
 
 private:
