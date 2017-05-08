@@ -52,7 +52,7 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
     _pixmap = new QPixmap();
     _zoom_factor = 1.0;
     _pen_width = 5;
-    _mask_transparency = 0.5;
+    _mask_transparency = 1.0;
     _is_drawing = false;
     _enable_painting = false;
     _is_confident = true;

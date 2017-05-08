@@ -37,10 +37,9 @@
 
 #include "defines.h"
 
-#define MASK_TPYE_NUM 11
+#define MASK_TPYE_NUM 10
 static const std::string S_mask_types[MASK_TPYE_NUM] = 
 {
-    "none",
     "microaneurysms" , 
     "exudates",
     "hemorrhages",
@@ -126,7 +125,6 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     QTextCodec::setCodecForTr(QTextCodec::codecForLocale());
     QString mask_type_tool_tips[MASK_TPYE_NUM] = 
     {
-        tr("空"),
         tr("微小血管瘤") , 
         tr("硬性渗出物"),
         tr("出血斑"),
@@ -183,7 +181,7 @@ QString MainWindow::get_current_file() const
 QString MainWindow::get_current_obj_file()
 {
     const int iObj = get_current_obj_id();
-    if (iObj < 1)
+    if (iObj < 0)
     {
         return QString("");
     }
@@ -332,8 +330,7 @@ void MainWindow::on_actionRedo_triggered()
 
 void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 {
-
-    if (0 == obj_id)
+    if (obj_id<0)
     {
         _pixmap_widget->enable_painting(false);
     }
@@ -343,7 +340,7 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 
         QString iFile = get_current_file();
         QString iDir = get_current_direction();
-        if (iFile.isEmpty() || iDir.isEmpty() || obj_id == 0)
+        if (iFile.isEmpty() || iDir.isEmpty() || obj_id < 0)
         {
             return;
         }
@@ -403,17 +400,20 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
     if (_current_obj_file_collection.empty())
     {
         objTypeComboBox->blockSignals(true);
-        objTypeComboBox->setCurrentIndex(0);
-        _pixmap_widget->enable_painting(false);
+        on_objTypeComboBox_currentIndexChanged(objTypeComboBox->currentIndex());
+        _pixmap_widget->enable_painting(true);
         objTypeComboBox->blockSignals(false);
     }
     else
     {
-        objTypeComboBox->blockSignals(true);
-        const int current_obj_id = _current_obj_file_collection.begin()->first;
-        objTypeComboBox->setCurrentIndex(current_obj_id);
+        const int pre_obj_id = objTypeComboBox->currentIndex();
+        if (_current_obj_file_collection.find(pre_obj_id) == _current_obj_file_collection.end())
+        {
+            objTypeComboBox->blockSignals(true);
+            on_objTypeComboBox_currentIndexChanged(pre_obj_id);
+            objTypeComboBox->blockSignals(false);
+        }
         _pixmap_widget->enable_painting(true);
-        objTypeComboBox->blockSignals(false);
     }
 
     _current_history_img = 0;
@@ -521,7 +521,7 @@ void MainWindow::refresh_obj_mask_i()
     QString iFile = get_current_file();
     QString iDir = get_current_direction();
     int iObj = get_current_obj_id();
-    if (iFile.isEmpty() || iDir.isEmpty() || iObj == 0)
+    if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
     {
         return;
     }
@@ -723,7 +723,7 @@ void MainWindow::save_mask_i()
     QString iFile = get_current_file();
     QString iDir = get_current_direction();
     int iObj = get_current_obj_id();
-    if (iFile.isEmpty() || iDir.isEmpty() || iObj ==0)
+    if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
     {
         return;
     }
@@ -817,10 +817,10 @@ std::map<int, QString> MainWindow::get_mask_files()
     for (int i = 0 ; i<files.size()  ;++i)
     {
         std::string s(files[i].toLocal8Bit());
-        for (int j = 1 ; j< MASK_TPYE_NUM ; ++j)
+        for (int j = 0 ; j< MASK_TPYE_NUM ; ++j)
         {
             std::string target = S_mask_types[j];
-            if (s.find(target))
+            if (s.find(target) != std::string::npos)
             {
                 _current_obj_file_collection[j] = files[i];
                 break;
@@ -833,6 +833,13 @@ std::map<int, QString> MainWindow::get_mask_files()
 
 void MainWindow::on_confidenceCheckBox_stateChanged(int state)
 {
-    std::cout << state << std::endl;
+    if (state)
+    {
+        _pixmap_widget->set_confidence(true);
+    }
+    else
+    {
+        _pixmap_widget->set_confidence(false);
+    }
 }
 
