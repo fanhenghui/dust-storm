@@ -147,9 +147,13 @@ void PixmapWidget::set_mask_transparency(double transparency)
         for (int x = 0; x < _drawMask.size().width(); ++x)
         {
             QRgb rgb = _drawMask.pixel(x, y);
-            if (qRed(rgb) != 0 || qGreen(rgb) != 0 || qBlue(rgb) != 0)
+            int r = qRed(rgb);
+            int g = qGreen(rgb);
+            int b = qBlue(rgb);
+            if ( r != 0 || g != 0 || b != 0)
             {
-                QRgb new_rgb = qRgba( qRed(rgb) , qGreen(rgb) , qBlue(rgb) , int(255*transparency));
+                int a = int(255*transparency);
+                QRgb new_rgb = qRgba( r , g , b , a);
                 _drawMask.setPixel(x, y, new_rgb);
             }
         }
