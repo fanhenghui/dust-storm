@@ -48,14 +48,12 @@ namespace
 PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *parent )
     : QGLWidget( parent)
 {
-    scrollArea = parentScrollArea;
-    m_pm = new QPixmap();
-    zoomFactor = 1.0;
-    iMaskEditColor = 1;
-    penWidth = 5;
-    maskTransparency = 0.5;
-    isDrawing = false;
-    isFloodFilling = false;
+    _scroll_area = parentScrollArea;
+    _pixmap = new QPixmap();
+    _zoom_factor = 1.0;
+    _pen_width = 5;
+    _mask_transparency = 0.5;
+    _is_drawing = false;
     _enable_painting = false;
     _is_confident = true;
     _is_erasing = false;
@@ -63,9 +61,8 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
 
     setAttribute(Qt::WA_OpaquePaintEvent);
     setFocusPolicy(Qt::NoFocus);
-    setMinimumSize( m_pm->width()*zoomFactor, m_pm->height()*zoomFactor );
+    setMinimumSize( _pixmap->width()*_zoom_factor, _pixmap->height()*_zoom_factor );
     setMouseTracking(true);
-    setCursor(QCursor(Qt::BlankCursor));
 
 
     makeCurrent();
@@ -76,21 +73,21 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
 
 PixmapWidget::~PixmapWidget()
 {
-    delete m_pm;
+    delete _pixmap;
 }
 
-void PixmapWidget::setZoomFactor( double f )
+void PixmapWidget::slot_zoom_factor_changed( double f )
 {
     int w, h;
 
-    if( fabs(f - zoomFactor) <= 0.001 )
+    if( fabs(f - _zoom_factor) <= 0.001 )
         return;
 
-    zoomFactor = f;
-    emit( zoomFactorChanged( zoomFactor ) );
+    _zoom_factor = f;
+    emit( zoomFactorChanged( _zoom_factor ) );
 
-    w = m_pm->width()*zoomFactor;
-    h = m_pm->height()*zoomFactor;
+    w = _pixmap->width()*_zoom_factor;
+    h = _pixmap->height()*_zoom_factor;
     setMinimumSize( w, h );
     std::cout << w << " , " << h << std::endl;
 
@@ -104,28 +101,15 @@ void PixmapWidget::setZoomFactor( double f )
     update();
 }
 
-int PixmapWidget::getMaskEditColor()
-{
-    return MAX(0, MIN(_drawMask.colorCount() - 1, iMaskEditColor));
-}
-
 const QImage& PixmapWidget::get_draw_mask() const
 {
-    //updateMask();
-
     return _drawMask;
 }
 
-void PixmapWidget::setPenWidth(int width)
+void PixmapWidget::set_pen_width(int width)
 {
-    penWidth = width;
+    _pen_width = width;
     update();
-}
-
-void PixmapWidget::setMaskEditColor(int iColor)
-{
-    std::cout << "Edti color : " << iColor << std::endl;
-    iMaskEditColor = iColor;
 }
 
 void PixmapWidget::set_mask(QImage& input_mask)
@@ -151,8 +135,9 @@ void PixmapWidget::set_mask(QImage& input_mask)
 }
 
 
-void PixmapWidget::setMaskTransparency(double transparency)
+void PixmapWidget::set_mask_transparency(double transparency)
 {
+    std::cout << transparency << std::endl;
     //maskTransparency = transparency;
     //updateMask();
 
@@ -168,25 +153,14 @@ void PixmapWidget::setMaskTransparency(double transparency)
     //update();
 }
 
-void PixmapWidget::setFloodFill(bool flag)
-{
-    isFloodFilling = flag;
-    if (flag)
-        setCursor(QCursor(Qt::CrossCursor));
-    else
-        setCursor(QCursor(Qt::BlankCursor));
-
-    update();
-}
-
 void PixmapWidget::set_pixmap( const QPixmap& pixmap)
 {
-    delete m_pm;
-    m_pm = new QPixmap(pixmap);
+    delete _pixmap;
+    _pixmap = new QPixmap(pixmap);
 
-    emit( pixmapChanged( m_pm ) );
+    emit( pixmapChanged( _pixmap ) );
 
-    setMinimumSize( m_pm->width()*zoomFactor, m_pm->height()*zoomFactor );
+    setMinimumSize( _pixmap->width()*_zoom_factor, _pixmap->height()*_zoom_factor );
     repaint();
 }
 
@@ -201,31 +175,34 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     bool drawBorder = false;
     int xOffset = 0, yOffset = 0;
 
-    if( width() > m_pm->width()*zoomFactor ) {
-        xOffset = (width()-m_pm->width()*zoomFactor)/2;
+    if( width() > _pixmap->width()*_zoom_factor ) {
+        xOffset = (width()-_pixmap->width()*_zoom_factor)/2;
         drawBorder = true;
     }
 
-    if( height() > m_pm->height()*zoomFactor ) {
-        yOffset = (height()-m_pm->height()*zoomFactor)/2;
+    if( height() > _pixmap->height()*_zoom_factor ) {
+        yOffset = (height()-_pixmap->height()*_zoom_factor)/2;
         drawBorder = true;
     }
 
     // get the current value of the parent scroll area .. to optimize the painting
     double hValue = 0, hMin = 0, hMax = 0, hPageStep = 0, hLength = 0;
     double vValue = 0, vMin = 0, vMax = 0, vPageStep = 0, vLength = 0;
-    if (scrollArea) {
+    if (_scroll_area) 
+    {
         QScrollBar *scrollBar;
-        scrollBar = scrollArea->horizontalScrollBar();
-        if (scrollBar) {
+        scrollBar = _scroll_area->horizontalScrollBar();
+        if (scrollBar) 
+        {
             hValue = scrollBar->value();
             hMin = scrollBar->minimum();
             hMax = scrollBar->maximum();
             hPageStep = scrollBar->pageStep();
             hLength = hMax - hMin + hPageStep;
         }
-        scrollBar = scrollArea->verticalScrollBar();
-        if (scrollBar) {
+        scrollBar = _scroll_area->verticalScrollBar();
+        if (scrollBar) 
+        {
             vValue = scrollBar->value();
             vMin = scrollBar->minimum();
             vMax = scrollBar->maximum();
@@ -245,18 +222,18 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     // adjust the coordinate system
     p.save();
     p.translate(xOffset, yOffset);
-    p.scale(zoomFactor, zoomFactor);
-    currentMatrixInv = p.matrix().inverted();
-    currentMatrix = p.matrix();
+    p.scale(_zoom_factor, _zoom_factor);
+    _current_matrix_inv = p.matrix().inverted();
+    _current_matrix = p.matrix();
 
     // find out which part of the image we have to draw
     // since we are embedded into a QScrollArea and not all is visible
-    QRectF updateRectF = currentMatrixInv.mapRect(event->rect());
-    if (lastVScrollValue != vValue || lastHScrollValue != hValue || updateRectF.isEmpty()) {
-        updateRectF.setLeft((hValue / hLength) * m_pm->width());
-        updateRectF.setWidth((hPageStep / hLength) * m_pm->width());
-        updateRectF.setTop((vValue / vLength) * m_pm->height());
-        updateRectF.setHeight((vPageStep / vLength) * m_pm->height());
+    QRectF updateRectF = _current_matrix_inv.mapRect(event->rect());
+    if (_last_v_scroll_value != vValue || _last_h_scroll_value != hValue || updateRectF.isEmpty()) {
+        updateRectF.setLeft((hValue / hLength) * _pixmap->width());
+        updateRectF.setWidth((hPageStep / hLength) * _pixmap->width());
+        updateRectF.setTop((vValue / vLength) * _pixmap->height());
+        updateRectF.setHeight((vPageStep / vLength) * _pixmap->height());
     }
     QRect updateRect;
     updateRect.setLeft(round(updateRectF.left()) - 1);
@@ -265,14 +242,14 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     updateRect.setBottom(round(updateRectF.bottom()) + 1);
 
     // save the scroll bar values
-    lastVScrollValue = vValue;
-    lastHScrollValue = hValue;
+    _last_v_scroll_value = vValue;
+    _last_h_scroll_value = hValue;
 
     // find out what needs to be cleared on the canvas outside the image
     QRectF eraseTop(updateRect.left(), updateRect.top(), updateRect.width(), -updateRect.top());
-    QRectF eraseBottom(updateRect.left(), m_pm->height(), updateRect.width(), updateRect.height() - (-updateRect.top() + m_pm->height()));
-    QRectF eraseLeft(updateRect.left(), 0, -updateRect.left(), m_pm->height());
-    QRectF eraseRight(m_pm->width(), 0, updateRect.height() - (-updateRect.left() + m_pm->width()), m_pm->height());
+    QRectF eraseBottom(updateRect.left(), _pixmap->height(), updateRect.width(), updateRect.height() - (-updateRect.top() + _pixmap->height()));
+    QRectF eraseLeft(updateRect.left(), 0, -updateRect.left(), _pixmap->height());
+    QRectF eraseRight(_pixmap->width(), 0, updateRect.height() - (-updateRect.left() + _pixmap->width()), _pixmap->height());
     if (eraseTop.isValid())
         p.eraseRect(eraseTop);
     if (eraseBottom.isValid())
@@ -282,66 +259,31 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     if (eraseRight.isValid())
         p.eraseRect(eraseRight);
 
-    // draw the image
     //std::cout<< "( "<<updateRect.left() << " , " << updateRect.right() << " ) " << " , ( "<<updateRect.bottom() << " , " << updateRect.top()<< " ) \n" ;
-    
 
-    p.drawPixmap(updateRect.topLeft(), *m_pm, updateRect);
+    // draw the image
+    p.drawPixmap(updateRect.topLeft(), *_pixmap, updateRect);
 
-    // draw the object mask
-    //clock_t start_time = clock();
-    //QImage transparentMask = drawMask.convertToFormat(QImage::Format_ARGB32);
-    //
-    //
-    //QImage alphaChannel = transparentMask.alphaChannel();
-    //for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < transparentMask.height(); y++)
-    //{
-    //    for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < transparentMask.width(); x++) 
-    //    {
-    //        QRgb rgb = transparentMask.pixel(x, y);
-    //        if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
-    //            // black is the background color .. 100% transparent
-    //            alphaChannel.setPixel(x, y, 0);
-    //        else
-    //            // all other colors are partly transparent
-    //            alphaChannel.setPixel(x, y, (int)(255 * maskTransparency + 0.5));
-    //    }
-    //}
-    //
-
-    //transparentMask.setAlphaChannel(alphaChannel);
-
-    //clock_t end_time = clock();
-   //std::cout << (double)(end_time - start_time) << std::endl;
-
-    //p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
+    // draw the mask
     p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
 
+    //TODO using cursor to replace bruch itself
     // draw the brush
-    //std::cout << isFloodFilling << std::endl;
-    if (!isFloodFilling) 
-    {
-        setCursor(QCursor(Qt::BlankCursor));
-
-        QPen penWhite(QColor(255, 255, 255, (int)(255 * maskTransparency + 0.5)));
-        penWhite.setWidth(1 / zoomFactor);
-        QPen penBlack(QColor(0, 0, 0, (int)(255 * maskTransparency + 0.5)));
-        penBlack.setWidth(1 / zoomFactor);
-        p.setPen(penWhite);
-        p.drawEllipse(QRectF(
-            xyMouseFollowed.x() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
-            xyMouseFollowed.y() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
-            penWidth + 1 / zoomFactor, penWidth + 1 / zoomFactor));
-        p.setPen(penBlack);
-        p.drawEllipse(QRectF(
-            xyMouseFollowed.x() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
-            xyMouseFollowed.y() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
-            penWidth - 1 / zoomFactor, penWidth - 1 / zoomFactor));
-    }
-    else
-    {
-        setCursor(QCursor(Qt::ArrowCursor));
-    }
+    QPen penWhite(Qt::lightGray);
+    penWhite.setWidth(1 / _zoom_factor);
+    QPen penBlack(Qt::darkGray);
+    penBlack.setWidth(1 / _zoom_factor);
+    p.setPen(penWhite);
+    p.setRenderHint(QPainter::Antialiasing, true);
+    p.drawEllipse(QRectF(
+        xyMouseFollowed.x() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
+        xyMouseFollowed.y() - 0.5 * _pen_width - 0.5 / _zoom_factor + 0.5,
+        _pen_width + 1 / _zoom_factor, _pen_width + 1 / _zoom_factor));
+    p.setPen(penBlack);
+    p.drawEllipse(QRectF(
+        xyMouseFollowed.x() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
+        xyMouseFollowed.y() - 0.5 * _pen_width + 0.5 / _zoom_factor + 0.5,
+        _pen_width - 1 / _zoom_factor, _pen_width - 1 / _zoom_factor));
 
     // draw a border around the image
     p.restore();
@@ -355,36 +297,34 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
 
 void PixmapWidget::mousePressEvent(QMouseEvent * event)
 {
-    if (isFloodFilling)
+    if (!_enable_painting)
     {
         return;
     }
 
     // get the mouse coordinate in the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
-    QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
+    QPoint xyMouse = _current_matrix_inv.map(xyMouseOrg);
 
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
         // get the region of the mouse cursor
         QRect updateRectOrg;
-        int penOffset = (int) ceil(zoomFactor * (0.5 * penWidth + 2));
+        int penOffset = (int) ceil(_zoom_factor * (0.5 * _pen_width + 2));
         updateRectOrg.setLeft(xyMouseOrg.x() - penOffset);
         updateRectOrg.setRight(xyMouseOrg.x() + penOffset);
         updateRectOrg.setTop(xyMouseOrg.y() - penOffset);
         updateRectOrg.setBottom(xyMouseOrg.y() + penOffset);
 
-        QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
+        QRect updateRect = _current_matrix_inv.mapRect(updateRectOrg);
 
         if (event->button() == Qt::LeftButton)
         {
             _is_erasing = false;
-            iMaskEditColor = 1;
         }
         else 
         {
             _is_erasing = true;
-            iMaskEditColor = 0;
         }
 
         // draw on the full image
@@ -392,10 +332,10 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
         setup_current_painter_i(painter);
         painter.drawPoint(xyMouse);
 
-        isDrawing = true;
+        _is_drawing = true;
 
         // save the current position and perform an update in the
-        // region of the mouse cousor
+        // region of the mouse cusor
         lastXyMouseOrg = xyMouseOrg;
         lastXyMouse = xyMouse;
         lastXyDrawnMouseOrg = xyMouseOrg;
@@ -406,26 +346,26 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
 
 void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 {
-    if (isFloodFilling)
+    if (!_enable_painting)
     {
         return;
     }
 
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
-    QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
+    QPoint xyMouse = _current_matrix_inv.map(xyMouseOrg);
     //	QPoint lastXyMouse = currentMatrixInv.map(lastXyMouseOrg);
     xyMouseFollowed = xyMouse;
 
     // determine the region that has been changed
     QRect updateRectOrg;
-    updateRectOrg.setLeft(MIN(lastXyMouseOrg.x(), xyMouseOrg.x()) - (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setRight(MAX(lastXyMouseOrg.x(), xyMouseOrg.x()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setTop(MIN(lastXyMouseOrg.y(), xyMouseOrg.y()) - (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
+    updateRectOrg.setLeft(MIN(lastXyMouseOrg.x(), xyMouseOrg.x()) - (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setRight(MAX(lastXyMouseOrg.x(), xyMouseOrg.x()) + (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setTop(MIN(lastXyMouseOrg.y(), xyMouseOrg.y()) - (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    QRect updateRect = _current_matrix_inv.mapRect(updateRectOrg);
 
-    if (isDrawing) 
+    if (_is_drawing) 
     {
         QPainter painter(&_drawMask);
         setup_current_painter_i(painter);
@@ -434,31 +374,31 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 
     // save the current position and perform an update
     lastXyMouseOrg = xyMouseOrg;
-    lastXyMouse = currentMatrixInv.map(xyMouseOrg);
+    lastXyMouse = _current_matrix_inv.map(xyMouseOrg);
     update(updateRectOrg);
 }
 
 void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 {
-    if (isFloodFilling)
+    if (!_enable_painting)
     {
         return;
     }
 
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
-    QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
-    QPoint lastXyMouse = currentMatrixInv.map(lastXyMouseOrg);
+    QPoint xyMouse = _current_matrix_inv.map(xyMouseOrg);
+    QPoint lastXyMouse = _current_matrix_inv.map(lastXyMouseOrg);
 
     // determine the region that has been changed
     QRect updateRectOrg;
-    updateRectOrg.setLeft(MIN(lastXyMouseOrg.x(), xyMouseOrg.x()) - (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setRight(MAX(lastXyMouseOrg.x(), xyMouseOrg.x()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setTop(MIN(lastXyMouseOrg.y(), xyMouseOrg.y()) - (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
-    QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
+    updateRectOrg.setLeft(MIN(lastXyMouseOrg.x(), xyMouseOrg.x()) - (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setRight(MAX(lastXyMouseOrg.x(), xyMouseOrg.x()) + (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setTop(MIN(lastXyMouseOrg.y(), xyMouseOrg.y()) - (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
+    QRect updateRect = _current_matrix_inv.mapRect(updateRectOrg);
 
-    if (event->button() == Qt::LeftButton && isDrawing) 
+    if (event->button() == Qt::LeftButton && _is_drawing) 
     {
         QPainter painter(&_drawMask);
         setup_current_painter_i(painter);
@@ -467,15 +407,15 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 
     // save the last position
     lastXyMouseOrg = xyMouseOrg;
-    lastXyMouse = currentMatrixInv.map(xyMouseOrg);
+    lastXyMouse = _current_matrix_inv.map(xyMouseOrg);
     lastXyDrawnMouseOrg = xyMouseOrg;
-    lastXyDrawnMouse = currentMatrixInv.map(xyMouseOrg);
+    lastXyDrawnMouse = _current_matrix_inv.map(xyMouseOrg);
 
     // send the signal that the mask has been changed
-    emit( drawEvent( &_drawMask ) );
+    emit( maskChanged( &_drawMask ) );
 
     // update
-    isDrawing = false;
+    _is_drawing = false;
     _is_erasing = false;
 
     // paint update
@@ -526,30 +466,37 @@ void PixmapWidget::updateMask()
     //    }
 }
 
-QRgb PixmapWidget::get_color_i()
+void PixmapWidget::setup_current_painter_i(QPainter &painter)
 {
+    QColor rgba;
     if (_is_erasing)
     {
-        return _drawMask.color(BACKGROUND);
+        rgba = QColor(_drawMask.color(BACKGROUND));
+        rgba.setAlpha(0);
     }
     else
     {
         if (_is_confident)
         {
-            return _drawMask.color(CONFIDENCE_OBJECT);
+            rgba = QColor(_drawMask.color(CONFIDENCE_OBJECT));
         }
         else
         {
-            return _drawMask.color(UN_CONFIDENCE_OBJECT);
+            rgba = QColor(_drawMask.color(UN_CONFIDENCE_OBJECT));
         }
+        rgba.setAlpha(int(_mask_transparency*255));
     }
-}
 
-void PixmapWidget::setup_current_painter_i(QPainter &painter)
-{
     painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(QPen(QBrush(get_color_i()),
-        penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.setPen(QPen(rgba, _pen_width, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    if (_is_erasing)
+    {
+        painter.setCompositionMode(QPainter::CompositionMode_Clear);
+    }
+    else
+    {
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    }
 }
 
 void PixmapWidget::initializeGL()
@@ -560,6 +507,17 @@ void PixmapWidget::initializeGL()
 void PixmapWidget::enable_painting(bool flag)
 {
     _enable_painting = flag;
+
+    if (flag)
+    {
+        setCursor(QCursor(Qt::CrossCursor));
+    }
+    else
+    {
+        setCursor(QCursor(Qt::ArrowCursor));
+    }
+
+    update();
 }
 
 void PixmapWidget::set_confidence(bool flag)

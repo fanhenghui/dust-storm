@@ -89,7 +89,6 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
 
     _scroll_area = new ScrollAreaNoWheel(this);
     _pixmap_widget = new PixmapWidget(_scroll_area, _scroll_area);
-    _pixmap_widget->setFloodFill(true);
     
     _scroll_area->setWidgetResizable(true);
     _scroll_area->setWidget(_pixmap_widget);
@@ -115,8 +114,8 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     setFocusPolicy(Qt::WheelFocus);
 
     // make some connections
-    connect(_pixmap_widget, SIGNAL(drawEvent(QImage *)), this, SLOT(slot_mask_draw_i(QImage *)));
-    connect(zoomSpinBox, SIGNAL(valueChanged(double)), _pixmap_widget, SLOT(setZoomFactor(double)));
+    connect(_pixmap_widget, SIGNAL(maskChanged(QImage *)), this, SLOT(slot_mask_draw_i(QImage *)));
+    connect(zoomSpinBox, SIGNAL(valueChanged(double)), _pixmap_widget, SLOT(slot_zoom_factor_changed(double)));
     connect(_pixmap_widget, SIGNAL(zoomFactorChanged(double)), zoomSpinBox, SLOT(setValue(double)));
     connect(_scroll_area, SIGNAL(wheelTurned(QWheelEvent*)), this, SLOT(slot_wheel_turned_in_scroll_area_i(QWheelEvent *)));
 
@@ -239,7 +238,6 @@ void MainWindow::on_actionOpenDir_triggered()
     // the ctrl key rests
     _is_key_ctrl_pressed = false;
     _is_key_shift_pressed = false;
-    _pixmap_widget->setFloodFill(false);
 
     // update the statusbar
     statusBar()->showMessage("Opened directory structure " + opened_dir, 5 * 1000);
@@ -337,11 +335,11 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 
     if (0 == obj_id)
     {
-        _pixmap_widget->setFloodFill(true);
+        _pixmap_widget->enable_painting(false);
     }
     else
     {
-        _pixmap_widget->setFloodFill(false);
+        _pixmap_widget->enable_painting(true);
 
         QString iFile = get_current_file();
         QString iDir = get_current_direction();
@@ -406,6 +404,7 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
     {
         objTypeComboBox->blockSignals(true);
         objTypeComboBox->setCurrentIndex(0);
+        _pixmap_widget->enable_painting(false);
         objTypeComboBox->blockSignals(false);
     }
     else
@@ -413,6 +412,7 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
         objTypeComboBox->blockSignals(true);
         const int current_obj_id = _current_obj_file_collection.begin()->first;
         objTypeComboBox->setCurrentIndex(current_obj_id);
+        _pixmap_widget->enable_painting(true);
         objTypeComboBox->blockSignals(false);
     }
 
@@ -426,12 +426,12 @@ void MainWindow::on_brushSizeComboBox_currentIndexChanged(int i)
 {
     if (i < 0 || i >= brushSizes.size())
         return;
-    _pixmap_widget->setPenWidth(brushSizes[i]);
+    _pixmap_widget->set_pen_width(brushSizes[i]);
 }
 
 void MainWindow::on_transparencySlider_valueChanged(int i)
 {
-    _pixmap_widget->setMaskTransparency(((double)i) / transparencySlider->maximum());
+    _pixmap_widget->set_mask_transparency(((double)i) / transparencySlider->maximum());
 }
 
 void MainWindow::slot_mask_draw_i(QImage *mask)
@@ -660,7 +660,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
     if (event->key() == Qt::Key_Control) {
         event->accept();
         _is_key_ctrl_pressed = false;
-        //pixmapWidget->setFloodFill(false);
         statusBar()->clearMessage();
     }
     else if (event->key() == Qt::Key_Shift) {
@@ -674,29 +673,35 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
-    if (!event->isAccepted()) {
+    if (!event->isAccepted()) 
+    {
         // see what to do with the event
-        if (_is_key_shift_pressed) {
+        if (_is_key_shift_pressed) 
+        {
             // select a different file
             if (event->delta() < 0)
                 switch_img_file(Down);
             else if (event->delta() > 0)
                 switch_img_file(Up);
         }
-        else if (_is_key_ctrl_pressed) {
+        else if (_is_key_ctrl_pressed) 
+        {
             // select a different object
-            if (event->delta() > 0) {
+            if (event->delta() > 0) 
+            {
                 int idx = brushSizeComboBox->currentIndex() + 1;
                 idx = idx > brushSizeComboBox->count() ? brushSizeComboBox->count() : idx;
                 brushSizeComboBox->setCurrentIndex(idx);
             }
-            else if (event->delta() < 0) {
+            else if (event->delta() < 0) 
+            {
                 int idx = brushSizeComboBox->currentIndex() - 1;
                 idx = idx > 0 ? idx : 0;
                 brushSizeComboBox->setCurrentIndex(idx);
             }
         }
-        else {
+        else 
+        {
             // forward the wheelEvent to the zoomSpinBox
             if (event->delta() > 0)
                 zoomSpinBox->stepDown();
@@ -719,19 +724,21 @@ void MainWindow::save_mask_i()
     QString iDir = get_current_direction();
     int iObj = get_current_obj_id();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj ==0)
+    {
         return;
+    }
 
     // get the current mask
-    const QImage draw_mask = _pixmap_widget->get_draw_mask();
+    const QImage& draw_mask = _pixmap_widget->get_draw_mask();
 
     //convert draw mask(RGBA32) to saved mask(Indexed8)
     QImage mask(draw_mask.size() , QImage::Format_Indexed8);
     mask.setColorTable(_color_table);
     mask.fill(BACKGROUND);
 
-    QRgb color_background =qRgb(0, 0, 0);
-    QRgb color_confident= qRgb(255, 0, 0);
-    QRgb color_unconfident =qRgb(0, 255, 0);
+    //const QRgb color_background =qRgb(0, 0, 0);
+    const QRgb color_confident= qRgb(255, 0, 0);
+    const QRgb color_unconfident =qRgb(0, 255, 0);
 
     const int img_height = draw_mask.height();
     const int img_width = draw_mask.width();
@@ -740,11 +747,12 @@ void MainWindow::save_mask_i()
         for (int x = 0; x < img_width; ++x) 
         {
             QRgb rgb = draw_mask.pixel(x, y);
-            if (qRed(rgb) == qRed(color_confident))
+
+            if (qRed(rgb) >0)
             {
                 mask.setPixel(x, y, CONFIDENCE_OBJECT);
             }
-            else if(qGreen(rgb) == qGreen(color_unconfident)) 
+            else if(qGreen(rgb) > 0) 
             {
                 mask.setPixel(x, y, UN_CONFIDENCE_OBJECT);
             }

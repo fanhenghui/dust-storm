@@ -54,26 +54,24 @@ class PixmapWidget : public QGLWidget
 public:
     PixmapWidget(QAbstractScrollArea*, QWidget *parent=0);
     virtual ~PixmapWidget();
-    int getMaskEditColor();
     const QImage& get_draw_mask() const;
 
     void enable_painting(bool flag);
+
     void set_pixmap(const QPixmap&);
     void set_mask(QImage&);
     void set_confidence(bool flag);
 
-    void setMaskEditColor(int iColor);
-    void setPenWidth(int width);
-    void setMaskTransparency(double transparency);
-    void setFloodFill(bool flag);
+    void set_pen_width(int width);
+    void set_mask_transparency(double transparency);
 
 public slots:
-    void setZoomFactor(double);
+    void slot_zoom_factor_changed(double);
 
 signals:
     void zoomFactorChanged(double);
     void pixmapChanged(QPixmap*);
-    void drawEvent(QImage*);
+    void maskChanged(QImage*);
 
 protected:
     virtual void initializeGL();
@@ -87,27 +85,29 @@ protected:
 private:
     void updateMouseCursor();
     void updateMask();
-    QRgb get_color_i();
     void setup_current_painter_i(QPainter &painter);
 
 private:
-    QPixmap *m_pm;
+    QPixmap *_pixmap;
     QImage _drawMask;
-    double zoomFactor;
-    double maskTransparency;
-    int iMaskEditColor;
-    int penWidth;
-    QMatrix currentMatrixInv;
-    QMatrix currentMatrix;
+
+    double _zoom_factor;
+    double _mask_transparency;
+    int _pen_width;
+
+    QMatrix _current_matrix_inv;
+    QMatrix _current_matrix;
     QPoint lastXyMouseOrg;
     QPoint lastXyMouse;
     QPoint lastXyDrawnMouseOrg;
     QPoint lastXyDrawnMouse;
     QPoint xyMouseFollowed;
-    bool isDrawing, isFloodFilling;
-    double lastVScrollValue, lastHScrollValue;
 
-    QAbstractScrollArea *scrollArea;
+    bool _is_drawing;
+
+    double _last_v_scroll_value;
+    double _last_h_scroll_value;
+    QAbstractScrollArea *_scroll_area;
 
     bool _enable_painting;
     bool _is_confident;
