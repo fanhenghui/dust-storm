@@ -33,9 +33,10 @@
 #include <QtDebug>
 #include <QMessageBox>
 #include <QImageReader>
+#include <QTextCodec>
 
 
-#define MASK_TPYE_NUM 9
+#define MASK_TPYE_NUM 11
 static const std::string S_mask_types[MASK_TPYE_NUM] = 
 {
     "none",
@@ -45,8 +46,10 @@ static const std::string S_mask_types[MASK_TPYE_NUM] =
     "cotton wool spots",
     "venous beading",
     "neovascularization",
-    "IMRA"
-    "hemorrhages spot"
+    "IMRA",
+    "hemorrhages spot",
+    "artery",
+    "vein"
 };
 
 
@@ -123,6 +126,31 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
 
     // set some default values
     brushSizeComboBox->setCurrentIndex(1);
+
+    //set objTypeComboBox item
+    QTextCodec::setCodecForTr(QTextCodec::codecForLocale());
+    QString mask_type_tool_tips[MASK_TPYE_NUM] = 
+    {
+        tr("¿Õ"),
+        tr("Î¢Ð¡Ñª¹ÜÁö") , 
+        tr("Ó²ÐÔÉø³öÎï"),
+        tr("³öÑª°ß"),
+        tr("ÃÞÈÞ°ß"),
+        tr("¾²Âö´®Öé"),
+        tr("ÐÂÉúÑª¹Ü"),
+        tr("Î¢Ñª¹ÜÒì³£"),
+        tr("³öÑª°ß"),
+        tr("¶¯Âö"),
+        tr("¾²Âö")
+    };
+
+    objTypeComboBox->setToolTip(tr("²¡ÔîÃû³Æ"));
+    objTypeComboBox->clear();
+    for (int i = 0 ; i< MASK_TPYE_NUM ; ++i)
+    {
+        objTypeComboBox->addItem(QString(S_mask_types[i].c_str()));
+        objTypeComboBox->setItemData(i , mask_type_tool_tips[i] ,Qt::ToolTipRole);
+    }
 }
 
 QString MainWindow::getMaskFile(int iMask, QString fileName) const
@@ -172,7 +200,7 @@ int MainWindow::currentObj() const
         return -1;
     }
 
-    return ComboBox_ObjType->currentIndex();
+    return objTypeComboBox->currentIndex();
 }
 
 
@@ -321,7 +349,7 @@ void MainWindow::on_actionRedo_triggered()
     }
 }
 
-void MainWindow::on_ComboBox_ObjType_currentIndexChanged(int obj_id)
+void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 {
 
     if (0 == obj_id)
@@ -393,16 +421,16 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
     getMaskFiles();
     if (_current_obj_file_collection.empty())
     {
-        ComboBox_ObjType->blockSignals(true);
-        ComboBox_ObjType->setCurrentIndex(0);
-        ComboBox_ObjType->blockSignals(false);
+        objTypeComboBox->blockSignals(true);
+        objTypeComboBox->setCurrentIndex(0);
+        objTypeComboBox->blockSignals(false);
     }
     else
     {
-        ComboBox_ObjType->blockSignals(true);
+        objTypeComboBox->blockSignals(true);
         const int current_obj_id = _current_obj_file_collection.begin()->first;
-        ComboBox_ObjType->setCurrentIndex(current_obj_id);
-        ComboBox_ObjType->blockSignals(false);
+        objTypeComboBox->setCurrentIndex(current_obj_id);
+        objTypeComboBox->blockSignals(false);
     }
 
     currentHistoryImg = 0;

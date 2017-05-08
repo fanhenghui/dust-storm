@@ -63,24 +63,22 @@ private:
     std::map<int, QString> getMaskFiles();
 
 private slots:
-    void onWheelTurnedInScrollArea(QWheelEvent *);
     void on_actionOpenDir_triggered();
     void on_actionQuit_triggered();
     void on_actionShortcutHelp_triggered();
     void on_actionUndo_triggered();
     void on_actionRedo_triggered();
 
-    void on_transparencySlider_valueChanged(int i);
-    void on_ComboBox_ObjType_currentIndexChanged(int);
     void on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *);
 
+    void on_transparencySlider_valueChanged(int i);
+    void on_objTypeComboBox_currentIndexChanged(int);
     void on_brushSizeComboBox_currentIndexChanged(int);
 
-
+    void onWheelTurnedInScrollArea(QWheelEvent *);
     void onMaskDraw(QImage *mask);
     void refreshImgView();
     void refreshObjMask();
-
     void nextPreviousFile(Direction);
 
 private:

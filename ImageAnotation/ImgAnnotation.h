@@ -63,7 +63,8 @@ public:
 };
 
 
-class ImgAnnotation : public QObject {
+class ImgAnnotation : public QObject 
+{
     Q_OBJECT
 
 public:

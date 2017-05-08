@@ -415,7 +415,6 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
             setUpPainter(painter);
             painter.drawLine(lastXyMouse, xyMouse);
         }
-
     }
 
     // save the current position and perform an update
@@ -431,8 +430,6 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
         return;
     }
 
-    iMaskEditColor = 1;
-
     // save the mouse position in coordinates of the zoomed image
     QPoint xyMouseOrg(event->x(), event->y());
     QPoint xyMouse = currentMatrixInv.map(xyMouseOrg);
@@ -446,17 +443,15 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
     updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(zoomFactor * (0.5 * penWidth + 2)));
     QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
 
-    if (event->button() == Qt::LeftButton && isDrawing) {
-
-        if (iMaskDrawOnColor < 0) {
+    if (event->button() == Qt::LeftButton && isDrawing) 
+    {
+        if (iMaskDrawOnColor < 0) 
+        {
             // draw on the full image
             QPainter painter(&drawMask);
             setUpPainter(painter);
             painter.drawLine(lastXyMouse, xyMouse);
         }
-
-        // update
-        isDrawing = false;
     }
 
     // save the last position
@@ -468,6 +463,9 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
     // send the signal that the mask has been changed
     updateMask();
     emit( drawEvent( &mask ) );
+
+    // update
+    isDrawing = false;
 
     // paint update
     update(updateRectOrg);
