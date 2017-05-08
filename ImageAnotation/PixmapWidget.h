@@ -55,7 +55,7 @@ public:
     PixmapWidget(QAbstractScrollArea*, QWidget *parent=0);
     virtual ~PixmapWidget();
     int getMaskEditColor();
-    QImage* getMask();
+    const QImage& get_draw_mask() const;
 
     void enable_painting(bool flag);
     void set_pixmap(const QPixmap&);
@@ -92,7 +92,7 @@ private:
 
 private:
     QPixmap *m_pm;
-    QImage mask, drawMask;
+    QImage _drawMask;
     double zoomFactor;
     double maskTransparency;
     int iMaskEditColor;

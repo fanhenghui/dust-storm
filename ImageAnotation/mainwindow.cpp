@@ -375,7 +375,7 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 
         // clear the history and append the current mask
         _img_undo_history.clear();
-        QImage maskImg = _pixmap_widget->getMask()->copy();
+        QImage maskImg = _pixmap_widget->get_draw_mask().copy();
         _img_undo_history.push_front(maskImg);
         _current_history_img = 0;
         update_undo_redo_menu();
@@ -722,10 +722,40 @@ void MainWindow::save_mask_i()
         return;
 
     // get the current mask
-    QImage *mask = _pixmap_widget->getMask();
+    const QImage draw_mask = _pixmap_widget->get_draw_mask();
 
+    //convert draw mask(RGBA32) to saved mask(Indexed8)
+    QImage mask(draw_mask.size() , QImage::Format_Indexed8);
+    mask.setColorTable(_color_table);
+    mask.fill(BACKGROUND);
+
+    QRgb color_background =qRgb(0, 0, 0);
+    QRgb color_confident= qRgb(255, 0, 0);
+    QRgb color_unconfident =qRgb(0, 255, 0);
+
+    const int img_height = draw_mask.height();
+    const int img_width = draw_mask.width();
+    for (int y = 0; y < img_height; ++y)
+    {
+        for (int x = 0; x < img_width; ++x) 
+        {
+            QRgb rgb = draw_mask.pixel(x, y);
+            if (qRed(rgb) == qRed(color_confident))
+            {
+                mask.setPixel(x, y, CONFIDENCE_OBJECT);
+            }
+            else if(qGreen(rgb) == qGreen(color_unconfident)) 
+            {
+                mask.setPixel(x, y, UN_CONFIDENCE_OBJECT);
+            }
+            else
+            {
+                mask.setPixel(x , y , BACKGROUND);
+            }
+        }
+    }
     // save the mask
-    mask->save(_current_opened_direction + iDir + "/" + _current_obj_file_collection[iObj], "PNG");
+    mask.save(_current_opened_direction + iDir + "/" + _current_obj_file_collection[iObj], "PNG");
 
     // save the image in the history and delete items in case the history
     // is too big
@@ -734,7 +764,7 @@ void MainWindow::save_mask_i()
         _img_undo_history.pop_front();
         _current_history_img--;
     }
-    QImage maskCopy = mask->copy();
+    QImage maskCopy = mask.copy();
     _img_undo_history.push_front(maskCopy);
     while (_img_undo_history.size() > _max_history_step)
         _img_undo_history.pop_back();

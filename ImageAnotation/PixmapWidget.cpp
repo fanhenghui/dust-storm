@@ -106,14 +106,14 @@ void PixmapWidget::setZoomFactor( double f )
 
 int PixmapWidget::getMaskEditColor()
 {
-    return MAX(0, MIN(mask.colorCount() - 1, iMaskEditColor));
+    return MAX(0, MIN(_drawMask.colorCount() - 1, iMaskEditColor));
 }
 
-QImage* PixmapWidget::getMask()
+const QImage& PixmapWidget::get_draw_mask() const
 {
-    updateMask();
+    //updateMask();
 
-    return &mask;
+    return _drawMask;
 }
 
 void PixmapWidget::setPenWidth(int width)
@@ -128,52 +128,44 @@ void PixmapWidget::setMaskEditColor(int iColor)
     iMaskEditColor = iColor;
 }
 
-void PixmapWidget::set_mask(QImage& newMask)
+void PixmapWidget::set_mask(QImage& input_mask)
 {
     // store the new mask
-    mask = newMask.copy();
+    QVector<uint> color_table = input_mask.colorTable();
+    _drawMask = input_mask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    _drawMask.setColorTable(color_table);
 
-    // create a partly transparent mask
-    QImage tmpMask = newMask.copy();
-    for (int i = 0; i < drawMask.colorCount(); i++)
+    for (int y = 0; y < _drawMask.size().height(); ++y)
     {
-        tmpMask.setColor(i, drawMask.color(i));
-    }
-
-    drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-    for (int y = 0; y < drawMask.size().height(); ++y)
-    {
-        for (int x = 0; x < drawMask.size().width(); ++x)
+        for (int x = 0; x < _drawMask.size().width(); ++x)
         {
-            QRgb rgb = drawMask.pixel(x, y);
+            QRgb rgb = _drawMask.pixel(x, y);
             if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
             {
-                drawMask.setPixel(x, y, 0);
+                _drawMask.setPixel(x, y, 0);
             }
         }
     }
     // we have to repaint
     repaint();
-
 }
 
 
 void PixmapWidget::setMaskTransparency(double transparency)
 {
-    maskTransparency = transparency;
-    updateMask();
+    //maskTransparency = transparency;
+    //updateMask();
 
-    // create a partly transparent mask
-    QImage tmpMask = mask.copy();
-    for (int i = 0; i < drawMask.colorCount(); i++) {
-        tmpMask.setColor(i, drawMask.color(i));
-    }
-    drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    //// create a partly transparent mask
+    //QImage tmpMask = mask.copy();
+    //for (int i = 0; i < _drawMask.colorCount(); i++) {
+    //    tmpMask.setColor(i, _drawMask.color(i));
+    //}
+    //_drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
 
-    // we have to repaint
-    update();
+    //// we have to repaint
+    //update();
 }
 
 void PixmapWidget::setFloodFill(bool flag)
@@ -323,7 +315,7 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
    //std::cout << (double)(end_time - start_time) << std::endl;
 
     //p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
-    p.drawImage(updateRect.topLeft(), drawMask, updateRect);
+    p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
 
     // draw the brush
     //std::cout << isFloodFilling << std::endl;
@@ -396,7 +388,7 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
         }
 
         // draw on the full image
-        QPainter painter(&drawMask);
+        QPainter painter(&_drawMask);
         setup_current_painter_i(painter);
         painter.drawPoint(xyMouse);
 
@@ -435,7 +427,7 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 
     if (isDrawing) 
     {
-        QPainter painter(&drawMask);
+        QPainter painter(&_drawMask);
         setup_current_painter_i(painter);
         painter.drawLine(lastXyMouse, xyMouse);
     }
@@ -468,7 +460,7 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 
     if (event->button() == Qt::LeftButton && isDrawing) 
     {
-        QPainter painter(&drawMask);
+        QPainter painter(&_drawMask);
         setup_current_painter_i(painter);
         painter.drawLine(lastXyMouse, xyMouse);
     }
@@ -480,8 +472,7 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
     lastXyDrawnMouse = currentMatrixInv.map(xyMouseOrg);
 
     // send the signal that the mask has been changed
-    updateMask();
-    emit( drawEvent( &mask ) );
+    emit( drawEvent( &_drawMask ) );
 
     // update
     isDrawing = false;
@@ -497,59 +488,59 @@ void PixmapWidget::updateMouseCursor()
 
 void PixmapWidget::updateMask()
 {
-    // store the original color table and clear the original mask
-    QVector<QRgb> orgColorTable = mask.colorTable();
-    mask.fill(0);
+    //// store the original color table and clear the original mask
+    //QVector<QRgb> orgColorTable = mask.colorTable();
+    //mask.fill(0);
 
-    // convert the mask to the original format
-    QRgb lastRgb = qRgb(0, 0, 0);
-    int  lastI = 0;
-    for (int y = 0; y < drawMask.height(); y++)
-        for (int x = 0; x < drawMask.width(); x++) {
-            QRgb rgb = drawMask.pixel(x, y);
+    //// convert the mask to the original format
+    //QRgb lastRgb = qRgb(0, 0, 0);
+    //int  lastI = 0;
+    //for (int y = 0; y < _drawMask.height(); y++)
+    //    for (int x = 0; x < _drawMask.width(); x++) {
+    //        QRgb rgb = _drawMask.pixel(x, y);
 
-            // see whether we have to find for the right color index or not
-            if (rgb == lastRgb)
-                mask.setPixel(x, y, lastI);
-            else {
-                // find the closest color
-                int bestI = -1;
-                double tmpDist, bestDist;
-                for (int j = 0; j < orgColorTable.size(); j++) {
-                    tmpDist = pow(double(qRed(rgb) - qRed(orgColorTable[j])), 2)
-                        + pow(double(qGreen(rgb) - qGreen(orgColorTable[j])), 2)
-                        + pow(double(qBlue(rgb) - qBlue(orgColorTable[j])), 2);
-                    if (bestI < 0 || tmpDist < bestDist) {
-                        bestI = j;
-                        bestDist = tmpDist;
-                        if (bestDist == 0)
-                            break;
-                    }
-                }
+    //        // see whether we have to find for the right color index or not
+    //        if (rgb == lastRgb)
+    //            mask.setPixel(x, y, lastI);
+    //        else {
+    //            // find the closest color
+    //            int bestI = -1;
+    //            double tmpDist, bestDist;
+    //            for (int j = 0; j < orgColorTable.size(); j++) {
+    //                tmpDist = pow(double(qRed(rgb) - qRed(orgColorTable[j])), 2)
+    //                    + pow(double(qGreen(rgb) - qGreen(orgColorTable[j])), 2)
+    //                    + pow(double(qBlue(rgb) - qBlue(orgColorTable[j])), 2);
+    //                if (bestI < 0 || tmpDist < bestDist) {
+    //                    bestI = j;
+    //                    bestDist = tmpDist;
+    //                    if (bestDist == 0)
+    //                        break;
+    //                }
+    //            }
 
-                // set the color and buffer the values
-                mask.setPixel(x, y, bestI);
-                lastI = bestI;
-                lastRgb = rgb;
-            }
-        }
+    //            // set the color and buffer the values
+    //            mask.setPixel(x, y, bestI);
+    //            lastI = bestI;
+    //            lastRgb = rgb;
+    //        }
+    //    }
 }
 
 QRgb PixmapWidget::get_color_i()
 {
     if (_is_erasing)
     {
-        return mask.color(BACKGROUND);
+        return _drawMask.color(BACKGROUND);
     }
     else
     {
         if (_is_confident)
         {
-            return mask.color(CONFIDENCE_OBJECT);
+            return _drawMask.color(CONFIDENCE_OBJECT);
         }
         else
         {
-            return mask.color(UN_CONFIDENCE_OBJECT);
+            return _drawMask.color(UN_CONFIDENCE_OBJECT);
         }
     }
 }
