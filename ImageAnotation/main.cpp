@@ -24,9 +24,9 @@
 #include "MainWindow.h"
 #include <QtDebug>
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #pragma comment( linker, "/subsystem:\"console\" /entry:\"mainCRTStartup\"" )
-#endif
+//#endif
 
 int main(int argc, char *argv[])
 {

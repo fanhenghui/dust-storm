@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <time.h>
 
 #include "defines.h"
 #include <QPixmap>
@@ -135,11 +136,26 @@ void PixmapWidget::set_mask(QImage& newMask)
     // create a partly transparent mask
     QImage tmpMask = newMask.copy();
     for (int i = 0; i < drawMask.colorCount(); i++)
+    {
         tmpMask.setColor(i, drawMask.color(i));
-    drawMask = tmpMask.convertToFormat(QImage::Format_RGB32);
+    }
 
+    drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
+    for (int y = 0; y < drawMask.size().height(); ++y)
+    {
+        for (int x = 0; x < drawMask.size().width(); ++x)
+        {
+            QRgb rgb = drawMask.pixel(x, y);
+            if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
+            {
+                drawMask.setPixel(x, y, 0);
+            }
+        }
+    }
     // we have to repaint
     repaint();
+
 }
 
 
@@ -275,61 +291,74 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
         p.eraseRect(eraseRight);
 
     // draw the image
+    //std::cout<< "( "<<updateRect.left() << " , " << updateRect.right() << " ) " << " , ( "<<updateRect.bottom() << " , " << updateRect.top()<< " ) \n" ;
+    
+
     p.drawPixmap(updateRect.topLeft(), *m_pm, updateRect);
 
     // draw the object mask
-    QImage transparentMask = drawMask.convertToFormat(QImage::Format_ARGB32);
-    QImage alphaChannel = transparentMask.alphaChannel();
-    for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < transparentMask.height(); y++)
+    //clock_t start_time = clock();
+    //QImage transparentMask = drawMask.convertToFormat(QImage::Format_ARGB32);
+    //
+    //
+    //QImage alphaChannel = transparentMask.alphaChannel();
+    //for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < transparentMask.height(); y++)
+    //{
+    //    for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < transparentMask.width(); x++) 
+    //    {
+    //        QRgb rgb = transparentMask.pixel(x, y);
+    //        if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
+    //            // black is the background color .. 100% transparent
+    //            alphaChannel.setPixel(x, y, 0);
+    //        else
+    //            // all other colors are partly transparent
+    //            alphaChannel.setPixel(x, y, (int)(255 * maskTransparency + 0.5));
+    //    }
+    //}
+    //
+
+    //transparentMask.setAlphaChannel(alphaChannel);
+
+    //clock_t end_time = clock();
+   //std::cout << (double)(end_time - start_time) << std::endl;
+
+    //p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
+    p.drawImage(updateRect.topLeft(), drawMask, updateRect);
+
+    // draw the brush
+    //std::cout << isFloodFilling << std::endl;
+    if (!isFloodFilling) 
     {
-        for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < transparentMask.width(); x++) 
-        {
-            QRgb rgb = transparentMask.pixel(x, y);
-            if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
-                // black is the background color .. 100% transparent
-                alphaChannel.setPixel(x, y, 0);
-            else
-                // all other colors are partly transparent
-                alphaChannel.setPixel(x, y, (int)(255 * maskTransparency + 0.5));
-        }
+        setCursor(QCursor(Qt::BlankCursor));
+
+        QPen penWhite(QColor(255, 255, 255, (int)(255 * maskTransparency + 0.5)));
+        penWhite.setWidth(1 / zoomFactor);
+        QPen penBlack(QColor(0, 0, 0, (int)(255 * maskTransparency + 0.5)));
+        penBlack.setWidth(1 / zoomFactor);
+        p.setPen(penWhite);
+        p.drawEllipse(QRectF(
+            xyMouseFollowed.x() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
+            xyMouseFollowed.y() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
+            penWidth + 1 / zoomFactor, penWidth + 1 / zoomFactor));
+        p.setPen(penBlack);
+        p.drawEllipse(QRectF(
+            xyMouseFollowed.x() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
+            xyMouseFollowed.y() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
+            penWidth - 1 / zoomFactor, penWidth - 1 / zoomFactor));
     }
-        transparentMask.setAlphaChannel(alphaChannel);
-        p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
+    else
+    {
+        setCursor(QCursor(Qt::ArrowCursor));
+    }
 
-        // draw the brush
-        //std::cout << isFloodFilling << std::endl;
-        if (!isFloodFilling) 
-        {
-            setCursor(QCursor(Qt::BlankCursor));
+    // draw a border around the image
+    p.restore();
+    //if (drawBorder) {
+    //	p.setPen( Qt::black );
+    //	p.drawRect( xOffset-1, yOffset-1, m_pm->width()*zoomFactor+1, m_pm->height()*zoomFactor+1 );
+    //}
 
-            QPen penWhite(QColor(255, 255, 255, (int)(255 * maskTransparency + 0.5)));
-            penWhite.setWidth(1 / zoomFactor);
-            QPen penBlack(QColor(0, 0, 0, (int)(255 * maskTransparency + 0.5)));
-            penBlack.setWidth(1 / zoomFactor);
-            p.setPen(penWhite);
-            p.drawEllipse(QRectF(
-                xyMouseFollowed.x() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
-                xyMouseFollowed.y() - 0.5 * penWidth - 0.5 / zoomFactor + 0.5,
-                penWidth + 1 / zoomFactor, penWidth + 1 / zoomFactor));
-            p.setPen(penBlack);
-            p.drawEllipse(QRectF(
-                xyMouseFollowed.x() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
-                xyMouseFollowed.y() - 0.5 * penWidth + 0.5 / zoomFactor + 0.5,
-                penWidth - 1 / zoomFactor, penWidth - 1 / zoomFactor));
-        }
-        else
-        {
-            setCursor(QCursor(Qt::ArrowCursor));
-        }
-
-        // draw a border around the image
-        p.restore();
-        //if (drawBorder) {
-        //	p.setPen( Qt::black );
-        //	p.drawRect( xOffset-1, yOffset-1, m_pm->width()*zoomFactor+1, m_pm->height()*zoomFactor+1 );
-        //}
-
-        swapBuffers();
+    swapBuffers();
 }
 
 void PixmapWidget::mousePressEvent(QMouseEvent * event)
