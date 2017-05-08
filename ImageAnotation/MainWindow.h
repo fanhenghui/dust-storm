@@ -44,11 +44,11 @@ public:
 
 public:
     MainWindow(QWidget *parent = 0, QFlag flags = 0);
-    QString getMaskFile(int iMask, QString fileName) const;
-    QString currentDir() const;
-    QString currentFile() const;
-    QString currentObjFile();
-    int currentObj() const;
+    QString get_mask_file(int obj_id, QString img_file) const;
+    QString get_current_direction() const;
+    QString get_current_file() const;
+    QString get_current_obj_file();
+    int get_current_obj_id() const;
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -57,10 +57,13 @@ protected:
     void wheelEvent(QWheelEvent *event);
 
 private:
-    void errorMessageMask();
-    void saveMask();
-    void updateUndoMenu();
-    std::map<int, QString> getMaskFiles();
+    void show_mask_error_message_i();
+    void save_mask_i();
+    void update_undo_redo_menu();
+    std::map<int, QString> get_mask_files();
+    void refresh_img_tree_i();
+    void refresh_obj_mask_i();
+    void switch_img_file(Direction);
 
 private slots:
     void on_actionOpenDir_triggered();
@@ -75,41 +78,28 @@ private slots:
     void on_objTypeComboBox_currentIndexChanged(int);
     void on_brushSizeComboBox_currentIndexChanged(int);
 
-    void onWheelTurnedInScrollArea(QWheelEvent *);
-    void onMaskDraw(QImage *mask);
-    void refreshImgView();
-    void refreshObjMask();
-    void nextPreviousFile(Direction);
+    void on_confidenceCheckBox_stateChanged(int);
+
+    void slot_wheel_turned_in_scroll_area_i(QWheelEvent *);
+    void slot_mask_draw_i(QImage *mask);
 
 private:
-    PixmapWidget *pixmapWidget;
-    ScrollAreaNoWheel *scrollArea;
-    QString currentlyOpenedDir;
+    PixmapWidget *_pixmap_widget;
+    ScrollAreaNoWheel *_scroll_area;
 
+    QString _current_opened_direction;
     std::map<int , QString> _current_obj_file_collection;
 
-    ImgAnnotation annotations;
-    QString lastObjType;
+    QVector<QRgb> _color_table;
 
-    IAObj copiedObj;
-
-    QVector<QRgb> colorTable;
-    int iBackgroundColor, iObjectColor, iOccludedColor;
-    QStringList objTypes;
-    QStringList maskTypes;
-    QStringList labels;
-    int iBackgroundMask, iObjMask, iOccludedObjMask;
     QVector<int> brushSizes;
 
-    QList<QImage> imgUndoHistory;
-    int currentHistoryImg;
-    int maxHistorySize;
+    QList<QImage> _img_undo_history;
+    int _current_history_img;
+    int _max_history_step;
 
-    bool keyShiftPressed;
-    bool keyCtrlPressed;
-
-    //Current mask type
-    QString _current_mask_type;
+    bool _is_key_shift_pressed;
+    bool _is_key_ctrl_pressed;
 };
 
 #endif

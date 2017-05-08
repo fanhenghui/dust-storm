@@ -35,6 +35,7 @@
 #include <QImageReader>
 #include <QTextCodec>
 
+#include "defines.h"
 
 #define MASK_TPYE_NUM 11
 static const std::string S_mask_types[MASK_TPYE_NUM] = 
@@ -60,7 +61,9 @@ bool maskFileLessThan(const QString &f1, const QString &f2)
     QString front1 = f1.section(".", 0, -4);
     QString front2 = f2.section(".", 0, -4);
     if (front1 != front2)
+    {
         return front1 < front2;
+    }
 
     // compare numbers
     QString strNum1 = f1.section(".", -2, -2);
@@ -83,33 +86,26 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
 {
     // set up the UI
     setupUi(this);
-    scrollArea = new ScrollAreaNoWheel(this);
-    pixmapWidget = new PixmapWidget(scrollArea, scrollArea);
-    pixmapWidget->setFloodFill(true);
+
+    _scroll_area = new ScrollAreaNoWheel(this);
+    _pixmap_widget = new PixmapWidget(_scroll_area, _scroll_area);
+    _pixmap_widget->setFloodFill(true);
     
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setWidget(pixmapWidget);
-    setCentralWidget(scrollArea);
-    keyShiftPressed = false;
-    keyCtrlPressed = false;
+    _scroll_area->setWidgetResizable(true);
+    _scroll_area->setWidget(_pixmap_widget);
+    setCentralWidget(_scroll_area);
+    _is_key_shift_pressed = false;
+    _is_key_ctrl_pressed = false;
 
-    // some hardcoded data
-    colorTable << qRgb(0, 0, 0); // background
-    colorTable << qRgb(255, 0, 0); // object
-    colorTable << qRgb(0, 255, 0); // occluded
-    iBackgroundColor = 0;
-    iObjectColor = 1;
-    iOccludedColor = 2;
-    objTypes << "Default";
-    maskTypes << "background" << "object" << "occluded object";
-    labels << "positive" << "uncertain";
-    iBackgroundMask = 0;
-    iObjMask = 1;
-    iOccludedObjMask = 2;
+    // some hard coded data
+    _color_table << qRgb(0, 0, 0); // background
+    _color_table << qRgb(255, 0, 0); // confident object
+    _color_table << qRgb(0, 255, 0); // unconfident object
+    
+
     brushSizes << 1 << 3 << 5 << 7 << 9 << 11 << 13 << 15 << 18 << 20 << 25 << 30 << 50 << 100;
-    maxHistorySize = 10;
-
-    currentHistoryImg = 0;
+    _max_history_step = 10;
+    _current_history_img = 0;
 
     for (int i = 0; i < brushSizes.size(); i++)
         brushSizeComboBox->addItem("Circle (" + QString::number(brushSizes[i]) + "x" + QString::number(brushSizes[i]) + ")");
@@ -119,10 +115,10 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     setFocusPolicy(Qt::WheelFocus);
 
     // make some connections
-    connect(pixmapWidget, SIGNAL(drawEvent(QImage *)), this, SLOT(onMaskDraw(QImage *)));
-    connect(zoomSpinBox, SIGNAL(valueChanged(double)), pixmapWidget, SLOT(setZoomFactor(double)));
-    connect(pixmapWidget, SIGNAL(zoomFactorChanged(double)), zoomSpinBox, SLOT(setValue(double)));
-    connect(scrollArea, SIGNAL(wheelTurned(QWheelEvent*)), this, SLOT(onWheelTurnedInScrollArea(QWheelEvent *)));
+    connect(_pixmap_widget, SIGNAL(drawEvent(QImage *)), this, SLOT(slot_mask_draw_i(QImage *)));
+    connect(zoomSpinBox, SIGNAL(valueChanged(double)), _pixmap_widget, SLOT(setZoomFactor(double)));
+    connect(_pixmap_widget, SIGNAL(zoomFactorChanged(double)), zoomSpinBox, SLOT(setValue(double)));
+    connect(_scroll_area, SIGNAL(wheelTurned(QWheelEvent*)), this, SLOT(slot_wheel_turned_in_scroll_area_i(QWheelEvent *)));
 
     // set some default values
     brushSizeComboBox->setCurrentIndex(1);
@@ -153,34 +149,41 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     }
 }
 
-QString MainWindow::getMaskFile(int iMask, QString fileName) const
+QString MainWindow::get_mask_file(int obj_id, QString img_file) const
 {
-    return fileName.replace(".image.", ".").section(".", 0, -2) + ".mask." + QString(S_mask_types[iMask].c_str()) + ".png";
+    return img_file.replace(".image.", ".").section(".", 0, -2) + ".mask." + QString(S_mask_types[obj_id].c_str()) + ".png";
 }
 
-QString MainWindow::currentDir() const
+QString MainWindow::get_current_direction() const
 {
     QTreeWidgetItem *current = imgTreeWidget->currentItem();
     if (!current || !current->parent())
+    {
         return "";
-
-    QString dir = current->parent()->text(0);
-
-    return dir;
+    }
+    else
+    {
+        QString dir = current->parent()->text(0);
+        return dir;
+    }
 }
 
-QString MainWindow::currentFile() const
+QString MainWindow::get_current_file() const
 {
     QTreeWidgetItem *current = imgTreeWidget->currentItem();
     if (!current || !current->parent())
+    {
         return "";
-
-    return current->text(0);
+    }
+    else
+    {
+        return current->text(0);
+    }
 }
 
-QString MainWindow::currentObjFile()
+QString MainWindow::get_current_obj_file()
 {
-    const int iObj = currentObj();
+    const int iObj = get_current_obj_id();
     if (iObj < 1)
     {
         return QString("");
@@ -191,20 +194,22 @@ QString MainWindow::currentObjFile()
     }
 }
 
-int MainWindow::currentObj() const
+int MainWindow::get_current_obj_id() const
 {
-    QString file = currentFile();
-    QString dir = currentDir();
+    QString file = get_current_file();
+    QString dir = get_current_direction();
     if (file.isEmpty() || dir.isEmpty())
     {
         return -1;
     }
-
-    return objTypeComboBox->currentIndex();
+    else
+    {
+        return objTypeComboBox->currentIndex();
+    }
 }
 
 
-void MainWindow::onWheelTurnedInScrollArea(QWheelEvent *event)
+void MainWindow::slot_wheel_turned_in_scroll_area_i(QWheelEvent *event)
 {
     wheelEvent(event);
 }
@@ -215,27 +220,29 @@ void MainWindow::on_actionOpenDir_triggered()
     statusBar()->clearMessage();
 
     // ask the user to add files
-    QString openedDir = QFileDialog::getExistingDirectory(this, "Choose a directory to be read in", currentlyOpenedDir);
+    QString opened_dir = QFileDialog::getExistingDirectory(this, "Choose a directory to be read in", _current_opened_direction);
 
-    if (openedDir.isEmpty())
+    if (opened_dir.isEmpty())
+    {
         return;
+    }
 
     // save the opened path
-    currentlyOpenedDir = openedDir;
+    _current_opened_direction = opened_dir;
 
     // read in the directory structure
-    refreshImgView();
+    refresh_img_tree_i();
 
     // update the window title
-    setWindowTitle("ImageAnnotation - " + openedDir);
+    setWindowTitle("ImageAnnotation - " + opened_dir);
 
     // the ctrl key rests
-    keyCtrlPressed = false;
-    keyShiftPressed = false;
-    pixmapWidget->setFloodFill(false);
+    _is_key_ctrl_pressed = false;
+    _is_key_shift_pressed = false;
+    _pixmap_widget->setFloodFill(false);
 
     // update the statusbar
-    statusBar()->showMessage("Opened directory structure " + openedDir, 5 * 1000);
+    statusBar()->showMessage("Opened directory structure " + opened_dir, 5 * 1000);
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -258,35 +265,11 @@ void MainWindow::on_actionShortcutHelp_triggered()
         "</tr><tr>\n"
         "<td><b>Right Mouse Button</b></td>\n"
         "<td width=10></td>\n"
-        "<td>draw a line from the last drawn position to the current one</td>\n"
-        "</tr><tr>\n"
-        "<td><b>Ctrl + Left Mouse Button</b></td>\n"
-        "<td width=10></td>\n"
-        "<td>flood filling with the current color</td>\n"
-        "</tr><tr>\n"
-        "<td><b>Alt+A</b></td>\n"
-        "<td width=10></td>\n"
-        "<td>add a new object</td>\n"
-        "</tr><tr>\n"
-        "<td><b>Alt+D</b></td>\n"
-        "<td width=10></td>\n"
-        "<td>duplicate the current object</td>\n"
-        "</tr><tr>\n"
-        "<td><b>Alt+R</b></td>\n"
-        "<td width=10></td>\n"
-        "<td>remove the current object</td>\n"
+        "<td>erase current point</td>\n"
         "</tr><tr>\n"
         "<td><b>1, ..., 9</b></td>\n"
         "<td></td>\n"
         "<td>choose brush size from drop down box</td>\n"
-        "</tr><tr>\n"
-        "<td><b>F1, F2, F3</b></td>\n"
-        "<td></td>\n"
-        "<td>choose edit color from drop down box</td>\n"
-        "</tr><tr>\n"
-        "<td><b>Shift+F1, ... F4</b></td>\n"
-        "<td></td>\n"
-        "<td>choose draw on color from drop down box</td>\n"
         "</tr><tr>\n"
         "<td><b>MouseWheel Up/Down</b></td>\n"
         "<td></td>\n"
@@ -305,47 +288,47 @@ void MainWindow::on_actionShortcutHelp_triggered()
 
 void MainWindow::on_actionUndo_triggered()
 {
-    if (currentHistoryImg < imgUndoHistory.size() - 1 && imgUndoHistory.size() > 1) {
+    if (_current_history_img < _img_undo_history.size() - 1 && _img_undo_history.size() > 1) {
         // get the name of the mask image file
-        QString iFile = currentFile();
-        QString iDir = currentDir();
-        QString iMask = currentObjFile();
+        QString iFile = get_current_file();
+        QString iDir = get_current_direction();
+        QString iMask = get_current_obj_file();
         if (iFile.isEmpty() || iDir.isEmpty() || iMask.isEmpty())
             return;
-        QString objMaskFilename = getMaskFile(currentObj(), iFile);
+        QString objMaskFilename = get_mask_file(get_current_obj_id(), iFile);
 
         // save the image from the history
-        currentHistoryImg++;
-        if (!imgUndoHistory[currentHistoryImg].save(currentlyOpenedDir + iDir + "/" + objMaskFilename, "PNG")) {
-            errorMessageMask();
+        _current_history_img++;
+        if (!_img_undo_history[_current_history_img].save(_current_opened_direction + iDir + "/" + objMaskFilename, "PNG")) {
+            show_mask_error_message_i();
             return;
         }
 
-        refreshObjMask();
-        updateUndoMenu();
+        refresh_obj_mask_i();
+        update_undo_redo_menu();
     }
 }
 
 void MainWindow::on_actionRedo_triggered()
 {
-    if (currentHistoryImg > 0 && currentHistoryImg < imgUndoHistory.size() && imgUndoHistory.size() > 1) {
+    if (_current_history_img > 0 && _current_history_img < _img_undo_history.size() && _img_undo_history.size() > 1) {
         // get the name of the mask image file
-        QString iFile = currentFile();
-        QString iDir = currentDir();
-        QString iMask = currentObjFile();
+        QString iFile = get_current_file();
+        QString iDir = get_current_direction();
+        QString iMask = get_current_obj_file();
         if (iFile.isEmpty() || iDir.isEmpty() || iMask.isEmpty())
             return;
-        QString objMaskFilename = getMaskFile(currentObj(), iFile);
+        QString objMaskFilename = get_mask_file(get_current_obj_id(), iFile);
 
         // save the image from the history
-        currentHistoryImg--;
-        if (!imgUndoHistory[currentHistoryImg].save(currentlyOpenedDir + iDir + "/" + objMaskFilename, "PNG")) {
-            errorMessageMask();
+        _current_history_img--;
+        if (!_img_undo_history[_current_history_img].save(_current_opened_direction + iDir + "/" + objMaskFilename, "PNG")) {
+            show_mask_error_message_i();
             return;
         }
 
-        refreshObjMask();
-        updateUndoMenu();
+        refresh_obj_mask_i();
+        update_undo_redo_menu();
     }
 }
 
@@ -354,14 +337,14 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 
     if (0 == obj_id)
     {
-        pixmapWidget->setFloodFill(true);
+        _pixmap_widget->setFloodFill(true);
     }
     else
     {
-        pixmapWidget->setFloodFill(false);
+        _pixmap_widget->setFloodFill(false);
 
-        QString iFile = currentFile();
-        QString iDir = currentDir();
+        QString iFile = get_current_file();
+        QString iDir = get_current_direction();
         if (iFile.isEmpty() || iDir.isEmpty() || obj_id == 0)
         {
             return;
@@ -372,15 +355,15 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
         // create a new segmentation mask
         if (empty_obj_file)
         {
-            QImage orgImg(currentlyOpenedDir + iDir + "/" + iFile);
+            QImage orgImg(_current_opened_direction + iDir + "/" + iFile);
             QImage mask(orgImg.size(), QImage::Format_Indexed8);
-            mask.setColorTable(colorTable);
-            mask.fill(iBackgroundColor);
+            mask.setColorTable(_color_table);
+            mask.fill(BACKGROUND);
             //mask.setText("annotationObjType", objTypes[0]);
-            QString objMaskFilename = getMaskFile(obj_id, iFile);
-            if (!mask.save(currentlyOpenedDir + iDir + "/" + objMaskFilename, "PNG")) 
+            QString objMaskFilename = get_mask_file(obj_id, iFile);
+            if (!mask.save(_current_opened_direction + iDir + "/" + objMaskFilename, "PNG")) 
             {
-                errorMessageMask();
+                show_mask_error_message_i();
                 return;
             }
             _current_obj_file_collection[obj_id] = objMaskFilename;
@@ -388,14 +371,14 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 
 
         // refresh
-        refreshObjMask();
+        refresh_obj_mask_i();
 
         // clear the history and append the current mask
-        imgUndoHistory.clear();
-        QImage maskImg = pixmapWidget->getMask()->copy();
-        imgUndoHistory.push_front(maskImg);
-        currentHistoryImg = 0;
-        updateUndoMenu();
+        _img_undo_history.clear();
+        QImage maskImg = _pixmap_widget->getMask()->copy();
+        _img_undo_history.push_front(maskImg);
+        _current_history_img = 0;
+        update_undo_redo_menu();
 
     }
 }
@@ -403,22 +386,22 @@ void MainWindow::on_objTypeComboBox_currentIndexChanged(int obj_id)
 void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
     // check weather dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
+    QString iFile = get_current_file();
+    QString iDir = get_current_direction();
     if (iFile.isEmpty() || iDir.isEmpty())
         return;
 
     // check weather we have a relative or absolute path
     QString absoluteDir;
     if (iDir[0] != '/')
-        absoluteDir = currentlyOpenedDir;
+        absoluteDir = _current_opened_direction;
 
     // load new file
     QString filepath(absoluteDir + iDir + "/" + iFile);
-    pixmapWidget->setPixmap(QPixmap(filepath  ));
+    _pixmap_widget->set_pixmap(QPixmap(filepath  ));
 
     // refresh the objListWidget
-    getMaskFiles();
+    get_mask_files();
     if (_current_obj_file_collection.empty())
     {
         objTypeComboBox->blockSignals(true);
@@ -433,9 +416,9 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
         objTypeComboBox->blockSignals(false);
     }
 
-    currentHistoryImg = 0;
+    _current_history_img = 0;
 
-    refreshObjMask();
+    refresh_obj_mask_i();
 }
 
 
@@ -443,29 +426,29 @@ void MainWindow::on_brushSizeComboBox_currentIndexChanged(int i)
 {
     if (i < 0 || i >= brushSizes.size())
         return;
-    pixmapWidget->setPenWidth(brushSizes[i]);
+    _pixmap_widget->setPenWidth(brushSizes[i]);
 }
 
 void MainWindow::on_transparencySlider_valueChanged(int i)
 {
-    pixmapWidget->setMaskTransparency(((double)i) / transparencySlider->maximum());
+    _pixmap_widget->setMaskTransparency(((double)i) / transparencySlider->maximum());
 }
 
-void MainWindow::onMaskDraw(QImage *mask)
+void MainWindow::slot_mask_draw_i(QImage *mask)
 {
     // check weather dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
+    QString iFile = get_current_file();
+    QString iDir = get_current_direction();
+    int iObj = get_current_obj_id();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj < 0)
         return;
 
     // save the mask
     // should only save mask once when finish mask draw
-    saveMask();
+    save_mask_i();
 }
 
-void MainWindow::refreshImgView()
+void MainWindow::refresh_img_tree_i()
 {
     QList<QByteArray> sup_imgs = QImageReader::supportedImageFormats();
     std::cout << "Support format : ";
@@ -489,7 +472,7 @@ void MainWindow::refreshImgView()
         dirs << nextDirStr;
 
         // get all directories in the current directory
-        QDir currentDir(currentlyOpenedDir + nextDirStr);
+        QDir currentDir(_current_opened_direction + nextDirStr);
         QStringList dirList = currentDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
         for (int i = 0; i < dirList.size(); i++) {
             relativeDirStack << nextDirStr + "/" + dirList[i];
@@ -502,7 +485,7 @@ void MainWindow::refreshImgView()
     nameFilters << "*.jpg" << "*.png" << "*.bmp" << "*.jpeg" << "*.tif" << "*.gif" << "*.tiff" << "*.pbm" << "*.pgm" << "*.ppm" << "*.xbm" << "*.xpm";
     for (int i = 0; i < dirs.size(); i++) {
         // get all images in the current directory
-        QDir currentDir(currentlyOpenedDir + dirs[i]);
+        QDir currentDir(_current_opened_direction + dirs[i]);
         currentDir.setFilter(QDir::Files);
         currentDir.setNameFilters(nameFilters);
         QStringList files = currentDir.entryList();
@@ -532,14 +515,16 @@ void MainWindow::refreshImgView()
     imgTreeWidget->sortItems(0, Qt::AscendingOrder);
 }
 
-void MainWindow::refreshObjMask()
+void MainWindow::refresh_obj_mask_i()
 {
-    // check wether dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
+    // check weather dir/file/object have been selected
+    QString iFile = get_current_file();
+    QString iDir = get_current_direction();
+    int iObj = get_current_obj_id();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj == 0)
+    {
         return;
+    }
 
     //if (iObj < 0) {
     //    // set an empty mask if no mask exists
@@ -550,23 +535,27 @@ void MainWindow::refreshObjMask()
     //else 
     {
         // load the mask
-        QImage mask(currentlyOpenedDir + iDir + "/" + currentObjFile());
-
+        QImage mask(_current_opened_direction + iDir + "/" + get_current_obj_file());
         // convert binary masks
-        if (mask.colorCount() == 2) {
-            QImage newMask(mask.size(), QImage::Format_Indexed8);
-            newMask.setColorTable(colorTable);
-            for (int y = 0; y < newMask.height(); y++)
-                for (int x = 0; x < newMask.width(); x++)
-                    newMask.setPixel(x, y, mask.pixelIndex(x, y));
-            mask = newMask;
-        }
+        //if (mask.colorCount() == 2) 
+        //{
+        //    QImage newMask(mask.size(), QImage::Format_Indexed8);
+        //    newMask.setColorTable(_color_table);
+        //    for (int y = 0; y < newMask.height(); y++)
+        //    {
+        //        for (int x = 0; x < newMask.width(); x++)
+        //        {
+        //            newMask.setPixel(x, y, mask.pixelIndex(x, y));
+        //        }
+        //        mask = newMask;
+        //    }
+        //}
 
-        pixmapWidget->setMask(mask);
+        _pixmap_widget->set_mask(mask);
     }
 }
 
-void MainWindow::nextPreviousFile(MainWindow::Direction direction)
+void MainWindow::switch_img_file(MainWindow::Direction direction)
 {
     // choose the current items from the imgTreeWidget
     QTreeWidgetItem *current = imgTreeWidget->currentItem();
@@ -645,18 +634,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent * event)
 {
     if (event->key() == Qt::Key_Control) {
-        keyCtrlPressed = true;
+        _is_key_ctrl_pressed = true;
         //pixmapWidget->setFloodFill(true);
         statusBar()->showMessage("Use mouse wheel to increase/decrease brush size");
         event->accept();
     }
     else if (event->key() == Qt::Key_Shift) {
-        keyShiftPressed = true;
+        _is_key_shift_pressed = true;
         statusBar()->showMessage("Use the mouse wheel to change files");
-        event->accept();
-    }
-    // keys to change the color
-    else if (keyShiftPressed && event->key() >= Qt::Key_F1 && event->key() <= Qt::Key_F4) {
         event->accept();
     }
     // keys to change the brush size
@@ -674,13 +659,13 @@ void MainWindow::keyReleaseEvent(QKeyEvent * event)
 {
     if (event->key() == Qt::Key_Control) {
         event->accept();
-        keyCtrlPressed = false;
+        _is_key_ctrl_pressed = false;
         //pixmapWidget->setFloodFill(false);
         statusBar()->clearMessage();
     }
     else if (event->key() == Qt::Key_Shift) {
         event->accept();
-        keyShiftPressed = false;
+        _is_key_shift_pressed = false;
         statusBar()->clearMessage();
     }
     else
@@ -691,14 +676,14 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 {
     if (!event->isAccepted()) {
         // see what to do with the event
-        if (keyShiftPressed) {
+        if (_is_key_shift_pressed) {
             // select a different file
             if (event->delta() < 0)
-                nextPreviousFile(Down);
+                switch_img_file(Down);
             else if (event->delta() > 0)
-                nextPreviousFile(Up);
+                switch_img_file(Up);
         }
-        else if (keyCtrlPressed) {
+        else if (_is_key_ctrl_pressed) {
             // select a different object
             if (event->delta() > 0) {
                 int idx = brushSizeComboBox->currentIndex() + 1;
@@ -722,59 +707,59 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     }
 }
 
-void MainWindow::errorMessageMask()
+void MainWindow::show_mask_error_message_i()
 {
     QMessageBox::critical(this, "Writing Error", "Object mask files could not be changed/created.\nPlease check your user rights for directory and files.");
 }
 
-void MainWindow::saveMask()
+void MainWindow::save_mask_i()
 {
     // check whether dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
-    int iObj = currentObj();
+    QString iFile = get_current_file();
+    QString iDir = get_current_direction();
+    int iObj = get_current_obj_id();
     if (iFile.isEmpty() || iDir.isEmpty() || iObj ==0)
         return;
 
     // get the current mask
-    QImage *mask = pixmapWidget->getMask();
+    QImage *mask = _pixmap_widget->getMask();
 
     // save the mask
-    mask->save(currentlyOpenedDir + iDir + "/" + _current_obj_file_collection[iObj], "PNG");
+    mask->save(_current_opened_direction + iDir + "/" + _current_obj_file_collection[iObj], "PNG");
 
     // save the image in the history and delete items in case the history
     // is too big
-    while (0 < currentHistoryImg) 
+    while (0 < _current_history_img) 
     {
-        imgUndoHistory.pop_front();
-        currentHistoryImg--;
+        _img_undo_history.pop_front();
+        _current_history_img--;
     }
     QImage maskCopy = mask->copy();
-    imgUndoHistory.push_front(maskCopy);
-    while (imgUndoHistory.size() > maxHistorySize)
-        imgUndoHistory.pop_back();
+    _img_undo_history.push_front(maskCopy);
+    while (_img_undo_history.size() > _max_history_step)
+        _img_undo_history.pop_back();
 
-    updateUndoMenu();
+    update_undo_redo_menu();
 }
 
-void MainWindow::updateUndoMenu()
+void MainWindow::update_undo_redo_menu()
 {
     // enable/disable the undo/redo menu items
-    if (currentHistoryImg < imgUndoHistory.size()  && imgUndoHistory.size() > 1)
+    if (_current_history_img < _img_undo_history.size()  && _img_undo_history.size() > 1)
         actionUndo->setEnabled(true);
     else
         actionUndo->setEnabled(false);
-    if (currentHistoryImg > 0 && imgUndoHistory.size() > 1)
+    if (_current_history_img > 0 && _img_undo_history.size() > 1)
         actionRedo->setEnabled(true);
     else
         actionRedo->setEnabled(false);
 }
 
-std::map<int, QString> MainWindow::getMaskFiles()
+std::map<int, QString> MainWindow::get_mask_files()
 {
     // check weather dir/file/object have been selected
-    QString iFile = currentFile();
-    QString iDir = currentDir();
+    QString iFile = get_current_file();
+    QString iDir = get_current_direction();
     if (iFile.isEmpty() || iDir.isEmpty())
         return std::map<int ,QString>();
 
@@ -783,7 +768,7 @@ std::map<int, QString> MainWindow::getMaskFiles()
     // number of objects for one image
     QStringList nameFilters;
     nameFilters << iFile.replace(".image.", ".").section(".", 0, -2) + ".mask.*.png";
-    QDir currentDir(currentlyOpenedDir + iDir);
+    QDir currentDir(_current_opened_direction + iDir);
     currentDir.setFilter(QDir::Files);
     currentDir.setNameFilters(nameFilters);
     currentDir.setSorting(QDir::Name);
@@ -806,5 +791,10 @@ std::map<int, QString> MainWindow::getMaskFiles()
     }
 
     return _current_obj_file_collection;
+}
+
+void MainWindow::on_confidenceCheckBox_stateChanged(int state)
+{
+    std::cout << state << std::endl;
 }
 

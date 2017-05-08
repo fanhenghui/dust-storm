@@ -51,45 +51,29 @@ class PixmapWidget : public QGLWidget
 {
     Q_OBJECT
 
-private:
-    QPixmap *m_pm;
-    QImage mask, drawMask;
-    double zoomFactor;
-    double maskTransparency;
-    int iMaskEditColor, iMaskDrawOnColor;
-    int penWidth;
-    QMatrix currentMatrixInv;
-    QMatrix currentMatrix;
-    QPoint lastXyMouseOrg;
-    QPoint lastXyMouse;
-    QPoint lastXyDrawnMouseOrg;
-    QPoint lastXyDrawnMouse;
-    QPoint xyMouseFollowed;
-    bool isDrawing, isFloodFilling;
-    double lastVScrollValue, lastHScrollValue;
-
-    QAbstractScrollArea *scrollArea;
-
 public:
     PixmapWidget(QAbstractScrollArea*, QWidget *parent=0);
-    ~PixmapWidget();
+    virtual ~PixmapWidget();
     int getMaskEditColor();
     QImage* getMask();
 
-    public slots:
-        void setZoomFactor(double);
-        void setPixmap(const QPixmap&);
-        void setMask(QImage&);
-        void setMaskEditColor(int iColor);
-        void setMaskDrawOnColor(int iColor);
-        void setPenWidth(int width);
-        void setMaskTransparency(double transparency);
-        void setFloodFill(bool flag);
+    void enable_painting(bool flag);
+    void set_pixmap(const QPixmap&);
+    void set_mask(QImage&);
+    void set_confidence(bool flag);
+
+    void setMaskEditColor(int iColor);
+    void setPenWidth(int width);
+    void setMaskTransparency(double transparency);
+    void setFloodFill(bool flag);
+
+public slots:
+    void setZoomFactor(double);
 
 signals:
-        void zoomFactorChanged(double);
-        void pixmapChanged(QPixmap*);
-        void drawEvent(QImage*);
+    void zoomFactorChanged(double);
+    void pixmapChanged(QPixmap*);
+    void drawEvent(QImage*);
 
 protected:
     virtual void initializeGL();
@@ -103,8 +87,31 @@ protected:
 private:
     void updateMouseCursor();
     void updateMask();
-    QRgb getColor(int i);
-    void setUpPainter(QPainter &painter);
+    QRgb get_color_i();
+    void setup_current_painter_i(QPainter &painter);
+
+private:
+    QPixmap *m_pm;
+    QImage mask, drawMask;
+    double zoomFactor;
+    double maskTransparency;
+    int iMaskEditColor;
+    int penWidth;
+    QMatrix currentMatrixInv;
+    QMatrix currentMatrix;
+    QPoint lastXyMouseOrg;
+    QPoint lastXyMouse;
+    QPoint lastXyDrawnMouseOrg;
+    QPoint lastXyDrawnMouse;
+    QPoint xyMouseFollowed;
+    bool isDrawing, isFloodFilling;
+    double lastVScrollValue, lastHScrollValue;
+
+    QAbstractScrollArea *scrollArea;
+
+    bool _enable_painting;
+    bool _is_confident;
+    bool _is_erasing;
 };
 
 #endif // PIXMAPWIDGET_H

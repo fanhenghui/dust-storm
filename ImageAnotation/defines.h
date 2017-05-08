@@ -24,5 +24,9 @@
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
+#define BACKGROUND  0
+#define CONFIDENCE_OBJECT  1
+#define UN_CONFIDENCE_OBJECT  2
+
 
 

@@ -55,7 +55,9 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
     maskTransparency = 0.5;
     isDrawing = false;
     isFloodFilling = false;
-    iMaskDrawOnColor= -1;
+    _enable_painting = false;
+    _is_confident = true;
+    _is_erasing = false;
 
 
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -113,21 +115,6 @@ QImage* PixmapWidget::getMask()
     return &mask;
 }
 
-void PixmapWidget::setMask(QImage& newMask)
-{
-    // store the new mask
-    mask = newMask.copy();
-
-    // create a partly transparent mask
-    QImage tmpMask = newMask.copy();
-    for (int i = 0; i < drawMask.colorCount(); i++)
-        tmpMask.setColor(i, getColor(i));
-    drawMask = tmpMask.convertToFormat(QImage::Format_RGB32);
-
-    // we have to repaint
-    repaint();
-}
-
 void PixmapWidget::setPenWidth(int width)
 {
     penWidth = width;
@@ -140,12 +127,21 @@ void PixmapWidget::setMaskEditColor(int iColor)
     iMaskEditColor = iColor;
 }
 
-void PixmapWidget::setMaskDrawOnColor(int iColor)
+void PixmapWidget::set_mask(QImage& newMask)
 {
-    iMaskDrawOnColor = MAX(-1, iColor);
-    if (iColor >= mask.colorCount())
-        iMaskDrawOnColor = -1;
+    // store the new mask
+    mask = newMask.copy();
+
+    // create a partly transparent mask
+    QImage tmpMask = newMask.copy();
+    for (int i = 0; i < drawMask.colorCount(); i++)
+        tmpMask.setColor(i, drawMask.color(i));
+    drawMask = tmpMask.convertToFormat(QImage::Format_RGB32);
+
+    // we have to repaint
+    repaint();
 }
+
 
 void PixmapWidget::setMaskTransparency(double transparency)
 {
@@ -155,7 +151,7 @@ void PixmapWidget::setMaskTransparency(double transparency)
     // create a partly transparent mask
     QImage tmpMask = mask.copy();
     for (int i = 0; i < drawMask.colorCount(); i++) {
-        tmpMask.setColor(i, getColor(i));
+        tmpMask.setColor(i, drawMask.color(i));
     }
     drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
@@ -175,7 +171,7 @@ void PixmapWidget::setFloodFill(bool flag)
     update();
 }
 
-void PixmapWidget::setPixmap( const QPixmap& pixmap)
+void PixmapWidget::set_pixmap( const QPixmap& pixmap)
 {
     delete m_pm;
     m_pm = new QPixmap(pixmap);
@@ -285,7 +281,9 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     QImage transparentMask = drawMask.convertToFormat(QImage::Format_ARGB32);
     QImage alphaChannel = transparentMask.alphaChannel();
     for (int y = MAX(0, updateRect.top()); y <= updateRect.bottom() && y < transparentMask.height(); y++)
-        for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < transparentMask.width(); x++) {
+    {
+        for (int x = MAX(0, updateRect.left()); x <= updateRect.right() && x < transparentMask.width(); x++) 
+        {
             QRgb rgb = transparentMask.pixel(x, y);
             if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
                 // black is the background color .. 100% transparent
@@ -294,6 +292,7 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
                 // all other colors are partly transparent
                 alphaChannel.setPixel(x, y, (int)(255 * maskTransparency + 0.5));
         }
+    }
         transparentMask.setAlphaChannel(alphaChannel);
         p.drawImage(updateRect.topLeft(), transparentMask, updateRect);
 
@@ -356,22 +355,21 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
 
         QRect updateRect = currentMatrixInv.mapRect(updateRectOrg);
 
-        if (iMaskDrawOnColor < 0) 
+        if (event->button() == Qt::LeftButton)
         {
-            if (event->button() == Qt::LeftButton)
-            {
-                iMaskEditColor = 1;
-            }
-            else 
-            {
-                iMaskEditColor = 0;
-            }
-
-            // draw on the full image
-            QPainter painter(&drawMask);
-            setUpPainter(painter);
-            painter.drawPoint(xyMouse);
+            _is_erasing = false;
+            iMaskEditColor = 1;
         }
+        else 
+        {
+            _is_erasing = true;
+            iMaskEditColor = 0;
+        }
+
+        // draw on the full image
+        QPainter painter(&drawMask);
+        setup_current_painter_i(painter);
+        painter.drawPoint(xyMouse);
 
         isDrawing = true;
 
@@ -408,13 +406,9 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
 
     if (isDrawing) 
     {
-        if (iMaskDrawOnColor < 0) 
-        {
-            // draw on the full image
-            QPainter painter(&drawMask);
-            setUpPainter(painter);
-            painter.drawLine(lastXyMouse, xyMouse);
-        }
+        QPainter painter(&drawMask);
+        setup_current_painter_i(painter);
+        painter.drawLine(lastXyMouse, xyMouse);
     }
 
     // save the current position and perform an update
@@ -445,13 +439,9 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 
     if (event->button() == Qt::LeftButton && isDrawing) 
     {
-        if (iMaskDrawOnColor < 0) 
-        {
-            // draw on the full image
-            QPainter painter(&drawMask);
-            setUpPainter(painter);
-            painter.drawLine(lastXyMouse, xyMouse);
-        }
+        QPainter painter(&drawMask);
+        setup_current_painter_i(painter);
+        painter.drawLine(lastXyMouse, xyMouse);
     }
 
     // save the last position
@@ -466,6 +456,7 @@ void PixmapWidget::mouseReleaseEvent(QMouseEvent * event)
 
     // update
     isDrawing = false;
+    _is_erasing = false;
 
     // paint update
     update(updateRectOrg);
@@ -515,22 +506,45 @@ void PixmapWidget::updateMask()
         }
 }
 
-QRgb PixmapWidget::getColor(int i)
+QRgb PixmapWidget::get_color_i()
 {
-    QRgb color = mask.color(i);
-    return color;
+    if (_is_erasing)
+    {
+        return mask.color(BACKGROUND);
+    }
+    else
+    {
+        if (_is_confident)
+        {
+            return mask.color(CONFIDENCE_OBJECT);
+        }
+        else
+        {
+            return mask.color(UN_CONFIDENCE_OBJECT);
+        }
+    }
 }
 
-void PixmapWidget::setUpPainter(QPainter &painter)
+void PixmapWidget::setup_current_painter_i(QPainter &painter)
 {
     painter.setRenderHint(QPainter::Antialiasing, false);
-    painter.setPen(QPen(QBrush(getColor(getMaskEditColor())),
+    painter.setPen(QPen(QBrush(get_color_i()),
         penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 }
 
 void PixmapWidget::initializeGL()
 {
 
+}
+
+void PixmapWidget::enable_painting(bool flag)
+{
+    _enable_painting = flag;
+}
+
+void PixmapWidget::set_confidence(bool flag)
+{
+    _is_confident = flag;
 }
 
 //void PixmapWidget::resizeGL(int w, int h)
