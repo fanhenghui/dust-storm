@@ -137,20 +137,27 @@ void PixmapWidget::set_mask(QImage& input_mask)
 
 void PixmapWidget::set_mask_transparency(double transparency)
 {
-    std::cout << transparency << std::endl;
-    //maskTransparency = transparency;
-    //updateMask();
+    if (abs(transparency - _mask_transparency) < 1e-6)
+    {
+        return;
+    }
 
-    //// create a partly transparent mask
-    //QImage tmpMask = mask.copy();
-    //for (int i = 0; i < _drawMask.colorCount(); i++) {
-    //    tmpMask.setColor(i, _drawMask.color(i));
-    //}
-    //_drawMask = tmpMask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    for (int y = 0; y < _drawMask.size().height(); ++y)
+    {
+        for (int x = 0; x < _drawMask.size().width(); ++x)
+        {
+            QRgb rgb = _drawMask.pixel(x, y);
+            if (qRed(rgb) != 0 || qGreen(rgb) != 0 || qBlue(rgb) != 0)
+            {
+                QRgb new_rgb = qRgba( qRed(rgb) , qGreen(rgb) , qBlue(rgb) , int(255*transparency));
+                _drawMask.setPixel(x, y, new_rgb);
+            }
+        }
+    }
 
+    _mask_transparency = transparency;
 
-    //// we have to repaint
-    //update();
+    update();
 }
 
 void PixmapWidget::set_pixmap( const QPixmap& pixmap)
