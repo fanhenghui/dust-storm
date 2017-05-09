@@ -395,7 +395,11 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
     QString filepath(absoluteDir + iDir + "/" + iFile);
     _pixmap_widget->set_pixmap(QPixmap(filepath  ));
 
-    // refresh the objListWidget
+    //refresh a frame
+     _pixmap_widget->enable_painting(false);
+     _pixmap_widget->repaint();
+
+     //get mask file
     get_mask_files();
     if (_current_obj_file_collection.empty())
     {

@@ -89,12 +89,12 @@ void PixmapWidget::slot_zoom_factor_changed( double f )
     w = _pixmap->width()*_zoom_factor;
     h = _pixmap->height()*_zoom_factor;
     setMinimumSize( w, h );
-    std::cout << w << " , " << h << std::endl;
+    //std::cout << w << " , " << h << std::endl;
 
     QWidget *p = dynamic_cast<QWidget*>( parent() );
     if( p )
     {
-        std::cout << p->width()<< " " << p->height() << std::endl;
+        //std::cout << p->width()<< " " << p->height() << std::endl;
         resize( p->width(), p->height() );
     }
 
@@ -280,7 +280,7 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
         // draw the mask
         p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
 
-        //TODO using cursor to replace bruch itself
+        //TODO using cursor to replace brush itself
         // draw the brush
         QPen penWhite(Qt::lightGray);
         penWhite.setWidth(1 / _zoom_factor);
