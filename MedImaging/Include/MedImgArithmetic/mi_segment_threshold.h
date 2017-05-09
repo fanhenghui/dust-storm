@@ -24,7 +24,7 @@ public:
 
     void segment(const Ellipsoid& region_ellipsoid , T threshold);
 
-    void segment_auto_threshold(const Ellipsoid& region_ellipsoid , ThresholdType type = Center);
+    void segment_auto_threshold(const Ellipsoid& region_ellipsoid , ThresholdType type = Otsu);
 
 private:
     T get_threshold_otsu_i(const Ellipsoid& region_ellipsoid);

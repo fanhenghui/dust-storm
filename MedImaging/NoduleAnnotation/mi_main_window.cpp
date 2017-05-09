@@ -435,9 +435,9 @@ void NoduleAnnotation::create_model_observer_i()
     _ob_voi_segment->set_model(_model_voi);
     _ob_voi_segment->set_volume_infos(_volume_infos);
 
-    _model_voi->add_observer(_ob_voi_statistic);
     _model_voi->add_observer(_ob_voi_table);
-    _model_voi->add_observer(_ob_voi_segment);
+    _model_voi->add_observer(_ob_voi_segment);//Segment first
+    _model_voi->add_observer(_ob_voi_statistic);// Then statistic
 
     //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene的刷新通过change item来完成
 

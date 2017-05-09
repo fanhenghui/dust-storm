@@ -2,7 +2,6 @@
 #define MED_IMAGING_ARRAY_STATISTICIAN_H_
 
 #include "MedImgArithmetic/mi_arithmetic_stdafx.h"
-#include "MedImgArithmetic/mi_sphere.h"
 #include "MedImgArithmetic/mi_ellipsoid.h"
 #include "MedImgArithmetic/mi_arithmetic_utils.h"
 
@@ -31,14 +30,49 @@ template<class T>
 class VolumeStatistician
 {
 public:
-    VolumeStatistician() {};
+    VolumeStatistician():_data_ref(nullptr),_mask_ref(nullptr)
+    {
+        _dim[0] = 0;
+        _dim[1] = 0;
+        _dim[2] = 0;
+
+        memset(_target_labels , 0 , sizeof(_target_labels));
+    };
+
     ~VolumeStatistician() {};
- 
-    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Sphere& sphere, 
+
+    void set_dim(const unsigned int (&dim)[3] )
+    {
+        memcpy(_dim , dim ,3*sizeof(unsigned int));
+    }
+
+    void set_data_ref(T* data_array)
+    {
+        _data_ref = data_array;
+    }
+
+    void set_mask_ref(unsigned char* mask_array)
+    {
+        _mask_ref = mask_array;
+    }
+
+    void set_target_labels(const std::vector<unsigned char>& labels)
+    {
+        memset(_target_labels , 0 , sizeof(_target_labels));
+        for (auto it = labels.begin() ; it != labels.end() ; ++it)
+        {
+            _target_labels[*it] = 1;
+        }
+    }
+
+    void get_intensity_analysis(const Ellipsoid& ellipsiod, 
         unsigned int& num , double& min , double& max , double& mean , double& var, double& std);
 
-    void get_intensity_analysis(const unsigned int (&dim)[3] , T* data_array , const Ellipsoid& ellipsiod, 
-        unsigned int& num , double& min , double& max , double& mean , double& var, double& std);
+private:
+    unsigned int _dim[3];//dim[2] could be 0
+    T* _data_ref;
+    unsigned char* _mask_ref;
+    unsigned char _target_labels[256];
 };
 
 #include "MedImgArithmetic/mi_volume_statistician.inl"

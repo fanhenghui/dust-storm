@@ -43,6 +43,9 @@ void VOIStatisticObserver::update(int code_id)
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     QTWIDGETS_CHECK_NULL_EXCEPTION(volume_data);
 
+    std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
+    QTWIDGETS_CHECK_NULL_EXCEPTION(mask_data);
+
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
     QTWIDGETS_CHECK_NULL_EXCEPTION(camera_cal);
 
@@ -66,7 +69,9 @@ void VOIStatisticObserver::update(int code_id)
     double min , max , mean , var , std;
     for (int i = 0; i<voi_num ; ++i)
     {
-        VOISphere voi = model->get_voi(i);
+        const VOISphere voi = model->get_voi(i);
+        const unsigned char label = model->get_label(i);
+
         Ellipsoid ellipsoid;
         ellipsoid._center = mat_p2v.transform(voi.center);
         double voi_abc[3] = {0,0,0};
@@ -82,16 +87,22 @@ void VOIStatisticObserver::update(int code_id)
         case SHORT:
             {
                 VolumeStatistician<short> sta;
-                sta.get_intensity_analysis(volume_data->_dim , (short*)volume_data->get_pixel_pointer() ,ellipsoid, 
-                    pixel_num , min , max , mean , var , std);
+                sta.set_data_ref((short*)volume_data->get_pixel_pointer());
+                sta.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
+                sta.set_dim(volume_data->_dim);
+                sta.set_target_labels(std::vector<unsigned char>(1, label));
+                sta.get_intensity_analysis(ellipsoid, pixel_num , min , max , mean , var , std);
 
                 break;
             }
         case USHORT:
             {
                 VolumeStatistician<unsigned short> sta;
-                sta.get_intensity_analysis(volume_data->_dim , (unsigned short*)volume_data->get_pixel_pointer() ,ellipsoid, 
-                    pixel_num , min , max , mean , var , std);
+                sta.set_data_ref((unsigned short*)volume_data->get_pixel_pointer());
+                sta.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
+                sta.set_dim(volume_data->_dim);
+                sta.set_target_labels(std::vector<unsigned char>(1, label));
+                sta.get_intensity_analysis(ellipsoid, pixel_num , min , max , mean , var , std);
 
                 break;
             }

@@ -19,21 +19,12 @@ void UT_Statistic()
     in.close();
 
     VolumeStatistician<unsigned short> vs;
-    Sphere sphere;
-    sphere._center = Point3(256.0,256.0 ,256.0);
-    sphere._radius = 100;
-
     double min , max , mean , var , std;
     unsigned int num;
     const unsigned int dim[3] = {512,512,734};
-    vs.get_intensity_analysis(dim , data_array , sphere , num , min , max , mean , var , std);
-
-    std::cout << "num : " << num << std::endl;
-    std::cout << "min : " << min << std::endl;
-    std::cout << "max : " << max << std::endl;
-    std::cout << "mean : " << mean<< std::endl;
-    std::cout << "variance : " << var << std::endl;
-    std::cout << "standard variance : " << std << std::endl << std::endl;
+    vs.set_data_ref(data_array);
+    vs.set_mask_ref(nullptr);
+    vs.set_dim(dim);
 
     Ellipsoid ellipsoid;
     ellipsoid._center = Point3(256.0,256.0 ,256.0);
@@ -41,7 +32,7 @@ void UT_Statistic()
     ellipsoid._b = 20;
     ellipsoid._c = 50;
 
-    vs.get_intensity_analysis(dim , data_array , ellipsoid , num , min , max , mean , var , std);
+    vs.get_intensity_analysis(ellipsoid , num , min , max , mean , var , std);
 
     std::cout << "num : " << num << std::endl;
     std::cout << "min : " << min << std::endl;
