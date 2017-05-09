@@ -70,8 +70,34 @@
 using namespace medical_imaging;
 
 //Nodule type
-const std::string NODULE_TYPE_GGN = std::string("GGN");
-const std::string NODULE_TYPE_AAH = std::string("AAH");
+#define NODULE_TYPE_NUM 6
+static const std::string S_NODULE_TYPES[NODULE_TYPE_NUM] = 
+{
+    "W",
+    "V",
+    "P",
+    "J",
+    "G",
+    "N"
+};
+static const std::string S_NODULE_TYPE_DESCRIPTION[NODULE_TYPE_NUM] = 
+{
+    "Well-Circumscribed",
+    "Vascualarized ",
+    "Pleural-Tail",
+    "Juxta-Pleural",
+    "GGO",
+    "Non-nodule"
+};
+static const std::string S_NODULE_TYPE_DESCRIPTION_CHINESE[NODULE_TYPE_NUM] = 
+{
+    "边界清晰的结节",
+    "粘连血管的结节",
+    "肺壁游离的结节",
+    "粘连肺壁的结节",
+    "毛玻璃型结节",
+    "非结节"
+};
 
 //Preset WL
 const float PRESET_CT_ABDOMEN_WW = 400;
@@ -1301,8 +1327,11 @@ void NoduleAnnotation::refresh_nodule_list_i()
 
             QComboBox * pNoduleType = new QComboBox(_ui.tableWidgetNoduleList);
             pNoduleType->clear();
-            pNoduleType->insertItem(0 ,  NODULE_TYPE_GGN.c_str());
-            pNoduleType->insertItem(1 , NODULE_TYPE_AAH.c_str());
+            for (int i = 0 ; i<NODULE_TYPE_NUM ; ++i)
+            {
+                pNoduleType->insertItem(i , S_NODULE_TYPES[i].c_str());
+                pNoduleType->setItemData(i , S_NODULE_TYPE_DESCRIPTION[i].c_str(), Qt::ToolTipRole);
+            }
             _ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
 
             connect(pNoduleType , SIGNAL(currentIndexChanged(int)) , _single_manager_nodule_type , SLOT(map()));

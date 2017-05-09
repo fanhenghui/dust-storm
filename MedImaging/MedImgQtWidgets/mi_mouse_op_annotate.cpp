@@ -13,8 +13,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-const std::string NODULE_TYPE_GGN = std::string("GGN");
-const std::string NODULE_TYPE_AAH = std::string("AAH");
+const static std::string  S_DEFAULT_NODULE_TYPE = std::string("W");
 
 MouseOpAnnotate::MouseOpAnnotate():_is_pin(false),_diameter(0.0),_current_label(0)
 {
@@ -49,7 +48,7 @@ void MouseOpAnnotate::press(const QPointF& pt)
             _center = sphere_center;
             _diameter = 0.0;
             _current_label = MaskLabelStore::instance()->acquire_label();
-            _model->add_voi(medical_imaging::VOISphere(_center , _diameter , NODULE_TYPE_GGN) , _current_label);
+            _model->add_voi(medical_imaging::VOISphere(_center , _diameter , S_DEFAULT_NODULE_TYPE) , _current_label);
             _model->notify(VOIModel::ADD_VOI);
         }
     }
