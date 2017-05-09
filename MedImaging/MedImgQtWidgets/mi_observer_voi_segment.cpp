@@ -324,8 +324,9 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
             segment.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             segment.set_dim(volume_data->_dim);
             segment.set_target_label(label);
-            segment.segment_auto_threshold(ellipsoid);
-
+            segment.set_min_scalar(volume_data->get_min_scalar());
+            segment.set_max_scalar(volume_data->get_max_scalar());
+            segment.segment_auto_threshold(ellipsoid , SegmentThreshold<short>::Otsu);
             break;
         }
     case USHORT:
@@ -336,7 +337,9 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
             segment.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             segment.set_dim(volume_data->_dim);
             segment.set_target_label(label);
-            segment.segment_auto_threshold(ellipsoid);
+            segment.set_min_scalar(volume_data->get_min_scalar());
+            segment.set_max_scalar(volume_data->get_max_scalar());
+            segment.segment_auto_threshold(ellipsoid, SegmentThreshold<unsigned short>::Otsu);
 
             break;
         }

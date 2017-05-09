@@ -39,11 +39,23 @@ public:
         _target_label = label;
     }
 
+    void set_min_scalar(float min_scalar)
+    {
+        _min_scalar = min_scalar;
+    }
+
+    void set_max_scalar(float max_scalar)
+    {
+        _max_scalar = max_scalar;
+    }
+
 protected:
     unsigned int _dim[3];//dim[2] could be 0
     T* _data_ref;
     unsigned char* _mask_ref;
     unsigned char _target_label;
+    float _min_scalar;
+    float _max_scalar;
 };
 
 MED_IMAGING_END_NAMESPACE

@@ -16,19 +16,19 @@ void VolumeStatistician<T>::get_intensity_analysis(const unsigned int (&dim)[3] 
     T tmp = 0;
     const unsigned int layer = dim[0]*dim[1];
 
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
     for (unsigned int z = begin[2] ; z < end[2] ; ++z)
     {
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
         for (unsigned int y = begin[1] ; y < end[1] ; ++y)
         {
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
             for (unsigned int x = begin[0] ; x < end[0] ; ++x)
             {
                 if (!((Point3(x,y,z) - center).magnitude() > radius))
@@ -47,19 +47,19 @@ void VolumeStatistician<T>::get_intensity_analysis(const unsigned int (&dim)[3] 
     min_out = static_cast<double>(min0);
     max_out = static_cast<double>(max0);
 
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
     for (unsigned int z = begin[2] ; z < end[2] ; ++z)
     {
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
         for (unsigned int y = begin[1] ; y < end[1] ; ++y)
         {
-#ifndef _DEBUG
-#pragma omp parallel for
-#endif
+//#ifndef _DEBUG
+//#pragma omp parallel for
+//#endif
             for (unsigned int x = begin[0] ; x < end[0] ; ++x)
             {
                 if (!((Point3(x,y,z) - center).magnitude() > radius))
