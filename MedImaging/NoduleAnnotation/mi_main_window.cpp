@@ -223,7 +223,7 @@ void NoduleAnnotation::configure_i()
         in.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(false);
+    Configuration::instance()->set_nodule_file_rsa(true);
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -955,6 +955,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
         NoduleSetParser parser;
+        parser.set_series_id(_volume_infos->get_data_header()->series_uid);
         std::string file_name_std(file_name.toLocal8Bit());
 
         IOStatus status ;

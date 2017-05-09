@@ -15,6 +15,8 @@ namespace
 {
     struct NoduleUnit
     {
+        int nodule_id;//none encoded
+        unsigned char series_id[512];//none encoded
         unsigned char pos_x[512];
         unsigned char pos_y[512];
         unsigned char pos_z[512];
@@ -23,6 +25,8 @@ namespace
 
         NoduleUnit()
         {
+            nodule_id = 0;
+            memset(series_id , 0 , sizeof(series_id));
             memset(pos_x , 0 , sizeof(pos_x));
             memset(pos_y , 0 , sizeof(pos_y));
             memset(pos_z , 0 , sizeof(pos_z));
@@ -56,6 +60,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
     //series uid,nodule uid,coordX,coordY,coordZ,diameter_mm,Type
     std::string line;
     std::getline(in , line);
+    std::string series_id;
     double id , pos_x , pos_y , pos_z , diameter;
     std::string separate;
     std::string type;
@@ -69,6 +74,17 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
             in.close();
             return IO_DATA_DAMAGE;
         }
+        series_id = infos[0];
+
+        //Check series id
+        if (!_series_id.empty())
+        {
+            if(series_id != _series_id)
+            {
+                return IO_UNMATCHED_FILE;
+            }
+        }
+
         id = str_num_converter.to_num(infos[1]);
         pos_x = str_num_converter.to_num(infos[2]);
         pos_y = str_num_converter.to_num(infos[3]);
@@ -155,6 +171,28 @@ IOStatus NoduleSetParser::load_as_rsa_binary(const std::string& file_path , cons
         if (!in.read((char*)(&nodule_unit) , sizeof(nodule_unit)))
         {
             break;
+        }
+
+        //Check series id
+        if (!_series_id.empty())
+        {
+            if (nodule_unit.series_id[_series_id.size()] != '\0')
+            {
+                return IO_UNMATCHED_FILE;
+            }
+
+            int i = 0;
+            for (; i < 512 && i<_series_id.size() ; ++i)
+            {
+                if (nodule_unit.series_id[i] == '\0' || nodule_unit.series_id[i] != _series_id[i])
+                {
+                    break;
+                }
+            }
+            if (i != _series_id.size())
+            {
+                return IO_UNMATCHED_FILE;
+            }
         }
 
         memset(buffer , 0 , sizeof(buffer));
@@ -251,6 +289,20 @@ IOStatus NoduleSetParser::save_as_rsa_binary(const std::string& file_path , cons
         std::string diameter = str_num_convertor.to_string(voi.diameter);
 
         NoduleUnit nodule_unit;
+
+        nodule_unit.nodule_id = id++;
+        if (!_series_id.empty())
+        {
+            if (_series_id.size() > 511)
+            {
+                return IO_UNSUPPORTED_YET;
+            }
+            for (int i = 0 ; i<_series_id.size() ; ++i)
+            {
+                nodule_unit.series_id[i] = _series_id[i];
+            }
+            nodule_unit.series_id[_series_id.size()] = '\0';
+        }
 
         status = rsa_utils.entrypt(rsa , pos_x.size() , (unsigned char*)(pos_x.c_str()) , nodule_unit.pos_x );
         if (status != 0)
