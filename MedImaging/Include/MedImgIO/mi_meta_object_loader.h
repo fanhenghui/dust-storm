@@ -11,9 +11,39 @@ MED_IMAGING_BEGIN_NAMESPACE
 class ImageData;
 class ImageDataHeader;
 
+#define META_COMMENT "Comment"
+#define META_OBJECT_TYPE "ObjectType"
+#define META_OBJECT_SUB_TYPE "ObjectSubType"
+#define META_TRANSFORM_TYPE "TransformType"
+#define META_NDIMS "NDims"
+#define META_NAME "Name"
+#define META_ID "ID"
+#define META_PATIENT_ID "ParentID"
+#define META_BINARY_DATA "BinaryData"
+#define META_ELEMENT_BYTE_ORDER_MSB "ElementByteOrderMSB"
+#define META_BINARY_DATA_BYTE_ORDER_MSB "BinaryDataByteOrderMSB"
+#define META_COMPRESSD_DATA "CompressedData"
+#define META_COLOR "Color"
+#define META_POSITION "Position"
+#define META_OFFSET "Offset"
+#define META_ORIENTATION "Orientation"
+#define META_TRANSFORM_MATRIX "TransformMatrix"
+#define META_ANATOMICAL_ORIENTATION "AnatomicalOrientation"
+#define META_ELEMENT_SPACING "ElementSpacing"
+#define META_DIM_SIZE "DimSize"
+#define META_HEADER_SIZE "HeaderSize"
+#define META_MODALITY "Modality"
+#define META_SEQUENCE_ID "SequenceID"
+#define META_ELEMENT_MIN "ElementMin"
+#define META_ELEMENT_MAX "ElementMax"
+#define META_ELEMENT_NUMBER_OF_CHANNELS "ElementNumberOfChannels"
+#define META_ELEMENT_SIZE "ElementSize"
+#define META_ELEMENT_TYPE "ElementType"
+#define META_ELEMENT_DATA_FILE "ElementDataFile"
+
+
 //Meta Tag info from web : 
 //https://itk.org/Wiki/MetaIO/Documentation#MetaObject_Tags
-
 struct MetaObjectTag
 {
     //////////////////////////////////////////////////////////////////////////
@@ -46,13 +76,16 @@ struct MetaObjectTag
 
     //BinaryData MET_STRING Are the data associated with this object stored at Binary or ASCII
     //Defined by derived objects- e.g.,  True
-    std::string binary_data;
+    bool is_binary_data;
 
     //ElementByteOrderMSB  MET_STRING
     std::string element_byte_order_msb;
 
     //BinaryDataByteOrderMSB MET_STRING
     std::string binary_data_byte_order_msb;
+
+    //CompressedData Tre or False
+    bool is_compressed_data;
 
     //Color MET_FLOAT_ARRAY[4] R, G, B, alpha (opacity)
     float color[4];
@@ -64,6 +97,7 @@ struct MetaObjectTag
     //Orientation MET_FLOAT_MATRIX[NDims][NDims]
     Vector3 orientation_x;
     Vector3 orientation_y;
+    Vector3 orientation_z;
 
     //AnatomicalOrientation MET_STRING
     //Specify anatomic ordering of the axis. Use only [R|L] | [A|P] | [S|I] per axis. 
@@ -85,7 +119,7 @@ struct MetaObjectTag
     //HeaderSize MET_INT
     //Number of Bytes to skip at the head of each data file.
     //Specify ¨C1 to have MetaImage calculate the header size based on the assumption that the data occurs at the end of the file.
-    //Specify 0 if the data occurs at the begining of the file.
+    //Specify 0 if the data occurs at the begin of the file.
     int header_size;
 
     //Modality MET_STRING
@@ -124,6 +158,26 @@ struct MetaObjectTag
     //3 LIST [X] ¨C This specifies that starting on the next line is a list of files (one filename per line) in which the data is stored. Each file (by default) contains an (N-1)D block of data. If a second argument is given, its first character must be a number that specifies the dimension of the data in each file. For example ElementDataFile = LIST 2D means that there will be a 2D block of data per file.
     //4 LOCAL ¨C Indicates that the data begins at the beginning of the next line.
     std::string element_data_file;
+
+    MetaObjectTag()
+    {
+        n_dims = 1;
+        id = 0;
+        parent_id = 0;
+        is_compressed_data = false;
+        is_binary_data = false;
+        color[0] = color[1] = color[2] = color[3] = 0; 
+        spacing[0] = spacing[1] = spacing[2] = 0;
+        dim_size[0] = dim_size[1] = dim_size[2] = 0;
+        header_size = 0;
+        modality = "MET_MOD_UNKNOWN";
+        sequence_id[0] = sequence_id[1] = sequence_id[2] = sequence_id[3] = 0;
+        element_min = element_max = 0;
+        element_number_of_channels = 1;
+        element_size[0] = element_size[1] = element_size[2] = 0;
+        element_type = "MET_UCHAR";
+        element_data_file = "";
+    }
 };
 
 class IO_Export MetaObjectLoader
@@ -137,6 +191,21 @@ public:
 
 protected:
 private:
+    IOStatus construct_meta_object_tag_i(
+        const std::string& info_file , 
+        std::shared_ptr<MetaObjectTag> & meta_obj_tag);
+
+    IOStatus construct_data_header_i(
+        std::shared_ptr<MetaObjectTag> meta_obj_tag , 
+        std::shared_ptr<ImageDataHeader> & img_data_header,
+        std::shared_ptr<ImageData> & img_data);
+
+    IOStatus construct_image_data_i(
+        const std::string& info_file ,
+        std::shared_ptr<MetaObjectTag> meta_obj_tag , 
+        std::shared_ptr<ImageDataHeader>  img_data_header,
+        std::shared_ptr<ImageData> img_data);
+
 };
 
 MED_IMAGING_END_NAMESPACE
