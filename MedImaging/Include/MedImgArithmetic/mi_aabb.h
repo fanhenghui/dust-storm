@@ -33,6 +33,8 @@ public:
 
     bool operator == (const AABBUI& aabb) const;
     bool operator != (const AABBUI& aabb) const;
+
+    void Print();
 };
 
 MED_IMAGING_END_NAMESPACE

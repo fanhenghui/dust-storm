@@ -68,8 +68,18 @@ void main()
     vec4 central4 = mat_mvp_inv * vec4(pos_ndc,1.0);
     vec3 central = central4.xyz / central4.w;
 
-    vec3 entry_point = central - ray_dir * thickness *0.5 ;
-    vec3 exit_point  = central + ray_dir * thickness * 0.5 ;
+    vec3 entry_point, exit_point;
+    if(thickness <= 1.0)
+    {
+        entry_point = central ;
+        exit_point  = central + ray_dir * thickness*0.5;
+    }
+    else
+    {
+        entry_point = central - ray_dir * thickness *0.5 ;
+        exit_point  = central + ray_dir * thickness * 0.5 ;
+    }
+    
 
     //imageStore(image_entry_points , img_coord , vec4(entry_point, 1.0f));
     //imageStore(image_exit_points , img_coord , vec4(exit_point, 1.0f));

@@ -44,6 +44,7 @@
 #include "MedImgQtWidgets/mi_mouse_op_probe.h"
 #include "MedImgQtWidgets/mi_mouse_op_annotate.h"
 #include "MedImgQtWidgets/mi_mouse_op_locate.h"
+#include "MedImgQtWidgets/mi_mouse_op_test.h"
 #include "MedImgQtWidgets/mi_model_voi.h"
 #include "MedImgQtWidgets/mi_model_cross_hair.h"
 #include "MedImgQtWidgets/mi_model_focus.h"
@@ -302,6 +303,13 @@ void NoduleAnnotation::create_scene_i()
         std::shared_ptr<MouseOpWindowing> op_windowing(new MouseOpWindowing());
         op_windowing->set_scene(mpr_scenes[i]);
         mpr_containers[i]->register_mouse_operation(op_windowing , Qt::MiddleButton , Qt::NoModifier);
+
+        //////////////////////////////////////////////////////////////////////////
+        //Debug middle mouse to test
+        /*std::shared_ptr<MouseOpTest> op_test(new MouseOpTest());
+        op_test->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->register_mouse_operation(op_test , Qt::MiddleButton , Qt::NoModifier);*/
+        //////////////////////////////////////////////////////////////////////////
 
         std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
         op_pan->set_scene(mpr_scenes[i]);

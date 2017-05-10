@@ -39,7 +39,7 @@ void VolumeStatistician<T>::get_intensity_analysis( const Ellipsoid& ellipsoid,
             for (unsigned int x = begin[0] ; x < end[0] ; ++x)
             {
                 pt = Point3(x,y,z) - center;
-                if ( !(pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r > 1.0) )
+                if ( pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r < 1.0 )
                 {
                     const unsigned int idx = z*layer + y*_dim[0] + x;
                     const unsigned char label = _mask_ref[idx];
@@ -89,7 +89,7 @@ void VolumeStatistician<T>::get_intensity_analysis( const Ellipsoid& ellipsoid,
             for (unsigned int x = begin[0] ; x < end[0] ; ++x)
             {
                 pt = Point3(x,y,z) - center;
-                if ( !(pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r > 1.0) )
+                if ( pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r < 1.0 )
                 {
                     const unsigned int idx = z*layer + y*_dim[0] + x;
                     const unsigned char label = _mask_ref[idx];

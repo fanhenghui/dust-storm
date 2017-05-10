@@ -28,7 +28,7 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid , T threshold)
             for (unsigned int x = begin[0] ; x < end[0] ; ++x)
             {
                 Vector3 pt = Point3(x,y,z) - center;
-                if ( !(pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r > 1.0) )
+                if ( pt.x*pt.x * aa_r + pt.y*pt.y * bb_r + pt.z*pt.z * cc_r < 1.0 )
                 {
                     unsigned int idx  = z*layer + y*_dim[0] + x;
                     T tmp = _data_ref[idx];

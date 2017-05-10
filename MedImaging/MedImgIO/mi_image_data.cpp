@@ -1,5 +1,6 @@
 #include "mi_image_data.h"
 #include "MedImgArithmetic/mi_sampler.h"
+#include "MedImgCommon/mi_configuration.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -64,11 +65,17 @@ bool ImageData::regulate_wl(float& window, float& level)
         return false;
     }
 
-    const float min_gray = get_min_scalar();
-
-    if (_data_type == SHORT || _data_type == CHAR)
+    if (Configuration::instance()->get_processing_unit_type() == GPU)
     {
-        level = (level - _intercept - min_gray)/_slope;
+        const float min_gray = get_min_scalar();
+        if (_data_type == SHORT || _data_type == CHAR)
+        {
+            level = (level - _intercept - min_gray)/_slope;
+        }
+        else
+        {
+            level = (level - _intercept)/_slope;
+        }
     }
     else
     {

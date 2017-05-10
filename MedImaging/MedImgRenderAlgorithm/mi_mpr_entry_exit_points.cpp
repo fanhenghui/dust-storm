@@ -122,9 +122,17 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
         const Matrix4 mat_mvp = mat_vp*mat_v2w;
         const Matrix4 mat_mvp_inv = mat_mvp.get_inverse();
 
-        const Point3 pt00 = mat_mvp_inv.transform(Point3(-1.0,-1.0,0));
+        /*const Point3 pt00 = mat_mvp_inv.transform(Point3(-1.0,-1.0,0));
         const Point3 pt01 = mat_mvp_inv.transform(Point3(-1.0,1.0,0));
-        const Point3 pt10 = mat_mvp_inv.transform(Point3(1.0,-1.0,0));
+        const Point3 pt10 = mat_mvp_inv.transform(Point3(1.0,-1.0,0));*/
+
+        Point2 pt00_2 = ArithmeticUtils::dc_to_ndc(Point2(0,_height - 1) , _width , _height);
+        Point2 pt01_2 = ArithmeticUtils::dc_to_ndc(Point2(0,0) , _width , _height) ;
+        Point2 pt10_2 = ArithmeticUtils::dc_to_ndc(Point2(_width-1,_height - 1) , _width , _height);
+        const Point3 pt00 = mat_mvp_inv.transform(Point3( pt00_2.x , pt00_2.y , 0) );
+        const Point3 pt01 = mat_mvp_inv.transform(Point3( pt01_2.x , pt01_2.y , 0) );
+        const Point3 pt10 = mat_mvp_inv.transform(Point3( pt10_2.x , pt10_2.y , 0) );
+
         const Vector3 x_delta = (pt10 - pt00) * (1.0/(_width-1));
         const Vector3 y_delta = (pt01 - pt00) * (1.0/(_height-1));
 
@@ -173,8 +181,16 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
             int iX = idx - iY*_width;
 
             ptCurF = pt00F + x_delta_float*(float)iX + y_delta_float*(float)iY;
-            ptEntryF = ptCurF - ray_dir*fThicknessHalf;
-            ptExitF = ptCurF + ray_dir*fThicknessHalf;
+            if (fThicknessHalf <= 1.0)
+            {
+                ptEntryF = ptCurF;
+                ptExitF = ptCurF + ray_dir*fThicknessHalf*2;
+            }
+            else
+            {
+                ptEntryF = ptCurF - ray_dir*fThicknessHalf;
+                ptExitF = ptCurF + ray_dir*fThicknessHalf;
+            }
 
             ptEntryIntersection = ptEntryF;
             ptExitIntersection = ptExitF;
@@ -379,10 +395,11 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         //////////////////////////////////////////////////////////////////////////
         //For testing
-        /*std::cout << "Size : " << _width << " " << _height << std::endl;
-        _entry_points_texture->bind();
-        _entry_points_texture->download(GL_RGBA , GL_FLOAT , _entry_points_buffer.get());*/
+        //std::cout << "Size : " << _width << " " << _height << std::endl;
+        //_entry_points_texture->bind();
+        //_entry_points_texture->download(GL_RGBA , GL_FLOAT , _entry_points_buffer.get());
 
+        //_entry_points_texture->unbind();
         //_exit_points_texture->bind();
         //_exit_points_texture->download(GL_RGBA , GL_FLOAT , _exit_points_buffer.get());
 
