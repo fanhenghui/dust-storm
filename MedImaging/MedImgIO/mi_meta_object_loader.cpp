@@ -42,7 +42,7 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
     std::ifstream in(info_file.c_str() , std::ios::in);
     if (!in.is_open())
     {
-        IO_THROW_EXCEPTION("Cant open meta file!");
+        return IO_FILE_OPEN_FAILED;
     }
 
     std::string sLine;
@@ -139,7 +139,7 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
             meta_obj_tag->color[2] = b;
             meta_obj_tag->color[3] = a;
         }
-        else if (tag == META_POSITION || tag == META_OFFSET)
+        else if (tag == META_POSITION || tag == META_OFFSET || tag == META_ORIGIN)
         {
             double x , y , z;
             if (3 == meta_obj_tag->n_dims)
@@ -154,7 +154,7 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
                 return IO_UNSUPPORTED_YET;
             }
         }
-        else if (tag == META_ORIENTATION || tag == META_TRANSFORM_MATRIX)
+        else if (tag == META_ORIENTATION || tag == META_TRANSFORM_MATRIX || tag == META_ROTATION)
         {
             double x , y , z , x1 , y1 , z1 , x2 , y2 , z2; 
             if (3 == meta_obj_tag->n_dims)
@@ -358,7 +358,24 @@ IOStatus MetaObjectLoader::construct_data_header_i(
     img_data_header->rows = meta_obj_tag->dim_size[1];
     img_data_header->columns = meta_obj_tag->dim_size[0];
 
-    //TODO calculate image position and slice location of each slice
+    //series
+    int postfix_sub = -1;
+    for (int i = int(meta_obj_tag->element_data_file.size())-1 ; i>= 0  ; --i)
+    {
+        if (postfix_sub == -1 && meta_obj_tag->element_data_file[i] == '.')
+        {
+            postfix_sub = i;
+            break;
+        }
+    }
+    if (postfix_sub != -1 && 
+        (meta_obj_tag->element_data_file.size() - postfix_sub == 4 ||//"raw" 
+        meta_obj_tag->element_data_file.size() - postfix_sub == 5) ) //"zraw"
+    {
+        img_data_header->series_uid = meta_obj_tag->element_data_file.substr(0 , postfix_sub);
+    }
+
+    //TODO calculate image position and slice location of each slice (necessarily ?)
 
     return IO_SUCCESS;
 }
@@ -369,24 +386,25 @@ IOStatus MetaObjectLoader::construct_image_data_i(
     std::shared_ptr<ImageDataHeader> img_data_header, 
     std::shared_ptr<ImageData> img_data )
 {
-    int file_sub = -1;
-    for (int i = 0 ; i< info_file.size()  ;++i)
+    int file_dir_sub = -1;
+    for (int i = int(info_file.size()) -1 ; i >= 0 ;--i)
     {
-        if (info_file[i] == '\\')
+        if (info_file[i] == '\\' || info_file[i] == '/')
         {
-            file_sub = i;
+            file_dir_sub = i;
             break;
         }
     }
-    if(file_sub == -1)
+
+    if(file_dir_sub == -1)
     {
         return IO_FILE_OPEN_FAILED;
     }
 
-    const std::string file1 = info_file.substr(0 , info_file.size() - file_sub) + meta_obj_tag->element_data_file;
+    const std::string file1 = info_file.substr(0 , file_dir_sub+1) + meta_obj_tag->element_data_file;
     const std::string file2 = meta_obj_tag->element_data_file;
 
-    std::fstream in(file1 , std::ios::out | std::ios::binary);
+    std::ifstream in(file1 , std::ios::out | std::ios::binary);
     if(!in.is_open())
     {
         in.open(file2 , std::ios::out | std::ios::binary);
@@ -397,29 +415,8 @@ IOStatus MetaObjectLoader::construct_image_data_i(
         return IO_FILE_OPEN_FAILED;
     }
 
-    unsigned int img_size = img_data->_dim[0]*img_data->_dim[1]*img_data->_dim[2];
-    switch(img_data->_data_type)
-    {
-    case CHAR:
-        img_size *= sizeof(char);
-        break;
-    case UCHAR:
-        img_size *= sizeof(unsigned char);
-        break;
-    case USHORT:
-        img_size *= sizeof(unsigned short);
-        break;
-    case SHORT:
-        img_size *=sizeof(short);
-        break;
-    case FLOAT:
-        img_size *= sizeof(float);
-        break;
-    default:
-        IO_THROW_EXCEPTION("Undefined image type!");
-    }
     img_data->mem_allocate();
-
+    const unsigned int img_size = img_data->get_data_size();
     in.read((char*)img_data->get_pixel_pointer() , img_size);
     in.close();
 

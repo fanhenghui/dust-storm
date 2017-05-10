@@ -60,6 +60,16 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
     //series uid,nodule uid,coordX,coordY,coordZ,diameter_mm,Type
     std::string line;
     std::getline(in , line);
+    std::vector<std::string> infos;
+    boost::split(infos , line , boost::is_any_of(","));
+    const size_t nodule_file_type = infos.size();
+    if (nodule_file_type != 7 && nodule_file_type != 5)
+    {
+        in.close();
+        return IO_UNSUPPORTED_YET;
+    }
+
+
     std::string series_id;
     double id , pos_x , pos_y , pos_z , diameter;
     std::string separate;
@@ -69,29 +79,48 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path , std::shared
     {
         std::vector<std::string> infos;
         boost::split(infos , line , boost::is_any_of(","));
-        if (infos.size() != 7)
+        if (infos.size() != nodule_file_type)
         {
             in.close();
             return IO_DATA_DAMAGE;
         }
-        series_id = infos[0];
-
-        //Check series id
-        if (!_series_id.empty())
+        if (7 == nodule_file_type)//Mine nodule list file
         {
+            series_id = infos[0];
+
+            //Check series id
+            if (!_series_id.empty())
+            {
+                if(series_id != _series_id)
+                {
+                    return IO_UNMATCHED_FILE;
+                }
+            }
+
+            id = str_num_converter.to_num(infos[1]);
+            pos_x = str_num_converter.to_num(infos[2]);
+            pos_y = str_num_converter.to_num(infos[3]);
+            pos_z = str_num_converter.to_num(infos[4]);
+            diameter = str_num_converter.to_num(infos[5]);
+            type = infos[6];
+            nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , type));
+        }
+        else if (5 == nodule_file_type)//Luna nodule list file
+        {
+            series_id = infos[0];
+
+            //Check series id
             if(series_id != _series_id)
             {
-                return IO_UNMATCHED_FILE;
+                continue;
             }
-        }
 
-        id = str_num_converter.to_num(infos[1]);
-        pos_x = str_num_converter.to_num(infos[2]);
-        pos_y = str_num_converter.to_num(infos[3]);
-        pos_z = str_num_converter.to_num(infos[4]);
-        diameter = str_num_converter.to_num(infos[5]);
-        type = infos[6];
-        nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , type));
+            pos_x = str_num_converter.to_num(infos[1]);
+            pos_y = str_num_converter.to_num(infos[2]);
+            pos_z = str_num_converter.to_num(infos[3]);
+            diameter = str_num_converter.to_num(infos[4]);
+            nodule_set->add_nodule(VOISphere(Point3(pos_x , pos_y , pos_z) , diameter , "W"));
+        }
     }
 
     in.close();
@@ -350,5 +379,7 @@ void NoduleSetParser::set_series_id(const std::string& series_id)
 {
     _series_id = series_id;
 }
+
+
 
 MED_IMAGING_END_NAMESPACE

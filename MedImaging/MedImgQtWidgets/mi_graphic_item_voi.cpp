@@ -42,6 +42,8 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 {
     try
     {
+        std::cout << "VOI update \n";
+
         QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
 
         std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);

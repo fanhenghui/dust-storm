@@ -28,6 +28,14 @@ MED_IMAGING_BEGIN_NAMESPACE
 #define ARITHMETIC_THROW_EXCEPTION(desc) THROW_EXCEPTION("Arithmetic" , desc);
 #endif
 
+#ifndef ARITHMETIC_CHECK_NULL_EXCEPTION
+#define  ARITHMETIC_CHECK_NULL_EXCEPTION(pointer)                  \
+    if (nullptr == pointer)                 \
+{                                       \
+    ARITHMETIC_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
+}
+#endif
+
 MED_IMAGING_END_NAMESPACE
 
 #endif

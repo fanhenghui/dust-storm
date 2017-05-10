@@ -24,10 +24,17 @@ class ImageDataHeader;
 #define META_BINARY_DATA_BYTE_ORDER_MSB "BinaryDataByteOrderMSB"
 #define META_COMPRESSD_DATA "CompressedData"
 #define META_COLOR "Color"
+
+//Position: (equiv. to offset and origin)
 #define META_POSITION "Position"
 #define META_OFFSET "Offset"
+#define META_ORIGIN "Origin"
+
+//Rotation: (equiv. to orientation and transformMatrix)
+#define META_ROTATION "Rotation"
 #define META_ORIENTATION "Orientation"
 #define META_TRANSFORM_MATRIX "TransformMatrix"
+
 #define META_ANATOMICAL_ORIENTATION "AnatomicalOrientation"
 #define META_ELEMENT_SPACING "ElementSpacing"
 #define META_DIM_SIZE "DimSize"
@@ -42,7 +49,7 @@ class ImageDataHeader;
 #define META_ELEMENT_DATA_FILE "ElementDataFile"
 
 
-//Meta Tag info from web : 
+//Meta Tag info from url :
 //https://itk.org/Wiki/MetaIO/Documentation#MetaObject_Tags
 struct MetaObjectTag
 {
@@ -84,17 +91,17 @@ struct MetaObjectTag
     //BinaryDataByteOrderMSB MET_STRING
     std::string binary_data_byte_order_msb;
 
-    //CompressedData Tre or False
+    //CompressedData True or False
     bool is_compressed_data;
 
     //Color MET_FLOAT_ARRAY[4] R, G, B, alpha (opacity)
     float color[4];
 
-    //Position MET_FLOAT_ARRAY[NDims]
+    //Position/Offset/Origin MET_FLOAT_ARRAY[NDims]
     //X, Y, Z,бн of real-world coordinate of 0,0,0 index of image)
     Point3 position;
 
-    //Orientation MET_FLOAT_MATRIX[NDims][NDims]
+    //Orientation/Rotation/TransformMatrix MET_FLOAT_MATRIX[NDims][NDims]
     Vector3 orientation_x;
     Vector3 orientation_y;
     Vector3 orientation_z;
@@ -189,7 +196,6 @@ public:
         std::shared_ptr<MetaObjectTag> & meta_obj_tag,
         std::shared_ptr<ImageDataHeader> & img_data_header);
 
-protected:
 private:
     IOStatus construct_meta_object_tag_i(
         const std::string& info_file , 

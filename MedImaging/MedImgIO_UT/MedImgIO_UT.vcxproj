@@ -158,6 +158,7 @@
     <ClInclude Include="mi_io_ut_stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="mi_io_ut_load_meta_object.cpp" />
     <ClCompile Include="mi_io_ut_load_rt_structure.cpp" />
     <ClCompile Include="mi_io_ut_load_series.cpp" />
     <ClCompile Include="mi_io_ut_main.cpp" />

@@ -3,6 +3,10 @@ template<class T>
 void VolumeStatistician<T>::get_intensity_analysis( const Ellipsoid& ellipsoid, 
     unsigned int& num_out , double& min_out , double& max_out , double& mean_out , double& var_out, double& std_out)
 {
+
+    ARITHMETIC_CHECK_NULL_EXCEPTION(_data_ref);
+    ARITHMETIC_CHECK_NULL_EXCEPTION(_mask_ref);
+
     const Point3& center = ellipsoid._center;
     const double& aa_r = 1.0 / (ellipsoid._a*ellipsoid._a);
     const double& bb_r = 1.0 / (ellipsoid._b*ellipsoid._b);

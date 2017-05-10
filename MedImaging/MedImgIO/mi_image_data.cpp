@@ -30,7 +30,7 @@ ImageData::~ImageData()
 
 bool ImageData::mem_allocate()
 {
-    const size_t mem_size = get_data_size_i();
+    const unsigned int mem_size = get_data_size();
     _data_array.reset(new char[mem_size]);
     memset(_data_array.get() , 0 , mem_size);
     _has_cal_min_max = false;
@@ -271,7 +271,7 @@ void ImageData::deep_copy(ImageData *image_data)
 
     //Copy this image data
     image_data->mem_allocate();
-    const size_t imemSize = this->get_data_size_i();
+    const size_t imemSize = this->get_data_size();
     memcpy(image_data->_data_array.get(), this->_data_array.get(), imemSize );
 }
 
@@ -307,9 +307,9 @@ void ImageData::find_min_max_i()
     _has_cal_min_max = true;
 }
 
-size_t ImageData::get_data_size_i()
+unsigned int ImageData::get_data_size()
 {
-    size_t imemSize = _dim[0] * _dim[1] * _dim[2] * _channel_num;
+    unsigned int imemSize = _dim[0] * _dim[1] * _dim[2] * _channel_num;
     switch(_data_type)
     {
     case CHAR:

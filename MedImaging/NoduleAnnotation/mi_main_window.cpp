@@ -223,7 +223,7 @@ void NoduleAnnotation::configure_i()
         in.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(true);
+    Configuration::instance()->set_nodule_file_rsa(false);
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -550,14 +550,14 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         }
 
         std::shared_ptr<ImageDataHeader> data_header;
-        std::shared_ptr<ImageData> volume_data;
+        std::shared_ptr<ImageData> img_data;
         DICOMLoader loader;
         loader.set_progress_model(_model_progress);
-        IOStatus status = loader.load_series(file_names_std, volume_data , data_header);
+        IOStatus status = loader.load_series(file_names_std, img_data , data_header);
         if (status != IO_SUCCESS)
         {
             QApplication::restoreOverrideCursor();
-            QMessageBox::warning(this , tr("load DICOM Folder") , tr("load DICOM folder failed!"));
+            QMessageBox::warning(this , tr("Load DICOM folder") , tr("load DICOM folder failed!"));
             _model_progress->clear_observer();
             return;
         }
@@ -566,53 +566,59 @@ void NoduleAnnotation::slot_open_dicom_folder_i()
         _dicom_series_files.clear();
         _dicom_series_files = file_names_std;
 
-        //////////////////////////////////////////////////////////////////////////
-        //Initialize
-        if (_volume_infos)//Delete last one
-        {
-            _volume_infos->finialize();
-        }
-        _volume_infos.reset(new VolumeInfos());
-        _volume_infos->set_data_header(data_header);
-        //SharedWidget::instance()->makeCurrent();
-        _volume_infos->set_volume(volume_data);//load volume texture if has graphic card
-
-        //Create empty mask
-        std::shared_ptr<ImageData> mask_data(new ImageData());
-        volume_data->shallow_copy(mask_data.get());
-        mask_data->_channel_num = 1;
-        mask_data->_data_type = medical_imaging::UCHAR;
-        mask_data->mem_allocate();
-        _volume_infos->set_mask(mask_data);
-
-        create_model_observer_i();
-
-        _mpr_00->clear();
-        _mpr_01->clear();
-        _mpr_10->clear();
-
-        create_scene_i();
-
-        save_layout2x2_parameter_i();
+        //Load data
+        load_data_i(img_data , data_header);
 
         QApplication::restoreOverrideCursor();
-
-        _mpr_00->update();
-        _mpr_01->update();
-        _mpr_10->update();
-
-        _model_progress->clear_observer();
-
-        //reset nodule list
-        refresh_nodule_list_i();
-        _select_vio_id = -1;
-
-        _is_ready = true;
     }
     else
     {
         return;
     }
+}
+
+void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,std::shared_ptr<ImageDataHeader> data_header)
+{
+    //////////////////////////////////////////////////////////////////////////
+    //Initialize
+    if (_volume_infos)//Delete last one
+    {
+        _volume_infos->finialize();
+    }
+    _volume_infos.reset(new VolumeInfos());
+    _volume_infos->set_data_header(data_header);
+    //SharedWidget::instance()->makeCurrent();
+    _volume_infos->set_volume(img_data);//load volume texture if has graphic card
+
+    //Create empty mask
+    std::shared_ptr<ImageData> mask_data(new ImageData());
+    img_data->shallow_copy(mask_data.get());
+    mask_data->_channel_num = 1;
+    mask_data->_data_type = medical_imaging::UCHAR;
+    mask_data->mem_allocate();
+    _volume_infos->set_mask(mask_data);
+
+    create_model_observer_i();
+
+    _mpr_00->clear();
+    _mpr_01->clear();
+    _mpr_10->clear();
+
+    create_scene_i();
+
+    save_layout2x2_parameter_i();
+
+    _mpr_00->update();
+    _mpr_01->update();
+    _mpr_10->update();
+
+    _model_progress->clear_observer();
+
+    //reset nodule list
+    refresh_nodule_list_i();
+    _select_vio_id = -1;
+
+    _is_ready = true;
 }
 
 void NoduleAnnotation::slot_dicom_anonymization_i()
@@ -630,6 +636,30 @@ void NoduleAnnotation::slot_dicom_anonymization_i()
 void NoduleAnnotation::slot_open_meta_image_i()
 {
 
+    QString file_name = QFileDialog::getOpenFileName(
+        this ,tr("Loading meta data"),"",tr("Dicom image(*mhd)"));
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+    MetaObjectLoader loader;
+    std::shared_ptr<MetaObjectTag> meta_tag;
+    std::shared_ptr<ImageData> img_data;
+    std::shared_ptr<ImageDataHeader> data_header;
+
+    IOStatus status = loader.load(std::string(file_name.toLocal8Bit()) , img_data , meta_tag,data_header);
+    if (status != IO_SUCCESS)
+    {
+        QApplication::restoreOverrideCursor();
+        QMessageBox::warning(this , tr("Load meta data") , tr("load meta data failed!"));
+        return;
+    }
+
+    //Clear DICOM series files
+    _dicom_series_files.clear();
+
+    load_data_i(img_data , data_header);
+
+    QApplication::restoreOverrideCursor();
 }
 
 void NoduleAnnotation::slot_open_raw_i()
@@ -1061,6 +1091,7 @@ void NoduleAnnotation::slot_delete_nodule_i()
         _model_voi->remove_voi(_select_vio_id);
         _model_voi->notify(VOIModel::DELETE_VOI);
         _select_vio_id = -1;
+        _ob_scene_container->update();
     }
 }
 

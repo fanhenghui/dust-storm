@@ -35,6 +35,8 @@ public:
 
     void* get_pixel_pointer();
 
+    unsigned int get_data_size();
+
     void shallow_copy(ImageData *image_data);
 
     void deep_copy(ImageData *image_data);
@@ -53,8 +55,6 @@ public:
     Point3 _image_position;
 
 private:
-    size_t get_data_size_i();
-
     std::unique_ptr<char[]> _data_array;
 
 private:
