@@ -8,8 +8,8 @@ ImageData::ImageData():
         _channel_num(1),
         _min_scalar(0),
         _max_scalar(1024),
-        _slope(1.0),
-        _intercept(0.0),
+        _slope(1.0f),
+        _intercept(0.0f),
         _image_position(Point3::S_ZERO_POINT),
         _has_cal_min_max(false)
 {
@@ -55,7 +55,7 @@ float ImageData::get_max_scalar()
     return _max_scalar;
 }
 
-bool ImageData::regulate_wl(float& window, float& level)
+bool ImageData::regulate_wl(float& window, float& level) 
 {
     // CT should apply slope and intercept
     // MR has always slope(1) and intercept(0)
@@ -64,9 +64,17 @@ bool ImageData::regulate_wl(float& window, float& level)
         return false;
     }
 
-    double dMin = get_min_scalar();
+    const float min_gray = get_min_scalar();
 
-    level = (level - _intercept)/_slope;
+    if (_data_type == SHORT || _data_type == CHAR)
+    {
+        level = (level - _intercept - min_gray)/_slope;
+    }
+    else
+    {
+        level = (level - _intercept)/_slope;
+    }
+
     window = window/_slope;
 
     return true;
@@ -78,8 +86,6 @@ void ImageData::normalize_wl(float& window, float& level)
     const static float S_65535_R = 1.0f/65535.0f;
     const static float S_255_R = 1.0f/255.0f;
 
-    float min_scalar = get_min_scalar();
-
     switch(_data_type)
     {
     case  USHORT:
@@ -88,7 +94,7 @@ void ImageData::normalize_wl(float& window, float& level)
         break;
     case  SHORT:
         window *= S_65535_R;
-        level = (level - std::min(0.0f, min_scalar) ) * S_65535_R;
+        level = level * S_65535_R;
         break;
     case UCHAR:
         window *= S_255_R;
@@ -96,7 +102,7 @@ void ImageData::normalize_wl(float& window, float& level)
         break;
     case CHAR:
         window *= S_255_R;
-        level = (level - std::min(0.0f, min_scalar)) *S_255_R;
+        level = level *S_255_R;
         break;
     case FLOAT:
         break;

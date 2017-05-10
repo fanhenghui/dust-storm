@@ -215,6 +215,20 @@ void VolumeInfos::release_volume_resource_i()
     }
 }
 
+namespace 
+{
+    template<typename SrcType , typename DstType >
+    std::unique_ptr<DstType[]>  signed_to_unsigned(unsigned int length, double min_gray , void* data_src)
+    {
+        std::unique_ptr<DstType[]> data_dst(new DstType[length]);
+        SrcType* data_src0 = (SrcType*)(data_src);
+        for (unsigned int i = 0 ; i< length ; ++i)
+        {
+            data_dst[i] = static_cast<DstType>( static_cast<double>(data_src0[i]) - min_gray);
+        }
+        return std::move(data_dst);
+    }
+}
 void VolumeInfos::load_volume_resource_i()
 {
     if (GPU == Configuration::instance()->get_processing_unit_type())
@@ -241,7 +255,23 @@ void VolumeInfos::load_volume_resource_i()
         GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
         GLenum internal_format , format , type;
         GLUtils::get_gray_texture_format(_volume_data->_data_type , internal_format , format ,type);
-        tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
+
+        const unsigned int length = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
+        const double min_gray = _volume_data->get_min_scalar();
+        if (_volume_data->_data_type == SHORT)
+        {
+            std::unique_ptr<unsigned short> dst_data = signed_to_unsigned<short , unsigned short>(length , min_gray , _volume_data->get_pixel_pointer());
+            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
+        }
+        else if (_volume_data->_data_type == CHAR)
+        {
+            std::unique_ptr<unsigned char> dst_data = signed_to_unsigned<char , unsigned char>(length , min_gray , _volume_data->get_pixel_pointer());
+            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
+        }
+        else
+        {
+            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
+        }
         tex->unbind();
 
         _volume_textures.push_back(tex);
