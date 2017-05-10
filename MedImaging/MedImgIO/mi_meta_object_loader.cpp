@@ -2,6 +2,7 @@
 #include "mi_image_data.h"
 #include "mi_image_data_header.h"
 #include "MedImgCommon/mi_string_number_converter.h"
+#include "Ext/zlib/zlib.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -129,6 +130,10 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
             {
                 meta_obj_tag->is_compressed_data = false;
             }
+        }
+        else if (tag == META_COMPRESSED_DATA_SIZE)
+        {
+            ss >> meta_obj_tag->compressed_data_size;
         }
         else if (tag == META_COLOR)
         {
@@ -260,7 +265,7 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
         meta_obj_tag->orientation_x == Vector3::S_ZERO_VECTOR ||
         meta_obj_tag->orientation_y == Vector3::S_ZERO_VECTOR ||
         meta_obj_tag->orientation_z == Vector3::S_ZERO_VECTOR ||
-        meta_obj_tag->is_compressed_data ||
+        //meta_obj_tag->is_compressed_data ||
         !meta_obj_tag->is_binary_data)
     {
         return IO_UNSUPPORTED_YET;
@@ -415,10 +420,28 @@ IOStatus MetaObjectLoader::construct_image_data_i(
         return IO_FILE_OPEN_FAILED;
     }
 
-    img_data->mem_allocate();
-    const unsigned int img_size = img_data->get_data_size();
-    in.read((char*)img_data->get_pixel_pointer() , img_size);
-    in.close();
+    if (meta_obj_tag->is_compressed_data)
+    {
+        img_data->mem_allocate();
+        const unsigned int img_size = img_data->get_data_size();
+        in.read((char*)img_data->get_pixel_pointer() , img_size);
+        in.close();
+    }
+    else 
+    {
+        const unsigned int c_size = meta_obj_tag->compressed_data_size;
+        std::unique_ptr<char[]> c_data(new char[c_size]);
+        in.read(c_data.get() , c_size);
+        in.close();
+
+        img_data->mem_allocate();
+        uLongf img_size = (uLongf)img_data->get_data_size();
+        int status = uncompress((Bytef *)img_data->get_pixel_pointer() , &img_size , (Bytef *)c_data.get() , c_size);
+        if (status != 0)
+        {
+            return IO_FILE_OPEN_FAILED;
+        }
+    }
 
     return IO_SUCCESS;
 }

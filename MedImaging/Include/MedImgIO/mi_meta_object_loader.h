@@ -23,6 +23,7 @@ class ImageDataHeader;
 #define META_ELEMENT_BYTE_ORDER_MSB "ElementByteOrderMSB"
 #define META_BINARY_DATA_BYTE_ORDER_MSB "BinaryDataByteOrderMSB"
 #define META_COMPRESSD_DATA "CompressedData"
+#define META_COMPRESSED_DATA_SIZE "CompressedDataSize "
 #define META_COLOR "Color"
 
 //Position: (equiv. to offset and origin)
@@ -93,6 +94,9 @@ struct MetaObjectTag
 
     //CompressedData True or False
     bool is_compressed_data;
+
+    //CompressedDataSize  MET_FLOAT
+    unsigned int compressed_data_size;
 
     //Color MET_FLOAT_ARRAY[4] R, G, B, alpha (opacity)
     float color[4];
@@ -172,6 +176,7 @@ struct MetaObjectTag
         id = 0;
         parent_id = 0;
         is_compressed_data = false;
+        compressed_data_size = 0;
         is_binary_data = false;
         color[0] = color[1] = color[2] = color[3] = 0; 
         spacing[0] = spacing[1] = spacing[2] = 0;
