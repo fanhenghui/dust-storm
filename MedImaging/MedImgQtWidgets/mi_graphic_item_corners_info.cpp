@@ -28,7 +28,9 @@ GraphicItemCornersInfo::GraphicItemCornersInfo():
         _text_item_rb(new QGraphicsTextItem()),
         _text_item_rt(new QGraphicsTextItem()),
         _pre_ww(std::numeric_limits<int>::min()),
-        _pre_wl(std::numeric_limits<int>::min())
+        _pre_wl(std::numeric_limits<int>::min()),
+        _pre_window_width(-1),
+        _pre_window_height(-1)
 {
 
 }
@@ -41,6 +43,76 @@ GraphicItemCornersInfo::~GraphicItemCornersInfo()
 void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
 {
     GraphicItemBase::set_scene(scene);
+    refresh_text_i();
+}
+
+
+std::vector<QGraphicsItem*> GraphicItemCornersInfo::get_init_items()
+{
+    std::vector<QGraphicsItem*> items(4);
+    items[0] = _text_item_lb;
+    items[1] = _text_item_lt;
+    items[2] = _text_item_rb;
+    items[3] = _text_item_rt;
+    return std::move(items);
+}
+
+void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove)
+{
+    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+    int width , height;
+    _scene->get_display_size(width , height);
+
+    if (_pre_window_width != width || _pre_window_height!= height)
+    {
+        refresh_text_i();
+        return;
+    }
+
+    //update window level
+    //////////////////////////////////////////////////////////////////////////
+    //3.3 Left Bottom
+    //Window level
+
+    std::string context;
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (mpr_scene)
+    {
+        //Set context
+        float ww(1) , wl(0);
+        mpr_scene->get_global_window_level(ww , wl);
+        int wl_int = (int)wl;
+        int ww_int = (int)ww;
+        if (wl_int == _pre_wl && ww_int == _pre_ww)
+        {
+            return;
+        }
+        else
+        {
+            _pre_wl = wl_int;
+            _pre_ww = ww_int;
+        }
+        
+
+        StrNumConverter<int> num_to_str;
+        context = std::string("C : ") + num_to_str.to_string(wl_int) + std::string("  W : ") + num_to_str.to_string(ww_int); 
+
+        //Set alignment
+        QTextDocument* dcm = _text_item_lb->document();
+        dcm->clear();
+        dcm->setPlainText(context.c_str());
+        QTextOption option = dcm->defaultTextOption();
+        option.setAlignment(Qt::AlignLeft);
+        dcm->setDefaultTextOption(option);
+        //_text_item_lb->setTextWidth(dcm->idealWidth());
+
+        //Set position
+        _text_item_lb->setPos(BORDER , height - (BORDER+MARGIN*2));
+    }
+}
+
+void GraphicItemCornersInfo::refresh_text_i()
+{
     QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
 
     std::shared_ptr<RayCastScene> ray_cast_scene = std::dynamic_pointer_cast<RayCastScene>(_scene);
@@ -53,7 +125,7 @@ void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
     QTWIDGETS_CHECK_NULL_EXCEPTION(data_header );
 
     int width(1),height(1);
-    scene->get_display_size(width , height);
+    _scene->get_display_size(width , height);
 
     //set font 
     QFont font("Times" , POINT_SIZE , QFont::Bold);
@@ -73,7 +145,7 @@ void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
     //////////////////////////////////////////////////////////////////////////
     //Patient four corners info
     //////////////////////////////////////////////////////////////////////////
-    
+
 
     //////////////////////////////////////////////////////////////////////////
     //3.1 Left Top
@@ -163,6 +235,7 @@ void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
         mpr_scene->get_global_window_level(ww , wl);
         int wl_int = (int)wl;
         int ww_int = (int)ww;
+
         StrNumConverter<int> num_to_str;
         context = std::string("C : ") + num_to_str.to_string(wl_int) + std::string("  W : ") + num_to_str.to_string(ww_int); 
 
@@ -176,63 +249,14 @@ void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
 
         //Set position
         _text_item_lb->setPos(BORDER , height - (BORDER+MARGIN*2));
-    }
 
-}
-
-
-std::vector<QGraphicsItem*> GraphicItemCornersInfo::get_init_items()
-{
-    std::vector<QGraphicsItem*> items(4);
-    items[0] = _text_item_lb;
-    items[1] = _text_item_lt;
-    items[2] = _text_item_rb;
-    items[3] = _text_item_rt;
-    return std::move(items);
-}
-
-void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove)
-{
-    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
-    int width , height;
-    _scene->get_display_size(width , height);
-
-    //update window level
-    //////////////////////////////////////////////////////////////////////////
-    //3.3 Left Bottom
-    //Window level
-
-    std::string context;
-    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
-    if (mpr_scene)
-    {
-        //Set context
-        float ww(1) , wl(0);
-        mpr_scene->get_global_window_level(ww , wl);
-        int wl_int = (int)wl;
-        int ww_int = (int)ww;
-        if (wl_int == _pre_wl && ww_int == _pre_ww)
-        {
-            return;
-        }
-        _pre_wl = wl_int;
         _pre_ww = ww_int;
-
-        StrNumConverter<int> num_to_str;
-        context = std::string("C : ") + num_to_str.to_string(wl_int) + std::string("  W : ") + num_to_str.to_string(ww_int); 
-
-        //Set alignment
-        QTextDocument* dcm = _text_item_lb->document();
-        dcm->clear();
-        dcm->setPlainText(context.c_str());
-        QTextOption option = dcm->defaultTextOption();
-        option.setAlignment(Qt::AlignLeft);
-        dcm->setDefaultTextOption(option);
-        //_text_item_lb->setTextWidth(dcm->idealWidth());
-
-        //Set position
-        _text_item_lb->setPos(BORDER , height - (BORDER+MARGIN*2));
+        _pre_wl = wl_int;
     }
+
+    
+    _pre_window_width = width;
+    _pre_window_height = height;
 }
 
 

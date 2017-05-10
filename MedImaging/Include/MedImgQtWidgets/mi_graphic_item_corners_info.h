@@ -19,7 +19,9 @@ public:
 
     virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 
-protected:
+private:
+    void refresh_text_i();
+
 private:
     QGraphicsTextItem* _text_item_lb;
     QGraphicsTextItem* _text_item_lt;
@@ -28,6 +30,9 @@ private:
 
     int _pre_ww;
     int _pre_wl;
+
+    int _pre_window_width;
+    int _pre_window_height;
 };
 
 MED_IMAGING_END_NAMESPACE

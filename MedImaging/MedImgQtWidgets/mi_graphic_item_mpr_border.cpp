@@ -79,7 +79,7 @@ void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::
     pen.setColor(color_qt);
 
     if (_pre_color == color_qt && _pre_pen_width == pen_width &&
-        _pre_window_width == width && _pre_window_width== height)
+        _pre_window_width == width && _pre_window_height== height)
     {
         return;
     }
