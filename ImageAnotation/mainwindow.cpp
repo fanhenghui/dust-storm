@@ -393,11 +393,8 @@ void MainWindow::on_imgTreeWidget_currentItemChanged(QTreeWidgetItem *current, Q
 
     // load new file
     QString filepath(absoluteDir + iDir + "/" + iFile);
+    _pixmap_widget->enable_painting(false);
     _pixmap_widget->set_pixmap(QPixmap(filepath  ));
-
-    //refresh a frame
-     _pixmap_widget->enable_painting(false);
-     _pixmap_widget->repaint();
 
      //get mask file
     get_mask_files();

@@ -675,6 +675,11 @@ void NoduleAnnotation::slot_open_raw_i()
 {
     RawDataImportDlg *dlg = new RawDataImportDlg();
     dlg->setWindowModality(Qt::WindowModal);
+
+    connect(
+        dlg , SIGNAL(raw_data_imported(std::shared_ptr<medical_imaging::ImageData> ,std::shared_ptr<medical_imaging::ImageDataHeader> )) , 
+        this , SLOT(load_data_i(std::shared_ptr<medical_imaging::ImageData> ,std::shared_ptr<medical_imaging::ImageDataHeader> )) );
+
     dlg->show();
 }
 

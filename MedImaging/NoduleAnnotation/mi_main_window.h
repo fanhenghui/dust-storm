@@ -85,11 +85,11 @@ private slots:
     //Crosshair visible
     void slot_crosshair_visibility_i(int );
 
+    void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
 
 private:
     void connect_signal_slot_i();
     void configure_i();
-    void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
     void create_scene_i();
     void create_model_observer_i();
     void refresh_nodule_list_i();
