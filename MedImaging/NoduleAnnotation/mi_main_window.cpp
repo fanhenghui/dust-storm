@@ -59,6 +59,7 @@
 #include "mi_mouse_op_min_max_hint.h"
 #include "mi_my_rsa.h"
 #include "mi_dicom_anonymization_dialog.h"
+#include "mi_raw_data_import_dialog.h"
 
 #include <QEvent>
 #include <QSizePolicy>
@@ -672,7 +673,9 @@ void NoduleAnnotation::slot_open_meta_image_i()
 
 void NoduleAnnotation::slot_open_raw_i()
 {
-
+    RawDataImportDlg *dlg = new RawDataImportDlg();
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->show();
 }
 
 void NoduleAnnotation::slot_press_btn_annotate_i()
