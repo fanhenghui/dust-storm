@@ -67,6 +67,7 @@ public:
 
 public slots:
     void slot_zoom_factor_changed(double);
+    
 
 signals:
     void zoomFactorChanged(double);
@@ -75,7 +76,8 @@ signals:
 
 protected:
     virtual void initializeGL();
-    //virtual void resizeGL(int w, int h);
+    virtual void resizeGL(int w, int h);
+    virtual void updateGL();
 
     void paintEvent(QPaintEvent*);
     void mouseMoveEvent(QMouseEvent * event);

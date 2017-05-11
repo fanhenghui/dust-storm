@@ -26,8 +26,7 @@ public:
     IO_Export DICOMExporter();
     IO_Export ~DICOMExporter();
     IO_Export IOStatus export_series(const std::vector<std::string>& in_files , 
-        const std::vector<std::string>& out_files,
-        ExportDicomDataType etype);
+        const std::vector<std::string>& out_files, ExportDicomDataType etype);
     IO_Export void set_progress_model(std::shared_ptr<ProgressModel> model);
     IO_Export void set_anonymous_taglist(const std::vector<DcmTagKey> &tag_list);
 

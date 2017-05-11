@@ -58,7 +58,6 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
     _is_confident = true;
     _is_erasing = false;
 
-
     setAttribute(Qt::WA_OpaquePaintEvent);
     setFocusPolicy(Qt::NoFocus);
     setMinimumSize( _pixmap->width()*_zoom_factor, _pixmap->height()*_zoom_factor );
@@ -177,11 +176,15 @@ void PixmapWidget::set_pixmap( const QPixmap& pixmap)
 
 void PixmapWidget::paintEvent( QPaintEvent *event )
 {
+    static unsigned int paint_id = 0;
+    std::cout << "paint : " << ++paint_id << std::endl;
+
     makeCurrent();
 
     //glClearColor(1.0,0.0,0.0,1.0);
     //glClear(GL_COLOR_BUFFER_BIT);
-
+    //swapBuffers();
+    //return;
 
     bool drawBorder = false;
     int xOffset = 0, yOffset = 0;
@@ -273,12 +276,20 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     //std::cout<< "( "<<updateRect.left() << " , " << updateRect.right() << " ) " << " , ( "<<updateRect.bottom() << " , " << updateRect.top()<< " ) \n" ;
 
     // draw the image
-    p.drawPixmap(updateRect.topLeft(), *_pixmap, updateRect);
+    QRectF rect_whole;
+    rect_whole.setLeft(0);
+    rect_whole.setWidth(_pixmap->width());
+    rect_whole.setTop(0);
+    rect_whole.setHeight(_pixmap->height());
+
+    p.drawPixmap(rect_whole.topLeft(), *_pixmap, rect_whole);
+    //p.drawPixmap(updateRect.topLeft(), *_pixmap, updateRect);
 
     if (_enable_painting)
     {
         // draw the mask
-        p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
+        //p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
+        p.drawImage(rect_whole.topLeft(), _drawMask, rect_whole);
 
         //TODO using cursor to replace brush itself
         // draw the brush
@@ -301,10 +312,11 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
 
     // draw a border around the image
     p.restore();
-    //if (drawBorder) {
-    //	p.setPen( Qt::black );
-    //	p.drawRect( xOffset-1, yOffset-1, m_pm->width()*zoomFactor+1, m_pm->height()*zoomFactor+1 );
-    //}
+    if (drawBorder) 
+    {
+        p.setPen( Qt::black );
+        p.drawRect( xOffset-1, yOffset-1, _pixmap->width()*_zoom_factor+1, _pixmap->height()*_zoom_factor+1 );
+    }
 
     swapBuffers();
 }
@@ -499,7 +511,13 @@ void PixmapWidget::set_confidence(bool flag)
     _is_confident = flag;
 }
 
-//void PixmapWidget::resizeGL(int w, int h)
-//{
-//
-//}
+void PixmapWidget::updateGL()
+{
+    std::cout << "In update GL\n";
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void PixmapWidget::resizeGL(int w, int h)
+{
+    std::cout << "In resize GL\n";
+}
