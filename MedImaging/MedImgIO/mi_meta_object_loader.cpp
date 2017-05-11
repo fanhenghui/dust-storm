@@ -1,8 +1,10 @@
 #include "mi_meta_object_loader.h"
+
+#include "MedImgCommon/mi_string_number_converter.h"
+
 #include "mi_image_data.h"
 #include "mi_image_data_header.h"
-#include "MedImgCommon/mi_string_number_converter.h"
-#include "Ext/zlib/zlib.h"
+#include "mi_zlib_utils.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -406,41 +408,49 @@ IOStatus MetaObjectLoader::construct_image_data_i(
         return IO_FILE_OPEN_FAILED;
     }
 
+    std::string raw_file = "";
     const std::string file1 = info_file.substr(0 , file_dir_sub+1) + meta_obj_tag->element_data_file;
     const std::string file2 = meta_obj_tag->element_data_file;
 
     std::ifstream in(file1 , std::ios::out | std::ios::binary);
-    if(!in.is_open())
+    if (in.is_open())
+    {
+        raw_file = file1;
+    }
+    else
     {
         in.open(file2 , std::ios::out | std::ios::binary);
+        if (in.is_open())
+        {
+            raw_file = file2;
+        }
     }
 
-    if(!in.is_open())
+    if(raw_file.empty())
     {
         return IO_FILE_OPEN_FAILED;
     }
 
     if (meta_obj_tag->is_compressed_data)
     {
-        img_data->mem_allocate();
-        const unsigned int img_size = img_data->get_data_size();
-        in.read((char*)img_data->get_pixel_pointer() , img_size);
         in.close();
-    }
-    else 
-    {
+
         const unsigned int c_size = meta_obj_tag->compressed_data_size;
         std::unique_ptr<char[]> c_data(new char[c_size]);
         in.read(c_data.get() , c_size);
         in.close();
 
         img_data->mem_allocate();
-        uLongf img_size = (uLongf)img_data->get_data_size();
-        int status = uncompress((Bytef *)img_data->get_pixel_pointer() , &img_size , (Bytef *)c_data.get() , c_size);
-        if (status != 0)
-        {
-            return IO_FILE_OPEN_FAILED;
-        }
+        const unsigned int img_size = img_data->get_data_size();
+        IOStatus status = ZLibUtils::decompress(raw_file , (char*)img_data->get_pixel_pointer() , img_size);
+        return status;
+    }
+    else 
+    {
+        img_data->mem_allocate();
+        const unsigned int img_size = img_data->get_data_size();
+        in.read((char*)img_data->get_pixel_pointer() , img_size);
+        in.close();
     }
 
     return IO_SUCCESS;

@@ -35,5 +35,11 @@
     <ClCompile Include="mi_io_ut_load_meta_object.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mi_io_ut_load_zraw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_io_ut_zlib_utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
