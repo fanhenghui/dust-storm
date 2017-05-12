@@ -1,0 +1,15 @@
+src_root = E:/Data/MyData
+dst_root = E:/Data/MyDataAnon
+skip_derived = true
+patient_name = false
+patient_id = false
+patient_birth_date = false
+patient_birth_time = false
+patient_birth_name = false
+patient_sex = false
+patient_age = false
+patient_weight = false
+patient_address = false
+other_patient_ids = false
+other_patient_names = false
+
