@@ -50,6 +50,7 @@ private slots:
     void slot_save_nodule_file_i();
     void slot_open_nodule_file_i();
     void slot_dicom_anonymization_i();
+    void slot_quit_i();
 
     //Common tools
     void slot_press_btn_arrow_i();

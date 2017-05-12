@@ -392,6 +392,7 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_file_i()));
     connect(_ui.actionLoad_Nodule , SIGNAL(triggered()) , this , SLOT(slot_open_nodule_file_i()));
     connect(_ui.actionAnonymization_DICOM , SIGNAL(triggered()) , this , SLOT(slot_dicom_anonymization_i()));
+    connect(_ui.actionQuit , SIGNAL(triggered()) , this , SLOT(slot_quit_i()));
 
     //MPR scroll bar
     connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
@@ -647,6 +648,11 @@ void NoduleAnnotation::slot_open_meta_image_i()
 
     QString file_name = QFileDialog::getOpenFileName(
         this ,tr("Loading meta data"),"",tr("Dicom image(*mhd)"));
+
+    if (file_name.isEmpty())
+    {
+        return;
+    }
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1396,6 +1402,11 @@ void NoduleAnnotation::save_layout2x2_parameter_i()
     _pre_2x2_height = _mpr_00->height();
 }
 
+
+void NoduleAnnotation::slot_quit_i()
+{
+    this->close();
+}
 
 
 

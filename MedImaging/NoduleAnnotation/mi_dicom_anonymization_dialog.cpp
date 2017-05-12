@@ -19,6 +19,8 @@ DICOMAnonymizationDlg::DICOMAnonymizationDlg(QWidget *parent /*= 0*/, Qt::Window
 {
     _ui.setupUi(this);
 
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+
     connect(_ui.pushButton_browse_path, SIGNAL(pressed()) , this , SLOT(slot_press_btn_browse_path_i()));
     connect(_ui.pushButton_export, SIGNAL(pressed()) , this , SLOT(slot_press_btn_export_i()));
     connect(_ui.pushButton_cancel, SIGNAL(pressed()) , this , SLOT(slot_press_btn_cancel_i()));
