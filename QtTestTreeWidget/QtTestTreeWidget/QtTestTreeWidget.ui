@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QtTestTreeWidgetClass</class>
+ <widget class="QMainWindow" name="QtTestTreeWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>524</width>
+    <height>777</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QtTestTreeWidget</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QTreeWidget" name="PathologyTreeWidget">
+      <column>
+       <property name="text">
+        <string>病变类型</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>勾选</string>
+       </property>
+      </column>
+      <item>
+       <property name="text">
+        <string>腺瘤</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>低级别上皮内瘤变</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>高级别上皮内瘤变</string>
+        </property>
+       </item>
+      </item>
+      <item>
+       <property name="text">
+        <string>癌</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>腺癌</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>乳头状腺癌</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>管状腺癌</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>粘液腺癌</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>低粘附性癌</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>混合性腺癌</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>神经内分泌肿瘤</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>未分化癌</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>鳞状细胞癌</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>肝样腺癌</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>伴有淋巴样间质的癌（髓样癌）</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>腺鳞癌</string>
+        </property>
+       </item>
+      </item>
+      <item>
+       <property name="text">
+        <string>神经内分泌肿瘤</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>神经内分泌瘤NET</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>NET 1级（类癌）</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>NET 2级</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>神经内分泌癌NEC</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>大细胞 NEC</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>小细胞 NEC</string>
+         </property>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>混合性腺神经内分泌癌</string>
+        </property>
+       </item>
+      </item>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>524</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="QtTestTreeWidget.qrc"/>
+ </resources>
+ <connections/>
+</ui>
