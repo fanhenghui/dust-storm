@@ -35,6 +35,8 @@
 #include <QColor>
 #include <QVector>
 #include <QtDebug>
+#include <QMainWindow>
+#include <QStatusBar>
 
 namespace
 {
@@ -49,6 +51,7 @@ PixmapWidget::PixmapWidget( QAbstractScrollArea *parentScrollArea, QWidget *pare
     : QGLWidget( parent)
 {
     _scroll_area = parentScrollArea;
+    _parent_window = qobject_cast<QMainWindow*>(parent);
     _pixmap = new QPixmap();
     _zoom_factor = 1.0;
     _pen_width = 5;
@@ -361,7 +364,7 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
         _is_drawing = true;
 
         // save the current position and perform an update in the
-        // region of the mouse cusor
+        // region of the mouse cursor
         lastXyMouseOrg = xyMouseOrg;
         lastXyMouse = xyMouse;
         lastXyDrawnMouseOrg = xyMouseOrg;
@@ -390,6 +393,8 @@ void PixmapWidget::mouseMoveEvent(QMouseEvent * event)
     updateRectOrg.setTop(MIN(lastXyMouseOrg.y(), xyMouseOrg.y()) - (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
     updateRectOrg.setBottom(MAX(lastXyMouseOrg.y(), xyMouseOrg.y()) + (int) ceil(_zoom_factor * (0.5 * _pen_width + 2)));
     QRect updateRect = _current_matrix_inv.mapRect(updateRectOrg);
+    _parent_window->statusBar()->showMessage("Current Image Position is: (" 
+        + QString::number(xyMouse.x()) + QString(", ") + QString::number(xyMouse.y()) + QString(")"), 5000);
 
     if (_is_drawing) 
     {

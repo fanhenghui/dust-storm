@@ -87,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent, QFlag flags)
     setupUi(this);
 
     _scroll_area = new ScrollAreaNoWheel(this);
-    _pixmap_widget = new PixmapWidget(_scroll_area, _scroll_area);
+    _pixmap_widget = new PixmapWidget(_scroll_area, this);
     
     _scroll_area->setWidgetResizable(true);
     _scroll_area->setWidget(_pixmap_widget);

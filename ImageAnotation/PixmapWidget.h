@@ -35,6 +35,7 @@
 
 
 class QAbstractScrollArea;
+class QMainWindow;
 
 // defines a bounding box that is to be drawn on the screen
 class BoundingBox
@@ -109,6 +110,7 @@ private:
     double _last_v_scroll_value;
     double _last_h_scroll_value;
     QAbstractScrollArea *_scroll_area;
+    QMainWindow *_parent_window;
 
     bool _enable_painting;
     bool _is_confident;
