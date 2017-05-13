@@ -1,3 +1,4 @@
+#include <io.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,7 +10,7 @@ int main(int argc , char* argv[])
 {
     if (argc == 1)
     {
-        std::cout << "DICOM Anonymization : "
+        std::cout << "DICOM Anonymization : ";
         std::cout << "arguments[1] be config file.\n";
         return -1;
     }
@@ -116,4 +117,6 @@ int main(int argc , char* argv[])
     
 
     std::cout << "DICOM anonymization done : \n";
+
+    return 0;
 }

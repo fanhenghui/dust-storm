@@ -18,6 +18,8 @@ RawDataImportDlg::RawDataImportDlg(QWidget *parent /*= 0*/, Qt::WindowFlags f /*
 {
     _ui.setupUi(this);
 
+    this->setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+
     //Initialize widget default value
     _ui.lineEdit_width->setValidator(new QIntValidator(1 , 3000 , _ui.lineEdit_width));
     _ui.lineEdit_height->setValidator(new QIntValidator(1 , 3000 , _ui.lineEdit_height));
@@ -229,6 +231,7 @@ void RawDataImportDlg::slot_press_btn_import_i()
     catch (const Exception& e)
     {
         QMessageBox::warning(this , tr("Error") , tr("Import raw data failed!"));
+        this->close();
     }
 }
 
