@@ -145,6 +145,37 @@ int anon(const std::string& src_root , const std::string& dst_root , const std::
     return 0;
 }
 
+void create_empty_config_file()
+{
+    const std::string config_file = "config.txt";
+    std::ofstream out(config_file.c_str() , std::ios::out);
+    if (out.is_open())
+    {
+        out<< "src_root = E:/Data/MyData\n\
+dst_root = E:/Data/MyDataAnon\n\
+skip_derived = true\n\
+remove_patient_name = true\n\
+remove_patient_id = true\n\
+remove_patient_birth_date = true\n\
+remove_patient_birth_time = true\n\
+remove_patient_birth_name = true\n\
+remove_patient_sex = true\n\
+remove_patient_age = true\n\
+remove_patient_weight = true\n\
+remove_patient_address = true\n\
+remove_other_patient_ids = true\n\
+remove_other_patient_names = true\n\
+remove_manufacturer = true\n\
+remove_manufacturer_model_name = true\n\
+remove_institution_name = true\n\
+remove_institution_address = true\n\
+remove_institutional_department_name = true\n\
+remove_referring_physician_name = true\n\
+remove_operator_name = true\n\
+remove_station_name = true";
+        out.close();
+    }
+}
 
 int main(int argc , char* argv[])
 {
@@ -178,6 +209,11 @@ int main(int argc , char* argv[])
     {
         std::cout << "open config file : " <<config_file << " failed !\n";
         out_log << "open config file : " <<config_file << " failed !\n";
+        if (argc == 1)
+        {
+            out_log << "Create a empty config file for you.";
+            create_empty_config_file();
+        }
         return -1;
     }
 
@@ -212,49 +248,81 @@ int main(int argc , char* argv[])
                 skip_derived = false;
             }
         }
-        else if (tag == "patient_name" && context == "false")
+        else if (tag == "remove_patient_name" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientName);
         }
-        else if (tag == "patient_id" && context == "false")
+        else if (tag == "remove_patient_id" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientID);
         }
-        else if (tag == "patient_birth_date" && context == "false")
+        else if (tag == "remove_patient_birth_date" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientBirthDate);
         }
-        else if (tag == "patient_birth_time" && context == "false")
+        else if (tag == "remove_patient_birth_time" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientBirthTime);
         }
-        else if (tag == "patient_birth_name" && context == "false")
+        else if (tag == "remove_patient_birth_name" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientBirthName);
         }
-        else if (tag == "patient_sex" && context == "false")
+        else if (tag == "remove_patient_sex" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientSex);
         }
-        else if (tag == "patient_age" && context == "false")
+        else if (tag == "remove_patient_age" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientAge);
         }
-        else if (tag == "patient_weight" && context == "false")
+        else if (tag == "remove_patient_weight" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientWeight);
         }
-        else if (tag == "patient_address" && context == "false")
+        else if (tag == "remove_patient_address" && context == "true")
         {
             ignore_tags.push_back(DCM_PatientAddress);
         }
-        else if (tag == "other_patient_ids" && context == "false")
+        else if (tag == "remove_other_patient_ids" && context == "true")
         {
             ignore_tags.push_back(DCM_OtherPatientIDs);
         }
-        else if (tag == "other_patient_names" && context == "false")
+        else if (tag == "remove_other_patient_names" && context == "true")
         {
             ignore_tags.push_back(DCM_OtherPatientNames);
+        }
+        else if (tag == "remove_manufacturer" && context == "true")
+        {
+            ignore_tags.push_back(DCM_Manufacturer);
+        }
+        else if (tag == "remove_manufacturer_model_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_ManufacturerModelName);
+        }
+        else if (tag == "remove_institution_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_InstitutionName);
+        }
+        else if (tag == "remove_institution_address" && context == "true")
+        {
+            ignore_tags.push_back(DCM_InstitutionAddress);
+        }
+        else if (tag == "remove_institutional_department_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_InstitutionalDepartmentName);
+        }
+        else if (tag == "remove_referring_physician_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_ReferringPhysicianName);
+        }
+        else if (tag == "remove_operator_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_OperatorsName);
+        }
+        else if (tag == "remove_station_name" && context == "true")
+        {
+            ignore_tags.push_back(DCM_StationName);
         }
     }
 
@@ -266,10 +334,30 @@ int main(int argc , char* argv[])
     out_log << "dst root : " << dst_root << std::endl;
     out_log << "DICOM anonymization begin : \n";
 
+    if (src_root.empty())
+    {
+        out_log << "src root is empty!\n";
+        std::cout << "src root is empty!\n";
+        return -1;
+    }
+
+    if (dst_root.empty())
+    {
+        out_log << "dst root is empty!\n";
+        std::cout << "dst root is empty!\n";
+        return -1;
+    }
+
     unsigned int file_sum = 0;
     get_all_files(src_root , file_sum);
     std::cout << "File number is : " << file_sum << std::endl;
     out_log << "File number is : " << file_sum << std::endl;
+
+    if (0 == file_sum)
+    {
+        out_log << "Empty file collection.\n";
+        return -1;
+    }
 
     int cur_file_id(0);
     int status = anon(src_root , dst_root , ignore_tags, true , cur_file_id , file_sum);
