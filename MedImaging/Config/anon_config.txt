@@ -1,4 +1,4 @@
-src_root = E:/Data/MyData
+src_root = E:/Data/MyDataAnonTestSrc
 dst_root = E:/Data/MyDataAnonTestDst
 skip_derived = true
 patient_name = false

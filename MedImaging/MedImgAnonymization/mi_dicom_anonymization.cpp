@@ -109,6 +109,7 @@ int anon(const std::string& src_root , const std::string& dst_root , const std::
 
         medical_imaging::DICOMExporter exporter;
         exporter.set_anonymous_taglist(ignore_tags);
+        exporter.skip_derived_image(skip_derived);
         medical_imaging::IOStatus status = exporter.export_series(std::vector<std::string>(1 , src_file) , 
             std::vector<std::string>(1 , dst_file) , medical_imaging::EXPORT_ANONYMOUS_DICOM);
 
@@ -131,10 +132,13 @@ int anon(const std::string& src_root , const std::string& dst_root , const std::
 
         ++file_id;
         int sub = file_sum/20;
-        int k = file_id / sub;
-        if (k != 0  && k*sub == file_id) 
+        if (sub != 0)
         {
-            std::cout << ">";
+            int k = file_id / sub;
+            if (k != 0  && k*sub == file_id) 
+            {
+                std::cout << ">";
+            }
         }
     }
 

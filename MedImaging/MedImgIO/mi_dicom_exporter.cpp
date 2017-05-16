@@ -1,6 +1,4 @@
 #include "mi_dicom_exporter.h"
-#include "mi_image_data.h"
-#include "mi_image_data_header.h"
 
 #include "dcmtk/config/osconfig.h"
 #include "dcmtk/oflog/oflog.h"
@@ -42,7 +40,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-    DICOMExporter::DICOMExporter():_progress(0.0f)
+    DICOMExporter::DICOMExporter():_progress(0.0f),_skip_derived_image(false)
 {
     _taglist.clear();
     _taglist.push_back(DCM_PatientName);
@@ -94,6 +92,12 @@ IOStatus DICOMExporter::load_dicom_file(const std::string file_name ,  DcmFileFo
         }
         const std::string my_tsu(context.c_str());
 
+        //DICOM transfer syntaxes
+        const std::string TSU_LittleEndianImplicitTransferSyntax     = std::string("1.2.840.10008.1.2");//Default transfer for DICOM
+        const std::string TSU_LittleEndianExplicitTransferSyntax    = std::string("1.2.840.10008.1.2.1");
+        const std::string TSU_DeflatedExplicitVRLittleEndianTransferSyntax = std::string("1.2.840.10008.1.2.1.99");
+        const std::string TSU_BigEndianExplicitTransferSyntax = std::string("1.2.840.10008.1.2.2");
+
         //JEPG Lossless
         const std::string TSU_JPEGProcess14SV1TransferSyntax      = std::string("1.2.840.10008.1.2.4.70");//Default Transfer Syntax for Lossless JPEG Image Compression
         const std::string TSU_JPEGProcess14TransferSyntax     = std::string("1.2.840.10008.1.2.4.57");
@@ -102,38 +106,43 @@ IOStatus DICOMExporter::load_dicom_file(const std::string file_name ,  DcmFileFo
         const std::string TSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
         const std::string TSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
 
-        if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
-            my_tsu == TSU_JEPG2000Compression)
+        if (my_tsu == TSU_LittleEndianImplicitTransferSyntax ||
+            my_tsu == TSU_LittleEndianExplicitTransferSyntax ||
+            my_tsu == TSU_DeflatedExplicitVRLittleEndianTransferSyntax ||
+            my_tsu == TSU_BigEndianExplicitTransferSyntax)
         {
-            return IO_UNSUPPORTED_YET;
+            return IO_SUCCESS;
         }
         else if (my_tsu == TSU_JPEGProcess14SV1TransferSyntax ||
             my_tsu == TSU_JPEGProcess14TransferSyntax)
         {
             //check if the input DICOM is compressed
-            DicomImage *imageq = new DicomImage(file_name.c_str());
-            if (imageq->getStatus() != EIS_Normal) 
+            DJDecoderRegistration::registerCodecs(); // register JPEG codecs
+            data_set = fileformatptr->getDataset();
+            // decompress data set if compressed
+            data_set->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+
+            // check if everything went well
+            if (data_set->canWriteXfer(EXS_LittleEndianExplicit))
             {
-                DJDecoderRegistration::registerCodecs(); // register JPEG codecs
-                data_set = fileformatptr->getDataset();
-                // decompress data set if compressed
-                data_set->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-
-                // check if everything went well
-                if (data_set->canWriteXfer(EXS_LittleEndianExplicit))
-                {
-                    fileformatptr->saveFile("test_decompressed.dcm", EXS_LittleEndianExplicit);
-                }
-                DJDecoderRegistration::cleanup(); // deregister JPEG codecs
-
-                fileformatptr->loadFile("test_decompressed.dcm");
-                data_set = nullptr;
-                delete data_set;
+                fileformatptr->saveFile("test_decompressed.dcm", EXS_LittleEndianExplicit);
             }
-            imageq = nullptr;	delete imageq;
+            DJDecoderRegistration::cleanup(); // deregister JPEG codecs
+
+            fileformatptr.reset(new DcmFileFormat());
+            fileformatptr->loadFile("test_decompressed.dcm");
+
+            return IO_SUCCESS;
         }
-        
-        return IO_SUCCESS;
+        else if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
+            my_tsu == TSU_JEPG2000Compression)
+        {
+            return IO_UNSUPPORTED_YET;
+        }
+        else
+        {
+            return IO_UNSUPPORTED_YET;
+        }
     }
     else
     {
@@ -185,6 +194,22 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
             {
                 return status;
             }
+
+            //Check image type
+            OFString context;
+            if(fileformat_ptr->getDataset()->findAndGetOFStringArray(DCM_ImageType , context).good())
+            {
+                std::string image_type(context.c_str());
+                if (_skip_derived_image && image_type.find("SECONDARY") != image_type.npos)//Skip derived image
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                return IO_UNSUPPORTED_YET;
+            }
+
             anonymous_dicom_data(fileformat_ptr);
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
             if (i % progress_step == 1)
@@ -202,6 +227,22 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
             {
                 return status;
             }
+
+            //Check image type
+            OFString context;
+            if(fileformat_ptr->getDataset()->findAndGetOFStringArray(DCM_ImageType , context).good())
+            {
+                std::string image_type(context.c_str());
+                if (_skip_derived_image && image_type.find("SECONDARY") != image_type.npos)//Skip derived image
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                return IO_UNSUPPORTED_YET;
+            }
+
             anonymous_dicom_data(fileformat_ptr);
             remove_private_tag(fileformat_ptr);
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
@@ -341,4 +382,10 @@ void DICOMExporter::set_progress_i(int value)
         _model->notify();
     }
 }
+
+void DICOMExporter::skip_derived_image(bool flag)
+{
+    _skip_derived_image = flag;
+}
+
 MED_IMAGING_END_NAMESPACE

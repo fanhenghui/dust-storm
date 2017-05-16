@@ -29,6 +29,7 @@ public:
         const std::vector<std::string>& out_files, ExportDicomDataType etype);
     IO_Export void set_progress_model(std::shared_ptr<ProgressModel> model);
     IO_Export void set_anonymous_taglist(const std::vector<DcmTagKey> &tag_list);
+    IO_Export void skip_derived_image(bool flag);
 
 private:
     IOStatus load_dicom_file(const std::string file_name , DcmFileFormatPtr&);
@@ -46,6 +47,7 @@ private:
     float _progress;
     std::shared_ptr<ProgressModel> _model;
     std::vector<DcmTagKey> _taglist;
+    bool _skip_derived_image;
 };
 
 MED_IMAGING_END_NAMESPACE
