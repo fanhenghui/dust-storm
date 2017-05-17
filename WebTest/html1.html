@@ -1,0 +1,74 @@
+<!DOCTYPE = html>
+<head>
+	<meta charset = "UTF-8">
+	<title> 呵呵 </title>
+	<link rel="stylesheet" type="text/css" href="./CSS/styles.css"></link>
+</head>
+<body>
+	<h1>标题</h1>
+	<p>段落2</p>
+	<a href="https://www.baidu.com/" target="_blank">
+		<button>
+			<font style="background-color:red;" size="10">Baidu</font>
+		</button>
+	</a>
+	<br>
+	<hr>
+	<img src="./images/lung.jpg" alt="LUNG Image" width="255" height="255"> 
+	<p><del>Hello</del> <ins>World</ins></p>
+	<hr>
+	<table border="1">
+		<caption>This is table caption</caption>
+		<tr>
+			<th>Name</th>
+			<th>Age</th>
+		</tr>
+		<tr>
+			<td>Smith</td>
+			<td>23</td>
+		</tr>
+		<tr>
+			<td>Jim</td>
+			<td>28</td>
+		</tr>
+	</table>
+	<hr>
+	<ul>
+		<li>C0</li>
+		<li>C1</li>
+		<li>C2</li>
+	</ul>
+	<ol>
+		<li>C0</li>
+		<li>C1</li>
+		<li>C2</li>
+	</ol>
+	<hr>
+	<form>
+		First name: <input type="text" name="firstname"><br>
+		Last name: <input type="text" name="lastname"><br>
+		Password: <input type = "password" name="pwd"><br>
+	</form>
+	<hr>
+	<p>Script</p>
+	<script>document.write("Hello srcipt")</script>
+	<p id="demo">JAVA</p>
+	<script>
+		function myFunc()
+		{
+			if(document.getElementById("demo").innerHTML == "C++")
+			{
+				document.getElementById("demo").innerHTML = "JAVA";
+			}
+			else
+			{
+				document.getElementById("demo").innerHTML = "C++";
+			}
+		}
+	</script>
+	<button type="button" onclick="myFunc()">CLick me</button>
+	<hr>
+	<p>
+	<button type="button" size="10" onclick="alert('welcome')"></button>
+	</p>
+</body>
