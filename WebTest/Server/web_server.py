@@ -19,7 +19,7 @@ def sigIntHander(signo,frame):
     global lisfd  
     lisfd.shutdown(socket.SHUT_RD)  
   
-strHost = "172.20.70.33"  
+strHost = "172.20.52.163"  
 HOST = strHost #socket.inet_pton(socket.AF_INET,strHost)  
 PORT = 20014  
   
