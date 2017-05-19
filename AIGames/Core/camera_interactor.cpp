@@ -1,8 +1,6 @@
-#include "mi_camera_interactor.h"
-#include "MedImgArithmetic/mi_quat4.h"
-#include "MedImgArithmetic/mi_track_ball.h"
-
-MED_IMAGING_BEGIN_NAMESPACE
+#include "camera_interactor.h"
+#include "Core/quat4.h"
+#include "Core/track_ball.h"
 
 OrthoCameraInteractor::OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera )
 {
@@ -16,7 +14,7 @@ OrthoCameraInteractor::~OrthoCameraInteractor()
 
 void OrthoCameraInteractor::set_initial_status(std::shared_ptr<OrthoCamera> camera)
 {
-    RENDERALGO_CHECK_NULL_EXCEPTION(camera);
+    //RENDERALGO_CHECK_NULL_EXCEPTION(camera);
     _camera_init = *(camera.get());
     _camera = camera;
 }
@@ -94,11 +92,3 @@ void OrthoCameraInteractor::rotate(const Point2& pre_pt , const Point2& cur_pt, 
     }
     this->rotate(TrackBall::mouse_motion_to_rotation(pre_pt , cur_pt , width , height  , Point2::S_ZERO_POINT).to_matrix());
 }
-
-
-
-
-
-
-
-MED_IMAGING_END_NAMESPACE
