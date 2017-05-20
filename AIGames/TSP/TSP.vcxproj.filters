@@ -24,12 +24,18 @@
     <ClCompile Include="tsp_solver.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="tsp_map_drawer.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tsp_map.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="tsp_solver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tsp_map_drawer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

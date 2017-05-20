@@ -5,11 +5,19 @@
 #include "Core/ortho_camera.h"
 #include "Core/camera_interactor.h"
 
+#include "tsp_map.h"
+#include "tsp_map_drawer.h"
+#include "tsp_solver.h"
 
-#define CROSSOVER_RATE 0.7
-#define MUTATION_RATE 0.001
-#define POP_SIZE 140
-#define CHROMO_LENGTH 70
+#define CROSSOVER_RATE 0.75
+#define MUTATION_RATE 0.2
+#define POP_SIZE 40
+
+#define CITY_RADIUS 200
+#define CITY_NUM 20
+
+#define ITERATION 20000
+
 
 namespace
 {
@@ -22,6 +30,12 @@ namespace
     std::shared_ptr<OrthoCamera> _camera;
     std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
 
+    std::shared_ptr<TSPMap> _tsp_map;
+    std::shared_ptr<TSPMapDrawer> _tsp_map_drawer;
+    std::shared_ptr<TSPSolver> _tsp_solver;
+    const int _iteration = ITERATION;
+    int _cur_iteration = ITERATION;
+
     void init()
     {
         _camera.reset(new OrthoCamera());
@@ -32,6 +46,13 @@ namespace
 
         _camera_interactor.reset(new OrthoCameraInteractor(_camera));
 
+        _tsp_map.reset(new TSPMap(CITY_RADIUS, CITY_NUM));
+        _tsp_map_drawer.reset(new TSPMapDrawer());
+        _tsp_map_drawer->set_tps_map(_tsp_map);
+        _tsp_map_drawer->set_camera(_camera);
+
+        _tsp_solver.reset(new TSPSolver(CROSSOVER_RATE , MUTATION_RATE , POP_SIZE, CITY_NUM));
+        _tsp_solver->set_tsp_map(_tsp_map);
     }
 
     void display()
@@ -41,7 +62,33 @@ namespace
 
         glViewport(0, 0, _width, _height);
 
+        _tsp_map_drawer->draw();
+
         glutSwapBuffers();
+
+        if (_cur_iteration < _iteration)
+        {
+            if (_cur_iteration == 0)
+            {
+                _tsp_solver->create_start_population();
+            }
+
+            std::cout << _cur_iteration << std::endl;
+            _tsp_solver->epoch();
+            std::vector<int> route = _tsp_solver->get_fittest_chromosome()._city_tours;
+            _tsp_map_drawer->set_route(route);
+            ++_cur_iteration;
+
+            //Check solved in advance
+            if (abs( _tsp_solver->get_shortest_route() -  _tsp_map->get_best_possible_route()) < FLOAT_EPSILON)
+            {
+                _cur_iteration = _iteration;
+            }
+
+            std::cout << "Shortest : " << _tsp_solver->get_shortest_route() << "  Best : " << _tsp_map->get_best_possible_route() << std::endl;
+
+            glutPostRedisplay();
+        }
 
     }
 
@@ -58,6 +105,10 @@ namespace
         if (_pre_btn == GLUT_LEFT_BUTTON)
         {
             _camera_interactor->rotate(_pre_pos, Point2(x, y), _width, _height);
+        }
+        else if (_pre_btn == GLUT_RIGHT_BUTTON)
+        {
+            _camera_interactor->zoom(_pre_pos, Point2(x, y), _width, _height);
         }
 
         _pre_pos = Point2(x, y);
@@ -77,6 +128,11 @@ namespace
     {
         switch (key)
         {
+        case 'b':
+        {
+            _cur_iteration = 0;
+            break;
+        }
         default:
             break;
         }

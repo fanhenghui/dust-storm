@@ -89,9 +89,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tsp_map.cpp" />
+    <ClCompile Include="tsp_map_drawer.cpp" />
     <ClCompile Include="tsp_solver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="tsp_map_drawer.h" />
     <ClInclude Include="tsp_solver.h" />
     <ClInclude Include="tsp_map.h" />
   </ItemGroup>
