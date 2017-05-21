@@ -5,7 +5,7 @@
 #include "Ext/gl/glew.h"
 #include "Ext/gl/freeglut.h"
 
-#define SPHERE_RADIUS 20
+#define SPHERE_RADIUS 1.5
 
 
 TSPMapDrawer::TSPMapDrawer()
@@ -20,7 +20,7 @@ TSPMapDrawer::~TSPMapDrawer()
 void TSPMapDrawer::set_tps_map(std::shared_ptr<TSPMap> tsp_map)
 {
     _tsp_map = tsp_map;
-    const double radius = _tsp_map->get_radius() + SPHERE_RADIUS;
+    const double radius = _tsp_map->get_radius() + SPHERE_RADIUS*2;
     _mat_model = make_scale(Vector3(1.0/radius , 1.0 / radius, 1.0 / radius));
 }
 
@@ -37,6 +37,7 @@ void TSPMapDrawer::set_camera(std::shared_ptr<CameraBase> camera)
 
 void TSPMapDrawer::set_route(std::vector<int> route)
 {
+    std::unique_lock<std::mutex> locker(_mutex);
     _route = route;
 }
 
@@ -70,7 +71,7 @@ void TSPMapDrawer::draw_map_i()
         const Matrix4 mat = _mat_model*make_translate(cities[i] - Point3::S_ZERO_POINT);
         glLoadMatrixd(mat._m);
 
-        glutSolidSphere(radius / SPHERE_RADIUS, 20, 20);
+        glutSolidSphere(SPHERE_RADIUS , 20, 20);
     }
 
     glPopMatrix();
@@ -85,7 +86,11 @@ void TSPMapDrawer::draw_route_i()
         return;
     }
 
-    const std::vector<Point3>& cities = _tsp_map->get_cities();
+    std::vector<Point3> cities;
+    {
+        std::unique_lock<std::mutex> locker(_mutex);
+        cities = _tsp_map->get_cities();
+    }
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glPushMatrix();
@@ -103,7 +108,7 @@ void TSPMapDrawer::draw_route_i()
         Point3 begin = cities[_route[i]];
         Point3 end = cities[_route[i+1]];
 
-        glLineWidth(0.5 + i*0.3);
+        glLineWidth(0.5 + i*0.015);
 
         glBegin(GL_LINES);
         glVertex3d(begin.x, begin.y, begin.z);

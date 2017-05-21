@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+#include <mutex>
 #include "Core/matrix4.h"
 
 class TSPMap;
@@ -31,5 +32,6 @@ private:
     std::shared_ptr<CameraBase> _camera;
 
     std::vector<int> _route;
+    std::mutex _mutex;
 
 };

@@ -11,12 +11,12 @@
 
 #define CROSSOVER_RATE 0.75
 #define MUTATION_RATE 0.2
-#define POP_SIZE 40
+#define POP_SIZE 200
 
 #define CITY_RADIUS 200
-#define CITY_NUM 20
+#define CITY_NUM 100
 
-#define ITERATION 20000
+#define ITERATION 50000
 
 
 namespace
@@ -36,6 +36,44 @@ namespace
     const int _iteration = ITERATION;
     int _cur_iteration = ITERATION;
 
+    std::mutex _mutex;
+
+    void generation()
+    {
+        while (true)
+        {
+            std::cout << "s" << std::endl;
+            while (_cur_iteration < ITERATION)
+            {
+                std::cout << _cur_iteration << std::endl;
+                if (_cur_iteration == 0)
+                {
+                    _tsp_solver->create_start_population();
+                }
+                
+
+                //std::cout << _cur_iteration << std::endl;
+                const int loop = 1;
+                for (int i = 0; i < loop; ++i)
+                {
+                    _tsp_solver->epoch();
+                    std::vector<int> route = _tsp_solver->get_fittest_chromosome()._city_tours;
+                    _tsp_map_drawer->set_route(route);
+                    ++_cur_iteration;
+                }
+
+                //Check solved in advance
+                if (abs(_tsp_solver->get_shortest_route() - _tsp_map->get_best_possible_route()) < 0.01)
+                {
+                    _cur_iteration = _iteration;
+                    std::cout << "Iteration : " << _cur_iteration << "Shortest : " << _tsp_solver->get_shortest_route() << "  Best : " << _tsp_map->get_best_possible_route() << std::endl;
+                }
+
+                //std::cout << "Shortest : " << _tsp_solver->get_shortest_route() << "  Best : " << _tsp_map->get_best_possible_route() << std::endl;
+            }
+        }
+    }
+
     void init()
     {
         _camera.reset(new OrthoCamera());
@@ -53,6 +91,9 @@ namespace
 
         _tsp_solver.reset(new TSPSolver(CROSSOVER_RATE , MUTATION_RATE , POP_SIZE, CITY_NUM));
         _tsp_solver->set_tsp_map(_tsp_map);
+
+        std::thread th(generation);
+        th.detach();
     }
 
     void display()
@@ -65,30 +106,6 @@ namespace
         _tsp_map_drawer->draw();
 
         glutSwapBuffers();
-
-        if (_cur_iteration < _iteration)
-        {
-            if (_cur_iteration == 0)
-            {
-                _tsp_solver->create_start_population();
-            }
-
-            std::cout << _cur_iteration << std::endl;
-            _tsp_solver->epoch();
-            std::vector<int> route = _tsp_solver->get_fittest_chromosome()._city_tours;
-            _tsp_map_drawer->set_route(route);
-            ++_cur_iteration;
-
-            //Check solved in advance
-            if (abs( _tsp_solver->get_shortest_route() -  _tsp_map->get_best_possible_route()) < FLOAT_EPSILON)
-            {
-                _cur_iteration = _iteration;
-            }
-
-            std::cout << "Shortest : " << _tsp_solver->get_shortest_route() << "  Best : " << _tsp_map->get_best_possible_route() << std::endl;
-
-            glutPostRedisplay();
-        }
 
     }
 
@@ -131,12 +148,18 @@ namespace
         case 'b':
         {
             _cur_iteration = 0;
+            std::cout << _cur_iteration << std::endl;
             break;
         }
         default:
             break;
         }
 
+        glutPostRedisplay();
+    }
+
+    void idle()
+    {
         glutPostRedisplay();
     }
 }
@@ -163,6 +186,7 @@ void main(int argc, char* argv[])
     glutMouseFunc(mouse_click);
     glutMotionFunc(mouse_motion);
     glutKeyboardFunc(keyboard);
+    glutIdleFunc(idle);
 
     init();
 

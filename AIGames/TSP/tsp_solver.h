@@ -59,14 +59,37 @@ private:
 
     void mutate_i(Chromosome& ch);
 
+    bool check_chromosome_valid(const Chromosome& ch);
+
 private:
+    //////////////////////////////////////////////////////////////////////////
+    //crossover operator
     //permutation crossover operator(PMX)
     void crossover_partially_mapped_crossover_i(
         const Chromosome& mum, const Chromosome& dad,
         Chromosome& baby0, Chromosome& baby1);
 
-    //Exchange Mutation operator(EM)
+    void crossover_order_based_crossover_i(
+        const Chromosome& mum, const Chromosome& dad,
+        Chromosome& baby0, Chromosome& baby1);
+
+    //暂时没调通
+    void crossover_position_based_crossover_i(
+        const Chromosome& mum, const Chromosome& dad, 
+        Chromosome& baby0, Chromosome& baby1);
+
+    //////////////////////////////////////////////////////////////////////////
+    //Mutation operator
+    //Exchange (EM)
     void mutate_exchange_i(Chromosome& ch);
+
+    //Scramble (SM)
+    void mutate_scramble_i(Chromosome& ch);
+
+    void mutate_displacement_i(Chromosome& ch);
+
+    void mutate_insertion_i(Chromosome& ch);
+
 
 private:
     std::vector<Chromosome> _chromosomes;
@@ -85,4 +108,6 @@ private:
     unsigned int _shortest_route_id;
 
     std::shared_ptr<TSPMap> _tsp_map;
+    std::vector<unsigned int> _loser;
+    std::vector<unsigned int> _winner;
 };
