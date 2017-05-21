@@ -2,6 +2,8 @@
 #define MED_IMAGING_GL_RESOURCE_MANAGER_H_
 
 #include <mutex>
+#include <vector>
+#include <map>
 #include "Core/gl_object.h"
 
 

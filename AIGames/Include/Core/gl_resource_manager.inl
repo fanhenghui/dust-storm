@@ -69,7 +69,8 @@ std::shared_ptr<ResourceType> GLResourceManager<ResourceType>::create_object(UID
     uid = _uid_generator->tick();
     if (_objects.find(uid) != _objects.end())
     {
-        GLRESOURCE_THROW_EXCEPTION("Generated UID invalid!");
+        return nullptr;
+        //GLRESOURCE_THROW_EXCEPTION("Generated UID invalid!");
     }
 
     std::shared_ptr<ResourceType> pResource(new ResourceType(uid));

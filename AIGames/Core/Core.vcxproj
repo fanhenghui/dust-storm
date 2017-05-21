@@ -125,6 +125,7 @@
     <ClInclude Include="..\Include\Core\rectangle.h" />
     <ClInclude Include="..\Include\Core\shape_interface.h" />
     <ClInclude Include="..\Include\Core\sphere.h" />
+    <ClInclude Include="..\Include\Core\targa.h" />
     <ClInclude Include="..\Include\Core\track_ball.h" />
     <ClInclude Include="..\Include\Core\triangle.h" />
     <ClInclude Include="..\Include\Core\common_utils.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="point3.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="sphere.cpp" />
+    <ClCompile Include="targa.cpp" />
     <ClCompile Include="track_ball.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="vector2.cpp" />

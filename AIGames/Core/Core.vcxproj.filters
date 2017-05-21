@@ -143,6 +143,9 @@
     <ClInclude Include="..\Include\Core\camera_interactor.h">
       <Filter>Arithmetic</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\Core\targa.h">
+      <Filter>IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -243,6 +246,9 @@
     </ClCompile>
     <ClCompile Include="camera_interactor.cpp">
       <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="targa.cpp">
+      <Filter>IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

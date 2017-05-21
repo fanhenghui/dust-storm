@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{C7344D13
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TSP", "TSP\TSP.vcxproj", "{203900DD-D66C-4EC3-AAD7-DAB02C023828}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MineSweeper", "MineSweeper\MineSweeper.vcxproj", "{878A89AA-A8F4-473D-916C-F75EF0E2577A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,6 +31,10 @@ Global
 		{203900DD-D66C-4EC3-AAD7-DAB02C023828}.Debug|x64.Build.0 = Debug|x64
 		{203900DD-D66C-4EC3-AAD7-DAB02C023828}.Release|x64.ActiveCfg = Release|x64
 		{203900DD-D66C-4EC3-AAD7-DAB02C023828}.Release|x64.Build.0 = Release|x64
+		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Debug|x64.ActiveCfg = Debug|x64
+		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Debug|x64.Build.0 = Debug|x64
+		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Release|x64.ActiveCfg = Release|x64
+		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,5 +42,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3079483B-37B4-46FC-A500-F72F46AD5E61} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
 		{203900DD-D66C-4EC3-AAD7-DAB02C023828} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
+		{878A89AA-A8F4-473D-916C-F75EF0E2577A} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
 	EndGlobalSection
 EndGlobal

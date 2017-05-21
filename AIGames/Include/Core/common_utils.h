@@ -31,8 +31,12 @@ T string_to_num(const std::string& s)
 
 inline int rand_int(int x, int y) { return rand() % (y - x + 1) + x; }
 
+//returns a random float in the range 0 < n < 1
 inline double rand_double() { return (rand()) / (RAND_MAX + 1.0); }
 
 inline bool rand_bool() { return 1 == rand_int(0, 1);}
+
+//returns a random float in the range -1 < n < 1
+inline double rand_clamped() {return rand_double() - rand_double();}
 
 #endif
