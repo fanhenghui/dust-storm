@@ -30,6 +30,12 @@
     <ClCompile Include="mine.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="param.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="battle_space.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_net.h">
@@ -42,6 +48,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="mine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="param.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="battle_space.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

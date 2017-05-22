@@ -10,7 +10,7 @@ public:
     Mine();
     ~Mine();
 
-    void set_position(const Point2& pt);
+    void reset();
 
     void draw();
 
@@ -19,4 +19,5 @@ public:
 public:
     Point2 _position;
     std::shared_ptr<GLTexture2D> _tex;
+    static double S_WIDTH;
 };

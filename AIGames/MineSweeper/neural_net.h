@@ -15,7 +15,6 @@ struct Neuron
         {
             _weights.push_back(rand_clamped());
         }
-        _weights[_input_num - 1] = -1.0;
     }
 };
 

@@ -39,4 +39,17 @@ inline bool rand_bool() { return 1 == rand_int(0, 1);}
 //returns a random float in the range -1 < n < 1
 inline double rand_clamped() {return rand_double() - rand_double();}
 
+inline void clamp(double &arg, double min, double max)
+{
+    if (arg < min)
+    {
+        arg = min;
+    }
+
+    if (arg > max)
+    {
+        arg = max;
+    }
+}
+
 #endif

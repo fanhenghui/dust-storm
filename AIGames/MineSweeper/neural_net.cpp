@@ -9,7 +9,7 @@ NeuralNet::NeuralNet(int input_num, int output_num, int hidden_layer_num , int n
     _bias(bias),
     _sigmod_respond(sigmoid_response)
 {
-
+    create_net();
 }
 
 NeuralNet::~NeuralNet()
@@ -39,24 +39,63 @@ void NeuralNet::create_net()
     }
 }
 
-//std::vector<double> NeuralNet::get_weights() const
-//{
-//}
-//
-//int NeuralNet::get_num_of_weights() const
-//{
-//
-//}
-//
-//void NeuralNet::set_weights(const std::vector<double>& weights)
-//{
-//
-//}
+std::vector<double> NeuralNet::get_weights() const
+{
+    int idx = 0;
+    std::vector<double> weights;
+    for (int i = 0 ; i <_hidden_layer_num + 1; ++i)
+    {
+        const NeuroLayer& layer = _layers[i];
+        for (int j = 0 ; j < layer._neuro_num ; ++j)
+        {
+            const Neuron& neuron = layer._neurons[j];
+            for (int k =0 ; k < neuron._input_num ; ++k)
+            {
+                weights.push_back(neuron._weights[k]);
+            }
+        }
+    }
+
+    return weights;
+}
+
+int NeuralNet::get_num_of_weights() const
+{
+    int idx = 0;
+    std::vector<double> weights;
+    for (int i = 0; i < _hidden_layer_num + 1; ++i)
+    {
+        const NeuroLayer& layer = _layers[i];
+        for (int j = 0; j < layer._neuro_num; ++j)
+        {
+            const Neuron& neuron = layer._neurons[j];
+            idx += neuron._input_num;
+        }
+    }
+
+    return idx;
+}
+
+void NeuralNet::set_weights(const std::vector<double>& weights)
+{
+    int idx = 0;
+    for (int i = 0; i < _hidden_layer_num + 1; ++i)
+    {
+        NeuroLayer& layer = _layers[i];
+        for (int j = 0; j < layer._neuro_num; ++j)
+        {
+            Neuron& neuron = layer._neurons[j];
+            for (int k = 0; k < neuron._input_num; ++k)
+            {
+                neuron._weights[k] = weights[idx++];
+            }
+        }
+    }
+}
 
 std::vector<double> NeuralNet::update(std::vector<double>& inputs)
 {
     std::vector<double> outputs;
-    
 
     if (inputs.size() != _input_num)
     {
@@ -75,18 +114,20 @@ std::vector<double> NeuralNet::update(std::vector<double>& inputs)
         outputs.clear();
         weight = 0;
 
-        for (int j = 0 ; j<_layers[i]._neuro_num;++i)
+        for (int j = 0 ; j<_layers[i]._neuro_num;++j)
         {
             double netinput = 0;
             const int cur_input = _layers[i]._neurons[j]._input_num;
             for (int k = 0 ; k<cur_input -1 ; ++k)
             {
-                netinput += _layers[i]._neurons[j]._weights[k] * inputs[k];
+                netinput += _layers[i]._neurons[j]._weights[k] * inputs[weight++];
             }
             //add in the bias
             netinput += _layers[i]._neurons[j]._weights[cur_input - 1] * _bias;
 
             outputs.push_back(sigmoid_i(netinput));
+
+            weight = 0;
         }
     }
 
@@ -95,5 +136,5 @@ std::vector<double> NeuralNet::update(std::vector<double>& inputs)
 
 double NeuralNet::sigmoid_i(double activation)
 {
-    return 1.0 / (1 + pow(E, -activation / _sigmod_respond));
+    return 1.0 / (1 + exp(-activation / _sigmod_respond));
 }
