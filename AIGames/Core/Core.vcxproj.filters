@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Stdafx">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Arithmetic">
+      <UniqueIdentifier>{666c21a0-429e-4a61-8a0f-a379ff0a522d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{9810e7f8-7cb1-48d7-8c55-9ce80a98cce3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{309c21a1-41db-4bc6-b306-5b675a726042}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLResource">
+      <UniqueIdentifier>{ed769c6c-3bdb-4612-862b-9cf72bcad777}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Stdafx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\camera_base.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\color_unit.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\matrix4.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\ortho_camera.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\perspective_camera.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\point2.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\point3.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\quat4.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\track_ball.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\vector2.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\vector3.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\aabb.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\ellipsoid.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\intersection_test.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\line.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\line_segment.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\plane.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\rectangle.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\shape_interface.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\sphere.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\triangle.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\common_utils.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_environment.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_buffer.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_fbo.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_object.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_program.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_resource_define.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_resource_manager.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_resource_manager_container.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_texture_1d.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_texture_1d_array.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_texture_2d.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_texture_3d.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_texture_base.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_utils.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\gl_vao.h">
+      <Filter>GLResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\camera_interactor.h">
+      <Filter>Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\Core\targa.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Stdafx</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_base.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix4.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="ortho_camera.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="perspective_camera.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="point2.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="point3.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="track_ball.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="vector2.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="vector3.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="aabb.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="ellipsoid.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="intersection_test.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="line.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="line_segment.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="plane.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="rectangle.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_environment.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_buffer.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_fbo.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_program.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_resource_manager.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_resource_manager_container.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_texture_1d.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_texture_1d_array.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_texture_2d.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_texture_3d.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_texture_base.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_utils.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="gl_vao.cpp">
+      <Filter>GLResource</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_interactor.cpp">
+      <Filter>Arithmetic</Filter>
+    </ClCompile>
+    <ClCompile Include="targa.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Include\Core\gl_resource_manager.inl">
+      <Filter>GLResource</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -35,5 +35,8 @@
     <ClCompile Include="mi_arithmetic_ut_statistic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mi_arithmetic_ut_rsa2pp.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

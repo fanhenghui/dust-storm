@@ -15,11 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="mi_io_ut_stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="mi_io_ut_stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -41,5 +36,10 @@
     <ClCompile Include="mi_io_ut_zlib_utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="mi_io_ut_stdafx.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

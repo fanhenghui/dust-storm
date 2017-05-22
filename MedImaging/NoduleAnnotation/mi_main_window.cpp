@@ -225,7 +225,7 @@ void NoduleAnnotation::configure_i()
         in.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(false);
+    Configuration::instance()->set_nodule_file_rsa(true);
     GLUtils::set_check_gl_flag(false);
 }
 

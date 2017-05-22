@@ -1,7 +1,6 @@
 #include "mi_camera_interactor.h"
 #include "MedImgArithmetic/mi_quat4.h"
 #include "MedImgArithmetic/mi_track_ball.h"
-#include "mi_camera_calculator.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
 

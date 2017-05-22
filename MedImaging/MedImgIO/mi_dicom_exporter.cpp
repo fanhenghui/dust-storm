@@ -1,6 +1,4 @@
 #include "mi_dicom_exporter.h"
-#include "mi_image_data.h"
-#include "mi_image_data_header.h"
 
 #include "dcmtk/config/osconfig.h"
 #include "dcmtk/oflog/oflog.h"
@@ -42,7 +40,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-    DICOMExporter::DICOMExporter():_progress(0.0f)
+    DICOMExporter::DICOMExporter():_progress(0.0f),_skip_derived_image(false)
 {
     _taglist.clear();
     _taglist.push_back(DCM_PatientName);
@@ -70,24 +68,55 @@ void DICOMExporter::set_progress_model(std::shared_ptr<ProgressModel> model)
 
 void DICOMExporter::set_anonymous_taglist(const std::vector<DcmTagKey> &taglist)
 {
-    if (taglist.empty())
-    {
-        IO_THROW_EXCEPTION("The input taglist to be anonymized is empty!");
-        return;
-    }
     _taglist.clear();
     _taglist = taglist;
 }
 
-DcmFileFormatPtr DICOMExporter::load_dicom_file(const std::string file_name)
+IOStatus DICOMExporter::load_dicom_file(const std::string file_name ,  DcmFileFormatPtr& fileformatptr)
 {
-    DcmFileFormatPtr fileformatptr(new DcmFileFormat());
+    fileformatptr.reset(new DcmFileFormat());
     DcmDataset* data_set = nullptr;
     if (fileformatptr->loadFile(file_name.c_str()).good())
     {
-        //check if the input DICOM is compressed
-        DicomImage *imageq = new DicomImage(file_name.c_str());
-        if (imageq->getStatus() != EIS_Normal) {
+        //Check compressed
+        DcmMetaInfo* meta_info= fileformatptr->getMetaInfo();
+        if (!meta_info)
+        {
+            return IO_DATA_DAMAGE;
+        }
+        OFString context;
+        OFCondition status = meta_info->findAndGetOFString(DCM_TransferSyntaxUID , context);
+        if (status.bad())
+        {
+            return IO_DATA_DAMAGE;
+        }
+        const std::string my_tsu(context.c_str());
+
+        //DICOM transfer syntaxes
+        const std::string TSU_LittleEndianImplicitTransferSyntax     = std::string("1.2.840.10008.1.2");//Default transfer for DICOM
+        const std::string TSU_LittleEndianExplicitTransferSyntax    = std::string("1.2.840.10008.1.2.1");
+        const std::string TSU_DeflatedExplicitVRLittleEndianTransferSyntax = std::string("1.2.840.10008.1.2.1.99");
+        const std::string TSU_BigEndianExplicitTransferSyntax = std::string("1.2.840.10008.1.2.2");
+
+        //JEPG Lossless
+        const std::string TSU_JPEGProcess14SV1TransferSyntax      = std::string("1.2.840.10008.1.2.4.70");//Default Transfer Syntax for Lossless JPEG Image Compression
+        const std::string TSU_JPEGProcess14TransferSyntax     = std::string("1.2.840.10008.1.2.4.57");
+
+        //JEPG2000 需要购买商业版的 dcmtk
+        const std::string TSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
+        const std::string TSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
+
+        if (my_tsu == TSU_LittleEndianImplicitTransferSyntax ||
+            my_tsu == TSU_LittleEndianExplicitTransferSyntax ||
+            my_tsu == TSU_DeflatedExplicitVRLittleEndianTransferSyntax ||
+            my_tsu == TSU_BigEndianExplicitTransferSyntax)
+        {
+            return IO_SUCCESS;
+        }
+        else if (my_tsu == TSU_JPEGProcess14SV1TransferSyntax ||
+            my_tsu == TSU_JPEGProcess14TransferSyntax)
+        {
+            //check if the input DICOM is compressed
             DJDecoderRegistration::registerCodecs(); // register JPEG codecs
             data_set = fileformatptr->getDataset();
             // decompress data set if compressed
@@ -100,16 +129,25 @@ DcmFileFormatPtr DICOMExporter::load_dicom_file(const std::string file_name)
             }
             DJDecoderRegistration::cleanup(); // deregister JPEG codecs
 
+            fileformatptr.reset(new DcmFileFormat());
             fileformatptr->loadFile("test_decompressed.dcm");
-            data_set = nullptr;		delete data_set;
+
+            return IO_SUCCESS;
         }
-        imageq = nullptr;	delete imageq;
+        else if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
+            my_tsu == TSU_JEPG2000Compression)
+        {
+            return IO_UNSUPPORTED_YET;
+        }
+        else
+        {
+            return IO_UNSUPPORTED_YET;
+        }
     }
     else
     {
-        IO_THROW_EXCEPTION(std::string("Load Dicom File " + file_name + " Failed!"));
+        return IO_DATA_DAMAGE;
     }
-    return fileformatptr;
 }
 
 IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<std::string>& in_files , 
@@ -129,12 +167,17 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
 
     set_progress_i(0);
 
+    IOStatus status;
     switch (etype)
     {
     case EXPORT_ORIGINAL_DICOM:
         for (int i = 0; i < in_files.size(); ++ i)
         {
-            fileformat_ptr = load_dicom_file(in_files[i]);
+            status = load_dicom_file(in_files[i] , fileformat_ptr);
+            if (status != IO_SUCCESS)
+            {
+                return status;
+            }
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
             if (i % progress_step == 1)
             {
@@ -146,7 +189,27 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
     case EXPORT_ANONYMOUS_DICOM:
         for (int i = 0; i < in_files.size(); ++ i)
         {
-            fileformat_ptr = load_dicom_file(in_files[i]);
+            status = load_dicom_file(in_files[i] , fileformat_ptr);
+            if (status != IO_SUCCESS)
+            {
+                return status;
+            }
+
+            //Check image type
+            OFString context;
+            if(fileformat_ptr->getDataset()->findAndGetOFStringArray(DCM_ImageType , context).good())
+            {
+                std::string image_type(context.c_str());
+                if (_skip_derived_image && image_type.find("SECONDARY") != image_type.npos)//Skip derived image
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                return IO_UNSUPPORTED_YET;
+            }
+
             anonymous_dicom_data(fileformat_ptr);
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
             if (i % progress_step == 1)
@@ -159,7 +222,27 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
     case EXPORT_ANONYMOUS_DICOM_WITHOUT_PRIVATETAG:
         for (int i = 0; i < in_files.size(); ++ i)
         {
-            fileformat_ptr = load_dicom_file(in_files[i]);
+            status = load_dicom_file(in_files[i] , fileformat_ptr);
+            if (status != IO_SUCCESS)
+            {
+                return status;
+            }
+
+            //Check image type
+            OFString context;
+            if(fileformat_ptr->getDataset()->findAndGetOFStringArray(DCM_ImageType , context).good())
+            {
+                std::string image_type(context.c_str());
+                if (_skip_derived_image && image_type.find("SECONDARY") != image_type.npos)//Skip derived image
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                return IO_UNSUPPORTED_YET;
+            }
+
             anonymous_dicom_data(fileformat_ptr);
             remove_private_tag(fileformat_ptr);
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
@@ -175,7 +258,13 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
     case EXPORT_BITMAP:
         for (int i = 0; i < in_files.size(); ++ i)
         {
-            save_dicom_as_bitmap(in_files[i], out_files[i]);
+            status = save_dicom_as_bitmap(in_files[i], out_files[i]);
+
+            if (status != IO_SUCCESS)
+            {
+                return status;
+            }
+
             if (i % progress_step == 1)
             {
                 set_progress_i(progress);
@@ -191,9 +280,15 @@ IOStatus MED_IMAGING_NAMESPACE::DICOMExporter::export_series(const std::vector<s
     return IO_SUCCESS;
 }
 
-void DICOMExporter::save_dicom_as_bitmap(const std::string in_file_name, const std::string out_file_name)
+IOStatus DICOMExporter::save_dicom_as_bitmap(const std::string in_file_name, const std::string out_file_name)
 {
-    DcmFileFormatPtr fileformat_ptr = load_dicom_file(in_file_name);
+    DcmFileFormatPtr fileformat_ptr;
+    IOStatus status = load_dicom_file(in_file_name , fileformat_ptr);
+    if (status != IO_SUCCESS)
+    {
+        return status;
+    }
+
     DcmDataset *data_set = fileformat_ptr->getDataset();
 
     //Save BITMAP
@@ -201,14 +296,12 @@ void DICOMExporter::save_dicom_as_bitmap(const std::string in_file_name, const s
     dcm_image.writeBMP(out_file_name.c_str());
     data_set = nullptr;
     delete data_set;
+
+    return IO_SUCCESS;
 }
 
 void DICOMExporter::anonymous_dicom_data(DcmFileFormatPtr in_fileformat_ptr)
 {
-    if (_taglist.size() < 1)
-    {
-        IO_THROW_EXCEPTION("No Dicom Tag To be Anonymized!");
-    }
     for (int i = 0; i < _taglist.size(); ++ i)
     {
         in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], " ");
@@ -289,4 +382,10 @@ void DICOMExporter::set_progress_i(int value)
         _model->notify();
     }
 }
+
+void DICOMExporter::skip_derived_image(bool flag)
+{
+    _skip_derived_image = flag;
+}
+
 MED_IMAGING_END_NAMESPACE

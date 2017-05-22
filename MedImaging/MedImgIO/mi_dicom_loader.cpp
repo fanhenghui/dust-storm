@@ -570,7 +570,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
         }
     }
     else if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
-        TSU_JEPG2000Compression == TSU_JEPG2000Compression)
+        my_tsu == TSU_JEPG2000Compression)
     {
         return IO_UNSUPPORTED_YET;
     }
