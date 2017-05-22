@@ -37,7 +37,9 @@ public:
 
     int get_generation() const;
 
-    unsigned int get_fitest_id()const;
+    double get_fittest_score()const;
+
+    double get_average_score()const;
 
     unsigned int roulette_wheel_selection(std::vector<Chromosome>& chromosomes) const;
 

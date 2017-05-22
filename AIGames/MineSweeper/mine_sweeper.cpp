@@ -56,7 +56,7 @@ int MineSweeper::update(const std::vector<Mine> &mines)
 {
     //use neural net to get output
     const Vector2 closest_mine = get_closest_mine(mines);
-    std::vector<double> input(4);
+    std::vector<double> input(Param::_input_num);
     input[0] = closest_mine.x;
     input[1] = closest_mine.y;
     input[2] = _direction.x;

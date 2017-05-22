@@ -13,7 +13,7 @@
 #include "genetic_alg.h"
 
 
-BattleSpace::BattleSpace():_render_callback(nullptr), _fast_training(true)
+BattleSpace::BattleSpace():_render_callback(nullptr), _fast_training(false)
 {
     _genetic_alg.reset(new GeneticAlg(
         Param::_crossover_rate, Param::_mutation_rate, Param::_max_perturbation));
@@ -93,7 +93,7 @@ void BattleSpace::update()
     }
 
     _weights_collection = _genetic_alg->epoch(_weights_collection);
-    unsigned int elite = _genetic_alg->get_fitest_id();
+    unsigned int elite = _genetic_alg->get_fittest_score();
     for (int i = 0 ; i<Param::_mine_sweeper_num ; ++i)
     {
         _mine_sweeper[i]->set_weights(_weights_collection[i]._weights);
@@ -104,7 +104,8 @@ void BattleSpace::update()
         _mine_sweeper[i]->i_am_elite(true);
     }
     std::cout << "Generation : " << _genetic_alg->get_generation() << " \n";
-    std::cout << "Best : " << _genetic_alg->get_fitest_id() << "\n\n";
+    std::cout << "Best fitness: " << _genetic_alg->get_fittest_score() << "\n";
+    std::cout << "Average fitness: " << _genetic_alg->get_average_score() << "\n\n";
 }
 
 void BattleSpace::register_render_callback(RenderCallback callback)

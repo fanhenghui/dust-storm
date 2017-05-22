@@ -78,9 +78,14 @@ int GeneticAlg::get_generation() const
     return _generation;
 }
 
-unsigned int GeneticAlg::get_fitest_id() const
+double GeneticAlg::get_fittest_score() const
 {
-    return _fittest_chromosome_id;
+    return _best_fitness_score;
+}
+
+double GeneticAlg::get_average_score() const
+{
+    return _total_fitness_score / _pop_size;
 }
 
 unsigned int GeneticAlg::roulette_wheel_selection(std::vector<Chromosome>& chromosomes) const
