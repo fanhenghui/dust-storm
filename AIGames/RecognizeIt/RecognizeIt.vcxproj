@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{878A89AA-A8F4-473D-916C-F75EF0E2577A}</ProjectGuid>
+    <ProjectGuid>{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MineSweeper</RootNamespace>
+    <RootNamespace>RecognizeIt</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -56,14 +56,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)GLEW_STATIC</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Include\;$(SolutionDir)\Include\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Core.lib;opengl32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\;$(SolutionDir)\Lib\$(Configuration)\Ext</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Core.lib;opengl32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -74,7 +74,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Include\;$(SolutionDir)\Include\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -82,26 +82,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Core.lib;opengl32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\;$(SolutionDir)\Lib\$(Configuration)\Ext</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Core.lib;opengl32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="genetic_alg.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mine.cpp" />
-    <ClCompile Include="mine_sweeper.cpp" />
-    <ClCompile Include="neural_net.cpp" />
-    <ClCompile Include="param.cpp" />
-    <ClCompile Include="battle_space.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="genetic_alg.h" />
-    <ClInclude Include="mine.h" />
-    <ClInclude Include="mine_sweeper.h" />
-    <ClInclude Include="neural_net.h" />
-    <ClInclude Include="param.h" />
-    <ClInclude Include="battle_space.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
