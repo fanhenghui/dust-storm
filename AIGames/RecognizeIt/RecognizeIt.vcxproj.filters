@@ -30,12 +30,30 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="gesture_drawer.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gesture_recogizer.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gesture_data.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_net.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="param.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="gesture_drawer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="gesture_recogizer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="gesture_data.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

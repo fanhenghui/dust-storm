@@ -56,7 +56,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Include\;$(SolutionDir)\Include\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -74,7 +74,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\Include\;$(SolutionDir)\Include\Core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -87,6 +87,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gesture_data.cpp" />
+    <ClCompile Include="gesture_drawer.cpp" />
+    <ClCompile Include="gesture_recogizer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="main_mgr.cpp" />
     <ClCompile Include="main_xor.cpp" />
@@ -94,6 +97,9 @@
     <ClCompile Include="param.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gesture_data.h" />
+    <ClInclude Include="gesture_drawer.h" />
+    <ClInclude Include="gesture_recogizer.h" />
     <ClInclude Include="neural_net.h" />
     <ClInclude Include="param.h" />
   </ItemGroup>

@@ -177,6 +177,8 @@ void NeuralNet::network_training_epoch(
     std::vector<double>::iterator cur_weight;
     std::vector<Neuron>::iterator cur_neuron_out , cur_neuron_hidden;
 
+    _error_sum = 0;
+
     assert(set_in.size() == set_out.size());
     for (size_t train_id = 0; train_id < set_in.size(); ++train_id)
     {
@@ -282,7 +284,7 @@ void NeuralNet::network_training_epoch(
 
 
         }
-
     }
+
     ++_epoch_num;
 }

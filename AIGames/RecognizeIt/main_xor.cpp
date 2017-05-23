@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "neural_net.h"
+#include "param.h"
 
 namespace
 {
@@ -30,13 +31,18 @@ namespace
 //对于异或问题，如果w的初始化全为同一个值则很难收敛
 //w初始化为随机值则可以收敛
 //////////////////////////////////////////////////////////////////////////
-void main_xor(int argc, char* argv)
+void main_xor(int argc, char* argv[])
 {
     _neural_net.reset(new NeuralNet(2 , 1 , 1 , 2 , -1 , 1 , 0.8));
 
     for (int i = 0; i< 10000; ++i)
     {
         _neural_net->network_training_epoch(_set_input, _set_output);
+        if (_neural_net->get_error() < Param::_error_threshold)
+        {
+            std::cout << "Iteration " << i << std::endl;
+            break;
+        }
 
         /*std::cout << "Iteration " << i << " 's weights : ";
         std::vector<double> weights = _neural_net->get_weights();

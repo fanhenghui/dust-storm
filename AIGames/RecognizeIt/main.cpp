@@ -1,8 +1,8 @@
 
-extern void main_xor(int, char*);
-extern void main_mgr(int, char*);
+extern void main_xor(int, char* argv[]);
+extern void main_mgr(int argc, char* argv[]);
 
-void main(int argc, char* argv)
+void main(int argc, char* argv[])
 {
-    main_xor(argc, argv);
+    main_mgr(argc, argv);
 }

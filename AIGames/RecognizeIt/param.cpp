@@ -1,8 +1,8 @@
 #include "param.h"
 
-int Param::_input_num = 4;
+int Param::_input_num = NUM_VECTORS*2;
 
-int Param::_output_num = 2;
+int Param::_output_num = NUM_PATTERNS;
 
 int Param::_hidden_layer_num = 1;
 
@@ -13,6 +13,8 @@ double Param::_bias = -1;
 double Param::_sigmoid_response = 1;
 
 double Param::_learning_rate =0.1;
+
+double Param::_error_threshold = 0.03;
 
 Param::Param()
 {
