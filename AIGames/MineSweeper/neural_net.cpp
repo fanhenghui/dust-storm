@@ -1,4 +1,6 @@
 #include "neural_net.h"
+#include <cassert>
+
 #include "Core/common.h"
 
 NeuralNet::NeuralNet(int input_num, int output_num, int hidden_layer_num , int neurons_per_hidden_layer , double bias , double sigmoid_response):
@@ -103,7 +105,6 @@ std::vector<double> NeuralNet::update(std::vector<double>& inputs)
     }
 
     //for each layer
-    int weight = 0;
     for (int i = 0 ; i< _hidden_layer_num+1 ; ++i)
     {
         if (i > 0)
@@ -112,22 +113,20 @@ std::vector<double> NeuralNet::update(std::vector<double>& inputs)
         }
 
         outputs.clear();
-        weight = 0;
 
         for (int j = 0 ; j<_layers[i]._neuro_num;++j)
         {
-            double netinput = 0;
+            double netoutput = 0;
             const int cur_input = _layers[i]._neurons[j]._input_num;
             for (int k = 0 ; k<cur_input -1 ; ++k)
             {
-                netinput += _layers[i]._neurons[j]._weights[k] * inputs[weight++];
+                netoutput += _layers[i]._neurons[j]._weights[k] * inputs[k];
             }
             //add in the bias
-            netinput += _layers[i]._neurons[j]._weights[cur_input - 1] * _bias;
+            netoutput += _layers[i]._neurons[j]._weights[cur_input - 1] * _bias;
 
-            outputs.push_back(sigmoid_i(netinput));
+            outputs.push_back(sigmoid_i(netoutput));
 
-            weight = 0;
         }
     }
 

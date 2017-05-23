@@ -88,6 +88,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_mgr.cpp" />
+    <ClCompile Include="main_xor.cpp" />
+    <ClCompile Include="neural_net.cpp" />
+    <ClCompile Include="param.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="neural_net.h" />
+    <ClInclude Include="param.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
