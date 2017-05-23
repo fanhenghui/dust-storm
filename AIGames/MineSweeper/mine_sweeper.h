@@ -40,6 +40,8 @@ public:
 
     void set_weights(const std::vector<double>& weights);
 
+    std::vector<int> get_weight_splits() const;
+
     void i_am_elite(bool flag);
 
     void reset();

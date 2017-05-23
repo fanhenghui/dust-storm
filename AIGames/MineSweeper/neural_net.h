@@ -47,6 +47,8 @@ public:
 
     std::vector<double> update(std::vector<double>& inputs);
 
+    std::vector<int> get_splits() const;
+
 private:
     double sigmoid_i(double activation);
 

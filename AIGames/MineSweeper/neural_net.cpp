@@ -134,6 +134,25 @@ std::vector<double> NeuralNet::update(std::vector<double>& inputs)
     return outputs;
 }
 
+std::vector<int> NeuralNet::get_splits() const
+{
+    std::vector<int> splits;
+    int idx = 0;
+    splits.push_back(idx);
+    for (int i = 0; i < _hidden_layer_num + 1; ++i)
+    {
+        const NeuroLayer& layer = _layers[i];
+        for (int j = 0; j < layer._neuro_num; ++j)
+        {
+            const Neuron& neuron = layer._neurons[j];
+            idx += neuron._input_num;
+            splits.push_back(idx);
+        }
+    }
+
+    return splits;
+}
+
 double NeuralNet::sigmoid_i(double activation)
 {
     return 1.0 / (1 + exp(-activation / _sigmod_respond));

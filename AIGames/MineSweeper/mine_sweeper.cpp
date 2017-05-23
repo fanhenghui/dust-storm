@@ -88,7 +88,7 @@ int MineSweeper::update(const std::vector<Mine> &mines)
         _direction.normalize();
 
         //update position
-        static const double S_SPEED_ADJUST = 0.005;
+        static const double S_SPEED_ADJUST = 0.004;
         _position += (_direction* _speed * S_SPEED_ADJUST);
     }
 
@@ -123,7 +123,7 @@ Vector2 MineSweeper::get_closest_mine(const std::vector<Mine> &mines)
     }
 
     closest_object = _position - mines[_closest_mine_id]._position;
-
+    closest_object.normalize();
     return closest_object;
 }
 
@@ -131,7 +131,7 @@ int MineSweeper::grab_mine(const std::vector<Mine> &mines)
 {
     Vector2 obj = _position - mines[_closest_mine_id]._position;
     const double dis = obj.magnitude();
-    if (dis < 0.04)
+    if (dis < Mine::S_WIDTH)
     {
         return _closest_mine_id;
     }
@@ -224,6 +224,11 @@ Chromosome MineSweeper::to_chromosome()
 void MineSweeper::set_weights(const std::vector<double>& weights)
 {
     _brain->set_weights(weights);
+}
+
+std::vector<int> MineSweeper::get_weight_splits() const
+{
+    return _brain->get_splits();
 }
 
 void MineSweeper::i_am_elite(bool flag)

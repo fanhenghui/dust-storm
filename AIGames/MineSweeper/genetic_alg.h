@@ -43,10 +43,16 @@ public:
 
     unsigned int roulette_wheel_selection(std::vector<Chromosome>& chromosomes) const;
 
+    void set_crossover_splits(const std::vector<int>& splits);
+
 private:
     void update_fitness_scores_i(std::vector<Chromosome>& ancestor);
 
     void crossover_i(
+        const Chromosome& mum, const Chromosome& dad,
+        Chromosome& baby0, Chromosome& baby1);
+
+    void crossover_splits_i(
         const Chromosome& mum, const Chromosome& dad,
         Chromosome& baby0, Chromosome& baby1);
 
@@ -65,5 +71,7 @@ private:
     unsigned int _fittest_chromosome_id;
     double _best_fitness_score;
     double _total_fitness_score;
+
+    std::vector<int> _crossover_splits;
 
 };

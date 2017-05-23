@@ -14,7 +14,6 @@ public:
     static int _mines_num;
     static int _mine_sweeper_num;
     static double _max_turn_rate;
-    static double _max_speed;
     static int _update_fps;
 
     static int _ticks_num;//sweeper do ticks_num jobs then goto GA to train a new brain
@@ -25,6 +24,8 @@ public:
     static int _elite_num;//elitism to show
     static int _copy_elite_num; //keep into next generation
 
+    //Add weight splits to consider one neuron's weight as crossover unit(thus don't cut one neuron's weight when crossover)
+    static int _neuron_as_crossover_unit;
     
 
 public:

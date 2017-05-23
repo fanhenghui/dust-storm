@@ -92,6 +92,14 @@ void BattleSpace::update()
         _weights_collection.push_back(_mine_sweeper[i]->to_chromosome());
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    //Add weight splits to consider one neuron's weight as crossover unit(thus don't cut one neuron's weight when crossover)
+    if (Param::_neuron_as_crossover_unit ==1 &&  0 == _genetic_alg->get_generation())
+    {
+        _genetic_alg->set_crossover_splits(_mine_sweeper[0]->get_weight_splits());
+    }
+    //////////////////////////////////////////////////////////////////////////
+
     _weights_collection = _genetic_alg->epoch(_weights_collection);
     unsigned int elite = _genetic_alg->get_fittest_score();
     for (int i = 0 ; i<Param::_mine_sweeper_num ; ++i)
