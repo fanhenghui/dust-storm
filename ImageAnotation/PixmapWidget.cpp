@@ -121,6 +121,7 @@ void PixmapWidget::set_mask(QImage& input_mask)
     _drawMask = input_mask.convertToFormat(QImage::Format_ARGB32_Premultiplied);
     _drawMask.setColorTable(color_table);
 
+    const QRgb zero = qRgba(0,0,0,0);
     for (int y = 0; y < _drawMask.size().height(); ++y)
     {
         for (int x = 0; x < _drawMask.size().width(); ++x)
@@ -128,7 +129,7 @@ void PixmapWidget::set_mask(QImage& input_mask)
             QRgb rgb = _drawMask.pixel(x, y);
             if (qRed(rgb) == 0 && qGreen(rgb) == 0 && qBlue(rgb) == 0)
             {
-                _drawMask.setPixel(x, y, 0);
+                _drawMask.setPixel(x, y, zero);
             }
         }
     }
@@ -144,24 +145,39 @@ void PixmapWidget::set_mask_transparency(double transparency)
         return;
     }
 
+    _mask_transparency = transparency;
+    std::cout << "Current transparency : " << transparency << std::endl;
+
+//#ifndef _DEBUG
+//#pragma  omp parallel for
+//#endif
     for (int y = 0; y < _drawMask.size().height(); ++y)
     {
+//#ifndef _DEBUG
+//#pragma  omp parallel for
+//#endif
         for (int x = 0; x < _drawMask.size().width(); ++x)
         {
             QRgb rgb = _drawMask.pixel(x, y);
             int r = qRed(rgb);
             int g = qGreen(rgb);
             int b = qBlue(rgb);
-            if ( r != 0 || g != 0 || b != 0)
+            if ( r != 0)
             {
                 int a = int(255*transparency);
-                QRgb new_rgb = qRgba( r , g , b , a);
+                QRgb new_rgb = qRgba( 255 , g , b , a);
+                _drawMask.setPixel(x, y, new_rgb);
+            }
+            else if(g != 0)
+            {
+                int a = int(255*transparency);
+                QRgb new_rgb = qRgba( r , 255 , b , a);
                 _drawMask.setPixel(x, y, new_rgb);
             }
         }
     }
 
-    _mask_transparency = transparency;
+    
 
     update();
 }
@@ -235,6 +251,7 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     QPainter p(this);
     p.setRenderHint(QPainter::SmoothPixmapTransform, false);
     p.setRenderHint(QPainter::Antialiasing, false);
+    p.setCompositionMode(QPainter::CompositionMode_Source);
 
     // adjust the coordinate system
     p.save();
@@ -292,7 +309,11 @@ void PixmapWidget::paintEvent( QPaintEvent *event )
     {
         // draw the mask
         //p.drawImage(updateRect.topLeft(), _drawMask, updateRect);
-        p.drawImage(rect_whole.topLeft(), _drawMask, rect_whole);
+        if (_mask_transparency > 0.01)
+        {
+            p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+            p.drawImage(rect_whole.topLeft(), _drawMask, rect_whole);
+        }
 
         //TODO using cursor to replace brush itself
         // draw the brush
@@ -356,12 +377,15 @@ void PixmapWidget::mousePressEvent(QMouseEvent * event)
             _is_erasing = true;
         }
 
-        // draw on the full image
-        QPainter painter(&_drawMask);
-        setup_current_painter_i(painter);
-        painter.drawPoint(xyMouse);
+        if (_mask_transparency > 0)
+        {
+            // draw on the full image
+            QPainter painter(&_drawMask);
+            setup_current_painter_i(painter);
+            painter.drawPoint(xyMouse);
 
-        _is_drawing = true;
+            _is_drawing = true;
+        }
 
         // save the current position and perform an update in the
         // region of the mouse cursor
@@ -486,7 +510,7 @@ void PixmapWidget::setup_current_painter_i(QPainter &painter)
     }
     else
     {
-        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.setCompositionMode(QPainter::CompositionMode_Source);
     }
 }
 

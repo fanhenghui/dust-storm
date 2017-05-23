@@ -15,7 +15,6 @@ struct Neuron
         {
             _weights.push_back(rand_clamped());
         }
-        _weights[_input_num - 1] = -1.0;
     }
 };
 
@@ -47,6 +46,8 @@ public:
     void set_weights(const std::vector<double>& weights);
 
     std::vector<double> update(std::vector<double>& inputs);
+
+    std::vector<int> get_splits() const;
 
 private:
     double sigmoid_i(double activation);

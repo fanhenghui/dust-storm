@@ -4,14 +4,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Maze", "Maze\Maze.vcxproj", "{3079483B-37B4-46FC-A500-F72F46AD5E61}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E90CA2E4-CC0D-4B90-8B36-4F7030776DF3} = {E90CA2E4-CC0D-4B90-8B36-4F7030776DF3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{E90CA2E4-CC0D-4B90-8B36-4F7030776DF3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{C7344D13-5734-431D-99F4-4D0DEFCA1F2C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TSP", "TSP\TSP.vcxproj", "{203900DD-D66C-4EC3-AAD7-DAB02C023828}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E90CA2E4-CC0D-4B90-8B36-4F7030776DF3} = {E90CA2E4-CC0D-4B90-8B36-4F7030776DF3}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MineSweeper", "MineSweeper\MineSweeper.vcxproj", "{878A89AA-A8F4-473D-916C-F75EF0E2577A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E90CA2E4-CC0D-4B90-8B36-4F7030776DF3} = {E90CA2E4-CC0D-4B90-8B36-4F7030776DF3}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RecognizeIt", "RecognizeIt\RecognizeIt.vcxproj", "{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +46,10 @@ Global
 		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Debug|x64.Build.0 = Debug|x64
 		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Release|x64.ActiveCfg = Release|x64
 		{878A89AA-A8F4-473D-916C-F75EF0E2577A}.Release|x64.Build.0 = Release|x64
+		{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}.Debug|x64.ActiveCfg = Debug|x64
+		{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}.Debug|x64.Build.0 = Debug|x64
+		{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}.Release|x64.ActiveCfg = Release|x64
+		{BA0A88A1-9779-4DB6-9BA4-91C4920624C6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,5 +58,6 @@ Global
 		{3079483B-37B4-46FC-A500-F72F46AD5E61} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
 		{203900DD-D66C-4EC3-AAD7-DAB02C023828} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
 		{878A89AA-A8F4-473D-916C-F75EF0E2577A} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
+		{BA0A88A1-9779-4DB6-9BA4-91C4920624C6} = {C7344D13-5734-431D-99F4-4D0DEFCA1F2C}
 	EndGlobalSection
 EndGlobal

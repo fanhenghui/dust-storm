@@ -15,45 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="neural_net.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="genetic_alg.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mine_sweeper.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mine.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
     <ClCompile Include="param.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="battle_space.cpp">
-      <Filter>头文件</Filter>
+    <ClCompile Include="main_mgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main_xor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_net.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="genetic_alg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="mine_sweeper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="mine.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="param.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="battle_space.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
