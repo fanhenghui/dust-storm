@@ -78,6 +78,8 @@ public:
 private:
     double sigmoid_i(double activation);
 
+    void calculate_num_of_weights_i();
+
 
 private:
     int _input_num;
@@ -96,5 +98,8 @@ private:
     bool _is_trained;
     int _epoch_num;
 
+    //momentum
+    int _num_of_weights;
+    std::vector<double> _delta_weight;
 
 };

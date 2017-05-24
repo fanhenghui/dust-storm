@@ -23,6 +23,13 @@ NeuralNet::NeuralNet(
     _learning_rate(learning_rate)
 {
     create_net();
+    calculate_num_of_weights_i();
+
+    _delta_weight.resize(get_num_of_weights());
+    for (int i = 0 ; i < _delta_weight.size() ; ++i)
+    {
+        _delta_weight[i] = 0;
+    }
 }
 
 NeuralNet::~NeuralNet()
@@ -74,19 +81,7 @@ std::vector<double> NeuralNet::get_weights() const
 
 int NeuralNet::get_num_of_weights() const
 {
-    int idx = 0;
-    std::vector<double> weights;
-    for (int i = 0; i < _hidden_layer_num + 1; ++i)
-    {
-        const NeuroLayer& layer = _layers[i];
-        for (int j = 0; j < layer._neuro_num; ++j)
-        {
-            const Neuron& neuron = layer._neurons[j];
-            idx += neuron._input_num;
-        }
-    }
-
-    return idx;
+    return _num_of_weights;
 }
 
 void NeuralNet::set_weights(const std::vector<double>& weights)
@@ -170,6 +165,23 @@ double NeuralNet::sigmoid_i(double activation)
     return 1.0 / (1 + exp(-activation / _sigmod_respond));
 }
 
+void NeuralNet::calculate_num_of_weights_i()
+{
+    int idx = 0;
+    std::vector<double> weights;
+    for (int i = 0; i < _hidden_layer_num + 1; ++i)
+    {
+        const NeuroLayer& layer = _layers[i];
+        for (int j = 0; j < layer._neuro_num; ++j)
+        {
+            const Neuron& neuron = layer._neurons[j];
+            idx += neuron._input_num;
+        }
+    }
+
+    _num_of_weights = idx;
+}
+
 void NeuralNet::network_training_epoch(
     const std::vector<std::vector<double>>& set_in,
     const std::vector<std::vector<double>>& set_out)
@@ -182,8 +194,17 @@ void NeuralNet::network_training_epoch(
     assert(set_in.size() == set_out.size());
     for (size_t train_id = 0; train_id < set_in.size(); ++train_id)
     {
+        int pre_weight = _num_of_weights;
+
         //1 Get output based on current network
-        const std::vector<double>& input = set_in[train_id];
+        std::vector<double> input = set_in[train_id];
+
+        //Add jittering
+       /* for (int i = 0; i < input.size(); ++i)
+        {
+            input[i] += rand_double()*Param::_max_noise_to_add;
+        }*/
+
         const std::vector<double>& target = set_out[train_id];
         assert(input.size() == _input_num);
         assert(target.size() == _output_num);
@@ -215,15 +236,21 @@ void NeuralNet::network_training_epoch(
             //w(j,k) weight hidden layer neuron j to output layer neuron k
             //L learning rate
             //O(j) hidden layer j's neuron's output(activation)
+            int cur_weight = pre_weight - neuron_out._weights.size();//For momentum
             for (int j = 0; j < neuron_out._weights.size() - 1; ++j)//!!!Attention no bias (bias's activation is always -1)
             {
-                neuron_out._weights[j] += _learning_rate * err * layer_hidden._neurons[j]._activation;
+                double delta = _learning_rate * err * layer_hidden._neurons[j]._activation ;
+                neuron_out._weights[j] += delta + _delta_weight[cur_weight] * Param::_momentum;
+                _delta_weight[cur_weight++] = delta;
             }
-            neuron_out._weights[neuron_out._input_num - 1] += _learning_rate*err*Param::_bias;
+            double delta = _learning_rate*err*Param::_bias ;
+            neuron_out._weights[neuron_out._input_num - 1] += delta + _delta_weight[cur_weight] * Param::_momentum;
+            _delta_weight[cur_weight++] = delta;
+
+            pre_weight -= neuron_out._weights.size();//move to next weights rear
         }
 
         //3 Adjust the weights for the hidden layers
-
         for (int hidden_id = _layers.size() - 2; hidden_id >= 0; --hidden_id)
         {
             NeuroLayer& layer_out = _layers[hidden_id + 1];
@@ -246,11 +273,18 @@ void NeuralNet::network_training_epoch(
                     neuron_hidden._error = err;
 
                     //update hidden neurons weight based on : w(i,j) := w(i,j) + L * E(j) * O(i)
+                    int cur_weight = pre_weight - neuron_hidden._weights.size();//For momentum
                     for (int i = 0; i < neuron_hidden._weights.size() - 1; ++i)//!!!Attention again no bias (bias's activation is always -1)
                     {
-                        neuron_hidden._weights[i] += _learning_rate*err*input[i];
+                        double delta = _learning_rate*err*input[i];
+                        neuron_hidden._weights[i] += delta + _delta_weight[cur_weight] *Param::_momentum;
+                        _delta_weight[cur_weight++] = delta;
                     }
-                    neuron_hidden._weights[neuron_hidden._weights.size() - 1] += _learning_rate*err*Param::_bias;
+                    double delta = _learning_rate*err*Param::_bias;
+                    neuron_hidden._weights[neuron_hidden._weights.size() - 1] += delta + _delta_weight[cur_weight] * Param::_momentum;
+                    _delta_weight[cur_weight++] = delta;
+
+                    pre_weight -= neuron_hidden._weights.size();//move to next weights rear
                 }
             }
             else//mid hidden layer

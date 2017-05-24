@@ -33,14 +33,21 @@ std::string GestureRecogizer::get_gesture_pattern_name(std::vector<double>& inpu
     double max_val = std::numeric_limits<double>::min();
     for (int i = 0 ; i<output.size() ; ++i)
     {
-        if (output[i] > max_val)
+        if (output[i] > max_val && output[i] > Param::_match_tolerance)
         {
             max_val = output[i];
             idx = i;
         }
     }
 
-    return _data->get_pattern_name(idx);
+    if (idx == -1)
+    {
+        return "Uncertain";
+    }
+    else
+    {
+        return _data->get_pattern_name(idx);
+    }
 }
 
 void GestureRecogizer::train()

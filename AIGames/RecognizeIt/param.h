@@ -1,7 +1,7 @@
 #pragma once
 
 //total number of built in patterns
-#define NUM_PATTERNS        13
+#define NUM_PATTERNS        11
 //how many vectors each pattern contains
 #define NUM_VECTORS         12
 
@@ -16,6 +16,14 @@ public:
     static double _sigmoid_response;
     static double _learning_rate;
     static double _error_threshold;
+    static double _match_tolerance;
+
+    //prevent algorithm stuck in a local minima.
+    //add a momentum in each weight updating
+    static double _momentum;
+
+    //prevent overfitting
+    static double _max_noise_to_add;
 
 
 public:
