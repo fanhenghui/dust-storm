@@ -61,6 +61,7 @@ void GestureRecogizer::train()
     for ( ; i< iteration ; ++i)
     {
         _brain->network_training_epoch(set_in, set_out);
+        std::cout << _brain->get_error() << std::endl;
         if (_brain->get_error() < Param::_error_threshold)
         {
             break;
