@@ -12,42 +12,60 @@ def feature_normalize(X) :
     X_norm = (X - mu) / sigma
     return X_norm, mu, sigma , max_val , min_val
 
-def compute_cost(X , y , theta):
-	err = 0;
-	for i in range(0 , X.shape[0]):
-		h = theta[0]*X[i][0] + theta[1]
-		err +=  (y[i][0] - h)**2
-	return err
+def compute_cost(X, y, theta):
+    '''
+    Comput cost for linear regression
+    '''
+    # Number of training samples
+    m = y.size
+
+    predictions = X.dot(theta).flatten()
+
+    sqErrors = (predictions - y) ** 2
+
+    J = (1.0 / (2 * m)) * sqErrors.sum()
+
+    return J
 
 
 def gradient_descent(X, y ,theta , alpha , iter):
+	#J_history = np.zeros(shape=(iter, 1))
+	m_r = 1.0/y.size;
 	for j in range(0,iter):
-		h =( X.dot(theta) - y)
+		h =( X.dot(theta).flatten() - y)
 		err0 = h*X[:,0]
 		err1 = h*X[:,1]
+		#print(err0.sum()*m_r*alpha);
+		#print(err1.sum()*m_r*alpha);
+		theta[0][0] =theta[0][0]- err0.sum()*m_r*alpha;
+		theta[1][0] =theta[1][0] - err1.sum()*m_r*alpha;
 
-		print(err0.sum())
-		print(err1.sum())
-		sys.exit()
-
-		theta[0] = theta[0] - alpha*err0
-		theta[1] -= alpha*err1
+		#_history[i, 0] = compute_cost(X, y, theta)
+	return theta;
 
 
 #--------------------------------------------------------------------------#
 
 
 file_house = "../../Data/housing/beijing/huilongguan1.txt"
+train_data_rate = 0.7
+iterations = 500
+alpha = 0.01
+
 
 print("numpy version : " , np.version.version )
-train_data = np.loadtxt(file_house , delimiter=',')
-print(train_data.shape)
+dataset = np.loadtxt(file_house , delimiter=',')
+print("dataset : " , dataset.shape)
 
+train_size = int(dataset.shape[0] * 0.7)
+train_data = dataset[0:train_size , : ]
 m = train_data.shape[0]
 y = train_data[: ,1]
-X_norm , mu , sigma , max_val , min_val = feature_normalize(train_data[0:m , 0])
+X_norm , mu , sigma , max_val , min_val = feature_normalize(train_data[:, 0])
 X = np.ones(shape = (m , 2))
-X[0:m , 0] = X_norm 
+X[:, 1] = X_norm
+print("X0 : " , X[0,0])
+print("X1 : " , X[0,1])
 
 #print(X[0])
 #print(y[0])
@@ -59,20 +77,15 @@ X[0:m , 0] = X_norm
 #gradient_descent(X,y,theta,0.5,1)
 
 
-print("mean : ", mu)
-print("Std : " , sigma)
-print("Max : " , max_val)
-print("Min : " , min_val)
-print("Norm min : " , np.min(X_norm))
-print("Norm max : " , np.max(X_norm))
+theta = np.zeros(shape = (2,1))
 
-iterations = 500
-alpha = 0.01
 
-theta = np.ones(shape = (2,1))
+#h = X.dot(theta).flatten()
+#print("X sum is : " , X.sum())
+#err = (h - y)*X[:, 0]
+#print("Sum is : " , err.sum())
 
-h = X.dot(theta).flatten()
-print("h shape : " , y.shape)
-err = (h - y)*X[:, 0]
-print(err.sum())
+theta = gradient_descent(X , y , theta , alpha , iterations)
+print(theta[0][0])
+print(theta[1][0])
 
