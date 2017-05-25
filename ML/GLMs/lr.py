@@ -40,7 +40,7 @@ def gradient_descent(X, y ,theta , alpha , iter):
 		theta[0][0] =theta[0][0]- err0.sum()*m_r*alpha;
 		theta[1][0] =theta[1][0] - err1.sum()*m_r*alpha;
 
-		#_history[i, 0] = compute_cost(X, y, theta)
+		_history[i, 0] = compute_cost(X, y, theta)
 	return theta;
 
 
