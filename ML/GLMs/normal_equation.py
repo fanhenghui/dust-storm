@@ -51,7 +51,6 @@ target_row = 1
 deli = ','
 
 
-print("numpy version : ", np.version.version)
 dataset = np.loadtxt(file_house, delimiter=deli)
 #dataset = np.loadtxt(file_house)
 print("dataset : ", dataset.shape)
@@ -66,10 +65,22 @@ print("testing set : ", test_data.shape)
 
 m = train_data.shape[0]
 y = train_data[:, target_row]
-X_norm, mu, sigma, max_val, min_val = feature_normalize(
-    train_data[:, feature_row])
 X = np.ones(shape=(m, 2))
-X[:, 1] = X_norm
+X[:, 1] = train_data[:, feature_row]
+
+print(X[0][1])
+print(X[3][1])
+XT = np.matmul(X.T, X)
+print(X[0][1])
+print(X[3][1])
+print(XT)
+XT = np.invert(XT)
+print(XT)
+
+theta = np.matmul(XT, np.matmul(X.T, y))
+print(theta)
+sys.exit()
+
 print("X0 : ", X[0, 0])
 print("X1 : ", X[0, 1])
 print(X_norm.shape)
