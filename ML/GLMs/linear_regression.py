@@ -40,6 +40,18 @@ def gradient_descent(X, y, theta, alpha, iter):
     return theta, J
 
 
+def update_line(X, theta, data):
+    # Plot the data
+    plt.cla()
+    plt.scatter(data[:, 0], data[:, 1], marker='o', c='b')
+    plt.title('House Price distribution')
+    plt.xlabel('House rea')
+    plt.ylabel('House Price')
+    result = X.dot(theta).flatten()
+    plt.plot(data[:, 0], result)
+    plt.pause(100)
+
+
 #file_house = "../../Data/housing/housing.data"
 file_house = "../../Data/housing/beijing/huilongguan1.txt"
 train_data_rate = 0.7
@@ -86,8 +98,8 @@ print("traing J ", J)
 
 theta[0][0] = -theta[1][0] * mu / sigma + theta[0][0]
 theta[1][0] = theta[1][0] / sigma
-# print(theta[0][0])
-# print(theta[1][0])
+print(theta[0][0])
+print(theta[1][0])
 
 
 X2 = np.ones(shape=(test_data.shape[0], 2))
@@ -95,3 +107,5 @@ X2[:, 1] = test_data[:, feature_row]
 y2 = test_data[:, target_row]
 J2 = compute_cost(X2, y2, theta)
 print("testing J ", J2)
+
+update_line(X2, theta, test_data)
