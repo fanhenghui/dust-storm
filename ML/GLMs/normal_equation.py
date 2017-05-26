@@ -25,21 +25,6 @@ def compute_cost(X, y, theta):
     return J
 
 
-def gradient_descent(X, y, theta, alpha, iter):
-    J_history = np.zeros(shape=(iter, 1))
-    m_r = 1.0 / y.size
-    for j in range(0, iter):
-        h = (X.dot(theta).flatten() - y)  # calculate all samples
-        err0 = (h * X[:, 0]).sum()
-        err1 = (h * X[:, 1]).sum()
-        theta[0][0] = theta[0][0] - err0 * m_r * alpha
-        theta[1][0] = theta[1][0] - err1 * m_r * alpha
-        J_history[j, 0] = compute_cost(X, y, theta)
-    #print("J : " , J_history[iter-1,0])
-    J = J_history[iter - 1, 0]
-    return theta, J
-
-
 #file_house = "../../Data/housing/housing.data"
 file_house = "../../Data/housing/beijing/huilongguan1.txt"
 train_data_rate = 0.7
@@ -70,35 +55,24 @@ X[:, 1] = train_data[:, feature_row]
 
 print(X[0][1])
 print(X[3][1])
-XT = np.matmul(X.T, X)
-print(X[0][1])
-print(X[3][1])
+XT = X.T
+print(XT.shape)
+XXT = np.matmul(X.T, X)
+print(X)
 print(XT)
-XT = np.invert(XT)
-print(XT)
+print(XXT)
+XXTInv = np.linalg.inv(XXT)
+print(XXTInv)
 
-theta = np.matmul(XT, np.matmul(X.T, y))
+theta = np.matmul(XXTInv, np.matmul(XT, y))
 print(theta)
-sys.exit()
-
-print("X0 : ", X[0, 0])
-print("X1 : ", X[0, 1])
-print(X_norm.shape)
 # sys.exit()
 
-
-theta = np.zeros(shape=(2, 1))
-
-
-theta, J = gradient_descent(X, y, theta, alpha, iterations)
+X = np.ones(shape=(train_data.shape[0], 2))
+X[:, 1] = train_data[:, feature_row]
+y = train_data[:, target_row]
+J = compute_cost(X, y, theta)
 print("traing J ", J)
-# print(theta[0][0])
-# print(theta[1][0])
-
-theta[0][0] = -theta[1][0] * mu / sigma + theta[0][0]
-theta[1][0] = theta[1][0] / sigma
-# print(theta[0][0])
-# print(theta[1][0])
 
 
 X2 = np.ones(shape=(test_data.shape[0], 2))
