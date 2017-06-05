@@ -66,7 +66,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib;../../Lib/Ext/boost;../../Lib/Ext/dcmtk;../../Lib/Ext/mbedtls;../../Lib/Ext/openslide;../../Lib/Ext/pugixml;../../Lib/Ext/opencv;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>ijg8.lib;libtiffd.lib;Core_d.lib;libjasperd.lib;libjpegd.lib;zlibd.lib;pugixml_d.lib;boost_thread-vc140-mt-gd-1_64.lib;boost_chrono-vc140-mt-gd-1_64.lib;boost_system-vc140-mt-gd-1_64.lib;boost_date_time-vc140-mt-gd-1_64.lib;boost_atomic-vc140-mt-gd-1_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ijg8.lib;libtiffd.lib;Core_d.lib;libjasperd.lib;libjpegd.lib;zlibd.lib;pugixml_d.lib;boost_thread-vc140-mt-gd-1_64.lib;boost_chrono-vc140-mt-gd-1_64.lib;boost_system-vc140-mt-gd-1_64.lib;boost_date_time-vc140-mt-gd-1_64.lib;boost_atomic-vc140-mt-gd-1_64.lib;mbedcrypto_d.lib;mbedTLS_d.lib;mbedx509_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib;../../Lib/Ext/boost;../../Lib/Ext/dcmtk;../../Lib/Ext/mbedtls;../../Lib/Ext/openslide;../../Lib/Ext/pugixml;../../Lib/Ext/opencv;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>ijg8.lib;libtiff.lib;Core.lib;libjasper.lib;libjpeg.lib;zlib.lib;pugixml.lib;boost_thread-vc140-mt-1_64.lib;boost_chrono-vc140-mt-1_64.lib;boost_system-vc140-mt-1_64.lib;boost_date_time-vc140-mt-1_64.lib;boost_atomic-vc140-mt-1_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ijg8.lib;libtiff.lib;Core.lib;libjasper.lib;libjpeg.lib;zlib.lib;pugixml.lib;boost_thread-vc140-mt-1_64.lib;boost_chrono-vc140-mt-1_64.lib;boost_system-vc140-mt-1_64.lib;boost_date_time-vc140-mt-1_64.lib;boost_atomic-vc140-mt-1_64.lib;mbedcrypto.lib;mbedTLS.lib;mbedx509.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

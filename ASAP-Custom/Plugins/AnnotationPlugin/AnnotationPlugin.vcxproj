@@ -50,7 +50,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;../../Lib;../../Lib/Ext/boost;../../Lib/Ext/dcmtk;../../Lib/Ext/mbedtls;../../Lib/Ext/openslide;../../Lib/Ext/pugixml;../../Lib/Ext/opencv;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5UiToolsd.lib;Qt5Widgetsd.lib;pugixml_d.lib;ASAP_d.lib;annotation_d.lib;core_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5UiToolsd.lib;Qt5Widgetsd.lib;pugixml_d.lib;ASAP_d.lib;annotation_d.lib;core_d.lib;ws2_32.lib;MultiResolutionImageInterface_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)\Lib\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -67,7 +67,7 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;../../Lib;../../Lib/Ext/boost;../../Lib/Ext/dcmtk;../../Lib/Ext/mbedtls;../../Lib/Ext/openslide;../../Lib/Ext/pugixml;../../Lib/Ext/opencv;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5UiTools.lib;Qt5Widgets.lib;pugixml.lib;ASAP.lib;annotation.lib;core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5UiTools.lib;Qt5Widgets.lib;pugixml.lib;ASAP.lib;annotation.lib;core.lib;ws2_32.lib;MultiResolutionImageInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>$(SolutionDir)\Lib\$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>

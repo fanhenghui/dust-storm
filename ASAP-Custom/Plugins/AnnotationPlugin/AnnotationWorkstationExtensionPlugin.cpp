@@ -1,3 +1,5 @@
+#include <winsock2.h>
+#include <windows.h>
 #include "AnnotationWorkstationExtensionPlugin.h"
 #include "DotAnnotationTool.h"
 #include "PolyAnnotationTool.h"
@@ -39,6 +41,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QCheckBox>
+
 
 #include <numeric>
 #include <iostream>
@@ -102,6 +105,7 @@ AnnotationWorkstationExtensionPlugin::AnnotationWorkstationExtensionPlugin() :
         QPushButton* clearButton = _dockWidget->findChild<QPushButton*>("clearButton");
         QPushButton* saveButton = _dockWidget->findChild<QPushButton*>("saveButton");
         QPushButton* loadButton = _dockWidget->findChild<QPushButton*>("loadButton");
+        QPushButton* tryLearningResultButton = _dockWidget->findChild<QPushButton*>("tryLearningResultButton");
         _currentAnnotationLine = _dockWidget->findChild<QFrame*>("currentAnnotationLine");
         _currentAnnotationLabel = _dockWidget->findChild<QLabel*>("currentAnnotationLabel");
         _currentAnnotationHeaderLabel = _dockWidget->findChild<QLabel*>("currentAnnotationHeaderLabel");
@@ -127,6 +131,7 @@ AnnotationWorkstationExtensionPlugin::AnnotationWorkstationExtensionPlugin() :
         connect(clearButton, SIGNAL(clicked()), this, SLOT(onClearButtonPressed()));
         connect(saveButton, SIGNAL(clicked()), this, SLOT(onSaveButtonPressed()));
         connect(loadButton, SIGNAL(clicked()), this, SLOT(onLoadButtonPressed()));
+        connect(tryLearningResultButton, SIGNAL(clicked()), this, SLOT(onTryLearningResultButtonPressed()));
         connect(_treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(onItemNameChanged(QTreeWidgetItem*, int)));
         connect(_treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(onTreeWidgetItemDoubleClicked(QTreeWidgetItem*, int)));
         connect(_treeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onTreeWidgetSelectedItemsChanged()));
@@ -554,6 +559,53 @@ void AnnotationWorkstationExtensionPlugin::onLoadButtonPressed(const std::string
     onTreeWidgetSelectedItemsChanged();
     onTumorTypeChanged();
 
+}
+
+void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
+{
+    std::shared_ptr<MultiResolutionImage> local_img = _img.lock();
+    if (!local_img)
+    {
+        //TODO warning message
+        std::cout << "Get failed!\n";
+        return;
+    }
+
+    unsigned char md5[16];
+    if (!local_img->getImgHash(md5))
+    {
+        //TODO warning message
+        std::cout << "Get failed!\n";
+        return;
+    }
+
+    //TCP/IP to transfer image's hash to server to get annotation
+    //Init socket
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+    //create socket
+    SOCKET sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    sockaddr_in sock_add;
+    memset(&sock_add, 0, sizeof(sock_add));
+    sock_add.sin_family = PF_INET;
+    //TODO server address read from config
+    sock_add.sin_addr.s_addr = inet_addr("127.0.0.1");
+    sock_add.sin_port = htons(1234);
+
+    //ask for server
+    if (-1 != ::connect(sock, (SOCKADDR*)&sock_add, sizeof(SOCKADDR)))
+    {
+        //send data to server
+        send(sock, (char*)(md5), 16, NULL);
+
+        //TODO
+        //get feedback (annotation byte stream)
+
+    }
+    //close socket
+    closesocket(sock);
+    WSACleanup();
 }
 
 bool AnnotationWorkstationExtensionPlugin::onSaveButtonPressed() {

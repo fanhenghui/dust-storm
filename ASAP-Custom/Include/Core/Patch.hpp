@@ -61,7 +61,7 @@ Patch<T>::~Patch()
 
 template<typename T>
 double Patch<T>::getMinValue(int channel) {
-  double min = std::numeric_limits<double>::max();
+  double min = (std::numeric_limits<double>::max)();
   if (_buffer) {
     for (int i = 0; i < _bufferSize; ++i) {
       if (_buffer[i] < min) {
@@ -74,7 +74,7 @@ double Patch<T>::getMinValue(int channel) {
 
 template<typename T>
 double Patch<T>::getMaxValue(int channel) {
-  double max = std::numeric_limits<double>::min();
+  double max = (std::numeric_limits<double>::min)();
   if (_buffer) {
     for (int i = 0; i < _bufferSize; ++i) {
       if (_buffer[i] > max) {

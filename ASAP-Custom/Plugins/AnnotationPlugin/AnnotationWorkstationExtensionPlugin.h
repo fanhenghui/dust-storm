@@ -56,6 +56,7 @@ public:
     void addAnnotationGroup();
     void onClearButtonPressed();
     void onLoadButtonPressed(const std::string& filePath = std::string());
+    void onTryLearningResultButtonPressed();
     bool onSaveButtonPressed();
     void onItemNameChanged(QTreeWidgetItem* item, int column);
     void onTreeWidgetItemDoubleClicked(QTreeWidgetItem * item, int column);

@@ -1,6 +1,7 @@
 #include "MultiResolutionImage.h"
 #include "boost/thread.hpp"
 #include <cmath>
+#include "mbedtls/md5.h"
 
 using namespace pathology;
 
@@ -110,6 +111,72 @@ template <> void MultiResolutionImage::getRawRegion(const long long& startX, con
     else if (this->getDataType()==pathology::UInt32) {
       delete[] data;
       data = (unsigned int*)readDataFromImage(startX, startY, width, height, level);
+    }
+}
+
+bool MultiResolutionImage::getImgHash(unsigned char(&md5)[16])
+{
+    memset(md5, 0, 16);
+    const int level = this->getNumberOfLevels()-1;
+    if (level<0)
+    {
+        return false;
+    }
+    else
+    {
+        std::vector<unsigned long long> dim = this->getLevelDimensions(level);
+        if (dim.size() != 2)
+        {
+            return false;
+        }
+
+        const unsigned long long w = dim[0];
+        const unsigned long long h = dim[1];
+        unsigned char* img_data = nullptr;
+        const unsigned int sample_per_pixel= getSamplesPerPixel();
+        unsigned long long img_len = w*h*sample_per_pixel;
+        switch (_dataType)
+        {
+        case pathology::UChar:
+        {
+            img_data = new unsigned char[w*h*sample_per_pixel];
+            unsigned char* img_uc = (unsigned char*)img_data;
+            getRawRegion<unsigned char>(0, 0, w, h, level, img_uc);
+            break;
+        }
+        case pathology::UInt16:
+        {
+            img_data = new unsigned char[w*h*sample_per_pixel * 2];
+            unsigned short* img_us = (unsigned short*)img_data;
+            getRawRegion<unsigned short>(0, 0, w, h, level, img_us);
+            img_len *= 2;
+            break;
+        }
+        case pathology::UInt32:
+        {
+            img_data = new unsigned char[w*h*sample_per_pixel * 4];
+            unsigned int* img_ui = (unsigned int*)img_data;
+            getRawRegion<unsigned int>(0, 0, w, h, level, img_ui);
+            img_len *= 4;
+            break;
+        }
+        case pathology::Float:
+        {
+            img_data = new unsigned char[w*h*sample_per_pixel * sizeof(float)];
+            float* img_f = (float*)img_data;
+            getRawRegion<float>(0, 0, w, h, level, img_f);
+            img_len *= sizeof(float);
+            break;
+        }
+        default:
+            return false;
+        }
+
+        mbedtls_md5(img_data, size_t(img_len), md5);
+
+        delete[] img_data;
+
+        return true;
     }
 }
 

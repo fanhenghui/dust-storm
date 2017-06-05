@@ -112,6 +112,8 @@ public :
       }
     }
 
+  bool getImgHash(unsigned char(&md5)[16]);
+
 protected :
 
   //! To make MultiResolutionImage thread-safe
