@@ -123,6 +123,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{62BD5C73-656F-47AA-8549-3E1E95D0AF26}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBImporter", "Executables\DBImporter\DBImporter.vcxproj", "{F943E6ED-0B19-43ED-87D3-DF4E953571D9}"
+<<<<<<< HEAD
 	ProjectSection(ProjectDependencies) = postProject
 		{7844E482-A4AD-4B39-9A7A-1C9909BABB7F} = {7844E482-A4AD-4B39-9A7A-1C9909BABB7F}
 	EndProjectSection
@@ -131,6 +132,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnnoFileStats", "Executable
 	ProjectSection(ProjectDependencies) = postProject
 		{9AF7F4F7-5334-400B-8BE0-F713129393B3} = {9AF7F4F7-5334-400B-8BE0-F713129393B3}
 	EndProjectSection
+=======
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnnoFileStats", "Executables\AnnoFileStats\AnnoFileStats.vcxproj", "{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4}"
+>>>>>>> d42934f1eda23a6d6e107b840a28c6bcb9f961c1
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

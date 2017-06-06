@@ -122,7 +122,7 @@ void char_str_to_hex_str(char *pucCharStr, int iSize, char *pszHexStr)
     }
 }
 
-static bool get_md5(const std::string& file , unsigned char (&md5)[16] , MultiResolutionImageReader& img_reader)
+static bool get_md5(const std::string& file, unsigned char(&md5)[16], MultiResolutionImageReader& img_reader)
 {
     MultiResolutionImage* img = img_reader.open(file);
     if (!img)
@@ -149,7 +149,6 @@ static bool get_md5(const std::string& file , unsigned char (&md5)[16] , MultiRe
 
 int main(int argc , char* argv[])
 {
-    LogSheild logfield;
 
     //exe "ip" "username" "password "database" "file_root"
     if (argc != 6)

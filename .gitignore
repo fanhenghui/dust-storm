@@ -291,4 +291,5 @@ __pycache__/
 [Ee]xt/
 [Ww]in32/
 [Gg]eneratedFiles/
+[Ll]ib/
 mi_shader_collection.h
