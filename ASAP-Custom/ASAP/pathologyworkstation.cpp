@@ -282,6 +282,7 @@ void PathologyWorkstation::openFile(const QString& fileName) {
                 vector<unsigned long long> dimensions = _img->getLevelDimensions(_img->getNumberOfLevels() - 1);
                 PathologyViewer* view = this->findChild<PathologyViewer*>("pathologyView");
                 view->initialize(_img);
+
                 emit newImageLoaded(_img, fn);
             }
             else {

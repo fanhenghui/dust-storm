@@ -139,33 +139,33 @@ bool MultiResolutionImage::getImgHash(unsigned char(&md5)[16])
         {
         case pathology::UChar:
         {
-            img_data = new unsigned char[w*h*sample_per_pixel];
-            unsigned char* img_uc = (unsigned char*)img_data;
+            unsigned char* img_uc = new unsigned char[w*h*sample_per_pixel];
             getRawRegion<unsigned char>(0, 0, w, h, level, img_uc);
+            img_data = (unsigned char*)img_uc;
             break;
         }
         case pathology::UInt16:
         {
-            img_data = new unsigned char[w*h*sample_per_pixel * 2];
-            unsigned short* img_us = (unsigned short*)img_data;
+            unsigned short* img_us = new unsigned short[w*h*sample_per_pixel];
             getRawRegion<unsigned short>(0, 0, w, h, level, img_us);
             img_len *= 2;
+            img_data = (unsigned char*)img_us;
             break;
         }
         case pathology::UInt32:
         {
-            img_data = new unsigned char[w*h*sample_per_pixel * 4];
-            unsigned int* img_ui = (unsigned int*)img_data;
+            unsigned int* img_ui = new unsigned int[w*h*sample_per_pixel];
             getRawRegion<unsigned int>(0, 0, w, h, level, img_ui);
             img_len *= 4;
+            img_data = (unsigned char*)img_ui;
             break;
         }
         case pathology::Float:
         {
-            img_data = new unsigned char[w*h*sample_per_pixel * sizeof(float)];
-            float* img_f = (float*)img_data;
+            float* img_f = new float[w*h*sample_per_pixel];
             getRawRegion<float>(0, 0, w, h, level, img_f);
             img_len *= sizeof(float);
+            img_data = (unsigned char*)img_f;
             break;
         }
         default:
