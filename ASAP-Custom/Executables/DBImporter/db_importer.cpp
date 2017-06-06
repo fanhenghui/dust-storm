@@ -159,11 +159,18 @@ int main(int argc , char* argv[])
     }
 
     //Get all files
-    std::string ip = std::string("tcp://") + std::string(argv[1]);
-    std::string user_name = argv[2];
-    std::string password = argv[3];
-    std::string database = argv[4];
+    const std::string ip = std::string("tcp://") + std::string(argv[1]);
+    const std::string user_name = argv[2];
+    const std::string password = argv[3];
+    const std::string database = argv[4];
     std::string file_root = argv[5];
+    for (int i = 0; i < file_root.size() ; ++i)
+    {
+        if (file_root[i] == '\\')
+        {
+            file_root[i] = '/';
+        }
+    }
 
     out_log << "IP : " << ip << std::endl;
     out_log << "User name : " << user_name << std::endl;
