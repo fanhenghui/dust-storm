@@ -149,12 +149,12 @@ static bool get_md5(const std::string& file, unsigned char(&md5)[16], MultiResol
 
 int main(int argc , char* argv[])
 {
-
+    LogSheild log_sheild;
     //exe "ip" "username" "password "database" "file_root"
     if (argc != 6)
     {
         out_log << "ERROR : invalid input.\n";
-        out_log << "\tFormat : ip username passport database file_root\n";
+        out_log << "\tFormat : ip username password database file_root\n";
         return -1;
     }
 
