@@ -123,7 +123,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{62BD5C73-656F-47AA-8549-3E1E95D0AF26}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DBImporter", "Executables\DBImporter\DBImporter.vcxproj", "{F943E6ED-0B19-43ED-87D3-DF4E953571D9}"
-<<<<<<< HEAD
 	ProjectSection(ProjectDependencies) = postProject
 		{7844E482-A4AD-4B39-9A7A-1C9909BABB7F} = {7844E482-A4AD-4B39-9A7A-1C9909BABB7F}
 	EndProjectSection
@@ -132,10 +131,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnnoFileStats", "Executable
 	ProjectSection(ProjectDependencies) = postProject
 		{9AF7F4F7-5334-400B-8BE0-F713129393B3} = {9AF7F4F7-5334-400B-8BE0-F713129393B3}
 	EndProjectSection
-=======
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnnoFileStats", "Executables\AnnoFileStats\AnnoFileStats.vcxproj", "{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4}"
->>>>>>> d42934f1eda23a6d6e107b840a28c6bcb9f961c1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnnoServer", "Executables\AnnoServer\AnnoServer.vcxproj", "{D414D0E4-8602-4126-B048-2EC6FC21DDAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,6 +220,10 @@ Global
 		{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4}.Debug|x64.Build.0 = Debug|x64
 		{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4}.Release|x64.ActiveCfg = Release|x64
 		{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4}.Release|x64.Build.0 = Release|x64
+		{D414D0E4-8602-4126-B048-2EC6FC21DDAC}.Debug|x64.ActiveCfg = Debug|x64
+		{D414D0E4-8602-4126-B048-2EC6FC21DDAC}.Debug|x64.Build.0 = Debug|x64
+		{D414D0E4-8602-4126-B048-2EC6FC21DDAC}.Release|x64.ActiveCfg = Release|x64
+		{D414D0E4-8602-4126-B048-2EC6FC21DDAC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -248,5 +249,6 @@ Global
 		{68C54224-F8AB-43D2-9F3C-C42B6DC638BA} = {3B88F495-D417-4F3E-8049-1F1E0F6B1E23}
 		{F943E6ED-0B19-43ED-87D3-DF4E953571D9} = {62BD5C73-656F-47AA-8549-3E1E95D0AF26}
 		{D47DDEE9-D1B3-4FDB-AC6C-7CE0C1F4F2C4} = {62BD5C73-656F-47AA-8549-3E1E95D0AF26}
+		{D414D0E4-8602-4126-B048-2EC6FC21DDAC} = {62BD5C73-656F-47AA-8549-3E1E95D0AF26}
 	EndGlobalSection
 EndGlobal
