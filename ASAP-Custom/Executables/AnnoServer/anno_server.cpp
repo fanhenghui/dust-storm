@@ -133,9 +133,25 @@ static bool query_path(std::string& anno_path , char (&md5_hex)[32])
     }
 }
 
-
+//////////////////////////////////////////////////////////////////////////
+//
 int main(int argc, char* argv[])
 {
+    std::string ip = "127.0.0.1";
+    int port = 1234;
+
+    if (argc == 1 )
+    {
+        std::cout << "Has not ip & port input , use local ip : 127.0.0.1 and port 1234\n";
+    }
+    else if(argc == 3)
+    {
+        ip = argv[1];
+        port = atoi(argv[2]);
+        std::cout << "IP : " << ip << std::endl;
+        std::cout << "Port : " << port << std::endl;
+    }
+
     LogSheild log_sheild;
 
     WSADATA wsaData;
@@ -148,8 +164,8 @@ int main(int argc, char* argv[])
     sockaddr_in sockAddr;
     memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都用0填充
     sockAddr.sin_family = PF_INET;  //使用IPv4地址
-    sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");  //具体的IP地址
-    sockAddr.sin_port = htons(1234);  //端口
+    sockAddr.sin_addr.s_addr = inet_addr(ip.c_str());  //具体的IP地址
+    sockAddr.sin_port = htons(port);  //端口
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
 
     //listen

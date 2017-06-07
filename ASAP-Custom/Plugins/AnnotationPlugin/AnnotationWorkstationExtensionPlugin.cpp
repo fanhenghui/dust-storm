@@ -45,6 +45,7 @@
 
 #include <numeric>
 #include <iostream>
+#include <fstream>
 
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationIndex = 0;
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationGroupIndex = 0;
@@ -592,6 +593,34 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
         return;
     }
 
+    //////////////////////////////////////////////////////////////////////////
+    //Get IP and port
+    std::ifstream server_conf("config/server.config", std::ios::in);
+    if (!server_conf.is_open())
+    {
+        QMessageBox::warning(nullptr, "ASAP", "Lack server config file!");
+        return;
+    }
+    std::string ip = "127.0.0.1";
+    int port = 1234;
+
+    std::string line;
+    while (std::getline(server_conf , line))
+    {
+        std::stringstream ss(line);
+        std::string tag, equal, context;
+        ss >> tag >> equal >> context;
+        if (tag == "ip" || tag == "IP" || tag == "Ip")
+        {
+            ip = context;
+        }
+        if (tag == "port" || tag == "PORT" || tag == "Port")
+        {
+            port = atoi(context.c_str());
+        }
+    }
+    //////////////////////////////////////////////////////////////////////////
+
     //TCP/IP to transfer image's hash to server to get annotation
     //Init socket
     WSADATA wsaData;
@@ -603,8 +632,8 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
     memset(&sock_add, 0, sizeof(sock_add));
     sock_add.sin_family = PF_INET;
     //TODO server address read from config
-    sock_add.sin_addr.s_addr = inet_addr("127.0.0.1");
-    sock_add.sin_port = htons(1234);
+    sock_add.sin_addr.s_addr = inet_addr(ip.c_str());
+    sock_add.sin_port = htons(port);
 
     //ask for server
     if (-1 != ::connect(sock, (SOCKADDR*)&sock_add, sizeof(SOCKADDR)))
@@ -639,6 +668,10 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
             clear();
             //////////////////////////////////////////////////////////////////////////
 
+            //std::cout << "Clear done\n";
+            //std::cout << "Group number : " << group_num << std::endl;
+            //std::cout << "Annotation number : " << anno_num<< std::endl;
+
             //////////////////////////////////////////////////////////////////////////
             //2 Parse group and annotation unit
             unsigned int group_and_anno_size = sizeof(GroupUnit)*group_num + sizeof(AnnotationUnit)*anno_num;
@@ -655,6 +688,7 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
                 points_num += cur_anno->point_num;
                 tmp_buffer += sizeof(AnnotationUnit);
             }
+            //std::cout << "Points number : " << points_num<< std::endl;
 
             char* buffer = new char[sizeof(AnnotationFileHeader) + group_and_anno_size + sizeof(float) * 2 * points_num];
             memcpy(buffer, (char*)(&fileheader), sizeof(AnnotationFileHeader));
@@ -665,8 +699,10 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
             //3 Parse all coordinates
             recv(sock, buffer + sizeof(AnnotationFileHeader) + group_and_anno_size, sizeof(float) * 2 * points_num , NULL);
 
+            //std::cout << "Ready to read all buffer\n";
             if (_annotationService->getList()->read(buffer, sizeof(AnnotationFileHeader) + group_and_anno_size + sizeof(float) * 2 * points_num))
             {
+                //std::cout << "Ready done\n";
                 //Notify
                 updateAnnotationWidget();
                 onTreeWidgetSelectedItemsChanged();
