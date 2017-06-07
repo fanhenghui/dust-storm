@@ -94,6 +94,8 @@ private:
     void clearQtAnnotations();
     void addChildCheckBox(QTreeWidget *tree_widget, QTreeWidgetItem* tree_widget_item);
 
+    void updateAnnotationWidget();
+
     static unsigned int _annotationIndex;
     static unsigned int _annotationGroupIndex;
 

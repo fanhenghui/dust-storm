@@ -99,6 +99,7 @@
     <ClInclude Include="..\include\Annotation\AnnotationList.h" />
     <ClInclude Include="..\include\Annotation\AnnotationService.h" />
     <ClInclude Include="..\include\Annotation\AnnotationToMask.h" />
+    <ClInclude Include="..\Include\Annotation\Annotation_define.h" />
     <ClInclude Include="..\include\Annotation\annotation_export.h" />
     <ClInclude Include="..\Include\Annotation\BinaryRepository.h" />
     <ClInclude Include="..\include\Annotation\ImageScopeRepository.h" />

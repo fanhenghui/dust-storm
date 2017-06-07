@@ -32,6 +32,8 @@ public:
   void removeAnnotation(std::string name);
   void removeAllAnnotations();
   void removeAllGroups();
+  bool read(char* buffer , unsigned int size);
+  bool write(char*& buffer, unsigned int& size);
 
 private:
   std::vector<std::shared_ptr<AnnotationGroup> > _groups;

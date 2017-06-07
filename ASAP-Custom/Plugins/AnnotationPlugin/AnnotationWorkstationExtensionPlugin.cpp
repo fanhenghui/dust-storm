@@ -41,7 +41,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QCheckBox>
-
+#include "Annotation/Annotation_define.h"
 
 #include <numeric>
 #include <iostream>
@@ -49,8 +49,7 @@
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationIndex = 0;
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationGroupIndex = 0;
 
-#define TUMOR_TYPE_NUM 22
-const static std::string TUMOR_TYPES[TUMOR_TYPE_NUM] =
+const static std::string TUMOR_TYPES_TREE[TUMOR_TYPE_NUM] =//For listing
 {
     "Uncertain",//不确定的病变
     "LGIEN", //低级别上皮内瘤变 腺瘤
@@ -208,7 +207,7 @@ void AnnotationWorkstationExtensionPlugin::addChildCheckBox(QTreeWidget *tree_wi
         tree_widget->setItemWidget(tree_widget_item, 1, check_box);
 
         assert(_tumor_type_to_item.size() < TUMOR_TYPE_NUM);
-        _tumor_type_to_item[TUMOR_TYPES[_tumor_type_to_item.size()]] = check_box;
+        _tumor_type_to_item[TUMOR_TYPES_TREE[_tumor_type_to_item.size()]] = check_box;
 
         connect(check_box, SIGNAL(stateChanged(int)), this, SLOT(onTumorTypeChanged(int)));
     }
@@ -221,6 +220,115 @@ void AnnotationWorkstationExtensionPlugin::addChildCheckBox(QTreeWidget *tree_wi
             addChildCheckBox(tree_widget, tree_widget_item->child(i));
         }
     }
+}
+
+void AnnotationWorkstationExtensionPlugin::updateAnnotationWidget()
+{
+    // Add loaded groups to treewidget
+    QList<QtAnnotationGroup* > childGroups;
+    std::map<std::shared_ptr<AnnotationGroup>, QTreeWidgetItem*> annotToWidget;
+    std::vector<std::shared_ptr<AnnotationGroup> > grps = _annotationService->getList()->getGroups();
+    for (std::vector<std::shared_ptr<AnnotationGroup> >::const_iterator it = grps.begin(); it != grps.end(); ++it) {
+        QtAnnotationGroup *grp = new QtAnnotationGroup(*it, this);
+        if ((*it)->getGroup() == NULL) {
+            _qtAnnotationGroups.append(grp);
+            QTreeWidgetItem* newAnnotationGroup = new QTreeWidgetItem(_treeWidget);
+            newAnnotationGroup->setText(1, QString::fromStdString((*it)->getName()));
+            newAnnotationGroup->setText(2, "Group");
+            newAnnotationGroup->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotationGroup*>(grp));
+            newAnnotationGroup->setFlags(newAnnotationGroup->flags() | Qt::ItemIsEditable);
+            int cHeight = _treeWidget->visualItemRect(newAnnotationGroup).height();
+            QPixmap iconPM(cHeight, cHeight);
+            iconPM.fill(QColor((*it)->getColor().c_str()));
+            QIcon color(iconPM);
+            newAnnotationGroup->setIcon(0, color);
+            newAnnotationGroup->setData(0, Qt::UserRole, QColor((*it)->getColor().c_str()));
+            annotToWidget[grp->getAnnotationGroup()] = newAnnotationGroup;
+        }
+        else {
+            childGroups.append(grp);
+        }
+    }
+    while (!childGroups.empty()) {
+        for (QList<QtAnnotationGroup*>::iterator it = childGroups.begin(); it != childGroups.end();) {
+            if (annotToWidget.find((*it)->getAnnotationGroup()->getGroup()) != annotToWidget.end()) {
+                _qtAnnotationGroups.append((*it));
+                QTreeWidgetItem* newAnnotationGroup = new QTreeWidgetItem(annotToWidget[(*it)->getAnnotationGroup()->getGroup()]);
+                newAnnotationGroup->setText(1, QString::fromStdString((*it)->getAnnotationGroup()->getName()));
+                newAnnotationGroup->setText(2, "Group");
+                newAnnotationGroup->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotationGroup*>((*it)));
+                newAnnotationGroup->setFlags(newAnnotationGroup->flags() | Qt::ItemIsEditable);
+                int cHeight = _treeWidget->visualItemRect(newAnnotationGroup).height();
+                QPixmap iconPM(cHeight, cHeight);
+                iconPM.fill(QColor((*it)->getAnnotationGroup()->getColor().c_str()));
+                QIcon color(iconPM);
+                newAnnotationGroup->setIcon(0, color);
+                newAnnotationGroup->setData(0, Qt::UserRole, QColor((*it)->getAnnotationGroup()->getColor().c_str()));
+                annotToWidget[(*it)->getAnnotationGroup()] = newAnnotationGroup;
+                it = childGroups.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+    std::vector<std::shared_ptr<Annotation> > annots = _annotationService->getList()->getAnnotations();
+    for (std::vector<std::shared_ptr<Annotation> >::const_iterator it = annots.begin(); it != annots.end(); ++it) {
+        QTreeWidgetItem* prnt = _treeWidget->invisibleRootItem();
+        if ((*it)->getGroup()) {
+            prnt = annotToWidget[(*it)->getGroup()];
+        }
+        std::string key = "Annotation " + QString::number(_annotationIndex).toStdString() + "_annotation";
+
+        // Add QtAnnotation
+        QtAnnotation* annot = NULL;
+        if ((*it)->getType() == Annotation::Type::DOT) {
+            annot = new DotQtAnnotation((*it), this, _viewer->getSceneScale());
+        }
+        else if ((*it)->getType() == Annotation::Type::POLYGON) {
+            annot = new PolyQtAnnotation((*it), this, _viewer->getSceneScale());
+            dynamic_cast<PolyQtAnnotation*>(annot)->setInterpolationType("linear");
+        }
+        else if ((*it)->getType() == Annotation::Type::SPLINE) {
+            annot = new PolyQtAnnotation((*it), this, _viewer->getSceneScale());
+            dynamic_cast<PolyQtAnnotation*>(annot)->setInterpolationType("spline");
+        }
+        else if ((*it)->getType() == Annotation::Type::MEASUREMENT) {
+            annot = new MeasurementQtAnnotation((*it), this, _viewer->getSceneScale());
+        }
+        else if ((*it)->getType() == Annotation::Type::POINTSET) {
+            annot = new PointSetQtAnnotation((*it), this, _viewer->getSceneScale());
+        }
+        if (annot) {
+            annot->finish();
+            _qtAnnotations.append(annot);
+            _viewer->scene()->addItem(annot);
+            annot->setZValue(20.);
+
+
+            _annotationIndex += 1;
+            QTreeWidgetItem* newAnnotation = new QTreeWidgetItem(prnt);
+            newAnnotation->setText(1, QString::fromStdString((*it)->getName()));
+            newAnnotation->setText(2, QString::fromStdString((*it)->getTypeAsString()));
+            newAnnotation->setFlags(newAnnotation->flags() & ~Qt::ItemIsDropEnabled);
+            newAnnotation->setFlags(newAnnotation->flags() | Qt::ItemIsEditable);
+            newAnnotation->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotation*>(annot));
+            int cHeight = _treeWidget->visualItemRect(newAnnotation).height();
+            if (_treeWidget->topLevelItemCount() > 0) {
+                cHeight = _treeWidget->visualItemRect(_treeWidget->topLevelItem(0)).height();
+            }
+            QPixmap iconPM(cHeight, cHeight);
+            iconPM.fill(QColor((*it)->getColor().c_str()));
+            QIcon color(iconPM);
+            newAnnotation->setIcon(0, color);
+            newAnnotation->setData(0, Qt::UserRole, QColor((*it)->getColor().c_str()));
+            _annotToItem[annot] = newAnnotation;
+            updateAnnotationToolTip(annot);
+            connect(annot, SIGNAL(annotationChanged(QtAnnotation*)), this, SLOT(updateAnnotationToolTip(QtAnnotation*)));
+        }
+    }
+    _treeWidget->resizeColumnToContents(0);
+    _treeWidget->resizeColumnToContents(1);
 }
 
 void AnnotationWorkstationExtensionPlugin::onItemNameChanged(QTreeWidgetItem* item, int column) {
@@ -449,111 +557,7 @@ void AnnotationWorkstationExtensionPlugin::onLoadButtonPressed(const std::string
                 }
             }
         }
-        // Add loaded groups to treewidget
-        QList<QtAnnotationGroup* > childGroups;
-        std::map<std::shared_ptr<AnnotationGroup>, QTreeWidgetItem*> annotToWidget;
-        std::vector<std::shared_ptr<AnnotationGroup> > grps = _annotationService->getList()->getGroups();
-        for (std::vector<std::shared_ptr<AnnotationGroup> >::const_iterator it = grps.begin(); it != grps.end(); ++it) {
-            QtAnnotationGroup *grp = new QtAnnotationGroup(*it, this);
-            if ((*it)->getGroup() == NULL) {
-                _qtAnnotationGroups.append(grp);
-                QTreeWidgetItem* newAnnotationGroup = new QTreeWidgetItem(_treeWidget);
-                newAnnotationGroup->setText(1, QString::fromStdString((*it)->getName()));
-                newAnnotationGroup->setText(2, "Group");
-                newAnnotationGroup->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotationGroup*>(grp));
-                newAnnotationGroup->setFlags(newAnnotationGroup->flags() | Qt::ItemIsEditable);
-                int cHeight = _treeWidget->visualItemRect(newAnnotationGroup).height();
-                QPixmap iconPM(cHeight, cHeight);
-                iconPM.fill(QColor((*it)->getColor().c_str()));
-                QIcon color(iconPM);
-                newAnnotationGroup->setIcon(0, color);
-                newAnnotationGroup->setData(0, Qt::UserRole, QColor((*it)->getColor().c_str()));
-                annotToWidget[grp->getAnnotationGroup()] = newAnnotationGroup;
-            }
-            else {
-                childGroups.append(grp);
-            }
-        }
-        while (!childGroups.empty()) {
-            for (QList<QtAnnotationGroup*>::iterator it = childGroups.begin(); it != childGroups.end();) {
-                if (annotToWidget.find((*it)->getAnnotationGroup()->getGroup()) != annotToWidget.end()) {
-                    _qtAnnotationGroups.append((*it));
-                    QTreeWidgetItem* newAnnotationGroup = new QTreeWidgetItem(annotToWidget[(*it)->getAnnotationGroup()->getGroup()]);
-                    newAnnotationGroup->setText(1, QString::fromStdString((*it)->getAnnotationGroup()->getName()));
-                    newAnnotationGroup->setText(2, "Group");
-                    newAnnotationGroup->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotationGroup*>((*it)));
-                    newAnnotationGroup->setFlags(newAnnotationGroup->flags() | Qt::ItemIsEditable);
-                    int cHeight = _treeWidget->visualItemRect(newAnnotationGroup).height();
-                    QPixmap iconPM(cHeight, cHeight);
-                    iconPM.fill(QColor((*it)->getAnnotationGroup()->getColor().c_str()));
-                    QIcon color(iconPM);
-                    newAnnotationGroup->setIcon(0, color);
-                    newAnnotationGroup->setData(0, Qt::UserRole, QColor((*it)->getAnnotationGroup()->getColor().c_str()));
-                    annotToWidget[(*it)->getAnnotationGroup()] = newAnnotationGroup;
-                    it = childGroups.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
-        }
-        std::vector<std::shared_ptr<Annotation> > annots = _annotationService->getList()->getAnnotations();
-        for (std::vector<std::shared_ptr<Annotation> >::const_iterator it = annots.begin(); it != annots.end(); ++it) {
-            QTreeWidgetItem* prnt = _treeWidget->invisibleRootItem();
-            if ((*it)->getGroup()) {
-                prnt = annotToWidget[(*it)->getGroup()];
-            }
-            std::string key = "Annotation " + QString::number(_annotationIndex).toStdString() + "_annotation";
-
-            // Add QtAnnotation
-            QtAnnotation* annot = NULL;
-            if ((*it)->getType() == Annotation::Type::DOT) {
-                annot = new DotQtAnnotation((*it), this, _viewer->getSceneScale());
-            }
-            else if ((*it)->getType() == Annotation::Type::POLYGON) {
-                annot = new PolyQtAnnotation((*it), this, _viewer->getSceneScale());
-                dynamic_cast<PolyQtAnnotation*>(annot)->setInterpolationType("linear");
-            }
-            else if ((*it)->getType() == Annotation::Type::SPLINE) {
-                annot = new PolyQtAnnotation((*it), this, _viewer->getSceneScale());
-                dynamic_cast<PolyQtAnnotation*>(annot)->setInterpolationType("spline");
-            }
-            else if ((*it)->getType() == Annotation::Type::MEASUREMENT) {
-                annot = new MeasurementQtAnnotation((*it), this, _viewer->getSceneScale());
-            }
-            else if ((*it)->getType() == Annotation::Type::POINTSET) {
-                annot = new PointSetQtAnnotation((*it), this, _viewer->getSceneScale());
-            }
-            if (annot) {
-                annot->finish();
-                _qtAnnotations.append(annot);
-                _viewer->scene()->addItem(annot);
-                annot->setZValue(20.);
-
-
-                _annotationIndex += 1;
-                QTreeWidgetItem* newAnnotation = new QTreeWidgetItem(prnt);
-                newAnnotation->setText(1, QString::fromStdString((*it)->getName()));
-                newAnnotation->setText(2, QString::fromStdString((*it)->getTypeAsString()));
-                newAnnotation->setFlags(newAnnotation->flags() & ~Qt::ItemIsDropEnabled);
-                newAnnotation->setFlags(newAnnotation->flags() | Qt::ItemIsEditable);
-                newAnnotation->setData(1, Qt::UserRole, QVariant::fromValue<QtAnnotation*>(annot));
-                int cHeight = _treeWidget->visualItemRect(newAnnotation).height();
-                if (_treeWidget->topLevelItemCount() > 0) {
-                    cHeight = _treeWidget->visualItemRect(_treeWidget->topLevelItem(0)).height();
-                }
-                QPixmap iconPM(cHeight, cHeight);
-                iconPM.fill(QColor((*it)->getColor().c_str()));
-                QIcon color(iconPM);
-                newAnnotation->setIcon(0, color);
-                newAnnotation->setData(0, Qt::UserRole, QColor((*it)->getColor().c_str()));
-                _annotToItem[annot] = newAnnotation;
-                updateAnnotationToolTip(annot);
-                connect(annot, SIGNAL(annotationChanged(QtAnnotation*)), this, SLOT(updateAnnotationToolTip(QtAnnotation*)));
-            }
-        }
-        _treeWidget->resizeColumnToContents(0);
-        _treeWidget->resizeColumnToContents(1);
+        updateAnnotationWidget();
     }
 
     onTreeWidgetSelectedItemsChanged();
@@ -563,19 +567,28 @@ void AnnotationWorkstationExtensionPlugin::onLoadButtonPressed(const std::string
 
 void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
 {
+    if (!_annotationService->getList()->getAnnotations().empty())
+    {
+        if (!(QDialogButtonBox::Yes == QMessageBox::warning(
+            nullptr, "ASAP", "Try learning result will clear your annotation. Do you want continue ? ", QDialogButtonBox::Yes, QDialogButtonBox::No)))
+        {
+            return;
+        }
+    }
+
     std::shared_ptr<MultiResolutionImage> local_img = _img.lock();
     if (!local_img)
     {
-        //TODO warning message
-        std::cout << "Get failed!\n";
+        //Input damage
+        QMessageBox::warning(nullptr, "ASAP", "The image input is damaged.");
         return;
     }
 
     unsigned char md5[16];
     if (!local_img->getImgHash(md5))
     {
-        //TODO warning message
-        std::cout << "Get failed!\n";
+        //Calculate image hash failed
+        QMessageBox::warning(nullptr, "ASAP", "Calculate image hash failed.");
         return;
     }
 
@@ -599,9 +612,76 @@ void AnnotationWorkstationExtensionPlugin::onTryLearningResultButtonPressed()
         //send data to server
         send(sock, (char*)(md5), 16, NULL);
 
-        //TODO
-        //get feedback (annotation byte stream)
+        //Receive server learning result (byte stream)
+        //////////////////////////////////////////////////////////////////////////
+        //1 Parse header
+        AnnotationFileHeader fileheader;
+        recv(sock, (char*)(&fileheader), sizeof(fileheader), NULL);
 
+        const int anno_num = fileheader.anno_num;
+        const int group_num = fileheader.group_num;
+
+        if (!fileheader.valid)
+        {
+            //Result damaged
+            QMessageBox::warning(nullptr, "ASAP", "Get learning result damaged.");
+        }
+        else if (fileheader.anno_num == 0 && fileheader.group_num == 0 )
+        {
+            //Empty result
+            //Not learning yet
+            QMessageBox::warning(nullptr, "ASAP", "Has not learning result yet.");
+        }
+        else
+        {
+            //////////////////////////////////////////////////////////////////////////
+            //Here clear all custom annotation
+            clear();
+            //////////////////////////////////////////////////////////////////////////
+
+            //////////////////////////////////////////////////////////////////////////
+            //2 Parse group and annotation unit
+            unsigned int group_and_anno_size = sizeof(GroupUnit)*group_num + sizeof(AnnotationUnit)*anno_num;
+            char* ga_buffer = new char[group_and_anno_size];
+            recv(sock, ga_buffer, group_and_anno_size, NULL);
+            char* tmp_buffer = ga_buffer;
+            tmp_buffer += sizeof(GroupUnit)*group_num;
+
+            //Calculate points number
+            unsigned int points_num = 0;
+            for (int i =0 ; i<anno_num ; ++i)
+            {
+                AnnotationUnit* cur_anno = (AnnotationUnit*)(tmp_buffer);
+                points_num += cur_anno->point_num;
+                tmp_buffer += sizeof(AnnotationUnit);
+            }
+
+            char* buffer = new char[sizeof(AnnotationFileHeader) + group_and_anno_size + sizeof(float) * 2 * points_num];
+            memcpy(buffer, (char*)(&fileheader), sizeof(AnnotationFileHeader));
+            memcpy(buffer + sizeof(AnnotationFileHeader), ga_buffer, group_and_anno_size);
+            delete[] ga_buffer;
+
+            //////////////////////////////////////////////////////////////////////////
+            //3 Parse all coordinates
+            recv(sock, buffer + sizeof(AnnotationFileHeader) + group_and_anno_size, sizeof(float) * 2 * points_num , NULL);
+
+            if (_annotationService->getList()->read(buffer, sizeof(AnnotationFileHeader) + group_and_anno_size + sizeof(float) * 2 * points_num))
+            {
+                //Notify
+                updateAnnotationWidget();
+                onTreeWidgetSelectedItemsChanged();
+                onTumorTypeChanged();
+            }
+            else
+            {
+                //Result damaged
+                QMessageBox::warning(nullptr, "ASAP", "Get learning result damaged.");
+            }
+        }
+    }
+    else
+    {
+        QMessageBox::warning(nullptr, "ASAP", "Connect to server failed.");
     }
     //close socket
     closesocket(sock);
