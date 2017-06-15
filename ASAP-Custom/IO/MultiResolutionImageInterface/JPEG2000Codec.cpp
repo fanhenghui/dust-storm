@@ -1,9 +1,11 @@
 #include "JPEG2000Codec.h"
-// Include LIBJASPER for JPEG2000 compression
-#include "jasper/jasper.h"
 #include <string>
 #include <vector>
 #include <sstream>
+
+// Include LIBJASPER for JPEG2000 compression
+#include "jasper/jasper.h"
+
 
 using namespace std;
 

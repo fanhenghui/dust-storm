@@ -11,8 +11,15 @@
 // Include DCMTK LIBJPEG for lossy and lossless JPEG compression
 extern "C" {
 #define boolean ijg_boolean
-#include "dcmtk/dcmjpeg/libijg8/jpeglib8.h"
+#ifdef WIN32
+#include "dcmjpeg/libijg8/jpeglib8.h"
 #include "jpeg_mem_src.h"
+#else
+#include "dcmjpeg/djeijg8.h"
+#include "dcmjpeg/djdijg8.h"
+#include "jpeg_mem_src.h"
+#endif
+
 #undef boolean
 #undef const
 }
