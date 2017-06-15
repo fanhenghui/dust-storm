@@ -1,6 +1,7 @@
 ver = debug
+lib = shared
 
-EXEDIR = ../bin
+BIN_DIR = ../bin
 LIB_DIR = ../lib
 INCLUDE_DIR = ../include
 
@@ -8,14 +9,20 @@ VPATH = $(INCLUDE_DIR)
 vpath %.h $(INCLUDE_DIR)
 
 ifeq ($(ver),debug)
-CFLAGS += -g
+CFLAGS += -g -fPIC
 endif
 
 CC = g++
-TARGET = $(EXEDIR)/make_file_test
+TARGET_NAME = main
+TARGET = $(BIN_DIR)/$(TARGET_NAME)
 
-$(TARGET) : linux_c_test.cpp ../lib/libclasses.a
+ifeq ($(lib),shared) 
+$(TARGET) : linux_c_test.cpp $(BIN_DIR)/libclasses.so
+	$(CC) $(CFLAGS) linux_c_test.cpp -I$(INCLUDE_DIR) -L$(BIN_DIR) -lclasses -lboost_system -lboost_thread  -o $(TARGET)
+else
+$(TARGET) : linux_c_test.cpp $(LIB_DIR)/libclasses.a
 	$(CC) $(CFLAGS) linux_c_test.cpp -I$(INCLUDE_DIR) -L$(LIB_DIR) -lclasses -lboost_system -lboost_thread  -o $(TARGET)
+endif
 
 .PHONY : clean
 clean :
