@@ -18,10 +18,11 @@ TARGET = $(BIN_DIR)/$(TARGET_NAME)
 
 ifeq ($(lib),shared) 
 $(TARGET) : linux_c_test.cpp $(BIN_DIR)/libclasses.so
-	$(CC) $(CFLAGS) linux_c_test.cpp -I$(INCLUDE_DIR) -L$(BIN_DIR) -lclasses -lboost_system -lboost_thread  -o $(TARGET)
+	$(CC) $(CFLAGS) -shared linux_c_test.cpp -I$(INCLUDE_DIR) -L$(BIN_DIR) -lclasses -o $(TARGET)
 else
 $(TARGET) : linux_c_test.cpp $(LIB_DIR)/libclasses.a
 	$(CC) $(CFLAGS) linux_c_test.cpp -I$(INCLUDE_DIR) -L$(LIB_DIR) -lclasses -lboost_system -lboost_thread  -o $(TARGET)
+#	$(CC) $(CFLAGS) -static linux_c_test.cpp -I$(INCLUDE_DIR) -L$(LIB_DIR) -lclasses  -o $(TARGET)
 endif
 
 .PHONY : clean

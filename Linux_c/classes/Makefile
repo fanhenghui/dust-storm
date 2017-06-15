@@ -25,7 +25,7 @@ TARGET_NAME = libclasses
 ifeq ($(lib),shared)
 TARGET = $(BIN_DIR)/$(TARGET_NAME).so
 $(TARGET) : $(OBJS)
-	$(CC) -shared -fPIC -o $(TARGET) $(OBJS)
+	$(CC) -shared -fPIC -lboost_system -lboost_thread -o $(TARGET) $(OBJS)
 else
 TARGET = $(LIB_DIR)/$(TARGET_NAME).a
 $(TARGET): $(OBJS)
