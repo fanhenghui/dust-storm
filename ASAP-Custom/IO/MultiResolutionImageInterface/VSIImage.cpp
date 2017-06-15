@@ -15,8 +15,8 @@ extern "C" {
 #include "dcmjpeg/libijg8/jpeglib8.h"
 #include "jpeg_mem_src.h"
 #else
-#include "dcmjpeg/djeijg8.h"
-#include "dcmjpeg/djdijg8.h"
+#include "dcmtk/dcmjpeg/djeijg8.h"
+#include "dcmtk/dcmjpeg/djdijg8.h"
 #include "jpeg_mem_src.h"
 #endif
 

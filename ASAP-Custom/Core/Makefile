@@ -7,9 +7,9 @@ ver = debug
 CC = g++ -std=c++11
 
 #file direction
-MODULE_NAME = Core
-INCLUDE_DIR = ../Include
-LIB_DIR = ../Lib
+MODULE_NAME = core
+INCLUDE_DIR = ../include
+LIB_DIR = ../lib
 
 VPATH = $(INCLUDE_DIR):$(INCLUDE_DIR)/$(MODULE_NAME)
 #vpath %.h $(INCLUDE_DIR):$(INCLUDE_DIR)/$(MODULE_NAME)
@@ -43,10 +43,10 @@ CmdLineProgressMonitor.o : $(EXPORT_HEADER) CmdLineProgressMonitor.cpp CmdLinePr
 ImageSource.o : $(EXPORT_HEADER) ImageSource.cpp ImageSource.h PathologyEnums.o
 	$(CC) $(CFLAGS) ImageSource.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)	
 
-stringconversion.o : $(EXPORT_HEADER)h stringconversion.cpp stringconversion.h 
+stringconversion.o : $(EXPORT_HEADER) stringconversion.cpp stringconversion.h 
 	$(CC) $(CFLAGS) stringconversion.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)
 
-ProgressMonitor.o : $(EXPORT_HEADER)h ProgressMonitor.cpp ProgressMonitor.h
+ProgressMonitor.o : $(EXPORT_HEADER) ProgressMonitor.cpp ProgressMonitor.h
 	$(CC) $(CFLAGS) ProgressMonitor.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)
 
 Box.o : $(EXPORT_HEADER) Box.cpp Box.h
