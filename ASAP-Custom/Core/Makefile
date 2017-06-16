@@ -32,9 +32,10 @@ OBJS = filetools.o CmdLineProgressMonitor.o ImageSource.o stringconversion.o Pro
 
 EXPORT_HEADER = core_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
+ADDITIANL_DEPENDENCIES = -lboost_system -lboost_filesystem -lboost_regex
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic -lboost_system -lboost_filesystem -lboost_regex -o $(TARGET) $(OBJS)
+	$(CC) -shared -fpic $(ADDITIANL_DEPENDENCIES) -o $(TARGET) $(OBJS)
 
 filetools.o : $(EXPORT_HEADER) filetools.cpp filetools.h stringconversion.o
 	$(CC) $(CFLAGS) filetools.cpp $(ADDITINAL_INCLUDE_DIR)

@@ -1,6 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
+
+//Socket header
+#ifdef WIN32
 #include <winsock2.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -43,7 +51,7 @@ protected:
 private:
 };
 
-/*µ¥¸ö×Ö·û×ªÊ®Áù½øÖÆ×Ö·û´®£¬³¤¶ÈÔö´ó2±»*/
+/*å•ä¸ªå­—ç¬¦è½¬åå…­è¿›åˆ¶å­—ç¬¦ä¸²ï¼Œé•¿åº¦å¢å¤§2è¢«*/
 static void char_to_hex(unsigned char ch, char *szHex)
 {
     int i;
@@ -60,7 +68,7 @@ static void char_to_hex(unsigned char ch, char *szHex)
     szHex[2] = 0;
 }
 
-/*×Ö·û´®×ª»»º¯Êı£¬ÖĞ¼äµ÷ÓÃÉÏÃæµÄº¯Êı*/
+/*å­—ç¬¦ä¸²è½¬æ¢å‡½æ•°ï¼Œä¸­é—´è°ƒç”¨ä¸Šé¢çš„å‡½æ•°*/
 static void char_str_to_hex_str(char *pucCharStr, int iSize, char *pszHexStr)
 {
     int i;
@@ -162,10 +170,10 @@ int main(int argc, char* argv[])
 
     //bind
     sockaddr_in sockAddr;
-    memset(&sockAddr, 0, sizeof(sockAddr));  //Ã¿¸ö×Ö½Ú¶¼ÓÃ0Ìî³ä
-    sockAddr.sin_family = PF_INET;  //Ê¹ÓÃIPv4µØÖ·
-    sockAddr.sin_addr.s_addr = inet_addr(ip.c_str());  //¾ßÌåµÄIPµØÖ·
-    sockAddr.sin_port = htons(port);  //¶Ë¿Ú
+    memset(&sockAddr, 0, sizeof(sockAddr));  //æ¯ä¸ªå­—èŠ‚éƒ½ç”¨0å¡«å……
+    sockAddr.sin_family = PF_INET;  //ä½¿ç”¨IPv4åœ°å€
+    sockAddr.sin_addr.s_addr = inet_addr(ip.c_str());  //å…·ä½“çš„IPåœ°å€
+    sockAddr.sin_port = htons(port);  //ç«¯å£
     bind(servSock, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR));
 
     //listen
@@ -229,13 +237,13 @@ int main(int argc, char* argv[])
             }
         }
 
-        //¹Ø±ÕÌ×½Ó×Ö
+        //å…³é—­å¥—æ¥å­—
         closesocket(clntSock);
 
     }
 
     closesocket(servSock);
-    //ÖÕÖ¹ DLL µÄÊ¹ÓÃ
+    //ç»ˆæ­¢ DLL çš„ä½¿ç”¨
     WSACleanup();
     return 0;
 }

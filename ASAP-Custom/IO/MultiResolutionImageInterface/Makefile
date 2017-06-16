@@ -36,14 +36,16 @@ TIFFImage.o TIFFImageFactory.o \
 VSIImage.o VSIImageFactory.o
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(MODULE_NAME)
+ADDITIANL_DEPENDENCIES = -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem \
+-lboost_regex -lboost_thread -lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509
+
 EXPORT_HEADER = multiresolutionimageinterface_export.h
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem -lboost_regex -lboost_thread \
-	-lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509 -o $(TARGET) $(OBJS)
+	$(CC) -shared -fpic $(ADDITIANL_DEPENDENCIES) -o $(TARGET) $(OBJS)
 
 MultiResolutionImageReader.o : $(EXPORT_HEADER) MultiResolutionImageReader.cpp MultiResolutionImageReader.h MultiResolutionImageFactory.o
-	$(CC) $(CFLAGS) MultiResolutionImageReader.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) $(CFLAGS) MultiResolutionImageReader.cpp  $(ADDITINAL_INCLUDE_DIR)
 
 MultiResolutionImageFactory.o : $(EXPORT_HEADER) MultiResolutionImageFactory.cpp MultiResolutionImageFactory.h VSIImage.o MultiResolutionImage.o 
 	$(CC) $(CFLAGS) MultiResolutionImageFactory.cpp $(ADDITINAL_INCLUDE_DIR)
