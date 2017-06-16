@@ -298,3 +298,4 @@ mi_shader_collection.h
 *.o
 *.so
 *.a
+.vscode/
