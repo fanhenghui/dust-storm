@@ -1,4 +1,4 @@
-#Core makefile
+#IO MultiResolutionImageInterface makefile
 
 #version (default debug)
 ver = debug
@@ -7,7 +7,7 @@ ver = debug
 CC = g++ -std=c++11
 
 #file direction
-MODULE_NAME = MultiResolutionImageInterface
+MODULE_NAME = multiresolutionimageinterface
 ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/io
@@ -28,7 +28,7 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/libmultiresolutionimageinterface.so
+TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
 OBJS = JPEG2000Codec.o TileCache.o AperioSVSWriter.o \
 MultiResolutionImage.o MultiResolutionImageFactory.o MultiResolutionImageReader.o MultiResolutionImageWriter.o \
 LIFImage.o LIFImageFactory.o \
@@ -36,13 +36,13 @@ TIFFImage.o TIFFImageFactory.o \
 VSIImage.o VSIImageFactory.o
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(MODULE_NAME)
-ADDITIANL_DEPENDENCIES = -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem \
+ADDITIANL_DEPENDENCIES = -L$(LIB_DIR) -lcore -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem \
 -lboost_regex -lboost_thread -lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509
 
 EXPORT_HEADER = multiresolutionimageinterface_export.h
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic $(ADDITIANL_DEPENDENCIES) -o $(TARGET) $(OBJS)
+	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 MultiResolutionImageReader.o : $(EXPORT_HEADER) MultiResolutionImageReader.cpp MultiResolutionImageReader.h MultiResolutionImageFactory.o
 	$(CC) $(CFLAGS) MultiResolutionImageReader.cpp  $(ADDITINAL_INCLUDE_DIR)

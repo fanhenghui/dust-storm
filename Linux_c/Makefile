@@ -1,5 +1,5 @@
 
-export ver = debug
+export ver = release
 export lib = shared
 
 MAKE = make

@@ -5,8 +5,11 @@
 #ifdef WIN32
 #include <winsock2.h>
 #else
-#include <sys/types.h>
+#include <unistd.h>
+#include <sys/types.h> 
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #endif
 
 #include <iostream>
@@ -21,14 +24,14 @@
 #include "cppconn/resultset.h"
 #include "cppconn/statement.h"
 #include "cppconn/prepared_statement.h"
-#include "cppconn/sqlstring.h"
+#include "cppconn/sqlstring.h"  
 //mysql end
 
-#include "Annotation/AnnotationList.h"
-#include "Annotation/Annotation.h"
-#include "Annotation/AnnotationGroup.h"
-#include "Annotation/BinaryRepository.h"
-#include "Annotation/Annotation_define.h"
+#include "annotation/AnnotationList.h"
+#include "annotation/Annotation.h"
+#include "annotation/AnnotationGroup.h"
+#include "annotation/BinaryRepository.h"
+#include "annotation/Annotation_define.h"
 
 static std::ofstream out_log;
 
@@ -145,6 +148,8 @@ static bool query_path(std::string& anno_path , char (&md5_hex)[32])
 //
 int main(int argc, char* argv[])
 {
+    std::cout << "enter main\n";
+    
     std::string ip = "127.0.0.1";
     int port = 1234;
 
@@ -162,12 +167,25 @@ int main(int argc, char* argv[])
 
     LogSheild log_sheild;
 
+#ifdef WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
+
 
     //create socket
+#ifdef WIN32
     SOCKET servSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+#else
+    int serversockfd = socket(AF_INET , SOCK_STREAM , 0);
+    if(serversockfd<0)
+    {
+        std::cout << "Create socket failed!\n";
+    }
+#endif
 
+    
+#ifdef WIN32
     //bind
     sockaddr_in sockAddr;
     memset(&sockAddr, 0, sizeof(sockAddr));  //每个字节都用0填充
@@ -180,16 +198,47 @@ int main(int argc, char* argv[])
     listen(servSock, 20);
     std::cout << "server running ...\n";
     out_log << "server running ...\n";
+#else
+    //bind
+    sockaddr_in serv_addr;
+    bzero(((char*)&serv_addr) , sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr(ip.c_str());  //具体的IP地址
+    serv_addr.sin_port = htons(port);  //端口
+    bind(serversockfd,(struct sockaddr *)&serv_addr ,sizeof(serv_addr)); 
 
+    //listen
+    listen(serversockfd, 20);
+    std::cout << "server running ...\n";
+    out_log << "server running ...\n";
+#endif
+
+    
     //accept loop
     while (1)
     {
+#ifdef WIN32
         SOCKADDR clntAddr;
         int nSize = sizeof(SOCKADDR);
         SOCKET clntSock = accept(servSock, (SOCKADDR*)&clntAddr, &nSize);
+#else
+        sockaddr_in cli_addr;
+        socklen_t cli_add_len = sizeof(cli_addr);
+        int clientsockfd = accept(serversockfd, (struct sockaddr*)&cli_addr, &cli_add_len);
+        if(clientsockfd < 0)
+        {
+            std::cout << "error on accept.\n";
+            continue;
+        }
+#endif
 
         char md5[16];
+#ifdef WIN32
         recv(clntSock, (char*)(md5), 16, NULL);
+#else
+        read(clientsockfd ,(char*)(md5), 16);
+#endif
+        
         char md5_hex[16 * 2];
         char_str_to_hex_str(md5, 16, md5_hex);
         std::cout << "calculate md5 is :" << md5_hex << "\n";
@@ -204,7 +253,11 @@ int main(int argc, char* argv[])
             empty_file_header.group_num = 0;
             empty_file_header.valid = true;
 
+#ifdef WIN32
             send(clntSock, (char*)(&empty_file_header), sizeof(empty_file_header) , NULL);
+#else
+            write(clientsockfd , (char*)(&empty_file_header) , sizeof(empty_file_header));
+#endif
         }
         else
         {
@@ -221,7 +274,12 @@ int main(int argc, char* argv[])
                 if (anno_list->write(buffers, size))
                 {
                     std::cout << "send learning result to client. buffer size : " << size << std::endl;
+
+#ifdef WIN32
                     send(clntSock, buffers, size, NULL);
+#else
+                    write(clientsockfd , buffers, size);
+#endif
                     delete[] buffers;
                 }
                 else
@@ -231,19 +289,32 @@ int main(int argc, char* argv[])
                     empty_file_header.anno_num = 0;
                     empty_file_header.group_num = 0;
                     empty_file_header.valid = true;
-
+#ifdef WIN32
                     send(clntSock, (char*)(&empty_file_header), sizeof(empty_file_header), NULL);
+#else
+                    write(clientsockfd, (char*)(&empty_file_header), sizeof(empty_file_header));
+#endif
                 }
             }
         }
 
         //关闭套接字
+#ifdef WIN32
         closesocket(clntSock);
+#else
+        close(clientsockfd);
+#endif
 
     }
 
+#ifdef WIN32
+    //关闭 server 套接字 
     closesocket(servSock);
     //终止 DLL 的使用
     WSACleanup();
+#else
+    close(serversockfd);
+#endif
+
     return 0;
 }

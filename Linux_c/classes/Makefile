@@ -1,4 +1,4 @@
-ver = debug
+ver = release
 lib = shared
 
 BIN_DIR = ../bin
@@ -9,9 +9,9 @@ VPATH = $(INCLUDE_DIR)
 vpath %.h $(INCLUDE_DIR)
 
 ifeq ($(ver),debug)
-CFLAGS += -c -g -fPIC
+CFLAGS += -fPIC -c -g 
 else
-CFLAGS += -c -fPIC
+CFLAGS += -fPIC -c 
 endif
 
 DEFS = -D TEST
@@ -25,7 +25,7 @@ TARGET_NAME = libclasses
 ifeq ($(lib),shared)
 TARGET = $(BIN_DIR)/$(TARGET_NAME).so
 $(TARGET) : $(OBJS)
-	$(CC) -shared -fPIC -lboost_system -lboost_thread -o $(TARGET) $(OBJS)
+	$(CC) -shared -o ../bin/libclasses.so $(OBJS) -lboost_system -lboost_thread
 else
 TARGET = $(LIB_DIR)/$(TARGET_NAME).a
 $(TARGET): $(OBJS)

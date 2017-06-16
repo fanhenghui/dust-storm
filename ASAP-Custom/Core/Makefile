@@ -27,7 +27,7 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/libcore.so
+TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
 OBJS = filetools.o CmdLineProgressMonitor.o ImageSource.o stringconversion.o ProgressMonitor.o Box.o Point.o PathologyEnums.o 
 
 EXPORT_HEADER = core_export.h
@@ -35,7 +35,7 @@ ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -lboost_system -lboost_filesystem -lboost_regex
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic $(ADDITIANL_DEPENDENCIES) -o $(TARGET) $(OBJS)
+	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 filetools.o : $(EXPORT_HEADER) filetools.cpp filetools.h stringconversion.o
 	$(CC) $(CFLAGS) filetools.cpp $(ADDITINAL_INCLUDE_DIR)

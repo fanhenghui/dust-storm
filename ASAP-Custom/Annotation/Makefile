@@ -1,4 +1,4 @@
-#Core makefile
+#Annotation makefile
 
 #version (default debug)
 ver = debug
@@ -27,18 +27,18 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/libannotation.so
+TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
 OBJS = Annotation.o AnnotationBase.o AnnotationGroup.o AnnotationList.o Repository.o\
 AnnotationToMask.o BinaryRepository.o ImageScopeRepository.o NDPARepository.o XmlRepository.o AnnotationService.o
 
 EXPORT_HEADER = annotation_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_ROOT_DIR)/io \
--I$(INCLUDE_ROOT_DIR)/io/MultiResolutionImageInterface -I$(INCLUDE_ROOT_DIR)/io/OpenSlideFileformat 
+-I$(INCLUDE_ROOT_DIR)/io/multiresolutionimageinterface -I$(INCLUDE_ROOT_DIR)/io/openslidefileformat 
 
-ADDITIANL_DEPENDENCIES = -L$(LIB_DIR) -lcore -lmultiresolutionimageinterface -lpugixml
+ADDITIANL_DEPENDENCIES = -L$(LIB_DIR) -lcore -lmultiresolutionimageinterface -lpugixml -lmbedcrypto -lmbedtls -lmbedx509  
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic $(ADDITIANL_DEPENDENCIES) -o $(TARGET) $(OBJS)
+	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 filetools.o : $(EXPORT_HEADER) filetools.cpp filetools.h stringconversion.o
 	$(CC) $(CFLAGS) filetools.cpp $(ADDITINAL_INCLUDE_DIR)
