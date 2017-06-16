@@ -8,11 +8,12 @@ CC = g++ -std=c++11
 
 #file direction
 MODULE_NAME = core
-INCLUDE_DIR = ../include
-LIB_DIR = ../lib
+ROOT = ..
+INCLUDE_ROOT_DIR = $(ROOT)/include
+INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/$(MODULE_NAME)
+LIB_DIR = $(ROOT)/lib
 
-VPATH = $(INCLUDE_DIR):$(INCLUDE_DIR)/$(MODULE_NAME)
-#vpath %.h $(INCLUDE_DIR):$(INCLUDE_DIR)/$(MODULE_NAME)
+VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 #debug/release cc
 ifeq ($(ver) , debug)
@@ -22,41 +23,42 @@ CFLAGS += -c -fPIC
 endif
 
 #macro
-DEFS = CORE_STATIC_DEFINE 
-CFLAGS += -D $(DEFS)
+# DEFS = CORE_STATIC_DEFINE 
+# CFLAGS += -D $(DEFS)
 
 #target and obj
 TARGET = $(LIB_DIR)/libcore.so
 OBJS = filetools.o CmdLineProgressMonitor.o ImageSource.o stringconversion.o ProgressMonitor.o Box.o Point.o PathologyEnums.o 
 
 EXPORT_HEADER = core_export.h
+ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
 	$(CC) -shared -fpic -lboost_system -lboost_filesystem -lboost_regex -o $(TARGET) $(OBJS)
 
 filetools.o : $(EXPORT_HEADER) filetools.cpp filetools.h stringconversion.o
-	$(CC) $(CFLAGS) filetools.cpp -I$(INCLUDE_DIR)  -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) filetools.cpp $(ADDITINAL_INCLUDE_DIR)
 
 CmdLineProgressMonitor.o : $(EXPORT_HEADER) CmdLineProgressMonitor.cpp CmdLineProgressMonitor.h ProgressMonitor.o
-	$(CC) $(CFLAGS) CmdLineProgressMonitor.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) CmdLineProgressMonitor.cpp $(ADDITINAL_INCLUDE_DIR)
 	
 ImageSource.o : $(EXPORT_HEADER) ImageSource.cpp ImageSource.h PathologyEnums.o
-	$(CC) $(CFLAGS) ImageSource.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)	
+	$(CC) $(CFLAGS) ImageSource.cpp $(ADDITINAL_INCLUDE_DIR)
 
 stringconversion.o : $(EXPORT_HEADER) stringconversion.cpp stringconversion.h 
-	$(CC) $(CFLAGS) stringconversion.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) stringconversion.cpp $(ADDITINAL_INCLUDE_DIR)
 
 ProgressMonitor.o : $(EXPORT_HEADER) ProgressMonitor.cpp ProgressMonitor.h
-	$(CC) $(CFLAGS) ProgressMonitor.cpp -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) ProgressMonitor.cpp $(ADDITINAL_INCLUDE_DIR)
 
 Box.o : $(EXPORT_HEADER) Box.cpp Box.h
-	$(CC) $(CFLAGS) Box.cpp -I$(INCLUDE_DIR)  -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) Box.cpp $(ADDITINAL_INCLUDE_DIR)
 
 Point.o : $(EXPORT_HEADER) Point.cpp Point.h
-	$(CC) $(CFLAGS) Point.cpp -I$(INCLUDE_DIR)  -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) Point.cpp $(ADDITINAL_INCLUDE_DIR)
 
 PathologyEnums.o : $(EXPORT_HEADER) PathologyEnums.cpp PathologyEnums.h
-	$(CC) $(CFLAGS) PathologyEnums.cpp -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(MODULE_NAME)
+	$(CC) $(CFLAGS) PathologyEnums.cpp $(ADDITINAL_INCLUDE_DIR)
 
 
 .PHONY : clean

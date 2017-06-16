@@ -33,13 +33,13 @@ OBJS = JPEG2000Codec.o TileCache.o AperioSVSWriter.o \
 MultiResolutionImage.o MultiResolutionImageFactory.o MultiResolutionImageReader.o MultiResolutionImageWriter.o \
 LIFImage.o LIFImageFactory.o \
 TIFFImage.o TIFFImageFactory.o \
-VSIImage.o VSIImageFactory.o VSIImageReader.o
-
+VSIImage.o VSIImageFactory.o
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(MODULE_NAME)
 EXPORT_HEADER = multiresolutionimageinterface_export.h
+
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
-	$(CC) -shared -fpic -lijg8 -ltiff -llibjasper -llibjpeg -lzlib -lpugixml -lboost_system -lboost_filesystem -lboost_regex -lboost_thread \
+	$(CC) -shared -fpic -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem -lboost_regex -lboost_thread \
 	-lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509 -o $(TARGET) $(OBJS)
 
 MultiResolutionImageReader.o : $(EXPORT_HEADER) MultiResolutionImageReader.cpp MultiResolutionImageReader.h MultiResolutionImageFactory.o
@@ -51,11 +51,8 @@ MultiResolutionImageFactory.o : $(EXPORT_HEADER) MultiResolutionImageFactory.cpp
 MultiResolutionImageWriter.o : $(EXPORT_HEADER) MultiResolutionImageWriter.cpp MultiResolutionImageWriter.h MultiResolutionImage.o JPEG2000Codec.o
 	$(CC) $(CFLAGS) MultiResolutionImageWriter.cpp $(ADDITINAL_INCLUDE_DIR)	
 
-VSIImageReader.o: $(EXPORT_HEADER) VSIImageReader.cpp VSIImageReader.h JPEG2000Codec.o
-	$(CC) $(CFLAGS) VSIImageReader.cpp $(ADDITINAL_INCLUDE_DIR)
-
 VSIImageFactory.o : $(EXPORT_HEADER) VSIImageFactory.cpp VSIImageFactory.h VSIImage.o 
-	$(CC) $(CFLAGS) LIFImageFactory.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) $(CFLAGS) VSIImageFactory.cpp $(ADDITINAL_INCLUDE_DIR)
 
 VSIImage.o : $(EXPORT_HEADER) VSIImage.cpp VSIImage.h MultiResolutionImage.o
 	$(CC) $(CFLAGS) VSIImage.cpp $(ADDITINAL_INCLUDE_DIR)

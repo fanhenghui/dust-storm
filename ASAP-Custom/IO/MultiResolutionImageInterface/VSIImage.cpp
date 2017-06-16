@@ -9,20 +9,21 @@
 #include "core/PathologyEnums.h"
 
 // Include DCMTK LIBJPEG for lossy and lossless JPEG compression
+#ifdef WIN32
+
 extern "C" {
 #define boolean ijg_boolean
-#ifdef WIN32
+
 #include "dcmjpeg/libijg8/jpeglib8.h"
 #include "jpeg_mem_src.h"
-#else
-#include "dcmtk/dcmjpeg/djeijg8.h"
-#include "dcmtk/dcmjpeg/djdijg8.h"
-#include "jpeg_mem_src.h"
-#endif
 
 #undef boolean
 #undef const
 }
+#else
+  #include "jpeglib.h"
+  #include "jpeg_mem_src.h"
+#endif
 
 #include "JPEG2000Codec.h"
 
