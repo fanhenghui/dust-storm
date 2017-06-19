@@ -90,7 +90,7 @@ static bool query_path(std::string& anno_path , char (&md5_hex)[32])
     {
         //create connect
         sql::Driver *driver = get_driver_instance();
-        sql::Connection *con = driver->connect("tcp://127.0.0.1:3306", "root", "0123456");
+        sql::Connection *con = driver->connect("tcp://127.0.0.1:3306", "root", "6ckj1sWR");
         con->setSchema("pathology");
 
         sql::Statement *stmt = con->createStatement();

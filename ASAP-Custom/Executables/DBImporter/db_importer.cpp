@@ -14,8 +14,10 @@
 #include "cppconn/sqlstring.h"
 //mysql end
 
-#include "IO/MultiResolutionImageInterface/MultiResolutionImageReader.h"
-#include "IO/MultiResolutionImageInterface/MultiResolutionImage.h"
+#include <dlfcn.h>
+
+#include "io/multiresolutionimageinterface/MultiResolutionImageReader.h"
+#include "io/multiresolutionimageinterface/MultiResolutionImage.h"
 
 static std::ofstream out_log;
 
@@ -83,7 +85,7 @@ static void get_all_files(const std::string& root, const std::vector<std::string
     }
 }
 
-/*µ¥¸ö×Ö·û×ªÊ®Áù½øÖÆ×Ö·û´®£¬³¤¶ÈÔö´ó2±»*/
+/*å•ä¸ªå­—ç¬¦è½¬åå…­è¿›åˆ¶å­—ç¬¦ä¸²ï¼Œé•¿åº¦å¢žå¤§2è¢«*/
 static void char_to_hex(unsigned char ch, char *szHex)
 {
     int i;
@@ -100,7 +102,7 @@ static void char_to_hex(unsigned char ch, char *szHex)
     szHex[2] = 0;
 }
 
-/*×Ö·û´®×ª»»º¯Êý£¬ÖÐ¼äµ÷ÓÃÉÏÃæµÄº¯Êý*/
+/*å­—ç¬¦ä¸²è½¬æ¢å‡½æ•°ï¼Œä¸­é—´è°ƒç”¨ä¸Šé¢çš„å‡½æ•°*/
 void char_str_to_hex_str(char *pucCharStr, int iSize, char *pszHexStr)
 {
     int i;
@@ -328,11 +330,30 @@ static bool import_anno(sql::Connection *con, unsigned int& file_num, std::vecto
     return true;
 }
 
+void test()
+{
+
+}
+
 int main(int argc , char* argv[])
 {
+
+    ///
+    //test
+    Dl_info dlInfo;
+    dladdr((void*)&test, &dlInfo);
+    std::string pathStr = std::string(dlInfo.dli_fname);
+    std::cout << pathStr << std::endl;
+    ///
+
     LogSheild log_sheild;
-    //exe "ip" "username" "password "database" "type" "file_root"
-    if (argc != 7)
+    //exe "type" "ip" "username" "password "database" "file_root"
+    if(argc == 2 && std::string(argv[1]) =="-h" || std::string(argv[1])=="--help")
+    {
+        std::cout << "\tFormat :[import_type(image or annotation)] [ip] [username] [password] [database] [file_root]\n";
+        return 0;
+    }
+    if (argc != 7)  
     {
         out_log << "ERROR : invalid input.\n";
         out_log << "\tFormat :import_type ip username password database file_root\n";

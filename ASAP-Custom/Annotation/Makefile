@@ -11,7 +11,7 @@ MODULE_NAME = annotation
 ROOT = ..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/$(MODULE_NAME)
-LIB_DIR = $(ROOT)/lib
+BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
@@ -27,7 +27,7 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
+TARGET = $(BIN_DIR)/lib$(MODULE_NAME).so
 OBJS = Annotation.o AnnotationBase.o AnnotationGroup.o AnnotationList.o Repository.o\
 AnnotationToMask.o BinaryRepository.o ImageScopeRepository.o NDPARepository.o XmlRepository.o AnnotationService.o
 
@@ -35,7 +35,7 @@ EXPORT_HEADER = annotation_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_ROOT_DIR)/io \
 -I$(INCLUDE_ROOT_DIR)/io/multiresolutionimageinterface -I$(INCLUDE_ROOT_DIR)/io/openslidefileformat 
 
-ADDITIANL_DEPENDENCIES = -L$(LIB_DIR) -lcore -lmultiresolutionimageinterface -lpugixml -lmbedcrypto -lmbedtls -lmbedx509  
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lcore -lmultiresolutionimageinterface -lpugixml -lmbedcrypto -lmbedtls -lmbedx509  
 
 $(TARGET): $(OBJS) $(EXPORT_HEADER)
 	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

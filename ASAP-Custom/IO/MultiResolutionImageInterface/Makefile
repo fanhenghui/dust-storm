@@ -4,14 +4,14 @@
 ver = debug
 
 #compiler
-CC = g++ -std=c++11
+CC = g++ -Wall -std=c++11
 
 #file direction
 MODULE_NAME = multiresolutionimageinterface
 ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/io
-LIB_DIR = $(ROOT)/lib
+BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR) : $(INCLUDE_DIR)/$(MODULE_NAME)
 #vpath %.h $(INCLUDE_DIR):$(INCLUDE_DIR)/$(MODULE_NAME)
@@ -28,7 +28,7 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
+TARGET = $(BIN_DIR)/lib$(MODULE_NAME).so
 OBJS = JPEG2000Codec.o TileCache.o AperioSVSWriter.o \
 MultiResolutionImage.o MultiResolutionImageFactory.o MultiResolutionImageReader.o MultiResolutionImageWriter.o \
 LIFImage.o LIFImageFactory.o \
@@ -36,8 +36,8 @@ TIFFImage.o TIFFImageFactory.o \
 VSIImage.o VSIImageFactory.o
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/$(MODULE_NAME)
-ADDITIANL_DEPENDENCIES = -L$(LIB_DIR) -lcore -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem \
--lboost_regex -lboost_thread -lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lcore -lijg8 -ltiff -ljasper -ljpeg -lz -lpugixml -lboost_system -lboost_filesystem \
+-lboost_regex -lboost_thread -lboost_chrono -lboost_date_time -lboost_atomic -lmbedcrypto -lmbedtls -lmbedx509 -ldl
 
 EXPORT_HEADER = multiresolutionimageinterface_export.h
 
@@ -71,7 +71,7 @@ TIFFImage.o : $(EXPORT_HEADER) TIFFImage.cpp TIFFImage.h MultiResolutionImage.o
 TIFFImageFactory.o : $(EXPORT_HEADER) TIFFImageFactory.cpp TIFFImageFactory.h TIFFImage.o 
 	$(CC) $(CFLAGS) TIFFImageFactory.cpp $(ADDITINAL_INCLUDE_DIR)
 
-MultiResolutionImage.o : $(EXPORT_HEADER) MultiResolutionImage.cpp MultiResolutionImage.h #$(LIB_DIR)/Core.so
+MultiResolutionImage.o : $(EXPORT_HEADER) MultiResolutionImage.cpp MultiResolutionImage.h #$(BIN_DIR)/Core.so
 	$(CC) $(CFLAGS) MultiResolutionImage.cpp $(ADDITINAL_INCLUDE_DIR)
 
 AperioSVSWriter.o : $(EXPORT_HEADER) AperioSVSWriter.cpp AperioSVSWriter.h JPEG2000Codec.o

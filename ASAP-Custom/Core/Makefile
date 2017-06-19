@@ -4,14 +4,14 @@
 ver = debug
 
 #compiler
-CC = g++ -std=c++11
+CC = g++ -Wall -std=c++11
 
 #file direction
 MODULE_NAME = core
 ROOT = ..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/$(MODULE_NAME)
-LIB_DIR = $(ROOT)/lib
+BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
@@ -27,7 +27,7 @@ endif
 # CFLAGS += -D $(DEFS)
 
 #target and obj
-TARGET = $(LIB_DIR)/lib$(MODULE_NAME).so
+TARGET = $(BIN_DIR)/lib$(MODULE_NAME).so
 OBJS = filetools.o CmdLineProgressMonitor.o ImageSource.o stringconversion.o ProgressMonitor.o Box.o Point.o PathologyEnums.o 
 
 EXPORT_HEADER = core_export.h
