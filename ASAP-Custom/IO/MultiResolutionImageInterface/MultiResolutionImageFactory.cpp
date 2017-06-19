@@ -49,11 +49,6 @@ MultiResolutionImage* MultiResolutionImageFactory::openImage(const std::string& 
 
 typedef void (*FileFormatLoader)();
 
-void test()
-{
-
-}
-
 void MultiResolutionImageFactory::registerExternalFileFormats() {
   if (MultiResolutionImageFactory::_externalFormatsRegistered) {
     return;
