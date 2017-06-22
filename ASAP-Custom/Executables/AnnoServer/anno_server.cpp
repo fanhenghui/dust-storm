@@ -144,6 +144,25 @@ static bool query_path(std::string& anno_path , char (&md5_hex)[32])
     }
 }
 
+#ifdef WIN32
+
+#else
+// void handle_connect(int serversockfd)
+// {
+//     sockaddr_in cli_addr;
+//     socklen_t cli_add_len = sizeof(cli_addr);
+//     int clientsockfd = accept(serversockfd, (struct sockaddr*)&cli_addr, &cli_add_len);
+//     if(clientsockfd < 0)
+//     {
+//         std::cout << "error on accept.\n";
+//         continue;
+//     }
+
+//     char md5[16];
+//     read(clientsockfd ,(char*)(md5), 16);
+// }
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //
 int main(int argc, char* argv[])
@@ -213,8 +232,9 @@ int main(int argc, char* argv[])
     out_log << "server running ...\n";
 #endif
 
+    std::cout << "Jump outof listen\n";
     
-    //accept loop
+//accept loop
     while (1)
     {
 #ifdef WIN32
