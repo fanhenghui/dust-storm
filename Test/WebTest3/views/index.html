@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>Web Medical Viewer</title>
-    <script src = "js/function.js"></script>
+    <script src = "javascripts/function.js"></script>
     <script>
     function signInFunc(){
             document.getElementById("demo").innerHTML=Date();
@@ -12,6 +12,7 @@
     </script>
 </head>
 <body>
+    <a id="head"></a>
     <img src="images/header.png" alt="medical picture">
     <h1>WEB MEDICAL VIEWER</h1>
     <p id="demo">time</p>
@@ -20,15 +21,25 @@
     <div>    
     </div>
     <br>
-    
-    <form>
+    <form name="form_login" onsubmit="onSignIn()">
+        Web review sign in<br>
+        <input type="radio" name="role" value="doctor" checked="true" onchange="onRoleChanged()">Doctor<br>
+        <input type="radio" name="role" value="patient" checked="false" onchange="onRoleChanged()">Patient<br>
         Usename or email address:<br>
         <input type="text" name="username"><br>
         Password:<br>
-        <input type="password" name"password"><br>
+        <input type="password" name="password"><br>
+        <input type="submit" value="Sign in" onclick="signInFunc()"><br>
     </form>
-    <button type="submit" onclick="signInFunc()">Sign in</button>
-
+    
+    <br>
+    <br>
+    <a href="#head">Jump to head</a>
+    <br>
+    <br>
+    <p id="test"></p><br>
+    <button onclick="test()">test</button>
+    
 </body>
 
 
