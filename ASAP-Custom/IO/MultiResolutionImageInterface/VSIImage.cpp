@@ -14,7 +14,7 @@
 extern "C" {
 #define boolean ijg_boolean
 
-#include "dcmjpeg/libijg8/jpeglib8.h"
+#include "dcmtk/dcmjpeg/libijg8/jpeglib8.h"
 #include "jpeg_mem_src.h"
 
 #undef boolean
