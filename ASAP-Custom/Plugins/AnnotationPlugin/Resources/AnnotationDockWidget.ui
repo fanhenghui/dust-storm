@@ -171,6 +171,11 @@
       </column>
       <item>
        <property name="text">
+        <string>疑似病变</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>不确定的病变</string>
        </property>
       </item>

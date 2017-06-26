@@ -3,7 +3,10 @@
 
 #include <string>
 
-#define TUMOR_TYPE_NUM 22
+#define TUMOR_TYPE_NUM 23
+//////////////////////////////////////////////////////////////////////////
+//这个list一定只能在底层扩展好保证对之前的标注结果兼容！！！
+//////////////////////////////////////////////////////////////////////////
 const std::string TUMOR_TYPES[TUMOR_TYPE_NUM] =
 {
     "LGIEN", //低级别上皮内瘤变 腺瘤
@@ -28,6 +31,7 @@ const std::string TUMOR_TYPES[TUMOR_TYPE_NUM] =
     "NO_GEIEN",//无上皮内瘤变
     "Uncertain_GEIEN",//不确定的上皮内瘤变
     "Uncertain",//不确定的病变
+    "SuspectedObject",//疑似病变
 };
 
 struct AnnotationFileHeader

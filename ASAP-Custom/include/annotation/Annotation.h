@@ -22,6 +22,7 @@ public:
         SPLINE = 3,
         POINTSET = 4,
         MEASUREMENT = 5,
+        RECTANGLE = 6,
     };
 
     Annotation();
@@ -59,7 +60,7 @@ public:
 private:
     Type _type;
     std::vector<Point> _coordinates;
-    static const char* _typeStrings[6];
+    static const char* _typeStrings[7];
 
     std::set<std::string> _tumourTypes;
 };

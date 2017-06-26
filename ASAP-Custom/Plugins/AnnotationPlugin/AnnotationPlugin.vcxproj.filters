@@ -81,6 +81,12 @@
     <CustomBuild Include="Resources\AnnotationWorkstationExtensionPlugin_resources.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="RectangleQtAnnotation.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RectangleAnnotationTool.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GeneratedFiles\Debug\moc_MeasurementAnnotationTool.cpp">
@@ -202,6 +208,24 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_AnnotationWorkstationExtensionPlugin_resources.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleAnnotationTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleQtAnnotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RectangleQtAnnotation.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RectangleQtAnnotation.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RectangleAnnotationTool.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RectangleAnnotationTool.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -47,11 +47,18 @@
 #include <iostream>
 #include <fstream>
 
+#include "RectangleAnnotationTool.h"
+#include "RectangleQtAnnotation.h"
+
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationIndex = 0;
 unsigned int AnnotationWorkstationExtensionPlugin::_annotationGroupIndex = 0;
 
+//////////////////////////////////////////////////////////////////////////
+//这个list一定要和UI的带checkbox的项顺序一致，要保持字符串值和Annotation_define.h中的值相同，顺序可以不同
+//////////////////////////////////////////////////////////////////////////
 const static std::string TUMOR_TYPES_TREE[TUMOR_TYPE_NUM] =//For listing
 {
+    "SuspectedObject",//疑似病变
     "Uncertain",//不确定的病变
     "LGIEN", //低级别上皮内瘤变 腺瘤
     "HGIEN", //高级别上皮内瘤变 腺瘤
@@ -299,6 +306,9 @@ void AnnotationWorkstationExtensionPlugin::updateAnnotationWidget()
         }
         else if ((*it)->getType() == Annotation::Type::POINTSET) {
             annot = new PointSetQtAnnotation((*it), this, _viewer->getSceneScale());
+        }
+        else if ((*it)->getType() == Annotation::Type::RECTANGLE) {
+            annot = new RectangleQtAnnotation((*it), this, _viewer->getSceneScale());
         }
         if (annot) {
             annot->finish();
@@ -963,6 +973,8 @@ bool AnnotationWorkstationExtensionPlugin::initialize(PathologyViewer* viewer) {
     _annotationTools.push_back(tool);
     tool.reset(new MeasurementAnnotationTool(this, viewer));
     _annotationTools.push_back(tool);
+    tool.reset(new RectangleAnnotationTool(this, viewer));
+    _annotationTools.push_back(tool);
     _annotationService.reset(new AnnotationService());
     return true;
 }
@@ -1001,6 +1013,11 @@ void AnnotationWorkstationExtensionPlugin::startAnnotation(float x, float y, con
     else if (type == "measurementannotation") {
         annot->setType(Annotation::Type::MEASUREMENT);
         MeasurementQtAnnotation* temp = new MeasurementQtAnnotation(annot, this, _viewer->getSceneScale());
+        _generatedAnnotation = temp;
+    }
+    else if (type == "rectangleannotation") {
+        annot->setType(Annotation::Type::RECTANGLE);
+        RectangleQtAnnotation* temp = new RectangleQtAnnotation(annot, this, _viewer->getSceneScale());
         _generatedAnnotation = temp;
     }
     else {
