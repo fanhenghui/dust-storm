@@ -27,11 +27,46 @@ io.on('connection', function(socket){
 		socket.name = obj.userid;
 
 		///////////////////////////////////////
-	//For testing process
-	const out = fs.openSync('./out_'+util.inspect(obj.username) + '.log', 'a');
-	const err = fs.openSync('./err_'+util.inspect(obj.username) + '.log', 'a');
-	var worker = child_process.spawn('./talker' ,[obj.username] ,{detached: true, stdio: [ 'ignore', out, err ]});
-		
+	    //Test 1 process 启动一个后台进程
+	    const out = fs.openSync('./out_'+util.inspect(obj.username) + '.log', 'a');
+	    const err = fs.openSync('./err_'+util.inspect(obj.username) + '.log', 'a');
+	    var worker = child_process.spawn('./talker' ,[obj.username] ,{detached: true, stdio: [ 'ignore', out, err ]});
+		///////////////////////////////////////
+
+		///////////////////////////////////////
+	    //Test 2 process 启动一个后台进程，并且能够和websocket服务器通信
+		var node_ipc=require('node-ipc');
+
+        const ipc=new node_ipc.IPC;
+    
+		console.log("path is : " + obj.username);
+        ipc.config.id   = obj.username;//'world' + i;
+        ipc.config.retry= 1500;
+    
+        ipc.serve(function(){
+    
+            ipc.config.rawBuffer=true;
+            ipc.server.on('data',function(buffer,socket){
+                
+                ipc.log('got a data : ' + buffer.length);
+                ipc.log(buffer.toString('ascii'));
+            });
+    
+            ipc.server.on('message',function(data,socket){
+                
+                ipc.log('got a message : ', data);
+                ipc.server.emit(socket,'message',  //this can be anything you want so long as your client knows. 
+                        data+' world!');
+            });
+    
+            ipc.server.on('socket.disconnected', function(socket, destroyedSocketID) {
+                    ipc.log('client ' + destroyedSocketID + ' has disconnected!');
+            });
+        });
+		ipc.server.start();
+		///////////////////////////////////////
+
+
 		//检查在线列表，如果不在里面就加入
 		if(!onlineUsers.hasOwnProperty(obj.userid)) {
 			onlineUsers[obj.userid] = obj.username;
