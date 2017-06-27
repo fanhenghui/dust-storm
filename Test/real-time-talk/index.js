@@ -28,9 +28,9 @@ io.on('connection', function(socket){
 
 		///////////////////////////////////////
 	//For testing process
-	const out = fs.openSync('./out_'+util.inspect(socket.name) + '.log', 'a');
-	const err = fs.openSync('./err_'+util.inspect(socket.name) + '.log', 'a');
-	var worker = child_process.spawn('./worker' ,[socket.name] ,{detached: true, stdio: [ 'ignore', out, err ]});
+	const out = fs.openSync('./out_'+util.inspect(obj.username) + '.log', 'a');
+	const err = fs.openSync('./err_'+util.inspect(obj.username) + '.log', 'a');
+	var worker = child_process.spawn('./talker' ,[obj.username] ,{detached: true, stdio: [ 'ignore', out, err ]});
 		
 		//检查在线列表，如果不在里面就加入
 		if(!onlineUsers.hasOwnProperty(obj.userid)) {
