@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="NoduleAnnotation">
+    <qresource prefix="/NoduleAnnotation">
+        <file>lung.png</file>
     </qresource>
 </RCC>

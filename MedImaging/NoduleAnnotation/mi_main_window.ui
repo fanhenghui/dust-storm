@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>NoduleAnnotation</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="mi_main_window.qrc">
+    <normaloff>:/NoduleAnnotation/lung.png</normaloff>:/NoduleAnnotation/lung.png</iconset>
+  </property>
   <property name="autoFillBackground">
    <bool>true</bool>
   </property>
