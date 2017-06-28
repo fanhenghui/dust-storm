@@ -24,19 +24,29 @@ window.FE = {
         //发送一段message
         this.socket.emit("message",{userid:this.userid , username:this.username , content:"first message"});
 
+        // this.socket.on("tick" , function(obj))
+        // {
+
+        // }
+
 
     },
 
-    userLogin:function()
+    userLogOut:function()
+    {
+        //this.socket.emit("logout",{userid:this.userid , username:this.username , content:"last message"});
+        //this.socket.emit("disconnect" , {userid:this.userid , username:this.username});
+        location.reload();
+    },
+
+
+    userLogIn:function()
     {
         var username = document.getElementById("username").value;
         
         this.init(username);
     },
 
-    userLogOut:function()
-    {
-        location.reload();
-    }
+    
 }
 })()
