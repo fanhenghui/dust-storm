@@ -1,4 +1,9 @@
 (function(){
+
+myCanvas = document.getElementById("myCanvas");
+myCtx = myCanvas.getContext("2d");
+myCanvasImg = myCtx.createImageData(myCanvas.width , myCanvas.height);
+
 window.FE = {
     username:null,
     userid:null,
@@ -46,7 +51,24 @@ window.FE = {
         
         this.init(username);
     },
-
-    
 }
+
+window.LOGIC = {
+    
+    drawImg:function()
+    {
+        for (var i=0;i<myCanvasImg.data.length;i+=4){
+            myCanvasImg.data[i]=255;//返回一个对象，其包含指定的 ImageData 对象的图像数据
+            myCanvasImg.data[i+1]=255;
+            myCanvasImg.data[i+2]=0;
+            myCanvasImg.data[i+3]=255;
+        }
+        myCtx.putImageData(myCanvasImg,0,0);//把图像数据（从指定的 ImageData 对象）放回画布上
+    },
+
+}
+
+
+
+
 })()
