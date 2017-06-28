@@ -86,6 +86,8 @@ io.on("connection" , function(socket){
                 onlineLocalSockets[obj.userid] = local_socket;
             });
 
+            ///////////////////////////////////////
+            //FE socket 收到BE的数据然后转发给Web FE
             ipc.server.on('data',function(buffer,local_socket){
 
                 ipc.log('got a data : ' + buffer.length);
@@ -96,7 +98,10 @@ io.on("connection" , function(socket){
                 {
                     ipc.log("buffer len : " + len);
                     ipc.log(buffer.toString('utf8',16,buffer.length));
+                    socket.emit("talk" , buffer);
                 }
+
+                
                 
                 
             });
@@ -108,8 +113,6 @@ io.on("connection" , function(socket){
         });
 		ipc.server.start();
         onlineLocalIPC[obj.userid] = ipc;
-
-        //ipc.server.stop();
         ///////////////////////////////////////
 
         ///////////////////////////////////////
@@ -140,7 +143,7 @@ io.on("connection" , function(socket){
         console.log(obj.username + " has disconnecting.");
         console.log("id : " +userid);
 
-        //发最后一个消息给c++ 业务逻辑进程
+        //发最后一个消息给c++ 业务逻辑进程来关闭该进程
         var ipc = onlineLocalIPC[userid];
         var local_socket = onlineLocalSockets[userid];
         //ipc.config.encoding='hex';

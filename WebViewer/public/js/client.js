@@ -34,6 +34,26 @@ window.FE = {
 
         // }
 
+        this.socket.on("talk",function(blob){
+            console.log("receive talk from websock.");
+            //解析buffer
+            console.log(blob.byteLength);
+            var reader = new FileReader();
+            reader.addEventListener("loadend", function() {
+                // reader.result contains the contents of blob as a typed array
+                console.log(reader.result);
+            });
+            reader.readAsBinaryString(blob);
+            
+            // var tag = buffer.readIntLE(0,4);
+            // var len = buffer.readIntLE(4,4);
+            // if(tag == 0)
+            // {
+            //     console.log("buffer len : " + len);
+            //     console.log(buffer.toString('utf8',16,buffer.length));
+            // }
+        })
+
 
     },
 
