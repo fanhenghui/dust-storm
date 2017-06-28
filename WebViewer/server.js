@@ -73,21 +73,32 @@ io.on("connection" , function(socket){
 		console.log("UNIX path is : " + obj.username);
         ipc.config.id = obj.username;
         ipc.config.retry= 1500;
-    
+        ipc.config.rawBuffer=true;
+        ipc.config.encoding='hex';
+
         ipc.serve(function(){
     
-            ipc.config.rawBuffer=true;
-
             ipc.server.on('connect' , function(local_socket){
+                ///////////////////////////////////////
+                //这里在生产环境下要注意，虽然一个逻辑是ipc仅仅构造一个C++逻辑进程，但这样做也是不合适的
+                ///////////////////////////////////////
                 console.log('IPC connect');
                 onlineLocalSockets[obj.userid] = local_socket;
             });
 
             ipc.server.on('data',function(buffer,local_socket){
-                
+
                 ipc.log('got a data : ' + buffer.length);
-                buffer.slice()
-                ipc.log(buffer.toString('ascii'));
+                //解析buffer
+                var tag = buffer.readIntLE(0,4);
+                var len = buffer.readIntLE(4,4);
+                if(tag == 0)
+                {
+                    ipc.log("buffer len : " + len);
+                    ipc.log(buffer.toString('utf8',16,buffer.length));
+                }
+                
+                
             });
 
             ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {
@@ -138,6 +149,7 @@ io.on("connection" , function(socket){
         quitMsg.writeIntLE(-1,0,4);
         quitMsg.writeIntLE(0,4,4);
         quitMsg.writeIntLE(0,8,8);
+
         
         ipc.server.emit(local_socket , quitMsg);
         ipc.server.stop();//关闭IPC
@@ -146,6 +158,7 @@ io.on("connection" , function(socket){
 		delete onlineUsers[userid];
         delete onlineLocalSockets[userid];
         delete onlineLogicProcessID[userid];
+        delete onlineLocalIPC[userid];
 		onlineCount--;
 
         console.log(obj.username + " disconnecting success.");

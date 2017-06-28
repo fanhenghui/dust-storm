@@ -38,7 +38,7 @@ void message_queue(int fd_remote)
         }
         std::cout << "BE : " << msg.buffer << std::endl;
         send(fd_remote , &msg , sizeof(msg) , 0);
-        
+        send(fd_remote , msg.buffer ,msg.len , 0);
         if(tick == 200){
             return;
         }
