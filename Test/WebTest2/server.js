@@ -43,7 +43,7 @@ app.post("/login_in" , urlencodedParser , function(req , res){
     if(req.body.username == "wr" && req.body.password == "000000"){
     
         console.log("login in success.");
-        var worker = child_process.spawn('./', ['1']);
+        var worker = child_process.spawn('./worker', ['1']);
 
         res.sendFile(__dirname + "/" + "jump.html");
     }

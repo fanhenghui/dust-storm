@@ -97,7 +97,7 @@
 			this.scrollToBottom();
 			
 			//连接websocket后端服务器
-			this.socket = io.connect('http://localhost:3000');
+			this.socket = io.connect('http://localhost:8000');
 			
 			//告诉服务器端有用户登录
 			this.socket.emit('login', {userid:this.userid, username:this.username});
@@ -132,18 +132,18 @@
 
 		}
 	};
-	//通过“回车”提交用户名
-	d.getElementById("username").onkeydown = function(e) {
-		e = e || event;
-		if (e.keyCode === 13) {
-			CHAT.usernameSubmit();
-		}
-	};
-	//通过“回车”提交信息
-	d.getElementById("content").onkeydown = function(e) {
-		e = e || event;
-		if (e.keyCode === 13) {
-			CHAT.submit();
-		}
-	};
+	// //通过“回车”提交用户名
+	// d.getElementById("username").onkeydown = function(e) {
+	// 	e = e || event;
+	// 	if (e.keyCode === 13) {
+	// 		CHAT.usernameSubmit();
+	// 	}
+	// };
+	// //通过“回车”提交信息
+	// d.getElementById("content").onkeydown = function(e) {
+	// 	e = e || event;
+	// 	if (e.keyCode === 13) {
+	// 		CHAT.submit();
+	// 	}
+	// };
 })();

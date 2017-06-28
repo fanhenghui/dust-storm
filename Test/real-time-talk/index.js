@@ -46,20 +46,20 @@ io.on('connection', function(socket){
         ipc.serve(function(){
     
             ipc.config.rawBuffer=true;
-            ipc.server.on('data',function(buffer,socket){
+            ipc.server.on('data',function(buffer,local_socket){
                 
                 ipc.log('got a data : ' + buffer.length);
                 ipc.log(buffer.toString('ascii'));
             });
     
-            ipc.server.on('message',function(data,socket){
+            ipc.server.on('message',function(data,local_socket){
                 
                 ipc.log('got a message : ', data);
-                ipc.server.emit(socket,'message',  //this can be anything you want so long as your client knows. 
+                ipc.server.emit(local_socket,'message',  //this can be anything you want so long as your client knows. 
                         data+' world!');
             });
     
-            ipc.server.on('socket.disconnected', function(socket, destroyedSocketID) {
+            ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {
                     ipc.log('client ' + destroyedSocketID + ' has disconnected!');
             });
         });
@@ -106,6 +106,6 @@ io.on('connection', function(socket){
   
 });
 
-http.listen(3000, function(){
-	console.log('listening on *:3000');
+http.listen(8000, function(){
+	console.log('listening on *:8000');
 });
