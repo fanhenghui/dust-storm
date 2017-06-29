@@ -34,26 +34,17 @@ window.FE = {
 
         // }
 
-        this.socket.on("talk",function(blob){
-            console.log("receive talk from websock.");
-            //解析buffer
-            console.log(blob.byteLength);
-            var reader = new FileReader();
-            reader.addEventListener("loadend", function() {
-                // reader.result contains the contents of blob as a typed array
-                console.log(reader.result);
-            });
-            reader.readAsBinaryString(blob);
+        this.socket.on("talk",function(arraybuffer){
+            var tag = new Int32Array(arraybuffer,0,1);
+            console.log("tag : " + tag[0]);
+            var len = new Int32Array(arraybuffer,4,1);
+            console.log("length : " + len[0]);
+            if(tag == 0)
+            {
+                var message = new Inr
+            }
             
-            // var tag = buffer.readIntLE(0,4);
-            // var len = buffer.readIntLE(4,4);
-            // if(tag == 0)
-            // {
-            //     console.log("buffer len : " + len);
-            //     console.log(buffer.toString('utf8',16,buffer.length));
-            // }
-        })
-
+        });
 
     },
 

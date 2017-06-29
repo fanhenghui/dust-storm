@@ -123,7 +123,7 @@ int main(int argc , char* argv[])
     {
         connect_status = connect(fd_s , (struct sockaddr*)(&remote) ,len );
         if(connect_status != -1)
-        {
+            {
             break;
         }
         std::cout << "connecting : " << i << std::endl;
