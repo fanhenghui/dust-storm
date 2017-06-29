@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#include <memory>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -13,38 +14,66 @@
 #include <mutex>
 
 #include "common.h"
+#include "img_gen.h"
 
 static std::mutex io_mutex;
 
+//#define TEST_IMG
+
+std::shared_ptr<ImgGen> _imgGen;
+
 void message_queue(int fd_remote)
 {
-    /////////////////////////////////////////////////////////
-    //For test tick
+    if(!_imgGen){
+        _imgGen.reset(new ImgGen());
+    }
     int tick =0;
-    while(true)
-    {
+    while(true){
         ++tick;
-        //100次循环发送一个心跳
-        sleep(2);
-        std::cout << "tick " << std::endl;
-        std::string msg_str = std::string("I am still on!");
-        Msg msg;
-        msg.tag = 0;
-        msg.len = msg_str.size() + 1;
-        msg.buffer = new char[msg.len];
-        msg.buffer[msg.len-1] = '\0';
-        for(int i = 0; i<msg.len-1 ; ++i) {
-            msg.buffer[i] = msg_str[i];
-        }
-        std::cout << "BE : " << msg.buffer << std::endl;
-        send(fd_remote , &msg , sizeof(msg) , 0);
-        send(fd_remote , msg.buffer ,msg.len , 0);
-        if(tick == 200) {
+        if(tick == 1000000){
             return;
         }
+
+        //1秒触发一次    
+        sleep(0.05);
+
+        Msg msg;
+        msg.tag = 1;
+        msg.len = 64*64*4;
+        msg.buffer = (char*)(_imgGen->gen_img(64,64));
+
+        send(fd_remote , &msg , sizeof(msg) , 0);
+        send(fd_remote , msg.buffer ,msg.len , 0);
+        
     }
+    /////////////////////////////////////////////////////////
+    //For test tick
+    // int tick =0;
+    // while(true)
+    // {
+    //     ++tick;
+    //     //100次循环发送一个心跳
+    //     sleep(2);
+    //     std::cout << "tick " << std::endl;
+    //     std::string msg_str = std::string("I am still on!");
+    //     Msg msg;
+    //     msg.tag = 0;
+    //     msg.len = msg_str.size() + 1;
+    //     msg.buffer = new char[msg.len];
+    //     msg.buffer[msg.len-1] = '\0';
+    //     for(int i = 0; i<msg.len-1 ; ++i) {
+    //         msg.buffer[i] = msg_str[i];
+    //     }
+    //     std::cout << "BE : " << msg.buffer << std::endl;
+    //     send(fd_remote , &msg , sizeof(msg) , 0);
+    //     send(fd_remote , msg.buffer ,msg.len , 0);
+    //     if(tick == 200) {
+    //         return;
+    //     }
+    // }
     //For test tick
     /////////////////////////////////////////////////////////
+    
 
     std::string in;
     while(std::cin >> in) {

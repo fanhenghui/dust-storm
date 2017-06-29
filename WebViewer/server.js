@@ -89,21 +89,23 @@ io.on("connection" , function(socket){
             ///////////////////////////////////////
             //FE socket 收到BE的数据然后转发给Web FE
             ipc.server.on('data',function(buffer,local_socket){
-
+                
                 ipc.log('got a data : ' + buffer.length);
                 //解析buffer
                 var tag = buffer.readIntLE(0,4);
                 var len = buffer.readIntLE(4,4);
                 if(tag == 0)
                 {
-                    ipc.log("buffer len : " + len);
-                    ipc.log(buffer.toString('utf8',16,buffer.length));
+                    console.log("ipc : string len : " + len);
+                    console.log("ipc : " + buffer.toString('utf8',16,buffer.length));
                     socket.emit("talk" , buffer);
                 }
+                else if(tag == 1)
+                {
+                    console.log("raw buffer length : " + len);
+                    socket.emit("image" , buffer);
+                }
 
-                
-                
-                
             });
 
             ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {

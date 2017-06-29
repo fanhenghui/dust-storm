@@ -35,15 +35,41 @@ window.FE = {
         // }
 
         this.socket.on("talk",function(arraybuffer){
+            console.log(arraybuffer.byteLength);
+            // var tag = new Int32Array(arraybuffer,0,1);
+            // console.log("tag : " + tag[0]);
+            // var len = new Int32Array(arraybuffer,4,1);
+            // console.log("length : " + len[0]);
+            
+            // if(tag == 0){   
+            //     var msg = new Int8Array(arraybuffer , 16,len[0]);
+            //     var s = new String;
+            //     for(var i = 0 ; i< len ; ++i)
+            //     {
+            //         s += msg[i];
+            //     }
+            //     console.log(s);
+            // }
+            
+        });
+
+
+        this.socket.on("image" , function(arraybuffer){
             var tag = new Int32Array(arraybuffer,0,1);
             console.log("tag : " + tag[0]);
             var len = new Int32Array(arraybuffer,4,1);
             console.log("length : " + len[0]);
-            if(tag == 0)
-            {
-                var message = new Inr
+            if(tag == 1){
+                if(len[0] == myCanvasImg.data.length){
+                    console.log("ready to draw ... ");
+                    var imgBuffer = new Uint8Array(arraybuffer , 16, len[0]);
+                    for(var i = 0;i<myCanvasImg.data.length;++i){
+                        myCanvasImg.data[i] = imgBuffer[i];
+                    }
+                    myCtx.putImageData(myCanvasImg,0,0);
+                    console.log("draw end ... ");
+                }
             }
-            
         });
 
     },
