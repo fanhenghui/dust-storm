@@ -10,10 +10,10 @@ const out = fs.openSync('./out.log', 'a');
 const err = fs.openSync('./out.log', 'a');
 
 var worker = child_process.spawn('./worker' ,['1'] ,{detached: true,
-  stdio: 'ignore'});
+  stdio: [ 'ignore', out, err ]});
 
 var worker2 = child_process.spawn('./worker' ,['2'] ,{detached:true,
-  stdio: 'ignore'});
+  stdio: [ 'ignore', out, err ]});
 
 // worker.stdout.on('data', function (data) {
 //       console.log('stdout: ' + data);

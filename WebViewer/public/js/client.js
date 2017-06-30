@@ -26,7 +26,7 @@ window.FE = {
         this.username = username;
 
         //链接websocket服务器
-        this.socket = io.connect("http://localhost:8080");
+        this.socket = io.connect("http://172.23.236.115:8080");
 
         //通知服务器有用户登录
         this.socket.emit("login" , {userid:this.userid , username:this.username});
@@ -65,9 +65,9 @@ window.FE = {
             bufferOffset = 0;
             if(msgEnd){
                 var tag = new Int32Array(arraybuffer,0,1);
-                console.log("tag : " + tag[0]);
+                //console.log("tag : " + tag[0]);
                 var len = new Int32Array(arraybuffer,4,1);
-                console.log("length : " + len[0]);
+                //console.log("length : " + len[0]);
 
                 msgTag = tag[0];
                 msgLen = len[0];lastPixel = 0;

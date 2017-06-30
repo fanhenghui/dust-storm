@@ -132,18 +132,18 @@
 
 		}
 	};
-	// //通过“回车”提交用户名
-	// d.getElementById("username").onkeydown = function(e) {
-	// 	e = e || event;
-	// 	if (e.keyCode === 13) {
-	// 		CHAT.usernameSubmit();
-	// 	}
-	// };
-	// //通过“回车”提交信息
-	// d.getElementById("content").onkeydown = function(e) {
-	// 	e = e || event;
-	// 	if (e.keyCode === 13) {
-	// 		CHAT.submit();
-	// 	}
-	// };
+	//通过“回车”提交用户名
+	d.getElementById("username").onkeydown = function(e) {
+		e = e || event;
+		if (e.keyCode === 13) {
+			CHAT.usernameSubmit();
+		}
+	};
+	//通过“回车”提交信息
+	d.getElementById("content").onkeydown = function(e) {
+		e = e || event;
+		if (e.keyCode === 13) {
+			CHAT.submit();
+		}
+	};
 })();
