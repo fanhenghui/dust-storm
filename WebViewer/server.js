@@ -38,8 +38,14 @@ var onlineLocalIPC = {};
 var onlineLogicProcessID = {};
 var onlineCount = 0;
 
+
 io.on("connection" , function(socket){
     console.log("<><><><><><> connecting <><><><><><>");
+
+    var msgEnd = true;
+    var msgTag = -1;
+    var msgLen = 0;
+    var msgRest = 0;
 
     //监听用户加入
     socket.on("login" , function(obj){
@@ -88,25 +94,56 @@ io.on("connection" , function(socket){
 
             ///////////////////////////////////////
             //FE socket 收到BE的数据然后转发给Web FE
+            //需要解析包以及发包
+            ///////////////////////////////////////
             ipc.server.on('data',function(buffer,local_socket){
                 
                 ipc.log('got a data : ' + buffer.length);
-                //解析buffer
-                var tag = buffer.readIntLE(0,4);
-                var len = buffer.readIntLE(4,4);
-                if(tag == 0)
-                {
-                    console.log("ipc : string len : " + len);
-                    console.log("ipc : " + buffer.toString('utf8',16,buffer.length));
-                    socket.emit("talk" , buffer);
-                }
-                else if(tag == 1)
-                {
-                    console.log("raw buffer length : " + len);
-                    socket.emit("image" , buffer);
-                }
+                //解析下一个报文
+                if(msgEnd){
+                    //解析buffer
+                    msgTag = buffer.readIntLE(0,4);
+                    msgLen = buffer.readIntLE(4,4);
+                    msgRest = msgLen;
+                    msgEnd = false;
 
+                    console.log("receive be message : tag " + msgTag);
+                    if(msgTag == 0){
+                        socket.emit("talk" , buffer);
+                    }
+                    else {
+                        socket.emit("image", buffer);
+                    }
+                    msgRest -= (buffer.length - 16);
+                    //一次报文包含了所有信息，不需要分包发送
+                    if(msgRest <=0 ){
+                        msgEnd = true;
+                        msgLen = 0;
+                        msgTag = -1;
+                    }
+                    
+                }
+                //持续传递上一个报文
+                else
+                {
+                    console.log("sending message : " + buffer.length);
+                    if(msgTag == 0){
+                        socket.emit("talk" , buffer);
+                        console.log("talk : " + buffer.toString('utf8',16,buffer.length));
+                    }
+                    else {
+                        socket.emit("image", buffer);
+                    }
+
+                    msgRest -= buffer.length;
+                    if(msgRest <=0 ){
+                        msgEnd = true;
+                        msgLen = 0;
+                        msgTag = -1;
+                    }
+                }
             });
+
 
             ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {
                     ipc.log('client ' + destroyedSocketID + ' has disconnected!');

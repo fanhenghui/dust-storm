@@ -22,6 +22,9 @@ static std::mutex io_mutex;
 
 std::shared_ptr<ImgGen> _imgGen;
 
+int width = 512;
+int height = 512;
+
 void message_queue(int fd_remote)
 {
     if(!_imgGen){
@@ -35,16 +38,19 @@ void message_queue(int fd_remote)
         }
 
         //1秒触发一次    
-        sleep(0.05);
+        usleep(50000);
 
         Msg msg;
         msg.tag = 1;
-        msg.len = 64*64*4;
-        msg.buffer = (char*)(_imgGen->gen_img(64,64));
+        msg.len = width*height*4;
+        msg.buffer = (char*)(_imgGen->gen_img(width,height));
+        char* buffer = new char[msg.len + 16];
+        memcpy(buffer , &(msg) , 16);
+        memcpy(buffer+16 , msg.buffer , msg.len);
 
-        send(fd_remote , &msg , sizeof(msg) , 0);
-        send(fd_remote , msg.buffer ,msg.len , 0);
+        send(fd_remote , buffer ,msg.len+16 , 0);
         
+        delete [] buffer;
     }
     /////////////////////////////////////////////////////////
     //For test tick

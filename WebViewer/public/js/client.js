@@ -4,6 +4,11 @@ myCanvas = document.getElementById("myCanvas");
 myCtx = myCanvas.getContext("2d");
 myCanvasImg = myCtx.createImageData(myCanvas.width , myCanvas.height);
 
+msgEnd = true;
+msgRest = 0;
+msgLen = 0;
+msgTag = 0;
+
 window.FE = {
     username:null,
     userid:null,
@@ -55,21 +60,55 @@ window.FE = {
 
 
         this.socket.on("image" , function(arraybuffer){
-            var tag = new Int32Array(arraybuffer,0,1);
-            console.log("tag : " + tag[0]);
-            var len = new Int32Array(arraybuffer,4,1);
-            console.log("length : " + len[0]);
-            if(tag == 1){
-                if(len[0] == myCanvasImg.data.length){
-                    console.log("ready to draw ... ");
-                    var imgBuffer = new Uint8Array(arraybuffer , 16, len[0]);
-                    for(var i = 0;i<myCanvasImg.data.length;++i){
-                        myCanvasImg.data[i] = imgBuffer[i];
-                    }
-                    myCtx.putImageData(myCanvasImg,0,0);
-                    console.log("draw end ... ");
+
+            curImgLen = arraybuffer.byteLength;
+            bufferOffset = 0;
+            if(msgEnd){
+                var tag = new Int32Array(arraybuffer,0,1);
+                console.log("tag : " + tag[0]);
+                var len = new Int32Array(arraybuffer,4,1);
+                console.log("length : " + len[0]);
+
+                msgTag = tag[0];
+                msgLen = len[0];lastPixel = 0;
+                msgRest = msgLen;
+                msgEnd = false;
+
+                curImgLen = arraybuffer.byteLength - 16;
+                bufferOffset = 16;
+            }
+
+            if(curImgLen > 0){
+                var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
+                for(var i = 0 ; i< curImgLen ; ++i){
+                    myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
                 }
             }
+
+            msgRest -= curImgLen;
+            if(msgRest <= 0){
+                msgRest = 0;
+                msgTag = -1;
+                msgLen = 0;
+                msgEnd = true;
+                myCtx.putImageData(myCanvasImg,0,0);
+            }
+
+            // var tag = new Int32Array(arraybuffer,0,1);
+            // console.log("tag : " + tag[0]);
+            // var len = new Int32Array(arraybuffer,4,1);
+            // console.log("length : " + len[0]);
+            // if(tag == 1){
+            //     if(len[0] == myCanvasImg.data.length){
+            //         console.log("ready to draw ... ");
+            //         var imgBuffer = new Uint8Array(arraybuffer , 16, len[0]);
+            //         for(var i = 0;i<myCanvasImg.data.length;++i){
+            //             myCanvasImg.data[i] = imgBuffer[i];
+            //         }
+            //         myCtx.putImageData(myCanvasImg,0,0);
+            //         console.log("draw end ... ");
+            //     }
+            // }
         });
 
     },
