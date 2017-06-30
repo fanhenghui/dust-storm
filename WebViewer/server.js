@@ -98,7 +98,7 @@ io.on("connection" , function(socket){
             ///////////////////////////////////////
             ipc.server.on('data',function(buffer,local_socket){
                 
-                ipc.log('got a data : ' + buffer.length);
+                //ipc.log('got a data : ' + buffer.length);
                 //解析下一个报文
                 if(msgEnd){
                     //解析buffer
@@ -107,7 +107,7 @@ io.on("connection" , function(socket){
                     msgRest = msgLen;
                     msgEnd = false;
 
-                    console.log("receive be message : tag " + msgTag);
+                    //console.log("receive be message : tag " + msgTag);
                     if(msgTag == 0){
                         socket.emit("talk" , buffer);
                     }
@@ -126,10 +126,10 @@ io.on("connection" , function(socket){
                 //持续传递上一个报文
                 else
                 {
-                    console.log("sending message : " + buffer.length);
+                    //console.log("sending message : " + buffer.length);
                     if(msgTag == 0){
                         socket.emit("talk" , buffer);
-                        console.log("talk : " + buffer.toString('utf8',16,buffer.length));
+                        //console.log("talk : " + buffer.toString('utf8',16,buffer.length));
                     }
                     else {
                         socket.emit("image", buffer);

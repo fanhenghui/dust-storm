@@ -20,21 +20,34 @@ static std::mutex io_mutex;
 
 //#define TEST_IMG
 
-std::shared_ptr<ImgGen> _imgGen;
-
+// std::shared_ptr<ImgGen> _imgGen;
 int width = 512;
 int height = 512;
 
+
+std::shared_ptr<ImgSeqGen> _imgGen;
+int deep = 713;
+std::string data_path = "/home/wr/data/AB_CTA_01.raw";
+
+
+
 void message_queue(int fd_remote)
 {
+    /////////////////////////////////////////////////////////
+    //Test 3 sequace image
     if(!_imgGen){
-        _imgGen.reset(new ImgGen());
+        _imgGen.reset(new ImgSeqGen());
+        _imgGen->set_raw_data(data_path , width,height,deep);
     }
     int tick =0;
     while(true){
         ++tick;
         if(tick == 1000000){
             return;
+        }
+        static int slice = 0;
+        if(slice > deep - 1){
+            slice = 0;
         }
 
         //1秒触发一次    
@@ -43,7 +56,7 @@ void message_queue(int fd_remote)
         Msg msg;
         msg.tag = 1;
         msg.len = width*height*4;
-        msg.buffer = (char*)(_imgGen->gen_img(width,height));
+        msg.buffer = (char*)(_imgGen->gen_img(slice++));
         char* buffer = new char[msg.len + 16];
         memcpy(buffer , &(msg) , 16);
         memcpy(buffer+16 , msg.buffer , msg.len);
@@ -53,7 +66,38 @@ void message_queue(int fd_remote)
         delete [] buffer;
     }
     /////////////////////////////////////////////////////////
-    //For test tick
+    
+    /////////////////////////////////////////////////////////
+    //Test 2 black image
+    // if(!_imgGen){
+    //     _imgGen.reset(new ImgGen());
+    // }
+    // int tick =0;
+    // while(true){
+    //     ++tick;
+    //     if(tick == 1000000){
+    //         return;
+    //     }
+
+    //     //1秒触发一次    
+    //     usleep(50000);
+
+    //     Msg msg;
+    //     msg.tag = 1;
+    //     msg.len = width*height*4;
+    //     msg.buffer = (char*)(_imgGen->gen_img(width,height));
+    //     char* buffer = new char[msg.len + 16];
+    //     memcpy(buffer , &(msg) , 16);
+    //     memcpy(buffer+16 , msg.buffer , msg.len);
+
+    //     send(fd_remote , buffer ,msg.len+16 , 0);
+        
+    //     delete [] buffer;
+    // }
+    /////////////////////////////////////////////////////////
+
+    /////////////////////////////////////////////////////////
+    //Test 1 string message
     // int tick =0;
     // while(true)
     // {
