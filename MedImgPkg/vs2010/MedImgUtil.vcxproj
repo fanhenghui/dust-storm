@@ -160,6 +160,8 @@
     <ClInclude Include="..\Include\MedImgUtil\mi_message_queue.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_model_interface.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_observer_interface.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_socket_client.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_socket_server.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_string_number_converter.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_util_export.h" />
   </ItemGroup>
@@ -167,6 +169,8 @@
     <ClCompile Include="..\MedImgUtil\mi_exception.cpp" />
     <ClCompile Include="..\MedImgUtil\mi_configuration.cpp" />
     <ClCompile Include="..\MedImgUtil\mi_model_interface.cpp" />
+    <ClCompile Include="..\MedImgUtil\mi_socket_client.cpp" />
+    <ClCompile Include="..\MedImgUtil\mi_socket_server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgUtil\mi_message_queue.inl" />
