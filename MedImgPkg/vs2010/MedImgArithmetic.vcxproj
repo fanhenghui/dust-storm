@@ -202,7 +202,6 @@
     <ClCompile Include="..\MedImgArithmetic\mi_aabb.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_arithmetic_utils.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_camera_base.cpp" />
-    <ClCompile Include="..\MedImgArithmetic\mi_color_unit.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_ellipsoid.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_intersection_test.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_line.cpp" />

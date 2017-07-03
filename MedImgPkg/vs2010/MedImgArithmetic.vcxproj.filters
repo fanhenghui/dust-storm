@@ -148,9 +148,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgArithmetic\mi_color_unit.cpp">
-      <Filter>Color Related</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgArithmetic\mi_volume_statistician.cpp">
       <Filter>Statistic</Filter>
     </ClCompile>

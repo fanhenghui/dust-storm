@@ -17,4 +17,9 @@
   <ItemGroup>
     <ClInclude Include="..\Executable\MedImgAnonymization\resource.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Executable\MedImgAnonymization\ph-list-icon-anonymous.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
