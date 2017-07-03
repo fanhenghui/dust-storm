@@ -4,7 +4,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-    boost::mutex GLResourceManagerContainer::_mutex;
+boost::mutex GLResourceManagerContainer::_mutex;
 
 GLResourceManagerContainer* GLResourceManagerContainer::_s_instance = nullptr;
 

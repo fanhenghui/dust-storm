@@ -47,15 +47,15 @@ private:
 #define THROW_EXCEPTION(module , desc) throw Exception(module  , __FILE__ , __LINE__ , __FUNCTION__ , desc);
 #endif
 
-#ifndef COMMON_THROW_EXCEPTION
-#define COMMON_THROW_EXCEPTION(desc) THROW_EXCEPTION("Common" , desc);
+#ifndef UTIL_THROW_EXCEPTION
+#define UTIL_THROW_EXCEPTION(desc) THROW_EXCEPTION("Common" , desc);
 #endif
 
-#ifndef COMMON_CHECK_NULL_EXCEPTION
-#define  COMMON_CHECK_NULL_EXCEPTION(pointer)                  \
+#ifndef  UTIL_CHECK_NULL_EXCEPTION
+#define   UTIL_CHECK_NULL_EXCEPTION(pointer)                  \
     if (nullptr == pointer)                 \
 {                                       \
-    COMMON_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
+    UTIL_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
 }
 #endif
 

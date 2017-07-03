@@ -146,7 +146,7 @@ void GLProgram::compile()
         //打印链接错误信息
         std::string err_info = std::string("Program link failed : ") + std::string(log_context.get()) + std::string("\n");
         std::cout << err_info;
-        COMMON_THROW_EXCEPTION(err_info.c_str());
+        GLRESOURCE_THROW_EXCEPTION(err_info.c_str());
 
     }
 

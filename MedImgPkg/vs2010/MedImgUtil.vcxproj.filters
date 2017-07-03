@@ -29,6 +29,9 @@
     <ClInclude Include="..\Include\MedImgUtil\mi_exception.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgUtil\mi_message_queue.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgUtil\mi_configuration.cpp">
@@ -40,5 +43,10 @@
     <ClCompile Include="..\MedImgUtil\mi_exception.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Include\MedImgUtil\mi_message_queue.inl">
+      <Filter>Include</Filter>
+    </None>
   </ItemGroup>
 </Project>
