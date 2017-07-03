@@ -1,11 +1,14 @@
 express = require("express");
 util = require("util");
 var bodyparser = require("body-parser");
+var fs = require("fs");
+var child_process = require("child_process");
+
 var app = express();
 
 var urlencodedParser =bodyparser.urlencoded({extended:false});
 
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 
 app.get("/index.html" , function(req , res){
     console.log("hostname : " + req.hostname);
@@ -24,32 +27,35 @@ app.get("/index.html" , function(req , res){
 
 });
 
-app.get("/process_get" , function(req , res){
+// app.get("/process_get" , function(req , res){
 
-    var response = { 
-        "firstname" : req.query.first_name ,
-        "lastname" : req.query.last_name 
-    };
-    console.log(util.inspect(response));
-    res.sendFile(__dirname + "/" + "jump.html");
-    //res.end(JSON.stringify(response));
+//     var response = { 
+//         "username" : req.query.username ,
+//         "password" : req.query.password 
+//     };
+//     console.log(util.inspect(response));
+//     res.sendFile(__dirname + "/" + "jump.html");
+//     //res.end(JSON.stringify(response));
+// });
+
+app.post("/login_in" , urlencodedParser , function(req , res){
+
+    if(req.body.username == "wr" && req.body.password == "000000"){
+    
+        console.log("login in success.");
+        var worker = child_process.spawn('./worker', ['1']);
+
+        res.sendFile(__dirname + "/" + "jump.html");
+    }
+    else{
+        console.log("login in failed!");
+    }
+   
 });
 
-app.post("/process_get" , urlencodedParser , function(req , res){
+app.post("/file_upload" , urlencodedParser , function(req , res){
+    console.log(req.body.file);
 
-    // var response = { 
-    //     "firstname2" : req.query.first_name ,
-    //     "lastname2" : req.query.last_name 
-    // };
-    // console.log(util.inspect(response));
-    // res.end(JSON.stringify(response));
-
-    var response = {
-       "first_name":req.body.first_name,
-       "last_name":req.body.last_name
-   };
-   console.log(response);
-   res.end(JSON.stringify(response));
 });
 
 

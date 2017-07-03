@@ -7,14 +7,23 @@
 
 <body>
     <h1>Main page</h1>
-    <p></p>
 
-    <form action="http://127.0.0.1:8080/process_get" method="GET">
-    First Name: <input type="text" name="first_name">  <br>
+    <h3>Login in</h3>
+    <form action="/login_in" method="post" >
+    Username : <input type="text" name="username">  <br>
  
-    Last Name: <input type="text" name="last_name">
+    Password : <input type="password" name="password">
     <input type="submit" value="Submit">
     </form>
+    <br>
+
+    <h3>文件上传表单</h3>
+    <form action="/file_upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" size="50"/><br>
+        <input type="submit" value="上传文件"/>    
+    </form>
 </body>
+
+
 </html>
 
