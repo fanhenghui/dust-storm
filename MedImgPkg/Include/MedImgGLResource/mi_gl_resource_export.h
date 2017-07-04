@@ -26,8 +26,6 @@ MED_IMG_BEGIN_NAMESPACE
     #define GLResource_Export
 #endif
 
-#pragma warning(disable: 4251)
-
 #ifndef GLRESOURCE_THROW_EXCEPTION
 #define GLRESOURCE_THROW_EXCEPTION(desc) THROW_EXCEPTION("GLResource" , desc);
 #endif

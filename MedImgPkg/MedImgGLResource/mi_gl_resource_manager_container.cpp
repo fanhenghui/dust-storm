@@ -1,6 +1,13 @@
 #include "mi_gl_resource_manager_container.h"
 #include "mi_gl_program.h"
 #include "mi_gl_buffer.h"
+#include "mi_gl_texture_1d.h"
+#include "mi_gl_texture_2d.h"
+#include "mi_gl_texture_3d.h"
+#include "mi_gl_texture_1d_array.h"
+#include "mi_gl_fbo.h"
+#include "mi_gl_vao.h"
+#include "mi_gl_context.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

@@ -3,6 +3,7 @@
 
 #include "MedImgUtil/mi_util_export.h"
 #include <vector>
+#include <memory>
 
 MED_IMG_BEGIN_NAMESPACE
 

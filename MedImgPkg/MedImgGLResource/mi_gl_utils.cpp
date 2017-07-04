@@ -2,7 +2,10 @@
 
 #ifdef WIN32
 #include <Windows.h>
+#else
+#include <string.h>
 #endif
+
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -309,7 +312,7 @@ int GLActiveTextureCounter::tick()
 {
     if (_current_active_texture_id > GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS  - 1)
     {
-        throw std::exception("Combined texture count is beyond limitation!");
+        GLRESOURCE_THROW_EXCEPTION("Combined texture count is beyond limitation!");
     }
     return _current_active_texture_id++;
 }

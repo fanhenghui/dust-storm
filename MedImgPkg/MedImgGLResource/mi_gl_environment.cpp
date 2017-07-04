@@ -1,5 +1,5 @@
 #include "mi_gl_environment.h"
-#include "gl/glew.h"
+#include "GL/glew.h"
 
 #include "MedImgUtil/mi_string_number_converter.h"
 

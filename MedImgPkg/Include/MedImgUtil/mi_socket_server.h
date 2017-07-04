@@ -1,3 +1,4 @@
+#ifndef WIN32
 #ifndef MED_IMG_SOCKET_SERVER_H_
 #define MED_IMG_SOCKET_SERVER_H_
 
@@ -10,13 +11,12 @@ MED_IMG_BEGIN_NAMESPACE
 class SocketServer
 {
 public:
-    SocketServer();
-    ~SocketServer();
+    SocketServer() {}
+    ~SocketServer() {}
 
-    void push_command();
-    void quit();
-    void run();
-    void handle
+    // void push_command();
+    // void quit();
+    // void run();
 
 
 protected:
@@ -26,4 +26,5 @@ private:
 
 MED_IMG_END_NAMESPACE
 
+#endif
 #endif

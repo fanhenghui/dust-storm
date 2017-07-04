@@ -5,6 +5,10 @@
 
 #include "MedImgUtil/mi_util_export.h"
 
+#include <string>
+
+#include "MedImgUtil/mi_ipc_common.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 class SocketClient
@@ -17,7 +21,7 @@ public:
     std::string get_path() const;
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
-    void send(const IPCDataHeader& data , void* buffer);
+    void send_data(const IPCDataHeader& dataheader , void* buffer);
 
     void run();
 
@@ -25,7 +29,9 @@ protected:
 private:
     std::string _path;
     std::shared_ptr<IPCDataRecvHandler> _handler;
-    bool _accepted;
+    int _fd_server;
+
+    static const int _reconnect_times = 100;
 };
 
 MED_IMG_END_NAMESPACE

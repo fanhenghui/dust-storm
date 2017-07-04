@@ -26,7 +26,7 @@ window.FE = {
         this.username = username;
 
         //链接websocket服务器
-        this.socket = io.connect("http://172.23.236.115:8080");
+        this.socket = io.connect("http://172.23.236.70:8080");
 
         //通知服务器有用户登录
         this.socket.emit("login" , {userid:this.userid , username:this.username});

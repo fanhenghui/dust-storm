@@ -1,13 +1,13 @@
 #ifndef MED_IMG_GL_OBJECT_H_
 #define MED_IMG_GL_OBJECT_H_
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "boost/thread/mutex.hpp"
 #include "MedImgGLResource/mi_gl_resource_export.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-    typedef unsigned long UIDType;
+typedef unsigned long UIDType;
 
 class GLUIDGenerator
 {

@@ -41,7 +41,7 @@ Exception& Exception::operator=(const Exception& e)
     return *this;
 }
 
-const char* Exception::what() const
+const char* Exception::what() const throw()
 {
     return get_full_description().c_str();
 }
