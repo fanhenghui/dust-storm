@@ -21,7 +21,6 @@ TARGET = $(BIN_DIR)/libmedimg_glresource.so
 
 EXPORT_HEADER = mi_gl_resource_export.h mi_gl_object.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-#ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L/usr/X11R6/lib -L/usr/X11R6/lib64 -L/usr/local/lib -lmedimg_util -lGL -lGLEW -lglx
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lGL -lGLEW
 
 $(TARGET): $(OBJS)

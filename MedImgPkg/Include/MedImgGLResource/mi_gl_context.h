@@ -2,6 +2,13 @@
 #define MED_IMG_GL_CONTEXT_H_
 
 #include "MedImgGLResource/mi_gl_object.h"
+#include "GL/glew.h"
+
+#ifdef WIN32
+
+#else
+#include "GL/glxew.h"
+#endif
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -35,8 +42,14 @@ public:
     
     void make_current();
     void make_noncurrent();
-protected:
+
+private:
+    void early_init_glx_fn_pointers();
+    void create_window();
 private: 
+    GLXContext _ctx;
+    Display *_dpy;
+    Window _win;
 };
 
 #endif
