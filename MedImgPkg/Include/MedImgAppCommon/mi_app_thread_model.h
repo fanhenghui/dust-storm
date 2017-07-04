@@ -16,13 +16,15 @@ public:
     AppThreadModel();
     ~AppThreadModel();
 
-    void start();
+    void initialize();
+    void finalize();
 
     void set_client_proxy(std::shared_ptr<IPCClientProxy> proxy);
 
     void push_operation(const std::shared_ptr<IOperation>& op);
     void pop_operation(std::shared_ptr<IOperation>& op);
 
+    void start();
 
 protected:
     void process_operating();
@@ -39,6 +41,8 @@ private:
     std::unique_ptr<InnerQueue> _op_queue;
     
     std::shared_ptr<IPCClientProxy> _proxy;
+
+    
 };
 
 MED_IMG_END_NAMESPACE

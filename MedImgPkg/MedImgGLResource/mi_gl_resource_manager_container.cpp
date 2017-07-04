@@ -57,7 +57,8 @@ _program_manager(new GLProgramManager()),
     _texture_3d_manager(new GLTexture3DManager()),
     _vao_manager(new GLVAOManager()),
     _fbo_manager(new GLFBOManager()),
-    _texture_1d_array_manager(new GLTexture1DArrayManager())
+    _texture_1d_array_manager(new GLTexture1DArrayManager()),
+    _context_manager(new GLContextManager())
 {
 
 }
@@ -91,5 +92,11 @@ GLTexture1DArrayManagerPtr GLResourceManagerContainer::get_texture_1d_array_mana
 {
     return _texture_1d_array_manager;
 }
+
+GLContextManagerPtr GLResourceManagerContainer::get_context_manager() const
+{
+    return _context_manager;
+}
+
 
 MED_IMG_END_NAMESPACE

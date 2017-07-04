@@ -25,7 +25,7 @@ public:
     virtual size_t size() const = 0;
     virtual bool is_empty() const = 0;
     virtual void push(const T&)=0;
-    virtual void pop(T*)=0;
+    virtual void pop(T&)=0;
     virtual void clear()= 0;
 };
 
@@ -39,7 +39,7 @@ public:
     virtual size_t size() const;
     virtual bool is_empty() const;
     virtual void push(const T&);
-    virtual void pop(T*);
+    virtual void pop(T&);
     virtual void clear();
 private:
     std::deque<T> _container;
@@ -55,7 +55,7 @@ public:
     virtual size_t size() const;
     virtual bool is_empty() const;
     virtual void push(const T&);
-    virtual void pop(T*);
+    virtual void pop(T&);
     virtual void clear();
 private:
     std::vector<T> _container;
@@ -160,7 +160,7 @@ public:
             _condition_read.notify_one();
         }
 
-        void pop(T* msg)
+        void pop(T& msg)
         {
             boost::mutex::scoped_lock locker(_mutex);
 

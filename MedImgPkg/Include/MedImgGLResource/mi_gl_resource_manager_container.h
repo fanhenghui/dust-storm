@@ -13,6 +13,7 @@ class GLTexture3D;
 class GLVAO;
 class GLFBO;
 class GLTexture1DArray;
+class GLContext;
 
 typedef GLResourceManager<GLProgram> GLProgramManager;
 typedef GLResourceManager<GLBuffer> GLBufferManager;
@@ -22,7 +23,7 @@ typedef GLResourceManager<GLTexture3D> GLTexture3DManager;
 typedef GLResourceManager<GLVAO> GLVAOManager;
 typedef GLResourceManager<GLFBO> GLFBOManager;
 typedef GLResourceManager<GLTexture1DArray> GLTexture1DArrayManager;
-
+typedef GLResourceManager<GLContext> GLContextManager;
 
 typedef std::shared_ptr<GLProgramManager> GLProgramManagerPtr;
 typedef std::shared_ptr<GLBufferManager> GLBufferManagerPtr;
@@ -32,6 +33,7 @@ typedef std::shared_ptr<GLTexture3DManager> GLTexture3DManagerPtr;
 typedef std::shared_ptr<GLVAOManager> GLVAOManagerPtr;
 typedef std::shared_ptr<GLFBOManager> GLFBOManagerPtr;
 typedef std::shared_ptr<GLTexture1DArrayManager> GLTexture1DArrayManagerPtr;
+typedef std::shared_ptr<GLContextManager> GLContextManagerPtr;
 
 class GLResource_Export GLResourceManagerContainer
 {
@@ -56,6 +58,8 @@ public:
 
     GLFBOManagerPtr get_fbo_manager() const;
 
+    GLContextManagerPtr get_context_manager() const;
+
     void update_all();
 
 private:
@@ -72,6 +76,7 @@ private:
     GLTexture1DArrayManagerPtr _texture_1d_array_manager;
     GLVAOManagerPtr _vao_manager;
     GLFBOManagerPtr _fbo_manager;
+    GLContextManagerPtr _context_manager;
 };
 
 

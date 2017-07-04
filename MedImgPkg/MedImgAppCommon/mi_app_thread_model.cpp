@@ -22,6 +22,60 @@ struct AppThreadModel::InnerQueue
     MessageQueue<std::shared_ptr<IOperation>> _msg_queue;
 };
 
+AppThreadModel::AppThreadModel()
+{
+
+}
+
+AppThreadModel::~AppThreadModel()
+{
+
+}
+
+void AppThreadModel::initialize()
+{
+    //
+}
+
+void AppThreadModel::finalize()
+{
+
+}
+
+void AppThreadModel::set_client_proxy(std::shared_ptr<IPCClientProxy> proxy)
+{
+    _proxy = proxy;
+}
+
+void AppThreadModel::push_operation(const std::shared_ptr<IOperation>& op)
+{
+    _op_queue->_msg_queue.push(op);
+}
+
+void AppThreadModel::pop_operation(std::shared_ptr<IOperation>& op)
+{
+    _op_queue->_msg_queue.pop(op);
+}
+
+void AppThreadModel::start()
+{
+
+}
+
+void AppThreadModel::process_operating()
+{
+
+}
+
+void AppThreadModel::process_rendering()
+{
+
+}
+
+void AppThreadModel::process_sending()
+{
+
+}
 
 
 

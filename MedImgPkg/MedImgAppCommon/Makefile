@@ -19,7 +19,7 @@ TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
 EXPORT_HEADER = mi_app_common_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lboost_system -lboost_filesystem -lboost_thread 
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lboost_system -lboost_filesystem -lboost_thread 
 
 $(TARGET): $(OBJS)
 	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
