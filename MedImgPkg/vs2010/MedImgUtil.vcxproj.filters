@@ -38,6 +38,12 @@
     <ClInclude Include="..\Include\MedImgUtil\mi_socket_client.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_proxy.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgUtil\mi_socket_data.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgUtil\mi_configuration.cpp">
@@ -53,6 +59,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgUtil\mi_socket_server.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgUtil\mi_ipc_proxy.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
