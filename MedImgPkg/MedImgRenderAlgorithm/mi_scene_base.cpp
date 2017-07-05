@@ -7,8 +7,10 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-SceneBase::SceneBase():_width(128),_height(128),_dirty(true),_name("Scene")
+SceneBase::SceneBase():_width(128),_height(128),_dirty(true),_name("Scene"),_front_buffer_id(0)
 {
+    _image_buffer[0].reset(new char[_width*_height*4]);
+    _image_buffer[1].reset(new char[_width*_height*4]);
 }
 
 SceneBase::SceneBase(int width , int height):_width(width) , _height(height),_dirty(true)
@@ -92,6 +94,9 @@ void SceneBase::set_display_size(int width , int height)
     _width = width;
     _height = height;
 
+    _image_buffer[0].reset(new char[_width*_height*4]);
+    _image_buffer[1].reset(new char[_width*_height*4]);
+
     _scene_color_attach_0->bind();
     _scene_color_attach_0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
@@ -123,7 +128,7 @@ void SceneBase::pan(const Point2& pre_pt , const Point2& cur_pt)
 
 void SceneBase::get_display_size(int& width, int& height) const
 {
-    width = _width;
+    width = _width;SceneBase::
     height = _height;
 }
 
@@ -145,6 +150,23 @@ void SceneBase::set_name(const std::string& name)
 const std::string& SceneBase::get_name() const
 {
     return _name;
+}
+
+void SceneBase::download_image_buffer()
+{
+    //download FBO to back buffer
+    _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get() , 0 );
+}
+
+void SceneBase::swap_image_buffer()
+{
+    _front_buffer_id = 1 - _front_buffer_id;
+}
+
+void SceneBase::get_image_buffer(void* buffer)
+{
+    //Get front buffer
+    buffer = _image_buffer[_front_buffer_id].get();
 }
 
 

@@ -31,6 +31,11 @@ public:
     virtual void render(int test_code);
     void render_to_back();
 
+    void download_image_buffer();
+    void swap_image_buffer();
+    void get_image_buffer(void* buffer);
+    
+
     void set_dirty(bool flag);
     bool get_dirty() const;
 
@@ -45,6 +50,9 @@ protected:
 
     bool _dirty;
     std::string _name;
+
+    std::unique_ptr<char[]> _image_buffer[2];
+    int _front_buffer_id;
 
 };
 
