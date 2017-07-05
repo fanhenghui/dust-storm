@@ -1,7 +1,9 @@
 #ifndef ARITHMETIC_CAMERA_BASE_H_
 #define ARITHMETIC_CAMERA_BASE_H_
 
+#include "MedImgArithmetic/mi_point3.h"
 #include "MedImgArithmetic/mi_vector2.h"
+#include "MedImgArithmetic/mi_vector3.h"
 #include "MedImgArithmetic/mi_matrix4.h"
 #include "MedImgArithmetic/mi_quat4.h"
 

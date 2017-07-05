@@ -8,6 +8,12 @@
 #include "mbedtls/x509.h"
 #include "mbedtls/rsa.h"
 
+#ifdef WIN32
+
+#else
+#include <string.h>
+#endif
+
 MED_IMG_BEGIN_NAMESPACE
 
 RSAUtils::RSAUtils()

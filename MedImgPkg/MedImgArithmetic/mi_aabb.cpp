@@ -1,5 +1,11 @@
 #include "mi_aabb.h"
 
+#ifdef WIN32
+
+#else
+#include <string.h>
+#endif
+
 MED_IMG_BEGIN_NAMESPACE
 
 AABB::AABB()

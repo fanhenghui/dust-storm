@@ -4,6 +4,12 @@
 #include "MedImgArithmetic/mi_vector3.h"
 #include "MedImgArithmetic/mi_point3.h"
 
+#ifdef WIN32
+
+#else
+#include <string.h>
+#endif
+
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -21,11 +27,11 @@ public:
 
 public:
 
-    Matrix4::Matrix4()
+    Matrix4()
     {
-    }
+    };
 
-    Matrix4::Matrix4(double m00, double m01, double m02, double m03,
+    Matrix4(double m00, double m01, double m02, double m03,
         double m10, double m11, double m12, double m13,
         double m20, double m21, double m22, double m23,
         double m30, double m31, double m32, double m33)
@@ -46,39 +52,39 @@ public:
         m[3][1] = m31;
         m[3][2] = m32;
         m[3][3] = m33;
-    }
+    };
 
-    Matrix4::Matrix4(const Matrix4& mat)
+    Matrix4(const Matrix4& mat)
     {
         memcpy(this->_m, mat._m, sizeof(mat._m));
-    }
+    };
 
-    inline double* Matrix4::operator[] (size_t iRow)
+    inline double* operator[] (size_t iRow)
     {
         if (iRow > 4)
             return nullptr;
         else
             return m[iRow];
-    }
+    };
 
-    inline const double *Matrix4::operator [] (size_t iRow) const
+    inline const double *operator [] (size_t iRow) const
     {
         if (iRow > 4)
             return nullptr;
         else
             return m[iRow];
-    }
+    };
 
-    inline Matrix4& Matrix4::operator = (const Matrix4& mat)
+    inline Matrix4& operator = (const Matrix4& mat)
     {
         for (int i = 0 ; i<16 ; ++i)
         {
             _m[i] = mat._m[i];
         }
         return *this;
-    }
+    };
 
-    inline Matrix4 Matrix4::operator * (const Matrix4 & m2) const
+    inline Matrix4 operator * (const Matrix4 & m2) const
     {
         return Matrix4(
             _m[0] * m2._m[0] + _m[4] * m2._m[1] + _m[8] * m2._m[2] + _m[12] * m2._m[3],
@@ -98,22 +104,22 @@ public:
             _m[2] * m2._m[12] + _m[6] * m2._m[13] + _m[10] * m2._m[14] + _m[14] * m2._m[15],
             _m[3] * m2._m[12] + _m[7] * m2._m[13] + _m[11] * m2._m[14] + _m[15] * m2._m[15]
         );
-    }
+    };
 
-    inline Matrix4 Matrix4::operator *= (const Matrix4 & m2)
+    inline Matrix4 operator *= (const Matrix4 & m2)
     {
         (*this) = (*this)*m2;
         return *this;
-    }
+    };
 
-    inline Vector3 Matrix4::operator * (const Vector3 &v) const
+    inline Vector3 operator * (const Vector3 &v) const
     {
         return  Vector3(_m[0] * v.x + _m[4] * v.y + _m[8] * v.z,
             _m[1] * v.x + _m[5] * v.y + _m[9] * v.z,
             _m[2] * v.x + _m[6] * v.y + _m[10] * v.z);
-    }
+    };
 
-    inline Point3 Matrix4::operator * (const Point3& pt) const
+    inline Point3 operator * (const Point3& pt) const
     {
         double dw = _m[3] * pt.x + _m[7] * pt.y + _m[11] * pt.z + _m[15];
         dw = fabs(dw) > DOUBLE_EPSILON ? dw : DOUBLE_EPSILON;
@@ -122,9 +128,9 @@ public:
             (_m[0] * pt.x + _m[4] * pt.y + _m[8] * pt.z + _m[12]) * dw,
             (_m[1] * pt.x + _m[5] * pt.y + _m[9] * pt.z + _m[13]) * dw,
             (_m[2] * pt.x + _m[6] * pt.y + _m[10] * pt.z + _m[14]) * dw);
-    }
+    };
 
-    inline Matrix4 Matrix4::operator * (const double scale) const
+    inline Matrix4 operator * (const double scale) const
     {
         return Matrix4(
             scale * _m[0], scale * _m[1], scale * _m[2], scale *_m[3],
@@ -132,18 +138,18 @@ public:
             scale * _m[8], scale * _m[9], scale * _m[10], scale *_m[11],
             scale * _m[12], scale * _m[13], scale * _m[14], scale *_m[15]
         );
-    }
+    };
 
-    inline Matrix4 Matrix4::operator *= (const double scale)
+    inline Matrix4 operator *= (const double scale)
     {
         for (int i = 0; i < 16; ++i)
         {
             _m[i] *= scale;
         }
         return *this;
-    }
+    };
 
-    inline bool Matrix4::operator == (const Matrix4& mat) const
+    inline bool operator == (const Matrix4& mat) const
     {
         return (std::fabs(_m[0] - mat._m[0]) < DOUBLE_EPSILON &&
             std::fabs(_m[1] - mat._m[1]) < DOUBLE_EPSILON &&
@@ -161,9 +167,9 @@ public:
             std::fabs(_m[13] - mat._m[13]) < DOUBLE_EPSILON &&
             std::fabs(_m[14] - mat._m[14]) < DOUBLE_EPSILON &&
             std::fabs(_m[15] - mat._m[15]) < DOUBLE_EPSILON);
-    }
+    };
 
-    inline bool Matrix4::operator != (const Matrix4& mat) const
+    inline bool operator != (const Matrix4& mat) const
     {
         return (std::fabs(_m[0] - mat._m[0]) > DOUBLE_EPSILON ||
             std::fabs(_m[1] - mat._m[1]) > DOUBLE_EPSILON ||
@@ -181,27 +187,27 @@ public:
             std::fabs(_m[13] - mat._m[13]) > DOUBLE_EPSILON ||
             std::fabs(_m[14] - mat._m[14]) > DOUBLE_EPSILON ||
             std::fabs(_m[15] - mat._m[15]) > DOUBLE_EPSILON);
-    }
+    };
 
-    void Matrix4::set_idintity()
+    void set_idintity()
     {
         m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = 0.0;
         m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = 0.0;
         m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = 0.0;
         m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
-    }
+    };
 
-    inline void Matrix4::prepend(const Matrix4 &mat)
+    inline void prepend(const Matrix4 &mat)
     {
         *this = mat * (*this);
-    }
+    };
 
-    inline void Matrix4::append(const Matrix4 &mat)
+    inline void append(const Matrix4 &mat)
     {
         *this = (*this) * mat;
-    }
+    };
 
-    inline void Matrix4::transpose()
+    inline void transpose()
     {
         std::swap(_m[1], _m[4]);
         std::swap(_m[2], _m[8]);
@@ -209,23 +215,23 @@ public:
         std::swap(_m[6], _m[9]);
         std::swap(_m[7], _m[13]);
         std::swap(_m[11], _m[14]);
-    }
+    };
 
-    inline Matrix4 Matrix4::get_transpose() const
+    inline Matrix4 get_transpose() const
     {
         return Matrix4(_m[0], _m[4], _m[8], _m[12],
             _m[1], _m[5], _m[9], _m[13],
             _m[2], _m[6], _m[10], _m[14],
             _m[3], _m[7], _m[11], _m[15]);
-    }
+    };
 
-    inline bool Matrix4::has_inverse() const
+    inline bool has_inverse() const
     {
         return (std::fabs(determinant()) > DOUBLE_EPSILON);
 
-    }
+    };
 
-    inline double Matrix4::determinant() const
+    inline double determinant() const
     {
         double m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
         double m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
@@ -245,9 +251,9 @@ public:
         double t30 = -(v3 * m10 - v1 * m11 + v0 * m12);
 
         return  (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
-    }
+    };
 
-    inline Matrix4 Matrix4::get_inverse() const
+    inline Matrix4 get_inverse() const
     {
         double m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
         double m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
@@ -312,23 +318,23 @@ public:
             d10, d11, d12, d13,
             d20, d21, d22, d23,
             d30, d31, d32, d33);
-    }
+    };
 
-    inline Matrix4 Matrix4::inverse()
+    inline Matrix4 inverse()
     {
         *this = get_inverse();
         return *this;
-    }
+    };
 
-    inline Point3 Matrix4::transform(const Point3 &pt) const
+    inline Point3 transform(const Point3 &pt) const
     {
         return (*this) * pt;
-    }
+    };
 
-    inline Vector3 Matrix4::transform(const Vector3 & v) const
+    inline Vector3 transform(const Vector3 & v) const
     {
         return (*this) * v;
-    }
+    };
 
     inline void to_float16(float (&fMat)[16]) const
     {
@@ -336,7 +342,7 @@ public:
         {
             fMat[i] = (float)_m[i];
         }
-    }
+    };
 };
 
 Matrix4 Arithmetic_Export make_scale(const Vector3 & v);
