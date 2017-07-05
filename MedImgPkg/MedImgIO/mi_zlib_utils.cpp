@@ -1,7 +1,14 @@
 #include "mi_zlib_utils.h"
 
-#include "Ext/zlib/zlib.h"
-#include "Ext/zlib/zconf.h"
+#ifdef WIN32
+#include "zlib/zlib.h"
+#include "zlib/zconf.h"
+#else
+#include <string.h>
+#include "zlib.h"
+#include "zconf.h"
+#endif
+
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -119,7 +126,7 @@ IOStatus ZLibUtils::decompress(const std::string& src_path , const std::string& 
             strm.avail_out = CHUNK;
             strm.next_out = out;
             ret = inflate(&strm, Z_NO_FLUSH);
-            if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)//½âÑ¹µ½Êý¾ÝÄ©Î²²»ÊÇZ_OK
+            if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)//ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä©Î²ï¿½ï¿½ï¿½ï¿½Z_OK
             {
                 src_file.close();
                 dst_file.close();
@@ -187,7 +194,7 @@ IOStatus ZLibUtils::decompress(const std::string& src_path , char* dst_buffer , 
             strm.avail_out = CHUNK;
             strm.next_out = out;
             ret = inflate(&strm, Z_NO_FLUSH);
-            if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)//½âÑ¹µ½Êý¾ÝÄ©Î²²»ÊÇZ_OK
+            if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)//ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä©Î²ï¿½ï¿½ï¿½ï¿½Z_OK
             {
                 src_file.close();
                 inflateEnd(&strm);

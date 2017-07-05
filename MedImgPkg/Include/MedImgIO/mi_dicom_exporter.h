@@ -1,10 +1,12 @@
 #ifndef MED_IMG_DICOM_EXPORTER_H
 #define MED_IMG_DICOM_EXPORTER_H
 
+#include <memory>
+
 #include "MedImgIO/mi_io_export.h"
 #include "MedImgIO/mi_io_define.h"
 
-#include "ext/dcmtk/dcmdata/dcdeftag.h"
+#include "dcmtk/dcmdata/dcdeftag.h"
 
 class DcmFileFormat;
 class DcmDataset;

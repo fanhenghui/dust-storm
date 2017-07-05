@@ -1,6 +1,7 @@
 #ifndef MED_IMG_DICOM_RT_STRUCT_SET_LOADER_H
 #define MED_IMG_DICOM_RT_STRUCT_SET_LOADER_H
 
+#include <memory>
 #include "MedImgIO/mi_io_export.h"
 #include "MedImgIO/mi_io_define.h"
 

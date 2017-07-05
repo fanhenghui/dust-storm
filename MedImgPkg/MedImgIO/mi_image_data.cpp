@@ -293,7 +293,7 @@ void ImageData::find_min_max_i()
     void* data_array = _data_array.get();
     if (nullptr == data_array)
     {
-        throw std::exception("Volume data is null!");
+        IO_THROW_EXCEPTION("Volume data is null!");
     }
 
     switch(_data_type)

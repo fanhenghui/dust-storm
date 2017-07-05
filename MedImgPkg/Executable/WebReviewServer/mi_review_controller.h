@@ -16,7 +16,7 @@ public:
     
     void initialize();
     void run(const std::string& path);
-
+    
 protected:
 private:
     std::shared_ptr<IPCClientProxy> _proxy;

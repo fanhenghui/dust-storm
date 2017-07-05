@@ -5,11 +5,6 @@
 #include "MedImgArithmetic/mi_ellipsoid.h"
 #include "MedImgArithmetic/mi_arithmetic_utils.h"
 
-#ifdef WIN32
-#else
-#include <typeinfo> 
-#endif
-
 MED_IMG_BEGIN_NAMESPACE
 
 struct IntensityInfo

@@ -11,7 +11,7 @@
 #include "dcmtk/dcmdata/dcpxitem.h" 
 #include "dcmtk/dcmjpeg/djdecode.h"
 
-#include "mi_model_progress.h"
+#include "MedImgUtil/mi_model_progress.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -62,7 +62,7 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_
         return checking_status;
     }
 
-    if (uiSliceCount < 16)//²»Ö§³ÖÉÙÓÚ16ÕÅµÄÊý¾Ý½øÐÐÈýÎ¬¿ÉÊÓ»¯ // TODO ÕâÒ»²½ÔÚÕâÀï×ö²»Ì«ºÏÊÊ
+    if (uiSliceCount < 16)//ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½16ï¿½Åµï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½Ó»ï¿½ // TODO ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½ï¿½
     {
         set_progress_i(100);
         return IO_UNSUPPORTED_YET;
@@ -292,21 +292,21 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
             //IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
-        //4.10 Patient Sex(ºÜ¶àÍ¼Ïñ¶¼Ã»ÓÐÕâ¸öTag)
+        //4.10 Patient Sex(ï¿½Ü¶ï¿½Í¼ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Tag)
         if (!get_patient_sex_i(data_set_first , img_data_header))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
             //IO_THROW_EXCEPTION("Parse tag PatientSex failed!");
         }
 
-        //4.11 Patient Age(ºÜ¶àÍ¼Ïñ¶¼Ã»ÓÐÕâ¸öTag)
+        //4.11 Patient Age(ï¿½Ü¶ï¿½Í¼ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Tag)
         if (!get_patient_age_i(data_set_first , img_data_header))
         {
             /*eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientAge failed!");*/
         }
 
-        //4.12 Slice thickness (²»ÊÇÒ»¶¨±ØÒª)
+        //4.12 Slice thickness (ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Òª)
         if (!get_slice_thickness_i(data_set_first , img_data_header))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
@@ -530,7 +530,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     const std::string TSU_JPEGProcess14SV1TransferSyntax      = std::string("1.2.840.10008.1.2.4.70");//Default Transfer Syntax for Lossless JPEG Image Compression
     const std::string TSU_JPEGProcess14TransferSyntax     = std::string("1.2.840.10008.1.2.4.57");
 
-    //JEPG2000 ÐèÒª¹ºÂòÉÌÒµ°æµÄ dcmtk
+    //JEPG2000 ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ dcmtk
     const std::string TSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
     const std::string TSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
 

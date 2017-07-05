@@ -36,7 +36,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "mi_model_progress.h"
+#include "MedImgUtil/mi_model_progress.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -102,7 +102,7 @@ IOStatus DICOMExporter::load_dicom_file(const std::string file_name ,  DcmFileFo
         const std::string TSU_JPEGProcess14SV1TransferSyntax      = std::string("1.2.840.10008.1.2.4.70");//Default Transfer Syntax for Lossless JPEG Image Compression
         const std::string TSU_JPEGProcess14TransferSyntax     = std::string("1.2.840.10008.1.2.4.57");
 
-        //JEPG2000 ÐèÒª¹ºÂòÉÌÒµ°æµÄ dcmtk
+        //JEPG2000 ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½ dcmtk
         const std::string TSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
         const std::string TSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
 

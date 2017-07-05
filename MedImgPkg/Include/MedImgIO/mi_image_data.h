@@ -1,6 +1,7 @@
 #ifndef MED_IMG_IMAGE_DATA_H
 #define MED_IMG_IMAGE_DATA_H
 
+#include <memory>
 #include "MedImgIO/mi_io_export.h"
 #include "MedImgIO/mi_io_define.h"
 #include "MedImgArithmetic/mi_point3.h"

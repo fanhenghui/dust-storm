@@ -4,6 +4,7 @@
 #include "med_img_pkg_config.h"
 
 #include <exception>
+#include <memory>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -12,6 +13,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <typeinfo>
+#include <cassert>
 
 #include "MedImgUtil/mi_exception.h"
 
