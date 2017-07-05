@@ -18,9 +18,9 @@ void FIFOQueue<T>::clear()
 }
 
 template<class T>
-void FIFOQueue<T>::pop(T& elem)
+void FIFOQueue<T>::pop(T* elem)
 {
-    elem = std::move(_container.front());
+    *elem = std::move(_container.front());
     _container.pop_front();
 }
 
@@ -61,9 +61,9 @@ void LIFOQueue<T>::clear()
 }
 
 template<class T>
-void LIFOQueue<T>::pop(T& elem)
+void LIFOQueue<T>::pop(T* elem)
 {
-    elem = std::move(_container.front());
+    *elem = std::move(_container.front());
     _container.pop_back(elem);
 }
 

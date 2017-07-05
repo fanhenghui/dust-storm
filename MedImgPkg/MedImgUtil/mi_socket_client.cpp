@@ -39,8 +39,7 @@ std::string SocketClient::get_path() const
 
 void SocketClient::set_path(const std::string& path)
 {
-    if(path.size() > 108)
-    {
+    if(path.size() > 108){
         UTIL_THROW_EXCEPTION("Path length is too long!");
     }
     _path = path;
@@ -94,8 +93,7 @@ void SocketClient::run()
             //TODO WARNING Handle
             std::cout << "buffer length is less than 0";
         }
-        else
-        {
+        else{
             buffer = new char[header._data_len];
             if(-1 == recv(_fd_server ,buffer , header._data_len , 0) ) {
                 std::cout << "warning recv failed!\n";
@@ -105,8 +103,7 @@ void SocketClient::run()
         }
         
         
-        if(_handler && -1 == _handler->handle(header , buffer))
-        {
+        if(_handler && -1 == _handler->handle(header , buffer)){
             //TODO quit id
             break;
         }

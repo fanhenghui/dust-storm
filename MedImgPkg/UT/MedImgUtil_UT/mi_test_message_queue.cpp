@@ -57,7 +57,7 @@ void mainloop()
     while(true)
     {
         Message msg;
-        _message_queue.pop(msg);
+        _message_queue.pop(&msg);
 
         std::cout << "main loop : " << msg.get() << std::endl;
     }

@@ -10,10 +10,10 @@ class TestOperation : public IOperation
 public:
     TestOperation() {};
     virtual ~TestOperation() {};
-    virtual int operate()
+    virtual int execute()
     {
         std::cout << "Hello test operation.";
-        return 1;
+        return 0;
     };
 };
 

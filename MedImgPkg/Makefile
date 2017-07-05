@@ -14,7 +14,7 @@ subsystem:
 PHONY.:clean
 clean:
 	$(MAKE) clean -C ./MedImgUtil
-	$(MAKE) clean -C ./UT/MedImgGLResource
+	$(MAKE) clean -C ./MedImgGLResource
 	$(MAKE) clean -C ./MedImgAppCommon
 	$(MAKE) clean -C ./UT/MedImgUtil_UT
 	$(MAKE) clean -C ./UT/MedImgGLResource_UT

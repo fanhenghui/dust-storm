@@ -17,6 +17,7 @@ struct OpDataHeader
     unsigned int _data_len;//data length
 };
 
+class AppController;
 class IOperation
 {
 public:
@@ -36,11 +37,20 @@ public:
         _buffer = buffer;
     };
 
-    virtual int operate() = 0;
+    void set_controller(std::shared_ptr<AppController> controller)
+    {
+        _controller = controller;
+    }
+
+    virtual int execute()
+    {
+        return 0;
+    }
 
 protected:
     OpDataHeader _data;
     void* _buffer;
+    std::weak_ptr<AppController> _controller;
 };
 
 MED_IMG_END_NAMESPACE

@@ -36,6 +36,7 @@ int OperationCommandHandler::handle_command(const IPCDataHeader& ipcheader , voi
     if(op)
     {
         op->set_data(op_header , buffer);
+        op->set_controller(controller);
         controller->get_thread_model()->push_operation(op);
     }
     else
