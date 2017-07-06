@@ -2,7 +2,7 @@
 #include "AnnotationList.h"
 #include "Annotation.h"
 #include "AnnotationGroup.h"
-#include "MultiResolutionImageWriter.h"
+#include "io/multiresolutionimageinterface/MultiResolutionImageWriter.h"
 #include "core/Box.h"
 #include "core/ProgressMonitor.h"
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>main page</title>
+</head>
+
+<body>
+    <h1>Main page</h1>
+
+    <h3>Login in</h3>
+    <form action="/login_in" method="post" >
+    Username : <input type="text" name="username">  <br>
+ 
+    Password : <input type="password" name="password">
+    <input type="submit" value="Submit">
+    </form>
+    <br>
+
+    <h3>文件上传表单</h3>
+    <form action="/file_upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" size="50"/><br>
+        <input type="submit" value="上传文件"/>    
+    </form>
+</body>
+
+
+</html>
+

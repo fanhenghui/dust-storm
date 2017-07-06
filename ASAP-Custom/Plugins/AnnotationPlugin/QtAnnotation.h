@@ -23,7 +23,7 @@ public:
   void insertCoordinate(const int& index, const Point& xy);
   void removeCoordinate(const int& index);
   void setCoordinates(const std::vector<Point>& coordinates);
-  void moveCoordinateBy(unsigned int index, const Point& moveBy);
+  virtual void moveCoordinateBy(unsigned int index, const Point& moveBy);//这个地方加virtual是为了让RectangleQtAnnotation修改控制点的逻辑区别于其他Annotation
   void moveCoordinatesBy(const Point& moveBy);
 
 	std::shared_ptr<Annotation> getAnnotation() const;

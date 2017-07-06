@@ -287,8 +287,15 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
-# Custom
+# Custom WIN
 [Ee]xt/
 [Ww]in32/
 [Gg]eneratedFiles/
+[Ll]ib/
 mi_shader_collection.h
+
+# Custom Linux
+*.o
+*.so
+*.a
+.vscode/

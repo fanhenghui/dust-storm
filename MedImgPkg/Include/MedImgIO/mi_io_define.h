@@ -1,0 +1,39 @@
+#ifndef MED_IMG_IO_DEGINE_H_
+#define MED_IMG_IO_DEGINE_H_
+
+#include "med_img_pkg_config.h"
+
+MED_IMG_BEGIN_NAMESPACE
+
+enum DataType
+{
+    CHAR = 0,
+    UCHAR,
+    SHORT,
+    USHORT,
+    FLOAT,
+};
+enum IOStatus
+{
+    IO_SUCCESS,
+    IO_EMPTY_INPUT,
+    IO_FILE_OPEN_FAILED,
+    IO_DATA_DAMAGE,
+    IO_DATA_CHECK_FAILED,
+    IO_UNSUPPORTED_YET,
+    IO_UNMATCHED_FILE,
+    IO_ENCRYPT_FAILED,
+    IO_DECRYPT_FAILED,
+};
+
+enum ExportDicomDataType
+{
+    EXPORT_ORIGINAL_DICOM,
+    EXPORT_ANONYMOUS_DICOM,
+    EXPORT_ANONYMOUS_DICOM_WITHOUT_PRIVATETAG,
+    EXPORT_RAW,
+    EXPORT_BITMAP,
+};
+
+MED_IMG_END_NAMESPACE
+#endif

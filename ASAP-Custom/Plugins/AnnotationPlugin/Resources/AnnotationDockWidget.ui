@@ -109,6 +109,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="tryLearningResultButton">
+        <property name="text">
+         <string>Try learning result</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="saveButton">
         <property name="text">
          <string>Save</string>
@@ -162,6 +169,11 @@
         <string>勾选</string>
        </property>
       </column>
+      <item>
+       <property name="text">
+        <string>疑似病变</string>
+       </property>
+      </item>
       <item>
        <property name="text">
         <string>不确定的病变</string>

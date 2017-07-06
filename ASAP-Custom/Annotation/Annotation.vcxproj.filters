@@ -54,6 +54,9 @@
     <ClInclude Include="..\Include\Annotation\BinaryRepository.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\Annotation\Annotation_define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnnotationBase.cpp">

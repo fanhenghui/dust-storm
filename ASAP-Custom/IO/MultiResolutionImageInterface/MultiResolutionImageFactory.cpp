@@ -8,7 +8,12 @@
 #include <windows.h>
 #else
 #include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 #endif
+
+#include <iostream>
 
 bool MultiResolutionImageFactory::_externalFormatsRegistered = false;
 
@@ -64,17 +69,29 @@ void MultiResolutionImageFactory::registerExternalFileFormats() {
   GetModuleFileNameA(hm, path, sizeof(path));
   pathStr = std::string(path);
 #else
-  Dl_info dlInfo;
-  dladdr((void*)&MultiResolutionImageFactory::registerExternalFileFormats, &dlInfo);
-  pathStr = std::string(dlInfo.dli_fname);
+  // Dl_info dlInfo;
+  // dladdr((void*)&MultiResolutionImageFactory::registerExternalFileFormats, &dlInfo);
+  // pathStr = std::string(dlInfo.dli_fname);
+  // std::cout << pathStr << std::endl;
+
+  char current_absolute_path[PATH_MAX +1];
+  //获取当前目录绝对路径
+  if (NULL == realpath("./", current_absolute_path))
+  {
+      printf("***Error***");
+      exit(-1);
+  }
+  pathStr = (current_absolute_path);
+  std::cout << pathStr << std::endl;
+
 #endif
-  std::string rootDir = core::extractFilePath(pathStr);
+  std::string rootDir = core::extractFilePath(pathStr);  
   std::vector<std::string> formatPlugins;
 #ifdef _WIN32
   std::string fileFormatPluginDir = core::completePath("formats", rootDir);  
   core::getFiles(fileFormatPluginDir, "*.dll", formatPlugins);
 #else
-  std::string fileFormatPluginDir = core::completePath("bin/formats", core::upOneLevel(rootDir));  
+  std::string fileFormatPluginDir = core::completePath("bin/formats", rootDir);  
   core::getFiles(fileFormatPluginDir, "*.so", formatPlugins);
 #endif
   for (std::vector<std::string>::const_iterator it = formatPlugins.begin(); it != formatPlugins.end(); ++it) {
@@ -97,6 +114,9 @@ void MultiResolutionImageFactory::registerExternalFileFormats() {
       if (loadfunction) {
         (*loadfunction)();
       }
+    }
+    else{
+      std::cout <<  dlerror();  
     }
 #endif
   }

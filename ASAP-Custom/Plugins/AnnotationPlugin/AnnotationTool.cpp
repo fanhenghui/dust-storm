@@ -48,6 +48,7 @@ void AnnotationTool::mouseMoveEvent(QMouseEvent *event) {
           QPointF delta = (scenePos - _moveStart);
           active->moveCoordinateBy(activeSeedPoint, Point(delta.x(), delta.y()));
           _moveStart = scenePos;
+          _viewer->scene()->update(_viewer->sceneRect());//强制刷新Scene
         }
       }
     }
@@ -74,6 +75,12 @@ void AnnotationTool::keyPressEvent(QKeyEvent *event) {
     }
   }
   else if (event->key() == Qt::Key::Key_Delete) {
+      //添加的逻辑，对于Rectangle来说不可以删除任何一个控制点
+      if (nullptr == _annotationPlugin->getActiveAnnotation() || 
+          _annotationPlugin->getActiveAnnotation()->getAnnotation()->getType() == Annotation::RECTANGLE)
+      {
+          return;
+      }
     if (_generating) {
       if (_annotationPlugin->getGeneratedAnnotation()->getAnnotation()->getCoordinates().size() < 2) {
         cancelAnnotation();

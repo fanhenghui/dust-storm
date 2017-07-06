@@ -77,6 +77,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UT", "UT", "{6D1D066E-73B7-477F-8506-AAC04E545393}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgAnonymization", "MedImgAnonymization\MedImgAnonymization.vcxproj", "{11DDA0D4-F26E-4EC7-ADA4-AFDF4B22A992}"
+	ProjectSection(ProjectDependencies) = postProject
+		{835B8C4E-D8A8-45CE-82F4-739CD390C4D6} = {835B8C4E-D8A8-45CE-82F4-739CD390C4D6}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{67BFFD06-EE56-4812-A26D-13FB7DDAE9CF}"
 EndProject

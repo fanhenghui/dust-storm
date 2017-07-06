@@ -56,6 +56,7 @@ public:
     void addAnnotationGroup();
     void onClearButtonPressed();
     void onLoadButtonPressed(const std::string& filePath = std::string());
+    void onTryLearningResultButtonPressed();
     bool onSaveButtonPressed();
     void onItemNameChanged(QTreeWidgetItem* item, int column);
     void onTreeWidgetItemDoubleClicked(QTreeWidgetItem * item, int column);
@@ -92,6 +93,8 @@ private:
     void clearAnnotationList();
     void clearQtAnnotations();
     void addChildCheckBox(QTreeWidget *tree_widget, QTreeWidgetItem* tree_widget_item);
+
+    void updateAnnotationWidget();
 
     static unsigned int _annotationIndex;
     static unsigned int _annotationGroupIndex;

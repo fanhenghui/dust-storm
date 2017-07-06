@@ -1,0 +1,42 @@
+EncoderDst = ../mi_shader_collection.h
+
+//MPR entry exit points
+EncoderItem = mpr_entry_exit_points.glsl S_MPR_ENTRY_EXIT_POINTS_COMP
+
+//GPU ray caster
+//1 Main
+EncoderItem = rc_main.vert S_RC_MAIN_VERTEX
+EncoderItem = rc_main.frag S_RC_MAIN_FRAGMENT
+
+//2 Ray casting
+EncoderItem = rc_ray_casting_dvr.frag S_RC_RAY_CASTING_DVR_FRAG
+EncoderItem = rc_ray_casting_mip_minip.frag S_RC_RAY_CASTING_MIP_MINIP_FRAG
+EncoderItem = rc_ray_casting_average.frag S_RC_RAY_CASTING_AVERAGE_FRAG
+
+//3 Composite
+EncoderItem = rc_composite_average.frag S_RC_COMPOSITE_AVERAGE_FRAG
+EncoderItem = rc_composite_dvr.frag S_RC_COMPOSITE_DVR_FRAG
+EncoderItem = rc_composite_mip.frag S_RC_COMPOSITE_MIP_FRAG
+EncoderItem = rc_composite_minip.frag S_RC_COMPOSITE_MINIP_FRAG
+
+//4 Shading
+EncoderItem = rc_shading_none.frag S_RC_SHADING_NONE_FRAG
+EncoderItem = rc_shading_phong.frag S_RC_SHADING_PHONG_FRAG
+
+//5 Sampler
+EncoderItem = rc_volume_linear_samper.frag S_RC_VOLUME_LINEAR_SAMPLER_FRAG
+EncoderItem = rc_volume_nearst_samper.frag S_RC_VOLUME_NEARST_SAMPLER_FRAG
+EncoderItem = rc_mask_linear_sampler.frag S_RC_MASK_LINEAR_SAMPLER_FRAG
+EncoderItem = rc_mask_nearst_sampler.frag S_RC_MASK_NEARST_SAMPLER_FRAG
+EncoderItem = rc_mask_none_sampler.frag S_RC_MASK_NONE_SAMPLER_FRAG
+
+//6 Color inverse
+EncoderItem = rc_color_inverse_disable.frag S_RC_COLOR_INVERSE_DISABLE_FRAG
+EncoderItem = rc_color_inverse_enable.frag S_RC_COLOR_INVERSE_ENABLE_FRAG
+
+//7 Overlay mask label
+EncoderItem = rc_mask_overlay_disable.frag S_RC_MASK_OVERLAY_DISABLE_FRAG
+EncoderItem = rc_mask_overlay_enable.frag S_RC_MASK_OVERLAY_ENABLE_FRAG
+
+//8 Utils
+EncoderItem = rc_utils.frag ksRCUtilsFrag
