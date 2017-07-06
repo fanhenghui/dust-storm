@@ -1,4 +1,4 @@
-ver = release
+ver = debug
 CC  = g++ -std=c++11 -Wall 
 
 ifeq ($(ver) , release)

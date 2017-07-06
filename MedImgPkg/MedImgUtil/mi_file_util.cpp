@@ -20,12 +20,12 @@ namespace
                 else{
                     const std::string ext = boost::filesystem::extension(*it);
                     if(postfix.empty()){
-                        files.push_back(it->path().filename().string());
+                        files.push_back(root + std::string("/") + it->path().filename().string());
                     }
                     else{
                         for(auto itext = postfix.begin() ; itext != postfix.end() ; ++itext){
                             if(*itext == ext){
-                                files.push_back(it->path().filename().string());
+                                files.push_back(root + std::string("/") + it->path().filename().string());
                                 break;
                             }
                         }

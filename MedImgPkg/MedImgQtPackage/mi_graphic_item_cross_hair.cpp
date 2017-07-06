@@ -90,7 +90,7 @@ void GraphicItemCrosshair::update(std::vector<QGraphicsItem*>& to_be_add , std::
         const double c = a*line._pt.x + b*line._pt.y;
 
         QPointF pt_dc_0 , pt_dc_1;
-        if (abs(a) < DOUBLE_EPSILON)
+        if (fabs(a) < DOUBLE_EPSILON)
         {
             double y = c/b;
             y = y < 0 ? 0 : y;
@@ -102,7 +102,7 @@ void GraphicItemCrosshair::update(std::vector<QGraphicsItem*>& to_be_add , std::
             pt_dc_1.setX(width -1);
             pt_dc_1.setY(y);
         }
-        else if (abs(b) < DOUBLE_EPSILON)
+        else if (fabs(b) < DOUBLE_EPSILON)
         {
             double x = c/a;
             x = x < 0 ? 0 : x;

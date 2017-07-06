@@ -41,6 +41,11 @@ OperationFactory::~OperationFactory()
 
 }
 
+OperationFactory::OperationFactory()
+{
+
+}
+
 std::shared_ptr<IOperation> OperationFactory::get_operation(unsigned int id)
 {
     return std::shared_ptr<IOperation>(new TestOperation());

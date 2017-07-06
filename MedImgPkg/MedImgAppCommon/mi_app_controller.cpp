@@ -45,6 +45,7 @@ pid_t AppController::get_server_pid() const
 void AppController::run(const std::string& path)
 {
     _thread_model->start();
+    _proxy->set_path(path);
     _proxy->run();
 }
 

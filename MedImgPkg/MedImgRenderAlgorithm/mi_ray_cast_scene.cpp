@@ -108,6 +108,8 @@ void RayCastScene::render(int test_code)
         return;
     }
 
+    initialize();
+
     _volume_infos->refresh();
 
     //////////////////////////////////////////////////////////////////////////

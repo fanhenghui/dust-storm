@@ -500,7 +500,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     image_data->_spacing[1] = data_header->pixel_spacing[0];
     const double slice_location_first= data_header->slice_location[0];
     const double slice_location_last= data_header->slice_location[slice_count-1];
-    image_data->_spacing[2] = abs( (slice_location_last - slice_location_first)/static_cast<double>(slice_count-1));
+    image_data->_spacing[2] = fabs( (slice_location_last - slice_location_first)/static_cast<double>(slice_count-1));
 
     //Image position in patient
     image_data->_image_position = data_header->image_position[0];

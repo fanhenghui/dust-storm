@@ -8,12 +8,17 @@
 #include "MedImgGLResource/mi_gl_context.h"
 
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
+#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+
+#include "MedImgAppCommon/mi_app_cell.h"
+#include "MedImgAppCommon//mi_app_thread_model.h"
+#include "MedImgAppCommon/mi_app_common_define.h"
 
 #include "mi_review_controller.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-LoadSeriesCommandHandler::LoadSeriesCommandHandler(std::shared_ptr<AppController> controller):_controller(controller)
+LoadSeriesCommandHandler::LoadSeriesCommandHandler(std::shared_ptr<ReviewController> controller):_controller(controller)
 {
 
 }
@@ -25,11 +30,15 @@ LoadSeriesCommandHandler::~LoadSeriesCommandHandler()
 
 int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , void* buffer)
 {
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<ReviewController> controller = _controller.lock();
     if(nullptr == controller){
         REVIEW_THROW_EXCEPTION("controller pointer is null!");
     }
-    std::shared_ptr<GLContext> gl_context = controller->get_gl_context();
+
+    std::shared_ptr<AppThreadModel> thread_model = controller->get_thread_model();
+    REVIEW_CHECK_NULL_EXCEPTION(thread_model);
+
+    std::shared_ptr<GLContext> gl_context = thread_model->get_gl_context();
 
     gl_context->make_current(MAIN_CONTEXT);
 
@@ -50,20 +59,19 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
         REVIEW_THROW_EXCEPTION("Empty series files!");
     }
 
-    IOStatus status = loader.load_series(file_names_std, img_data , data_header);
+    std::shared_ptr<ImageDataHeader> data_header;
+    std::shared_ptr<ImageData> img_data;
+    DICOMLoader loader;
+    IOStatus status = loader.load_series(dcm_files, img_data , data_header);
     if (status != IO_SUCCESS){
         REVIEW_THROW_EXCEPTION("load series failed");
     }
 
     //2 construct volume infos
-    if (_volume_infos)//Delete last one
-    {
-        _volume_infos->finialize();
-    }
-    _volume_infos.reset(new VolumeInfos());
-    _volume_infos->set_data_header(data_header);
+    std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos());
+    volume_infos->set_data_header(data_header);
     //SharedWidget::instance()->makeCurrent();
-    _volume_infos->set_volume(img_data);//load volume texture if has graphic card
+    volume_infos->set_volume(img_data);//load volume texture if has graphic card
 
     //Create empty mask
     std::shared_ptr<ImageData> mask_data(new ImageData());
@@ -71,10 +79,28 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
     mask_data->_channel_num = 1;
     mask_data->_data_type = medical_imaging::UCHAR;
     mask_data->mem_allocate();
-    _volume_infos->set_mask(mask_data);
+    volume_infos->set_mask(mask_data);
 
+    controller->set_volume_infos(volume_infos);
 
-    //2 initialize data
+    //3 construct cell
+    std::shared_ptr<AppCell> cell(new AppCell);
+    std::shared_ptr<MPRScene> mpr_scene(new MPRScene(512,512));
+    cell->set_scene(mpr_scene);
+
+    const float PRESET_CT_LUNGS_WW = 1500;
+    const float PRESET_CT_LUNGS_WL = -400;
+
+    mpr_scene->set_volume_infos(volume_infos);
+    mpr_scene->set_sample_rate(1.0);
+    mpr_scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
+    mpr_scene->set_composite_mode(COMPOSITE_AVERAGE);
+    mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+    mpr_scene->set_mask_mode(MASK_NONE);
+    mpr_scene->set_interpolation_mode(LINEAR);
+
+    controller->add_cell(0 , cell);
+
 
     gl_context->make_noncurrent();
 
