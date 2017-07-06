@@ -1,15 +1,18 @@
 #include "mi_app_thread_model.h"
 
 #include "boost/thread/thread.hpp"
-#include "boost/thread/mutex.hpp"
 #include "boost/thread/condition.hpp"
 
 #include "MedImgUtil/mi_message_queue.h"
+#include "MedImgUtil/mi_ipc_client_proxy.h"
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_context.h"
+#include "MedImgRenderAlgorithm/mi_scene_base.h"
 
 #include "mi_operation_interface.h"
-
+#include "mi_app_controller.h"
+#include "mi_app_cell.h"
+#include "mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -37,6 +40,8 @@ AppThreadModel::AppThreadModel():
     UIDType uid(0);
     _glcontext = GLResourceManagerContainer::instance()->get_context_manager()->create_object(uid);
     _glcontext->initialize();
+    _glcontext->create_shared_context(RENDERING_CONTEXT);
+    _glcontext->create_shared_context(OPERATION_CONTEXT);
 }
 
 AppThreadModel::~AppThreadModel()
@@ -44,9 +49,19 @@ AppThreadModel::~AppThreadModel()
 
 }
 
+std::shared_ptr<GLContext> AppThreadModel::get_gl_context()
+{
+    return _glcontext;
+}
+
 void AppThreadModel::set_client_proxy(std::shared_ptr<IPCClientProxy> proxy)
 {
     _proxy = proxy;
+}
+
+void AppThreadModel::set_controller(std::shared_ptr<AppController> controller)
+{
+    _controller = controller;
 }
 
 void AppThreadModel::push_operation(const std::shared_ptr<IOperation>& op)
@@ -135,9 +150,12 @@ void AppThreadModel::process_rendering()
     try
     {
         
-        _glcontext->make_current();
+        _glcontext->make_current(RENDERING_CONTEXT);
 
         for(;;){
+
+            std::deque<unsigned int> dirty_cells;
+            std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
             ///\ 1 render
             {
@@ -148,7 +166,21 @@ void AppThreadModel::process_rendering()
                 }
 
                 ////////////////////////////////////////
-                //TODOTODO rendering code
+                //render all dirty cells
+                std::shared_ptr<AppController> controller = _controller.lock();
+                APPCOMMON_CHECK_NULL_EXCEPTION(controller);
+
+                std::map<unsigned int , std::shared_ptr<AppCell> > cells = controller->get_cells();
+                for(auto it = cells.begin() ; it != cells.end() ; ++it){
+                    std::shared_ptr<SceneBase> scene = it->second->get_scene();
+                    APPCOMMON_CHECK_NULL_EXCEPTION(scene);
+                    if(scene->get_dirty()){
+                        dirty_cells.push_back(it->first);
+                        dirty_scenes.push_back(scene);
+                        scene->render(0);
+                        scene->set_dirty(false);
+                    }
+                }
                 ////////////////////////////////////////
 
                 //interrupt point    
@@ -161,7 +193,18 @@ void AppThreadModel::process_rendering()
             /// \2 get image result to buffer
             
             ////////////////////////////////////////
-            //TODOTODO rendering code
+            //download all dirty scene image to buffer
+            for(auto it = dirty_scenes.begin() ; it != dirty_scenes.end() ; ++it){
+                (*it)->download_image_buffer();
+            }        
+            //tell sending the change and swap dirty scene image buffer    
+            {
+                boost::mutex::scoped_lock dirty_cells_locker(_dirty_cells_mutex);
+                _dirty_cells = dirty_cells;
+            for(auto it = dirty_scenes.begin() ; it != dirty_scenes.end() ; ++it){
+                    (*it)->swap_image_buffer();
+                }          
+            }
             ////////////////////////////////////////
             _sending = true;    
             _th_sending->_condition.notify_one();
@@ -198,7 +241,43 @@ void AppThreadModel::process_sending()
             }
 
             ////////////////////////////////////////
-            //TODOTODO sending code
+            //get dirty cells to be sending
+            std::deque<unsigned int> dirty_cells;
+            {
+                boost::mutex::scoped_lock dirty_cells_locker(_dirty_cells_mutex);
+                dirty_cells = _dirty_cells;
+            }
+
+            std::shared_ptr<AppController> controller = _controller.lock();
+            APPCOMMON_CHECK_NULL_EXCEPTION(controller);
+
+            //sendong image buffer
+            for(auto it = dirty_cells.begin() ; it != dirty_cells.end() ; ++it){
+                const unsigned int cell_id = *it;
+                std::shared_ptr<AppCell> cell =  controller->get_cell(cell_id);
+                APPCOMMON_CHECK_NULL_EXCEPTION(cell);
+                std::shared_ptr<SceneBase> scene = cell->get_scene();
+                APPCOMMON_CHECK_NULL_EXCEPTION(scene);
+                int width(32) , height(32);
+                scene->get_display_size(width , height);
+
+                IPCDataHeader header;
+                header._sender = static_cast<unsigned int>( controller->get_local_pid() );
+                header._receiver = static_cast<unsigned int>( controller->get_server_pid() );;
+                header._msg_id = COMMAND_ID_BE_SEND_IMAGE;
+                header._msg_info0 = cell_id;
+                header._msg_info1 = 0;
+                header._data_type = 0;
+                header._big_end = 0;
+                header._data_len = static_cast<unsigned int>(width*height*4);
+
+                void* buffer = nullptr;
+                scene->get_image_buffer(buffer);
+                APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
+
+                _proxy->async_send_message(header , buffer);
+            }
+            
             ////////////////////////////////////////
 
             //interrupt point    

@@ -17,6 +17,11 @@ struct IPCDataHeader
     unsigned int _data_type;//0 raw_data 1 protocol buffer
     unsigned int _big_end;//0 small end 1 big_end 
     unsigned int _data_len;//data length
+
+    IPCDataHeader():
+        _sender(0),_receiver(0),_msg_id(0),_msg_info0(0),
+        _msg_info1(0),_data_type(0),_big_end(0),_data_len(0)
+    {}
 };
 
 class IPCDataRecvHandler

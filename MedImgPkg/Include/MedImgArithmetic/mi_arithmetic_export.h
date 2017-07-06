@@ -13,7 +13,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
-#include <typeinfo>
 
 MED_IMG_BEGIN_NAMESPACE
 

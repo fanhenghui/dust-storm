@@ -8,7 +8,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class OperationFactory
+class AppCommon_Export OperationFactory
 {
 public:
     static OperationFactory* instance();

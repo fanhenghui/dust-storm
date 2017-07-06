@@ -15,6 +15,8 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
+#include <cassert>
+
 
 #include "MedImgArithmetic/mi_arithmetic_utils.h"
 #include "MedImgArithmetic/mi_vector3.h"

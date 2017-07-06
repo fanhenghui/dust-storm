@@ -4,6 +4,8 @@
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
 
+#include "boost/thread/mutex.hpp"
+
 MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export SceneBase 
@@ -53,6 +55,8 @@ protected:
 
     std::unique_ptr<char[]> _image_buffer[2];
     int _front_buffer_id;
+    boost::mutex _read_mutex;
+    boost::mutex _write_mutex;
 
 };
 

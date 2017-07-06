@@ -77,7 +77,6 @@ void SocketClient::run()
     }
 
     _fd_server = fd_s;
-
     
     for(;;) {
 
@@ -102,10 +101,22 @@ void SocketClient::run()
             }
         }
         
+        try
+        {
+            if(_handler){
+                const int err = _handler->handle(header , buffer);
+                const int quit_id = 2;//TODO define in a common include file
+                if(err == quit_id){
+                    break;
+                }
+            }
         
-        if(_handler && -1 == _handler->handle(header , buffer)){
-            //TODO quit id
-            break;
+        }
+        catch(const Exception& e)
+        {
+            //TODO 
+            //Ignore error
+            std::cout << "Handle command error : " << e.what() << std::endl;
         }
     }
 }

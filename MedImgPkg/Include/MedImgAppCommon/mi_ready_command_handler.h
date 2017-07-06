@@ -1,5 +1,5 @@
-#ifndef MED_IMG_OPERATION_COMMAND_HANDLER_H
-#define MED_IMG_OPERATION_COMMAND_HANDLER_H
+#ifndef MED_IMG_READY_COMMAND_HANDLER_H
+#define MED_IMG_READY_COMMAND_HANDLER_H
 
 #include "MedImgAppCommon/mi_app_common_export.h"
 #include "MedImgUtil/mi_ipc_common.h"
@@ -8,12 +8,12 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
-class AppCommon_Export OperationCommandHandler : public ICommandHandler
+class AppCommon_Export ReadyCommandHandler : public ICommandHandler
 {
 public:
-    OperationCommandHandler(std::shared_ptr<AppController> controller);
+    ReadyCommandHandler(std::shared_ptr<AppController> controller);
 
-    virtual ~OperationCommandHandler();
+    virtual ~ReadyCommandHandler();
 
     virtual int handle_command(const IPCDataHeader& datahaeder , void* buffer);
 
