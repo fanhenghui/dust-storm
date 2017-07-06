@@ -260,12 +260,12 @@ void VolumeInfos::load_volume_resource_i()
         const double min_gray = _volume_data->get_min_scalar();
         if (_volume_data->_data_type == SHORT)
         {
-            std::unique_ptr<unsigned short> dst_data = signed_to_unsigned<short , unsigned short>(length , min_gray , _volume_data->get_pixel_pointer());
+            std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short , unsigned short>(length , min_gray , _volume_data->get_pixel_pointer());
             tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
         }
         else if (_volume_data->_data_type == CHAR)
         {
-            std::unique_ptr<unsigned char> dst_data = signed_to_unsigned<char , unsigned char>(length , min_gray , _volume_data->get_pixel_pointer());
+            std::unique_ptr<unsigned char[]> dst_data = signed_to_unsigned<char , unsigned char>(length , min_gray , _volume_data->get_pixel_pointer());
             tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
         }
         else

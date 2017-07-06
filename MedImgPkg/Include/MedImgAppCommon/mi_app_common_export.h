@@ -20,5 +20,13 @@ MED_IMG_BEGIN_NAMESPACE
 #define APPCOMMON_THROW_EXCEPTION(desc) THROW_EXCEPTION("AppCommon" , desc);
 #endif
 
+#ifndef APPCOMMON_CHECK_NULL_EXCEPTION
+#define  APPCOMMON_CHECK_NULL_EXCEPTION(pointer)                  \
+    if (nullptr == pointer)                 \
+{                                       \
+    APPCOMMON_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
+}
+#endif
+
 MED_IMG_END_NAMESPACE
 #endif

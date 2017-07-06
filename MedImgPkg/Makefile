@@ -8,6 +8,8 @@ subsystem:
 	$(MAKE) -C ./MedImgArithmetic
 	$(MAKE) -C ./MedImgIO
 	$(MAKE) -C ./MedImgAppCommon
+	$(MAKE) -C ./Executable/MedImgShaderEncoder
+	$(MAKE) -C ./MedImgRenderAlgorithm
 	$(MAKE) -C ./UT/MedImgUtil_UT
 	$(MAKE) -C ./UT/MedImgGLResource_UT
 
@@ -20,6 +22,8 @@ clean:
 	$(MAKE) clean -C ./MedImgArithmetic
 	$(MAKE) clean -C ./MedImgIO
 	$(MAKE) clean -C ./MedImgAppCommon
+	$(MAKE) clean -C ./Executable/MedImgShaderEncoder
+	$(MAKE) clean -C ./MedImgRenderAlgorithm
 	$(MAKE) clean -C ./UT/MedImgUtil_UT
 	$(MAKE) clean -C ./UT/MedImgGLResource_UT
 	-rm -r bin

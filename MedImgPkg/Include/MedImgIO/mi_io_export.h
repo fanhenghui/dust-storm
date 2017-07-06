@@ -13,7 +13,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cmath>
-#include <typeinfo>
 #include <cassert>
 
 #include "MedImgUtil/mi_exception.h"

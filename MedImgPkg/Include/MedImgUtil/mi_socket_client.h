@@ -32,6 +32,9 @@ private:
     int _fd_server;
 
     static const int _reconnect_times = 100;
+
+    pid_t _local_pid;
+    pid_t _server_pid;
 };
 
 MED_IMG_END_NAMESPACE

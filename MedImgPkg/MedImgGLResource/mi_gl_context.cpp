@@ -11,7 +11,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_ctx(NULL),_win((Window)NULL)
+XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_ctx(NULL),_win((Window)NULL),_fb_configs(nullptr)
 {
 
 }
@@ -39,7 +39,6 @@ void XGLContext::create_window()
     GLint nMajorVer = 0;
     GLint nMinorVer = 0;
     XVisualInfo *visualInfo;
-    GLXFBConfig *fbConfigs;
     int numConfigs = 0;
     static int fbAttribs[] = {
                     GLX_RENDER_TYPE,   GLX_RGBA_BIT,
@@ -67,8 +66,8 @@ void XGLContext::create_window()
         exit(0);
     }
     // Get a new fb config that meets our attrib requirements
-    fbConfigs = glXChooseFBConfig(_dpy, DefaultScreen(_dpy), fbAttribs, &numConfigs);
-    visualInfo = glXGetVisualFromFBConfig(_dpy, fbConfigs[0]);
+    _fb_configs = glXChooseFBConfig(_dpy, DefaultScreen(_dpy), fbAttribs, &numConfigs);
+    visualInfo = glXGetVisualFromFBConfig(_dpy, _fb_configs[0]);
 
     // Now create an X window
     winAttribs.event_mask = ExposureMask | VisibilityChangeMask | 
@@ -94,7 +93,7 @@ void XGLContext::create_window()
       GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
       GLX_CONTEXT_MINOR_VERSION_ARB, 5,
       0 };
-    _ctx = glXCreateContextAttribsARB(_dpy, fbConfigs[0], 0, True, attribs);
+    _ctx = glXCreateContextAttribsARB(_dpy, _fb_configs[0], 0, True, attribs);
 
     this->make_current();
     
@@ -110,6 +109,27 @@ void XGLContext::create_window()
     printf("GL Version = %s\n", s);    
 }
 
+void XGLContext::create_shared_context(int id)
+{
+    if(_ctx == NULL){
+        GLRESOURCE_THROW_EXCEPTION("main context is NULL!");
+    }
+
+    if(_shared_ctx.find(id) != _shared_ctx.end()){
+        GLRESOURCE_THROW_EXCEPTION("Create the same shared context id");
+    }
+
+    GLint attribs[] = {
+      GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+      GLX_CONTEXT_MINOR_VERSION_ARB, 5,
+      0 };
+
+    GLXContext ctx = glXCreateContextAttribsARB(_dpy , _fb_configs[0] , _ctx , True, attribs);
+
+    _shared_ctx[id] = ctx;
+    
+}
+
 void XGLContext::initialize()
 {
     create_window();
@@ -120,6 +140,10 @@ void XGLContext::finalize()
     glXMakeCurrent(_dpy, None, NULL);
     glXDestroyContext(_dpy, _ctx);
     _ctx = NULL;
+    for(auto it = _shared_ctx.begin() ; it != _shared_ctx.end() ; ++it){
+        glXDestroyContext(_dpy, it->second);
+    }
+    _shared_ctx.clear();
 
     XDestroyWindow(_dpy, _win);
     _win = (Window)NULL;
@@ -128,9 +152,21 @@ void XGLContext::finalize()
     _dpy = nullptr;
 }
 
-void XGLContext::make_current()
+void XGLContext::make_current(int id )
 {
-    glXMakeCurrent(_dpy, _win, _ctx);
+    if(0 == id){
+        glXMakeCurrent(_dpy, _win, _ctx);
+    }
+    else{
+        auto it = _shared_ctx.find(id);
+        if(it != _shared_ctx.end()){
+            glXMakeCurrent(_dpy, _win, it->second);
+        }
+        else{
+            GLRESOURCE_THROW_EXCEPTION("cant find such shared context");
+        }
+    }
+    
 }
 
 void XGLContext::make_noncurrent()

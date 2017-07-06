@@ -3,6 +3,7 @@
 
 #include "MedImgGLResource/mi_gl_object.h"
 #include "GL/glew.h"
+#include <map>
 
 #ifdef WIN32
 
@@ -22,8 +23,10 @@ public:
 
     virtual void initialize();
     virtual void finalize();
+
+    void create_shared_context(int id);
     
-    void make_current();
+    void make_current(int id = 0);//0 is main context
     void make_noncurrent();
 protected:
 private: 
@@ -39,8 +42,10 @@ public:
 
     virtual void initialize();
     virtual void finalize();
+
+    void create_shared_context(int id);
     
-    void make_current();
+    void make_current(int id = 0);//0 is main context
     void make_noncurrent();
 
 private:
@@ -48,8 +53,10 @@ private:
     void create_window();
 private: 
     GLXContext _ctx;
+    std::map<int , GLXContext> _shared_ctx;
     Display *_dpy;
     Window _win;
+    GLXFBConfig *_fb_configs;
 };
 
 #endif

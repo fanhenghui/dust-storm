@@ -10,12 +10,13 @@ namespace
     static const std::string S_TAG_ENCODER_DST = "EncoderDst";
     static const std::string S_TAG_ECODER_ITEM = "EncoderItem";
 }
-void main(int argc , char* argv[])
+
+int main(int argc , char* argv[])
 {
     if (argc < 2)
     {
         std::cout <<"Parameter valid!\n";
-        return;
+        return -1;
     }
 
     //1 Parse config file
@@ -24,7 +25,7 @@ void main(int argc , char* argv[])
     if (!in_config.is_open())
     {
         std::cout <<"Cant open config file " << config_file << std::endl;
-        return;
+        return -1;
     }
 
     int root_sub = -1;
@@ -119,4 +120,6 @@ void main(int argc , char* argv[])
     out_encod_dst_file.clear();
     out_encod_dst_file.close();
     in_config.close();
+
+    return 0;
 }

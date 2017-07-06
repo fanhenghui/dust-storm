@@ -128,7 +128,7 @@ void SceneBase::pan(const Point2& pre_pt , const Point2& cur_pt)
 
 void SceneBase::get_display_size(int& width, int& height) const
 {
-    width = _width;SceneBase::
+    width = _width;
     height = _height;
 }
 
@@ -155,17 +155,21 @@ const std::string& SceneBase::get_name() const
 void SceneBase::download_image_buffer()
 {
     //download FBO to back buffer
+    boost::mutex::scoped_lock locker(_write_mutex);
     _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get() , 0 );
 }
 
 void SceneBase::swap_image_buffer()
 {
+    boost::mutex::scoped_lock locker0(_read_mutex);
+    boost::mutex::scoped_lock locker1(_write_mutex);
     _front_buffer_id = 1 - _front_buffer_id;
 }
 
 void SceneBase::get_image_buffer(void* buffer)
 {
     //Get front buffer
+    boost::mutex::scoped_lock locker(_read_mutex);
     buffer = _image_buffer[_front_buffer_id].get();
 }
 

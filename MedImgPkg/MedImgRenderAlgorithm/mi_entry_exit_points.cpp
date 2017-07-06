@@ -145,9 +145,9 @@ void EntryExitPoints::debug_output_entry_points(const std::string& file_name)
             bb = bb > 255.0f ? 255.0f : bb;
             bb = bb <0.0f ? 0.0f : bb;
 
-            r = unsigned char(rr);
-            g = unsigned char(gg);
-            b = unsigned char(bb);
+            r = static_cast<unsigned char>(rr);
+            g = static_cast<unsigned char>(gg);
+            b = static_cast<unsigned char>(bb);
 
             rgb_array[i*3] = r;
             rgb_array[i*3+1] = g;
@@ -192,9 +192,9 @@ void EntryExitPoints::debug_output_exit_points(const std::string& file_name)
             bb = bb > 255.0f ? 255.0f : bb;
             bb = bb <0.0f ? 0.0f : bb;
 
-            r = unsigned char(rr);
-            g = unsigned char(gg);
-            b = unsigned char(bb);
+            r = static_cast<unsigned char>(rr);
+            g = static_cast<unsigned char>(gg);
+            b = static_cast<unsigned char>(bb);
 
             rgb_array[i*3] = r;
             rgb_array[i*3+1] = g;

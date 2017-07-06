@@ -6,6 +6,7 @@
 #include <exception>
 #include <string>
 #include <sstream>
+#include <typeinfo>
 
 MED_IMG_BEGIN_NAMESPACE
 

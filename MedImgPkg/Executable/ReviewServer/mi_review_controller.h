@@ -6,20 +6,26 @@
 #include <string>
 #include <memory>
 
+#include "MedImgAppCommon/mi_app_controller.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
-class ReviewController
+class VolumeInfos;
+class ReviewController : public AppController
 {
 public:
     ReviewController();
     ~ReviewController();
     
     void initialize();
-    void run(const std::string& path);
+    
+    void set_volume_infos(std::shared_ptr<VolumeInfos> volumeinfos);
+    std::shared_ptr<VolumeInfos> get_volume_infos();
     
 protected:
 private:
-    std::shared_ptr<IPCClientProxy> _proxy;
+    std::shared_ptr<VolumeInfos> _volumeinfos;
+    
 };
 
 MED_IMG_END_NAMESPACE

@@ -14,7 +14,8 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_exception.o mi_configuration.o mi_model_interface.o mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o
+OBJS = mi_exception.o mi_configuration.o mi_model_interface.o mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o \
+mi_file_util.o
 TARGET = $(BIN_DIR)/libmedimg_util.so
 
 EXPORT_HEADER = mi_util_export.h
@@ -41,6 +42,9 @@ mi_configuration.o: $(EXPORT_HEADER) mi_configuration.h mi_configuration.cpp
 
 mi_model_interface.o: $(EXPORT_HEADER) mi_model_interface.h mi_model_interface.cpp
 	$(CC) $(CFLAGS) mi_model_interface.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_file_util.o: $(EXPORT_HEADER) mi_file_util.h mi_file_util.cpp
+	$(CC) $(CFLAGS) mi_file_util.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

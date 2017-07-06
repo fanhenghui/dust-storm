@@ -17,6 +17,9 @@ class ImageData;
 class CameraBase;
 class RayCasterInnerBuffer;
 class RayCasterCanvas;
+class RayCastingCPU;
+class RayCastingGPU;
+class RayCastingCPUBrickAcc;
 
 class RenderAlgo_Export RayCaster : public std::enable_shared_from_this<RayCaster>
 {
