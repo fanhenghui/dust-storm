@@ -5,6 +5,8 @@
 #include "MedImgArithmetic/mi_point3.h"
 #include "MedImgArithmetic/mi_vector3f.h"
 
+#include <vector>
+
 MED_IMAGING_BEGIN_NAMESPACE
 
 struct ContourData
