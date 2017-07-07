@@ -23,7 +23,7 @@ class IOperation
 public:
     IOperation():_buffer(nullptr)
     {
-        memset((char*)(&_data) , 0, sizeof(_data));
+        memset((char*)(&_header) , 0, sizeof(_header));
     };
 
     virtual ~IOperation()
@@ -33,7 +33,7 @@ public:
 
     void set_data(const OpDataHeader& data , void* buffer)
     {
-        _data = data;
+        _header = data;
         _buffer = buffer;
     };
 
@@ -48,7 +48,7 @@ public:
     }
 
 protected:
-    OpDataHeader _data;
+    OpDataHeader _header;
     void* _buffer;
     std::weak_ptr<AppController> _controller;
 };

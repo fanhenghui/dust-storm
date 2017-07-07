@@ -21,10 +21,10 @@ EXPORT_HEADER = mi_app_common_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lboost_system -lboost_filesystem -lboost_thread 
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
-mi_app_controller.o: $(EXPORT_HEADER) mi_app_controller.h mi_app_thread_model.o
+mi_app_controller.o: $(EXPORT_HEADER) mi_app_controller.h mi_app_controller.cpp mi_app_thread_model.o
 	$(CC) -c -fPIC $(CFLAGS) mi_app_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_operation_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_operation_command_handler.h mi_operation_command_handler.cpp mi_operation_factory.o mi_app_thread_model.o
@@ -42,7 +42,7 @@ mi_app_thread_model.o: $(EXPORT_HEADER) mi_operation_interface.h mi_app_thread_m
 mi_operation_factory.o: $(EXPORT_HEADER) mi_operation_interface.h mi_operation_factory.h mi_operation_factory.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_operation_factory.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_app_cell.o: $(EXPORT_HEADER) mi_app_cell.h mi_app_cell.h
+mi_app_cell.o: $(EXPORT_HEADER) mi_app_cell.h mi_app_cell.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_app_cell.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 .PHONY : clean

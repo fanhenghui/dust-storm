@@ -16,6 +16,7 @@ public:
 
     // void register_operation(unsigned int id , std::shared_ptr<IOperation> operation);
     std::shared_ptr<IOperation> get_operation(unsigned int id);
+    void register_operation(unsigned int id , std::shared_ptr<IOperation> op);
 
 private:
     OperationFactory();
@@ -23,6 +24,8 @@ private:
 private:
     static OperationFactory* _s_instance;
     static boost::mutex _mutex;
+
+    std::map<unsigned int , std::shared_ptr<IOperation>> _ops;
 
 private:
 };

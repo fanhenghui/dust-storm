@@ -78,7 +78,7 @@ window.FE = {
                 //unsigned int _data_type;//0 raw_data 1 protocol buffer
                 //unsigned int _big_end;//0 small end 1 big_end 
                 //unsigned int _data_len;//data length
-                var header = Uint32Array(arraybuffer,0,8);
+                var header = new Uint32Array(arraybuffer,0,8);
 
                 ipc_sender = header[0];
                 ipc_receiver = header[1];
@@ -99,16 +99,16 @@ window.FE = {
 
             if(curImgLen > 0){
                 //Handle data
-                if(pic_msg_id == COMMAND_ID_BE_READY){
+                if(ipc_msg_id == COMMAND_ID_BE_READY){
                     console.log("Ready");
                     //this.socket.emit
                 }
-                else if(pic_msg_id == COMMAND_ID_BE_SEND_IMAGE){
-                    // var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
-                    // for(var i = 0 ; i< curImgLen ; ++i){
-                    // myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
-                    // }
-                    this.processingImg(arraybuffer , bufferOffset , curImgLen);
+                else if(ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE){
+                    var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
+                    for(var i = 0 ; i< curImgLen ; ++i){
+                    myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
+                    }
+                    //this.processingImg(arraybuffer , bufferOffset , curImgLen);
                 }
                 
             }

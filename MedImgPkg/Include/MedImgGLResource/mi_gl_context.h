@@ -4,6 +4,7 @@
 #include "MedImgGLResource/mi_gl_object.h"
 #include "GL/glew.h"
 #include <map>
+#include "boost/thread/mutex.hpp"
 
 #ifdef WIN32
 
@@ -57,6 +58,7 @@ private:
     Display *_dpy;
     Window _win;
     GLXFBConfig *_fb_configs;
+    boost::mutex _ctx_mutex;//TODO add mutex context in command handler and operation
 };
 
 #endif

@@ -108,7 +108,11 @@ void RayCastScene::render(int test_code)
         return;
     }
 
+    CHECK_GL_ERROR;
+
     initialize();
+
+    CHECK_GL_ERROR;
 
     _volume_infos->refresh();
 
@@ -119,14 +123,19 @@ void RayCastScene::render(int test_code)
     //1 Ray casting
     CHECK_GL_ERROR;
     glPushAttrib(GL_ALL_ATTRIB_BITS);
-
+    CHECK_GL_ERROR;
     glViewport(0,0,_width , _height);
+    CHECK_GL_ERROR;
     glClearColor(0,0,0,0);
+    CHECK_GL_ERROR;
     glClear(GL_COLOR_BUFFER_BIT);
+    CHECK_GL_ERROR;
 
+    CHECK_GL_ERROR;
     _entry_exit_points->calculate_entry_exit_points();
+    CHECK_GL_ERROR;
     _ray_caster->render(_test_code);
-
+    CHECK_GL_ERROR;
     glPopAttrib();
     CHECK_GL_ERROR;
 

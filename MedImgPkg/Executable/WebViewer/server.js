@@ -38,6 +38,8 @@ var onlineLocalIPC = {};
 var onlineLogicProcessID = {};
 var onlineCount = 0;
 
+////////////////////////////////////////////////////////////
+//这里是暂时用来测试用的，作为转发层，server不需要解析具体的command ID
 //FE to BE
 var COMMAND_ID_FE_READY = 120001;
 var COMMAND_ID_FE_OPERATION = 120002;
@@ -47,6 +49,9 @@ var COMMAND_ID_FE_LOAD_SERIES = 120003;
 var COMMAND_ID_BE_READY = 270001;
 var COMMAND_ID_BE_SEND_IMAGE = 270002;
 
+//OPERATION
+var OPERATION_ID_MPR_PAGING = 310001;
+////////////////////////////////////////////////////////////
 
 io.on("connection" , function(socket){
     console.log("<><><><><><> connecting <><><><><><>");
@@ -128,14 +133,14 @@ io.on("connection" , function(socket){
                     //unsigned int _big_end;//0 small end 1 big_end 
                     //unsigned int _data_len;//data length
 
-                    ipc_sender = buffer.readUintLE(0,4);
-                    ipc_receiver = buffer.readUintLE(4,4);
-                    ipc_msg_id = buffer.readUintLE(8,4);
-                    ipc_msg_info0 = buffer.readUintLE(12,4);
-                    ipc_msg_info1 = buffer.readUintLE(16,4);
-                    ipc_data_type = buffer.readUintLE(20,4);
-                    ipc_big_end = buffer.readUintLE(24,4);
-                    ipc_data_len = buffer.readUintLE(28,4);
+                    ipc_sender = buffer.readUIntLE(0,4);
+                    ipc_receiver = buffer.readUIntLE(4,4);
+                    ipc_msg_id = buffer.readUIntLE(8,4);
+                    ipc_msg_info0 = buffer.readUIntLE(12,4);
+                    ipc_msg_info1 = buffer.readUIntLE(16,4);
+                    ipc_data_type = buffer.readUIntLE(20,4);
+                    ipc_big_end = buffer.readUIntLE(24,4);
+                    ipc_data_len = buffer.readUIntLE(28,4);
                     
                     msgLen = ipc_data_len;
                     msgRest = ipc_data_len;
@@ -254,6 +259,8 @@ io.on("connection" , function(socket){
         if(command_id == COMMAND_ID_FE_OPERATION){
             const msgBE = new Buffer(32);
             msgBE.writeUIntLE(COMMAND_ID_FE_OPERATION,8,4);
+            msgBE.writeUIntLE(0,12,4);
+            msgBE.writeUIntLE(OPERATION_ID_MPR_PAGING,16,4);
             ipc.server.emit(local_socket , msgBE);
         }
         else if(command_id == COMMAND_ID_FE_LOAD_SERIES){

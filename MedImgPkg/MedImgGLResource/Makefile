@@ -22,7 +22,7 @@ EXPORT_HEADER = mi_gl_resource_export.h mi_gl_object.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lGL -lGLEW
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 mi_gl_resource_manager_container.o: $(EXPORT_HEADER) mi_gl_resource_manager_container.h mi_gl_resource_manager_container.cpp \

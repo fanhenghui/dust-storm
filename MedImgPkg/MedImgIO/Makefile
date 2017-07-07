@@ -21,7 +21,7 @@ EXPORT_HEADER = mi_io_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_arithmetic -ldcmdata -ldcmimage -ldcmjpeg -lz
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 mi_dicom_loader.o: $(EXPORT_HEADER) mi_dicom_loader.h mi_dicom_loader.cpp mi_image_data_header.h mi_image_data.o

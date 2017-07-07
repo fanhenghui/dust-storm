@@ -15,6 +15,8 @@ SceneBase::SceneBase():_width(128),_height(128),_dirty(true),_name("Scene"),_fro
 
 SceneBase::SceneBase(int width , int height):_width(width) , _height(height),_dirty(true)
 {
+    _image_buffer[0].reset(new char[_width*_height*4]);
+    _image_buffer[1].reset(new char[_width*_height*4]);
 }
 
 SceneBase::~SceneBase()
@@ -156,7 +158,9 @@ void SceneBase::download_image_buffer()
 {
     //download FBO to back buffer
     boost::mutex::scoped_lock locker(_write_mutex);
+    _scene_color_attach_0->bind();
     _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get() , 0 );
+    _scene_color_attach_0->unbind();
 }
 
 void SceneBase::swap_image_buffer()
@@ -166,9 +170,9 @@ void SceneBase::swap_image_buffer()
     _front_buffer_id = 1 - _front_buffer_id;
 }
 
-void SceneBase::get_image_buffer(void* buffer)
+void SceneBase::get_image_buffer(void*& buffer)
 {
-    //Get front buffer
+    //Get front buffer 
     boost::mutex::scoped_lock locker(_read_mutex);
     buffer = _image_buffer[_front_buffer_id].get();
 }

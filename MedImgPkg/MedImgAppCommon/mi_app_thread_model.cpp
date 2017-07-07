@@ -5,6 +5,7 @@
 
 #include "MedImgUtil/mi_message_queue.h"
 #include "MedImgUtil/mi_ipc_client_proxy.h"
+#include "MedImgUtil/mi_file_util.h"
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_context.h"
 #include "MedImgRenderAlgorithm/mi_scene_base.h"
@@ -79,6 +80,7 @@ void AppThreadModel::start()
     try
     {
         _th_operating->_th = boost::thread(boost::bind(&AppThreadModel::process_operating, this));
+        _op_queue->_msg_queue.activate();
             
         _th_sending->_th = boost::thread(boost::bind(&AppThreadModel::process_sending, this));
 
@@ -117,26 +119,31 @@ void AppThreadModel::process_operating()
 
             boost::mutex::scoped_lock locker(_th_rendering->_mutex);
 
+            std::cout << "Execute op begin\n";
             int err = op->execute();
             if(-1 == err){
                 //TODO execute failed
-
             }
+            std::cout << "Execute op done\n";
 
             //interrupt point    
             boost::this_thread::interruption_point();
 
             _rendering = true;
-            _th_rendering->_condition.notify_one();       
+            _th_rendering->_condition.notify_one();    
+
+            std::cout << "Execute op done 2\n";   
         }
         
     }
     catch(const Exception& e)
     {   
+        throw e;
         //TODO ERROR
     }
     catch(boost::thread_interrupted& e)
     {
+        throw e;
         //TODO thread interrupted 
     }
     catch(...)
@@ -149,14 +156,12 @@ void AppThreadModel::process_rendering()
 {
     try
     {
-        
-        _glcontext->make_current(RENDERING_CONTEXT);
-
         for(;;){
 
             std::deque<unsigned int> dirty_cells;
             std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
+            _glcontext->make_current(RENDERING_CONTEXT);
             ///\ 1 render
             {
                 boost::mutex::scoped_lock locker(_th_rendering->_mutex);
@@ -164,7 +169,7 @@ void AppThreadModel::process_rendering()
                 while(!_rendering){
                     _th_rendering->_condition.wait(_th_rendering->_mutex);
                 }
-
+                std::cout << "Begin rendering \n";   
                 ////////////////////////////////////////
                 //render all dirty cells
                 std::shared_ptr<AppController> controller = _controller.lock();
@@ -181,6 +186,7 @@ void AppThreadModel::process_rendering()
                         scene->set_dirty(false);
                     }
                 }
+                std::cout << "Rendering done \n";   
                 ////////////////////////////////////////
 
                 //interrupt point    
@@ -194,6 +200,7 @@ void AppThreadModel::process_rendering()
             
             ////////////////////////////////////////
             //download all dirty scene image to buffer
+            std::cout << "Begin download \n";   
             for(auto it = dirty_scenes.begin() ; it != dirty_scenes.end() ; ++it){
                 (*it)->download_image_buffer();
             }        
@@ -205,20 +212,22 @@ void AppThreadModel::process_rendering()
                     (*it)->swap_image_buffer();
                 }          
             }
+            std::cout << "Download done \n";   
             ////////////////////////////////////////
             _sending = true;    
             _th_sending->_condition.notify_one();
+
+             _glcontext->make_noncurrent();
         }
-
-
-        _glcontext->make_noncurrent();
+       
     }
     catch(const Exception& e)
     {
-
+        throw e;
     }
     catch(boost::thread_interrupted& e)
     {
+        throw e;
         //TODO 
     }
     catch(...)
@@ -240,6 +249,8 @@ void AppThreadModel::process_sending()
                 _th_sending->_condition.wait(_th_sending->_mutex);
             }
 
+            std::cout << "Begin sending \n";  
+
             ////////////////////////////////////////
             //get dirty cells to be sending
             std::deque<unsigned int> dirty_cells;
@@ -250,7 +261,7 @@ void AppThreadModel::process_sending()
 
             std::shared_ptr<AppController> controller = _controller.lock();
             APPCOMMON_CHECK_NULL_EXCEPTION(controller);
-
+            
             //sendong image buffer
             for(auto it = dirty_cells.begin() ; it != dirty_cells.end() ; ++it){
                 const unsigned int cell_id = *it;
@@ -275,11 +286,14 @@ void AppThreadModel::process_sending()
                 scene->get_image_buffer(buffer);
                 APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
 
+                //For testing wirte image to disk
+                FileUtil::write_raw("/home/wr/Documents/img.raw" , buffer , width*height*4);
+
                 _proxy->async_send_message(header , buffer);
             }
             
             ////////////////////////////////////////
-
+            std::cout << "Sending done \n";  
             //interrupt point    
             boost::this_thread::interruption_point();
 
@@ -288,10 +302,11 @@ void AppThreadModel::process_sending()
     }
     catch(const Exception& e)
     {
-
+        throw e;
     }
     catch(boost::thread_interrupted& e)
     {
+        throw e;
         //TODO 
     }
     catch(...)

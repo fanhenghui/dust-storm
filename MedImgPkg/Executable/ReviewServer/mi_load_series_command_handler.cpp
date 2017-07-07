@@ -14,6 +14,8 @@
 #include "MedImgAppCommon//mi_app_thread_model.h"
 #include "MedImgAppCommon/mi_app_common_define.h"
 
+#include "MedImgGLResource/mi_gl_utils.h"
+
 #include "mi_review_controller.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -41,6 +43,8 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
     std::shared_ptr<GLContext> gl_context = thread_model->get_gl_context();
 
     gl_context->make_current(MAIN_CONTEXT);
+
+    CHECK_GL_ERROR;
 
     const unsigned int cell_id = ipcheader._msg_info0;
     const unsigned int op_id = ipcheader._msg_info1;
@@ -98,9 +102,10 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
     mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     mpr_scene->set_mask_mode(MASK_NONE);
     mpr_scene->set_interpolation_mode(LINEAR);
-
+    mpr_scene->place_mpr(SAGITTAL);
     controller->add_cell(0 , cell);
 
+    CHECK_GL_ERROR;
 
     gl_context->make_noncurrent();
 

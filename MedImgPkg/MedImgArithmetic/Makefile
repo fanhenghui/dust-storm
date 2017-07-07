@@ -26,7 +26,7 @@ EXPORT_HEADER = mi_arithmetic_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmbedcrypto -lmbedtls -lmbedx509 
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 mi_volume_statistician.o: $(EXPORT_HEADER) mi_volume_statistician.h mi_volume_statistician.cpp \

@@ -329,6 +329,7 @@ bool GLContextHelper::has_gl_context()
     HDC hdc = wglGetCurrentDC();
     return (hdc != NULL);
 #else
+    
     return true;
 #endif
 }

@@ -331,10 +331,13 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
             RENDERALGO_THROW_EXCEPTION("Program ID is 0!");
         }
 
+        CHECK_GL_ERROR;
+
         _program->bind();
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
+        CHECK_GL_ERROR;
 
         _entry_points_texture->bind_image(IMAGE_ENTRY_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
         _exit_points_texture->bind_image(IMAGE_EXIT_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
@@ -386,7 +389,11 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
         }
         glDispatchCompute(aWorkGroupsNum[0] , aWorkGroupsNum[1] , 1);
 
+        CHECK_GL_ERROR;
+        
         glPopAttrib();
+
+        CHECK_GL_ERROR;
 
         _program->unbind();
 

@@ -35,7 +35,7 @@ public:
 
     void download_image_buffer();
     void swap_image_buffer();
-    void get_image_buffer(void* buffer);
+    void get_image_buffer(void*& buffer);
     
 
     void set_dirty(bool flag);

@@ -36,7 +36,7 @@ pre-build:
 
 main-build: $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so $(BIN_DIR)/libmedimg_io.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 #scene related

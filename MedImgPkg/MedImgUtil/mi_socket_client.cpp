@@ -77,7 +77,7 @@ void SocketClient::run()
     }
 
     _fd_server = fd_s;
-    
+
     for(;;) {
 
         IPCDataHeader header;
@@ -119,6 +119,7 @@ void SocketClient::run()
             std::cout << "Handle command error : " << e.what() << std::endl;
         }
     }
+
 }
 
 void SocketClient::send_data(const IPCDataHeader& dataheader , void* buffer)

@@ -12,6 +12,7 @@ subsystem:
 	$(MAKE) -C ./MedImgRenderAlgorithm
 	$(MAKE) -C ./UT/MedImgUtil_UT
 	$(MAKE) -C ./UT/MedImgGLResource_UT
+	$(MAKE) -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) -C ./Executable/ReviewServer
 
 	-export LD_LIBRARY_PATH=/home/	wr/program/git/dust-storm/MedImgPkg/bin 　　 
@@ -27,5 +28,6 @@ clean:
 	$(MAKE) clean -C ./MedImgRenderAlgorithm
 	$(MAKE) clean -C ./UT/MedImgUtil_UT
 	$(MAKE) clean -C ./UT/MedImgGLResource_UT
+	$(MAKE) clean -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) clean -C ./Executable/ReviewServer
 	-rm -r bin
