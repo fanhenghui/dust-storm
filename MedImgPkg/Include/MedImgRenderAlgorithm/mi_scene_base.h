@@ -35,7 +35,7 @@ public:
 
     void download_image_buffer();
     void swap_image_buffer();
-    void get_image_buffer(void*& buffer);
+    void get_image_buffer(unsigned char*& buffer);
     
 
     void set_dirty(bool flag);
@@ -53,7 +53,7 @@ protected:
     bool _dirty;
     std::string _name;
 
-    std::unique_ptr<char[]> _image_buffer[2];
+    std::unique_ptr<unsigned char[]> _image_buffer[2];
     int _front_buffer_id;
     boost::mutex _read_mutex;
     boost::mutex _write_mutex;

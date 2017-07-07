@@ -84,7 +84,7 @@ namespace
         _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         _scene->set_mask_mode(MASK_NONE);
         _scene->set_interpolation_mode(LINEAR);
-        _scene->place_mpr(TRANSVERSE);
+        _scene->place_mpr(SAGITTAL);
         _scene->initialize();
 
     }
@@ -94,18 +94,11 @@ namespace
         try
         {
             glViewport(0,0,_width , _height);
-            glClearColor(0.0,0.0,0.0,1.0);
+            glClearColor(1.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            //_scene->initialize();
+            _scene->initialize();
             _scene->render(0);
-            //_scene->render_to_back();
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
-            _scene->download_image_buffer();
-            _scene->swap_image_buffer();
-            unsigned char* buffer = nullptr;
-            _scene->get_image_buffer(buffer);
-            FileUtil::write_raw("/home/wr/data/output_ut.raw",buffer , _width*_height*4);
 
             //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)_canvas->get_color_array());
 

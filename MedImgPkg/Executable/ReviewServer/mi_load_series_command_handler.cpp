@@ -98,7 +98,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
     mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     mpr_scene->set_mask_mode(MASK_NONE);
     mpr_scene->set_interpolation_mode(LINEAR);
-    mpr_scene->place_mpr(SAGITTAL);
+    mpr_scene->place_mpr(TRANSVERSE);
     controller->add_cell(0 , cell);
 
     CHECK_GL_ERROR;

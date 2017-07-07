@@ -2,6 +2,7 @@
 
 
 #include "MedImgUtil/mi_configuration.h"
+#include "MedImgUtil/mi_file_util.h"
 
 #include "MedImgArithmetic/mi_ortho_camera.h"
 #include "MedImgArithmetic/mi_point2.h"
@@ -132,7 +133,6 @@ void RayCastScene::render(int test_code)
     _entry_exit_points->calculate_entry_exit_points();
     CHECK_GL_ERROR;
 
-
     _ray_caster->render(_test_code);
     //glPopAttrib();
     CHECK_GL_ERROR;
@@ -168,6 +168,21 @@ void RayCastScene::render(int test_code)
     CHECK_GL_ERROR;
     glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
     CHECK_GL_ERROR;
+
+    _scene_fbo->unbind();
+
+
+CHECK_GL_ERROR;
+    _canvas->debug_output_color("/home/wr/data/output.raw");
+CHECK_GL_ERROR;
+
+
+    // _scene_color_attach_0->bind();
+    // std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*4]);
+    // _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , color_array.get());
+
+    // FileUtil::write_raw("/home/wr/data/scene_output.raw" , (char*)color_array.get(), _width*_height*4);
+    
 
     set_dirty(false);
 }
@@ -354,6 +369,7 @@ std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const
 {
     return _camera_calculator;
 }
+
 
 
 
