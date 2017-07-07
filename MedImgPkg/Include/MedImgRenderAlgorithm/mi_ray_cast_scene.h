@@ -58,6 +58,10 @@ public:
     void set_shading_mode(ShadingMode mode);
     void set_color_inverse_mode(ColorInverseMode mode);
 
+
+    void debug_output_entry_points(const std::string& file_name);
+    void debug_output_exit_points(const std::string& file_name);
+
 protected:
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;

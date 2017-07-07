@@ -51,13 +51,9 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
 
     //1 load series
     const std::string series_path("/home/wr/data/AB_CTA_01/");
-    std::vector<std::string> postfix(3);
-    postfix[0] = ".dcm";
-    postfix[1] = ".DCM";
-    postfix[2] = ".Dcm";
     std::vector<std::string> dcm_files;
 
-    FileUtil::get_all_file_recursion(series_path , postfix , dcm_files);
+    FileUtil::get_all_file_recursion(series_path , std::vector<std::string>() , dcm_files);
 
     if(dcm_files.empty()){
         REVIEW_THROW_EXCEPTION("Empty series files!");
