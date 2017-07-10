@@ -58,7 +58,8 @@ public:
     void set_shading_mode(ShadingMode mode);
     void set_color_inverse_mode(ColorInverseMode mode);
 
-    //virtual void render_to_back();
+
+    virtual void download_image_buffer();//TODO Temp change for scene FBO download error
 
 protected:
     std::shared_ptr<VolumeInfos> _volume_infos;

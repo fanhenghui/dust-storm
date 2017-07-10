@@ -33,7 +33,7 @@ public:
     virtual void render(int test_code);
     void render_to_back();
 
-    void download_image_buffer();
+    virtual void download_image_buffer();//TODO Temp change for scene FBO download error
     void swap_image_buffer();
     void get_image_buffer(unsigned char*& buffer);
     

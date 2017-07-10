@@ -287,7 +287,7 @@ void AppThreadModel::process_sending()
                 APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
 
                 //For testing wirte image to disk
-                FileUtil::write_raw("/home/wr/data/img_buffer.raw" , buffer , width*height*4);
+                //FileUtil::write_raw("/home/wr/data/img_buffer.raw" , buffer , width*height*4);
 
                 _proxy->async_send_message(header , buffer);
             }

@@ -99,13 +99,13 @@ namespace
             
             //_scene->initialize();
             _scene->render(0);
-            //_scene->render_to_back();
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
-            _scene->download_image_buffer();
-            _scene->swap_image_buffer();
-            unsigned char* buffer = nullptr;
-            _scene->get_image_buffer(buffer);
-            FileUtil::write_raw("/home/wr/data/output_ut.raw",buffer , _width*_height*4);
+            _scene->render_to_back();
+            // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
+            // _scene->download_image_buffer();
+            // _scene->swap_image_buffer();
+            // unsigned char* buffer = nullptr;
+            // _scene->get_image_buffer(buffer);
+            // FileUtil::write_raw("/home/wr/data/output_ut.raw",buffer , _width*_height*4);
 
             //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)_canvas->get_color_array());
 
@@ -126,6 +126,7 @@ namespace
             {
                 // std::cout << "W H :" << _width << " " << _height << std::endl;
                 // m_pMPREE->debug_output_entry_points("D:/entry_exit.rgb.raw");
+                _scene->page(1);
                 break;
             }
         // case 'a':
