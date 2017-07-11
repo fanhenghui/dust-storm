@@ -190,15 +190,16 @@ void NoduleAnnotation::configure_i()
 {
     //1 TODO Check process unit
     //Open config file
-    std::fstream in("../../../config/configure.txt" , std::ios::in);
-    if (!in.is_open())
+    std::fstream input_file("../../../config/configure.txt" , std::ios::in);
+    if (!input_file.is_open())
     {
-        in.open("./config/configure.txt" , std::ios::in);//second chance
+        input_file.open("./config/configure.txt" , std::ios::in);//second chance
     }
 
-    if (!in.is_open())
+    if (!input_file.is_open())
     {
         Configuration::instance()->set_processing_unit_type(GPU);
+        Configuration::instance()->set_nodule_file_rsa(true);
     }
     else
     {
@@ -206,7 +207,7 @@ void NoduleAnnotation::configure_i()
         std::string tag;
         std::string equal;
         std::string context;
-        while(std::getline(in,line))
+        while(std::getline(input_file,line))
         {
             std::stringstream ss(line);
             ss >> tag >> equal >> context;
@@ -221,11 +222,23 @@ void NoduleAnnotation::configure_i()
                     Configuration::instance()->set_processing_unit_type(CPU);
                 }
             }
+
+            if (tag == "NoduleOutput")
+            {
+                if(context == "TEXT")
+                {
+                    Configuration::instance()->set_nodule_file_rsa(false);
+                }
+                else
+                {
+                    Configuration::instance()->set_nodule_file_rsa(true);
+                }
+            }
         }
-        in.close();
+        input_file.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(true);
+
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -394,6 +407,9 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_ui.actionAnonymization_DICOM , SIGNAL(triggered()) , this , SLOT(slot_dicom_anonymization_i()));
     connect(_ui.actionQuit , SIGNAL(triggered()) , this , SLOT(slot_quit_i()));
 
+    connect(_ui.actionSave_Label, SIGNAL(triggered()) , this , SLOT(slot_save_label_file()));
+    //connect(_ui.actionLoad_Label, SIGNAL(triggered()) , this , SLOT(slot_load_label_file()));
+
     //MPR scroll bar
     connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
     connect(_mpr_01_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr01_i(int)));
@@ -508,7 +524,7 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _mpr_01->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _mpr_10->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _vr_11->setMinimumSize(_pre_2x2_width ,_pre_2x2_height);
-    
+
 
     _mpr_00->show();
     _mpr_00_scroll_bar->show();
@@ -971,7 +987,7 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         {
             status = parser.save_as_csv(file_name_std , nodule_set);
         }
-        
+
 
         if (status == IO_SUCCESS)
         {
@@ -1051,7 +1067,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         //TODO check status
     }
 
-    
+
 }
 
 void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value)
@@ -1408,6 +1424,241 @@ void NoduleAnnotation::slot_quit_i()
     this->close();
 }
 
+void NoduleAnnotation::slot_save_label_file()
+{
+    //TODO: check whether data are ready
 
+    // label remapping
+    std::map<unsigned char, unsigned char> label_correction = this->LabelCorrection();
 
+    // encode the original labels
+    std::vector<int> run_length_encoded_output = this->RunLengthEncodeLabel(label_correction);
 
+    // write to disk
+    this->WriteEncodedLabels(run_length_encoded_output);    
+}
+
+std::map<unsigned char, unsigned char> NoduleAnnotation::LabelCorrection()
+{
+    // get the labels which are ordered
+    const auto & labels = this->_model_voi->get_labels();
+
+    // build a map to 'correct' the labels to be sequential, starting from 1
+    std::map<unsigned char, unsigned char> label_correction;
+
+    unsigned char label_index = 1;
+    for (auto it = labels.begin(); it != labels.end(); ++it, ++label_index)
+    {
+        label_correction[(*it)] = label_index;
+        //std::cout << static_cast<int>(*it) << " mapped to " << static_cast<int>(cnt) << '\n';
+    }
+    return label_correction;
+}
+
+std::vector<int> NoduleAnnotation::RunLengthEncodeLabel(const std::map<unsigned char, unsigned char> &label_correction)
+{
+    // create a new data as the final output
+    ImageData * output_label_volume = new ImageData();
+    std::shared_ptr<ImageData> mask_data = this->_volume_infos->get_mask(); //get the associated mask
+    mask_data->deep_copy(output_label_volume);
+
+    // iterate/correct the mask data as 1D array
+    unsigned char* array_pointer = static_cast<unsigned char*>(output_label_volume->get_pixel_pointer());
+    //if (array_pointer == nullptr)
+    //{
+    //    std::cout << "We get a null pointer for the label :( \n";
+    //    return;
+    //}
+
+    unsigned int total_number_of_voxels = mask_data->_dim[0] * mask_data->_dim[1] * mask_data->_dim[2];
+    for (int voxel=0; voxel < total_number_of_voxels; ++voxel)
+    {
+        if (array_pointer[voxel] != 0) // skip empty voxels
+        {
+            auto it = label_correction.find(array_pointer[voxel]);
+            if (it != label_correction.end())
+            {
+                array_pointer[voxel] = it->second;
+            }
+        }
+    }
+
+    // encode with run-length in the format of <times, value>
+    std::vector<int> run_length_encoded_output;
+    int cnt = 1; unsigned char val = array_pointer[0];
+    for (int voxel=1; voxel<total_number_of_voxels; ++voxel)
+    {
+        if (val == array_pointer[voxel])
+        {
+            ++cnt;
+        }
+        else
+        {
+            run_length_encoded_output.push_back(cnt);
+            run_length_encoded_output.push_back(val);
+
+            val = array_pointer[voxel];
+            cnt = 1;
+        }
+    }
+
+    //unsigned int sum_voxels = 0;
+    //for (auto it=run_length_encoded_output.begin(); it != run_length_encoded_output.end(); it += 2)
+    //{
+    //    sum_voxels += (*it);
+    //}
+    //std::cout << sum_voxels << " voxels get counted\n";
+
+    // record the last pair
+    run_length_encoded_output.push_back(cnt);
+    run_length_encoded_output.push_back(val);
+    
+    // clean up
+    delete output_label_volume;
+
+    return run_length_encoded_output;
+}
+
+void NoduleAnnotation::WriteEncodedLabels(std::vector<int> &run_length_encoded_output)
+{
+    QString output_file_name = QFileDialog::getSaveFileName(
+        this,
+        tr("Save Label"), 
+        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.raw)") );
+
+    if (!output_file_name.isEmpty())
+    {
+        std::string output_file_name_std(output_file_name.toLocal8Bit());
+
+        bool binary_output = true;
+        if (binary_output)
+        {
+            std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+            if (output_file.is_open())
+            {
+                int * raw_ptr = run_length_encoded_output.data();
+                output_file.write(
+                    reinterpret_cast<char *>(raw_ptr),
+                    sizeof(int) * run_length_encoded_output.size());
+                output_file.flush();
+                output_file.close();
+            }
+        }
+        else /*for debug*/
+        {
+            std::ofstream output_file;
+            output_file.open(output_file_name_std, std::ios::out);
+            if (output_file.is_open())
+            {
+                std::ostream_iterator<int> out_it (output_file, ", ");
+                std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
+                output_file.flush();
+                output_file.close();
+            }
+        }
+    }
+}
+
+//void NoduleAnnotation::slot_load_label_file()
+//{
+//    //if (!this->_volume_infos)
+//    //{
+//    //    std::cout << "No volume loaded yet!\n";
+//    //    return;
+//    //}
+//
+//    // read file, interpret as pairs of integers, (repeated times, value)
+//    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , "home/" /*QString(_volume_infos->get_data_header()->series_uid.c_str())*/, tr("LabelSet(*.raw)"));
+//    if (label_file_name_str.isEmpty())
+//    {
+//        return;
+//    }
+//    std::string file_name_std(label_file_name_str.toLocal8Bit());
+//    std::ifstream input_file(file_name_std, std::ios::in | std::ios::binary | std::ios::ate);
+//    if (!input_file.is_open())
+//    {
+//        return;
+//    }
+//
+//    // get size in bytes
+//    input_file.seekg (0, input_file.end);
+//    int file_size = input_file.tellg();
+//    input_file.seekg (0, input_file.beg);
+//
+//    // prepare the buffer and copy into it
+//    int number_of_entries = file_size/sizeof(int);
+//    std::vector<int> labels(number_of_entries);
+//    char * buffer = reinterpret_cast<char*>(labels.data());
+//    input_file.read (buffer, file_size);
+//
+//    //if (input_file)
+//    //    std::cout << "all characters read successfully.";
+//    //else
+//    //    std::cout << "error: only " << input_file.gcount() << " could be read";
+//
+//    input_file.close();
+//
+//    // count the voxels, check w.r.t _volume_infos.dim[0]*dim[1]*dim[2]
+//    unsigned int sum_voxels = 0;
+//    for (auto it = labels.begin(); it != labels.end(); it += 2)
+//    {
+//        sum_voxels += (*it);
+//    }
+//    std::cout << sum_voxels << " labels are loaded\n";
+//
+//    std::shared_ptr<ImageData> mask_in_use = this->_volume_infos->get_mask();
+//    unsigned int total_number_of_voxels = mask_in_use->_dim[0] * mask_in_use->_dim[1] * mask_in_use->_dim[2];
+//    if (sum_voxels != total_number_of_voxels)
+//    {
+//        std::cout << "label data FAILED to match the mask in use \n";
+//        return;
+//    }
+//
+//    // TODO: directly update the mask_data? but if in the presence of existing vois (i.e., spheres), how to combine them?
+//    bool directly_update_mask = true;
+//    std::vector<unsigned char> unique_labels;
+//    unsigned char * dest_value_ptr = static_cast<unsigned char *>(mask_in_use->get_pixel_pointer());
+//    unsigned char * src_value = new unsigned char [total_number_of_voxels];
+//
+//    if (directly_update_mask)
+//    {
+//        unsigned int current_index = 0;
+//        unsigned char current_label = static_cast<unsigned char>( labels[current_index+1] );
+//
+//        if (current_label != 0)
+//            unique_labels.push_back(current_label);
+//
+//        for (int voxel=0; voxel<total_number_of_voxels;++voxel)
+//        {
+//            if (voxel >= labels[current_index] )
+//            {
+//                current_index += 2;
+//                labels[current_index] += labels[current_index-2];
+//                current_label = static_cast<unsigned char>( labels[current_index+1] );
+//
+//                if ( current_label != 0 && std::find(unique_labels.begin(), unique_labels.end(), current_label) == unique_labels.end() )
+//                    unique_labels.push_back(current_label);
+//            }
+//
+//            // populate the temporary information container
+//            src_value[voxel] = current_label;
+//
+//            // update current volume with loaded labels
+//            dest_value_ptr[voxel] = current_label;
+//
+//            //// on-line debug: write out, then read in, and compare!
+//            //if (dest_value_ptr[voxel] != current_label)
+//            //{
+//            //    std::cout << "Voxel " << voxel <<" has wrong value!\n";
+//            //}
+//        }
+//    }
+//
+//    // Notify that mask volume has changed, renderer should refresh GPU memory
+//    // [lower_bound, upper_bound)
+//    unsigned int lower_bound[3] = {0,0,0};
+//    unsigned int upper_bound[3] = {mask_in_use->_dim[0], mask_in_use->_dim[1], mask_in_use->_dim[2]};
+//
+//    this->_volume_infos->update_mask(lower_bound, upper_bound, src_value, true); // "src_value": temporary data container; "true" : already update loaded
+//    this->_ob_scene_container->update();
+//}

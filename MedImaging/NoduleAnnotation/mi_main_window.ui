@@ -294,6 +294,8 @@
     <addaction name="actionSave_Nodule"/>
     <addaction name="actionLoad_Nodule"/>
     <addaction name="separator"/>
+    <addaction name="actionSave_Label"/>
+    <addaction name="separator"/>
     <addaction name="actionAnonymization_DICOM"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -423,6 +425,16 @@
   <action name="actionAnonymization_DICOM">
    <property name="text">
     <string>DICOM Anonymization</string>
+   </property>
+  </action>
+  <action name="actionSave_Label">
+   <property name="text">
+    <string>Save Label (Test)</string>
+   </property>
+  </action>
+  <action name="actionLoad_Label">
+   <property name="text">
+    <string>Load Label (Test)</string>
    </property>
   </action>
  </widget>

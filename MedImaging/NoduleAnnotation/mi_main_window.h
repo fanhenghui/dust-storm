@@ -51,6 +51,12 @@ private slots:
     void slot_open_nodule_file_i();
     void slot_dicom_anonymization_i();
     void slot_quit_i();
+    
+
+    void slot_save_label_file();
+
+
+   //  void slot_load_label_file();
 
     //Common tools
     void slot_press_btn_arrow_i();
@@ -95,6 +101,11 @@ private:
     void create_model_observer_i();
     void refresh_nodule_list_i();
     void save_layout2x2_parameter_i();
+    
+    // for label encoding
+    std::map<unsigned char, unsigned char> LabelCorrection();
+    std::vector<int> RunLengthEncodeLabel(const std::map<unsigned char, unsigned char> &label_correction);
+    void WriteEncodedLabels(std::vector<int> &run_length_encoded_output);
 
 private:
     Ui::NoduleAnnotationClass _ui;
