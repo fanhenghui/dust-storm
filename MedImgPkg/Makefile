@@ -3,6 +3,7 @@ ver = debug
 
 subsystem:
 	-mkdir bin
+	-export LD_LIBRARY_PATH=/home/wr/program/git/dust-storm/MedImgPkg/bin:/home/wr/program/git/dust-storm/MedImgPkg/:/usr/local/lib
 	$(MAKE) -C ./MedImgUtil
 	$(MAKE) -C ./MedImgGLResource
 	$(MAKE) -C ./MedImgArithmetic
@@ -14,8 +15,6 @@ subsystem:
 	$(MAKE) -C ./UT/MedImgGLResource_UT
 	$(MAKE) -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) -C ./Executable/ReviewServer
-
-	-export LD_LIBRARY_PATH=/home/	wr/program/git/dust-storm/MedImgPkg/bin 　　 
 
 PHONY.:clean
 clean:

@@ -138,7 +138,7 @@ void RayCastScene::render(int test_code)
     CHECK_GL_ERROR;
 
     //////////////////////////////////////////////////////////////////////////
-    //2 Mapping ray casting result to Scene FBO
+    //2 Mapping ray casting result to Scene FBO (<><>flip vertically<><>)
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
@@ -154,14 +154,24 @@ void RayCastScene::render(int test_code)
     CHECK_GL_ERROR;
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); 
+    // glTexCoord2f(0.0, 0.0); 
+    // glVertex2f(-1.0, -1.0);
+    // glTexCoord2f(1.0, 0.0); 
+    // glVertex2f(1.0, -1.0);
+    // glTexCoord2f(1.0, 1.0); 
+    // glVertex2f(1.0, 1.0);
+    // glTexCoord2f(0.0, 1.0);
+    // glVertex2f(-1.0, 1.0);
+
+    glTexCoord2f(0.0, 1.0); 
     glVertex2f(-1.0, -1.0);
-    glTexCoord2f(1.0, 0.0); 
-    glVertex2f(1.0, -1.0);
     glTexCoord2f(1.0, 1.0); 
+    glVertex2f(1.0, -1.0);
+    glTexCoord2f(1.0, 0.0); 
     glVertex2f(1.0, 1.0);
-    glTexCoord2f(0.0, 1.0);
+    glTexCoord2f(0.0, 0.0);
     glVertex2f(-1.0, 1.0);
+    
     glEnd();
 
     //glDisable(GL_TEXTURE_2D);
@@ -178,10 +188,10 @@ CHECK_GL_ERROR;
 
 
     // _scene_color_attach_0->bind();
-    // std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*4]);
-    // _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , color_array.get());
+    // std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*3]);
+    // _scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , color_array.get());
 
-    // FileUtil::write_raw("/home/wr/data/scene_output.raw" , (char*)color_array.get(), _width*_height*4);
+    // FileUtil::write_raw("/home/wr/data/scene_output_rgb.raw" , (char*)color_array.get(), _width*_height*4);
     
 
     set_dirty(false);

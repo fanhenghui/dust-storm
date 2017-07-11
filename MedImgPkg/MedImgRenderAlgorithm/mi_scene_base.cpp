@@ -31,7 +31,7 @@ void SceneBase::render_to_back()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glDrawBuffer(GL_BACK);
-    glBlitFramebuffer(0,0,_width, _height , 0,0,_width , _height , GL_COLOR_BUFFER_BIT , GL_NEAREST);
+    glBlitFramebuffer(0,_height,_width,0, 0,0,_width , _height , GL_COLOR_BUFFER_BIT , GL_NEAREST);//flip vertically copy
 }
 
 std::shared_ptr<CameraBase> SceneBase::get_camera()
@@ -59,7 +59,7 @@ void SceneBase::initialize()
         _scene_color_attach_0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-        _scene_color_attach_0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+        _scene_color_attach_0->load(GL_RGB8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
         UIDType depth_color_id = 0;
         _scene_depth_attach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(depth_color_id);
@@ -101,7 +101,7 @@ void SceneBase::set_display_size(int width , int height)
     _image_buffer[1].reset(new unsigned char[_width*_height*4]);
 
     _scene_color_attach_0->bind();
-    _scene_color_attach_0->load(GL_RGBA8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
+    _scene_color_attach_0->load(GL_RGB8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
     _scene_depth_attach->bind();
     _scene_depth_attach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
@@ -182,5 +182,9 @@ void SceneBase::get_image_buffer(unsigned char*& buffer)
     buffer = _image_buffer[_front_buffer_id].get();
 }
 
+GLTexture2DPtr SceneBase::get_scene_color_attach_0()
+{
+    return _scene_color_attach_0;
+}
 
 MED_IMG_END_NAMESPACE

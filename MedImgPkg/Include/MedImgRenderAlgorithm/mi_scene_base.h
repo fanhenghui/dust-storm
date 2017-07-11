@@ -41,6 +41,8 @@ public:
     void set_dirty(bool flag);
     bool get_dirty() const;
 
+    GLTexture2DPtr get_scene_color_attach_0();
+
 protected:
     int _width , _height;
 
