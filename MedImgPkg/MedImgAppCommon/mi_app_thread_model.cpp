@@ -280,14 +280,16 @@ void AppThreadModel::process_sending()
                 header._msg_info1 = 0;
                 header._data_type = 0;
                 header._big_end = 0;
-                header._data_len = static_cast<unsigned int>(width*height*4);
+                header._data_len = static_cast<unsigned int>(width*height*3);
 
                 unsigned char* buffer = nullptr;
-                scene->get_image_buffer(buffer);
+                int buffer_size = 0;
+                scene->get_image_buffer(buffer , buffer_size);
                 APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
+                header._data_len = static_cast<unsigned int>(buffer_size);
 
                 //For testing wirte image to disk
-                //FileUtil::write_raw("/home/wr/data/img_buffer.raw" , buffer , width*height*4);
+                FileUtil::write_raw("/home/wr/data/img_buffer.jpeg" , buffer , buffer_size);
 
                 _proxy->async_send_message(header , buffer);
             }

@@ -30,6 +30,14 @@ MED_IMG_BEGIN_NAMESPACE
 #define GLRESOURCE_THROW_EXCEPTION(desc) THROW_EXCEPTION("GLResource" , desc);
 #endif
 
+#ifndef GLRESOURCE_CHECK_NULL_EXCEPTION
+#define  GLRESOURCE_CHECK_NULL_EXCEPTION(pointer)                  \
+    if (nullptr == pointer)                 \
+{                                       \
+    GLRESOURCE_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
+}
+#endif
+
 MED_IMG_END_NAMESPACE
 
 #endif

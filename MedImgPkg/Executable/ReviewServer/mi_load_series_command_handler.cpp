@@ -105,6 +105,8 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
 
     gl_context->make_noncurrent();
 
+    std::cout << "load series done\n";
+
     return 0;
 }
 

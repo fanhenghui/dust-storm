@@ -8,16 +8,57 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-SceneBase::SceneBase():_width(128),_height(128),_dirty(true),_name("Scene"),_front_buffer_id(0)
+SceneBase::SceneBase():_width(128),_height(128)
 {
-    _image_buffer[0].reset(new unsigned char[_width*_height*4]);
-    _image_buffer[1].reset(new unsigned char[_width*_height*4]);
+    _image_buffer[0].reset(new unsigned char[_width*_height*3]);
+    _image_buffer[1].reset(new unsigned char[_width*_height*3]);
+    _image_buffer_size[0] = _width*_height*3;
+    _image_buffer_size[1] = _width*_height*3;
+
+    _dirty = true;
+    _name = "Scene";
+    _front_buffer_id = 0;
+
+    //init gpujepg parameter
+    _gpujpeg_encoder = nullptr;
+    _gpujpeg_texture = nullptr;
+
+    gpujpeg_set_default_parameters(&_gpujpeg_param);//默认参数
+    gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param);//默认采样参数;
+
+    gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+    _gpujpeg_image_param.comp_count = 3;
+    _gpujpeg_image_param.color_space = GPUJPEG_RGB;
+    _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
 }
 
-SceneBase::SceneBase(int width , int height):_width(width) , _height(height),_dirty(true)
+SceneBase::SceneBase(int width , int height):_width(width) , _height(height)
 {
-    _image_buffer[0].reset(new unsigned char[_width*_height*4]);
-    _image_buffer[1].reset(new unsigned char[_width*_height*4]);
+    _image_buffer[0].reset(new unsigned char[_width*_height*3]);
+    _image_buffer[1].reset(new unsigned char[_width*_height*3]);
+    _image_buffer_size[0] = _width*_height*3;
+    _image_buffer_size[1] = _width*_height*3;
+
+    _dirty = true;
+    _name = "Scene";
+    _front_buffer_id = 0;
+
+    //init gpujepg parameter
+    _gpujpeg_encoder = nullptr;
+    _gpujpeg_texture = nullptr;
+
+    gpujpeg_set_default_parameters(&_gpujpeg_param);//默认参数
+    gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param);//默认采样参数;
+
+    gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+    _gpujpeg_image_param.comp_count = 3;
+    _gpujpeg_image_param.color_space = GPUJPEG_RGB;
+    _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
 }
 
 SceneBase::~SceneBase()
@@ -79,6 +120,17 @@ void SceneBase::initialize()
         _scene_fbo->unbind();
 
         CHECK_GL_ERROR;
+
+        //init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in multi-scene) 
+        gpujpeg_init_device(0,0);
+        //bind GL texture to cuda(by PBO)
+        unsigned int tex_id = _scene_color_attach_0->get_id();
+        _gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
+        //create encoder
+        _gpujpeg_encoder = gpujpeg_encoder_create(&_gpujpeg_param,&_gpujpeg_image_param);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+        //set texture as input
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input, _gpujpeg_texture);
     }
 }
 
@@ -97,14 +149,26 @@ void SceneBase::set_display_size(int width , int height)
     _width = width;
     _height = height;
 
-    _image_buffer[0].reset(new unsigned char[_width*_height*4]);
-    _image_buffer[1].reset(new unsigned char[_width*_height*4]);
+    _image_buffer[0].reset(new unsigned char[_width*_height*3]);
+    _image_buffer[1].reset(new unsigned char[_width*_height*3]);
 
     _scene_color_attach_0->bind();
     _scene_color_attach_0->load(GL_RGB8 , _width , _height , GL_RGBA , GL_UNSIGNED_BYTE , nullptr);
 
     _scene_depth_attach->bind();
     _scene_depth_attach->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , nullptr);
+
+    //change gpujpeg parameter
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+
+    if(_gpujpeg_encoder){
+        gpujpeg_encoder_destroy(_gpujpeg_encoder);
+        _gpujpeg_encoder = nullptr;
+        //recreate encoder
+        _gpujpeg_encoder = gpujpeg_encoder_create(&_gpujpeg_param,&_gpujpeg_image_param);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+    }
 
     set_dirty(true);
 }
@@ -155,17 +219,35 @@ const std::string& SceneBase::get_name() const
     return _name;
 }
 
-void SceneBase::download_image_buffer()
+void SceneBase::download_image_buffer(bool jpeg /*= true*/)
 {
-    //download FBO to back buffer
-    CHECK_GL_ERROR;
     boost::mutex::scoped_lock locker(_write_mutex);
-    _scene_color_attach_0->bind();
-    _scene_color_attach_0->download(GL_RGBA , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get());
 
-    CHECK_GL_ERROR;
-    
-    FileUtil::write_raw("/home/wr/data/output_download.raw",_image_buffer[1 - _front_buffer_id].get() , _width*_height*4);
+    if (jpeg){
+        uint8_t* image_compressed = nullptr;
+        int image_compressed_size = 0;
+        int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input, &image_compressed,&image_compressed_size);
+        if (err != 0){
+            RENDERALGO_THROW_EXCEPTION("GPU jpeg encoding failed!");
+        }
+        //copy image_compressed to image_buffer
+        memcpy((char*)( _image_buffer[1 - _front_buffer_id].get()) , image_compressed , image_compressed_size);
+        _image_buffer_size[1 - _front_buffer_id] = image_compressed_size;
+
+        FileUtil::write_raw("/home/wr/data/output_download.jpeg",_image_buffer[1 - _front_buffer_id].get() , image_compressed_size);
+    }
+    else{
+        //download FBO to back buffer directly
+        CHECK_GL_ERROR;
+        
+        _scene_color_attach_0->bind();
+        _scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get());
+        _image_buffer_size[1 - _front_buffer_id] = _width*_height*3;
+
+        CHECK_GL_ERROR;
+
+        //FileUtil::write_raw("/home/wr/data/output_download.raw",_image_buffer[1 - _front_buffer_id].get() , _width*_height*4);
+    }
 }
 
 void SceneBase::swap_image_buffer()
@@ -175,11 +257,11 @@ void SceneBase::swap_image_buffer()
     _front_buffer_id = 1 - _front_buffer_id;
 }
 
-void SceneBase::get_image_buffer(unsigned char*& buffer)
+void SceneBase::get_image_buffer(unsigned char*& buffer , int& size)
 {
-    //Get front buffer 
     boost::mutex::scoped_lock locker(_read_mutex);
     buffer = _image_buffer[_front_buffer_id].get();
+    size = _width*_height*3;
 }
 
 GLTexture2DPtr SceneBase::get_scene_color_attach_0()

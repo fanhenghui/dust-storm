@@ -26,30 +26,14 @@
 #include "GL/freeglut.h"
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
-#include "cuda_runtime.h"
 
 
 using namespace medical_imaging;
-
-#define cuda_check_error(msg) \
-    { \
-        cudaError_t err = cudaGetLastError(); \
-        if( cudaSuccess != err) { \
-            fprintf(stderr, "[GPUJPEG] [Error] %s (line %i): %s: %s.\n", \
-                __FILE__, __LINE__, msg, cudaGetErrorString( err) ); \
-        } \
-    } \
-
 namespace
 {
     std::shared_ptr<ImageDataHeader> _data_header;
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<VolumeInfos> _volumeinfos;
-    gpujpeg_opengl_texture* gpujpeg_texture;
-
-    gpujpeg_parameters param;//gpujpeg parameter 
-    gpujpeg_image_parameters param_image;//image parameter
-    gpujpeg_encoder* encoder = nullptr;//jpeg encoder
 
     std::shared_ptr<MPRScene> _scene;
 
@@ -103,41 +87,6 @@ namespace
         _scene->set_interpolation_mode(LINEAR);
         _scene->place_mpr(TRANSVERSE);
         _scene->initialize();
-
-        ////////////////////////////////////////
-        //init gpujpeg
-        gpujpeg_init_device(0,0);
-        unsigned int tex_id = _scene->get_scene_color_attach_0()->get_id();
-        std::cout << "scene base texture id : " << tex_id << std::endl;
-        gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
-        std::cout << "Cuda graphics resource : " << gpujpeg_texture->texture_pbo_resource << std::endl;
-
-        //init gpujepg parameter
-        gpujpeg_set_default_parameters(&param);//默认参数
-        gpujpeg_parameters_chroma_subsampling(&param);//默认采样参数;
-        
-        //也可以自己设置采样参数
-        // param.sampling_factor[0].horizontal = 4;
-        // param.sampling_factor[0].vertical = 4;
-        // param.sampling_factor[1].horizontal = 1;
-        // param.sampling_factor[1].vertical = 2;
-        // param.sampling_factor[2].horizontal = 2;
-        // param.sampling_factor[2].vertical = 1;
-
-        //Init gpujpeg image parameter
-        gpujpeg_image_set_default_parameters(&param_image);
-        param_image.width = _width;
-        param_image.height = _height;
-        param_image.comp_count = 3;
-        param_image.color_space = GPUJPEG_RGB;
-        param_image.sampling_factor = GPUJPEG_4_4_4;
-
-        //create encoder
-         encoder = gpujpeg_encoder_create(&param,&param_image);
-         if (!encoder){
-             std::cout << "Create encoder failed!\n";
-         }
-         cuda_check_error("error");
         
     }
 
@@ -152,67 +101,15 @@ namespace
             //_scene->initialize();
             _scene->render(0);
             _scene->render_to_back();
-            // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
-            // _scene->download_image_buffer();
-            // _scene->swap_image_buffer();
-            // unsigned char* buffer = nullptr;
-            // _scene->get_image_buffer(buffer);
-            // FileUtil::write_raw("/home/wr/data/output_ut.raw",buffer , _width*_height*4);
 
-            //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)_canvas->get_color_array());
+            //glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
+            _scene->download_image_buffer();
+            _scene->swap_image_buffer();
+            unsigned char* buffer = nullptr;
+            int buffer_size=0;
+            _scene->get_image_buffer(buffer,buffer_size);
+            FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
 
-
-            //Encoding input
-            gpujpeg_encoder_input encoder_input;
-            
-            ////////////////////////////////////////////////////////
-            //方案1 download下来再压缩
-            //Test download scene FBO color attachment 0
-            //GLTexture2DPtr scene_color_attach_0 = _scene->get_scene_color_attach_0();
-            //scene_color_attach_0->bind();
-            //std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*3]);
-            //scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , color_array.get());
-            //FileUtil::write_raw("/home/wr/data/scene_output_rgb.raw" , (char*)color_array.get(), _width*_height*3);
-
-            cuda_check_error("error");
-
-            //gpujpeg_encoder_input_set_image(&encoder_input, color_array.get());
-
-
-            ////////////////////////////////////////////////////////
-            //方案2 直接用texture来做
-            gpujpeg_encoder_input_set_texture(&encoder_input, gpujpeg_texture);
-
-            cuda_check_error("error");
-
-            uint8_t* image_compressed = nullptr;
-            int image_compressed_size = 0;
-            if (gpujpeg_encoder_encode(encoder, &encoder_input, &image_compressed,
-                &image_compressed_size) != 0){
-                std::cout << "encode failed!\n";
-            }
-
-            cuda_check_error("error");
-
-            std::cout << "compress image size : " << image_compressed_size << std::endl;
-
-            //if (gpujpeg_image_save_to_file("/home/wr/data/scene_output_rgb.jpeg", image_compressed,
-            //image_compressed_size) != 0){
-            //    std::cout << "save filed failed!\n";
-            //}
-
-            if(image_compressed_size != 0){
-                FileUtil::write_raw("/home/wr/data/scene_output_rgb2.jpeg" , image_compressed , image_compressed_size);
-            }
-
-            cuda_check_error("error");
-
-            //gpujpeg_image_destroy(image_compressed);
-
-            cuda_check_error("error");
-
-            //gpujpeg_encoder_destroy(encoder);
-            image_compressed = nullptr;
 
             glutSwapBuffers();
         }
@@ -272,15 +169,6 @@ namespace
         _width = x;
         _height = y;
         _scene->set_display_size(_width , _height);
-        if(encoder){
-            param_image.width = _width;
-            param_image.height = _height;
-            gpujpeg_encoder_destroy(encoder);
-            encoder = gpujpeg_encoder_create(&param,&param_image);
-            if (!encoder){
-                std::cout << "Create encoder failed!\n";
-            }
-        }
         glutPostRedisplay();
     }
 

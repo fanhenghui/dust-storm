@@ -6,6 +6,9 @@
 
 #include "boost/thread/mutex.hpp"
 
+#include "libgpujpeg/gpujpeg.h"
+#include "libgpujpeg/gpujpeg_common.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export SceneBase 
@@ -32,15 +35,16 @@ public:
 
     virtual void render(int test_code);
     void render_to_back();
-
-    virtual void download_image_buffer();//TODO Temp change for scene FBO download error
+    
+    void download_image_buffer(bool jpeg = true);//TODO Temp change for scene FBO download error
     void swap_image_buffer();
-    void get_image_buffer(unsigned char*& buffer);
+    void get_image_buffer(unsigned char*& buffer, int& size);
     
 
     void set_dirty(bool flag);
     bool get_dirty() const;
 
+    //FOR testing
     GLTexture2DPtr get_scene_color_attach_0();
 
 protected:
@@ -56,9 +60,17 @@ protected:
     std::string _name;
 
     std::unique_ptr<unsigned char[]> _image_buffer[2];
+    int _image_buffer_size[2];
     int _front_buffer_id;
     boost::mutex _read_mutex;
     boost::mutex _write_mutex;
+
+    //GPU JPEG
+    gpujpeg_parameters _gpujpeg_param;//gpujpeg parameter 
+    gpujpeg_image_parameters _gpujpeg_image_param;//image parameter
+    gpujpeg_opengl_texture* _gpujpeg_texture;//input gpujpeg texture
+    gpujpeg_encoder* _gpujpeg_encoder;//jpeg encoder
+    gpujpeg_encoder_input _gpujpeg_encoder_input;//jpeg encoding input
 
 };
 

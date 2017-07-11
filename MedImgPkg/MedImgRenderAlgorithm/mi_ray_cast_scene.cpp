@@ -380,22 +380,4 @@ std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const
     return _camera_calculator;
 }
 
-void RayCastScene::download_image_buffer()
-{
-    //download FBO to back buffer
-    CHECK_GL_ERROR;
-    boost::mutex::scoped_lock locker(_write_mutex);
-    GLTexture2DPtr tex = _canvas->get_color_attach_texture();
-    tex->bind();
-    tex->download(GL_RGBA , GL_UNSIGNED_BYTE , _image_buffer[1 - _front_buffer_id].get());
-
-    //TODO Reversal top to down
-
-    CHECK_GL_ERROR;
-    
-//    FileUtil::write_raw("/home/wr/data/output_download.raw",_image_buffer[1 - _front_buffer_id].get() , _width*_height*4);
-}
-
-
-
 MED_IMG_END_NAMESPACE

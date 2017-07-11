@@ -11,7 +11,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_ctx(NULL),_win((Window)NULL),_fb_configs(nullptr)
+XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_vis(nullptr),_ctx(NULL),_win((Window)NULL)
 {
 
 }
@@ -21,161 +21,103 @@ XGLContext::~XGLContext()
 
 }
 
-void XGLContext::early_init_glx_fn_pointers()
-{
-
-    glGenVertexArraysAPPLE = (void(*)(GLsizei, const GLuint*))glXGetProcAddressARB((GLubyte*)"glGenVertexArrays");
-    glBindVertexArrayAPPLE = (void(*)(const GLuint))glXGetProcAddressARB((GLubyte*)"glBindVertexArray");
-    glDeleteVertexArraysAPPLE = (void(*)(GLsizei, const GLuint*))glXGetProcAddressARB((GLubyte*)"glGenVertexArrays");
-    glXCreateContextAttribsARB = (GLXContext(*)(Display* dpy, GLXFBConfig config, GLXContext share_context, Bool direct, const int *attrib_list))glXGetProcAddressARB((GLubyte*)"glXCreateContextAttribsARB");
-    glXChooseFBConfig = (GLXFBConfig*(*)(Display *dpy, int screen, const int *attrib_list, int *nelements))glXGetProcAddressARB((GLubyte*)"glXChooseFBConfig");
-    glXGetVisualFromFBConfig = (XVisualInfo*(*)(Display *dpy, GLXFBConfig config))glXGetProcAddressARB((GLubyte*)"glXGetVisualFromFBConfig");
-}
-
-// void XGLContext::create_window()
-// {
-//     XSetWindowAttributes winAttribs;
-//     GLint winmask;
-//     GLint nMajorVer = 0;
-//     GLint nMinorVer = 0;
-//     XVisualInfo *visualInfo;
-//     int numConfigs = 0;
-//     static int fbAttribs[] = {
-//                     GLX_RENDER_TYPE,   GLX_RGBA_BIT,
-//                     GLX_X_RENDERABLE,  True,
-//                     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-//                     GLX_DOUBLEBUFFER,  True,
-//                     GLX_RED_SIZE,      8,
-//                     GLX_BLUE_SIZE,     8,
-//                     GLX_GREEN_SIZE,    8,
-//                     0 };
-
-//     early_init_glx_fn_pointers();
-
-//     // Tell X we are going to use the display
-//     _dpy = XOpenDisplay(NULL);
-
-//     // Get Version info
-//     glXQueryVersion(_dpy, &nMajorVer, &nMinorVer);
-//     printf("Supported GLX version - %d.%d\n", nMajorVer, nMinorVer);   
-
-//     if(nMajorVer == 1 && nMinorVer < 2)
-//     {
-//         printf("ERROR: GLX 1.2 or greater is necessary\n");
-//         XCloseDisplay(_dpy);
-//         exit(0);
-//     }
-//     // Get a new fb config that meets our attrib requirements
-//     _fb_configs = glXChooseFBConfig(_dpy, DefaultScreen(_dpy), fbAttribs, &numConfigs);
-//     visualInfo = glXGetVisualFromFBConfig(_dpy, _fb_configs[0]);
-
-//     // Now create an X window
-//     winAttribs.event_mask = ExposureMask | VisibilityChangeMask | 
-//                             KeyPressMask | PointerMotionMask    |
-//                             StructureNotifyMask ;
-
-//     winAttribs.border_pixel = 0;
-//     winAttribs.bit_gravity = StaticGravity;
-//     winAttribs.colormap = XCreateColormap(_dpy, 
-//                                           RootWindow(_dpy, visualInfo->screen), 
-//                                           visualInfo->visual, AllocNone);
-//     winmask = CWBorderPixel | CWBitGravity | CWEventMask| CWColormap;
-
-//     _win = XCreateWindow(_dpy, DefaultRootWindow(_dpy), 20, 20,
-//                  32, 32, 0, 
-//                              visualInfo->depth, InputOutput,
-//                  visualInfo->visual, winmask, &winAttribs);
-
-//     //XMapWindow(_dpy, _win);//这一句注释掉就不会出现窗口的瞬间出现
-
-//     // Also create a new GL context for rendering
-//     GLint attribs[] = {
-//       GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-//       GLX_CONTEXT_MINOR_VERSION_ARB, 5,
-//       0 };
-//     _ctx = glXCreateContextAttribsARB(_dpy, _fb_configs[0], 0, True, attribs);
-
-//     this->make_current();
-    
-//     glewExperimental = GL_TRUE;
-//     GLenum err = glewInit();
-//     if (GLEW_OK != err)
-//     {
-//         /* Problem: glewInit failed, something is seriously wrong. */
-//         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-//     }
-
-//     //Testing 
-//     const GLubyte *s = glGetString(GL_VERSION);
-//     printf("GL Version = %s\n", s);    
-// }
-
 void XGLContext::create_window()
 {
-    XSetWindowAttributes winAttribs;
-    GLint winmask;
-    GLint nMajorVer = 0;
-    GLint nMinorVer = 0;
-    XVisualInfo *visualInfo;
-    int numConfigs = 0;
-    static int fbAttribs[] = {
-                    GLX_RENDER_TYPE,   GLX_RGBA_BIT,
-                    GLX_X_RENDERABLE,  True,
-                    GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-                    GLX_DOUBLEBUFFER,  True,
-                    GLX_RED_SIZE,      8,
-                    GLX_BLUE_SIZE,     8,
-                    GLX_GREEN_SIZE,    8,
-                    0 };
-
-    early_init_glx_fn_pointers();
-
-    // Tell X we are going to use the display
+    /// \Open display
     _dpy = XOpenDisplay(NULL);
+    if (nullptr == _dpy) {
+        GLRESOURCE_THROW_EXCEPTION("Failed to open X display!\n");
+    }
+
+    /// \Choose visual
+    //get visual info RGB
+    int attributes_list[32];
+    int n = 0;
+    attributes_list[n++] = GLX_RGBA;
+    attributes_list[n++] = GLX_RED_SIZE;
+    attributes_list[n++] = 1;
+    attributes_list[n++] = GLX_GREEN_SIZE;
+    attributes_list[n++] = 1;
+    attributes_list[n++] = GLX_BLUE_SIZE;
+    attributes_list[n++] = 1;
+    //if (GLUT_WIND_HAS_ALPHA(mode)) {
+          attributes_list[n++] = GLX_ALPHA_SIZE;
+          attributes_list[n++] = 1;
+    //}
+    //if (GLUT_WIND_IS_DOUBLE(mode)) {
+      attributes_list[n++] = GLX_DOUBLEBUFFER;
+    //}
+    //if (GLUT_WIND_IS_STEREO(mode)) {//立体显示的时候要设置
+    //  attributes_list[n++] = GLX_STEREO;
+    //}
+    //if (GLUT_WIND_HAS_DEPTH(mode)) {
+      attributes_list[n++] = GLX_DEPTH_SIZE;
+      attributes_list[n++] = 1;
+    //}
+    //if (GLUT_WIND_HAS_STENCIL(mode)) {
+      attributes_list[n++] = GLX_STENCIL_SIZE;
+      attributes_list[n++] = 1;
+    //}
+    //if (GLUT_WIND_HAS_ACCUM(mode)) {
+    //  attributes_list[n++] = GLX_ACCUM_RED_SIZE;
+    //  attributes_list[n++] = 1;
+    //  attributes_list[n++] = GLX_ACCUM_GREEN_SIZE;
+    //  attributes_list[n++] = 1;
+    //  attributes_list[n++] = GLX_ACCUM_BLUE_SIZE;
+    //  attributes_list[n++] = 1;
+    //  if (GLUT_WIND_HAS_ALPHA(mode)) {
+    //    attributes_list[n++] = GLX_ACCUM_ALPHA_SIZE;
+    //    attributes_list[n++] = 1;
+    //  }
+    //}
+    attributes_list[n] = (int) None;//end tag
+    
+    _vis = glXChooseVisual(_dpy, DefaultScreen(_dpy), attributes_list);
+    if (nullptr == _vis) {
+        GLRESOURCE_THROW_EXCEPTION("Failed to choose visual!\n");
+    }
+
+    /// \Create OpenGL context
+    _ctx = glXCreateContext(_dpy, _vis, 0, GL_TRUE);
+    if ( nullptr == _ctx) {
+        GLRESOURCE_THROW_EXCEPTION("Failed to create OpenGL context!\n");
+    }
+
+    /// \Create window
+    Colormap colormap = XCreateColormap(_dpy, RootWindow(_dpy, _vis->screen), _vis->visual, AllocNone);
+    XSetWindowAttributes swa;
+    swa.background_pixmap = None;
+    swa.border_pixel = 0;
+    swa.colormap = colormap;
+    unsigned long attribMask =  CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
+    _win = XCreateWindow(
+        _dpy,
+        RootWindow(_dpy, _vis->screen),
+        0, 0, 64, 64,
+        0, _vis->depth, InputOutput, _vis->visual,
+        attribMask,
+        &swa
+    );
 
     // Get Version info
-    glXQueryVersion(_dpy, &nMajorVer, &nMinorVer);
-    printf("Supported GLX version - %d.%d\n", nMajorVer, nMinorVer);   
+    int major = 0;
+    int minor = 0;
+    glXQueryVersion(_dpy, &major, &minor);
+    printf("Supported GLX version - %d.%d\n", major, minor);   
 
-    if(nMajorVer == 1 && nMinorVer < 2)
-    {
-        printf("ERROR: GLX 1.2 or greater is necessary\n");
-        XCloseDisplay(_dpy);
-        exit(0);
-    }
-    // Get a new fb config that meets our attrib requirements
-    _fb_configs = glXChooseFBConfig(_dpy, DefaultScreen(_dpy), fbAttribs, &numConfigs);
-    visualInfo = glXGetVisualFromFBConfig(_dpy, _fb_configs[0]);
+    //if(major == 1 && minor < 2)
+    //{
+    //    printf("ERROR: GLX 1.2 or greater is necessary\n");
+    //    XCloseDisplay(_dpy);
+    //    exit(0);
+    //}
 
-    // Now create an X window
-    winAttribs.event_mask = ExposureMask | VisibilityChangeMask | 
-                            KeyPressMask | PointerMotionMask    |
-                            StructureNotifyMask ;
-
-    winAttribs.background_pixmap = None;
-    winAttribs.border_pixel = 0;
-    winAttribs.bit_gravity = StaticGravity;
-    winAttribs.colormap = XCreateColormap(_dpy, 
-                                          RootWindow(_dpy, visualInfo->screen), 
-                                          visualInfo->visual, AllocNone);
-    winmask = CWBorderPixel | CWBackPixmap | CWEventMask| CWColormap;
-    _win = XCreateWindow(_dpy, DefaultRootWindow(_dpy), 20, 20,
-                 32, 32, 0, 
-                             visualInfo->depth, InputOutput,
-                 visualInfo->visual, winmask, &winAttribs);
-
-    //XMapWindow(_dpy, _win);//这一句注释掉就不会出现窗口的瞬间出现
-
-    // Also create a new GL context for rendering
-    GLint attribs[] = {
-      GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-      GLX_CONTEXT_MINOR_VERSION_ARB, 5,
-      0 };
-    _ctx = glXCreateContextAttribsARB(_dpy, _fb_configs[0], 0, True, attribs);
+    //XMapWindow(_dpy, _win);//这一句注释掉就不会出现窗口的瞬间出现,而始终保持隐藏
 
     this->make_current();
     
     glewExperimental = GL_TRUE;
+
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
@@ -188,6 +130,7 @@ void XGLContext::create_window()
     printf("GL Version = %s\n", s);    
 }
 
+
 void XGLContext::create_shared_context(int id)
 {
     if(_ctx == NULL){
@@ -198,12 +141,10 @@ void XGLContext::create_shared_context(int id)
         GLRESOURCE_THROW_EXCEPTION("Create the same shared context id");
     }
 
-    GLint attribs[] = {
-      GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-      GLX_CONTEXT_MINOR_VERSION_ARB, 5,
-      0 };
-
-    GLXContext ctx = glXCreateContextAttribsARB(_dpy , _fb_configs[0] , _ctx , True, attribs);
+    GLXContext ctx = glXCreateContext(_dpy, _vis, _ctx, GL_TRUE);
+    if ( nullptr == _ctx) {
+        GLRESOURCE_THROW_EXCEPTION("Failed to create OpenGL context!\n");
+    }
 
     _shared_ctx[id] = ctx;
     

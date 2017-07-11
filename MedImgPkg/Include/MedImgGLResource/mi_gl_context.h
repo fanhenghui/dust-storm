@@ -50,14 +50,13 @@ public:
     void make_noncurrent();
 
 private:
-    void early_init_glx_fn_pointers();
     void create_window();
 private: 
     GLXContext _ctx;
     std::map<int , GLXContext> _shared_ctx;
     Display *_dpy;
+    XVisualInfo* _vis;
     Window _win;
-    GLXFBConfig *_fb_configs;
     boost::mutex _ctx_mutex;//TODO add mutex context in command handler and operation
 };
 
