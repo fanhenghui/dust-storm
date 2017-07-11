@@ -107,10 +107,10 @@ namespace
         ////////////////////////////////////////
         //init gpujpeg
         gpujpeg_init_device(0,0);
-        //unsigned int tex_id = _scene->get_scene_color_attach_0()->get_id();
-        //std::cout << "scene base texture id : " << tex_id << std::endl;
-        //gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
-        //std::cout << "Cuda graphics resource : " << gpujpeg_texture->texture_pbo_resource << std::endl;
+        unsigned int tex_id = _scene->get_scene_color_attach_0()->get_id();
+        std::cout << "scene base texture id : " << tex_id << std::endl;
+        gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
+        std::cout << "Cuda graphics resource : " << gpujpeg_texture->texture_pbo_resource << std::endl;
 
         //init gpujepg parameter
         gpujpeg_set_default_parameters(&param);//默认参数
@@ -162,26 +162,28 @@ namespace
             //glDrawPixels(_width , _height , GL_RGBA , GL_UNSIGNED_BYTE , (void*)_canvas->get_color_array());
 
 
+            //Encoding input
+            gpujpeg_encoder_input encoder_input;
+            
             ////////////////////////////////////////////////////////
             //方案1 download下来再压缩
             //Test download scene FBO color attachment 0
-            GLTexture2DPtr scene_color_attach_0 = _scene->get_scene_color_attach_0();
-            scene_color_attach_0->bind();
-            std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*3]);
-            scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , color_array.get());
-            FileUtil::write_raw("/home/wr/data/scene_output_rgb.raw" , (char*)color_array.get(), _width*_height*3);
+            //GLTexture2DPtr scene_color_attach_0 = _scene->get_scene_color_attach_0();
+            //scene_color_attach_0->bind();
+            //std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*3]);
+            //scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , color_array.get());
+            //FileUtil::write_raw("/home/wr/data/scene_output_rgb.raw" , (char*)color_array.get(), _width*_height*3);
 
             cuda_check_error("error");
 
-            gpujpeg_encoder_input encoder_input;
-            gpujpeg_encoder_input_set_image(&encoder_input, color_array.get());
+            //gpujpeg_encoder_input_set_image(&encoder_input, color_array.get());
+
+
+            ////////////////////////////////////////////////////////
+            //方案2 直接用texture来做
+            gpujpeg_encoder_input_set_texture(&encoder_input, gpujpeg_texture);
 
             cuda_check_error("error");
-
-            //encoder = gpujpeg_encoder_create(&param,&param_image);
-            //if (!encoder){
-            //    std::cout << "Create encoder failed!\n";
-            //}
 
             uint8_t* image_compressed = nullptr;
             int image_compressed_size = 0;
