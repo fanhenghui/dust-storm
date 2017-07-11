@@ -234,7 +234,7 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/)
         memcpy((char*)( _image_buffer[1 - _front_buffer_id].get()) , image_compressed , image_compressed_size);
         _image_buffer_size[1 - _front_buffer_id] = image_compressed_size;
 
-        FileUtil::write_raw("/home/wr/data/output_download.jpeg",_image_buffer[1 - _front_buffer_id].get() , image_compressed_size);
+        //FileUtil::write_raw("/home/wr/data/output_download.jpeg",_image_buffer[1 - _front_buffer_id].get() , image_compressed_size);
     }
     else{
         //download FBO to back buffer directly
@@ -261,7 +261,7 @@ void SceneBase::get_image_buffer(unsigned char*& buffer , int& size)
 {
     boost::mutex::scoped_lock locker(_read_mutex);
     buffer = _image_buffer[_front_buffer_id].get();
-    size = _width*_height*3;
+    size = _image_buffer_size[_front_buffer_id];
 }
 
 GLTexture2DPtr SceneBase::get_scene_color_attach_0()

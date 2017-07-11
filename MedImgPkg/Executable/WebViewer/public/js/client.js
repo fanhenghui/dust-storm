@@ -105,9 +105,21 @@ window.FE = {
                 }
                 else if(ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE){
                     var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
-                    for(var i = 0 ; i< curImgLen ; ++i){
-                    myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
-                    }
+                    var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
+                    var datajpg = "data:image/jpg;base64," + b64encoded;
+
+                    var img=new Image();
+                    img.src = datajpg;
+                    img.onload = function () {
+                        console.log("Image Onload");
+                        myCtx.drawImage(img, 0,0, myCanvas.width, myCanvas.height);
+                    };
+
+                    ////Draw raw image 
+                    //var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
+                    // for(var i = 0 ; i< curImgLen ; ++i){
+                    // myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
+                    // }
                     //this.processingImg(arraybuffer , bufferOffset , curImgLen);
                 }
                 
