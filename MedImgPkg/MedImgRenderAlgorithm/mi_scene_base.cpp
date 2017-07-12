@@ -6,6 +6,9 @@
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
+#include "libgpujpeg/gpujpeg_encoder.h"
+#include "libgpujpeg/gpujpeg_encoder_internal.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 SceneBase::SceneBase():_width(128),_height(128)
@@ -32,6 +35,8 @@ SceneBase::SceneBase():_width(128),_height(128)
     _gpujpeg_image_param.comp_count = 3;
     _gpujpeg_image_param.color_space = GPUJPEG_RGB;
     _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
+    //_gpujpeg_encoding_duration = 0;
 }
 
 SceneBase::SceneBase(int width , int height):_width(width) , _height(height)
@@ -58,6 +63,8 @@ SceneBase::SceneBase(int width , int height):_width(width) , _height(height)
     _gpujpeg_image_param.comp_count = 3;
     _gpujpeg_image_param.color_space = GPUJPEG_RGB;
     _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
+    //_gpujpeg_encoding_duration = 0;
 
 }
 
@@ -131,6 +138,9 @@ void SceneBase::initialize()
         RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
         //set texture as input
         gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input, _gpujpeg_texture);
+
+        //cudaEventCreate(&_gpujpeg_encoding_start);
+        //cudaEventCreate(&_gpujpeg_encoding_stop);
     }
 }
 
@@ -226,10 +236,33 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/)
     if (jpeg){
         uint8_t* image_compressed = nullptr;
         int image_compressed_size = 0;
+
+        //Record cuda time of encoding(在OpenGL的环境下时间不对,得加一个glFinish)
+        //::glFinish();
+        //cudaEventRecord(_gpujpeg_encoding_start,0);
+
         int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input, &image_compressed,&image_compressed_size);
         if (err != 0){
             RENDERALGO_THROW_EXCEPTION("GPU jpeg encoding failed!");
         }
+
+        //cudaEventRecord(_gpujpeg_encoding_stop,0);
+        //cudaEventSynchronize(_gpujpeg_encoding_stop);
+        //cudaEventElapsedTime(&_gpujpeg_encoding_duration ,_gpujpeg_encoding_start , _gpujpeg_encoding_stop);        
+
+        // std::cout << "encoding spec : \n";
+        // std::cout << " memory to : " << _gpujpeg_encoder->coder.duration_memory_to << std::endl;
+        // std::cout << " memory from : " << _gpujpeg_encoder->coder.duration_memory_from << std::endl;
+        // std::cout << " memory map : " << _gpujpeg_encoder->coder.duration_memory_map << std::endl;
+        // std::cout << " memory unmap : " << _gpujpeg_encoder->coder.duration_memory_unmap << std::endl;
+        // std::cout << " preprocessor : " << _gpujpeg_encoder->coder.duration_preprocessor << std::endl;
+        // std::cout << " dct_quantization : " << _gpujpeg_encoder->coder.duration_dct_quantization << std::endl; 
+        // std::cout << " huffman coder : " << _gpujpeg_encoder->coder.duration_huffman_coder << std::endl; 
+        // std::cout << " stream : " << _gpujpeg_encoder->coder.duration_stream << std::endl; 
+        // std::cout << " in gpu : " << _gpujpeg_encoder->coder.duration_in_gpu << std::endl; 
+        // std::cout << " jpeg encoding time : " << _gpujpeg_encoding_duration << std::endl;
+        // std::cout << std::endl;
+        
         //copy image_compressed to image_buffer
         memcpy((char*)( _image_buffer[1 - _front_buffer_id].get()) , image_compressed , image_compressed_size);
         _image_buffer_size[1 - _front_buffer_id] = image_compressed_size;
@@ -264,9 +297,9 @@ void SceneBase::get_image_buffer(unsigned char*& buffer , int& size)
     size = _image_buffer_size[_front_buffer_id];
 }
 
-GLTexture2DPtr SceneBase::get_scene_color_attach_0()
-{
-    return _scene_color_attach_0;
-}
+//float SceneBase::get_compressing_time() const
+//{
+//    return _gpujpeg_encoding_duration;
+//}
 
 MED_IMG_END_NAMESPACE

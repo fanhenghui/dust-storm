@@ -289,7 +289,7 @@ void AppThreadModel::process_sending()
                 header._data_len = static_cast<unsigned int>(buffer_size);
 
                 //For testing wirte image to disk
-                FileUtil::write_raw("/home/wr/data/img_buffer.jpeg" , buffer , buffer_size);
+                //FileUtil::write_raw("/home/wr/data/img_buffer.jpeg" , buffer , buffer_size);
 
                 _proxy->async_send_message(header , buffer);
             }

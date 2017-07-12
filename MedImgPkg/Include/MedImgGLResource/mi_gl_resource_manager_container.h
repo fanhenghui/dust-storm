@@ -14,6 +14,7 @@ class GLVAO;
 class GLFBO;
 class GLTexture1DArray;
 class GLContext;
+class GLTimeQuery;
 
 typedef GLResourceManager<GLProgram> GLProgramManager;
 typedef GLResourceManager<GLBuffer> GLBufferManager;
@@ -24,6 +25,7 @@ typedef GLResourceManager<GLVAO> GLVAOManager;
 typedef GLResourceManager<GLFBO> GLFBOManager;
 typedef GLResourceManager<GLTexture1DArray> GLTexture1DArrayManager;
 typedef GLResourceManager<GLContext> GLContextManager;
+typedef GLResourceManager<GLTimeQuery> GLTimeQueryManager;
 
 typedef std::shared_ptr<GLProgramManager> GLProgramManagerPtr;
 typedef std::shared_ptr<GLBufferManager> GLBufferManagerPtr;
@@ -34,6 +36,7 @@ typedef std::shared_ptr<GLVAOManager> GLVAOManagerPtr;
 typedef std::shared_ptr<GLFBOManager> GLFBOManagerPtr;
 typedef std::shared_ptr<GLTexture1DArrayManager> GLTexture1DArrayManagerPtr;
 typedef std::shared_ptr<GLContextManager> GLContextManagerPtr;
+typedef std::shared_ptr<GLTimeQueryManager> GLTimeQueryManagerPtr;
 
 class GLResource_Export GLResourceManagerContainer
 {
@@ -60,6 +63,8 @@ public:
 
     GLContextManagerPtr get_context_manager() const;
 
+    GLTimeQueryManagerPtr get_time_query_manager() const;
+
     void update_all();
 
 private:
@@ -77,6 +82,7 @@ private:
     GLVAOManagerPtr _vao_manager;
     GLFBOManagerPtr _fbo_manager;
     GLContextManagerPtr _context_manager;
+    GLTimeQueryManagerPtr _time_query_manager;
 };
 
 

@@ -6,6 +6,8 @@
 
 #include "boost/thread/mutex.hpp"
 
+#include "cuda_runtime.h"
+
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 
@@ -39,13 +41,11 @@ public:
     void download_image_buffer(bool jpeg = true);//TODO Temp change for scene FBO download error
     void swap_image_buffer();
     void get_image_buffer(unsigned char*& buffer, int& size);
+    //float get_compressing_time() const;
     
 
     void set_dirty(bool flag);
     bool get_dirty() const;
-
-    //FOR testing
-    GLTexture2DPtr get_scene_color_attach_0();
 
 protected:
     int _width , _height;
@@ -71,6 +71,11 @@ protected:
     gpujpeg_opengl_texture* _gpujpeg_texture;//input gpujpeg texture
     gpujpeg_encoder* _gpujpeg_encoder;//jpeg encoder
     gpujpeg_encoder_input _gpujpeg_encoder_input;//jpeg encoding input
+    
+    //在OpenGL的环境下 cuda event 会收到OpenGL的影响,导致计算的encoding时间不对(需要在cudaevent之前加一个glfinish)
+    //float _gpujpeg_encoding_duration;
+    //cudaEvent_t _gpujpeg_encoding_start;
+    //cudaEvent_t _gpujpeg_encoding_stop;
 
 };
 

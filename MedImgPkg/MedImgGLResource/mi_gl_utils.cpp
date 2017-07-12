@@ -373,5 +373,6 @@ void GLTextureUtils::set_filter( GLenum texture_target , GLint filter_type )
     glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, filter_type); 
 }
 
+
 MED_IMG_END_NAMESPACE
 

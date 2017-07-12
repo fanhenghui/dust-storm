@@ -113,8 +113,6 @@ void RayCastScene::render(int test_code)
 
     initialize();
 
-    CHECK_GL_ERROR;
-
     _volume_infos->refresh();
 
     //////////////////////////////////////////////////////////////////////////
@@ -122,36 +120,28 @@ void RayCastScene::render(int test_code)
 
     //////////////////////////////////////////////////////////////////////////
     //1 Ray casting
-    CHECK_GL_ERROR;
     //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    CHECK_GL_ERROR;
     _entry_exit_points->calculate_entry_exit_points();
-    CHECK_GL_ERROR;
 
     _ray_caster->render(_test_code);
     //glPopAttrib();
-    CHECK_GL_ERROR;
 
     //////////////////////////////////////////////////////////////////////////
     //2 Mapping ray casting result to Scene FBO (<><>flip vertically<><>)
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
 
     _scene_fbo->bind();
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-    CHECK_GL_ERROR;
-
     glEnable(GL_TEXTURE_2D);
     _canvas->get_color_attach_texture()->bind();
-
-    CHECK_GL_ERROR;
 
     glBegin(GL_QUADS);
     // glTexCoord2f(0.0, 0.0); 
@@ -174,17 +164,18 @@ void RayCastScene::render(int test_code)
     
     glEnd();
 
-    //glDisable(GL_TEXTURE_2D);
-    CHECK_GL_ERROR;
-    glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
-    CHECK_GL_ERROR;
+    //CHECK_GL_ERROR;
+    //glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
+    //CHECK_GL_ERROR;
 
     _scene_fbo->unbind();
 
+    CHECK_GL_ERROR;
+    
 
-CHECK_GL_ERROR;
+//CHECK_GL_ERROR;
     //_canvas->debug_output_color("/home/wr/data/output.raw");
-CHECK_GL_ERROR;
+//CHECK_GL_ERROR;
 
 
     // _scene_color_attach_0->bind();

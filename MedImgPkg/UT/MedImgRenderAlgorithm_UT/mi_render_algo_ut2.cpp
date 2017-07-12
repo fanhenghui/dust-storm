@@ -14,6 +14,8 @@
 #include "MedImgGLResource/mi_gl_environment.h"
 #include "MedImgGLResource/mi_gl_texture_1d.h"
 #include "MedImgGLResource/mi_gl_utils.h"
+#include "MedImgGLResource/mi_gl_time_query.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 #include "MedImgRenderAlgorithm/mi_camera_calculator.h"
 #include "MedImgRenderAlgorithm/mi_mpr_entry_exit_points.h"
@@ -26,6 +28,7 @@
 #include "GL/freeglut.h"
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
+#include "cuda_runtime.h"
 
 
 using namespace medical_imaging;
@@ -37,8 +40,11 @@ namespace
 
     std::shared_ptr<MPRScene> _scene;
 
-    int _width = 800;
-    int _height = 800;
+    std::shared_ptr<GLTimeQuery> _time_query;
+    std::shared_ptr<GLTimeQuery> _time_query2;
+
+    int _width = 1920;
+    int _height = 1080;
     int m_iButton = -1;
     Point2 m_ptPre;
     int m_iTestCode = 0;
@@ -87,6 +93,14 @@ namespace
         _scene->set_interpolation_mode(LINEAR);
         _scene->place_mpr(TRANSVERSE);
         _scene->initialize();
+
+        //Time query
+        UIDType uid = 0;
+        _time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(uid);
+        _time_query->initialize();
+
+        _time_query2 = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(uid);
+        _time_query2->initialize();
         
     }
 
@@ -98,18 +112,29 @@ namespace
             glClearColor(0.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
             
+            _time_query->begin();
+            _scene->set_dirty(true);
             //_scene->initialize();
             _scene->render(0);
+            
             _scene->render_to_back();
 
+            
+
+            //_time_query2->begin();
             //glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
             _scene->download_image_buffer();
             _scene->swap_image_buffer();
             unsigned char* buffer = nullptr;
             int buffer_size=0;
             _scene->get_image_buffer(buffer,buffer_size);
-            FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
+            //FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
+            //std::cout << "compressing time : " << _scene->get_compressing_time() << std::endl;
+            
 
+            //std::cout << "gl compressing time : " << _time_query2->end() << std::endl;
+
+            std::cout << "rendering time : " << _time_query->end() << std::endl;
 
             glutSwapBuffers();
         }
