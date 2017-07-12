@@ -7,6 +7,7 @@
 #include "MedImgAppCommon/mi_shut_down_command_handler.h"
 #include "MedImgAppCommon/mi_app_common_define.h"
 #include "mi_load_series_command_handler.h"
+#include "mi_mpr_play_command_handler.h"
 #include "MedImgAppCommon/mi_operation_factory.h"
 
 #include "MedImgUtil/mi_configuration.h"
@@ -42,6 +43,9 @@ void ReviewController::initialize()
 
     std::shared_ptr<OperationCommandHandler> handler_operation(new OperationCommandHandler(app_controller));
     _proxy->register_command_handler(COMMAND_ID_FE_OPERATION , handler_operation);
+
+    std::shared_ptr<MPRPlayCommandHandler> handler_mpr_play(new MPRPlayCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY , handler_mpr_play);
 
     std::shared_ptr<ReviewController> review_controller = std::dynamic_pointer_cast<ReviewController>(app_controller);
     std::shared_ptr<LoadSeriesCommandHandler> handler_loadseries(new LoadSeriesCommandHandler(review_controller));

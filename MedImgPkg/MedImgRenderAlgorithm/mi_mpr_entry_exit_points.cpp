@@ -401,15 +401,15 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         //////////////////////////////////////////////////////////////////////////
         //For testing
-        // std::cout << "Size : " << _width << " " << _height << std::endl;
-        // _entry_points_texture->bind();
-        // _entry_points_texture->download(GL_RGBA , GL_FLOAT , _entry_points_buffer.get());
+        //std::cout << "Size : " << _width << " " << _height << std::endl;
+        //_entry_points_texture->bind();
+        //_entry_points_texture->download(GL_RGBA , GL_FLOAT , _entry_points_buffer.get());
 
         // _entry_points_texture->unbind();
         // _exit_points_texture->bind();
         // _exit_points_texture->download(GL_RGBA , GL_FLOAT , _exit_points_buffer.get());
 
-        // this->debug_output_entry_points("/home/wr/data/entry_points.raw");
+        //this->debug_output_entry_points("/home/wr/data/entry_points.raw");
 
         //CHECK_GL_ERROR;
 

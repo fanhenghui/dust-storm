@@ -11,8 +11,8 @@ INCLUDE_ROOT_DIR = $(ROOT)/Include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/MedImgRenderAlgorithm
 BIN_DIR = $(ROOT)/bin
 
-CUDA_INCLUDE_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/include
-CUDA_LIB_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/lib/
+#CUDA_INCLUDE_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/include
+#CUDA_LIB_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/lib/
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
@@ -28,9 +28,9 @@ mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o
 TARGET = $(BIN_DIR)/libmedimg_renderalgorithm.so
 
 EXPORT_HEADER = mi_render_algo_export.h
-ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(CUDA_INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(CUDA_LIB_DIR) -lmedimg_util -lmedimg_arithmetic -lmedimg_glresource -lmedimg_io \
--lboost_system -lboost_thread -lgpujpeg -lcuda -lcudart
+ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_arithmetic -lmedimg_glresource -lmedimg_io \
+-lboost_system -lboost_thread -lgpujpeg
 
 
 all: pre-build main-build

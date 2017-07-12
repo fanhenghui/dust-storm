@@ -2,7 +2,8 @@
 
     myCanvas = document.getElementById("myCanvas");
     myCtx = myCanvas.getContext("2d");
-    myCanvasImg = myCtx.createImageData(myCanvas.width, myCanvas.height);
+    //myCanvasImg = myCtx.createImageData(myCanvas.width, myCanvas.height);
+    myCanvasImgJpeg = new Image();
 
     msgEnd = true;
     msgRest = 0;
@@ -23,6 +24,7 @@
     COMMAND_ID_FE_OPERATION = 120002;
     COMMAND_ID_FE_SHUT_DOWN = 121112;
     COMMAND_ID_FE_LOAD_SERIES = 120003;
+    COMMAND_ID_FE_MPR_PAGE = 120004;
 
     //BE to FE
     COMMAND_ID_BE_READY = 270001;
@@ -95,6 +97,7 @@
                     bufferOffset = 32;
                 }
 
+
                 if (curImgLen > 0) {
                     //Handle data
                     if (ipc_msg_id == COMMAND_ID_BE_READY) {
@@ -105,11 +108,11 @@
                         var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
                         var datajpg = "data:image/jpg;base64," + b64encoded;
 
-                        var img = new Image();
-                        img.src = datajpg;
-                        img.onload = function() {
+                        //var img = new Image();
+                        myCanvasImgJpeg.src = datajpg;
+                        myCanvasImgJpeg.onload = function() {
                             console.log("Image Onload");
-                            myCtx.drawImage(img, 0, 0, myCanvas.width, myCanvas.height);
+                            myCtx.drawImage(myCanvasImgJpeg, 0, 0, myCanvas.width, myCanvas.height);
                         };
 
                         ////Draw raw image 
@@ -161,7 +164,7 @@
             var header = new Uint32Array(header_buffer);
             header[0] = 0;
             header[1] = 0;
-            header[2] = COMMAND_ID_FE_OPERATION;
+            header[2] = COMMAND_ID_FE_MPR_PAGE;
             header[3] = 11; //paging
             header[4] = 0;
             header[5] = 0;

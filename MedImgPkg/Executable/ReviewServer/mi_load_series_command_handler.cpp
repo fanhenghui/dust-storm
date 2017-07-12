@@ -32,6 +32,15 @@ LoadSeriesCommandHandler::~LoadSeriesCommandHandler()
 
 int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , void* buffer)
 {
+
+    //Test
+    //目前只能load一次
+    static bool load = false;
+    if(load)
+    {
+        return 0;
+    }
+
     std::shared_ptr<ReviewController> controller = _controller.lock();
     if(nullptr == controller){
         REVIEW_THROW_EXCEPTION("controller pointer is null!");
@@ -106,7 +115,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , vo
     gl_context->make_noncurrent();
 
     std::cout << "load series done\n";
-
+    load = true;
     return 0;
 }
 

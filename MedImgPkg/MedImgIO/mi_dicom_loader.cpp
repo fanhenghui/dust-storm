@@ -181,9 +181,32 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileForm
     return IO_SUCCESS;
 }
 
-void DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
+IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
 {
+    //sort based on slice location
+    std::map<double , int> locs;
+    for(int i = 0 ; i< file_format_set.size() ; ++i){
+        DcmDataset* data_set = file_format_set[i]->getDataset();
+        if (!data_set)
+        {
+            return IO_DATA_DAMAGE;
+        }
+        double sl(0);
+        get_slice_location_i(data_set , sl);
+        if(locs.find(sl) != locs.end()){
+            //Same slice location
+            return IO_DATA_DAMAGE;
+        }
+        locs[sl] = i;
+    }
 
+    DcmFileFormatSet new_set(file_format_set.size());
+    int idx = 0;
+    for(auto it = locs.begin(); it != locs.end() ; ++it){
+        new_set[idx++] = file_format_set[it->second];
+    }
+
+    file_format_set = std::move(new_set);
 }
 
 IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> img_data_header)
@@ -940,7 +963,7 @@ bool DICOMLoader::get_slice_location_i(DcmDataset*data_set , double& slice_locat
     {
         return false;
     }
-    slice_location = atoi(context.c_str());
+    slice_location = atof(context.c_str());
     return true;
 }
 

@@ -119,12 +119,12 @@ void AppThreadModel::process_operating()
 
             boost::mutex::scoped_lock locker(_th_rendering->_mutex);
 
-            std::cout << "Execute op begin\n";
+            //std::cout << "Execute op begin\n";
             int err = op->execute();
             if(-1 == err){
                 //TODO execute failed
             }
-            std::cout << "Execute op done\n";
+            //std::cout << "Execute op done\n";
 
             //interrupt point    
             boost::this_thread::interruption_point();
@@ -132,7 +132,7 @@ void AppThreadModel::process_operating()
             _rendering = true;
             _th_rendering->_condition.notify_one();    
 
-            std::cout << "Execute op done 2\n";   
+            //std::cout << "Execute op done 2\n";   
         }
         
     }
@@ -169,7 +169,7 @@ void AppThreadModel::process_rendering()
                 while(!_rendering){
                     _th_rendering->_condition.wait(_th_rendering->_mutex);
                 }
-                std::cout << "Begin rendering \n";   
+                //std::cout << "Begin rendering \n";   
                 ////////////////////////////////////////
                 //render all dirty cells
                 std::shared_ptr<AppController> controller = _controller.lock();
@@ -186,7 +186,7 @@ void AppThreadModel::process_rendering()
                         scene->set_dirty(false);
                     }
                 }
-                std::cout << "Rendering done \n";   
+                //std::cout << "Rendering done \n";   
                 ////////////////////////////////////////
 
                 //interrupt point    
@@ -200,7 +200,7 @@ void AppThreadModel::process_rendering()
             
             ////////////////////////////////////////
             //download all dirty scene image to buffer
-            std::cout << "Begin download \n";   
+            //std::cout << "Begin download \n";   
             for(auto it = dirty_scenes.begin() ; it != dirty_scenes.end() ; ++it){
                 (*it)->download_image_buffer();
             }        
@@ -212,7 +212,7 @@ void AppThreadModel::process_rendering()
                     (*it)->swap_image_buffer();
                 }          
             }
-            std::cout << "Download done \n";   
+            //std::cout << "Download done \n";   
             ////////////////////////////////////////
             _sending = true;    
             _th_sending->_condition.notify_one();
@@ -249,7 +249,7 @@ void AppThreadModel::process_sending()
                 _th_sending->_condition.wait(_th_sending->_mutex);
             }
 
-            std::cout << "Begin sending \n";  
+            //std::cout << "Begin sending \n";  
 
             ////////////////////////////////////////
             //get dirty cells to be sending
@@ -295,7 +295,7 @@ void AppThreadModel::process_sending()
             }
             
             ////////////////////////////////////////
-            std::cout << "Sending done \n";  
+            //std::cout << "Sending done \n";  
             //interrupt point    
             boost::this_thread::interruption_point();
 

@@ -45,6 +45,7 @@ var COMMAND_ID_FE_READY = 120001;
 var COMMAND_ID_FE_OPERATION = 120002;
 var COMMAND_ID_FE_SHUT_DOWN = 121112;
 var COMMAND_ID_FE_LOAD_SERIES = 120003;
+var COMMAND_ID_FE_MPR_PLAY = 120004;
 //BE to FE
 var COMMAND_ID_BE_READY = 270001;
 var COMMAND_ID_BE_SEND_IMAGE = 270002;
@@ -182,10 +183,10 @@ io.on("connection", function(socket) {
         console.log("path: " + "/tmp/app." + obj.username);
 
         //TODO Test 自己起C++ BE
-        // const out = fs.openSync('./out_'+util.inspect(obj.username) + '.log', 'a');
-        // const err = fs.openSync('./err_'+util.inspect(obj.username) + '.log', 'a');
-        // var worker = child_process.spawn('./public/cpp/be' ,["/tmp/app."+obj.username] ,{detached: true, stdio: [ 'ignore', out, err ]});
-        // onlineLogicProcessID[obj.userid] = worker;
+        const out = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
+        const err = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
+        var worker = child_process.spawn('/home/wr/program/git/dust-storm/MedImgPkg/bin/review_server', ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out, err] });
+        onlineLogicProcessID[obj.userid] = worker;
 
         console.log("<><><><><><> logining success <><><><><><>");
 
@@ -261,6 +262,10 @@ io.on("connection", function(socket) {
         } else if (command_id == COMMAND_ID_FE_LOAD_SERIES) {
             const msgBE = new Buffer(32);
             msgBE.writeUIntLE(COMMAND_ID_FE_LOAD_SERIES, 8, 4);
+            ipc.server.emit(local_socket, msgBE);
+        } else if (command_id == COMMAND_ID_FE_MPR_PLAY) {
+            const msgBE = new Buffer(32);
+            msgBE.writeUIntLE(COMMAND_ID_FE_MPR_PLAY, 8, 4);
             ipc.server.emit(local_socket, msgBE);
         }
 

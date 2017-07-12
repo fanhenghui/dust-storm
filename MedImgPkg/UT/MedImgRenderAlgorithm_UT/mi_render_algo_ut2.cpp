@@ -153,7 +153,19 @@ namespace
             {
                 // std::cout << "W H :" << _width << " " << _height << std::endl;
                 // m_pMPREE->debug_output_entry_points("D:/entry_exit.rgb.raw");
-                _scene->page(1);
+                std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(_scene->get_camera());
+                int cur_page = _scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
+                std::cout << "current page : " << cur_page << std::endl;
+                if(cur_page >= _volume_data->_dim[2] - 2)
+                {
+                    _scene->page_to(1);
+                }
+                else
+                {
+                    _scene->page(1);
+                }
+            
+
                 break;
             }
         // case 'a':
@@ -199,7 +211,7 @@ namespace
 
     void Idle()
     {
-        glutPostRedisplay();
+        //glutPostRedisplay();
     }
 
     void MouseClick(int button , int status , int x , int y)

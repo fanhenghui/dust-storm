@@ -6,8 +6,8 @@
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
-#include "libgpujpeg/gpujpeg_encoder.h"
-#include "libgpujpeg/gpujpeg_encoder_internal.h"
+// #include "libgpujpeg/gpujpeg_encoder.h"
+// #include "libgpujpeg/gpujpeg_encoder_internal.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
