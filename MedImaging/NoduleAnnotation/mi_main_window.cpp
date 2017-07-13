@@ -18,6 +18,7 @@
 #include "MedImgIO/mi_nodule_set.h"
 #include "MedImgIO/mi_nodule_set_parser.h"
 #include "MedImgIO/mi_model_progress.h"
+#include "MedImgIO/mi_run_length_operator.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -1429,19 +1430,7 @@ void NoduleAnnotation::slot_save_label_file()
     //TODO: check whether data are ready
 
     // label remapping
-    std::map<unsigned char, unsigned char> label_correction = this->LabelCorrection();
-
-    // encode the original labels
-    std::vector<int> run_length_encoded_output = this->RunLengthEncodeLabel(label_correction);
-
-    // write to disk
-    this->WriteEncodedLabels(run_length_encoded_output);    
-}
-
-std::map<unsigned char, unsigned char> NoduleAnnotation::LabelCorrection()
-{
-    // get the labels which are ordered
-    const auto & labels = this->_model_voi->get_labels();
+    const auto & labels = this->_model_voi->get_labels(); // get the labels which are ordered
 
     // build a map to 'correct' the labels to be sequential, starting from 1
     std::map<unsigned char, unsigned char> label_correction;
@@ -1452,11 +1441,7 @@ std::map<unsigned char, unsigned char> NoduleAnnotation::LabelCorrection()
         label_correction[(*it)] = label_index;
         //std::cout << static_cast<int>(*it) << " mapped to " << static_cast<int>(cnt) << '\n';
     }
-    return label_correction;
-}
 
-std::vector<int> NoduleAnnotation::RunLengthEncodeLabel(const std::map<unsigned char, unsigned char> &label_correction)
-{
     // create a new data as the final output
     ImageData * output_label_volume = new ImageData();
     std::shared_ptr<ImageData> mask_data = this->_volume_infos->get_mask(); //get the associated mask
@@ -1464,11 +1449,11 @@ std::vector<int> NoduleAnnotation::RunLengthEncodeLabel(const std::map<unsigned 
 
     // iterate/correct the mask data as 1D array
     unsigned char* array_pointer = static_cast<unsigned char*>(output_label_volume->get_pixel_pointer());
-    //if (array_pointer == nullptr)
-    //{
-    //    std::cout << "We get a null pointer for the label :( \n";
-    //    return;
-    //}
+    if (array_pointer == nullptr)
+    {
+        std::cout << "We get a null pointer for the label :( \n";
+        return;
+    }
 
     unsigned int total_number_of_voxels = mask_data->_dim[0] * mask_data->_dim[1] * mask_data->_dim[2];
     for (int voxel=0; voxel < total_number_of_voxels; ++voxel)
@@ -1483,79 +1468,76 @@ std::vector<int> NoduleAnnotation::RunLengthEncodeLabel(const std::map<unsigned 
         }
     }
 
-    // encode with run-length in the format of <times, value>
-    std::vector<int> run_length_encoded_output;
-    int cnt = 1; unsigned char val = array_pointer[0];
-    for (int voxel=1; voxel<total_number_of_voxels; ++voxel)
-    {
-        if (val == array_pointer[voxel])
-        {
-            ++cnt;
-        }
-        else
-        {
-            run_length_encoded_output.push_back(cnt);
-            run_length_encoded_output.push_back(val);
 
-            val = array_pointer[voxel];
-            cnt = 1;
-        }
-    }
-
-    //unsigned int sum_voxels = 0;
-    //for (auto it=run_length_encoded_output.begin(); it != run_length_encoded_output.end(); it += 2)
-    //{
-    //    sum_voxels += (*it);
-    //}
-    //std::cout << sum_voxels << " voxels get counted\n";
-
-    // record the last pair
-    run_length_encoded_output.push_back(cnt);
-    run_length_encoded_output.push_back(val);
-    
-    // clean up
+    // encode the original labels
+    std::vector<unsigned int> run_length_encoded_output = RunLengthOperator::Encode(array_pointer, total_number_of_voxels);
     delete output_label_volume;
 
-    return run_length_encoded_output;
-}
+    //std::vector<int> run_length_encoded_output = this->RunLengthEncodeLabel(label_correction);
 
-void NoduleAnnotation::WriteEncodedLabels(std::vector<int> &run_length_encoded_output)
-{
+    // write to disk
     QString output_file_name = QFileDialog::getSaveFileName(
         this,
         tr("Save Label"), 
-        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.raw)") );
+        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
 
     if (!output_file_name.isEmpty())
     {
         std::string output_file_name_std(output_file_name.toLocal8Bit());
+        this->write_encoded_labels(output_file_name_std, run_length_encoded_output);
+    }
+    // this->WriteEncodedLabels(run_length_encoded_output);    
+}
 
-        bool binary_output = true;
-        if (binary_output)
-        {
-            std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
-            if (output_file.is_open())
-            {
-                int * raw_ptr = run_length_encoded_output.data();
-                output_file.write(
-                    reinterpret_cast<char *>(raw_ptr),
-                    sizeof(int) * run_length_encoded_output.size());
-                output_file.flush();
-                output_file.close();
-            }
-        }
-        else /*for debug*/
-        {
-            std::ofstream output_file;
-            output_file.open(output_file_name_std, std::ios::out);
-            if (output_file.is_open())
-            {
-                std::ostream_iterator<int> out_it (output_file, ", ");
-                std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
-                output_file.flush();
-                output_file.close();
-            }
-        }
+void NoduleAnnotation::write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output)
+{
+    //QString output_file_name = QFileDialog::getSaveFileName(
+    //    this,
+    //    tr("Save Label"), 
+    //    QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
+
+    //if (!output_file_name.isEmpty())
+    //{
+    //    std::string output_file_name_std(output_file_name.toLocal8Bit());
+
+    //    bool binary_output = true;
+    //    if (binary_output)
+    //    {
+    //        std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+    //        if (output_file.is_open())
+    //        {
+    //            int * raw_ptr = run_length_encoded_output.data();
+    //            output_file.write(
+    //                reinterpret_cast<char *>(raw_ptr),
+    //                sizeof(int) * run_length_encoded_output.size());
+    //            output_file.flush();
+    //            output_file.close();
+    //        }
+    //    }
+    //    else /*for debug*/
+    //    {
+    //        std::ofstream output_file;
+    //        output_file.open(output_file_name_std, std::ios::out);
+    //        if (output_file.is_open())
+    //        {
+    //            std::ostream_iterator<int> out_it (output_file, ", ");
+    //            std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
+    //            output_file.flush();
+    //            output_file.close();
+    //        }
+    //    }
+    //}
+
+
+    std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
+    if (output_file.is_open())
+    {
+        unsigned int * raw_ptr = run_length_encoded_output.data();
+        output_file.write(
+            reinterpret_cast<char *>(raw_ptr),
+            sizeof(unsigned int) * run_length_encoded_output.size());
+        output_file.flush();
+        output_file.close();
     }
 }
 

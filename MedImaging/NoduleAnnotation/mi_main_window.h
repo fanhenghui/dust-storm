@@ -102,10 +102,7 @@ private:
     void refresh_nodule_list_i();
     void save_layout2x2_parameter_i();
     
-    // for label encoding
-    std::map<unsigned char, unsigned char> LabelCorrection();
-    std::vector<int> RunLengthEncodeLabel(const std::map<unsigned char, unsigned char> &label_correction);
-    void WriteEncodedLabels(std::vector<int> &run_length_encoded_output);
+    void write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output);
 
 private:
     Ui::NoduleAnnotationClass _ui;
