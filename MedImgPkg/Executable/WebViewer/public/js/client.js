@@ -104,6 +104,7 @@
                         console.log("Ready");
                         //this.socket.emit
                     } else if (ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE) {
+                        //Draw jpeg buffer
                         var imgBuffer = new Uint8Array(arraybuffer, bufferOffset, curImgLen);
                         var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
                         var datajpg = "data:image/jpg;base64," + b64encoded;
@@ -120,7 +121,6 @@
                         // for(var i = 0 ; i< curImgLen ; ++i){
                         // myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
                         // }
-                        //this.processingImg(arraybuffer , bufferOffset , curImgLen);
                     }
 
                 }
@@ -149,14 +149,6 @@
             var username = document.getElementById("username").value;
 
             this.init(username);
-        },
-
-        processingImg: function(arraybuffer, bufferOffset, bufferLength) {
-            curImgLen = bufferLength;
-            var imgBuffer = new Uint8Array(arraybuffer, bufferOffset, curImgLen);
-            for (var i = 0; i < curImgLen; ++i) {
-                myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
-            }
         },
 
         paging: function() {

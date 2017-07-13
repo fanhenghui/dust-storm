@@ -224,9 +224,10 @@ io.on("connection", function(socket) {
         quitMsg.writeUIntLE(0, 24, 4);
         quitMsg.writeUIntLE(0, 28, 4);
 
-
-        ipc.server.emit(local_socket, quitMsg);
-        ipc.server.stop(); //关闭IPC
+        if (ipc != undefined) {
+            ipc.server.emit(local_socket, quitMsg);
+            ipc.server.stop(); //关闭IPC
+        }
 
         //删除user的信息
         delete onlineUsers[userid];
@@ -246,8 +247,19 @@ io.on("connection", function(socket) {
 
     socket.on("data", function(obj) {
         userid = obj.userid;
+        console.log("socket on data , userid : " + userid);
         var ipc = onlineLocalIPC[userid];
+        if (ipc === undefined || ipc == null) {
+            console.log("socket on data , ERROR IPC");
+            return;
+        }
+
         var local_socket = onlineLocalSockets[userid];
+        if (local_socket === undefined || local_socket == null) {
+            console.log("socket on data , ERROR SOCKET");
+            return;
+        }
+
         console.log("web send to server : username " + obj.username);
         var buffer = obj.content;
 

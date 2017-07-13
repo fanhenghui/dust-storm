@@ -28,7 +28,7 @@ int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , void*
     if(_playing){
         return 0;
     }
-    
+
     std::shared_ptr<AppController> controller = _controller.lock();
     if(nullptr == controller){
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
@@ -75,6 +75,8 @@ void MPRPlayCommandHandler::logic_i(OpDataHeader& op_header, void* buffer)
             APPCOMMON_THROW_EXCEPTION("cant find operation!");
         }
     }
+
+    _playing = false;
 }
 
 MED_IMG_END_NAMESPACE

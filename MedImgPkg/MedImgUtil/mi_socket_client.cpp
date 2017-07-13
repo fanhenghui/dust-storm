@@ -131,11 +131,13 @@ void SocketClient::send_data(const IPCDataHeader& dataheader , void* buffer)
     }
 
     if(-1 == send(_fd_server , &dataheader , sizeof(dataheader) , 0)) {
+            //delete [] buffer;
             return;
     }
 
     if(buffer != nullptr && dataheader._data_len > 0 ){
         if(-1 == send(_fd_server , buffer ,dataheader._data_len , 0)) {
+            //delete [] buffer;
             return;
         }
     }

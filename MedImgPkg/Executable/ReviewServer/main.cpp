@@ -27,6 +27,6 @@ int main(int argc , char* argv[])
         std::cout << "Review server error exit : " << e.what() << std::endl;
     } 
 
-    std::cout << "Review server exit.\n"; 
+    std::cout << "Review server exit.\n";   
     return 0;
 }
