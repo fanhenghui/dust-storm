@@ -439,6 +439,9 @@ void NoduleAnnotation::connect_signal_slot_i()
 
     //Crosshair visibility
     connect(_ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
+
+    //Nodule overlay visibility
+    connect(_ui.checkBoxNoduleOverlay , SIGNAL(stateChanged(int)) , this , SLOT(slot_nodule_overlay_visibility_i(int)));
 }
 
 void NoduleAnnotation::create_model_observer_i()
@@ -1355,6 +1358,23 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
     _ob_scene_container->update();
 }
 
+void NoduleAnnotation::slot_nodule_overlay_visibility_i(int flag)
+{
+    if (!_is_ready)
+    {
+        return;
+    }
+
+    std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
+    MaskOverlayMode mode = flag != 0 ? MASK_OVERLAY_ENABLE : MASK_OVERLAY_DISABLE;
+    for(int i= 0 ; i < 3 ; ++i)
+    {
+        scenes[i]->set_mask_overlay_mode(mode);
+        scenes[i]->set_dirty(true);
+    }
+    _ob_scene_container->update();
+}
+
 void NoduleAnnotation::refresh_nodule_list_i()
 {
     //reset nodule list
@@ -1473,8 +1493,6 @@ void NoduleAnnotation::slot_save_label_file()
     std::vector<unsigned int> run_length_encoded_output = RunLengthOperator::Encode(array_pointer, total_number_of_voxels);
     delete output_label_volume;
 
-    //std::vector<int> run_length_encoded_output = this->RunLengthEncodeLabel(label_correction);
-
     // write to disk
     QString output_file_name = QFileDialog::getSaveFileName(
         this,
@@ -1484,62 +1502,60 @@ void NoduleAnnotation::slot_save_label_file()
     if (!output_file_name.isEmpty())
     {
         std::string output_file_name_std(output_file_name.toLocal8Bit());
-        this->write_encoded_labels(output_file_name_std, run_length_encoded_output);
-    }
-    // this->WriteEncodedLabels(run_length_encoded_output);    
-}
 
-void NoduleAnnotation::write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output)
-{
-    //QString output_file_name = QFileDialog::getSaveFileName(
-    //    this,
-    //    tr("Save Label"), 
-    //    QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
-
-    //if (!output_file_name.isEmpty())
-    //{
-    //    std::string output_file_name_std(output_file_name.toLocal8Bit());
-
-    //    bool binary_output = true;
-    //    if (binary_output)
-    //    {
-    //        std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
-    //        if (output_file.is_open())
-    //        {
-    //            int * raw_ptr = run_length_encoded_output.data();
-    //            output_file.write(
-    //                reinterpret_cast<char *>(raw_ptr),
-    //                sizeof(int) * run_length_encoded_output.size());
-    //            output_file.flush();
-    //            output_file.close();
-    //        }
-    //    }
-    //    else /*for debug*/
-    //    {
-    //        std::ofstream output_file;
-    //        output_file.open(output_file_name_std, std::ios::out);
-    //        if (output_file.is_open())
-    //        {
-    //            std::ostream_iterator<int> out_it (output_file, ", ");
-    //            std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
-    //            output_file.flush();
-    //            output_file.close();
-    //        }
-    //    }
-    //}
-
-
-    std::ofstream output_file(file_name, std::ios::out | std::ios::binary);
-    if (output_file.is_open())
-    {
-        unsigned int * raw_ptr = run_length_encoded_output.data();
-        output_file.write(
-            reinterpret_cast<char *>(raw_ptr),
-            sizeof(unsigned int) * run_length_encoded_output.size());
-        output_file.flush();
-        output_file.close();
+        std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+        if (output_file.is_open())
+        {
+            unsigned int * raw_ptr = run_length_encoded_output.data();
+            output_file.write(
+                reinterpret_cast<char *>(raw_ptr),
+                sizeof(unsigned int) * run_length_encoded_output.size());
+            output_file.flush();
+            output_file.close();
+        }
     }
 }
+
+//
+//void NoduleAnnotation::write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output)
+//{
+//    QString output_file_name = QFileDialog::getSaveFileName(
+//        this,
+//        tr("Save Label"), 
+//        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
+//
+//    if (!output_file_name.isEmpty())
+//    {
+//        std::string output_file_name_std(output_file_name.toLocal8Bit());
+//
+//        bool binary_output = true;
+//        if (binary_output)
+//        {
+//            std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+//            if (output_file.is_open())
+//            {
+//                int * raw_ptr = run_length_encoded_output.data();
+//                output_file.write(
+//                    reinterpret_cast<char *>(raw_ptr),
+//                    sizeof(int) * run_length_encoded_output.size());
+//                output_file.flush();
+//                output_file.close();
+//            }
+//        }
+//        else /*for debug*/
+//        {
+//            std::ofstream output_file;
+//            output_file.open(output_file_name_std, std::ios::out);
+//            if (output_file.is_open())
+//            {
+//                std::ostream_iterator<int> out_it (output_file, ", ");
+//                std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
+//                output_file.flush();
+//                output_file.close();
+//            }
+//        }
+//    }
+//}
 
 //void NoduleAnnotation::slot_load_label_file()
 //{

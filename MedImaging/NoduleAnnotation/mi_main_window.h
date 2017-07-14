@@ -91,6 +91,7 @@ private slots:
 
     //Crosshair visible
     void slot_crosshair_visibility_i(int );
+    void slot_nodule_overlay_visibility_i(int );
 
     void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
 
@@ -101,8 +102,6 @@ private:
     void create_model_observer_i();
     void refresh_nodule_list_i();
     void save_layout2x2_parameter_i();
-    
-    void write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output);
 
 private:
     Ui::NoduleAnnotationClass _ui;
