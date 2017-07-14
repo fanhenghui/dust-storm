@@ -50,7 +50,7 @@ std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned 
 {
     std::vector<unsigned char> result;
 
-    // count the voxels, check w.r.t _volume_infos.dim[0]*dim[1]*dim[2]
+    // count the voxels
     unsigned int total_number_of_voxels = 0;
     for (auto it = to_be_decoded.begin(); it != to_be_decoded.end(); it += 2)
     {
@@ -58,15 +58,17 @@ std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned 
     }
     std::cout << total_number_of_voxels << " labels are loaded\n";
 
+    // decode
     unsigned int current_index = 0;
+    unsigned int voxel_bound = to_be_decoded[current_index];
     unsigned char current_label = static_cast<unsigned char>( to_be_decoded[current_index+1] );
 
     for (unsigned int voxel=0; voxel< total_number_of_voxels; ++voxel)
     {
-        if (voxel >= to_be_decoded[current_index] )
+        if (voxel != voxel_bound )
         {
             current_index += 2;
-            to_be_decoded[current_index] += to_be_decoded[current_index-2];
+            voxel_bound = to_be_decoded[current_index] + to_be_decoded[current_index-2];
             current_label = static_cast<unsigned char>( to_be_decoded[current_index+1] );
         }
 

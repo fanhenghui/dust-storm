@@ -8,7 +8,7 @@ MED_IMAGING_BEGIN_NAMESPACE
 class RunLengthOperator
 {
 public:
-    IO_Export static std::vector<unsigned int> encode(const std::vector<unsigned char>& to_be_decoded );
+    IO_Export static std::vector<unsigned int> encode(const std::vector<unsigned char>& to_be_encoded );
     IO_Export static std::vector<unsigned int> encode(const unsigned char* mask_array_pointer, const size_t total_number_of_voxels);
               
     IO_Export static std::vector<unsigned char> decode(const std::vector<unsigned int>& to_be_decoded );

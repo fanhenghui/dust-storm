@@ -1490,7 +1490,7 @@ void NoduleAnnotation::slot_save_label_file()
 
 
     // encode the original labels
-    std::vector<unsigned int> run_length_encoded_output = RunLengthOperator::Encode(array_pointer, total_number_of_voxels);
+    std::vector<unsigned int> run_length_encoded_output = RunLengthOperator::encode(array_pointer, total_number_of_voxels);
     delete output_label_volume;
 
     // write to disk
