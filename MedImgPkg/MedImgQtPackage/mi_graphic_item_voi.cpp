@@ -185,7 +185,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             sphere_center = mat_p2w.transform(it->center);
             diameter = it->diameter;
             double distance = norm.dot_product(look_at - sphere_center);
-            if (abs(distance) < diameter*0.5)
+            if (fabs(distance) < diameter*0.5)
             {
                 Point3 pt0 = sphere_center + distance*norm;
                 double radius = sqrt(diameter*diameter*0.25 - distance*distance);
@@ -323,8 +323,8 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
     }
     else if (event->buttons() == Qt::RightButton)
     {
-        float x = abs(this->mapToScene(event->pos()).x() - _pre_center.x());
-        float y = abs(_pre_center.y() - this->mapToScene(event->pos()).y());
+        float x = fabs(this->mapToScene(event->pos()).x() - _pre_center.x());
+        float y = fabs(_pre_center.y() - this->mapToScene(event->pos()).y());
         float radius = sqrt(x*x + y*y);
 
         set_sphere(_pre_center , radius);
@@ -466,8 +466,8 @@ void GraphicsSphereItem::update_sphere_diameter_i(int code_id /*= 0*/)
 
     //Get current circle radius
     const float cur_radius = this->rect().width()*0.5f;
-    const float radio = abs(cur_radius / pre_radius);
-    if (abs(radio - 1.0f) < FLOAT_EPSILON && code_id != VOIModel::MODIFY_COMPLETED)
+    const float radio = fabs(cur_radius / pre_radius);
+    if (fabs(radio - 1.0f) < FLOAT_EPSILON && code_id != VOIModel::MODIFY_COMPLETED)
     {
         return;
     }

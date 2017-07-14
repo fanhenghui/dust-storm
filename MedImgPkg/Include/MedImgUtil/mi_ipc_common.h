@@ -7,7 +7,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-struct IPCDataHeader
+struct IPCDataHeader//32 byte
 {
     unsigned int _sender;//sender pid
     unsigned int _receiver;//receiver pid

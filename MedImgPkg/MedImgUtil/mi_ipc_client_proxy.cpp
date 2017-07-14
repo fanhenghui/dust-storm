@@ -29,7 +29,8 @@ private:
 
 IPCClientProxy::IPCClientProxy():_client(new SocketClient())
 {
-
+    std::shared_ptr<IPCDataRecvHandlerExt> recv_handler(new IPCDataRecvHandlerExt(this));
+    _client->register_revc_handler(recv_handler);
 }
 
 IPCClientProxy::~IPCClientProxy()

@@ -8,6 +8,7 @@
 #include "mi_gl_fbo.h"
 #include "mi_gl_vao.h"
 #include "mi_gl_context.h"
+#include "mi_gl_time_query.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -58,7 +59,8 @@ _program_manager(new GLProgramManager()),
     _vao_manager(new GLVAOManager()),
     _fbo_manager(new GLFBOManager()),
     _texture_1d_array_manager(new GLTexture1DArrayManager()),
-    _context_manager(new GLContextManager())
+    _context_manager(new GLContextManager()),
+    _time_query_manager(new GLTimeQueryManager())
 {
 
 }
@@ -98,5 +100,9 @@ GLContextManagerPtr GLResourceManagerContainer::get_context_manager() const
     return _context_manager;
 }
 
+GLTimeQueryManagerPtr GLResourceManagerContainer::get_time_query_manager() const
+{
+    return _time_query_manager;
+}
 
 MED_IMG_END_NAMESPACE

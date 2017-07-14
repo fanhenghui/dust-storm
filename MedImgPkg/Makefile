@@ -1,8 +1,9 @@
 MAKE = make
-ver = release
+ver = debug
 
 subsystem:
 	-mkdir bin
+	-export LD_LIBRARY_PATH=/home/wr/program/git/dust-storm/MedImgPkg/bin:/home/wr/program/git/dust-storm/MedImgPkg/:/usr/local/lib
 	$(MAKE) -C ./MedImgUtil
 	$(MAKE) -C ./MedImgGLResource
 	$(MAKE) -C ./MedImgArithmetic
@@ -12,8 +13,8 @@ subsystem:
 	$(MAKE) -C ./MedImgRenderAlgorithm
 	$(MAKE) -C ./UT/MedImgUtil_UT
 	$(MAKE) -C ./UT/MedImgGLResource_UT
-
-	-export LD_LIBRARY_PATH=/home/	wr/program/git/dust-storm/MedImgPkg/bin 　　 
+	$(MAKE) -C ./UT/MedImgRenderAlgorithm_UT
+	$(MAKE) -C ./Executable/ReviewServer
 
 PHONY.:clean
 clean:
@@ -26,4 +27,6 @@ clean:
 	$(MAKE) clean -C ./MedImgRenderAlgorithm
 	$(MAKE) clean -C ./UT/MedImgUtil_UT
 	$(MAKE) clean -C ./UT/MedImgGLResource_UT
+	$(MAKE) clean -C ./UT/MedImgRenderAlgorithm_UT
+	$(MAKE) clean -C ./Executable/ReviewServer
 	-rm -r bin

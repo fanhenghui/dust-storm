@@ -329,6 +329,7 @@ bool GLContextHelper::has_gl_context()
     HDC hdc = wglGetCurrentDC();
     return (hdc != NULL);
 #else
+    
     return true;
 #endif
 }
@@ -371,6 +372,7 @@ void GLTextureUtils::set_filter( GLenum texture_target , GLint filter_type )
     glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, filter_type); 
     glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, filter_type); 
 }
+
 
 MED_IMG_END_NAMESPACE
 

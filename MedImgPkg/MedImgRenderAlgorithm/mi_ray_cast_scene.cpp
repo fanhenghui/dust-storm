@@ -2,6 +2,7 @@
 
 
 #include "MedImgUtil/mi_configuration.h"
+#include "MedImgUtil/mi_file_util.h"
 
 #include "MedImgArithmetic/mi_ortho_camera.h"
 #include "MedImgArithmetic/mi_point2.h"
@@ -108,6 +109,10 @@ void RayCastScene::render(int test_code)
         return;
     }
 
+    CHECK_GL_ERROR;
+
+    initialize();
+
     _volume_infos->refresh();
 
     //////////////////////////////////////////////////////////////////////////
@@ -115,50 +120,70 @@ void RayCastScene::render(int test_code)
 
     //////////////////////////////////////////////////////////////////////////
     //1 Ray casting
-    CHECK_GL_ERROR;
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     _entry_exit_points->calculate_entry_exit_points();
-    _ray_caster->render(_test_code);
 
-    glPopAttrib();
-    CHECK_GL_ERROR;
+    _ray_caster->render(_test_code);
+    //glPopAttrib();
 
     //////////////////////////////////////////////////////////////////////////
-    //2 Mapping ray casting result to Scene FBO
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //2 Mapping ray casting result to Scene FBO (<><>flip vertically<><>)
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
 
     _scene_fbo->bind();
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-    CHECK_GL_ERROR;
-
     glEnable(GL_TEXTURE_2D);
     _canvas->get_color_attach_texture()->bind();
 
-    CHECK_GL_ERROR;
-
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0); 
+    // glTexCoord2f(0.0, 0.0); 
+    // glVertex2f(-1.0, -1.0);
+    // glTexCoord2f(1.0, 0.0); 
+    // glVertex2f(1.0, -1.0);
+    // glTexCoord2f(1.0, 1.0); 
+    // glVertex2f(1.0, 1.0);
+    // glTexCoord2f(0.0, 1.0);
+    // glVertex2f(-1.0, 1.0);
+
+    glTexCoord2f(0.0, 1.0); 
     glVertex2f(-1.0, -1.0);
-    glTexCoord2f(1.0, 0.0); 
-    glVertex2f(1.0, -1.0);
     glTexCoord2f(1.0, 1.0); 
+    glVertex2f(1.0, -1.0);
+    glTexCoord2f(1.0, 0.0); 
     glVertex2f(1.0, 1.0);
-    glTexCoord2f(0.0, 1.0);
+    glTexCoord2f(0.0, 0.0);
     glVertex2f(-1.0, 1.0);
+    
     glEnd();
 
-    //glDisable(GL_TEXTURE_2D);
+    //CHECK_GL_ERROR;
+    //glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
+    //CHECK_GL_ERROR;
+
+    _scene_fbo->unbind();
+
     CHECK_GL_ERROR;
-    glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
-    CHECK_GL_ERROR;
+    
+
+//CHECK_GL_ERROR;
+    //_canvas->debug_output_color("/home/wr/data/output.raw");
+//CHECK_GL_ERROR;
+
+
+    // _scene_color_attach_0->bind();
+    // std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width*_height*3]);
+    // _scene_color_attach_0->download(GL_RGB , GL_UNSIGNED_BYTE , color_array.get());
+
+    // FileUtil::write_raw("/home/wr/data/scene_output_rgb.raw" , (char*)color_array.get(), _width*_height*4);
+    
 
     set_dirty(false);
 }
@@ -345,7 +370,5 @@ std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const
 {
     return _camera_calculator;
 }
-
-
 
 MED_IMG_END_NAMESPACE

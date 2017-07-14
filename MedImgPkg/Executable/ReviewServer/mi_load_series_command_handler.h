@@ -8,7 +8,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class ReviewController;
-class AppCommon_Export LoadSeriesCommandHandler : public ICommandHandler
+class LoadSeriesCommandHandler : public ICommandHandler
 {
 public:
     LoadSeriesCommandHandler(std::shared_ptr<ReviewController> controller);

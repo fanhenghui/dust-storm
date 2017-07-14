@@ -1,10 +1,9 @@
-ver = release
+ver = debug
 CC  = g++ -std=c++11 -Wall 
 
 ifeq ($(ver) , release)
-CFLAGS += -c -fPIC
 else
-CFLAGS += -c -g -fPIC
+CFLAGS += -g
 endif
 
 ROOT = ..
@@ -20,37 +19,37 @@ TARGET = $(BIN_DIR)/libmedimg_io.so
 
 EXPORT_HEADER = mi_io_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_arithmetic -ldcmdata -ldcmimage -lz
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_arithmetic -ldcmdata -ldcmimage -ldcmjpeg -lz
 
-$(TARGET): $(OBJS)
-	$(CC) -shared -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
+$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
+	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 mi_dicom_loader.o: $(EXPORT_HEADER) mi_dicom_loader.h mi_dicom_loader.cpp mi_image_data_header.h mi_image_data.o
-	$(CC) $(CFLAGS) mi_dicom_loader.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_dicom_loader.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_dicom_exporter.o: $(EXPORT_HEADER) mi_dicom_exporter.h mi_dicom_exporter.cpp mi_image_data.o 
-	$(CC) $(CFLAGS) mi_dicom_exporter.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_dicom_exporter.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_image_data.o: $(EXPORT_HEADER) mi_image_data.h mi_image_data.cpp mi_io_define.h
-	$(CC) $(CFLAGS) mi_image_data.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) mi_image_data.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_zlib_utils.o: $(EXPORT_HEADER) mi_zlib_utils.h mi_zlib_utils.cpp
-	$(CC) $(CFLAGS) mi_zlib_utils.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) mi_zlib_utils.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_meta_object_loader.o: $(EXPORT_HEADER) mi_meta_object_loader.h mi_meta_object_loader.cpp mi_image_data_header.h mi_image_data.o mi_zlib_utils.o
-	$(CC) $(CFLAGS) mi_meta_object_loader.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_meta_object_loader.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_dicom_rt_struct.o: $(EXPORT_HEADER) mi_dicom_rt_struct.h mi_dicom_rt_struct.cpp
-	$(CC) $(CFLAGS) mi_dicom_rt_struct.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_dicom_rt_struct.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_dicom_rt_struct_loader.o: $(EXPORT_HEADER) mi_dicom_rt_struct_loader.h mi_dicom_rt_struct_loader.cpp mi_dicom_rt_struct.o
-	$(CC) $(CFLAGS) mi_dicom_rt_struct_loader.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_dicom_rt_struct_loader.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_nodule_set_parser.o: $(EXPORT_HEADER) mi_nodule_set_parser.h mi_nodule_set_parser.cpp mi_nodule_set.o
-	$(CC) $(CFLAGS) mi_nodule_set_parser.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) mi_nodule_set_parser.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_nodule_set.o: $(EXPORT_HEADER) mi_nodule_set.h mi_nodule_set.cpp
-	$(CC) $(CFLAGS) mi_nodule_set.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) mi_nodule_set.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

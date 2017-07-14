@@ -1,5 +1,6 @@
 #include "mi_file_util.h"
 
+#include <fstream>
 #include "boost/filesystem.hpp"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -20,12 +21,12 @@ namespace
                 else{
                     const std::string ext = boost::filesystem::extension(*it);
                     if(postfix.empty()){
-                        files.push_back(it->path().filename().string());
+                        files.push_back(root + std::string("/") + it->path().filename().string());
                     }
                     else{
                         for(auto itext = postfix.begin() ; itext != postfix.end() ; ++itext){
                             if(*itext == ext){
-                                files.push_back(it->path().filename().string());
+                                files.push_back(root + std::string("/") + it->path().filename().string());
                                 break;
                             }
                         }
@@ -52,6 +53,22 @@ void FileUtil::get_all_file_recursion(
     }
 
     get_files(root , postfix, files);
+}
+
+void FileUtil::write_raw(const std::string& path , void* buffer , unsigned int length)
+{
+    if(nullptr == buffer || path.empty()){
+        return;
+    }
+
+    std::ofstream out(path.c_str() , std::ios::out | std::ios::binary);
+    if(!out.is_open()){
+        return;
+    }
+
+    
+    out.write((char*)buffer , length);
+    out.close();
 }
 
 MED_IMG_END_NAMESPACE

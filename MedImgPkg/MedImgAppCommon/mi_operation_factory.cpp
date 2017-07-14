@@ -2,23 +2,6 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-
-////////////////////////////////////////
-//Test
-class TestOperation : public IOperation
-{
-public:
-    TestOperation() {};
-    virtual ~TestOperation() {};
-    virtual int execute()
-    {
-        std::cout << "Hello test operation.";
-        return 0;
-    };
-};
-
-////////////////////////////////////////
-
 boost::mutex OperationFactory::_mutex;
 
 OperationFactory* OperationFactory::_s_instance = nullptr;
@@ -41,9 +24,26 @@ OperationFactory::~OperationFactory()
 
 }
 
+OperationFactory::OperationFactory()
+{
+
+}
+
 std::shared_ptr<IOperation> OperationFactory::get_operation(unsigned int id)
 {
-    return std::shared_ptr<IOperation>(new TestOperation());
+    auto it = _ops.find(id);
+    if(it != _ops.end()){
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void OperationFactory::register_operation(unsigned int id , std::shared_ptr<IOperation> op)
+{
+    _ops[id] = op;
 }
 
 MED_IMG_END_NAMESPACE

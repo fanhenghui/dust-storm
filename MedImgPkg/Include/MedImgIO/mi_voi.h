@@ -23,12 +23,12 @@ struct VOISphere
 
     bool operator == (const VOISphere& voi) const
     {
-        return voi.center == center && abs(voi.diameter - diameter) < DOUBLE_EPSILON;
+        return voi.center == center && fabs(voi.diameter - diameter) < DOUBLE_EPSILON;
     }
 
     bool operator != (const VOISphere& voi) const
     {
-        return abs(voi.diameter - diameter) > DOUBLE_EPSILON || voi.center != center;
+        return fabs(voi.diameter - diameter) > DOUBLE_EPSILON || voi.center != center;
     }
 };
 

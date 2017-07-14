@@ -1,8 +1,10 @@
 #include "mi_app_controller.h"
 
 #include "MedImgUtil/mi_ipc_client_proxy.h"
+#include "MedImgGLResource/mi_gl_context.h"
 
 #include "mi_app_thread_model.h"
+#include "mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -24,7 +26,7 @@ AppController::~AppController()
 
 void AppController::initialize()
 {
-
+    _thread_model->set_controller(shared_from_this()); 
 }
 
 pid_t AppController::get_local_pid() const
@@ -45,6 +47,7 @@ pid_t AppController::get_server_pid() const
 void AppController::run(const std::string& path)
 {
     _thread_model->start();
+    _proxy->set_path(path);
     _proxy->run();
 }
 

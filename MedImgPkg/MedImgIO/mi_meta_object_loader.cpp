@@ -261,9 +261,9 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i( const std::string& info_
         meta_obj_tag->dim_size[0] == 0 || 
         meta_obj_tag->dim_size[1] == 0 || 
         meta_obj_tag->dim_size[2] == 0 || 
-        abs(meta_obj_tag->spacing[0]) <  DOUBLE_EPSILON ||
-        abs(meta_obj_tag->spacing[1]) <  DOUBLE_EPSILON ||
-        abs(meta_obj_tag->spacing[2]) <  DOUBLE_EPSILON ||
+        fabs(meta_obj_tag->spacing[0]) <  DOUBLE_EPSILON ||
+        fabs(meta_obj_tag->spacing[1]) <  DOUBLE_EPSILON ||
+        fabs(meta_obj_tag->spacing[2]) <  DOUBLE_EPSILON ||
         meta_obj_tag->orientation_x == Vector3::S_ZERO_VECTOR ||
         meta_obj_tag->orientation_y == Vector3::S_ZERO_VECTOR ||
         meta_obj_tag->orientation_z == Vector3::S_ZERO_VECTOR ||
