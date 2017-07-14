@@ -1,4 +1,4 @@
-#include "mi_dicom_loader.h"
+ï»¿#include "mi_dicom_loader.h"
 #include "mi_image_data.h"
 #include "mi_image_data_header.h"
 
@@ -62,7 +62,7 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_
         return checking_status;
     }
 
-    if (uiSliceCount < 16)//²»Ö§³ÖÉÙÓÚ16ÕÅµÄÊı¾İ½øĞĞÈıÎ¬¿ÉÊÓ»¯ // TODO ÕâÒ»²½ÔÚÕâÀï×ö²»Ì«ºÏÊÊ
+    if (uiSliceCount < 16)//ä¸æ”¯æŒå°‘äº16å¼ çš„æ•°æ®è¿›è¡Œä¸‰ç»´å¯è§†åŒ– // TODO è¿™ä¸€æ­¥åœ¨è¿™é‡Œåšä¸å¤ªåˆé€‚
     {
         set_progress_i(100);
         return IO_UNSUPPORTED_YET;
@@ -72,7 +72,13 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_
 
     //////////////////////////////////////////////////////////////////////////
     //3 Sort series
-    sort_series_i(data_format_set);
+    IOStatus sort_status = sort_series_i(data_format_set);
+
+    if(IO_SUCCESS !=  sort_status)
+    {
+        set_progress_i(100);
+        return sort_status;
+    }
 
     add_progress_i(4);
 
@@ -181,9 +187,34 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileForm
     return IO_SUCCESS;
 }
 
-void DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
+IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
 {
+    //sort based on slice location
+    std::map<double , int> locs;
+    for(int i = 0 ; i< file_format_set.size() ; ++i){
+        DcmDataset* data_set = file_format_set[i]->getDataset();
+        if (!data_set)
+        {
+            return IO_DATA_DAMAGE;
+        }
+        double sl(0);
+        get_slice_location_i(data_set , sl);
+        if(locs.find(sl) != locs.end()){
+            //Same slice location
+            return IO_DATA_DAMAGE;
+        }
+        locs[sl] = i;
+    }
 
+    DcmFileFormatSet new_set(file_format_set.size());
+    int idx = 0;
+    for(auto it = locs.begin(); it != locs.end() ; ++it){
+        new_set[idx++] = file_format_set[it->second];
+    }
+
+    file_format_set = std::move(new_set);
+
+    return IO_SUCCESS;
 }
 
 IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> img_data_header)
@@ -292,21 +323,21 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
             //IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
-        //4.10 Patient Sex(ºÜ¶àÍ¼Ïñ¶¼Ã»ÓĞÕâ¸öTag)
+        //4.10 Patient Sex(å¾ˆå¤šå›¾åƒéƒ½æ²¡æœ‰è¿™ä¸ªTag)
         if (!get_patient_sex_i(data_set_first , img_data_header))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
             //IO_THROW_EXCEPTION("Parse tag PatientSex failed!");
         }
 
-        //4.11 Patient Age(ºÜ¶àÍ¼Ïñ¶¼Ã»ÓĞÕâ¸öTag)
+        //4.11 Patient Age(å¾ˆå¤šå›¾åƒéƒ½æ²¡æœ‰è¿™ä¸ªTag)
         if (!get_patient_age_i(data_set_first , img_data_header))
         {
             /*eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientAge failed!");*/
         }
 
-        //4.12 Slice thickness (²»ÊÇÒ»¶¨±ØÒª)
+        //4.12 Slice thickness (ä¸æ˜¯ä¸€å®šå¿…è¦)
         if (!get_slice_thickness_i(data_set_first , img_data_header))
         {
             //eLoadingStatus = IO_DATA_DAMAGE;
@@ -530,7 +561,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     const std::string TSU_JPEGProcess14SV1TransferSyntax      = std::string("1.2.840.10008.1.2.4.70");//Default Transfer Syntax for Lossless JPEG Image Compression
     const std::string TSU_JPEGProcess14TransferSyntax     = std::string("1.2.840.10008.1.2.4.57");
 
-    //JEPG2000 ĞèÒª¹ºÂòÉÌÒµ°æµÄ dcmtk
+    //JEPG2000 éœ€è¦è´­ä¹°å•†ä¸šç‰ˆçš„ dcmtk
     const std::string TSU_JEPG2000CompressionLosslessOnly = std::string("1.2.840.10008.1.2.4.90");
     const std::string TSU_JEPG2000Compression = std::string("1.2.840.10008.1.2.4.91");
 
@@ -940,7 +971,7 @@ bool DICOMLoader::get_slice_location_i(DcmDataset*data_set , double& slice_locat
     {
         return false;
     }
-    slice_location = atoi(context.c_str());
+    slice_location = atof(context.c_str());
     return true;
 }
 

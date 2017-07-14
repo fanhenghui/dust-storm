@@ -34,7 +34,7 @@ public:
 private:
     IOStatus data_check_i(std::vector<std::string>& files , DcmFileFormatSet& file_format_set);
 
-    void sort_series_i(DcmFileFormatSet& file_format_set);
+    IOStatus sort_series_i(DcmFileFormatSet& file_format_set);
 
     IOStatus construct_data_header_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> img_data_header);
 
