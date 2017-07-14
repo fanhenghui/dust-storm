@@ -1,1 +1,2 @@
 ProcessingUnit = GPU
+NoduleOutput = TEXT
