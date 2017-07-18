@@ -567,7 +567,7 @@ void MultiResolutionImageWriter::setBaseTags(TIFF* levelTiff) {
     TIFFSetField(levelTiff, TIFFTAG_SAMPLESPERPIXEL, _numberOfIndexedColors);
   }
   TIFFSetField(levelTiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-  TIFFSetField(levelTiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+  TIFFSetField(levelTiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT); 
 }
 
 void MultiResolutionImageWriter::setPyramidTags(TIFF* levelTiff, const unsigned long long& width, const unsigned long long& hight) {
