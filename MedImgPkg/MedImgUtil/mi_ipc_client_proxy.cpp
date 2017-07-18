@@ -1,3 +1,4 @@
+#ifndef WIN32
 #include "mi_ipc_client_proxy.h"
 #include "mi_socket_client.h"
 
@@ -85,5 +86,7 @@ int IPCClientProxy::handle_command(const IPCDataHeader& header , void* buffer)
 }
 
 MED_IMG_END_NAMESPACE
+
+#endif
 
 

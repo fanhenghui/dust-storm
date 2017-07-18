@@ -164,23 +164,35 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileForm
 
         std::sort(to_be_delete.begin() ,to_be_delete.end() , std::less<int>());
 
+        if (to_be_delete.empty())
+        {
+            return IO_SUCCESS;
+        }
+
+        DcmFileFormatSet file_format_set_major;
+        std::vector<std::string> file_major;
+        file_format_set_major.reserve(file_format_set.size());
+        file_major.reserve(file_format_set.size());
+
         //delete minority series file format
         auto it_delete = to_be_delete.begin();
         int idx_delete = 0;
         auto it_file = files.begin();
-        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete , ++it_file)
+        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete , ++it_file , ++it)
         {
-            if (idx_delete == *it_delete)
+            if (idx_delete != *it_delete)
             {
-                it = file_format_set.erase(it);
-                it_file = files.erase(it_file);
-                ++it_delete;
+                file_format_set_major.push_back(*it);
+                file_major.push_back(*it_file);
             }
             else
             {
-                ++it;
+                ++it_delete;
             }
         }
+
+        files = file_major;
+        file_format_set = file_format_set_major;
 
     }
 

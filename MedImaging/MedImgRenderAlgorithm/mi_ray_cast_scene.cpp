@@ -130,7 +130,7 @@ void RayCastScene::render(int test_code)
 
     //////////////////////////////////////////////////////////////////////////
     //2 Mapping ray casting result to Scene FBO
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glViewport(0,0,_width , _height);
 
@@ -157,8 +157,29 @@ void RayCastScene::render(int test_code)
 
     //glDisable(GL_TEXTURE_2D);
     CHECK_GL_ERROR;
-    glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
+    //glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
     CHECK_GL_ERROR;
+
+
+    /*_scene_color_attach_0->bind();
+    std::unique_ptr<char[]> img_buffer (new char[_width*_height*4]);
+    _scene_color_attach_0->download(GL_RGBA, GL_UNSIGNED_BYTE, img_buffer.get());
+    _scene_color_attach_0->unbind();
+
+    std::stringstream ss; 
+    ss << "D:/temp/img_data_" << _width <<"_" << _height << ".raw";
+    std::ofstream out(ss.str().c_str() , std::ios::binary | std::ios::out);
+    if(out.is_open()){
+    std::unique_ptr<char[]> img_rgb(new char[_width*_height*3]);
+    for (int i = 0; i<_width*_height ; ++i)
+    {
+    img_rgb[i*3] = img_buffer[i*4];
+    img_rgb[i*3+1] = img_buffer[i*4+1];
+    img_rgb[i*3+2] = img_buffer[i*4+2];
+    }
+    out.write(img_rgb.get() , _width*_height*3);
+    out.close();
+    }*/
 
     set_dirty(false);
 }

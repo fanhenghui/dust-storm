@@ -46,7 +46,7 @@ std::vector<unsigned int> RunLengthOperator::encode(const std::vector<unsigned c
     return RunLengthOperator::encode(to_be_encoded.data(), to_be_encoded.size());
 }
 
-std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned int>& to_be_decoded)
+std::vector<unsigned char> RunLengthOperator::decode(std::vector<unsigned int>& to_be_decoded)
 {
     std::vector<unsigned char> result;
 
