@@ -171,6 +171,9 @@
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\AperioSVSWriter.h" />
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\JPEG2000Codec.h" />
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\jpeg_mem_src.h" />
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBImage.h" />
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBImageFactory.h" />
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBParser.h" />
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\LIFImage.h" />
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\LIFImageFactory.h" />
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\MultiResolutionImage.h" />
@@ -187,6 +190,9 @@
   <ItemGroup>
     <ClCompile Include="AperioSVSWriter.cpp" />
     <ClCompile Include="JPEG2000Codec.cpp" />
+    <ClCompile Include="KFBImage.cpp" />
+    <ClCompile Include="KFBImageFactory.cpp" />
+    <ClCompile Include="KFBParser.cpp" />
     <ClCompile Include="LIFImage.cpp" />
     <ClCompile Include="LIFImageFactory.cpp" />
     <ClCompile Include="MultiResolutionImage.cpp" />
