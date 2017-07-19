@@ -1,7 +1,7 @@
-#ifndef MED_IMG_UTIL_MODEL_H_
-#define MED_IMG_UTIL_MODEL_H_
+#ifndef MEDIMGUTIL_MI_MODEL_INTERFACE_H
+#define MEDIMGUTIL_MI_MODEL_INTERFACE_H
 
-#include "MedImgUtil/mi_util_export.h"
+#include "medimgutil/mi_util_export.h"
 #include <vector>
 #include <memory>
 
@@ -10,8 +10,7 @@ MED_IMG_BEGIN_NAMESPACE
 class IObserver;
 typedef std::shared_ptr<IObserver> ObserverPtr;
 
-class Util_Export IModel
-{
+class Util_Export IModel {
 public:
     IModel();
     virtual ~IModel();

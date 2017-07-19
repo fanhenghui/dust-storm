@@ -1,30 +1,25 @@
-#ifndef MED_IMG_MODEL_PROGRESS
-#define MED_IMG_MODEL_PROGRESS
+#ifndef MEDIMGUTIL_MI_MODEL_PROGRESS_H
+#define MEDIMGUTIL_MI_MODEL_PROGRESS_H
 
-#include "MedImgIO/mi_io_export.h"
-#include "MedImgUtil/mi_model_interface.h"
+#include "medimgutil/mi_model_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class IO_Export ProgressModel : public IModel
-{
+class IO_Export ProgressModel : public IModel {
 public:
-    ProgressModel():_progress(0)
-    {}
+    ProgressModel(): _progress(0) {
+    }
 
     virtual ~ProgressModel() {};
 
-    void set_progress(int value) 
-    {
-        if (value != _progress)
-        {
+    void set_progress(int value) {
+        if (value != _progress) {
             _progress = value;
             set_changed();
         }
     }
 
-    int get_progress() const
-    {
+    int get_progress() const {
         return _progress;
     }
 

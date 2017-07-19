@@ -6,8 +6,6 @@
 
 #include "boost/thread/mutex.hpp"
 
-//#include "cuda_runtime.h"
-
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 

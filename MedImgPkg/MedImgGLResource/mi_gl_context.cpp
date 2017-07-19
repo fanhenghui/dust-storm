@@ -13,6 +13,42 @@ MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
 
+MSGLContext::MSGLContext(UIDType uid) : GLObject(uid)
+{
+
+}
+
+MSGLContext::~MSGLContext()
+{
+
+}
+
+void MSGLContext::finalize()
+{
+
+}
+
+void MSGLContext::initialize()
+{
+
+}
+
+void MSGLContext::make_noncurrent()
+{
+
+}
+
+void MSGLContext::make_current(int id /*= 0*/)
+{
+
+}
+
+void MSGLContext::create_shared_context(int id)
+{
+
+}
+
+
 #else
 
 XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_vis(nullptr),_ctx(NULL),_win((Window)NULL)

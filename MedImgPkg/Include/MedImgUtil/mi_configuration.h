@@ -1,19 +1,17 @@
-#ifndef MED_IMG_CONFIGURATION_H
-#define MED_IMG_CONFIGURATION_H
+#ifndef MEDIMGUTIL_MI_CONFIGURATION_H
+#define MEDIMGUTIL_MI_CONFIGURATION_H
 
-#include "MedImgUtil/mi_util_export.h"
+#include "medimgutil/mi_util_export.h"
 #include "boost/thread/mutex.hpp"
 
 MED_IMG_BEGIN_NAMESPACE
 
-enum ProcessingUnitType
-{
+enum ProcessingUnitType {
     CPU = 0,
     GPU,
 };
 
-class Util_Export Configuration
-{
+class Util_Export Configuration {
 public:
     static Configuration* instance();
 

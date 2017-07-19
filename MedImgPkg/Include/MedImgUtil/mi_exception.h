@@ -1,7 +1,7 @@
-#ifndef MED_IMG_UTIL_EXCEPTION_H_
-#define MED_IMG_UTIL_EXCEPTION_H_
+#ifndef MEDIMGUTIL_MI_EXCEPTION_H
+#define MEDIMGUTIL_MI_EXCEPTION_H
 
-#include "MedImgUtil/mi_util_export.h"
+#include "medimgutil/mi_util_export.h"
 
 #include <exception>
 #include <string>
@@ -10,10 +10,10 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class Util_Export Exception : public std::exception
-{
+class Util_Export Exception : public std::exception {
 public:
-    Exception(const std::string &module, const std::string& file, long line, const std::string& func, const std::string& des);
+    Exception(const std::string& module, const std::string& file, long line, const std::string& func,
+              const std::string& des);
 
     Exception(const Exception& e);
 
