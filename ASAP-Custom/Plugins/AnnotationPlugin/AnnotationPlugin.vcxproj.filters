@@ -34,6 +34,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Custom">
+      <UniqueIdentifier>{66b878b2-7111-4b72-b896-33ae09f1362d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MeasurementAnnotationTool.h">
@@ -75,9 +78,6 @@
     <CustomBuild Include="DotQtAnnotation.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="Resources\AnnotationDockWidget.ui">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="Resources\AnnotationWorkstationExtensionPlugin_resources.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
@@ -86,6 +86,12 @@
     </CustomBuild>
     <CustomBuild Include="RectangleAnnotationTool.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources\AnnotationDockWidget_RuiJin.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources\AnnotationDockWidget_ShanghaiNo1.ui">
+      <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -262,5 +268,22 @@
     <None Include="Resources\inactive_spline.xpm">
       <Filter>Resource Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_AnnotationDockWidget_RuiJin.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\annotation\TumorTypeShanghaiNo1.h">
+      <Filter>Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\annotation\TumorTypeDefine.h">
+      <Filter>Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\annotation\TumorTypeRuiJin.h">
+      <Filter>Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_AnnotationDockWidget_ShanghaiNo1.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

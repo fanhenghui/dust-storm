@@ -17,7 +17,9 @@ RectangleQtAnnotation::RectangleQtAnnotation(const std::shared_ptr<Annotation>& 
     _selectionSensitivity(100.0),
     _currentLOD(1.0f)
 {
+#ifdef SHANGHAI_NO1
     annotation->addTumorType(TUMOR_TYPES[22]);// "SuspectedObject"“…À∆≤°±‰
+#endif // SHANGHAI_NO1
 }
 
 QRectF RectangleQtAnnotation::boundingRect() const
