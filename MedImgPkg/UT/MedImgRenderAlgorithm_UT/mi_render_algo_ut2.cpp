@@ -25,10 +25,16 @@
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
 
+#ifdef WIN32
+#include "GL/glut.h"
+#else
 #include "GL/freeglut.h"
+#include "cuda_runtime.h"
+#endif
+
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
-#include "cuda_runtime.h"
+
 
 
 using namespace medical_imaging;
@@ -51,8 +57,12 @@ namespace
 
     std::vector<std::string> GetFiles()
     {
-
+#ifdef WIN32
+        const std::string root  = "E:/data/MyData/AB_CTA_01/";
+#else
         const std::string root  = "/home/wr/data/AB_CTA_01/";
+#endif
+        
         std::vector<std::string> files;
         FileUtil::get_all_file_recursion(root , std::vector<std::string>() , files);
         return files;

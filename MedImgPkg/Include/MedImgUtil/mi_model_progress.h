@@ -5,7 +5,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class IO_Export ProgressModel : public IModel {
+class Util_Export ProgressModel : public IModel {
 public:
     ProgressModel(): _progress(0) {
     }
