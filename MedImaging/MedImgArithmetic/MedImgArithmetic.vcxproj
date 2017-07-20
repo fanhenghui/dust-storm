@@ -188,6 +188,7 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_utils.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_camera_base.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_color_unit.h" />
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_line.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="mi_arithmetic_utils.cpp" />
     <ClCompile Include="mi_camera_base.cpp" />
     <ClCompile Include="mi_color_unit.cpp" />
+    <ClCompile Include="mi_connected_domain_analysis.cpp" />
     <ClCompile Include="mi_ellipsoid.cpp" />
     <ClCompile Include="mi_intersection_test.cpp" />
     <ClCompile Include="mi_line.cpp" />

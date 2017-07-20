@@ -146,6 +146,9 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h">
       <Filter>Segmentation</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h">
+      <Filter>Segmentation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -231,6 +234,9 @@
     </ClCompile>
     <ClCompile Include="mi_color_unit.cpp">
       <Filter>Color Related</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_connected_domain_analysis.cpp">
+      <Filter>Segmentation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

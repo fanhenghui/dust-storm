@@ -235,6 +235,11 @@ void NoduleAnnotation::configure_i()
                     Configuration::instance()->set_nodule_file_rsa(true);
                 }
             }
+
+            if (tag == "LastOpenDirection")
+            {
+                _last_open_direction = context;
+            }
         }
         input_file.close();
     }
@@ -550,10 +555,12 @@ void NoduleAnnotation::slot_change_layout2x2_i()
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList file_name_list = QFileDialog::getOpenFileNames(
-        this ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
+        this ,tr("Loading DICOM Dialog"),_last_open_direction.c_str(),tr("Dicom image(*dcm);;Other(*)"));
 
     if (!file_name_list.empty())
     {
+        update_last_open_direction_i(std::string(file_name_list[0].toLocal8Bit()));
+
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         //Init progress dialog
@@ -667,12 +674,14 @@ void NoduleAnnotation::slot_open_meta_image_i()
 {
 
     QString file_name = QFileDialog::getOpenFileName(
-        this ,tr("Loading meta data"),"",tr("Dicom image(*mhd)"));
+        this ,tr("Loading meta data"),_last_open_direction.c_str(),tr("Dicom image(*mhd)"));
 
     if (file_name.isEmpty())
     {
         return;
     }
+
+    update_last_open_direction_i(std::string(file_name.toLocal8Bit()));
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1439,10 +1448,66 @@ void NoduleAnnotation::save_layout2x2_parameter_i()
     _pre_2x2_height = _mpr_00->height();
 }
 
+void NoduleAnnotation::closeEvent(QCloseEvent * event)
+{
+    //Save config file
+    int tag = 0;
+    std::ifstream input_file("../../../config/configure.txt" , std::ios::in);
+    if (!input_file.is_open())
+    {
+        tag = 1;
+        input_file.open("./config/configure.txt");//second chance
+    }
+
+    if (input_file.is_open())
+    {
+        input_file.close();
+    }
+
+    std::ofstream output_file;
+    if (tag == 0)
+    {
+        output_file.open("../../../config/configure.txt" , std::ios::out);
+    }
+    else
+    {
+        output_file.open("./config/configure.txt" , std::ios::out);
+    }
+
+    if (output_file.is_open())
+    {
+
+        output_file << "ProcessingUnit = ";
+        if (Configuration::instance()->get_processing_unit_type() == CPU)
+        {
+            output_file << "CPU\n";
+        }
+        else
+        {
+            output_file << "GPU\n";
+        }
+
+        output_file << "NoduleOutput = ";
+        if (Configuration::instance()->get_nodule_file_rsa())
+        {
+            output_file << "RSA\n";
+        }
+        else
+        {
+            output_file << "TEXT\n";
+        }
+
+        output_file<< "LastOpenDirection = " << _last_open_direction; 
+        output_file.close();
+    }
+
+    QMainWindow::closeEvent(event);
+}
 
 void NoduleAnnotation::slot_quit_i()
 {
     this->close();
+
 }
 
 void NoduleAnnotation::slot_save_label_file()
@@ -1512,6 +1577,20 @@ void NoduleAnnotation::slot_save_label_file()
                 sizeof(unsigned int) * run_length_encoded_output.size());
             output_file.flush();
             output_file.close();
+        }
+    }
+}
+
+void NoduleAnnotation::update_last_open_direction_i(const std::string& file_path)
+{
+    int sub_file_path = -1;
+    for(int i = file_path.size() - 1 ; i >= 0 ;--i)
+    {
+        if(file_path[i] == '/' || file_path[i] == '\\')
+        {
+            sub_file_path = i;
+            _last_open_direction = file_path.substr(0 , sub_file_path);
+            break;
         }
     }
 }

@@ -3,6 +3,7 @@
 #include "MedImgCommon/mi_configuration.h"
 
 #include "MedImgArithmetic/mi_segment_threshold.h"
+#include "MedImgArithmetic/mi_connected_domain_analysis.h"
 
 #include "MedImgIO/mi_image_data.h"
 
@@ -327,6 +328,14 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
             segment.set_min_scalar(volume_data->get_min_scalar());
             segment.set_max_scalar(volume_data->get_max_scalar());
             segment.segment_auto_threshold(ellipsoid , SegmentThreshold<short>::Otsu);
+
+
+            ConnectedDomainAnalysis cd_analy;
+            cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
+            cd_analy.set_dim(volume_data->_dim);
+            cd_analy.set_target_label(label);
+            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.keep_major();
             break;
         }
     case USHORT:
@@ -340,6 +349,13 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
             segment.set_min_scalar(volume_data->get_min_scalar());
             segment.set_max_scalar(volume_data->get_max_scalar());
             segment.segment_auto_threshold(ellipsoid, SegmentThreshold<unsigned short>::Otsu);
+
+            ConnectedDomainAnalysis cd_analy;
+            cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
+            cd_analy.set_dim(volume_data->_dim);
+            cd_analy.set_target_label(label);
+            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.keep_major();
 
             break;
         }
@@ -370,13 +386,14 @@ void VOISegmentObserver::update_aabb_i(const AABBUI& aabb)
     const unsigned int layer_whole = mask_data->_dim[0]*mask_data->_dim[1];
     const unsigned int layer_brick = dim_brick[0]*dim_brick[1];
 
-    for(unsigned int z = aabb._min[2] ; z < aabb._max[2] ; ++z)
+    for (unsigned int z = 0  ; z< dim_brick[2] ; ++z)
     {
-        for(unsigned int y = aabb._min[1] ; y < aabb._max[1] ; ++y)
+        for (unsigned int y = 0 ; y < dim_brick[1] ; ++y)
         {
-            memcpy( mask_updated + (z-aabb._min[2])*layer_brick + (y - aabb._min[1])*dim_brick[0],
-                mask_array + z*layer_whole + y*mask_data->_dim[0] + aabb._min[0] ,
-                dim_brick[0]);
+            int zz = z+aabb._min[2];
+            int yy = y+aabb._min[1];
+            memcpy(mask_updated + z*dim_brick[0]*dim_brick[1] + y*dim_brick[0],
+                mask_array + zz*layer_whole + yy*mask_data->_dim[0] + aabb._min[0]  ,dim_brick[0]);
         }
     }
 
