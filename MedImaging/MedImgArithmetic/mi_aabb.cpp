@@ -41,6 +41,49 @@ AABBUI::~AABBUI()
 
 }
 
+int AABBUI::Intersect(const AABBUI & aabb)
+{
+    bool intersects;
+    unsigned int pMin[3]={0u, 0u, 0u}, pMax[3] = {1024u, 1024u, 1024u};
+    for (unsigned i = 0; i < 3; i++)
+    {
+        intersects = false;
+        if ((aabb._min[i] >= this->_min[i]) && (aabb._min[i] <= this->_max[i]))
+        {
+            intersects = true;
+            pMin[i] = aabb._min[i];
+        }
+        else if ((this->_min[i] >= aabb._min[i]) && (this->_min[i] <= aabb._max[i]))
+        {
+            intersects = true;
+            pMin[i] = this->_min[i];
+        }
+
+        if ((aabb._max[i] >= this->_min[i]) && (aabb._max[i] <= this->_max[i]))
+        {
+            intersects = true;
+            pMax[i] = aabb._max[i];
+        }
+        else if ((this->_max[i] >= aabb._min[i]) && (this->_max[i] <= aabb._max[i]))
+        {
+            intersects = true;
+            pMax[i] = this->_max[i];
+        }
+        if (!intersects)
+        {
+            return 0;
+        }
+    }
+
+    // OK they did intersect - set the box to be the result
+    for (unsigned i = 0; i < 3; i++)
+    {
+        this->_min[i] = pMin[i];
+        this->_max[i] = pMax[i];
+    }
+    return 1;
+}
+
 bool AABBUI::operator==(const AABBUI& aabb) const
 {
     return (_min[0] == aabb._min[0] && _min[1] == aabb._min[1] && _min[2] == aabb._min[2] &&

@@ -214,6 +214,31 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             }
         }
 
+        if (VOIModel::TUNING_VOI == code_id)
+        {
+            // _pre_vois (aka sphere geometry) do not change at all
+            assert(_pre_vois.size() == vois.size());// actually not only size, each element of _pre_vois is exactly the same as that of vois
+            AABBUI voxel_block = model->get_voxel_to_tune();// copy one
+            int voi_idx = model->get_voi_to_tune();
+            
+            if (voi_idx < 0)
+            {
+                return;
+            }
+            const unsigned char voi_label = model->get_label(voi_idx);
+            const AABBUI& voi_boundingbox = _pre_voi_aabbs[voi_label]; 
+            //intersect voi_boundingbox with voxel_block
+            int intersect = voxel_block.Intersect(voi_boundingbox);
+            if (intersect)
+            {
+                recover_i( voxel_block, voi_label);
+
+                for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
+                {
+                    (*it)->set_dirty(true);
+                }
+            }
+        }
     }
     catch (const Exception& e)
     {

@@ -2,7 +2,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-VOIModel::VOIModel():_voi_mask_visible(true)
+VOIModel::VOIModel():_voi_mask_visible(true), _voi_to_be_tuned(-1), _tune_radius(2.5)
 {
 
 }
@@ -109,6 +109,19 @@ void VOIModel::modify_voi_list_rear(const VOISphere& voi)
     set_changed();
 }
 
+void VOIModel::set_tune_radius(const double r)
+{
+    if (r > 0.0)
+    {
+        this->_tune_radius = r;
+    }
+}
+
+double VOIModel::get_tune_radius()
+{
+    return this->_tune_radius;
+}
+
 void VOIModel::modify_name(int id , std::string name)
 {
     if (id < _vois.size())
@@ -167,6 +180,27 @@ int VOIModel::get_voi_number() const
 const std::vector<IntensityInfo>& VOIModel::get_intensity_infos() const
 {
     return _intensity_infos;
+}
+
+void VOIModel::set_voi_to_tune(int voi_idx)
+{
+    this->_voi_to_be_tuned = voi_idx;
+}
+
+int VOIModel::get_voi_to_tune()
+{
+    return this->_voi_to_be_tuned;
+}
+
+void VOIModel::set_voxel_to_tune(AABBUI& voxel_range, int /*tune_type*/)
+{
+    this->_voxels_to_be_tuned = voxel_range;
+    this->set_changed();
+}
+
+const AABBUI& VOIModel::get_voxel_to_tune()
+{
+    return this->_voxels_to_be_tuned;
 }
 
 bool VOIModel::is_voi_mask_visible() const

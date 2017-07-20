@@ -19,7 +19,7 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-GraphicItemVOI::GraphicItemVOI():_pre_item_num(0),_pre_width(0),_pre_height(0)
+GraphicItemVOI::GraphicItemVOI():_pre_item_num(0),_pre_width(0),_pre_height(0),_item_to_be_tuned(-1)
 {
 }
 
@@ -57,7 +57,9 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         //Check voi firstly
         const std::vector<VOISphere>& vois = _model->get_vois();
         const int voi_count = vois.size();
-
+        //if (this->_model->)
+        //{
+        //}
         //graphics item number changed
         if (_pre_item_num != voi_count)
         {
@@ -203,7 +205,6 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
                 }
             }
         }
-
         //3 Draw intersect circle if intersected
         for (int i = 0 ; i < _items_spheres.size() ; ++i)
         {
@@ -277,9 +278,49 @@ void GraphicItemVOI::post_update()
     std::vector<QGraphicsItem*>().swap(_items_to_be_delete);
 }
 
+void GraphicItemVOI::enable_interaction()
+{
+    for (int i = 0 ; i < _items_spheres.size() ; ++i)
+    {
+        this->_items_spheres[i]->setEnabled(true);
+        this->_items_infos[i]->setEnabled(true);
+        this->_items_lines[i]->setEnabled(true);
+    }
+}
+
+void GraphicItemVOI::disable_interaction()
+{
+    for (int i = 0 ; i < _items_spheres.size() ; ++i)
+    {
+        this->_items_spheres[i]->setEnabled(false);
+        this->_items_infos[i]->setEnabled(false);
+        this->_items_lines[i]->setEnabled(false);
+    }
+}
+
+void GraphicItemVOI::set_item_to_be_tuned(const int new_idx)
+{
+    if(new_idx > static_cast<int>(this->_items_spheres.size()) || new_idx == this->_item_to_be_tuned)
+    {
+        return;
+    }
+    if (new_idx >= 0)
+    {
+        this->_items_spheres[new_idx]->setPen(QPen(QColor(222,203,228)));
+    }
+
+    if (this->_item_to_be_tuned >=0)
+    {
+        this->_items_spheres[this->_item_to_be_tuned]->setPen(QPen(QColor(220,50,50)));
+    }
+
+    this->_item_to_be_tuned = new_idx;
+}
+
 MED_IMAGING_END_NAMESPACE
 
 using namespace medical_imaging;
+
 
 GraphicsSphereItem::GraphicsSphereItem(QGraphicsItem *parent /*= 0 */, QGraphicsScene *scene /*= 0*/):_id(-1),_is_frezze(false)
 {
@@ -354,6 +395,11 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
         frezze(false);
 
     }
+}
+
+std::shared_ptr<medical_imaging::VOIModel>& GraphicsSphereItem::get_voi_model()
+{
+    return this->_model;
 }
 
 void GraphicsSphereItem::update_circle_center_i()
@@ -540,4 +586,33 @@ void GraphicsLineItem::slot_info_position_changed(QPointF info_pos)
 {
     QLineF pre_line = this->line();
     this->setLine(QLineF(pre_line.p1() , info_pos +QPointF(0 , 10.0f*4.0f) ));
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// To simulate the eraser
+//////////////////////////////////////////////////////////////////////////
+GraphicsCircleItem::GraphicsCircleItem(QGraphicsItem *parent /*= 0 */, QGraphicsScene *scene /*= 0*/)
+{
+
+}
+
+GraphicsCircleItem::~GraphicsCircleItem()
+{
+
+}
+
+void GraphicsCircleItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    std::shared_ptr<VOIModel>& model = this->get_voi_model();
+}
+
+void GraphicsCircleItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+
+}
+
+void GraphicsCircleItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+
 }

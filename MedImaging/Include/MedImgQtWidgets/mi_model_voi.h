@@ -5,8 +5,10 @@
 #include "MedImgCommon/mi_model_interface.h"
 #include "MedImgIO/mi_voi.h"
 #include "MedImgArithmetic/mi_volume_statistician.h"
+#include "MedImgArithmetic/mi_aabb.h"
 
 MED_IMAGING_BEGIN_NAMESPACE
+
 
 //Notify code ID:
 //0 ÐÞ¸Ä½áÊø 
@@ -21,7 +23,8 @@ public:
         MODIFY_COMPLETED = 0,
         MODIFYING = 1,
         ADD_VOI = 2,
-        DELETE_VOI = 3
+        DELETE_VOI = 3,
+        TUNING_VOI = 4,
     };
     static void print_code_id(int code_id);
 
@@ -50,6 +53,14 @@ public:
     void modify_center(int id , const Point3& center);
     void modify_voi_list_rear(const VOISphere& voi);
 
+    void set_tune_radius(const double r);
+    double get_tune_radius();
+    void set_voi_to_tune(int voi_idx);
+    int get_voi_to_tune();
+    void set_voxel_to_tune(AABBUI& voxel_range, int tune_type);
+    const AABBUI& get_voxel_to_tune();
+
+
     bool is_voi_mask_visible() const;
     void set_voi_mask_visible(bool flag);
 
@@ -59,6 +70,11 @@ private:
     std::vector<unsigned char>   _labels;
     std::vector<IntensityInfo>     _intensity_infos;
     bool _voi_mask_visible;
+
+    // which voi to tune, which voxels to tune
+    int _voi_to_be_tuned;
+    AABBUI _voxels_to_be_tuned;
+    double _tune_radius;
 };
 
 MED_IMAGING_END_NAMESPACE

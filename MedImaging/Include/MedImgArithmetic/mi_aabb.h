@@ -31,6 +31,8 @@ public:
     AABBUI(const unsigned int (&min0)[3] , const unsigned int (&max0)[3]);
     virtual ~AABBUI();
 
+    int Intersect(const AABBUI & aabb);
+
     bool operator == (const AABBUI& aabb) const;
     bool operator != (const AABBUI& aabb) const;
 
