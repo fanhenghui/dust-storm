@@ -5,10 +5,10 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class Util_Export ProgressModel : public IModel {
+class ProgressModel : public IModel {
 public:
     ProgressModel(): _progress(0) {
-    }
+    };
 
     virtual ~ProgressModel() {};
 
@@ -17,11 +17,11 @@ public:
             _progress = value;
             set_changed();
         }
-    }
+    };
 
     int get_progress() const {
         return _progress;
-    }
+    };
 
 protected:
 private:

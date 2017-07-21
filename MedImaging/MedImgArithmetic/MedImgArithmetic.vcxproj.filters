@@ -34,6 +34,9 @@
     <Filter Include="Segmentation">
       <UniqueIdentifier>{89b9b355-916a-4a39-b414-d31a5df2e3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scan Line">
+      <UniqueIdentifier>{e63c05a0-1194-49e7-8b90-a32e8cbc53ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
@@ -149,6 +152,9 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h">
       <Filter>Segmentation</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_scan_line_analysis.h">
+      <Filter>Scan Line</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -237,6 +243,9 @@
     </ClCompile>
     <ClCompile Include="mi_connected_domain_analysis.cpp">
       <Filter>Segmentation</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_scan_line_analysis.cpp">
+      <Filter>Scan Line</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

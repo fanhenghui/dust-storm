@@ -36,7 +36,6 @@
 #include "libgpujpeg/gpujpeg_common.h"
 
 
-
 using namespace medical_imaging;
 namespace
 {
@@ -49,8 +48,8 @@ namespace
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
 
-    int _width = 1920;
-    int _height = 1080;
+    int _width = 512;
+    int _height = 512;
     int m_iButton = -1;
     Point2 m_ptPre;
     int m_iTestCode = 0;
@@ -71,7 +70,7 @@ namespace
     void Init()
     {
         Configuration::instance()->set_processing_unit_type(GPU);
-        GLUtils::set_check_gl_flag(true);
+        GLUtils::set_check_gl_flag(false);
 
         std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
@@ -122,29 +121,34 @@ namespace
             glClearColor(0.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            _time_query->begin();
+            //_time_query->begin();
             _scene->set_dirty(true);
-            //_scene->initialize();
+
             _scene->render(0);
-            
+
             _scene->render_to_back();
 
             
 
             //_time_query2->begin();
             //glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
-            _scene->download_image_buffer();
+            
+           /* _scene->download_image_buffer();
             _scene->swap_image_buffer();
             unsigned char* buffer = nullptr;
             int buffer_size=0;
-            _scene->get_image_buffer(buffer,buffer_size);
+            _scene->get_image_buffer(buffer,buffer_size);*/
+
+#ifdef WIN32
+            //FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
+#else
             //FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
+#endif
             //std::cout << "compressing time : " << _scene->get_compressing_time() << std::endl;
-            
 
             //std::cout << "gl compressing time : " << _time_query2->end() << std::endl;
 
-            std::cout << "rendering time : " << _time_query->end() << std::endl;
+            //std::cout << "rendering time : " << _time_query->end() << std::endl;
 
             glutSwapBuffers();
         }
@@ -213,6 +217,10 @@ namespace
 
     void resize(int x , int y)
     {
+        if(x == 0  || y == 0){
+            return;
+        }
+
         _width = x;
         _height = y;
         _scene->set_display_size(_width , _height);
@@ -221,7 +229,7 @@ namespace
 
     void Idle()
     {
-        //glutPostRedisplay();
+        glutPostRedisplay();
     }
 
     void MouseClick(int button , int status , int x , int y)
@@ -282,7 +290,7 @@ namespace
     }
 }
 
-int main(int argc , char* argv[])
+int TE_MPRScene(int argc , char* argv[])
 {
     try
     {

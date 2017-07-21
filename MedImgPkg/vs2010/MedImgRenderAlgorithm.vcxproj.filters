@@ -41,16 +41,10 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h">
       <Filter>Brick</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_generator.h">
-      <Filter>Brick</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h">
       <Filter>Brick</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h">
-      <Filter>Brick</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h">
       <Filter>Brick</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_scene.h">
@@ -100,9 +94,6 @@
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h">
       <Filter>Camera replacement</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
-      <Filter>Ray caster</Filter>
     </ClInclude>
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_gpu.h">
       <Filter>Ray caster</Filter>
@@ -156,6 +147,12 @@
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_shader_collection.h">
       <Filter>Shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_geometry.h">
+      <Filter>Brick</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_entry_exit_points.cpp">
@@ -176,19 +173,10 @@
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_vr_proxy_geometry_cube.cpp">
       <Filter>Entry exit points</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_define.cpp">
-      <Filter>Brick</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_pool.cpp">
       <Filter>Brick</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_generator.cpp">
-      <Filter>Brick</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_info_generator.cpp">
-      <Filter>Brick</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_utils.cpp">
       <Filter>Brick</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_camera_calculator.cpp">
@@ -230,9 +218,6 @@
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_rc_step_utils.cpp">
       <Filter>Ray caster\GPU Ray Casting</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp">
-      <Filter>Ray caster</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_gpu.cpp">
       <Filter>Ray caster</Filter>
     </ClCompile>
@@ -265,6 +250,12 @@
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_mask_label_store.cpp">
       <Filter>Brick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_geometry.cpp">
+      <Filter>Brick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

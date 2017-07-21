@@ -10,28 +10,53 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+
+/// \ Brick mesh structure
+struct BrickEleIndex
+{
+    unsigned int idx[36];
+};
+
+struct BrickGeometry
+{
+    BrickEleIndex *brick_idx_units;
+    float *vertex_array;//x y z
+    float *color_array;//RGBA
+    int vertex_count;
+
+    BrickGeometry():brick_idx_units(nullptr),vertex_array(nullptr),color_array(nullptr),vertex_count(0)
+    {
+    }
+
+    ~BrickGeometry()
+    {
+        if (nullptr != brick_idx_units)
+        {
+            delete [] brick_idx_units;
+            brick_idx_units = nullptr;
+        }
+
+        if (nullptr != vertex_array)
+        {
+            delete [] vertex_array;
+            vertex_array = nullptr;
+        }
+
+        if (nullptr != color_array)
+        {
+            delete [] color_array;
+            color_array = nullptr;
+        }
+    }
+};
+
+/// \ Brick corner image coordinate
 struct BrickCorner
 {
     unsigned int min[3];
 };
 
-struct BrickUnit
-{
-    void* data;
-
-    BrickUnit():data(nullptr)
-    {}
-
-    ~BrickUnit()
-    {
-        if (nullptr != data)
-        {
-            delete [] data;
-            data = nullptr;
-        }
-    }
-};
-
+/// \ Brick info
 struct VolumeBrickInfo
 {
     float min;
@@ -40,7 +65,7 @@ struct VolumeBrickInfo
 
 struct MaskBrickInfo
 {
-    int label;
+    int label;//0 for empty ; 255 for more than two different labels ; others for certain label
 };
 
 struct LabelKey
@@ -102,7 +127,7 @@ struct LabelKey
         }
     }
 
-    bool operator < (const LabelKey& lk)
+    bool operator < (const LabelKey& lk) const
     {
         return this->key < lk.key;
     }
@@ -118,7 +143,7 @@ struct BrickDistance
 };
 
 
-RenderAlgo_Export bool operator <(const LabelKey& left, const LabelKey& right);
+//RenderAlgo_Export bool operator <(const LabelKey& left, const LabelKey& right);
 
 MED_IMG_END_NAMESPACE
 

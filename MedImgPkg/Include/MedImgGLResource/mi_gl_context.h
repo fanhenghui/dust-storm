@@ -16,7 +16,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
 
-class MSGLContext : public GLObject
+class GLResource_Export MSGLContext : public GLObject
 {
 public:
     MSGLContext(UIDType uid);
@@ -35,7 +35,7 @@ private:
 
 #else
 
-class XGLContext : public GLObject
+class GLResource_Export XGLContext : public GLObject
 {
 public:
     XGLContext(UIDType uid);

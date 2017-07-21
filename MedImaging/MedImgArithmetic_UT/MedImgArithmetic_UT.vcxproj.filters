@@ -38,5 +38,8 @@
     <ClCompile Include="mi_arithmetic_ut_rsa2pp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mi_arithmetic_ut_scan_line.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

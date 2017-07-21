@@ -15,7 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_ut2.cpp">
+    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_mpr_scene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

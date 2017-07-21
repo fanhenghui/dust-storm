@@ -6,66 +6,20 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class ImageData;
-class RenderAlgo_Export CPUVolumeBrickInfoGenerator
+class RenderAlgo_Export VolumeBrickInfoGenerator
 {
 public:
-    CPUVolumeBrickInfoGenerator();
-    ~CPUVolumeBrickInfoGenerator();
-
-    void calculate_brick_info(
-        std::shared_ptr<ImageData> image_data , 
-        unsigned int brick_size , 
-        unsigned int brick_expand , 
-        BrickCorner* _brick_corner_array , 
-        BrickUnit* brick_unit_array , 
-        VolumeBrickInfo* brick_info_array);
-protected:
-    template<typename T>
-    void calculate_brick_info_i(
-        BrickCorner& bc , 
-        BrickUnit& bu ,
-        VolumeBrickInfo& vbi,
-        std::shared_ptr<ImageData> image_data , 
-        unsigned int brick_size , 
-        unsigned int brick_expand);
-
-    template<typename T>
-    void calculate_brick_info_kernel_i(
-        unsigned int begin , 
-        unsigned int end , 
-        BrickCorner* _brick_corner_array , 
-        BrickUnit* brick_unit_array , 
-        VolumeBrickInfo* brick_info_array,
-        std::shared_ptr<ImageData> image_data , 
-        unsigned int brick_size , 
-        unsigned int brick_expand);
-private:
-};
-
-class RenderAlgo_Export GPUVolumeBrickInfoGenerator
-{
-public:
-    GPUVolumeBrickInfoGenerator();
-    ~GPUVolumeBrickInfoGenerator();
+    VolumeBrickInfoGenerator();
+    ~VolumeBrickInfoGenerator();
 protected:
 private:
 };
 
-class RenderAlgo_Export CPUMaskBrickInfoGenerator
+class RenderAlgo_Export MaskBrickInfoGenerator
 {
 public:
-    CPUMaskBrickInfoGenerator();
-    ~CPUMaskBrickInfoGenerator();
-protected:
-private:
-};
-
-class RenderAlgo_Export GPUMaskBrickInfoGenerator
-{
-public:
-    GPUMaskBrickInfoGenerator();
-    ~GPUMaskBrickInfoGenerator();
+    MaskBrickInfoGenerator();
+    ~MaskBrickInfoGenerator();
 protected:
 private:
 };

@@ -207,6 +207,7 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
     }
 
     file_format_set = std::move(new_set);
+    return IO_SUCCESS;
 }
 
 IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set , std::shared_ptr<ImageDataHeader> img_data_header)

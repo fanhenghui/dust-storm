@@ -65,6 +65,7 @@ double GLTimeQuery::end()
 
     std::swap(_query[0] , _query[1]);
 
+    return _time_elapsed;
 }
 
 double GLTimeQuery::get_time_elapsed()
