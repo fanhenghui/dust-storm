@@ -12,6 +12,16 @@ public:
     struct Pt2
     {
         int x,y;
+
+        Pt2(int xx , int yy):x(xx),y(yy)
+        {
+
+        }
+
+        Pt2()
+        {
+
+        }
     };
 
     struct Edge
