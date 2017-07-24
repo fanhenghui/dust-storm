@@ -31,6 +31,8 @@ public:
 
     IO_Export void set_progress_model(std::shared_ptr<ProgressModel> model);
 
+    IO_Export IOStatus check_series_uid(const std::string& file , std::string& study_uid , std::string& series_uid);
+
 private:
     IOStatus data_check_i(std::vector<std::string>& files , DcmFileFormatSet& file_format_set);
 

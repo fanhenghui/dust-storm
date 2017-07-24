@@ -9,14 +9,36 @@
 #include "MedImgIO/mi_dicom_loader.h"
 #include "MedImgIO/mi_image_data_header.h"
 #include "MedImgIO/mi_image_data.h"
+#include "MedImgIO/mi_run_length_operator.h"
 #include "Ext/pugixml/pugixml.hpp"
 #include "Ext/pugixml/pugiconfig.hpp"
 
 using namespace medical_imaging;
 
-const std::string path_direction = "E:/data/LIDC/LIDC-IDRI-0001/1.3.6.1.4.1.14519.5.2.1.6279.6001.298806137288633453246975630178/1.3.6.1.4.1.14519.5.2.1.6279.6001.179049373636438705059720603192/";
-const std::string xml_file = path_direction + std::string("/069.xml");
-const bool save_slice_location_less = false;
+//////////////////////////////////////////////////////////////////////////
+static std::ofstream out_log;
+class LogSheild
+{
+public:
+    LogSheild(const std::string& log_file , const std::string& start_word )
+    {
+        out_log.open("anon.log" , std::ios::out);
+        if (out_log.is_open())
+        {
+            out_log << start_word;
+        }
+    }
+    ~LogSheild()
+    {
+        out_log.close();
+    }
+protected:
+private:
+};
+
+
+#define LOG_OUT(info) std::cout << info; out_log << info;
+//////////////////////////////////////////////////////////////////////////
 
 struct Nodule
 {
@@ -25,36 +47,32 @@ struct Nodule
     std::vector<Point3> _points;
 };
 
-std::vector<std::string> get_dicom_files()
-{
-    std::vector<std::string> files;
-    FileUtil::get_all_file_recursion(path_direction , std::vector<std::string>(1,".dcm") , files);
-    return files;
-}
-
-bool load_dicom_series(std::vector<std::string>& files ,
-    std::shared_ptr<ImageDataHeader>& header,
-    std::shared_ptr<ImageData>& img)
-{
-    DICOMLoader loader;
-    IOStatus status = loader.load_series(files , img , header);
-    return status == IO_SUCCESS;
-}
-
 bool point_less(const Point3& l, const Point3& r)
 {
     return l.z < r.z;
 }
 
-void get_nodule_set(const std::string& xml_file);
+int load_dicom_series(std::vector<std::string>& files ,
+    std::shared_ptr<ImageDataHeader>& header,
+    std::shared_ptr<ImageData>& img)
+{
+    DICOMLoader loader;
+    if(loader.load_series(files , img , header) == IO_SUCCESS)
+    {
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
+}
 
-
-int main(int argc , char* argv[])
+int get_nodule_set(const std::string& xml_file, std::vector<Nodule>& nodules , std::string& series_uid)
 {
     pugi::xml_document doc;
     if (!doc.load_file(xml_file.c_str()))
     {
-        std::cout << "Load file failed!\n!";
+       LOG_OUT("Load file failed!\n!");
         return -1;
     }
 
@@ -62,7 +80,7 @@ int main(int argc , char* argv[])
     pugi::xml_node root_node = doc.child("LidcReadMessage");
     if (root_node.empty())
     {
-        std::cout << "invalid format , find Lidc read message failed!\n";
+       LOG_OUT( "invalid format , find Lidc read message failed!\n");
         return -1;
     }
 
@@ -70,7 +88,7 @@ int main(int argc , char* argv[])
     pugi::xml_node response_header_node = root_node.child("ResponseHeader");
     if (response_header_node.empty())
     {
-        std::cout << "invalid format , find Lidc response header failed!\n";
+       LOG_OUT("invalid format , find Lidc response header failed!\n");
         return -1;
     }
 
@@ -78,24 +96,28 @@ int main(int argc , char* argv[])
     pugi::xml_node study_uid_node = response_header_node.child("StudyInstanceUID");
     if (study_uid_node.empty())
     {
-        std::cout << "invalid format , find study UID failed!\n";
+        LOG_OUT("invalid format , find study UID failed!\n");
         return -1;
     }
     const std::string study_uid = study_uid_node.child_value();
-    std::cout << "study uid : " << study_uid << std::endl;
+    //LOG_OUT( std::string("study uid : ") + study_uid + "\n");
 
     //Series UID
     pugi::xml_node series_uid_node = response_header_node.child("SeriesInstanceUid");
     if (series_uid_node.empty())
     {
-        std::cout << "invalid format , find series UID failed!\n";
+        LOG_OUT( "invalid format , find series UID failed!\n");
         return -1;
     }
-    const std::string series_uid = series_uid_node.child_value();
-    std::cout << "series uid : " << series_uid << std::endl;
+    series_uid = series_uid_node.child_value();
+    //LOG_OUT( "series uid : " + series_uid + "\n");
+    if (series_uid.empty())
+    {
+        LOG_OUT( "invalid format , empty series UID !\n");
+        return -1;
+    }
 
-
-    std::vector<Nodule> _nodules;
+    
 
     StrNumConverter<double> str_to_num;
     pugi::xpath_node_set reading_session_node_set = root_node.select_nodes("readingSession");
@@ -113,7 +135,7 @@ int main(int argc , char* argv[])
             if (id_node.empty())
             {
                 //TODO ERROR
-                std::cout << "invalid format , find nodule ID failed!\n";
+                LOG_OUT(  "invalid format , find nodule ID failed!\n");
                 return -1;
             }
             nodule.name = id_node.child_value();
@@ -129,7 +151,7 @@ int main(int argc , char* argv[])
                 if (pos_z_node.empty())
                 {
                     //TODO ERROR
-                    std::cout << "invalid format , find image position z failed!\n";
+                    LOG_OUT("invalid format , find image position z failed!\n");
                     return -1;
                 }
                 const double pos_z = str_to_num.to_num(pos_z_node.child_value());
@@ -142,14 +164,14 @@ int main(int argc , char* argv[])
                     if (x_node.empty())
                     {
                         //TODO ERROR
-                        std::cout << "invalid format , find edge position x failed!\n";
+                        LOG_OUT( "invalid format , find edge position x failed!\n");
                         return -1;
                     }
                     pugi::xml_node y_node = edge_node.node().child("yCoord");
                     if (y_node.empty())
                     {
                         //TODO ERROR
-                        std::cout << "invalid format , find edge position y failed!\n";
+                        LOG_OUT( "invalid format , find edge position y failed!\n");
                         return -1;
                     }
                     const double pos_x = str_to_num.to_num(x_node.child_value());
@@ -159,19 +181,16 @@ int main(int argc , char* argv[])
 
             }
 
-            _nodules.push_back(nodule);
+            nodules.push_back(nodule);
         }
     }
 
-    //slice location to pixal coordinate
-    std::shared_ptr<ImageDataHeader> _data_header;
-    std::shared_ptr<ImageData> _volume_data;
-    if(!load_dicom_series(get_dicom_files() ,_data_header,_volume_data ))
-    {
-        std::cout << "load series failed!\n";
-        return -1;
-    }
-    std::vector<double> slice_location = _data_header->slice_location;
+    return 0;
+}
+
+int resample_z(std::vector<Nodule>& nodules , std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less)
+{
+    std::vector<double> slice_location = header->slice_location;
     if (!save_slice_location_less)
     {
         std::sort(slice_location.begin() , slice_location.end() , std::greater<double>());//slice location from max to min
@@ -188,13 +207,13 @@ int main(int argc , char* argv[])
 
     if (fabs(delta) < DOUBLE_EPSILON )
     {
-        std::cout << "slice location error!\n";
+        LOG_OUT(  "slice location error!\n");
         return -1;
     }
 
     const double slice0 = slice_location[0];
 
-    for (auto it = _nodules.begin() ; it != _nodules.end() ; ++it)
+    for (auto it = nodules.begin() ; it != nodules.end() ; ++it)
     {
         Nodule& nodule = *it;
         std::vector<Point3>& pts = nodule._points;
@@ -205,7 +224,7 @@ int main(int argc , char* argv[])
             int tmp_idx = static_cast<int>(delta_slice / delta);
             if (tmp_idx > slice_location.size())
             {
-                std::cout << "find slice lotation failed!\n";
+                LOG_OUT( "find slice lotation failed!\n");
                 return -1;
             }
 
@@ -238,9 +257,8 @@ int main(int argc , char* argv[])
                         }
                     }
                 }
-                
 
-                std::cout << "find slice lotation failed!\n";
+                LOG_OUT(  "find slice lotation failed!\n");
                 return -1;
             }
             else
@@ -267,9 +285,9 @@ int main(int argc , char* argv[])
                         }
                     }
                 }
-                
 
-                std::cout << "find slice lotation failed!\n";
+
+                LOG_OUT( "find slice lotation failed!\n");
                 return -1;
             }
 
@@ -277,16 +295,18 @@ FIND_LOCATION:;
         }
     }
 
-    //contour to mask
-    std::shared_ptr<ImageData> _mask(new ImageData);
-    _volume_data->shallow_copy(_mask.get());
-    _mask->_data_type = UCHAR;
-    _mask->mem_allocate();
+    return 0;
+}
+
+int contour_to_mask(std::vector<Nodule>& nodules , std::shared_ptr<ImageData> mask)
+{
+    mask->_data_type = UCHAR;
+    mask->mem_allocate();
 
     ScanLineAnalysis<unsigned char> scan_line_analysis;
     typedef ScanLineAnalysis<unsigned char>::Pt2 PT2;
     unsigned char label = 0;
-    for (auto it = _nodules.begin() ; it != _nodules.end() ; ++it)
+    for (auto it = nodules.begin() ; it != nodules.end() ; ++it)
     {
         Nodule& nodule = *it;
         std::vector<Point3>& pts = nodule._points;
@@ -302,7 +322,7 @@ FIND_LOCATION:;
         bool begin = true;
         int current_z = 0;
         std::vector<PT2> current_contour;
-        
+
         for (int i = 0 ; i < pts.size() ; ++i)
         {
             if(begin)
@@ -320,9 +340,8 @@ FIND_LOCATION:;
                 }
                 else// do scaning
                 {
-                    scan_line_analysis.fill((unsigned char*)_mask->get_pixel_pointer() + current_z*_mask->_dim[0]*_mask->_dim[1] ,
-                        _mask->_dim[0] , _mask->_dim[1] , current_contour , label);
-
+                    scan_line_analysis.fill((unsigned char*)mask->get_pixel_pointer() + current_z*mask->_dim[0]*mask->_dim[1] ,
+                        mask->_dim[0] , mask->_dim[1] , current_contour , label);
 
                     //back to begin
                     --i;
@@ -330,18 +349,299 @@ FIND_LOCATION:;
                     begin = true;
                 }
             }
-            
         }
     }
 
+    return 0;
+}
 
-    FileUtil::write_raw(path_direction+std::string("/mask.raw") , _mask->get_pixel_pointer() , _mask->get_data_size());
-    //FileUtil::write_raw(path_direction+std::string("/volume.raw") , _volume_data->get_pixel_pointer() , _volume_data->get_data_size());
+int save_mask(std::shared_ptr<ImageData> mask , const std::string& path , bool compressed)
+{
+    if (path.empty())
+    {
+        LOG_OUT("save mask path is empty!");
+        return -1;
+    }
+    if (compressed)
+    {
+        std::vector<unsigned int> code = RunLengthOperator::encode((unsigned char*)mask->get_pixel_pointer() , mask->get_data_size());
+        if (code.empty())
+        {
+            LOG_OUT("mask is all zero!");
+            return -1;
+        }
+        return FileUtil::write_raw(path , code.data() , static_cast<unsigned int>(code.size())*sizeof(unsigned int));
+    }
+    else
+    {
+        return FileUtil::write_raw(path , mask->get_pixel_pointer() , mask->get_data_size());
+    }
+}
+
+int browse_root_xml(const std::string& root , std::vector<std::string>& xml_files )
+{
+    if (root.empty()) {
+        LOG_OUT("empty root!");
+        return -1;
+    }
+
+    std::map<std::string , std::vector<std::string> >files;
+    std::set<std::string > postfix;
+    postfix.insert(".xml");
+
+    FileUtil::get_all_file_recursion(root , postfix , files);
+    if (files.empty())
+    {
+        LOG_OUT("empty files!")
+        return -1;
+    }
+
+    if (files.find(".xml") != files.end() )
+    {
+        xml_files = files[".xml"];
+    }
+    return 0;
+}
+
+int browse_root_dcm(const std::string& root, std::map<std::string, std::vector<std::string>>& dcm_files )
+{
+    if (root.empty()) {
+        LOG_OUT("empty root!");
+        return -1;
+    }
+
+    std::map<std::string , std::vector<std::string> >files;
+    std::set<std::string > postfix;
+    postfix.insert(".dcm");
+
+    FileUtil::get_all_file_recursion(root , postfix , files);
+    if (files.empty())
+    {
+        LOG_OUT("empty files!")
+            return -1;
+    }
+
+    if (files.find(".dcm") != files.end())
+    {
+        DICOMLoader loader;
+        std::vector<std::string>& all_dcm_files = files.find(".dcm")->second;
+        for (auto it = all_dcm_files.begin() ; it != all_dcm_files.end() ; ++it)
+        {
+            std::string study_uid;
+            std::string series_uid;
+            loader.check_series_uid(*it , study_uid , series_uid);
+            if (dcm_files.find(series_uid) == dcm_files.end())
+            {
+                std::vector<std::string> sub_dcm_files(1 , *it);
+                dcm_files[series_uid] = sub_dcm_files;
+            }
+            else
+            {
+                dcm_files[series_uid].push_back(*it);
+            }
+        }
+    }
+    return 0;
+}
 
 
+int main(int argc , char* argv[])
+{
+    /*arguments list:
+    -help : print all argument
+    -data <path> : dicom data root(.dcm)
+    -annotation <path> : annotation root(.xml)
+    -output <path] : save mask root
+    -compress : if mask is compressed 
+    -slicelocation <less/greater> : default is less
+    */
 
+    LogSheild log_sheild("em.log" , "Extracting mask from LIDC data set >>> \n");
 
+    std::string dcm_direction;
+    std::string annotation_direction;
+    std::string output_direction;
+    bool compressed = false;
+    bool save_slice_location_less = true;
 
-    std::cout << "Done\n";
+    if (argc == 1)
+    {
+        LOG_OUT("invalid arguments!\n");
+        LOG_OUT("targuments list:\n");
+        LOG_OUT("\t-annotation <path> : annotation root(.dcm)\n");
+        LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
+        LOG_OUT("\t-output <path] : save mask root\n");
+        LOG_OUT("\t-compress : if mask is compressed\n");
+        LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
+        return -1;
+    }
+    else
+    {
+       for (int i = 1; i< argc ; ++i)
+       {
+           if (std::string(argv[i]) == "-help")
+           {
+               LOG_OUT("arguments list:\n");
+               LOG_OUT("\t-annotation <path> : annotation root(.dcm)\n");
+               LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
+               LOG_OUT("\t-output <path] : save mask root\n");
+               LOG_OUT("\t-compress : if mask is compressed\n");
+               LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
+               return 0;
+           }
+           if (std::string(argv[i]) == "-data")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               dcm_direction = std::string(argv[i+1]);
+               
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-annotation")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+
+               annotation_direction = std::string(argv[i+1]);
+               ++i;
+           }
+           else if (std::string(argv[i])== "-output")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+
+               output_direction = std::string(argv[i+1]);
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-compress")
+           {
+               compressed = true;
+           }
+           else if (std::string(argv[i]) == "-slicelocation")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+
+               if(std::string(argv[i+1]) == "less")
+               {
+                   save_slice_location_less = true;
+               }
+               else if(std::string(argv[i+1]) == "greater")
+               {
+                   save_slice_location_less =false;
+               }
+               else
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               ++i;
+           }
+       }
+    }
+
+    if (dcm_direction.empty() || annotation_direction.empty() || output_direction.empty())
+    {
+        LOG_OUT(  "invalid empty direction!\n");
+        return -1;
+    }
+
+    std::map<std::string , std::vector<std::string>> dcm_files;
+    if (0 != browse_root_dcm(dcm_direction , dcm_files))
+    {
+        LOG_OUT(  "browse dicom direction failed!\n");
+        return -1;
+    }
+
+    std::vector<std::string> xml_files;
+    if (0 != browse_root_xml(annotation_direction , xml_files))
+    {
+        LOG_OUT(  "browse annotation direction failed!\n");
+        return -1;
+    }
+
+    for (auto it = xml_files.begin() ; it != xml_files.end() ; ++it)
+    {
+        LOG_OUT(  "parse annotation file : " + *it + " >>>\n");
+
+        //parse nodule annotation file
+        std::vector<Nodule> nodules;
+        std::string series_uid;
+        if(0 !=  get_nodule_set(*it , nodules , series_uid))
+        {
+            LOG_OUT(  "parse nodule annotation failed!\n");
+            return -1;
+        }
+
+        LOG_OUT("series UID : " + series_uid + "\n");
+
+        auto it_dcm = dcm_files.find(series_uid);
+        if (it_dcm == dcm_files.end())
+        {
+            LOG_OUT(  "can't find dcm files!\n");
+            continue;
+        }
+
+        LOG_OUT( "loading DICOM files to get image information :  >>>\n");
+
+        //slice location to pixal coordinate
+        std::shared_ptr<ImageDataHeader> data_header;
+        std::shared_ptr<ImageData> volume_data;
+        if(0 != load_dicom_series(it_dcm->second ,data_header,volume_data ))
+        {
+            LOG_OUT(  "load series failed!\n");
+            return -1;
+        }
+
+        //resample position z from slice location to pixel coordinate
+        if( 0 != resample_z(nodules , data_header , save_slice_location_less) )
+        {
+            LOG_OUT( "resample z failed!\n");
+            return -1;
+        }
+
+        LOG_OUT( "convert contour to mask >>>\n");
+
+        //contour to mask
+        std::shared_ptr<ImageData> mask(new ImageData);
+        volume_data->shallow_copy(mask.get());
+        if (0 != contour_to_mask(nodules , mask))
+        {
+            LOG_OUT( "convert contour to mask failed!\n");
+            return -1;
+        }
+
+        //save mask
+        std::string output;
+        if (compressed)
+        {
+            output = output_direction+ series_uid + ".rle";
+        }
+        else
+        {
+            output = output_direction+ series_uid + ".raw";
+        }
+        if(0 != save_mask( mask , output ,compressed))
+        {
+            LOG_OUT( "save mask failed!\n");
+            return -1;
+        }
+
+        LOG_OUT( "extract mask done.\n");
+    }
+
+    LOG_OUT(  "done.\n");
     return 0;
 }

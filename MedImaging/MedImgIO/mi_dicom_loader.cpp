@@ -25,6 +25,44 @@ DICOMLoader::~DICOMLoader()
 
 }
 
+IOStatus MED_IMAGING_NAMESPACE::DICOMLoader::check_series_uid(const std::string& file , std::string& study_uid , std::string& series_uid)
+{
+    if (file.empty())
+    {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->loadFile(file.c_str());
+    if (status.bad())
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset *data_set = file_format->getDataset();
+    if (nullptr == data_set)
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_StudyInstanceUID , context);
+    if (status.bad())
+    {
+        return IO_DATA_DAMAGE;
+    }
+    study_uid = std::string(context.c_str());
+    
+    status = data_set->findAndGetOFString(DCM_SeriesInstanceUID , context);
+    if (status.bad())
+    {
+        return IO_DATA_DAMAGE;
+    }
+    series_uid = std::string(context.c_str());
+
+    return IO_SUCCESS;
+}
+
 IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
     if (files.empty())
