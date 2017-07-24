@@ -342,6 +342,13 @@ ScanSliceType CameraCalculator::check_scan_type(std::shared_ptr<OrthoCamera> cam
     return scan_type;
 }
 
+void CameraCalculator::pan_orthognal_mpr_to(std::shared_ptr<OrthoCamera> camera , const Point3& pt)
+{
+    const Matrix4& matvp = camera->get_view_projection_matrix();
+    Point3 p1 = matvp.transform(pt);
+    camera->pan(Vector2(p1.x,p1.y));
+}
+
 bool CameraCalculator::page_orthognal_mpr(std::shared_ptr<OrthoCamera> camera , int iPageStep)const
 {
     Point3 eye = camera->get_eye();

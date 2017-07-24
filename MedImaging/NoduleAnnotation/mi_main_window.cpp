@@ -1112,7 +1112,7 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
     //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = _model_voi->get_voi(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
-    _model_crosshair->locate(mat_p2w.transform(voi.center));
+    _model_crosshair->locate(mat_p2w.transform(voi.center),  false);
     _model_crosshair->notify();
     _select_vio_id = row;
 }

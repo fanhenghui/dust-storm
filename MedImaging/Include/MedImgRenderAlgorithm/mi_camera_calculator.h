@@ -99,16 +99,18 @@ public:
     // Axial F->H
     // Sagittal R->L
     // Coronal A -> P
-    bool page_orthognal_mpr(std::shared_ptr<OrthoCamera> pMPRCamera , int iPageStep) const;
+    bool page_orthognal_mpr(std::shared_ptr<OrthoCamera> camera , int page_step) const;
 
-    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , int page) const;
+    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> camera , int page) const;
 
-    int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> pMPRCamera) const;
+    int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> camera) const;
 
     //MPR translate toward normal direction until MPR's plane is intersect with input point
-    void translate_mpr_to(std::shared_ptr<OrthoCamera> pMPRCamera , const Point3& pt);
+    void translate_mpr_to(std::shared_ptr<OrthoCamera> camera , const Point3& pt);
 
-    ScanSliceType check_scan_type(std::shared_ptr<OrthoCamera> pMPRCamera) const;
+    ScanSliceType check_scan_type(std::shared_ptr<OrthoCamera> camera) const;
+
+    void pan_orthognal_mpr_to(std::shared_ptr<OrthoCamera> camera , const Point3& pt);
 
     /*Point3 adjust_point_to_discrete(const Point3& ptWorld) const;
 
