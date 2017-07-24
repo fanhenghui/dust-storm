@@ -189,6 +189,10 @@ NoduleAnnotation::~NoduleAnnotation()
 
 void NoduleAnnotation::configure_i()
 {
+    //default
+    Configuration::instance()->set_processing_unit_type(GPU);
+    Configuration::instance()->set_nodule_file_rsa(true);
+
     //1 TODO Check process unit
     //Open config file
     std::fstream input_file("../../../config/configure.txt" , std::ios::in);
@@ -197,12 +201,7 @@ void NoduleAnnotation::configure_i()
         input_file.open("./config/configure.txt" , std::ios::in);//second chance
     }
 
-    if (!input_file.is_open())
-    {
-        Configuration::instance()->set_processing_unit_type(GPU);
-        Configuration::instance()->set_nodule_file_rsa(true);
-    }
-    else
+    if (input_file.is_open())
     {
         std::string line;
         std::string tag;
@@ -273,6 +272,7 @@ void NoduleAnnotation::create_scene_i()
         mpr_containers[i]->set_scene(mpr_scenes[i]);
 
         //2 Set scene parameter
+        mpr_scenes[i]->set_mask_label_level(LabelLevel::L_64);
         mpr_scenes[i]->set_volume_infos(_volume_infos);
         mpr_scenes[i]->set_sample_rate(1.0);
         mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
@@ -971,7 +971,10 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         }
     }
 
-    QString file_name = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    QString file_name = Configuration::instance()->get_nodule_file_rsa() ?
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw)")) :
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
+
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
@@ -983,7 +986,8 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         std::string file_name_std(file_name.toLocal8Bit());
 
         IOStatus status;
-        if (Configuration::instance()->get_nodule_file_rsa())
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
         {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
@@ -1031,7 +1035,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         }
     }
 
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv);;NoduleSet(*.nraw)"));
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
@@ -1039,8 +1043,9 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         parser.set_series_id(_volume_infos->get_data_header()->series_uid);
         std::string file_name_std(file_name.toLocal8Bit());
 
-        IOStatus status ;
-        if (Configuration::instance()->get_nodule_file_rsa())
+        IOStatus status;
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
         {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
@@ -1487,13 +1492,14 @@ void NoduleAnnotation::closeEvent(QCloseEvent * event)
             output_file << "GPU\n";
         }
 
-        output_file << "NoduleOutput = ";
         if (Configuration::instance()->get_nodule_file_rsa())
         {
-            output_file << "RSA\n";
+            //output_file << "NoduleOutput = ";
+            //output_file << "RSA\n";
         }
         else
         {
+            output_file << "NoduleOutput = ";
             output_file << "TEXT\n";
         }
 

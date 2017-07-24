@@ -1,3 +1,2 @@
 ProcessingUnit = GPU
-NoduleOutput = TEXT
-LastOpenDirection = E:\data\MyData\Anonymous\sichuan_lung_anon
+LastOpenDirection = C:\
