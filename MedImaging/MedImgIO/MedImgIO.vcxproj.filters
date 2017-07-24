@@ -54,9 +54,6 @@
     <ClInclude Include="..\Include\MedImgIO\mi_zlib_utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_run_length_operator.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_io_stdafx.cpp">
@@ -87,9 +84,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mi_zlib_utils.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="mi_run_length_operator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

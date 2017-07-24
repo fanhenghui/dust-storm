@@ -2,9 +2,9 @@
 
 MED_IMAGING_BEGIN_NAMESPACE
 
-VOIModel::VOIModel():_voi_mask_visible(true), _voi_to_be_tuned(-1), _tune_radius(2.5)
+VOIModel::VOIModel():_voi_mask_visible(true), _voi_to_be_tuned(-1), _tune_radius(5.0)
 {
-
+    this->_voxel_to_be_tuned.reserve(3);
 }
 
 VOIModel::~VOIModel()
@@ -192,15 +192,38 @@ int VOIModel::get_voi_to_tune()
     return this->_voi_to_be_tuned;
 }
 
-void VOIModel::set_voxel_to_tune(AABBUI& voxel_range, int /*tune_type*/)
+void VOIModel::set_tune_location(const Point3& loc)
 {
-    this->_voxels_to_be_tuned = voxel_range;
-    this->set_changed();
+    this->_tune_location = loc;
+}
+const Point3& VOIModel::get_tune_location()
+{
+    return this->_tune_location;
 }
 
-const AABBUI& VOIModel::get_voxel_to_tune()
+//void VOIModel::set_voxel_block_to_tune(AABBUI& voxel_range, int /*tune_type*/)
+//{
+//    this->_voxel_block_to_be_tuned = voxel_range;
+//    this->set_changed();
+//}
+//
+//const AABBUI& VOIModel::get_voxel_block_to_tune()
+//{
+//    return this->_voxel_block_to_be_tuned;
+//}
+
+void VOIModel::set_voxel_to_tune(const std::vector<unsigned int>& voxel_idx, int tune_type)
 {
-    return this->_voxels_to_be_tuned;
+    if (voxel_idx.size() == 3)
+    {
+        this->_voxel_to_be_tuned = voxel_idx;
+        this->set_changed();
+    }
+}
+
+const std::vector<unsigned int>& VOIModel::get_voxel_to_tune()
+{
+    return this->_voxel_to_be_tuned;
 }
 
 bool VOIModel::is_voi_mask_visible() const

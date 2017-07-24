@@ -18,7 +18,9 @@ namespace medical_imaging
     class VOIStatisticObserver;
     class FocusModel;
     class VOISegmentObserver;
+    class GraphicItemVOI;
 }
+
 typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
 class SceneContainer;
@@ -54,18 +56,19 @@ private slots:
     
 
     void slot_save_label_file();
-
-
-   //  void slot_load_label_file();
+    void slot_load_label_file();
 
     //Common tools
     void slot_press_btn_arrow_i();
     void slot_press_btn_annotate_i();
+    void slot_press_btn_fine_tune_i();
+    void slot_spn_box_tune_radius(int);
     void slot_press_btn_rotate_i();
     void slot_press_btn_zoom_i();
     void slot_press_btn_pan_i();
     void slot_press_btn_windowing_i();
     void slot_press_btn_fit_window_i();
+    
 
     //MPR scroll bar 
     void slot_sliding_bar_mpr00_i(int value);
@@ -102,6 +105,7 @@ private:
     void create_model_observer_i();
     void refresh_nodule_list_i();
     void save_layout2x2_parameter_i();
+    void shift_tune_object();
 
 private:
     Ui::NoduleAnnotationClass _ui;
@@ -141,6 +145,8 @@ private:
     std::shared_ptr<medical_imaging::SceneContainerObserver> _ob_scene_container;
     std::shared_ptr<MPRScrollBarObserver> _ob_mpr_scroll_bar;
 
+    // Scene ROI container for each render window
+    std::vector < std::shared_ptr<medical_imaging::GraphicItemVOI> > _voi_collections;
     //Nodule VOI list
     QSignalMapper* _single_manager_nodule_type;
     QNoduleObject* _object_nodule;
@@ -149,13 +155,14 @@ private:
     QMinMaxHintObject* _object_min_max_hint;
 
     //Selected voi
-    int _select_vio_id;
+    int _select_voi_id;
 
     int _pre_2x2_width;
     int _pre_2x2_height;
 
     //DICOM files cache
     std::vector<std::string> _dicom_series_files;
+    std::string _current_operation; // remember current operation
 };
 
 #endif // MI_MAIN_WINDOW_H

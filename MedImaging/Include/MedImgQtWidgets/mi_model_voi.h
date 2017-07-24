@@ -21,10 +21,11 @@ public:
     enum CodeID
     {
         MODIFY_COMPLETED = 0,
-        MODIFYING = 1,
-        ADD_VOI = 2,
-        DELETE_VOI = 3,
-        TUNING_VOI = 4,
+        MODIFYING = 1, 
+        ADD_VOI = 2, // add voi by drawing a sphere
+        DELETE_VOI = 3, // delete the voi
+        TUNING_VOI = 4, // tune voi (aka eraser) specified by user
+        LOAD_VOI = 5, // load/read voi (, and reconstruct the sphere)
     };
     static void print_code_id(int code_id);
 
@@ -53,28 +54,35 @@ public:
     void modify_center(int id , const Point3& center);
     void modify_voi_list_rear(const VOISphere& voi);
 
-    void set_tune_radius(const double r);
-    double get_tune_radius();
     void set_voi_to_tune(int voi_idx);
     int get_voi_to_tune();
-    void set_voxel_to_tune(AABBUI& voxel_range, int tune_type);
-    const AABBUI& get_voxel_to_tune();
+    void set_tune_radius(const double r);
+    double get_tune_radius();
+    void set_tune_location(const Point3& loc);
+    const Point3& get_tune_location();
+    
+    //void set_voxel_block_to_tune(AABBUI& voxel_range, int tune_type);
+    //const AABBUI& get_voxel_block_to_tune();
 
+    void set_voxel_to_tune(const std::vector<unsigned int>& voxel_idx, int tune_type);
+    const std::vector<unsigned int>& get_voxel_to_tune();
 
     bool is_voi_mask_visible() const;
     void set_voi_mask_visible(bool flag);
 
 protected:
 private:
-    std::vector<VOISphere>        _vois;
+    std::vector<VOISphere>       _vois;
     std::vector<unsigned char>   _labels;
-    std::vector<IntensityInfo>     _intensity_infos;
+    std::vector<IntensityInfo>   _intensity_infos;
     bool _voi_mask_visible;
 
     // which voi to tune, which voxels to tune
     int _voi_to_be_tuned;
-    AABBUI _voxels_to_be_tuned;
+    //AABBUI _voxel_block_to_be_tuned;
+    std::vector<unsigned int> _voxel_to_be_tuned;
     double _tune_radius;
+    Point3 _tune_location; 
 };
 
 MED_IMAGING_END_NAMESPACE

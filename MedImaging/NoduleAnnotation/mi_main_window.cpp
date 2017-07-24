@@ -10,6 +10,8 @@
 
 #include "MedImgArithmetic/mi_rsa_utils.h"
 #include "MedImgArithmetic/mi_ortho_camera.h"
+#include "MedImgArithmetic/mi_run_length_operator.h"
+#include "MedImgArithmetic/mi_label_sphere_converter.h"
 
 #include "MedImgIO/mi_dicom_loader.h"
 #include "MedImgIO/mi_image_data.h"
@@ -18,7 +20,6 @@
 #include "MedImgIO/mi_nodule_set.h"
 #include "MedImgIO/mi_nodule_set_parser.h"
 #include "MedImgIO/mi_model_progress.h"
-#include "MedImgIO/mi_run_length_operator.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -30,6 +31,7 @@
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
 #include "MedImgRenderAlgorithm/mi_mask_label_store.h"
+
 
 #include "MedImgQtWidgets/mi_shared_widget.h"
 #include "MedImgQtWidgets/mi_scene_container.h"
@@ -44,6 +46,7 @@
 #include "MedImgQtWidgets/mi_mouse_op_windowing.h"
 #include "MedImgQtWidgets/mi_mouse_op_probe.h"
 #include "MedImgQtWidgets/mi_mouse_op_annotate.h"
+#include "MedImgQtWidgets/mi_mouse_op_annotate_fine_tuning.h"
 #include "MedImgQtWidgets/mi_mouse_op_locate.h"
 #include "MedImgQtWidgets/mi_mouse_op_test.h"
 #include "MedImgQtWidgets/mi_model_voi.h"
@@ -53,7 +56,7 @@
 #include "MedImgQtWidgets/mi_observer_progress.h"
 #include "MedImgQtWidgets/mi_observer_voi_statistic.h"
 #include "MedImgQtWidgets/mi_observer_voi_segment.h"
-
+#include "MedImgQtWidgets/mi_graphic_item_voi.h"
 
 #include "mi_observer_voi_table.h"
 #include "mi_observer_mpr_scroll_bar.h"
@@ -127,7 +130,7 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     _is_ready(false),
     _object_nodule(nullptr),
     _single_manager_nodule_type(nullptr),
-    _select_vio_id(-1)
+    _select_voi_id(-1)
 {
     _ui.setupUi(this);
 
@@ -285,6 +288,7 @@ void NoduleAnnotation::create_scene_i()
         graphic_item_voi->set_scene(mpr_scenes[i]);
         graphic_item_voi->set_voi_model(_model_voi);
         mpr_containers[i]->add_item(graphic_item_voi);
+        this->_voi_collections.push_back(graphic_item_voi);
 
         std::shared_ptr<GraphicItemCrosshair> graphic_item_crosshair(new GraphicItemCrosshair());
         graphic_item_crosshair->set_scene(mpr_scenes[i]);
@@ -409,7 +413,7 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_ui.actionQuit , SIGNAL(triggered()) , this , SLOT(slot_quit_i()));
 
     connect(_ui.actionSave_Label, SIGNAL(triggered()) , this , SLOT(slot_save_label_file()));
-    //connect(_ui.actionLoad_Label, SIGNAL(triggered()) , this , SLOT(slot_load_label_file()));
+    connect(_ui.actionLoad_Label, SIGNAL(triggered()) , this , SLOT(slot_load_label_file()));
 
     //MPR scroll bar
     connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
@@ -424,6 +428,9 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
     connect(_ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
     connect(_ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
+
+    connect(_ui.pushButtonFineTune , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fine_tune_i()));
+    connect(_ui.spinBoxTuneRadius , SIGNAL(valueChanged(int)) , this , SLOT(slot_spn_box_tune_radius(int)));
 
     //VOI list
     connect(_ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
@@ -646,7 +653,7 @@ void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,std::sha
 
     //reset nodule list
     refresh_nodule_list_i();
-    _select_vio_id = -1;
+    _select_voi_id = -1;
 
     _is_ready = true;
 }
@@ -715,7 +722,7 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
     {
         return;
     }
-
+    this->_current_operation = "Annotate";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -731,7 +738,7 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
         std::shared_ptr<MouseOpAnnotate> op_annotate(new MouseOpAnnotate());
         op_annotate->set_scene(mpr_scenes[i]);
         op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools
-
+        
         std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
         op_min_max_hint->set_scene(mpr_scenes[i]);
         op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
@@ -739,9 +746,87 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
         IMouseOpPtrCollection left_btn_ops(2);
         left_btn_ops[0] = op_annotate;
         left_btn_ops[1] = op_min_max_hint;
-
+        
         mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+
+        this->_voi_collections[i]->enable_interaction();
+        this->_voi_collections[i]->set_item_to_be_tuned(-1);
+        
+        mpr_containers[i]->setMouseTracking(false);
     }
+
+    this->_model_voi->set_voi_to_tune(-1);
+}
+
+void NoduleAnnotation::slot_press_btn_fine_tune_i()
+{
+    if (!_is_ready || this->_model_voi->get_vois().size() < 1)
+    {
+        return;
+    }
+    this->_current_operation = "Finetune";
+    std::vector<MPRScenePtr> mpr_slices;
+    mpr_slices.push_back(this->_mpr_scene_00);
+    mpr_slices.push_back(this->_mpr_scene_01);
+    mpr_slices.push_back(this->_mpr_scene_10);
+
+    std::vector<SceneContainer*> render_windows;
+    render_windows.push_back(_mpr_00);
+    render_windows.push_back(_mpr_01);
+    render_windows.push_back(_mpr_10);
+
+    // can select the table entry but fail to highlight
+    int voi_to_be_tuned = this->_select_voi_id == -1 ? this->_ui.tableWidgetNoduleList->rowCount()-1 : this->_select_voi_id;
+    this->_ui.tableWidgetNoduleList->selectRow(voi_to_be_tuned);
+    
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        // take over left-button operation
+        std::shared_ptr<MouseOpAnnotateFineTuning> op_annotate_fine_tuning(new MouseOpAnnotateFineTuning());
+        op_annotate_fine_tuning->set_scene(mpr_slices[i]);
+        op_annotate_fine_tuning->set_voi_model(this->_model_voi);//Set Model to annotate tools
+        
+        IMouseOpPtrCollection left_btn_ops(1);
+        left_btn_ops[0] = op_annotate_fine_tuning;
+
+        render_windows[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        render_windows[i]->register_mouse_operation(left_btn_ops , Qt::NoButton , Qt::NoModifier);
+
+        // freeze all the vois
+        this->_voi_collections[i]->disable_interaction();
+
+        // highlight the circle
+        this->_voi_collections[i]->set_item_to_be_tuned(voi_to_be_tuned);
+
+        // make sure the circle updated
+        // render_windows[i]->update_scene(); // not working :(
+        
+        render_windows[i]->set_mouse_hovering(true);
+    }
+
+    this->_model_voi->set_voi_to_tune(voi_to_be_tuned);
+}
+
+void NoduleAnnotation::slot_spn_box_tune_radius(int new_value)
+{
+    if (!_is_ready || !_model_voi)
+    {
+        return;
+    }
+
+    this->_model_voi->set_tune_radius(new_value);
+}
+
+void NoduleAnnotation::shift_tune_object()
+{
+    int voi_to_be_tuned = this->_select_voi_id == -1 ? this->_ui.tableWidgetNoduleList->rowCount()-1 : this->_select_voi_id;
+    this->_ui.tableWidgetNoduleList->selectRow(voi_to_be_tuned);
+
+    for (int view_idx=0; view_idx<3; ++view_idx)
+    {
+        this->_voi_collections[view_idx]->set_item_to_be_tuned(voi_to_be_tuned);
+    }
+    this->_model_voi->set_voi_to_tune(voi_to_be_tuned);
 }
 
 void NoduleAnnotation::slot_press_btn_arrow_i()
@@ -750,7 +835,7 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
     {
         return;
     }
-
+    this->_current_operation = "Arrow";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -776,6 +861,7 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
         left_btn_ops[1] = op_min_max_hint;
 
         mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -785,7 +871,7 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
     {
         return;
     }
-
+    this->_current_operation = "Rotate";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -809,7 +895,7 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
         left_btn_ops[0] = op_rotate;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -843,7 +929,7 @@ void NoduleAnnotation::slot_press_btn_zoom_i()
         left_btn_ops[0] = op_zoom;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -877,7 +963,7 @@ void NoduleAnnotation::slot_press_btn_pan_i()
         left_btn_ops[0] = op_pan;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -911,7 +997,7 @@ void NoduleAnnotation::slot_press_btn_windowing_i()
         left_btn_ops[0] = op_windowing;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -1105,7 +1191,12 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
     _model_crosshair->locate(mat_p2w.transform(voi.center));
     _model_crosshair->notify();
-    _select_vio_id = row;
+    _select_voi_id = row;
+    
+    if (this->_current_operation.compare("Finetune") == 0)
+    {
+        this->shift_tune_object();
+    }
 }
 
 void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *item)
@@ -1128,12 +1219,17 @@ void NoduleAnnotation::slot_add_nodule_i()
 
 void NoduleAnnotation::slot_delete_nodule_i()
 {
-    if (_select_vio_id >= 0 && _select_vio_id < _model_voi->get_vois().size())
+    if (_select_voi_id >= 0 && _select_voi_id < _model_voi->get_vois().size())
     {
-        _model_voi->remove_voi(_select_vio_id);
+        _model_voi->remove_voi(_select_voi_id);
         _model_voi->notify(VOIModel::DELETE_VOI);
-        _select_vio_id = -1;
+        _select_voi_id = -1;
         _ob_scene_container->update();
+    }
+
+    if (this->_current_operation.compare("Finetune") == 0)
+    {
+        this->shift_tune_object();
     }
 }
 
@@ -1395,7 +1491,7 @@ void NoduleAnnotation::refresh_nodule_list_i()
     _ui.tableWidgetNoduleList->setHorizontalHeaderItem(2, qtablewidgetitem2);
 
     //reset selected voi id
-    _select_vio_id = -1;
+    _select_voi_id = -1;
     const std::vector<VOISphere>& vois = _model_voi->get_vois();
     if (!vois.empty())
     {
@@ -1557,106 +1653,113 @@ void NoduleAnnotation::slot_save_label_file()
 //    }
 //}
 
-//void NoduleAnnotation::slot_load_label_file()
-//{
-//    //if (!this->_volume_infos)
-//    //{
-//    //    std::cout << "No volume loaded yet!\n";
-//    //    return;
-//    //}
-//
-//    // read file, interpret as pairs of integers, (repeated times, value)
-//    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , "home/" /*QString(_volume_infos->get_data_header()->series_uid.c_str())*/, tr("LabelSet(*.raw)"));
-//    if (label_file_name_str.isEmpty())
-//    {
-//        return;
-//    }
-//    std::string file_name_std(label_file_name_str.toLocal8Bit());
-//    std::ifstream input_file(file_name_std, std::ios::in | std::ios::binary | std::ios::ate);
-//    if (!input_file.is_open())
-//    {
-//        return;
-//    }
-//
-//    // get size in bytes
-//    input_file.seekg (0, input_file.end);
-//    int file_size = input_file.tellg();
-//    input_file.seekg (0, input_file.beg);
-//
-//    // prepare the buffer and copy into it
-//    int number_of_entries = file_size/sizeof(int);
-//    std::vector<int> labels(number_of_entries);
-//    char * buffer = reinterpret_cast<char*>(labels.data());
-//    input_file.read (buffer, file_size);
-//
-//    //if (input_file)
-//    //    std::cout << "all characters read successfully.";
-//    //else
-//    //    std::cout << "error: only " << input_file.gcount() << " could be read";
-//
-//    input_file.close();
-//
-//    // count the voxels, check w.r.t _volume_infos.dim[0]*dim[1]*dim[2]
-//    unsigned int sum_voxels = 0;
-//    for (auto it = labels.begin(); it != labels.end(); it += 2)
-//    {
-//        sum_voxels += (*it);
-//    }
-//    std::cout << sum_voxels << " labels are loaded\n";
-//
-//    std::shared_ptr<ImageData> mask_in_use = this->_volume_infos->get_mask();
-//    unsigned int total_number_of_voxels = mask_in_use->_dim[0] * mask_in_use->_dim[1] * mask_in_use->_dim[2];
-//    if (sum_voxels != total_number_of_voxels)
-//    {
-//        std::cout << "label data FAILED to match the mask in use \n";
-//        return;
-//    }
-//
-//    // TODO: directly update the mask_data? but if in the presence of existing vois (i.e., spheres), how to combine them?
-//    bool directly_update_mask = true;
-//    std::vector<unsigned char> unique_labels;
-//    unsigned char * dest_value_ptr = static_cast<unsigned char *>(mask_in_use->get_pixel_pointer());
-//    unsigned char * src_value = new unsigned char [total_number_of_voxels];
-//
-//    if (directly_update_mask)
-//    {
-//        unsigned int current_index = 0;
-//        unsigned char current_label = static_cast<unsigned char>( labels[current_index+1] );
-//
-//        if (current_label != 0)
-//            unique_labels.push_back(current_label);
-//
-//        for (int voxel=0; voxel<total_number_of_voxels;++voxel)
-//        {
-//            if (voxel >= labels[current_index] )
-//            {
-//                current_index += 2;
-//                labels[current_index] += labels[current_index-2];
-//                current_label = static_cast<unsigned char>( labels[current_index+1] );
-//
-//                if ( current_label != 0 && std::find(unique_labels.begin(), unique_labels.end(), current_label) == unique_labels.end() )
-//                    unique_labels.push_back(current_label);
-//            }
-//
-//            // populate the temporary information container
-//            src_value[voxel] = current_label;
-//
-//            // update current volume with loaded labels
-//            dest_value_ptr[voxel] = current_label;
-//
-//            //// on-line debug: write out, then read in, and compare!
-//            //if (dest_value_ptr[voxel] != current_label)
-//            //{
-//            //    std::cout << "Voxel " << voxel <<" has wrong value!\n";
-//            //}
-//        }
-//    }
-//
-//    // Notify that mask volume has changed, renderer should refresh GPU memory
-//    // [lower_bound, upper_bound)
-//    unsigned int lower_bound[3] = {0,0,0};
-//    unsigned int upper_bound[3] = {mask_in_use->_dim[0], mask_in_use->_dim[1], mask_in_use->_dim[2]};
-//
-//    this->_volume_infos->update_mask(lower_bound, upper_bound, src_value, true); // "src_value": temporary data container; "true" : already update loaded
-//    this->_ob_scene_container->update();
-//}
+void NoduleAnnotation::slot_load_label_file()
+{
+    if (!_is_ready || !this->_volume_infos)
+    {
+        std::cout << "No volume loaded yet!\n";
+        return;
+    }
+
+    if (!_model_voi->get_vois().empty())
+    {
+        if (QMessageBox::No == QMessageBox::warning(
+            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
+            QMessageBox::Yes | QMessageBox::No))
+        {
+            return;
+        }
+    }
+
+    // read file, interpret as pairs of integers, (repeated times, value)
+    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , "home/" /*QString(_volume_infos->get_data_header()->series_uid.c_str())*/, tr("LabelSet(*.rle)"));
+    if (label_file_name_str.isEmpty())
+    {
+        return;
+    }
+    std::string file_name_std(label_file_name_str.toLocal8Bit());
+    std::ifstream input_file(file_name_std, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!input_file.is_open())
+    {
+        return;
+    }
+
+    // get size in bytes
+    input_file.seekg (0, input_file.end);
+    int file_size = input_file.tellg();
+    input_file.seekg (0, input_file.beg);
+
+    // prepare the buffer and copy into it
+    int number_of_entries = file_size/sizeof(int);
+    std::vector<unsigned int> labels(number_of_entries);
+    char * buffer = reinterpret_cast<char*>(labels.data());
+    input_file.read (buffer, file_size);
+
+    //if (input_file)
+    //    std::cout << "all characters read successfully.";
+    //else
+    //    std::cout << "error: only " << input_file.gcount() << " could be read";
+
+    input_file.close();
+
+    // count the voxels, check w.r.t _volume_infos.dim[0]*dim[1]*dim[2]
+    unsigned int sum_voxels = 0;
+    for (auto it = labels.begin(); it != labels.end(); it += 2)
+    {
+        sum_voxels += (*it);
+    }
+    std::cout << sum_voxels << " labels are loaded\n";
+
+    std::shared_ptr<ImageData> mask_in_use = this->_volume_infos->get_mask();
+    unsigned int total_number_of_voxels = mask_in_use->_dim[0] * mask_in_use->_dim[1] * mask_in_use->_dim[2];
+    if (sum_voxels != total_number_of_voxels)
+    {
+        std::cout << "Fail since label data not match the volume in use \n";
+        return;
+    }
+
+    // delete previous files
+    this->_model_voi->remove_all();
+    this->_model_voi->notify(VOIModel::DELETE_VOI);
+
+    // TODO: directly update the mask_data? but if in the presence of existing vois (i.e., spheres), how to combine them?
+    std::vector<unsigned char> actual_labels = RunLengthOperator::decode(labels);
+    
+    std::shared_ptr<ImageData> volume = _volume_infos->get_volume(); 
+    double origin[3] = {volume->_image_position.x, volume->_image_position.y, volume->_image_position.z}; // TODO here we ignore rotation
+    std::vector<VOISphere> voi_spheres = Label2SphereConverter::convert_label_2_sphere(actual_labels, volume->_dim, volume->_spacing, origin);
+
+    // update underlying mask
+    bool directly_update_mask = true;
+    if (directly_update_mask)
+    {
+        unsigned char * dest_value_ptr = static_cast<unsigned char *>(mask_in_use->get_pixel_pointer());
+        unsigned char * src_value = new unsigned char [total_number_of_voxels];
+
+        for (int voxel=0; voxel<total_number_of_voxels;++voxel)
+        {
+            unsigned int current_label = actual_labels.at(voxel);
+
+            // populate the temporary information container
+            src_value[voxel] = current_label;
+
+            // update current volume with loaded labels
+            dest_value_ptr[voxel] = current_label;
+        }
+
+        // Notify that mask volume has changed, renderer should refresh GPU memory [lower_bound, upper_bound) // half-open interval
+        unsigned int lower_bound[3] = {0,0,0};
+        unsigned int upper_bound[3] = {mask_in_use->_dim[0], mask_in_use->_dim[1], mask_in_use->_dim[2]};
+
+        this->_volume_infos->update_mask(lower_bound, upper_bound, src_value, true); // "src_value": temporary data container; "true" : already update loaded
+    }
+
+    // update the underlying model & visual representation
+    for (int sphere_idx=0; sphere_idx<voi_spheres.size(); ++sphere_idx)
+    {
+        this->_model_voi->add_voi(voi_spheres.at(sphere_idx), sphere_idx+1);
+    }
+    this->_model_voi->notify(VOIModel::LOAD_VOI);
+    
+    QMessageBox::information(this , tr("Load Label") , tr("Load label file success."),QMessageBox::Ok);
+}

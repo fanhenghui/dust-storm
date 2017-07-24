@@ -65,10 +65,10 @@ std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned 
 
     for (unsigned int voxel=0; voxel< total_number_of_voxels; ++voxel)
     {
-        if (voxel != voxel_bound )
+        if (voxel == voxel_bound )
         {
             current_index += 2;
-            voxel_bound = to_be_decoded[current_index] + to_be_decoded[current_index-2];
+            voxel_bound += to_be_decoded[current_index];
             current_label = static_cast<unsigned char>( to_be_decoded[current_index+1] );
         }
 

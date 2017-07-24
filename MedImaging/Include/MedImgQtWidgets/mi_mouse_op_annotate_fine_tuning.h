@@ -16,6 +16,9 @@ public:
 
     virtual void press(const QPointF& pt);
     virtual void move(const QPointF& pt);
+
+    void tune_voi(const QPointF &pt);
+
     virtual void release(const QPointF& pt);
     virtual void double_click(const QPointF& pt);
     virtual void wheel_slide(int value);

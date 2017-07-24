@@ -83,6 +83,7 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    std::shared_ptr<medical_imaging::VOIModel>& get_voi_model();
 
 private:
     void update_circle_center_i();
@@ -95,6 +96,19 @@ private:
     bool _is_frezze;
 };
 
+// left-button changes circle size
+class GraphicsCircleItem : public GraphicsSphereItem
+{
+public:
+    GraphicsCircleItem(QGraphicsItem *parent = 0 , QGraphicsScene *scene = 0);
+    virtual ~GraphicsCircleItem();
+
+protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+};
+
 
 MED_IMAGING_BEGIN_NAMESPACE
 
@@ -102,6 +116,7 @@ class QtWidgets_Export GraphicItemVOI : public GraphicItemBase
 {
 public:
     GraphicItemVOI();
+
     virtual ~GraphicItemVOI();
 
     void set_voi_model(std::shared_ptr<VOIModel> model);
@@ -112,6 +127,12 @@ public:
 
     virtual void post_update();
 
+    void enable_interaction();
+
+    void disable_interaction();
+
+    void set_item_to_be_tuned(const int idx);
+
 private:
     std::shared_ptr<VOIModel> _model;
     std::vector<GraphicsSphereItem*> _items_spheres;//Circle on MPR plane
@@ -119,6 +140,10 @@ private:
     std::vector<GraphicsLineItem*> _items_lines;//Circle to info line
     int _pre_item_num;
     std::vector<QGraphicsItem*> _items_to_be_delete;
+
+    // three circles on three slices
+    std::unique_ptr<GraphicsSphereItem> _tune_graphic_item;
+    int _item_to_be_tuned;
 
     //cache
     std::vector<VOISphere> _pre_vois;

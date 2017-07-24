@@ -55,6 +55,15 @@ public:
     void register_mouse_wheel_operation(IMouseOpPtrCollection mouse_ops);
     IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier);
 
+    void set_mouse_hovering(bool new_state)
+    {
+        _mouse_hovering = new_state;
+    };
+    bool get_mouse_hovering()
+    {
+        return _mouse_hovering;
+    };
+
 signals:
     void focus_in_scene();
     void focus_out_scene();
@@ -102,6 +111,8 @@ private:
     int _mouse_press_time;
     int _mouse_release_time;
     Qt::MouseButtons _buttons_pre_press;
+    
+    bool _mouse_hovering;
 
     std::vector<GraphicItemPtr> _graphic_items;
 };

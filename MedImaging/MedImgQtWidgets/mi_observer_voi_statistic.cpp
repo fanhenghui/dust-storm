@@ -33,7 +33,7 @@ void VOIStatisticObserver::set_volume_infos(std::shared_ptr<VolumeInfos> volume_
 
 void VOIStatisticObserver::update(int code_id)
 {
-    if(1 == code_id)
+    if(VOIModel::MODIFYING == code_id || VOIModel::TUNING_VOI == code_id)
     {
         return;
     }

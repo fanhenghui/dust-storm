@@ -57,9 +57,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         //Check voi firstly
         const std::vector<VOISphere>& vois = _model->get_vois();
         const int voi_count = vois.size();
-        //if (this->_model->)
-        //{
-        //}
+
         //graphics item number changed
         if (_pre_item_num != voi_count)
         {
@@ -134,9 +132,66 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
         const std::vector<IntensityInfo>& intensity_infos = _model->get_intensity_infos();
 
-        //1 Get MPR plane
+        //////////////////////////////////////////////////////////////////////////
         std::shared_ptr<CameraBase> camera = scene->get_camera();
 
+        // draw the circle around the mouse
+        if (this->_tune_graphic_item)
+        {
+            this->_tune_graphic_item->hide();
+        }
+        if (this->_item_to_be_tuned >= 0)
+        {
+            if (!this->_tune_graphic_item)
+            {
+                GraphicsSphereItem* item = new GraphicsSphereItem();
+                item->setEnabled(false);
+                item->setPen(QPen(QColor(217,217,217)));
+                this->_tune_graphic_item.reset(item);
+                to_be_add.push_back(item);
+            }
+            this->_tune_graphic_item->hide();
+            std::shared_ptr<CameraCalculator> camera_cal = scene->get_camera_calculator();
+            Point3 look_at = camera->get_look_at();
+            Point3 eye = camera->get_eye();
+            Vector3 norm = look_at - eye;
+            norm.normalize();
+            Vector3 up = camera->get_up_direction();
+
+            const Matrix4 mat_vp = camera->get_view_projection_matrix();
+            
+            // draw the three circles, representing the cursor location
+            Point3 physical_loc = this->_model->get_tune_location();
+            // physical_loc = mat_p2w.transform(physical_loc);
+            double physical_radius = this->_model->get_tune_radius();
+            double distance = norm.dot_product(look_at - physical_loc);
+            if (abs(distance) < physical_radius)
+            {
+                Point3 pt0 = physical_loc + distance*norm;
+                double length = sqrt(physical_radius*physical_radius - distance*distance);
+                Point3 pt1 = pt0 + length*up;
+                pt0 = mat_vp.transform(pt0);
+                pt1 = mat_vp.transform(pt1);
+                Point2 pt_dc0 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt0.x , pt0.y) , width , height);
+                Point2 pt_dc1 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt1.x , pt1.y) , width , height);
+                float length_float = static_cast<float>( (pt_dc1 - pt_dc0).magnitude() );
+                if (length_float > 0.95f)
+                {
+                    this->_tune_graphic_item->set_sphere(QPointF(static_cast<float>(pt_dc0.x) , static_cast<float>(pt_dc0.y)) , length_float);
+                    this->_tune_graphic_item->show();
+                }
+                //else
+                //{
+                //    this->_tune_graphic_item->hide();
+                //}
+            }
+            //else
+            //{
+            //    this->_tune_graphic_item->hide();
+            //}
+        }
+        //////////////////////////////////////////////////////////////////////////
+        //1 Get MPR plane
         if (_pre_camera == *(std::dynamic_pointer_cast<OrthoCamera>(camera)) &&
             _pre_vois == vois &&
             _pre_intensity_infos == intensity_infos &&
@@ -203,8 +258,21 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
                     radiuses.push_back(radius_float);
                     voi_id.push_back(idx);
                 }
+                else
+                {
+                    circle_center.push_back(pt_dc0);
+                    radiuses.push_back(0.0f);
+                    voi_id.push_back(idx);
+                }
+            }
+            else
+            {
+                circle_center.push_back(Point2(0.0, 0.0));
+                radiuses.push_back(0.0f);
+                voi_id.push_back(idx);
             }
         }
+
         //3 Draw intersect circle if intersected
         for (int i = 0 ; i < _items_spheres.size() ; ++i)
         {
@@ -223,6 +291,11 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
         StrNumConverter<double> str_num_converter;
         for (size_t i = 0 ; i <circle_center.size() ; ++i , ++item_sphere , ++item_info , ++item_line)
         {
+            if (radiuses[i] < 0.5f)
+            {
+                continue;
+            }
+            
             //sphere
             if (!(*item_sphere)->is_frezze())
             {
@@ -306,7 +379,7 @@ void GraphicItemVOI::set_item_to_be_tuned(const int new_idx)
     }
     if (new_idx >= 0)
     {
-        this->_items_spheres[new_idx]->setPen(QPen(QColor(222,203,228)));
+        this->_items_spheres[new_idx]->setPen(QPen(QColor(255, 255, 0)));
     }
 
     if (this->_item_to_be_tuned >=0)

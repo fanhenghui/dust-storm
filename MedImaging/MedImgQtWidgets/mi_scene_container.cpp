@@ -44,6 +44,8 @@ SceneContainer::SceneContainer(QWidget* parent /*= 0*/):
     this->setViewport(_inner_gl_widget );
 
     //this->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+
+    this->setMouseTracking(false);
 }
 
 SceneContainer::~SceneContainer()
@@ -244,13 +246,15 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 {
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseMoveEvent(event);
+    //bool flag = this->hasMouseTracking();
+    //std::cout << flag << std::endl; // flag = 0 ? if so, why we enter here£¿
 
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
-        if (_buttons == Qt::NoButton)
+        if (!this->get_mouse_hovering() && _buttons == Qt::NoButton)
         {
             return;
         }

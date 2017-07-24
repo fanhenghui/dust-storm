@@ -137,6 +137,9 @@
     <ClCompile Include="mi_mouse_op_test.cpp">
       <Filter>Src\Operation</Filter>
     </ClCompile>
+    <ClCompile Include="mi_mouse_op_annotate_fine_tuning.cpp">
+      <Filter>Src\Operation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_qt_widgets_stdafx.h">
@@ -203,6 +206,9 @@
       <Filter>Src\Model Observer</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_test.h">
+      <Filter>Src\Operation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgQtWidgets\mi_mouse_op_annotate_fine_tuning.h">
       <Filter>Src\Operation</Filter>
     </ClInclude>
   </ItemGroup>

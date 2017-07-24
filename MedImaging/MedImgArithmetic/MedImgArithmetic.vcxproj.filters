@@ -146,6 +146,12 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h">
       <Filter>Segmentation</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_label_sphere_converter.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_run_length_operator.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_vector3.cpp">
@@ -231,6 +237,12 @@
     </ClCompile>
     <ClCompile Include="mi_color_unit.cpp">
       <Filter>Color Related</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_label_sphere_converter.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_run_length_operator.cpp">
+      <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
