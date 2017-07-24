@@ -74,11 +74,24 @@ void OrthoCameraInteractor::pan(const Vector2& pan)
 
 void OrthoCameraInteractor::pan(const Point2& pre_pt , const Point2& cur_pt, int width, int height)
 {
-    Vector2 delta = (pre_pt - cur_pt);
-    delta.x /= width;
-    delta.y /= -height;
-    delta *= 2.0;//归一化坐标是-1 ~ 1 需要乘以2
-    this->pan(delta);
+    const Matrix4 mat_p = _camera->get_projection_matrix();
+    if (mat_p.has_inverse())
+    {
+        const Matrix4 mat_vp = _camera->get_view_projection_matrix();
+        const Point3 at_screen = mat_vp.transform(_camera->get_look_at());
+
+        const double dx = (cur_pt.x - pre_pt.x)/width*2.0;
+        const double dy = (pre_pt.y - cur_pt.y)/height*2.0;
+        const Point3 pt = mat_p.get_inverse().transform(Point3(dx , dy , at_screen.z));
+
+        this->pan(Vector2(pt.x , pt.y));
+    }
+
+    //Vector2 delta = (pre_pt - cur_pt);
+    //delta.x /= width;
+    //delta.y /= -height;
+    //delta *= 2.0;//归一化坐标是-1 ~ 1 需要乘以2
+    //this->pan(delta);
 }
 
 void OrthoCameraInteractor::rotate(const Matrix4& mat)

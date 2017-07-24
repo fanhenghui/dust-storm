@@ -110,7 +110,7 @@ public:
 
     ScanSliceType check_scan_type(std::shared_ptr<OrthoCamera> camera) const;
 
-    void pan_orthognal_mpr_to(std::shared_ptr<OrthoCamera> camera , const Point3& pt);
+    //void pan_orthognal_mpr_to(std::shared_ptr<OrthoCamera> camera , const Point3& pt);
 
     /*Point3 adjust_point_to_discrete(const Point3& ptWorld) const;
 
