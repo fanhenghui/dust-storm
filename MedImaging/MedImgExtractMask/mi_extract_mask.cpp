@@ -476,7 +476,7 @@ void scan_contour_to_mask(std::vector<Point3>& pts , std::shared_ptr<ImageData> 
     }
 }
 
-int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr<ImageData> mask, float same_nodule_precent , int confidence, int setlogic)
+int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr<ImageData> mask, float same_nodule_precent , int confidence, int pixel_confidence , int setlogic)
 {
     mask->_data_type = UCHAR;
     mask->mem_allocate();
@@ -521,7 +521,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
             int cur_confidence = 1+ static_cast<int>(same_nodules.size());
             if (cur_confidence < confidence)
             {
-                nodule.flag = -1;//not satisify confidece
+                nodule.flag = -1;//not satisify confidence
                 for (int k = 0 ; k < same_nodules.size() ; ++k)
                 {
                     same_nodules[k]->flag = -1;
@@ -536,7 +536,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
             }
 
 
-            //choose points based on set logic(intercetion or union)
+            //choose points based on set logic(intersection or union)
             if (setlogic == 0)//intersection
             {
                 scan_contour_to_mask(pts , mask, label);
@@ -568,7 +568,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                     }
                 }
 
-                //reset uninterceted position to 0 , and set interceted positon to label
+                //reset uninterceted position to 0 , and set interceted position to label
                 unsigned char* mask_data = (unsigned char*)mask->get_pixel_pointer();
                 for (int z = max_region._min[2] ; z <= max_region._max[2] ; ++z)
                 {
@@ -588,7 +588,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                                         ++cur_inter;
                                     }
                                 }
-                                if (cur_inter < cur_confidence)
+                                if (cur_inter < pixel_confidence)
                                 {
                                     mask_data[idx] = 0;
                                 }
@@ -718,6 +718,7 @@ int ExtractMask(int argc , char* argv[])
     bool save_slice_location_less = true;
     float cross_nodule_percent = 0.7f;
     int confidence = 2;
+    int pixel_confidence = 2;
     int setlogic = 0;//0 for intersection 1 for union
 
     if (argc == 1)
@@ -731,7 +732,9 @@ int ExtractMask(int argc , char* argv[])
         LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
         LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
         LOG_OUT("\t-confidence<1~4> default is 2\n");
+        LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
         LOG_OUT("\t-setlogic<inter/union> default is inter\n");
+        LOG_OUT("\t-vis: if vis contour in 2D\n");
         return -1;
     }
     else
@@ -748,7 +751,9 @@ int ExtractMask(int argc , char* argv[])
                LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
                LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
                LOG_OUT("\t-confidence<1~4> default is 2\n");
+               LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
                LOG_OUT("\t-setlogic<inter/union> default is inter\n");
+               LOG_OUT("\t-vis: if vis contour in 2D\n");
                return 0;
            }
            if (std::string(argv[i]) == "-data")
@@ -833,6 +838,17 @@ int ExtractMask(int argc , char* argv[])
                confidence = conv.to_num(std::string(argv[i+1]));
                ++i;
            }
+           else if (std::string(argv[i]) == "-pixelconfidence")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<int> conv;
+               pixel_confidence = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
            else if (std::string(argv[i]) == "-setlogic")
            {
                if (i+1 > argc-1)
@@ -903,7 +919,7 @@ int ExtractMask(int argc , char* argv[])
 
         LOG_OUT( "loading DICOM files to get image information :  >>>\n");
 
-        //slice location to pixal coordinate
+        //slice location to pixel coordinate
         std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> volume_data;
         if(0 != load_dicom_series(it_dcm->second ,data_header,volume_data ))
@@ -927,7 +943,7 @@ int ExtractMask(int argc , char* argv[])
         //contour to mask
         std::shared_ptr<ImageData> mask(new ImageData);
         volume_data->shallow_copy(mask.get());
-        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, setlogic))
+        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, pixel_confidence , setlogic))
         {
             LOG_OUT( "convert contour to mask failed!\n");
             return -1;

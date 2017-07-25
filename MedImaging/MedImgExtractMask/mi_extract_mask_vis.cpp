@@ -1,5 +1,5 @@
 #include "gl/glew.h"
-#include "gl/glut.h"
+#include "gl/freeglut.h"
 #include "gl/GLU.h"
 
 #include <string>
@@ -48,7 +48,7 @@ extern void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator 
 typedef ScanLineAnalysis<unsigned char>::Pt2 PT2;
 extern void scan_contour_to_mask(std::vector<Point3>& pts , std::shared_ptr<ImageData> mask, unsigned char label);
 
-extern int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr<ImageData> mask, float same_nodule_precent , int confidence, int setlogic);
+extern int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr<ImageData> mask, float same_nodule_precent , int confidence, int pixel_confidence , int setlogic);
 
 extern int browse_root_xml(const std::string& root , std::vector<std::string>& xml_files );
 
@@ -228,7 +228,22 @@ void mouse(int btn , int status , int x , int y)
     _pre_x = x;
     _pre_y = y;
     glutPostRedisplay();
+}
 
+void mousewheel(int btn , int dir, int x , int y)
+{
+    _cur_z += dir;
+    if (_cur_z > _max_z)
+    {
+        _cur_z = _max_z;
+    }
+    if (_cur_z < 0)
+    {
+        _cur_z = 0;
+    }
+    std::cout << "Current Z : "<< _cur_z << std::endl;
+
+    glutPostRedisplay();
 }
 
 int ExtractMaskVis(int argc , char* argv[])
@@ -246,7 +261,6 @@ int ExtractMaskVis(int argc , char* argv[])
     -setlogic<inter/union> default is inter 
     */
 
-
     std::string dcm_direction;
     std::string annotation_direction;
     std::string output_direction;
@@ -254,6 +268,7 @@ int ExtractMaskVis(int argc , char* argv[])
     bool save_slice_location_less = true;
     float cross_nodule_percent = 0.7f;
     int confidence = 2;
+    int pixel_confidence = 2;
     int setlogic = 0;//0 for intersection 1 for union
 
     if (argc == 1)
@@ -267,7 +282,9 @@ int ExtractMaskVis(int argc , char* argv[])
         LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
         LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
         LOG_OUT("\t-confidence<1~4> default is 2\n");
+        LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
         LOG_OUT("\t-setlogic<inter/union> default is inter\n");
+        LOG_OUT("\t-vis: if view last annotation set's contour in 2D\n");
         return -1;
     }
     else
@@ -284,115 +301,128 @@ int ExtractMaskVis(int argc , char* argv[])
                 LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
                 LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
                 LOG_OUT("\t-confidence<1~4> default is 2\n");
+                LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
                 LOG_OUT("\t-setlogic<inter/union> default is inter\n");
+                LOG_OUT("\t-vis: if view last annotation set's contour in 2D\n");
                 return 0;
             }
-            if (std::string(argv[i]) == "-data")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-                dcm_direction = std::string(argv[i+1]);
+           if (std::string(argv[i]) == "-data")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               dcm_direction = std::string(argv[i+1]);
+               
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-annotation")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
 
-                ++i;
-            }
-            else if (std::string(argv[i]) == "-annotation")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
+               annotation_direction = std::string(argv[i+1]);
+               ++i;
+           }
+           else if (std::string(argv[i])== "-output")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
 
-                annotation_direction = std::string(argv[i+1]);
-                ++i;
-            }
-            else if (std::string(argv[i])== "-output")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
+               output_direction = std::string(argv[i+1]);
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-compress")
+           {
+               compressed = true;
+           }
+           else if (std::string(argv[i]) == "-slicelocation")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
 
-                output_direction = std::string(argv[i+1]);
-                ++i;
-            }
-            else if (std::string(argv[i]) == "-compress")
-            {
-                compressed = true;
-            }
-            else if (std::string(argv[i]) == "-slicelocation")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
+               if(std::string(argv[i+1]) == "less")
+               {
+                   save_slice_location_less = true;
+               }
+               else if(std::string(argv[i+1]) == "greater")
+               {
+                   save_slice_location_less =false;
+               }
+               else
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-crosspercent")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<float> conv;
+               cross_nodule_percent = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-confidence")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<int> conv;
+               confidence = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-pixelconfidence")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<int> conv;
+               pixel_confidence = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-setlogic")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
 
-                if(std::string(argv[i+1]) == "less")
-                {
-                    save_slice_location_less = true;
-                }
-                else if(std::string(argv[i+1]) == "greater")
-                {
-                    save_slice_location_less =false;
-                }
-                else
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-                ++i;
-            }
-            else if (std::string(argv[i]) == "-crosspercent")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-                StrNumConverter<float> conv;
-                cross_nodule_percent = conv.to_num(std::string(argv[i+1]));
-                ++i;
-            }
-            else if (std::string(argv[i]) == "-confidence")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-                StrNumConverter<int> conv;
-                confidence = conv.to_num(std::string(argv[i+1]));
-                ++i;
-            }
-            else if (std::string(argv[i]) == "-setlogic")
-            {
-                if (i+1 > argc-1)
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-
-                if(std::string(argv[i+1]) == "inter")
-                {
-                    setlogic = 0;
-                }
-                else if(std::string(argv[i+1]) == "union")
-                {
-                    setlogic = 1;
-                }
-                else
-                {
-                    LOG_OUT(  "invalid arguments!\n");
-                    return -1;
-                }
-                ++i;
-            }
-        }
+               if(std::string(argv[i+1]) == "inter")
+               {
+                   setlogic = 0;
+               }
+               else if(std::string(argv[i+1]) == "union")
+               {
+                   setlogic = 1;
+               }
+               else
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               ++i;
+           }
+       }
     }
 
     if (dcm_direction.empty() || annotation_direction.empty() || output_direction.empty())
@@ -439,7 +469,7 @@ int ExtractMaskVis(int argc , char* argv[])
 
         LOG_OUT( "loading DICOM files to get image information :  >>>\n");
 
-        //slice location to pixal coordinate
+        //slice location to pixel coordinate
         std::shared_ptr<ImageDataHeader> data_header;
         std::shared_ptr<ImageData> volume_data;
         if(0 != load_dicom_series(it_dcm->second ,data_header,volume_data ))
@@ -463,7 +493,7 @@ int ExtractMaskVis(int argc , char* argv[])
         //contour to mask
         std::shared_ptr<ImageData> mask(new ImageData);
         volume_data->shallow_copy(mask.get());
-        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, setlogic))
+        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, pixel_confidence , setlogic))
         {
             LOG_OUT( "convert contour to mask failed!\n");
             return -1;
@@ -511,6 +541,7 @@ int ExtractMaskVis(int argc , char* argv[])
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutKeyboardFunc(keybord);
+    glutMouseWheelFunc(mousewheel);
 
     glutMainLoop(); 
 
