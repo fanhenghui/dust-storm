@@ -1664,7 +1664,7 @@ void NoduleAnnotation::slot_load_label_file()
     if (!_model_voi->get_vois().empty())
     {
         if (QMessageBox::No == QMessageBox::warning(
-            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
+            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new label file"),
             QMessageBox::Yes | QMessageBox::No))
         {
             return;
@@ -1723,11 +1723,17 @@ void NoduleAnnotation::slot_load_label_file()
     this->_model_voi->notify(VOIModel::DELETE_VOI);
 
     // TODO: directly update the mask_data? but if in the presence of existing vois (i.e., spheres), how to combine them?
+    //clock_t _start = clock();
     std::vector<unsigned char> actual_labels = RunLengthOperator::decode(labels);
-    
+    /*clock_t _end = clock();
+    std::cout << "decode cost : " << double(_end - _start) << " ms\n";*/
+
     std::shared_ptr<ImageData> volume = _volume_infos->get_volume(); 
     double origin[3] = {volume->_image_position.x, volume->_image_position.y, volume->_image_position.z}; // TODO here we ignore rotation
     std::vector<VOISphere> voi_spheres = Label2SphereConverter::convert_label_2_sphere(actual_labels, volume->_dim, volume->_spacing, origin);
+
+    //clock_t _end2 = clock();
+    //std::cout << "convert label cost : " << double(_end2 - _end) << " ms\n";
 
     // update underlying mask
     bool directly_update_mask = true;

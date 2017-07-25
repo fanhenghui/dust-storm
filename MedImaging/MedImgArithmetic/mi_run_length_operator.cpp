@@ -48,15 +48,15 @@ std::vector<unsigned int> RunLengthOperator::encode(const std::vector<unsigned c
 
 std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned int>& to_be_decoded)
 {
-    std::vector<unsigned char> result;
-
     // count the voxels
     unsigned int total_number_of_voxels = 0;
     for (auto it = to_be_decoded.begin(); it != to_be_decoded.end(); it += 2)
     {
         total_number_of_voxels += (*it);
     }
-    std::cout << total_number_of_voxels << " labels are loaded\n";
+    //std::cout << total_number_of_voxels << " labels are loaded\n";
+
+    std::vector<unsigned char> result(total_number_of_voxels);
 
     // decode
     unsigned int current_index = 0;
@@ -73,7 +73,7 @@ std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned 
         }
 
         // populate the temporary information container
-        result.push_back(current_label);
+        result[voxel] = current_label;
     }
 
     return result; // std::move(result)

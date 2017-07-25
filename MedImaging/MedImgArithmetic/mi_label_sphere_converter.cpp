@@ -16,8 +16,12 @@ static void GetStructuredCoordinates(const unsigned int idx, const unsigned int 
 }
 std::vector<VOISphere> Label2SphereConverter::convert_label_2_sphere(const std::vector<unsigned char>& labels, const unsigned int dim[3], const double spacing[3], const double origin[3])
 {
-    std::vector<unsigned char> unique_labels;
-    std::vector<AABBUI> aabbs;
+    AABBUI* aabb_bucket[255];
+    for (int i = 0 ; i< 255 ; ++i)
+    {
+        aabb_bucket[i] = nullptr;
+    }
+
     for (unsigned int voxel=0; voxel<labels.size(); ++voxel)
     {
         unsigned char current_label = labels[voxel];
@@ -30,54 +34,116 @@ std::vector<VOISphere> Label2SphereConverter::convert_label_2_sphere(const std::
             unsigned int ijk[3] = {0,0,0};
             GetStructuredCoordinates(voxel, dim, ijk);
 
-            unsigned int idx = std::distance(unique_labels.begin(), find(unique_labels.begin(), unique_labels.end(), current_label));
-            if (idx < unique_labels.size()) // we have this label
+            if (aabb_bucket[current_label]) // we have this label
             {
                 //update aabbs at idx
-                AABBUI& aabb = aabbs.at(idx);
+                AABBUI* aabb = aabb_bucket[current_label];
                 for (int i=0; i<3; ++i)
                 {
-                    if (aabb._min[i] > ijk[i])
+                    if (aabb->_min[i] > ijk[i])
                     {
-                        aabb._min[i] = ijk[i];
+                        aabb->_min[i] = ijk[i];
                     }
 
-                    if (aabb._max[i] < ijk[i])
+                    if (aabb->_max[i] < ijk[i])
                     {
-                        aabb._max[i] = ijk[i];
+                        aabb->_max[i] = ijk[i];
                     }
                 }
             }
             else
             {
-                unique_labels.push_back(current_label);
-                AABBUI new_aabb;
+                AABBUI* new_aabb = new AABBUI;
+                aabb_bucket[current_label] = new_aabb;
                 for (int i=0; i<3; ++i)
                 {
-                    new_aabb._min[i] = ijk[i];
-                    new_aabb._max[i] = ijk[i];
+                    new_aabb->_min[i] = ijk[i];
+                    new_aabb->_max[i] = ijk[i];
                 }
-                aabbs.push_back(new_aabb);
             }
         }
     }
 
-    std::vector<VOISphere> ret;
-    for (int sphere_idx = 0; sphere_idx<unique_labels.size(); ++sphere_idx)
+    int label_num = 0;
+    VOISphere* sphere_bucket[255];
+    for (int i = 0 ; i< 255; ++i)
     {
-        double center[3] = {0.0, 0.0, 0.0};
-        double radius = 0.0;
-        AABBUI& aabb = aabbs.at(sphere_idx);
-        for (int i=0; i<3; ++i)
+        if (aabb_bucket[i])
         {
-            radius = std::max(0.5 * spacing[i] * (aabb._max[i]-aabb._min[i]+1), radius);
-            center[i] = origin[i] +  spacing[i] * 0.5 * (aabb._max[i]+aabb._min[i]);
+            sphere_bucket[i] = new VOISphere;
+            sphere_bucket[i]->center.x = (aabb_bucket[i]->_min[0] + aabb_bucket[i]->_max[0])*0.5;
+            sphere_bucket[i]->center.y = (aabb_bucket[i]->_min[1] + aabb_bucket[i]->_max[1])*0.5;
+            sphere_bucket[i]->center.z = (aabb_bucket[i]->_min[2] + aabb_bucket[i]->_max[2])*0.5;
+
+            sphere_bucket[i]->diameter = 0.0f;
+            ++label_num;
+        }
+        else
+        {
+            sphere_bucket[i] = nullptr;
+        }
+    }
+
+    for (unsigned int voxel=0; voxel<labels.size(); ++voxel)
+    {
+        unsigned char current_label = labels[voxel];
+        if (current_label == 0)
+        {
+            continue;
+        }
+        else
+        {
+            unsigned int ijk[3] = {0,0,0};
+            GetStructuredCoordinates(voxel, dim, ijk);
+
+            if (sphere_bucket[current_label]) // we have this label
+            {
+                VOISphere* sphere = sphere_bucket[current_label];
+                double dx = (ijk[0] - sphere->center.x)*spacing[0];
+                double dy = (ijk[1] - sphere->center.y)*spacing[1];
+                double dz = (ijk[2] - sphere->center.z)*spacing[2];
+                double distance = sqrt(dx*dx + dy*dy + dz*dz);
+                if ( distance > sphere->diameter*0.5f)
+                {
+                    sphere->diameter = distance*2.0f;
+                }
+            }
+        }
+    }
+
+    std::vector<VOISphere> ret(label_num);
+    int cur_label_num =0;
+    for (int i = 0 ;i < 255 ; ++i)
+    {
+        if (sphere_bucket[i])
+        {
+            ret[cur_label_num] = VOISphere(*sphere_bucket[i]);
+            ret[cur_label_num].center.x = ret[cur_label_num].center.x*spacing[0] + origin[0];
+            ret[cur_label_num].center.y = ret[cur_label_num].center.y*spacing[1] + origin[1];
+            ret[cur_label_num].center.z = ret[cur_label_num].center.z*spacing[2] + origin[2];
+            ++cur_label_num;
+        }
+        if (cur_label_num > label_num)
+        {
+            break;
         }
 
-        // construct the sphere
-        ret.push_back(
-            VOISphere(Point3(center[0], center[1], center[2]), 2.0*radius));
     }
+
+    for (int i = 0; i< 255 ; ++i)
+    {
+        if (aabb_bucket[i])
+        {
+            delete aabb_bucket[i];
+            aabb_bucket[i] = nullptr;
+        }
+        if (sphere_bucket[i])
+        {
+            delete sphere_bucket[i];
+            sphere_bucket[i] = nullptr;
+        }
+    }
+
     return ret;
 }
 MED_IMAGING_END_NAMESPACE
