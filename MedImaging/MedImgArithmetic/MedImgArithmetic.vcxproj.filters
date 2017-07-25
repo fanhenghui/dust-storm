@@ -244,8 +244,5 @@
     <ClCompile Include="mi_connected_domain_analysis.cpp">
       <Filter>Segmentation</Filter>
     </ClCompile>
-    <ClCompile Include="mi_scan_line_analysis.cpp">
-      <Filter>Scan Line</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

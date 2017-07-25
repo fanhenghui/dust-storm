@@ -38,19 +38,19 @@ namespace
         gluOrtho2D(0,_width ,0,_height);
 
         glPointSize(2.0);
-        if (!_pre_contours.empty())
-        {
-            glColor3f(0.0,1.0,1.0);
-            glBegin(GL_POINTS);
-            for (int i = 0 ; i<_pre_contours.size() ; ++i)
-            {
-                for (int j = 0 ; j < _pre_contours[i].size() ; ++j)
-                {
-                    glVertex2d(_pre_contours[i][j].x , _pre_contours[i][j].y);
-                }
-            }
-            glEnd();
-        }
+        //if (!_pre_contours.empty())
+        //{
+        //    glColor3f(0.0,1.0,1.0);
+        //    glBegin(GL_POINTS);
+        //    for (int i = 0 ; i<_pre_contours.size() ; ++i)
+        //    {
+        //        for (int j = 0 ; j < _pre_contours[i].size() ; ++j)
+        //        {
+        //            glVertex2d(_pre_contours[i][j].x , _pre_contours[i][j].y);
+        //        }
+        //    }
+        //    glEnd();
+        //}
 
         if (!_cur_contours.empty())
         {

@@ -55,6 +55,8 @@ public:
             ARITHMETIC_THROW_EXCEPTION("empty contour");
         }
 
+        std::vector<std::pair<Pt2,Pt2>> horizational_line;
+
         //1 create new edge table (net)
         Edge** net = new Edge*[height];
         for (int i = 0; i<height ; ++i)
@@ -69,6 +71,7 @@ public:
 
             if (pt0.y == pt1.y)
             {
+                horizational_line.push_back(std::make_pair(pt0 , pt1));
                 continue;//discard horizational line
             }
 
@@ -184,6 +187,20 @@ public:
                 }
 
                 aet_edge = aet_edge->_next->_next;
+            }
+        }
+
+        //4 fill horizational line
+        for (auto it = horizational_line.begin() ; it != horizational_line.end() ; ++it)
+        {
+            Pt2 p0 = it->first;
+            Pt2 p1 = it->second;
+            int h = p0.y;
+            int x = std::min(p0.x , p1.x);
+            int x2 = std::max(p0.x , p1.x);
+            for (;x <= x2 ; ++x)
+            {
+                img[h*width  + x ] = label;
             }
         }
 

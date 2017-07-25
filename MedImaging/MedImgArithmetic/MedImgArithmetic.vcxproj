@@ -241,7 +241,6 @@
     <ClCompile Include="mi_rectangle.cpp" />
     <ClCompile Include="mi_rsa_utils.cpp" />
     <ClCompile Include="mi_sampler.cpp" />
-    <ClCompile Include="mi_scan_line_analysis.cpp" />
     <ClCompile Include="mi_sphere.cpp" />
     <ClCompile Include="mi_volume_statistician.cpp" />
     <ClCompile Include="mi_track_ball.cpp" />
