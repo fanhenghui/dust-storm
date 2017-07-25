@@ -1,9 +1,8 @@
-#ifndef MED_UTIL_MESSAGE_QUEUE_H_
-#define MED_UTIL_MESSAGE_QUEUE_H_
+#ifndef MEDIMGUTIL_MI_MESSAGE_QUEUE_H
+#define MEDIMGUTIL_MI_MESSAGE_QUEUE_H
 
-
-#include "MedImgUtil/mi_util_export.h"
-#include "MedImgUtil/mi_exception.h"
+#include "medimgutil/mi_util_export.h"
+#include "medimgutil/mi_exception.h"
 
 #include <vector>
 #include <deque>
@@ -18,20 +17,18 @@
 MED_IMG_BEGIN_NAMESPACE
 
 template<class T>
-class Queue 
-{
+class Queue {
 public:
-    virtual ~Queue(){};
+    virtual ~Queue() {};
     virtual size_t size() const = 0;
     virtual bool is_empty() const = 0;
-    virtual void push(const T&)=0;
-    virtual void pop(T*)=0;
-    virtual void clear()= 0;
+    virtual void push(const T&) = 0;
+    virtual void pop(T*) = 0;
+    virtual void clear() = 0;
 };
 
 template<class T>
-class FIFOQueue : public Queue<T>
-{
+class FIFOQueue : public Queue<T> {
 public:
     FIFOQueue();
     virtual ~FIFOQueue();
@@ -46,8 +43,7 @@ private:
 };
 
 template<class T>
-class LIFOQueue : public Queue<T>
-{
+class LIFOQueue : public Queue<T> {
 public:
     LIFOQueue();
     virtual ~LIFOQueue();
@@ -62,119 +58,100 @@ private:
 };
 
 template<class T , class TQueue = FIFOQueue<T>>
-class MessageQueue : public boost::noncopyable
-{
+class MessageQueue : public boost::noncopyable {
 public:
-        MessageQueue():_is_activated(false)
-        {
+    MessageQueue(): _is_activated(false) {
 
+    }
+
+    ~MessageQueue() {
+
+    }
+
+    void wait_to_push(boost::mutex::scoped_lock& locker , int time_wait_limit) {
+        auto time = boost::get_system_time() +
+                    boost::posix_time::milliseconds(time_wait_limit);
+
+        while (is_full()) {
+            if (!_condition_write.timed_wait(locker , time)) {
+                UTIL_THROW_EXCEPTION("message time out.");
+            }
         }
+    }
 
-        ~MessageQueue()
-        {
+    void wait_to_pop(boost::mutex::scoped_lock& locker , int time_wait_limit) {
+        auto time = boost::get_system_time() +
+                    boost::posix_time::milliseconds(time_wait_limit);
 
-        }
-
-        void wait_to_push(boost::mutex::scoped_lock& locker , int time_wait_limit )
-        {
-            auto time = boost::get_system_time() + 
-                boost::posix_time::milliseconds(time_wait_limit);
-            while(is_full())
-            {
-                if (!_condition_write.timed_wait(locker , time))
-                {
-                    UTIL_THROW_EXCEPTION("message time out.");
-                }
+        while (is_empty()) {
+            if (!_condition_read.timed_wait(locker , time)) {
+                UTIL_THROW_EXCEPTION("message time out.");
             }
         }
 
-        void wait_to_pop(boost::mutex::scoped_lock& locker , int time_wait_limit )
-        {
-            auto time = boost::get_system_time() + 
-                boost::posix_time::milliseconds(time_wait_limit);
-            while(is_empty())
-            {
-                if (!_condition_read.timed_wait(locker , time))
-                {
-                    UTIL_THROW_EXCEPTION("message time out.");
-                }
-            }
+    }
 
-        }
+    size_t capacity() const {
+        return _DEFAULT_CAPACITY;
+    }
 
-        size_t capacity() const
-        {
-            return _DEFAULT_CAPACITY;
-        }
+    size_t size() const {
+        return _container.size();
+    }
 
-        size_t size() const
-        {
-            return _container.size();
-        }
+    bool is_full() const {
+        return _DEFAULT_CAPACITY <= _container.size();
+    }
 
-        bool is_full() const
-        {
-            return _DEFAULT_CAPACITY <= _container.size();
-        }
+    bool is_empty() const {
+        return _container.is_empty();
+    }
 
-        bool is_empty() const
-        {
-            return _container.is_empty();
-        }
+    void activate() {
+        _is_activated = true;
+    }
 
-        void activate()
-        {
-            _is_activated = true;
-        }
-
-        void deactivate()
-        {
-            if (_is_activated)
-            {
-                boost::mutex::scoped_lock locker(_mutex);
-
-                _is_activated = false;
-                _condition_read.notify_all();
-                _condition_write.notify_all();
-            }
-        }
-
-        bool is_activated() const
-        {
-            return _is_activated;
-        }
-
-        void push(const T& msg)
-        {
+    void deactivate() {
+        if (_is_activated) {
             boost::mutex::scoped_lock locker(_mutex);
 
-            wait_to_push(locker , _DEFAULT_TIME_WAIT_LIMIT);
+            _is_activated = false;
+            _condition_read.notify_all();
+            _condition_write.notify_all();
+        }
+    }
 
-            if (!is_activated())
-            {
-                UTIL_THROW_EXCEPTION("message queue is not activated!");
-            }
+    bool is_activated() const {
+        return _is_activated;
+    }
 
-            _container.push(msg);
+    void push(const T& msg) {
+        boost::mutex::scoped_lock locker(_mutex);
 
-            _condition_read.notify_one();
+        wait_to_push(locker , _DEFAULT_TIME_WAIT_LIMIT);
+
+        if (!is_activated()) {
+            UTIL_THROW_EXCEPTION("message queue is not activated!");
         }
 
-        void pop(T* msg)
-        {
-            boost::mutex::scoped_lock locker(_mutex);
+        _container.push(msg);
 
-            wait_to_pop(locker , _DEFAULT_TIME_WAIT_LIMIT);
+        _condition_read.notify_one();
+    }
 
-            if (!is_activated())
-            {
-                UTIL_THROW_EXCEPTION("message queue is not activated!");
-            }
+    void pop(T* msg) {
+        boost::mutex::scoped_lock locker(_mutex);
 
-            _container.pop(msg);
+        wait_to_pop(locker , _DEFAULT_TIME_WAIT_LIMIT);
 
-            _condition_write.notify_one();
+        if (!is_activated()) {
+            UTIL_THROW_EXCEPTION("message queue is not activated!");
         }
+
+        _container.pop(msg);
+
+        _condition_write.notify_one();
+    }
 
 protected:
 private:

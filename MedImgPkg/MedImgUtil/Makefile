@@ -13,7 +13,7 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_exception.o mi_configuration.o mi_model_interface.o mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o \
+OBJS = mi_exception.o mi_configuration.o mi_model_interface.o mi_socket_client.o mi_ipc_client_proxy.o \
 mi_file_util.o
 TARGET = $(BIN_DIR)/libmedimg_util.so
 
@@ -24,14 +24,11 @@ ADDITIANL_DEPENDENCIES = -lboost_system -lboost_filesystem -lboost_thread
 $(TARGET): $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
-mi_ipc_client_proxy.o: $(EXPORT_HEADER) mi_ipc_common.h mi_ipc_client_proxy.h mi_ipc_client_proxy.cpp mi_socket_client.o mi_socket_server.o
+mi_ipc_client_proxy.o: $(EXPORT_HEADER) mi_ipc_common.h mi_ipc_client_proxy.h mi_ipc_client_proxy.cpp mi_socket_client.o
 	$(CC) -c -fPIC $(CFLAGS) mi_ipc_client_proxy.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_socket_client.o: $(EXPORT_HEADER) mi_ipc_common.h mi_socket_client.h mi_socket_client.cpp mi_exception.o
 	$(CC) -c -fPIC $(CFLAGS) mi_socket_client.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_socket_server.o: $(EXPORT_HEADER) mi_ipc_common.h mi_socket_server.h mi_socket_server.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_socket_server.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_exception.o: $(EXPORT_HEADER) mi_exception.h mi_exception.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_exception.cpp $(ADDITINAL_INCLUDE_DIR)

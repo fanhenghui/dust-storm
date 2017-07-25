@@ -32,9 +32,6 @@
     <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_model_progress.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgIO\mi_nodule_set.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -80,9 +77,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgIO\mi_zlib_utils.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_io_export.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

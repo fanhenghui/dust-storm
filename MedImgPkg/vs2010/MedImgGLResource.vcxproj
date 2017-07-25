@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGGLRESOURCE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgGLResource;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +104,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGGLRESOURCE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgGLResource;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,7 +124,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGGLRESOURCE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgGLResource;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,7 +146,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGGLRESOURCE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgGLResource;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_buffer.h" />
+    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_context.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_environment.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_fbo.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_object.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_2d.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_3d.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_base.h" />
+    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_time_query.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_utils.h" />
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_vao.h" />
   </ItemGroup>
@@ -181,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgGLResource\mi_gl_buffer.cpp" />
+    <ClCompile Include="..\MedImgGLResource\mi_gl_context.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_environment.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_fbo.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_program.cpp" />
@@ -191,6 +194,7 @@
     <ClCompile Include="..\MedImgGLResource\mi_gl_texture_2d.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_texture_3d.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_texture_base.cpp" />
+    <ClCompile Include="..\MedImgGLResource\mi_gl_time_query.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_utils.cpp" />
     <ClCompile Include="..\MedImgGLResource\mi_gl_vao.cpp" />
   </ItemGroup>

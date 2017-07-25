@@ -1,18 +1,19 @@
+
+#ifndef MEDIMGUTIL_MI_SOCKET_CLIENT_H
+#define MEDIMGUTIL_MI_SOCKET_CLIENT_H
+
 #ifndef WIN32
 
-#ifndef MED_IMG_SOCKET_CLIENT_H_
-#define MED_IMG_SOCKET_CLIENT_H_
-
-#include "MedImgUtil/mi_util_export.h"
+#include "medimgutil/mi_util_export.h"
 
 #include <string>
+#include "boost/noncopyable.hpp"
 
-#include "MedImgUtil/mi_ipc_common.h"
+#include "medimgutil/mi_ipc_common.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class SocketClient
-{
+class SocketClient : public boost::noncopyable {
 public:
     SocketClient();
     ~SocketClient();
@@ -21,7 +22,7 @@ public:
     std::string get_path() const;
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
-    void send_data(const IPCDataHeader& dataheader , void* buffer);
+    void send_data(const IPCDataHeader& dataheader , char* buffer);
 
     void run();
 

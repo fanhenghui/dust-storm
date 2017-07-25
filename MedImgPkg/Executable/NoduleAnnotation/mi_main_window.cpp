@@ -10,13 +10,13 @@
 #include "MedImgArithmetic/mi_rsa_utils.h"
 #include "MedImgArithmetic/mi_ortho_camera.h"
 
-#include "MedImgIO/mi_dicom_loader.h"
-#include "MedImgIO/mi_image_data.h"
-#include "MedImgIO/mi_image_data_header.h"
-#include "MedImgIO/mi_meta_object_loader.h"
-#include "MedImgIO/mi_nodule_set.h"
-#include "MedImgIO/mi_nodule_set_parser.h"
-#include "MedImgIO/mi_model_progress.h"
+#include "MedImgUtil/mi_dicom_loader.h"
+#include "MedImgUtil/mi_image_data.h"
+#include "MedImgUtil/mi_image_data_header.h"
+#include "MedImgUtil/mi_meta_object_loader.h"
+#include "MedImgUtil/mi_nodule_set.h"
+#include "MedImgUtil/mi_nodule_set_parser.h"
+#include "MedImgUtil/mi_model_progress.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 

@@ -15,6 +15,7 @@
         <file alias="rectangle.png">rectangle.png</file>
     </qresource>
     <qresource prefix="/AnnotationWorkstationExtensionPlugin_ui">
-        <file>AnnotationDockWidget.ui</file>
+        <file>AnnotationDockWidget_ShanghaiNo1.ui</file>
+        <file>AnnotationDockWidget_RuiJin.ui</file>
     </qresource>
 </RCC>

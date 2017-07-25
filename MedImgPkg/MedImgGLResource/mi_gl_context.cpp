@@ -11,6 +11,46 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+#ifdef WIN32
+
+MSGLContext::MSGLContext(UIDType uid) : GLObject(uid)
+{
+
+}
+
+MSGLContext::~MSGLContext()
+{
+
+}
+
+void MSGLContext::finalize()
+{
+
+}
+
+void MSGLContext::initialize()
+{
+
+}
+
+void MSGLContext::make_noncurrent()
+{
+
+}
+
+void MSGLContext::make_current(int id /*= 0*/)
+{
+
+}
+
+void MSGLContext::create_shared_context(int id)
+{
+
+}
+
+
+#else
+
 XGLContext::XGLContext(UIDType uid):GLObject(uid),_dpy(nullptr),_vis(nullptr),_ctx(NULL),_win((Window)NULL)
 {
 
@@ -41,22 +81,22 @@ void XGLContext::create_window()
     attributes_list[n++] = GLX_BLUE_SIZE;
     attributes_list[n++] = 1;
     //if (GLUT_WIND_HAS_ALPHA(mode)) {
-          attributes_list[n++] = GLX_ALPHA_SIZE;
-          attributes_list[n++] = 1;
+    attributes_list[n++] = GLX_ALPHA_SIZE;
+    attributes_list[n++] = 1;
     //}
     //if (GLUT_WIND_IS_DOUBLE(mode)) {
-      attributes_list[n++] = GLX_DOUBLEBUFFER;
+    attributes_list[n++] = GLX_DOUBLEBUFFER;
     //}
     //if (GLUT_WIND_IS_STEREO(mode)) {//立体显示的时候要设置
     //  attributes_list[n++] = GLX_STEREO;
     //}
     //if (GLUT_WIND_HAS_DEPTH(mode)) {
-      attributes_list[n++] = GLX_DEPTH_SIZE;
-      attributes_list[n++] = 1;
+    attributes_list[n++] = GLX_DEPTH_SIZE;
+    attributes_list[n++] = 1;
     //}
     //if (GLUT_WIND_HAS_STENCIL(mode)) {
-      attributes_list[n++] = GLX_STENCIL_SIZE;
-      attributes_list[n++] = 1;
+    attributes_list[n++] = GLX_STENCIL_SIZE;
+    attributes_list[n++] = 1;
     //}
     //if (GLUT_WIND_HAS_ACCUM(mode)) {
     //  attributes_list[n++] = GLX_ACCUM_RED_SIZE;
@@ -71,7 +111,7 @@ void XGLContext::create_window()
     //  }
     //}
     attributes_list[n] = (int) None;//end tag
-    
+
     _vis = glXChooseVisual(_dpy, DefaultScreen(_dpy), attributes_list);
     if (nullptr == _vis) {
         GLRESOURCE_THROW_EXCEPTION("Failed to choose visual!\n");
@@ -97,7 +137,7 @@ void XGLContext::create_window()
         0, _vis->depth, InputOutput, _vis->visual,
         attribMask,
         &swa
-    );
+        );
 
     // Get Version info
     int major = 0;
@@ -115,7 +155,7 @@ void XGLContext::create_window()
     //XMapWindow(_dpy, _win);//这一句注释掉就不会出现窗口的瞬间出现,而始终保持隐藏
 
     this->make_current();
-    
+
     glewExperimental = GL_TRUE;
 
     GLenum err = glewInit();
@@ -147,7 +187,7 @@ void XGLContext::create_shared_context(int id)
     }
 
     _shared_ctx[id] = ctx;
-    
+
 }
 
 void XGLContext::initialize()
@@ -186,12 +226,15 @@ void XGLContext::make_current(int id )
             GLRESOURCE_THROW_EXCEPTION("cant find such shared context");
         }
     }
-    
+
 }
 
 void XGLContext::make_noncurrent()
 {
     glXMakeCurrent(_dpy, None, NULL);
 }
+
+#endif
+
 
 MED_IMG_END_NAMESPACE

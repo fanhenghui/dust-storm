@@ -175,9 +175,6 @@
     <ClCompile Include="..\MedImgArithmetic\mi_sphere.cpp">
       <Filter>Shape</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_sampler.cpp">
-      <Filter>Sampler</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgArithmetic\mi_rsa_utils.cpp">
       <Filter>RSA</Filter>
     </ClCompile>

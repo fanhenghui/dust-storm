@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -103,7 +103,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,7 +122,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,7 +143,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251;</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,23 +157,24 @@
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgUtil\mi_exception.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_configuration.h" />
-    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_proxy.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_file_util.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_client_proxy.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_common.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_message_queue.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_model_interface.h" />
+    <ClInclude Include="..\Include\MedImgUtil\mi_model_progress.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_observer_interface.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_socket_client.h" />
-    <ClInclude Include="..\Include\MedImgUtil\mi_socket_data.h" />
-    <ClInclude Include="..\Include\MedImgUtil\mi_socket_server.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_string_number_converter.h" />
     <ClInclude Include="..\Include\MedImgUtil\mi_util_export.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgUtil\mi_exception.cpp" />
     <ClCompile Include="..\MedImgUtil\mi_configuration.cpp" />
-    <ClCompile Include="..\MedImgUtil\mi_ipc_proxy.cpp" />
+    <ClCompile Include="..\MedImgUtil\mi_file_util.cpp" />
+    <ClCompile Include="..\MedImgUtil\mi_ipc_client_proxy.cpp" />
     <ClCompile Include="..\MedImgUtil\mi_model_interface.cpp" />
     <ClCompile Include="..\MedImgUtil\mi_socket_client.cpp" />
-    <ClCompile Include="..\MedImgUtil\mi_socket_server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgUtil\mi_message_queue.inl" />

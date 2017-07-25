@@ -60,13 +60,13 @@
     <ClInclude Include="..\..\include\IO\MultiResolutionImageInterface\VSIImageFactory.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\IO\MultiResolutionImageInterface\KFBImage.h">
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\IO\MultiResolutionImageInterface\KFBImageFactory.h">
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBImageFactory.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Include\IO\MultiResolutionImageInterface\KFBParser.h">
+    <ClInclude Include="..\..\include\io\multiresolutionimageinterface\KFBParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

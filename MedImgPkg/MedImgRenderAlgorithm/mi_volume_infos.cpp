@@ -147,16 +147,6 @@ BrickCorner* VolumeInfos::get_brick_corner()
     return _brick_pool->get_brick_corner();
 }
 
-BrickUnit* VolumeInfos::get_volume_brick_unit()
-{
-    return _brick_pool->get_volume_brick_unit();
-}
-
-BrickUnit* VolumeInfos::get_mask_brick_unit()
-{
-    return _brick_pool->get_mask_brick_unit();
-}
-
 VolumeBrickInfo* VolumeInfos::get_volume_brick_info()
 {
     return _brick_pool->get_volume_brick_info();

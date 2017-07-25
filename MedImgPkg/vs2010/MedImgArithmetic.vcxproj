@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgArithmetic;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4505;4099</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4099;4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +104,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgArithmetic;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4505;4099</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4099;4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,7 +124,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgArithmetic;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4505;4099</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4099;4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,7 +146,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGARITHMETIC_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgArithmetic;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4505;4099</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4505;4099;4251;4819;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -215,7 +215,6 @@
     <ClCompile Include="..\MedImgArithmetic\mi_point3.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_rectangle.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_rsa_utils.cpp" />
-    <ClCompile Include="..\MedImgArithmetic\mi_sampler.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_sphere.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_track_ball.cpp" />
     <ClCompile Include="..\MedImgArithmetic\mi_triangle.cpp" />

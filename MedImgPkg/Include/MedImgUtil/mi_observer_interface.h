@@ -1,15 +1,14 @@
-#ifndef MED_IMG_OBSERVER_H_
-#define MED_IMG_OBSERVER_H_
+#ifndef MEDIMGUTIL_MI_OBSERVER_INTERFACE_H
+#define MEDIMGUTIL_MI_OBSERVER_INTERFACE_H
 
-#include "MedImgUtil/mi_util_export.h"
+#include "medimgutil/mi_util_export.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class Util_Export IObserver
-{
+class Util_Export IObserver {
 public:
-    IObserver(){}
-    virtual ~IObserver(){}
+    IObserver() {}
+    virtual ~IObserver() {}
 
     virtual void update(int code_id = 0) = 0;
 protected:

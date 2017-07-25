@@ -3,50 +3,48 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-IModel::IModel():_is_changed(false)
-{
+IModel::IModel(): _is_changed(false) {
 
 }
 
-IModel::~IModel()
-{
+IModel::~IModel() {
 
 }
 
-void IModel::add_observer( ObserverPtr observer )
-{
+void IModel::add_observer(ObserverPtr observer) {
     bool has_registered = false;
     auto it = _observers.begin();
 
-    while(it != _observers.end()){
-        if (*it == observer){
+    while (it != _observers.end()) {
+        if (*it == observer) {
             has_registered = true;
             break;
         }
+
         ++it;
     }
 
-    if (!has_registered){
+    if (!has_registered) {
         _observers.push_back(observer);
     }
 }
 
-void IModel::delete_observer( ObserverPtr observer )
-{
+void IModel::delete_observer(ObserverPtr observer) {
     auto it = _observers.begin();
-    while(it != _observers.end()){
-        if (*it == observer){
+
+    while (it != _observers.end()) {
+        if (*it == observer) {
             _observers.erase(it);
             break;
         }
+
         ++it;
     }
 }
 
-void IModel::notify(int code_id /*= 0*/)
-{
-    if (_is_changed){
-        for (auto it = _observers.begin() ; it != _observers.end() ; ++it){
+void IModel::notify(int code_id /*= 0*/) {
+    if (_is_changed) {
+        for (auto it = _observers.begin(); it != _observers.end(); ++it) {
             (*it)->update(code_id);
         }
 
@@ -54,23 +52,19 @@ void IModel::notify(int code_id /*= 0*/)
     }
 }
 
-void IModel::set_changed()
-{
+void IModel::set_changed() {
     _is_changed = true;
 }
 
-void IModel::reset_changed()
-{
+void IModel::reset_changed() {
     _is_changed = false;
 }
 
-bool IModel::has_changed()
-{
+bool IModel::has_changed() {
     return _is_changed;
 }
 
-void IModel::clear_observer()
-{
+void IModel::clear_observer() {
     _observers.clear();
 }
 

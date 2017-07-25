@@ -86,7 +86,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgRenderAlgorithm;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -94,7 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\MedImgRenderAlgorithm\Shader\shader_config</Command>
@@ -108,7 +108,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgRenderAlgorithm;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -116,7 +116,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\MedImgRenderAlgorithm\Shader\shader_config</Command>
@@ -132,7 +132,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgRenderAlgorithm;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -142,7 +142,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\MedImgRenderAlgorithm\Shader\shader_config</Command>
@@ -158,7 +158,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgRenderAlgorithm;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4251</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -168,7 +168,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\MedImgRenderAlgorithm\Shader\shader_config</Command>
@@ -176,10 +176,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h" />
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_generator.h" />
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_geometry.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h" />
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_utils.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_interactor.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_color_transfer_function.h" />
@@ -217,11 +216,9 @@
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_vr_entry_exit_points_culling.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_define.cpp" />
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_generator.cpp" />
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_geometry.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_info_generator.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_pool.cpp" />
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_utils.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_camera_calculator.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_camera_interactor.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_color_transfer_function.cpp" />

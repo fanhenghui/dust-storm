@@ -1,6 +1,6 @@
 #include "mi_observer_progress.h"
 
-#include "MedImgIO/mi_model_progress.h"
+#include "MedImgUtil/mi_model_progress.h"
 
 #include <QProgressDialog>
 
