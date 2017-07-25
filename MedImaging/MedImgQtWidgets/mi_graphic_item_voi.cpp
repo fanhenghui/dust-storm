@@ -101,23 +101,23 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             {
                 //delete from rear
                 int delete_num = _pre_item_num - voi_count;
-                auto it_del_item = (--_items_spheres.end());
-                auto it_del_item_info = (--_items_infos.end());
-                auto it_del_item_line = (--_items_lines.end());
-
                 while(delete_num >0)
                 {
+                    auto it_del_item = (--_items_spheres.end());
+                    auto it_del_item_info = (--_items_infos.end());
+                    auto it_del_item_line = (--_items_lines.end());
+
                     _items_to_be_delete.push_back(*it_del_item);
                     to_be_remove.push_back(*it_del_item);
-                    it_del_item = _items_spheres.erase(it_del_item);
+                    _items_spheres.erase(it_del_item);
 
                     _items_to_be_delete.push_back(*it_del_item_info);
                     to_be_remove.push_back(*it_del_item_info);
-                    it_del_item_info = _items_infos.erase(it_del_item_info);
+                    _items_infos.erase(it_del_item_info);
 
                     _items_to_be_delete.push_back(*it_del_item_line);
                     to_be_remove.push_back(*it_del_item_line);
-                    it_del_item_line = _items_lines.erase(it_del_item_line);
+                    _items_lines.erase(it_del_item_line);
 
                     --delete_num;
                 }

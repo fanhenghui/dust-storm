@@ -25,6 +25,44 @@ DICOMLoader::~DICOMLoader()
 
 }
 
+IOStatus MED_IMAGING_NAMESPACE::DICOMLoader::check_series_uid(const std::string& file , std::string& study_uid , std::string& series_uid)
+{
+    if (file.empty())
+    {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->loadFile(file.c_str());
+    if (status.bad())
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset *data_set = file_format->getDataset();
+    if (nullptr == data_set)
+    {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_StudyInstanceUID , context);
+    if (status.bad())
+    {
+        return IO_DATA_DAMAGE;
+    }
+    study_uid = std::string(context.c_str());
+    
+    status = data_set->findAndGetOFString(DCM_SeriesInstanceUID , context);
+    if (status.bad())
+    {
+        return IO_DATA_DAMAGE;
+    }
+    series_uid = std::string(context.c_str());
+
+    return IO_SUCCESS;
+}
+
 IOStatus DICOMLoader::load_series(std::vector<std::string>& files , std::shared_ptr<ImageData> &image_data , std::shared_ptr<ImageDataHeader> &img_data_header)
 {
     if (files.empty())
@@ -164,23 +202,35 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileForm
 
         std::sort(to_be_delete.begin() ,to_be_delete.end() , std::less<int>());
 
+        if (to_be_delete.empty())
+        {
+            return IO_SUCCESS;
+        }
+
+        DcmFileFormatSet file_format_set_major;
+        std::vector<std::string> file_major;
+        file_format_set_major.reserve(file_format_set.size());
+        file_major.reserve(file_format_set.size());
+
         //delete minority series file format
         auto it_delete = to_be_delete.begin();
         int idx_delete = 0;
         auto it_file = files.begin();
-        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete , ++it_file)
+        for (auto it = file_format_set.begin() ; it != file_format_set.end() ; ++idx_delete , ++it_file , ++it)
         {
-            if (idx_delete == *it_delete)
+            if (idx_delete != *it_delete)
             {
-                it = file_format_set.erase(it);
-                it_file = files.erase(it_file);
-                ++it_delete;
+                file_format_set_major.push_back(*it);
+                file_major.push_back(*it_file);
             }
             else
             {
-                ++it;
+                ++it_delete;
             }
         }
+
+        files = file_major;
+        file_format_set = file_format_set_major;
 
     }
 

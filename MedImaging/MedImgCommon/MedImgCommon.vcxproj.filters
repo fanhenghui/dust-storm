@@ -39,6 +39,9 @@
     <ClInclude Include="..\Include\MedImgCommon\mi_observer_interface.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgCommon\mi_common_file_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="mi_common_stdafx.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mi_model_interface.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_common_file_util.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

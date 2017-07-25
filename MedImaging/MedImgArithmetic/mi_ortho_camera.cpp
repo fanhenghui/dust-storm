@@ -87,7 +87,7 @@ void OrthoCamera::zoom(double rate)
 
 void OrthoCamera::pan(const Vector2& pan)
 {
-    _VecPan += pan;
+    //_VecPan += pan;
     //只能移动一半窗口
     //if (_VecPan.x > 1.0)
     //{
@@ -105,7 +105,20 @@ void OrthoCamera::pan(const Vector2& pan)
     //{
     //    _VecPan.y = -1.0;
     //}
-    _is_proj_mat_cal = false;
+
+    Matrix4 viewmat = get_view_matrix();
+    if (!viewmat.has_inverse())
+    {
+        return;
+    }
+    Matrix4 mat= viewmat;
+    mat.prepend(make_translate(Point3::S_ZERO_POINT - Point3(pan.x,pan.y,0.0)));
+    mat.prepend(viewmat.get_inverse());
+    _eye = mat.transform(_eye);
+    _at  = mat.transform(_at);
+
+    _is_view_mat_cal = false;
+
 }
 
 double OrthoCamera::get_near_clip_distance() const

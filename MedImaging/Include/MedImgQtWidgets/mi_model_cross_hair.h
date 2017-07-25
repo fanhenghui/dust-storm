@@ -47,7 +47,7 @@ public:
     //locate in one MPR will paging others 2
     bool locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc);
 
-    bool locate(const Point3& center_w);
+    bool locate(const Point3& center_w, bool ignore_pan = true);
 
     //bool locate_focus(const Point3& center_w);
 

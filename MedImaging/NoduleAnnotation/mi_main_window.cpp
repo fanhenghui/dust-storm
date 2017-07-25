@@ -192,6 +192,10 @@ NoduleAnnotation::~NoduleAnnotation()
 
 void NoduleAnnotation::configure_i()
 {
+    //default
+    Configuration::instance()->set_processing_unit_type(GPU);
+    Configuration::instance()->set_nodule_file_rsa(true);
+
     //1 TODO Check process unit
     //Open config file
     std::fstream input_file("../../../config/configure.txt" , std::ios::in);
@@ -200,12 +204,7 @@ void NoduleAnnotation::configure_i()
         input_file.open("./config/configure.txt" , std::ios::in);//second chance
     }
 
-    if (!input_file.is_open())
-    {
-        Configuration::instance()->set_processing_unit_type(GPU);
-        Configuration::instance()->set_nodule_file_rsa(true);
-    }
-    else
+    if (input_file.is_open())
     {
         std::string line;
         std::string tag;
@@ -237,6 +236,11 @@ void NoduleAnnotation::configure_i()
                 {
                     Configuration::instance()->set_nodule_file_rsa(true);
                 }
+            }
+
+            if (tag == "LastOpenDirection")
+            {
+                _last_open_direction = context;
             }
         }
         input_file.close();
@@ -271,6 +275,7 @@ void NoduleAnnotation::create_scene_i()
         mpr_containers[i]->set_scene(mpr_scenes[i]);
 
         //2 Set scene parameter
+        mpr_scenes[i]->set_mask_label_level(LabelLevel::L_64);
         mpr_scenes[i]->set_volume_infos(_volume_infos);
         mpr_scenes[i]->set_sample_rate(1.0);
         mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
@@ -557,10 +562,12 @@ void NoduleAnnotation::slot_change_layout2x2_i()
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList file_name_list = QFileDialog::getOpenFileNames(
-        this ,tr("Loading DICOM Dialog"),"",tr("Dicom image(*dcm);;Other(*)"));
+        this ,tr("Loading DICOM Dialog"),_last_open_direction.c_str(),tr("Dicom image(*dcm);;Other(*)"));
 
     if (!file_name_list.empty())
     {
+        update_last_open_direction_i(std::string(file_name_list[0].toLocal8Bit()));
+
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         //Init progress dialog
@@ -674,12 +681,14 @@ void NoduleAnnotation::slot_open_meta_image_i()
 {
 
     QString file_name = QFileDialog::getOpenFileName(
-        this ,tr("Loading meta data"),"",tr("Dicom image(*mhd)"));
+        this ,tr("Loading meta data"),_last_open_direction.c_str(),tr("Dicom image(*mhd)"));
 
     if (file_name.isEmpty())
     {
         return;
     }
+
+    update_last_open_direction_i(std::string(file_name.toLocal8Bit()));
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1048,7 +1057,10 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         }
     }
 
-    QString file_name = QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    QString file_name = Configuration::instance()->get_nodule_file_rsa() ?
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw)")) :
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
+
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
@@ -1060,7 +1072,8 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         std::string file_name_std(file_name.toLocal8Bit());
 
         IOStatus status;
-        if (Configuration::instance()->get_nodule_file_rsa())
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
         {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
@@ -1108,7 +1121,7 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         }
     }
 
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv);;NoduleSet(*.nraw)"));
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
@@ -1116,8 +1129,9 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         parser.set_series_id(_volume_infos->get_data_header()->series_uid);
         std::string file_name_std(file_name.toLocal8Bit());
 
-        IOStatus status ;
-        if (Configuration::instance()->get_nodule_file_rsa())
+        IOStatus status;
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
         {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
@@ -1189,7 +1203,7 @@ void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
     //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = _model_voi->get_voi(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
-    _model_crosshair->locate(mat_p2w.transform(voi.center));
+    _model_crosshair->locate(mat_p2w.transform(voi.center),  false);
     _model_crosshair->notify();
     _select_voi_id = row;
     
@@ -1535,10 +1549,67 @@ void NoduleAnnotation::save_layout2x2_parameter_i()
     _pre_2x2_height = _mpr_00->height();
 }
 
+void NoduleAnnotation::closeEvent(QCloseEvent * event)
+{
+    //Save config file
+    int tag = 0;
+    std::ifstream input_file("../../../config/configure.txt" , std::ios::in);
+    if (!input_file.is_open())
+    {
+        tag = 1;
+        input_file.open("./config/configure.txt");//second chance
+    }
+
+    if (input_file.is_open())
+    {
+        input_file.close();
+    }
+
+    std::ofstream output_file;
+    if (tag == 0)
+    {
+        output_file.open("../../../config/configure.txt" , std::ios::out);
+    }
+    else
+    {
+        output_file.open("./config/configure.txt" , std::ios::out);
+    }
+
+    if (output_file.is_open())
+    {
+
+        output_file << "ProcessingUnit = ";
+        if (Configuration::instance()->get_processing_unit_type() == CPU)
+        {
+            output_file << "CPU\n";
+        }
+        else
+        {
+            output_file << "GPU\n";
+        }
+
+        if (Configuration::instance()->get_nodule_file_rsa())
+        {
+            //output_file << "NoduleOutput = ";
+            //output_file << "RSA\n";
+        }
+        else
+        {
+            output_file << "NoduleOutput = ";
+            output_file << "TEXT\n";
+        }
+
+        output_file<< "LastOpenDirection = " << _last_open_direction; 
+        output_file.close();
+    }
+
+    QMainWindow::closeEvent(event);
+}
 
 void NoduleAnnotation::slot_quit_i()
 {
     this->close();
+
 }
 
 void NoduleAnnotation::slot_save_label_file()
@@ -1608,6 +1679,20 @@ void NoduleAnnotation::slot_save_label_file()
                 sizeof(unsigned int) * run_length_encoded_output.size());
             output_file.flush();
             output_file.close();
+        }
+    }
+}
+
+void NoduleAnnotation::update_last_open_direction_i(const std::string& file_path)
+{
+    int sub_file_path = -1;
+    for(int i = file_path.size() - 1 ; i >= 0 ;--i)
+    {
+        if(file_path[i] == '/' || file_path[i] == '\\')
+        {
+            sub_file_path = i;
+            _last_open_direction = file_path.substr(0 , sub_file_path);
+            break;
         }
     }
 }

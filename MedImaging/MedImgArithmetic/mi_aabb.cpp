@@ -101,4 +101,44 @@ void AABBUI::Print()
     std::cout << "AABBUI : [ " << _min[0] << " " << _min[1] << " " << _min[2] << " ] , [" << _max[0] << " " << _max[1] << " " << _max[2] <<" ]\n";
 }
 
+
+AABBI::AABBI()
+{
+    memset(_min , 0 , sizeof(_min));
+    memset(_max , 0 , sizeof(_max));
+}
+
+AABBI::AABBI(const int (&min0)[3] , const int (&max0)[3])
+{
+    memcpy(_min ,min0 , sizeof(_min));
+    memcpy(_max ,max0 , sizeof(_max));
+}
+
+AABBI::~AABBI()
+{
+
+}
+
+bool AABBI::operator==(const AABBI& aabb) const
+{
+    return (_min[0] == aabb._min[0] && _min[1] == aabb._min[1] && _min[2] == aabb._min[2] &&
+        _max[0] == aabb._max[0] && _max[1] == aabb._max[1] && _max[2] == aabb._max[2]);
+}
+
+bool AABBI::operator!=(const AABBI& aabb) const
+{
+    return (_min[0] != aabb._min[0] || _min[1] != aabb._min[1] || _min[2] != aabb._min[2] ||
+        _max[0] != aabb._max[0] || _max[1] != aabb._max[1] || _max[2] != aabb._max[2]);
+}
+
+int AABBI::volume() const
+{
+    return (_max[0] - _min[0])*(_max[1] - _min[1])*(_max[2] - _min[2]);
+}
+
+void AABBI::Print()
+{
+    std::cout << "AABBI : [ " << _min[0] << " " << _min[1] << " " << _min[2] << " ] , [" << _max[0] << " " << _max[1] << " " << _max[2] <<" ]\n";
+}
+
 MED_IMAGING_END_NAMESPACE

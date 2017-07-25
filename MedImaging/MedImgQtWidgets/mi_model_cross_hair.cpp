@@ -146,7 +146,7 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& target_mpr_scene , in
     return true;
 }
 
-bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc)
+bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc )
 {
     //1 Get latest location
     Point3 ptV;
@@ -193,9 +193,9 @@ bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& target_mpr_scene , 
 
 }
 
-bool CrosshairModel::locate(const Point3& center_w)
+bool CrosshairModel::locate(const Point3& center_w , bool ignore_pan /*= true*/)
 {
-    //3 MPR plane paging to the input point slice towards to each normal
+    //MPR plane paging to the input point slice towards to each normal
     //don't focus the center
     if (!set_center_i(center_w))
     {
@@ -211,6 +211,25 @@ bool CrosshairModel::locate(const Point3& center_w)
         int page = _camera_calculator->get_orthognal_mpr_page(camera);
         _pages[i] = page;
     }
+
+    //pan center to screen
+    if (!ignore_pan)
+    {
+        for (int i = 0 ; i<3; ++i)
+        {
+            std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(_mpr_scenes[i]->get_camera());
+            const Matrix4 mat_p = camera->get_projection_matrix();
+            if (mat_p.has_inverse())
+            {
+                const Matrix4 mat_vp = camera->get_view_projection_matrix();
+                Point3 center_s = mat_vp.transform(center_w);
+                const Point3 at_screen = mat_vp.transform(camera->get_look_at());
+                const Point3 pt = mat_p.get_inverse().transform(Point3(-center_s.x , -center_s.y , at_screen.z));
+                camera->pan(Vector2(pt.x , pt.y));
+            }
+        }
+    }
+
 
     set_changed();
 

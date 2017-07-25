@@ -34,6 +34,9 @@
     <Filter Include="Segmentation">
       <UniqueIdentifier>{89b9b355-916a-4a39-b414-d31a5df2e3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scan Line">
+      <UniqueIdentifier>{e63c05a0-1194-49e7-8b90-a32e8cbc53ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
@@ -146,11 +149,19 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h">
       <Filter>Segmentation</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\Include\MedImgArithmetic\mi_label_sphere_converter.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_run_length_operator.h">
       <Filter>Utils</Filter>
+=======
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h">
+      <Filter>Segmentation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgArithmetic\mi_scan_line_analysis.h">
+      <Filter>Scan Line</Filter>
+>>>>>>> 87980cf84260980f64c260a25e949e402d008bdc
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,11 +249,16 @@
     <ClCompile Include="mi_color_unit.cpp">
       <Filter>Color Related</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="mi_label_sphere_converter.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="mi_run_length_operator.cpp">
       <Filter>Utils</Filter>
+=======
+    <ClCompile Include="mi_connected_domain_analysis.cpp">
+      <Filter>Segmentation</Filter>
+>>>>>>> 87980cf84260980f64c260a25e949e402d008bdc
     </ClCompile>
   </ItemGroup>
 </Project>

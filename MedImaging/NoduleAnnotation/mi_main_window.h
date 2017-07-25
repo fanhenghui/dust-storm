@@ -41,6 +41,9 @@ public:
     NoduleAnnotation(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~NoduleAnnotation();
 
+protected:
+    virtual void closeEvent(QCloseEvent * event);
+
 private slots:
     //Layout 
     void slot_change_layout2x2_i();
@@ -106,6 +109,8 @@ private:
     void refresh_nodule_list_i();
     void save_layout2x2_parameter_i();
     void shift_tune_object();
+    void update_last_open_direction_i(const std::string& cur_file);
+
 
 private:
     Ui::NoduleAnnotationClass _ui;
@@ -163,6 +168,9 @@ private:
     //DICOM files cache
     std::vector<std::string> _dicom_series_files;
     std::string _current_operation; // remember current operation
+
+    //Last open direction cache
+    std::string _last_open_direction;
 };
 
 #endif // MI_MAIN_WINDOW_H
