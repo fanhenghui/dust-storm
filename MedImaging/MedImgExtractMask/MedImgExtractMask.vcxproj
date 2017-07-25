@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -111,7 +111,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,7 +131,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,13 +151,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MedImgCommon.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="mi_extract_mask.cpp" />
+    <ClCompile Include="mi_extract_mask_vis.cpp" />
+    <ClCompile Include="mi_main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="mi_extract_mask_common.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

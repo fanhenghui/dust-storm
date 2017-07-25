@@ -18,10 +18,19 @@
     <ClCompile Include="mi_extract_mask.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="mi_extract_mask_vis.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="mi_main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mi_extract_mask_common.h">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

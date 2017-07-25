@@ -17,6 +17,8 @@ public:
     //平面相交，返回交线，平行或重合则检测失败
     static bool plane_to_plane(const Plane& plane1,const Plane& plane2,Line3D& intersected_line );
 
+    static bool aabb_to_aabb(const AABBI& l , const AABBI& r , AABBI& result);
+
     ////平面相交三角形，返回交线
     //bool PlaneIntersectTriangle(const Plane& plane , const Triangle& triangle , LineSegment3D& line);
 

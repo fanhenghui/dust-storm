@@ -5,6 +5,8 @@
 #include "MedImgCommon/mi_common_file_util.h"
 #include "MedImgArithmetic/mi_scan_line_analysis.h"
 #include "MedImgArithmetic/mi_point3.h"
+#include "MedImgArithmetic/mi_aabb.h"
+#include "MedImgArithmetic/mi_intersection_test.h"
 #include "MedImgCommon/mi_string_number_converter.h"
 #include "MedImgIO/mi_dicom_loader.h"
 #include "MedImgIO/mi_image_data_header.h"
@@ -12,6 +14,8 @@
 #include "MedImgIO/mi_run_length_operator.h"
 #include "Ext/pugixml/pugixml.hpp"
 #include "Ext/pugixml/pugiconfig.hpp"
+
+#include "mi_extract_mask_common.h"
 
 using namespace medical_imaging;
 
@@ -40,16 +44,28 @@ private:
 #define LOG_OUT(info) std::cout << info; out_log << info;
 //////////////////////////////////////////////////////////////////////////
 
-struct Nodule
-{
-    int type;//0 for unblinded-nodule ; 1 for non-nodule
-    std::string name;
-    std::vector<Point3> _points;
-};
 
-bool point_less(const Point3& l, const Point3& r)
+int save_mask(std::shared_ptr<ImageData> mask , const std::string& path , bool compressed)
 {
-    return l.z < r.z;
+    if (path.empty())
+    {
+        LOG_OUT("save mask path is empty!");
+        return -1;
+    }
+    if (compressed)
+    {
+        std::vector<unsigned int> code = RunLengthOperator::encode((unsigned char*)mask->get_pixel_pointer() , mask->get_data_size());
+        if (code.empty())
+        {
+            LOG_OUT("mask is all zero!");
+            return -1;
+        }
+        return FileUtil::write_raw(path , code.data() , static_cast<unsigned int>(code.size())*sizeof(unsigned int));
+    }
+    else
+    {
+        return FileUtil::write_raw(path , mask->get_pixel_pointer() , mask->get_data_size());
+    }
 }
 
 int load_dicom_series(std::vector<std::string>& files ,
@@ -67,7 +83,7 @@ int load_dicom_series(std::vector<std::string>& files ,
     }
 }
 
-int get_nodule_set(const std::string& xml_file, std::vector<Nodule>& nodules , std::string& series_uid)
+int get_nodule_set(const std::string& xml_file, std::vector<std::vector<Nodule>>& nodules , std::string& series_uid)
 {
     pugi::xml_document doc;
     if (!doc.load_file(xml_file.c_str()))
@@ -120,9 +136,10 @@ int get_nodule_set(const std::string& xml_file, std::vector<Nodule>& nodules , s
     
 
     StrNumConverter<double> str_to_num;
-    pugi::xpath_node_set reading_session_node_set = root_node.select_nodes("readingSession");
+    pugi::xpath_node_set reading_session_node_set = root_node.select_nodes("readingSession");// a reading session means a certain reader's result
     for (auto it = reading_session_node_set.begin() ; it != reading_session_node_set.end(); ++it)
     {
+        std::vector<Nodule> nodules_perreader;
         pugi::xpath_node_set unblind_nodule_node_set = (*it).node().select_nodes("unblindedReadNodule");
         for (auto it2 = unblind_nodule_node_set.begin() ; it2 != unblind_nodule_node_set.end(); ++it2)
         {
@@ -178,17 +195,62 @@ int get_nodule_set(const std::string& xml_file, std::vector<Nodule>& nodules , s
                     const double pos_y = str_to_num.to_num(y_node.child_value());
                     nodule._points.push_back(Point3(pos_x , pos_y , pos_z));
                 }
-
             }
-
-            nodules.push_back(nodule);
+            nodules_perreader.push_back(nodule);
         }
+
+        pugi::xpath_node_set non_nodule_node_set = (*it).node().select_nodes("nonNodule");
+        for (auto it2 = non_nodule_node_set.begin() ; it2 != non_nodule_node_set.end(); ++it2)
+        {
+            pugi::xpath_node node_nonnodule = (*it2);
+            Nodule nodule;
+            nodule.type = 1;//for non-noudle
+
+            //get ID
+            pugi::xml_node id_node = node_nonnodule.node().child("nonNoduleID");
+            if (id_node.empty())
+            {
+                //TODO ERROR
+                LOG_OUT(  "invalid format , find non-nodule ID failed!\n");
+                return -1;
+            }
+            nodule.name = id_node.child_value();
+
+            //get position z
+            pugi::xml_node pos_z_node = node_nonnodule.node().child("imageZposition");
+            if (pos_z_node.empty())
+            {
+                //TODO ERROR
+                LOG_OUT("invalid format , find image position z failed!\n");
+                return -1;
+            }
+            const double pos_z = str_to_num.to_num(pos_z_node.child_value());
+
+            pugi::xml_node locus_node = node_nonnodule.node().child("locus");
+            if (locus_node.empty())
+            {
+                //TODO ERROR
+                LOG_OUT(  "invalid format , find non-nodule locus failed!\n");
+                return -1;
+            }
+            pugi::xml_node x_node = locus_node.child("xCoord");
+            pugi::xml_node y_node = locus_node.child("yCoord");
+
+
+            const double pos_x = str_to_num.to_num(x_node.child_value());
+            const double pos_y = str_to_num.to_num(y_node.child_value());
+            nodule._points.push_back(Point3(pos_x , pos_y , pos_z));
+
+            nodules_perreader.push_back(nodule);
+        }
+
+        nodules.push_back(nodules_perreader);
     }
 
     return 0;
 }
 
-int resample_z(std::vector<Nodule>& nodules , std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less)
+int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less)
 {
     std::vector<double> slice_location = header->slice_location;
     if (!save_slice_location_less)
@@ -213,170 +275,357 @@ int resample_z(std::vector<Nodule>& nodules , std::shared_ptr<ImageDataHeader>& 
 
     const double slice0 = slice_location[0];
 
-    for (auto it = nodules.begin() ; it != nodules.end() ; ++it)
+    for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader)
     {
-        Nodule& nodule = *it;
-        std::vector<Point3>& pts = nodule._points;
-        for (int  i= 0 ; i< pts.size() ; ++i)
+        for(auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it)
         {
-            double slice = pts[i].z;
-            double delta_slice = slice - slice0;
-            int tmp_idx = static_cast<int>(delta_slice / delta);
-            if (tmp_idx > slice_location.size())
+            Nodule& nodule = *it;
+            std::vector<Point3>& pts = nodule._points;
+            for (int  i= 0 ; i< pts.size() ; ++i)
             {
-                LOG_OUT( "find slice lotation failed!\n");
-                return -1;
-            }
-
-            if (fabs(slice_location[tmp_idx] - slice) < DOUBLE_EPSILON )
-            {
-                pts[i].z = static_cast<double>(tmp_idx);
-                goto FIND_LOCATION;
-            }
-            else if (slice_location[tmp_idx] - slice < 0)
-            {
-                if (save_slice_location_less)
+                double slice = pts[i].z;
+                double delta_slice = slice - slice0;
+                int tmp_idx = static_cast<int>(delta_slice / delta);
+                if (tmp_idx > slice_location.size())
                 {
-                    for(int j = tmp_idx ; j<slice_location.size() ; ++j)
+                    LOG_OUT( "find slice lotation failed!\n");
+                    return -1;
+                }
+
+                if (fabs(slice_location[tmp_idx] - slice) < DOUBLE_EPSILON )
+                {
+                    pts[i].z = static_cast<double>(tmp_idx);
+                    goto FIND_LOCATION;
+                }
+                else if (slice_location[tmp_idx] - slice < 0)
+                {
+                    if (save_slice_location_less)
                     {
-                        if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                        for(int j = tmp_idx ; j<slice_location.size() ; ++j)
                         {
-                            pts[i].z = static_cast<double>(j);
-                            goto FIND_LOCATION;
+                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            {
+                                pts[i].z = static_cast<double>(j);
+                                goto FIND_LOCATION;
+                            }
                         }
                     }
+                    else
+                    {
+                        for(int j = tmp_idx ; j>0 ; --j)
+                        {
+                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            {
+                                pts[i].z = static_cast<double>(j);
+                                goto FIND_LOCATION;
+                            }
+                        }
+                    }
+
+                    LOG_OUT(  "find slice lotation failed!\n");
+                    return -1;
                 }
                 else
                 {
-                    for(int j = tmp_idx ; j>0 ; --j)
+                    if (save_slice_location_less)
                     {
-                        if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                        for(int j = tmp_idx ; j>0 ; --j)
                         {
-                            pts[i].z = static_cast<double>(j);
-                            goto FIND_LOCATION;
+                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            {
+                                pts[i].z = static_cast<double>(j);
+                                goto FIND_LOCATION;
+                            }
                         }
                     }
-                }
-
-                LOG_OUT(  "find slice lotation failed!\n");
-                return -1;
-            }
-            else
-            {
-                if (save_slice_location_less)
-                {
-                    for(int j = tmp_idx ; j>0 ; --j)
+                    else
                     {
-                        if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                        for(int j = tmp_idx ; j<slice_location.size() ; ++j)
                         {
-                            pts[i].z = static_cast<double>(j);
-                            goto FIND_LOCATION;
+                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            {
+                                pts[i].z = static_cast<double>(j);
+                                goto FIND_LOCATION;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    for(int j = tmp_idx ; j<slice_location.size() ; ++j)
-                    {
-                        if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
-                        {
-                            pts[i].z = static_cast<double>(j);
-                            goto FIND_LOCATION;
-                        }
-                    }
-                }
 
 
-                LOG_OUT( "find slice lotation failed!\n");
-                return -1;
-            }
+                    LOG_OUT( "find slice lotation failed!\n");
+                    return -1;
+                }
 
 FIND_LOCATION:;
+            }
         }
+        
     }
 
     return 0;
 }
 
-int contour_to_mask(std::vector<Nodule>& nodules , std::shared_ptr<ImageData> mask)
+void cal_nodule_aabb(std::vector <std::vector<Nodule>>& nodules )
 {
-    mask->_data_type = UCHAR;
-    mask->mem_allocate();
-
-    ScanLineAnalysis<unsigned char> scan_line_analysis;
-    typedef ScanLineAnalysis<unsigned char>::Pt2 PT2;
-    unsigned char label = 0;
-    for (auto it = nodules.begin() ; it != nodules.end() ; ++it)
+    for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader)
     {
-        Nodule& nodule = *it;
-        std::vector<Point3>& pts = nodule._points;
-        if (pts.size() < 10)//TODO skip some to test
+        for(auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it)
+        {
+            Nodule& nodule = *it;
+            const std::vector<Point3>& pts = nodule._points;
+
+            nodule._aabb._min[0] = static_cast<int>(pts[0].x);
+            nodule._aabb._min[1] = static_cast<int>(pts[0].y);
+            nodule._aabb._min[2] = static_cast<int>(pts[0].z);
+
+            nodule._aabb._max[0]  = nodule._aabb._min[0];
+            nodule._aabb._max[1]  = nodule._aabb._min[1];
+            nodule._aabb._max[2]  = nodule._aabb._min[2];
+
+            for (int i = 1 ; i<pts.size() ; ++i)
+            {
+                int tmp[3] = { static_cast< int>(pts[i].x) , static_cast<int>(pts[i].y), static_cast<int>(pts[i].z)};
+                for (int  j = 0 ; j<3 ; ++j)
+                {
+                    nodule._aabb._min[j] = nodule._aabb._min[j] > tmp[j] ? tmp[j] : nodule._aabb._min[j];
+                    nodule._aabb._max[j] = nodule._aabb._max[j] < tmp[j] ? tmp[j] : nodule._aabb._max[j];
+                }
+            }
+        }
+    }
+}
+
+void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader , Nodule& target , std::vector <std::vector<Nodule>>& nodules, std::vector<Nodule*>& same_nodules, std::vector<int>& reader_id ,  float region_percent)
+{
+    same_nodules.clear();
+    reader_id.clear();
+
+    const int v_target = target._aabb.volume();
+
+    int cur_readid = 0;
+    for (auto it = nodules.begin() ; it != nodules.end(); ++it , ++cur_readid )
+    {
+        if ( it == reader )//skip myself
         {
             continue;
         }
 
-        ++label;
-
-        std::sort(pts.begin() , pts.end() , point_less);
-
-        bool begin = true;
-        int current_z = 0;
-        std::vector<PT2> current_contour;
-
-        for (int i = 0 ; i < pts.size() ; ++i)
+        for(auto it2 = (*it).begin()  ; it2 != (*it).end() ; ++it2)
         {
-            if(begin)
+            Nodule& nodule = *it2;
+            if (nodule.type != 0 || nodule._points.size() < 2)
             {
-                current_z = static_cast<int>(pts[i].z);
+                continue;
+            }
+
+            if (nodule.flag != 0)//has been analysized
+            {
+                continue;
+            }
+
+            AABBI inter;
+            if (IntersectionTest::aabb_to_aabb(nodule._aabb , target._aabb , inter))
+            {
+                const int v = nodule._aabb.volume();
+                const int inter_v = inter.volume();
+                const float inter_p = static_cast<float>(inter_v) / ( (v + v_target)*0.5f);
+                if (inter_p > region_percent)
+                {
+                    same_nodules.push_back(&nodule);
+                    reader_id.push_back(cur_readid);
+                }
+            }
+        }
+    }
+}
+
+typedef ScanLineAnalysis<unsigned char>::Pt2 PT2;
+void scan_contour_to_mask(std::vector<Point3>& pts , std::shared_ptr<ImageData> mask, unsigned char label)
+{
+    ScanLineAnalysis<unsigned char> scan_line_analysis;
+
+    bool begin = true;
+    int current_z = 0;
+    std::vector<PT2> current_contour;
+
+    for (int i = 0 ; i < pts.size() ; ++i)
+    {
+        if(begin)
+        {
+            current_z = static_cast<int>(pts[i].z);
+            current_contour.push_back(PT2(static_cast<int>(pts[i].x) , static_cast<int>(pts[i].y) ) );
+            begin = false;
+        }
+        else
+        {
+            int z = static_cast<int>(pts[i].z);
+            if (z == current_z)//push contour
+            {
                 current_contour.push_back(PT2(static_cast<int>(pts[i].x) , static_cast<int>(pts[i].y) ) );
-                begin = false;
+            }
+            else// do scaning
+            {
+                scan_line_analysis.fill((unsigned char*)mask->get_pixel_pointer() + current_z*mask->_dim[0]*mask->_dim[1] ,
+                    mask->_dim[0] , mask->_dim[1] , current_contour , label);
+
+                //back to begin
+                --i;
+                current_contour.clear();
+                begin = true;
+            }
+        }
+    }
+}
+
+int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr<ImageData> mask, float same_nodule_precent , int confidence, int setlogic)
+{
+    mask->_data_type = UCHAR;
+    mask->mem_allocate();
+
+    std::vector<std::shared_ptr<ImageData>> mask_reader;
+    mask_reader.resize(nodules.size());
+    mask_reader[0] = mask;
+
+    for (int i = 1; i< nodules.size() ; ++i)
+    {
+        mask_reader[i] = std::shared_ptr<ImageData>(new ImageData);
+        mask->shallow_copy(mask_reader[i].get());
+        mask_reader[i]->mem_allocate();
+    }
+
+    ScanLineAnalysis<unsigned char> scan_line_analysis;
+    unsigned char label = 0;
+    for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader)
+    {
+        for(auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it)
+        {
+            Nodule& nodule = *it;
+            std::vector<Point3>& pts = nodule._points;
+            if (pts.size() <=1)//TODO skip nodule < 3mm and non-nodule
+            {
+                continue;
+            }
+
+            ++label;
+
+            if (nodule.flag != 0)//has already been analysized
+            {
+                continue;
+            }
+
+            //search the same region nodules
+            std::vector<Nodule*> same_nodules;
+            std::vector<int> reader_id;
+            get_same_region_nodules(itreader , nodule , nodules ,same_nodules , reader_id , same_nodule_precent);
+
+            //case 1 just one reader annotation this nodule > 3mm
+            int cur_confidence = 1+ static_cast<int>(same_nodules.size());
+            if (cur_confidence < confidence)
+            {
+                nodule.flag = -1;//not satisify confidece
+                for (int k = 0 ; k < same_nodules.size() ; ++k)
+                {
+                    same_nodules[k]->flag = -1;
+                }
+            }
+
+            //set flags
+            nodule.flag = label;
+            for (int k = 0 ; k < same_nodules.size() ; ++k)
+            {
+                same_nodules[k]->flag = label;
+            }
+
+
+            //choose points based on set logic(intercetion or union)
+            if (setlogic == 0)//intersection
+            {
+                scan_contour_to_mask(pts , mask, label);
+
+                //save_mask( mask , "D:/temp/0.raw" ,false);
+
+                for (int k = 0 ; k < same_nodules.size() ; ++k)
+                {
+                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->_points;
+                    scan_contour_to_mask(pts_same_nodule , mask_reader[reader_id[k]], label);
+
+                    //StrNumConverter<int> conv;
+                    //save_mask( mask_reader[reader_id[k]] , std::string("D:/temp/") + conv.to_string(reader_id[k]) + ".raw" ,false);
+                }
+
+                //extracted label from label to interlabel(label + confidence)
+                unsigned char inter_label = label + cur_confidence;
+                AABBI max_region = nodule._aabb;
+                for (int k = 0 ; k < same_nodules.size() ; ++k)
+                {
+                    AABBI sub_regio = same_nodules[k]->_aabb;
+                    for (int k2 =0  ; k2 < 3 ; ++k2)
+                    {
+                        max_region._min[k2] = max_region._min[k2] > sub_regio._min[k2] ?
+                            sub_regio._min[k2] : max_region._min[k2];
+
+                        max_region._max[k2] = max_region._max[k2] < sub_regio._max[k2] ?
+                            sub_regio._max[k2] : max_region._max[k2];
+                    }
+                }
+
+                //reset uninterceted position to 0 , and set interceted positon to label
+                unsigned char* mask_data = (unsigned char*)mask->get_pixel_pointer();
+                for (int z = max_region._min[2] ; z <= max_region._max[2] ; ++z)
+                {
+                    for (int y = max_region._min[1] ; y <= max_region._max[1] ; ++y)
+                    {
+                        for (int x = max_region._min[0] ; x <= max_region._max[0] ; ++x)
+                        {
+                            const int idx = z*mask->_dim[0]*mask->_dim[1] + y*mask->_dim[0] + x;
+                            if (mask_data[idx] == label)
+                            {
+                                int cur_inter = 1;
+                                for (int k = 0 ; k < reader_id.size() ; ++k)
+                                {
+                                    unsigned char* mask_other = (unsigned char*)mask_reader[k]->get_pixel_pointer();
+                                    if (mask_other[idx] == label)
+                                    {
+                                        ++cur_inter;
+                                    }
+                                }
+                                if (cur_inter < cur_confidence)
+                                {
+                                    mask_data[idx] = 0;
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            else if (setlogic == 1)//union
+            {
+                scan_contour_to_mask(pts , mask, label);
+
+                for (int k = 0 ; k < same_nodules.size() ; ++k)
+                {
+                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->_points;
+                    scan_contour_to_mask(pts_same_nodule , mask, label);
+                }
             }
             else
             {
-                int z = static_cast<int>(pts[i].z);
-                if (z == current_z)//push contour
-                {
-                    current_contour.push_back(PT2(static_cast<int>(pts[i].x) , static_cast<int>(pts[i].y) ) );
-                }
-                else// do scaning
-                {
-                    scan_line_analysis.fill((unsigned char*)mask->get_pixel_pointer() + current_z*mask->_dim[0]*mask->_dim[1] ,
-                        mask->_dim[0] , mask->_dim[1] , current_contour , label);
-
-                    //back to begin
-                    --i;
-                    current_contour.clear();
-                    begin = true;
-                }
+                LOG_OUT("Invalid nodule region set logic."); 
+                return -1;
             }
+
+
         }
+
     }
+
 
     return 0;
+
 }
 
-int save_mask(std::shared_ptr<ImageData> mask , const std::string& path , bool compressed)
-{
-    if (path.empty())
-    {
-        LOG_OUT("save mask path is empty!");
-        return -1;
-    }
-    if (compressed)
-    {
-        std::vector<unsigned int> code = RunLengthOperator::encode((unsigned char*)mask->get_pixel_pointer() , mask->get_data_size());
-        if (code.empty())
-        {
-            LOG_OUT("mask is all zero!");
-            return -1;
-        }
-        return FileUtil::write_raw(path , code.data() , static_cast<unsigned int>(code.size())*sizeof(unsigned int));
-    }
-    else
-    {
-        return FileUtil::write_raw(path , mask->get_pixel_pointer() , mask->get_data_size());
-    }
-}
 
 int browse_root_xml(const std::string& root , std::vector<std::string>& xml_files )
 {
@@ -445,7 +694,7 @@ int browse_root_dcm(const std::string& root, std::map<std::string, std::vector<s
 }
 
 
-int main(int argc , char* argv[])
+int ExtractMask(int argc , char* argv[])
 {
     /*arguments list:
     -help : print all argument
@@ -454,6 +703,10 @@ int main(int argc , char* argv[])
     -output <path] : save mask root
     -compress : if mask is compressed 
     -slicelocation <less/greater> : default is less
+
+    -crosspercent<0.1~1> default 0.7
+    -confidence<1~4> default is 2
+    -setlogic<inter/union> default is inter 
     */
 
     LogSheild log_sheild("em.log" , "Extracting mask from LIDC data set >>> \n");
@@ -463,16 +716,22 @@ int main(int argc , char* argv[])
     std::string output_direction;
     bool compressed = false;
     bool save_slice_location_less = true;
+    float cross_nodule_percent = 0.7f;
+    int confidence = 2;
+    int setlogic = 0;//0 for intersection 1 for union
 
     if (argc == 1)
     {
         LOG_OUT("invalid arguments!\n");
         LOG_OUT("targuments list:\n");
-        LOG_OUT("\t-annotation <path> : annotation root(.dcm)\n");
+        LOG_OUT("\t-data <path> : DICOM data root(.dcm)\n");
         LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
         LOG_OUT("\t-output <path] : save mask root\n");
         LOG_OUT("\t-compress : if mask is compressed\n");
         LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
+        LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
+        LOG_OUT("\t-confidence<1~4> default is 2\n");
+        LOG_OUT("\t-setlogic<inter/union> default is inter\n");
         return -1;
     }
     else
@@ -482,11 +741,14 @@ int main(int argc , char* argv[])
            if (std::string(argv[i]) == "-help")
            {
                LOG_OUT("arguments list:\n");
-               LOG_OUT("\t-annotation <path> : annotation root(.dcm)\n");
+               LOG_OUT("\t-data <path> : DICOM data root(.dcm)\n");
                LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
                LOG_OUT("\t-output <path] : save mask root\n");
                LOG_OUT("\t-compress : if mask is compressed\n");
                LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
+               LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
+               LOG_OUT("\t-confidence<1~4> default is 2\n");
+               LOG_OUT("\t-setlogic<inter/union> default is inter\n");
                return 0;
            }
            if (std::string(argv[i]) == "-data")
@@ -549,6 +811,51 @@ int main(int argc , char* argv[])
                }
                ++i;
            }
+           else if (std::string(argv[i]) == "-crosspercent")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<float> conv;
+               cross_nodule_percent = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-confidence")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               StrNumConverter<int> conv;
+               confidence = conv.to_num(std::string(argv[i+1]));
+               ++i;
+           }
+           else if (std::string(argv[i]) == "-setlogic")
+           {
+               if (i+1 > argc-1)
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+
+               if(std::string(argv[i+1]) == "inter")
+               {
+                   setlogic = 0;
+               }
+               else if(std::string(argv[i+1]) == "union")
+               {
+                   setlogic = 1;
+               }
+               else
+               {
+                   LOG_OUT(  "invalid arguments!\n");
+                   return -1;
+               }
+               ++i;
+           }
        }
     }
 
@@ -577,7 +884,7 @@ int main(int argc , char* argv[])
         LOG_OUT(  "parse annotation file : " + *it + " >>>\n");
 
         //parse nodule annotation file
-        std::vector<Nodule> nodules;
+        std::vector<std::vector<Nodule>> nodules;
         std::string series_uid;
         if(0 !=  get_nodule_set(*it , nodules , series_uid))
         {
@@ -614,10 +921,13 @@ int main(int argc , char* argv[])
 
         LOG_OUT( "convert contour to mask >>>\n");
 
+        //calculate aabb for extract mask
+        cal_nodule_aabb(nodules);
+
         //contour to mask
         std::shared_ptr<ImageData> mask(new ImageData);
         volume_data->shallow_copy(mask.get());
-        if (0 != contour_to_mask(nodules , mask))
+        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, setlogic))
         {
             LOG_OUT( "convert contour to mask failed!\n");
             return -1;
