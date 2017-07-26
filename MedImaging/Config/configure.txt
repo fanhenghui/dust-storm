@@ -1,2 +1,3 @@
 ProcessingUnit = GPU
-LastOpenDirection = C:\
+NoduleOutput = TEXT
+LastOpenDirection = E:/data/LUNA/subset1-crash

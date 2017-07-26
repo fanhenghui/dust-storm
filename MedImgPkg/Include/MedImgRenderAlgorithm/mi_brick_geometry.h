@@ -23,6 +23,7 @@ public:
     float* get_vertex_array();
     float* get_color_array();
     unsigned int* get_index_array();
+    unsigned int get_vertex_count() const;
 
 protected:
 private:

@@ -1,4 +1,4 @@
-#include "MedImgArithmetic/mi_label_sphere_converter.h"
+#include "MedImgIO/mi_mask_voi_converter.h"
 
 #include "MedImgIO/mi_voi.h"
 #include "MedImgArithmetic/mi_aabb.h"
@@ -14,10 +14,10 @@ static void GetStructuredCoordinates(const unsigned int idx, const unsigned int 
     ijk[1] = (idx-ijk[2]*N12)/dim[1];
     ijk[0] = idx-ijk[2]*N12-ijk[1]*dim[1];
 }
-std::vector<VOISphere> Label2SphereConverter::convert_label_2_sphere(const std::vector<unsigned char>& labels, const unsigned int dim[3], const double spacing[3], const double origin[3])
+std::vector<VOISphere> MaskVOIConverter::convert_label_2_sphere(const std::vector<unsigned char>& labels, const unsigned int dim[3], const double spacing[3], const double origin[3])
 {
     AABBUI* aabb_bucket[255];
-    for (int i = 0 ; i< 255 ; ++i)
+    for (int i = 0 ; i< 255 ; ++i)  
     {
         aabb_bucket[i] = nullptr;
     }
@@ -118,9 +118,9 @@ std::vector<VOISphere> Label2SphereConverter::convert_label_2_sphere(const std::
         if (sphere_bucket[i])
         {
             ret[cur_label_num] = VOISphere(*sphere_bucket[i]);
-            ret[cur_label_num].center.x = ret[cur_label_num].center.x*spacing[0] + origin[0];
+            /*ret[cur_label_num].center.x = ret[cur_label_num].center.x*spacing[0] + origin[0];
             ret[cur_label_num].center.y = ret[cur_label_num].center.y*spacing[1] + origin[1];
-            ret[cur_label_num].center.z = ret[cur_label_num].center.z*spacing[2] + origin[2];
+            ret[cur_label_num].center.z = ret[cur_label_num].center.z*spacing[2] + origin[2];*/
             ++cur_label_num;
         }
         if (cur_label_num > label_num)

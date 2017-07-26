@@ -55,9 +55,6 @@
     <ClCompile Include="mi_connected_domain_analysis.cpp">
       <Filter>Image</Filter>
     </ClCompile>
-    <ClCompile Include="mi_label_sphere_converter.cpp">
-      <Filter>Image</Filter>
-    </ClCompile>
     <ClCompile Include="mi_ellipsoid.cpp">
       <Filter>Shape</Filter>
     </ClCompile>
@@ -154,9 +151,6 @@
       <Filter>Shape</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h">
-      <Filter>Image</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_label_sphere_converter.h">
       <Filter>Image</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h">

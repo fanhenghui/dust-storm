@@ -11,7 +11,6 @@
 #include "MedImgArithmetic/mi_rsa_utils.h"
 #include "MedImgArithmetic/mi_ortho_camera.h"
 #include "MedImgArithmetic/mi_run_length_operator.h"
-#include "MedImgArithmetic/mi_label_sphere_converter.h"
 
 #include "MedImgIO/mi_dicom_loader.h"
 #include "MedImgIO/mi_image_data.h"
@@ -20,6 +19,7 @@
 #include "MedImgIO/mi_nodule_set.h"
 #include "MedImgIO/mi_nodule_set_parser.h"
 #include "MedImgIO/mi_model_progress.h"
+#include "MedImgIO/mi_mask_voi_converter.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -1815,7 +1815,12 @@ void NoduleAnnotation::slot_load_label_file()
 
     std::shared_ptr<ImageData> volume = _volume_infos->get_volume(); 
     double origin[3] = {volume->_image_position.x, volume->_image_position.y, volume->_image_position.z}; // TODO here we ignore rotation
-    std::vector<VOISphere> voi_spheres = Label2SphereConverter::convert_label_2_sphere(actual_labels, volume->_dim, volume->_spacing, origin);
+    std::vector<VOISphere> voi_spheres = MaskVOIConverter::convert_label_2_sphere(actual_labels, volume->_dim, volume->_spacing, origin);
+    const Matrix4 matv2patient = _volume_infos->get_camera_calculator()->get_world_to_patient_matrix()*_volume_infos->get_camera_calculator()->get_volume_to_world_matrix();
+    for (auto it = voi_spheres.begin() ; it != voi_spheres.end() ; ++it)
+    {
+        (*it).center = matv2patient.transform((*it).center);
+    }
 
     //clock_t _end2 = clock();
     //std::cout << "convert label cost : " << double(_end2 - _end) << " ms\n";
@@ -1856,4 +1861,4 @@ void NoduleAnnotation::slot_load_label_file()
     this->_model_voi->notify(VOIModel::LOAD_VOI);
     
     QMessageBox::information(this , tr("Load Label") , tr("Load label file success."),QMessageBox::Ok);
-}
+} 

@@ -4,7 +4,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 BrickGeometry::BrickGeometry():_vertex_count(0)
 {
-
+    
 }
 
 BrickGeometry::~BrickGeometry()
@@ -12,7 +12,10 @@ BrickGeometry::~BrickGeometry()
 
 }
 
-void BrickGeometry::set_parameter(const unsigned int(&volume_dim)[3] , unsigned int brick_size , unsigned int (&brick_dim)[3])
+void BrickGeometry::set_parameter(
+    const unsigned int(&volume_dim)[3] , 
+    unsigned int brick_size , 
+    unsigned int (&brick_dim)[3])
 {
 
 }

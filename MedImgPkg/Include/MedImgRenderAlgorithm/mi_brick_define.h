@@ -17,38 +17,38 @@ struct BrickEleIndex
     unsigned int idx[36];
 };
 
-struct BrickGeometry
-{
-    BrickEleIndex *brick_idx_units;
-    float *vertex_array;//x y z
-    float *color_array;//RGBA
-    int vertex_count;
-
-    BrickGeometry():brick_idx_units(nullptr),vertex_array(nullptr),color_array(nullptr),vertex_count(0)
-    {
-    }
-
-    ~BrickGeometry()
-    {
-        if (nullptr != brick_idx_units)
-        {
-            delete [] brick_idx_units;
-            brick_idx_units = nullptr;
-        }
-
-        if (nullptr != vertex_array)
-        {
-            delete [] vertex_array;
-            vertex_array = nullptr;
-        }
-
-        if (nullptr != color_array)
-        {
-            delete [] color_array;
-            color_array = nullptr;
-        }
-    }
-};
+//struct BrickGeometry
+//{
+//    BrickEleIndex *brick_idx_units;
+//    float *vertex_array;//x y z
+//    float *color_array;//RGBA
+//    int vertex_count;
+//
+//    BrickGeometry():brick_idx_units(nullptr),vertex_array(nullptr),color_array(nullptr),vertex_count(0)
+//    {
+//    }
+//
+//    ~BrickGeometry()
+//    {
+//        if (nullptr != brick_idx_units)
+//        {
+//            delete [] brick_idx_units;
+//            brick_idx_units = nullptr;
+//        }
+//
+//        if (nullptr != vertex_array)
+//        {
+//            delete [] vertex_array;
+//            vertex_array = nullptr;
+//        }
+//
+//        if (nullptr != color_array)
+//        {
+//            delete [] color_array;
+//            color_array = nullptr;
+//        }
+//    }
+//};
 
 /// \ Brick corner image coordinate
 struct BrickCorner

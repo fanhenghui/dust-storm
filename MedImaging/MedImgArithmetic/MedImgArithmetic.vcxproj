@@ -191,7 +191,6 @@
     <ClInclude Include="..\Include\MedImgArithmetic\mi_connected_domain_analysis.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h" />
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_label_sphere_converter.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_line.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_line_segment.h" />
     <ClInclude Include="..\Include\MedImgArithmetic\mi_matrix4.h" />
@@ -231,7 +230,6 @@
     <ClCompile Include="mi_connected_domain_analysis.cpp" />
     <ClCompile Include="mi_ellipsoid.cpp" />
     <ClCompile Include="mi_intersection_test.cpp" />
-    <ClCompile Include="mi_label_sphere_converter.cpp" />
     <ClCompile Include="mi_line.cpp" />
     <ClCompile Include="mi_line_segment.cpp" />
     <ClCompile Include="mi_matrix4.cpp" />
