@@ -1,7 +1,7 @@
 #include <string>
 
-extern int ExtractMask(int argc , char* argv[]);
-extern int ExtractMaskVis(int argc , char* argv[]);
+extern int logic(int argc , char* argv[]);
+extern int logic_vis(int argc , char* argv[]);
 
 int main(int argc , char* argv[])
 {
@@ -15,10 +15,10 @@ int main(int argc , char* argv[])
     }
     if (vis)
     {
-        return ExtractMaskVis(argc , argv);
+        return logic_vis(argc , argv);
     }
     else
     {
-        return ExtractMask(argc , argv);
+        return logic(argc , argv);
     }
 }

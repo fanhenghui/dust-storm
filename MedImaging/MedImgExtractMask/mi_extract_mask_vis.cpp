@@ -33,9 +33,7 @@ int _height = 512;
 
 extern int save_mask(std::shared_ptr<ImageData> mask , const std::string& path , bool compressed);
 
-extern int load_dicom_series(std::vector<std::string>& files ,
-    std::shared_ptr<ImageDataHeader>& header,
-    std::shared_ptr<ImageData>& img);
+extern int load_dicom_series(std::vector<std::string>& files , std::shared_ptr<ImageDataHeader>& header, std::shared_ptr<ImageData>& img);
 
 extern int get_nodule_set(const std::string& xml_file, std::vector<std::vector<Nodule>>& nodules , std::string& series_uid);
 
@@ -54,18 +52,34 @@ extern int browse_root_xml(const std::string& root , std::vector<std::string>& x
 
 extern int browse_root_dcm(const std::string& root, std::map<std::string, std::vector<std::string>>& dcm_files );
 
+extern int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img , std::shared_ptr<ImageDataHeader>& last_header , std::vector<std::vector<Nodule>>& last_nodule);
+
 std::vector<std::vector<Nodule>> _vis_nodules;
+std::shared_ptr<ImageData> _img_data;
+std::shared_ptr<ImageDataHeader> _data_header;
+std::shared_ptr<unsigned char> _buffer;
 int _cur_z = 46;
 int _max_z = 133;
 int _cur_reader = 0;
 int _pre_x = 0;
 int _pre_y = 0;
 
+const float PRESET_CT_LUNGS_WW = 1500;
+const float PRESET_CT_LUNGS_WL = -400;
+
+float _ww = PRESET_CT_LUNGS_WW;
+float _wl = PRESET_CT_LUNGS_WL;
+
+void calculate_raw_image_buffer();
+
 void display()
 {
     glViewport(0,0,_width,_height);
     glClearColor(0,0,0,0);
     glClear(GL_COLOR_BUFFER_BIT );
+
+    calculate_raw_image_buffer();
+    glDrawPixels(_width , _height , GL_RGB , GL_UNSIGNED_BYTE , _buffer.get());
 
     glPushMatrix();
 
@@ -77,20 +91,6 @@ void display()
     gluOrtho2D(0,_width ,0,_height);
 
     glPointSize(2.0);
-    //if (!_pre_contours.empty())
-    //{
-    //    glColor3f(0.0,1.0,1.0);
-    //    glBegin(GL_POINTS);
-    //    for (int i = 0 ; i<_pre_contours.size() ; ++i)
-    //    {
-    //        for (int j = 0 ; j < _pre_contours[i].size() ; ++j)
-    //        {
-    //            glVertex2d(_pre_contours[i][j].x , _pre_contours[i][j].y);
-    //        }
-    //    }
-    //    glEnd();
-    //}
-
     if (!_vis_nodules.empty())
     {
         const Vector3 colors[4] = {
@@ -123,16 +123,16 @@ void display()
                 if (i<pts.size())
                 {
                     glColor3d(colors[reader].x , colors[reader].y , colors[reader].z);
-                    glBegin(GL_LINES);
+                    glBegin(GL_LINE_STRIP);
                     for (int j = i ; j < pts.size() ; ++j)
                     {
                         if (pts[j].z != _cur_z)
                         {
                             break;
                         }
-                        glVertex2d(pts[j].x , pts[j].y);
+                        glVertex2d(pts[j].x , _height - pts[j].y - 1);
                     }
-                    glVertex2d(pts[i].x , pts[i].y);
+                    glVertex2d(pts[i].x , _height -pts[i].y - 1);
                     glEnd();
                 }
             }
@@ -174,6 +174,19 @@ void keybord(unsigned char key , int x, int y)
             _cur_reader= 4;
             break;
         }
+    case 'h':
+        {
+            std::cout << "\n************  user manual ************\n";
+            std::cout << "\tnum 0 : show reader 1's annotation.\n";
+            std::cout << "\tnum 1 : show reader 2's annotation.\n";
+            std::cout << "\tnum 2 : show reader 3's annotation.\n";
+            std::cout << "\tnum 3 : show reader 4's annotation.\n";
+            std::cout << "\tnum 4 : show all annotation.\n";
+            std::cout << "\tmouse wheel for paging.\n";
+            std::cout << "\tmouse click&motion for windowing.\n";
+            std::cout << "************  user manual ************\n";
+            break;
+        }
     default:
         break;
     }
@@ -183,33 +196,24 @@ void keybord(unsigned char key , int x, int y)
 
 void reshape(int x , int y)
 {
-    if (x == 0 || y == 0)
-    {
-        return;
-    }
-    _width = x;
-    _height = y;
-
     glutPostRedisplay();
 }
 
 void motion(int x , int y)
 {
-    int delta = y - _pre_y;
-    _cur_z += delta;
-    if (_cur_z > _max_z)
+    int delta_y = y - _pre_y;
+    int delta_x = x - _pre_x;
+
+    _wl += delta_y ;
+    _ww += delta_x ;
+    if (_ww < 1)
     {
-        _cur_z = _max_z;
-    }
-    if (_cur_z < 0)
-    {
-        _cur_z = 0;
+        _ww = 1;
     }
 
     _pre_x = x;
     _pre_y = y;
 
-    std::cout << "Current Z : "<< _cur_z << std::endl;
     glutPostRedisplay();
 
 }
@@ -218,7 +222,7 @@ void mouse(int btn , int status , int x , int y)
 {
     if (status == GLUT_DOWN)
     {
-
+        
     }
     else if(status == GLUT_UP)
     {
@@ -246,289 +250,70 @@ void mousewheel(int btn , int dir, int x , int y)
     glutPostRedisplay();
 }
 
-int ExtractMaskVis(int argc , char* argv[])
+
+void calculate_raw_image_buffer()
 {
-    /*arguments list:
-    -help : print all argument
-    -data <path> : dicom data root(.dcm)
-    -annotation <path> : annotation root(.xml)
-    -output <path] : save mask root
-    -compress : if mask is compressed 
-    -slicelocation <less/greater> : default is less
+    const float min_wl = _wl - _img_data->_intercept - _ww*0.5f;
 
-    -crosspercent<0.1~1> default 0.7
-    -confidence<1~4> default is 2
-    -setlogic<inter/union> default is inter 
-    */
-
-    std::string dcm_direction;
-    std::string annotation_direction;
-    std::string output_direction;
-    bool compressed = false;
-    bool save_slice_location_less = true;
-    float cross_nodule_percent = 0.7f;
-    int confidence = 2;
-    int pixel_confidence = 2;
-    int setlogic = 0;//0 for intersection 1 for union
-
-    if (argc == 1)
+    if (_img_data->_data_type == DataType::USHORT)
     {
-        LOG_OUT("invalid arguments!\n");
-        LOG_OUT("targuments list:\n");
-        LOG_OUT("\t-data <path> : DICOM data root(.dcm)\n");
-        LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
-        LOG_OUT("\t-output <path] : save mask root\n");
-        LOG_OUT("\t-compress : if mask is compressed\n");
-        LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
-        LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
-        LOG_OUT("\t-confidence<1~4> default is 2\n");
-        LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
-        LOG_OUT("\t-setlogic<inter/union> default is inter\n");
-        LOG_OUT("\t-vis: if view last annotation set's contour in 2D\n");
-        return -1;
-    }
-    else
-    {
-        for (int i = 1; i< argc ; ++i)
+        unsigned short* volume_data = (unsigned short*)_img_data->get_pixel_pointer();
+        for (int y  = 0 ; y <_height; ++y)
         {
-            if (std::string(argv[i]) == "-help")
+            int yy = _height - y - 1;
+            for (int x = 0; x < _width ; ++x)
             {
-                LOG_OUT("arguments list:\n");
-                LOG_OUT("\t-data <path> : DICOM data root(.dcm)\n");
-                LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
-                LOG_OUT("\t-output <path] : save mask root\n");
-                LOG_OUT("\t-compress : if mask is compressed\n");
-                LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
-                LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
-                LOG_OUT("\t-confidence<1~4> default is 2\n");
-                LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
-                LOG_OUT("\t-setlogic<inter/union> default is inter\n");
-                LOG_OUT("\t-vis: if view last annotation set's contour in 2D\n");
-                return 0;
+                unsigned short v = volume_data[_cur_z*_width*_height + yy*_width + x];
+                float v0 = ((float)v  - min_wl)/_ww;
+                v0 = v0 > 1.0f ? 1.0f : v0;
+                v0 = v0 < 0.0f ? 0.0f : v0;
+                unsigned char rgb = static_cast<unsigned char>(v0*255.0f);
+                _buffer.get()[(y*_width + x)*3] = rgb;
+                _buffer.get()[(y*_width + x)*3+1] = rgb;
+                _buffer.get()[(y*_width + x)*3+2] = rgb;
             }
-           if (std::string(argv[i]) == "-data")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               dcm_direction = std::string(argv[i+1]);
-               
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-annotation")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-
-               annotation_direction = std::string(argv[i+1]);
-               ++i;
-           }
-           else if (std::string(argv[i])== "-output")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-
-               output_direction = std::string(argv[i+1]);
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-compress")
-           {
-               compressed = true;
-           }
-           else if (std::string(argv[i]) == "-slicelocation")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-
-               if(std::string(argv[i+1]) == "less")
-               {
-                   save_slice_location_less = true;
-               }
-               else if(std::string(argv[i+1]) == "greater")
-               {
-                   save_slice_location_less =false;
-               }
-               else
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-crosspercent")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               StrNumConverter<float> conv;
-               cross_nodule_percent = conv.to_num(std::string(argv[i+1]));
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-confidence")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               StrNumConverter<int> conv;
-               confidence = conv.to_num(std::string(argv[i+1]));
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-pixelconfidence")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               StrNumConverter<int> conv;
-               pixel_confidence = conv.to_num(std::string(argv[i+1]));
-               ++i;
-           }
-           else if (std::string(argv[i]) == "-setlogic")
-           {
-               if (i+1 > argc-1)
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-
-               if(std::string(argv[i+1]) == "inter")
-               {
-                   setlogic = 0;
-               }
-               else if(std::string(argv[i+1]) == "union")
-               {
-                   setlogic = 1;
-               }
-               else
-               {
-                   LOG_OUT(  "invalid arguments!\n");
-                   return -1;
-               }
-               ++i;
-           }
-       }
+        }
     }
-
-    if (dcm_direction.empty() || annotation_direction.empty() || output_direction.empty())
+    else if (_img_data->_data_type == DataType::SHORT)
     {
-        LOG_OUT(  "invalid empty direction!\n");
+        short* volume_data = (short*)_img_data->get_pixel_pointer();
+        for (int y  = 0 ; y <_height ; ++y)
+        {
+            int yy = _height - y - 1;
+            for (int x = 0; x < _width ; ++x)
+            {
+                short v = volume_data[_cur_z*_width*_height + yy*_width + x];
+                float v0 = ((float)v   - min_wl)/_ww;
+                v0 = v0 > 1.0f ? 1.0f : v0;
+                v0 = v0 < 0.0f ? 0.0f : v0;
+                unsigned char rgb = static_cast<unsigned char>(v0*255.0f);
+                _buffer.get()[(y*_width + x)*3] = rgb;
+                _buffer.get()[(y*_width + x)*3+1] = rgb;
+                _buffer.get()[(y*_width + x)*3+2] = rgb;
+            }
+        }
+    }
+}
+
+int logic_vis(int argc , char* argv[])
+{
+    if(0 != extract_mask(argc , argv , _img_data , _data_header , _vis_nodules))
+    {
         return -1;
     }
 
-    std::map<std::string , std::vector<std::string>> dcm_files;
-    if (0 != browse_root_dcm(dcm_direction , dcm_files))
-    {
-        LOG_OUT(  "browse dicom direction failed!\n");
-        return -1;
-    }
-
-    std::vector<std::string> xml_files;
-    if (0 != browse_root_xml(annotation_direction , xml_files))
-    {
-        LOG_OUT(  "browse annotation direction failed!\n");
-        return -1;
-    }
-
-    for (auto it = xml_files.begin() ; it != xml_files.end() ; ++it)
-    {
-        LOG_OUT(  "parse annotation file : " + *it + " >>>\n");
-
-        //parse nodule annotation file
-        std::vector<std::vector<Nodule>> nodules;
-        std::string series_uid;
-        if(0 !=  get_nodule_set(*it , nodules , series_uid))
-        {
-            LOG_OUT(  "parse nodule annotation failed!\n");
-            return -1;
-        }
-
-        LOG_OUT("series UID : " + series_uid + "\n");
-
-        auto it_dcm = dcm_files.find(series_uid);
-        if (it_dcm == dcm_files.end())
-        {
-            LOG_OUT(  "can't find dcm files!\n");
-            continue;
-        }
-
-        LOG_OUT( "loading DICOM files to get image information :  >>>\n");
-
-        //slice location to pixel coordinate
-        std::shared_ptr<ImageDataHeader> data_header;
-        std::shared_ptr<ImageData> volume_data;
-        if(0 != load_dicom_series(it_dcm->second ,data_header,volume_data ))
-        {
-            LOG_OUT(  "load series failed!\n");
-            return -1;
-        }
-
-        //resample position z from slice location to pixel coordinate
-        if( 0 != resample_z(nodules , data_header , save_slice_location_less) )
-        {
-            LOG_OUT( "resample z failed!\n");
-            return -1;
-        }
-
-        LOG_OUT( "convert contour to mask >>>\n");
-
-        //calculate aabb for extract mask
-        cal_nodule_aabb(nodules);
-
-        //contour to mask
-        std::shared_ptr<ImageData> mask(new ImageData);
-        volume_data->shallow_copy(mask.get());
-        if (0 != contour_to_mask(nodules , mask , cross_nodule_percent ,confidence, pixel_confidence , setlogic))
-        {
-            LOG_OUT( "convert contour to mask failed!\n");
-            return -1;
-        }
-
-        //save mask
-        std::string output;
-        if (compressed)
-        {
-            output = output_direction+ series_uid + ".rle";
-        }
-        else
-        {
-            output = output_direction+ series_uid + ".raw";
-        }
-        if(0 != save_mask( mask , output ,compressed))
-        {
-            LOG_OUT( "save mask failed!\n");
-            return -1;
-        }
-
-        LOG_OUT( "extract mask done.\n");
-
-        _vis_nodules = nodules;
-    }
-
-    LOG_OUT(  "done.\n");
-
+    _width =  _img_data->_dim[0];
+    _height =  _img_data->_dim[1];
+    _max_z = _img_data->_dim[2];
+    _cur_z = _img_data->_dim[2]/2;
+    _buffer.reset(new  unsigned char[_width*_height*3] , std::default_delete<unsigned char[]>());
 
     glutInit(&argc , argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(0,0);
     glutInitWindowSize(_width,_height);
 
-    glutCreateWindow("Test Scan Line");
+    glutCreateWindow(_data_header->series_uid.c_str());
 
     if ( GLEW_OK != glewInit())
     {

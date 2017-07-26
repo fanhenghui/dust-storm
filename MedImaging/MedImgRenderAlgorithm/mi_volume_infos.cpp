@@ -359,7 +359,7 @@ void VolumeInfos::release_mask_resource_i()
 
 void VolumeInfos::refresh()
 {
-    if (!_mask_aabb_to_be_update.empty())
+    if (!_mask_aabb_to_be_update.empty() && Configuration::instance()->get_processing_unit_type() == GPU)
     {
         CHECK_GL_ERROR;
 

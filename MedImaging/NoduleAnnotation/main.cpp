@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     try
     {
         QApplication a(argc, argv);
-        //a.doubleClickInterval(150);
+        //std::cout << a.doubleClickInterval() << std::endl;
 
         NoduleAnnotation w;
         w.show();

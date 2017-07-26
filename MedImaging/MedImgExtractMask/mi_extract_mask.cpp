@@ -693,8 +693,7 @@ int browse_root_dcm(const std::string& root, std::map<std::string, std::vector<s
     return 0;
 }
 
-
-int ExtractMask(int argc , char* argv[])
+int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img , std::shared_ptr<ImageDataHeader>& last_header , std::vector<std::vector<Nodule>>& last_nodule)
 {
     /*arguments list:
     -help : print all argument
@@ -953,11 +952,11 @@ int ExtractMask(int argc , char* argv[])
         std::string output;
         if (compressed)
         {
-            output = output_direction+ series_uid + ".rle";
+            output = output_direction+ "/" + series_uid + ".rle";
         }
         else
         {
-            output = output_direction+ series_uid + ".raw";
+            output = output_direction+ "/" +series_uid + ".raw";
         }
         if(0 != save_mask( mask , output ,compressed))
         {
@@ -966,8 +965,20 @@ int ExtractMask(int argc , char* argv[])
         }
 
         LOG_OUT( "extract mask done.\n");
+
+        last_img = volume_data;
+        last_header = data_header;
+        last_nodule = nodules;
     }
 
     LOG_OUT(  "done.\n");
     return 0;
+}
+
+int logic(int argc , char* argv[])
+{
+    std::shared_ptr<ImageData> last_img;
+    std::shared_ptr<ImageDataHeader> last_header;
+    std::vector<std::vector<Nodule>> last_nodule;
+    return extract_mask(argc , argv ,last_img , last_header ,last_nodule);
 }
