@@ -57,8 +57,8 @@ bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Li
 
 bool IntersectionTest::aabb_to_aabb(const AABBI& l , const AABBI& r , AABBI& result)
 {
-    if ( (l._min[0] > r._max[0] && l._min[1] > r._max[1] && l._min[2] > r._max[2]) ||
-        (r._min[0] > l._max[0] && r._min[1] > l._max[1] && r._min[2] > l._max[2]) )
+    if ( (l._min[0] > r._max[0] || l._min[1] > r._max[1] || l._min[2] > r._max[2]) ||
+        (r._min[0] > l._max[0] || r._min[1] > l._max[1] || r._min[2] > l._max[2]) )
     {
         return false;
     }

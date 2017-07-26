@@ -250,6 +250,61 @@ int get_nodule_set(const std::string& xml_file, std::vector<std::vector<Nodule>>
     return 0;
 }
 
+#define LOCATION_EPSILON 0.0001
+//if slice location is not match with position z , use position z (not very precise)
+int resample_z_backup(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less)
+{
+    std::vector<double> slice_location;
+    for (int i = 0 ; i < header->image_position.size() ; ++i)
+    {
+        slice_location.push_back(header->image_position[i].z);
+    }
+
+    double delta = 0;
+    for(int i = 1; i<slice_location.size() ; ++i)
+    {
+        if (fabs(slice_location[i] - slice_location[i-1]) > LOCATION_EPSILON)
+        {
+            delta = slice_location[i] - slice_location[i-1];
+        }
+    }
+
+    const double slice0 = slice_location[0];
+
+    for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader)
+    {
+        for(auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it)
+        {
+            Nodule& nodule = *it;
+            std::vector<Point3>& pts = nodule._points;
+            for (int  i= 0 ; i< pts.size() ; ++i)
+            {
+                double slice = pts[i].z;
+                double delta_slice = slice - slice0;
+                int tmp_idx = 0;
+                for (int j = 0 ; j<slice_location.size() ; ++j)
+                {
+                    if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
+                    {
+                        pts[i].z = static_cast<double>(j);
+                        goto FIND_LOCATION;
+                    }
+                }
+
+                LOG_OUT(  "find slice lotation failed!\n");
+                return -1;
+
+FIND_LOCATION:;
+            }
+
+        }
+
+    }
+
+    return 0;
+
+}
+
 int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less)
 {
     std::vector<double> slice_location = header->slice_location;
@@ -261,13 +316,13 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
     double delta = 0;
     for(int i = 1; i<slice_location.size() ; ++i)
     {
-        if (fabs(slice_location[i] - slice_location[i-1]) > DOUBLE_EPSILON)
+        if (fabs(slice_location[i] - slice_location[i-1]) > LOCATION_EPSILON)
         {
             delta = slice_location[i] - slice_location[i-1];
         }
     }
 
-    if (fabs(delta) < DOUBLE_EPSILON )
+    if (fabs(delta) < LOCATION_EPSILON )
     {
         LOG_OUT(  "slice location error!\n");
         return -1;
@@ -292,7 +347,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
                     return -1;
                 }
 
-                if (fabs(slice_location[tmp_idx] - slice) < DOUBLE_EPSILON )
+                if (fabs(slice_location[tmp_idx] - slice) < LOCATION_EPSILON )
                 {
                     pts[i].z = static_cast<double>(tmp_idx);
                     goto FIND_LOCATION;
@@ -303,7 +358,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
                     {
                         for(int j = tmp_idx ; j<slice_location.size() ; ++j)
                         {
-                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
                             {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -314,7 +369,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
                     {
                         for(int j = tmp_idx ; j>0 ; --j)
                         {
-                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
                             {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -331,7 +386,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
                     {
                         for(int j = tmp_idx ; j>0 ; --j)
                         {
-                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
                             {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -342,7 +397,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules , std::shared_ptr<Image
                     {
                         for(int j = tmp_idx ; j<slice_location.size() ; ++j)
                         {
-                            if (fabs(slice_location[j] - slice) < DOUBLE_EPSILON )
+                            if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
                             {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -402,12 +457,17 @@ void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader 
     const int v_target = target._aabb.volume();
 
     int cur_readid = 0;
+   
+
     for (auto it = nodules.begin() ; it != nodules.end(); ++it , ++cur_readid )
     {
         if ( it == reader )//skip myself
         {
             continue;
         }
+
+        Nodule* cross_nodule = nullptr;
+        float max_region_percent = -1;
 
         for(auto it2 = (*it).begin()  ; it2 != (*it).end() ; ++it2)
         {
@@ -428,14 +488,23 @@ void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader 
                 const int v = nodule._aabb.volume();
                 const int inter_v = inter.volume();
                 const float inter_p = static_cast<float>(inter_v) / ( (v + v_target)*0.5f);
-                if (inter_p > region_percent)
+                //std::cout << "cross percent : " << inter_p << std::endl;
+                if (inter_p > max_region_percent)
                 {
-                    same_nodules.push_back(&nodule);
-                    reader_id.push_back(cur_readid);
+                    max_region_percent = inter_p;
+                    cross_nodule = &nodule;
                 }
             }
         }
+
+        if (max_region_percent > region_percent)
+        {
+            same_nodules.push_back(cross_nodule);
+            reader_id.push_back(cur_readid);
+        }
+
     }
+
 }
 
 typedef ScanLineAnalysis<unsigned char>::Pt2 PT2;
@@ -526,6 +595,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                 {
                     same_nodules[k]->flag = -1;
                 }
+                continue;
             }
 
             //set flags
@@ -715,7 +785,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
     std::string output_direction;
     bool compressed = false;
     bool save_slice_location_less = true;
-    float cross_nodule_percent = 0.7f;
+    float cross_nodule_percent = 0.5f;
     int confidence = 2;
     int pixel_confidence = 2;
     int setlogic = 0;//0 for intersection 1 for union
@@ -729,7 +799,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
         LOG_OUT("\t-output <path] : save mask root\n");
         LOG_OUT("\t-compress : if mask is compressed\n");
         LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
-        LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
+        LOG_OUT("\t-crosspercent<0.1~1> default 0.5\n");
         LOG_OUT("\t-confidence<1~4> default is 2\n");
         LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
         LOG_OUT("\t-setlogic<inter/union> default is inter\n");
@@ -748,7 +818,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
                LOG_OUT("\t-output <path] : save mask root\n");
                LOG_OUT("\t-compress : if mask is compressed\n");
                LOG_OUT("\t-slicelocation <less/greater> : default is less\n");
-               LOG_OUT("\t-crosspercent<0.1~1> default 0.7\n");
+               LOG_OUT("\t-crosspercent<0.1~1> default 0.5\n");
                LOG_OUT("\t-confidence<1~4> default is 2\n");
                LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
                LOG_OUT("\t-setlogic<inter/union> default is inter\n");
@@ -930,8 +1000,11 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
         //resample position z from slice location to pixel coordinate
         if( 0 != resample_z(nodules , data_header , save_slice_location_less) )
         {
-            LOG_OUT( "resample z failed!\n");
-            return -1;
+            if (0 != resample_z_backup(nodules , data_header , save_slice_location_less))
+            {
+                LOG_OUT( "resample z failed!\n");
+                return -1;
+            }
         }
 
         LOG_OUT( "convert contour to mask >>>\n");

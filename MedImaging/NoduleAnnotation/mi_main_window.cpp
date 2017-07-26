@@ -1820,6 +1820,10 @@ void NoduleAnnotation::slot_load_label_file()
     for (auto it = voi_spheres.begin() ; it != voi_spheres.end() ; ++it)
     {
         (*it).center = matv2patient.transform((*it).center);
+        if ((*it).diameter <DOUBLE_EPSILON)
+        {
+            (*it).diameter = (std::min)((std::min)(volume->_spacing[0] , volume->_spacing[1]) , volume->_spacing[2]);
+        }
     }
 
     //clock_t _end2 = clock();
