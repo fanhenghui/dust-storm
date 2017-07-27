@@ -60,6 +60,8 @@ public:
     void set_color_inverse_mode(ColorInverseMode mode);
 
 protected:
+    virtual void pre_render();
+protected:
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
     std::shared_ptr<RayCaster> _ray_caster;

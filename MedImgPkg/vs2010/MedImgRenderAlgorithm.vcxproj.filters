@@ -144,6 +144,9 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_lut_loader.h">
+      <Filter>Transfer function</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_entry_exit_points.cpp">
@@ -241,6 +244,9 @@
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_lut_loader.cpp">
+      <Filter>Transfer function</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -72,7 +72,18 @@ void VRScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
     _camera_calculator->init_vr_placement(_ray_cast_camera);
 
     //initialize bounding box
+    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points = 
+        std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
 
+    std::shared_ptr<ImageData> volume = _volume_infos->get_volume();
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume);
+
+    AABB default_aabb;
+    default_aabb._min = Point3::S_ZERO_POINT;
+    default_aabb._max.x = static_cast<double>(volume->_dim[0]);
+    default_aabb._max.y = static_cast<double>(volume->_dim[1]);
+    default_aabb._max.z = static_cast<double>(volume->_dim[2]);
+    vr_entry_exit_points->set_bounding_box(default_aabb);
 }
 
 void VRScene::set_bounding_box(const AABB& aabb)

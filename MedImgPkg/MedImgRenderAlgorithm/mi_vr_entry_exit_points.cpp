@@ -62,6 +62,13 @@ void VREntryExitPoints::initialize()
 
 
          _gl_fbo->unbind();
+
+         _proxy_geo_cube.reset(new ProxyGeometryCube);
+         _proxy_geo_cube->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));
+         _proxy_geo_cube->initialize();
+
+         /*_proxy_geo_brick.reset(new ProxyGeometryBrick);
+         _proxy_geo_brick->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));*/
     }
 }
 
@@ -119,6 +126,8 @@ void VREntryExitPoints::set_proxy_geometry(ProxyGeometry pg)
 
 void VREntryExitPoints::calculate_entry_exit_points()
 {
+    initialize();
+
     if (_proxy_geometry == PG_CUBE)
     {
         _proxy_geo_cube->calculate_entry_exit_points();

@@ -104,8 +104,25 @@ void RayCastScene::set_display_size(int width , int height)
     _camera_interactor->resize(width , height);
 }
 
+void RayCastScene::pre_render()
+{
+    //refresh volume & mask & their infos
+    _volume_infos->refresh();
+
+    //scene FBO , ray casting program ...
+    initialize();
+
+    //entry exit points initialize
+    _entry_exit_points->initialize();
+
+    //GL resource update
+    GLResourceManagerContainer::instance()->update_all();
+}
+
 void RayCastScene::render()
 {
+    pre_render();
+
     //Skip render scene
     if (!get_dirty())
     {
@@ -113,14 +130,6 @@ void RayCastScene::render()
     }
 
     CHECK_GL_ERROR;
-
-    //refresh volume & mask & their infos
-    _volume_infos->refresh();
-
-    //scene FBO , ray casting program ...
-    initialize();
-
-    GLResourceManagerContainer::instance()->update_all();
 
     //////////////////////////////////////////////////////////////////////////
     //TODO other common graphic object rendering list
@@ -210,6 +219,9 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
 
         std::shared_ptr<ImageDataHeader> data_header = _volume_infos->get_data_header();
         RENDERALGO_CHECK_NULL_EXCEPTION(data_header);
+
+        _volume_infos->refresh();//TODOTODOTODO
+
 
         //Camera calculator
         _camera_calculator = volume_infos->get_camera_calculator();

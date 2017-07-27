@@ -50,9 +50,9 @@ namespace
 
     int _width = 512;
     int _height = 512;
-    int m_iButton = -1;
-    Point2 m_ptPre;
-    int m_iTestCode = 0;
+    int _iButton = -1;
+    Point2 _ptPre;
+    int _iTestCode = 1;
 
     std::vector<std::string> GetFiles()
     {
@@ -96,11 +96,12 @@ namespace
         _scene->set_volume_infos(_volumeinfos);
         _scene->set_sample_rate(1.0);
         _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
-        _scene->set_composite_mode(COMPOSITE_DVR);
+        _scene->set_composite_mode(COMPOSITE_MIP);
         _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         _scene->set_mask_mode(MASK_NONE);
         _scene->set_interpolation_mode(LINEAR);
         _scene->set_proxy_geometry(PG_CUBE);
+        _scene->set_test_code(_iTestCode);
         _scene->initialize();
 
         //Time query
@@ -165,7 +166,7 @@ namespace
         {
         case 'f':
             {
-                m_iTestCode = 1- m_iTestCode;
+                _iTestCode = 1- _iTestCode;
                 break;
             }
         default:
@@ -199,23 +200,23 @@ namespace
         y = y< 0 ? 0 : y;
         y = y> _height-1 ?  _height-1 : y;
 
-        m_iButton = button;
+        _iButton = button;
 
-        if (m_iButton == GLUT_LEFT_BUTTON)
+        if (_iButton == GLUT_LEFT_BUTTON)
         {
             
         }
-        else if (m_iButton == GLUT_MIDDLE_BUTTON)
+        else if (_iButton == GLUT_MIDDLE_BUTTON)
         {
 
         }
-        else if (m_iButton == GLUT_RIGHT_BUTTON)
+        else if (_iButton == GLUT_RIGHT_BUTTON)
         {
 
         }
 
         
-        m_ptPre = Point2(x,y);
+        _ptPre = Point2(x,y);
         glutPostRedisplay();
     }
 
@@ -230,21 +231,21 @@ namespace
 
         //std::cout << "Pre : " << m_ptPre.x << " " <<m_ptPre.y << std::endl;
         //std::cout << "Cur : " << cur_pt.x << " " <<cur_pt.y << std::endl;
-        if (m_iButton == GLUT_LEFT_BUTTON)
+        if (_iButton == GLUT_LEFT_BUTTON)
         {
-            _scene->rotate(m_ptPre , cur_pt);
+            _scene->rotate(_ptPre , cur_pt);
             
         }
-        else if (m_iButton == GLUT_MIDDLE_BUTTON)
+        else if (_iButton == GLUT_MIDDLE_BUTTON)
         {
-            _scene->pan(m_ptPre , cur_pt);
+            _scene->pan(_ptPre , cur_pt);
         }
-        else if (m_iButton == GLUT_RIGHT_BUTTON)
+        else if (_iButton == GLUT_RIGHT_BUTTON)
         {
-            _scene->zoom(m_ptPre , cur_pt);
+            _scene->zoom(_ptPre , cur_pt);
         }
 
-        m_ptPre = cur_pt;
+        _ptPre = cur_pt;
         glutPostRedisplay();
 
     }

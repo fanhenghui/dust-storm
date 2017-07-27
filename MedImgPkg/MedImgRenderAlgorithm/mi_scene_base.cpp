@@ -219,6 +219,12 @@ bool SceneBase::get_dirty() const
     return _dirty;
 }
 
+
+void SceneBase::pre_render()
+{
+
+}
+
 void SceneBase::set_name(const std::string& name)
 {
     _name = name;

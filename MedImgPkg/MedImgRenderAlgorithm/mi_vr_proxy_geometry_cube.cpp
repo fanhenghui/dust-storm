@@ -28,14 +28,9 @@ ProxyGeometryCube::~ProxyGeometryCube()
 
 }
 
-void ProxyGeometryCube::set_vr_entry_exit_poitns(std::shared_ptr<VREntryExitPoints> vr_entry_exit_points)
+void ProxyGeometryCube::initialize()
 {
-    _vr_entry_exit_points = vr_entry_exit_points;
-}
-
-void ProxyGeometryCube::create_gl_resource_i()
-{
-    if (nullptr != _gl_program)
+    if (nullptr == _gl_program)
     {
         UIDType uid;
         _gl_program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
@@ -77,6 +72,20 @@ void ProxyGeometryCube::create_gl_resource_i()
         _gl_vao->unbind();
     }
 }
+
+void ProxyGeometryCube::finialize()
+{
+    if (_gl_program)
+    {
+        //TODO delete program
+    }
+}
+
+void ProxyGeometryCube::set_vr_entry_exit_poitns(std::shared_ptr<VREntryExitPoints> vr_entry_exit_points)
+{
+    _vr_entry_exit_points = vr_entry_exit_points;
+}
+
 
 void ProxyGeometryCube::calculate_entry_exit_points()
 {
@@ -126,8 +135,10 @@ void ProxyGeometryCube::calculate_entry_exit_points()
         _gl_vao->bind();
         _gl_program->bind();
 
-        const Matrix4 mat_mvp = entry_exit_points->get_camera()->get_view_projection_matrix()*
-            entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
+        const Matrix4 mat_vp = entry_exit_points->get_camera()->get_view_projection_matrix();
+        const Matrix4 mat_m = entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
+        const Matrix4 mat_mvp = mat_vp*mat_m;
+            
         int loc = _gl_program->get_uniform_location("mat_mvp");
         if (-1 == loc)
         {

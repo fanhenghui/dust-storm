@@ -15,12 +15,14 @@ public:
     ProxyGeometryCube();
     ~ProxyGeometryCube();
 
+    void initialize();
+    void finialize();
+
     void set_vr_entry_exit_poitns(std::shared_ptr<VREntryExitPoints> vr_entry_exit_points);
 
     void calculate_entry_exit_points();
 
 protected:
-    void create_gl_resource_i();
 
 private:
     GLVAOPtr _gl_vao;

@@ -48,6 +48,9 @@ public:
     bool get_dirty() const;
 
 protected:
+    virtual void pre_render();
+
+protected:
     int _width , _height;
 
     GLFBOPtr _scene_fbo;

@@ -11,7 +11,7 @@ MED_IMG_BEGIN_NAMESPACE
 class CameraBase;
 class ImageData;
 class CameraCalculator;
-class RenderAlgo_Export EntryExitPoints
+class RenderAlgo_Export EntryExitPoints : public std::enable_shared_from_this<EntryExitPoints>
 {
 public:
     EntryExitPoints();
