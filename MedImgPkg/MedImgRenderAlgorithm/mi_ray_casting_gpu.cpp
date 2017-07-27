@@ -20,7 +20,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):_ray_caster(ray_caster)
+RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):_ray_caster(ray_caster),_last_test_code(-1)
 {
 
 }
@@ -30,7 +30,7 @@ RayCastingGPU::~RayCastingGPU()
 
 }
 
-void RayCastingGPU::render(int test_code)
+void RayCastingGPU::render()
 {
     update_i();
 
@@ -104,13 +104,16 @@ void RayCastingGPU::update_i()
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
 
+    const int test_code = ray_caster->get_test_code();
+
     if (_ray_casting_steps.empty() || 
         _mask_mode != ray_caster->_mask_mode ||
         _composite_mode != ray_caster->_composite_mode||
         _interpolation_mode != ray_caster->_interpolation_mode||
         _shading_mode != ray_caster->_shading_mode ||
         _color_inverse_mode != ray_caster->_color_inverse_mode ||
-        _mask_overlay_mode != ray_caster->_mask_overlay_mode)
+        _mask_overlay_mode != ray_caster->_mask_overlay_mode ||
+        _last_test_code != test_code)
     {
         _ray_casting_steps.clear();
         _mask_mode = ray_caster->_mask_mode;
@@ -119,95 +122,101 @@ void RayCastingGPU::update_i()
         _shading_mode = ray_caster->_shading_mode;
         _color_inverse_mode = ray_caster->_color_inverse_mode;
         _mask_overlay_mode = ray_caster->_mask_overlay_mode;
+        _last_test_code = test_code;
 
 #define STEP_PUSH_BACK(step_class_name) \
-        _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _program)));
+    _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _program)));
 
-        //Main
-        STEP_PUSH_BACK(RCStepMainVert);
-        STEP_PUSH_BACK(RCStepMainFrag);
-
-        //Utils
-        STEP_PUSH_BACK(RCStepUtils);
-
-        //Composite
-        if (_composite_mode == COMPOSITE_DVR)
+        if (_last_test_code == 1 || _last_test_code == 2)
         {
-
-        }
-        else if (_composite_mode == COMPOSITE_AVERAGE)
-        {
-            STEP_PUSH_BACK(RCStepRayCastingAverage);
-            STEP_PUSH_BACK(RCStepCompositeAverage);
-        }
-        else if (_composite_mode == COMPOSITE_MIP)
-        {
-            STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
-            STEP_PUSH_BACK(RCStepCompositeMIP);
-        }
-        else if (_composite_mode == COMPOSITE_MINIP)
-        {
-            STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
-            STEP_PUSH_BACK(RCStepCompositeMinIP);
-        }
-
-        //Mask
-        if (_mask_mode == MASK_NONE)
-        {
-            STEP_PUSH_BACK(RCStepMaskNoneSampler);
-        }
-        else if (_mask_mode == MASK_MULTI_LABEL)
-        {
-            STEP_PUSH_BACK(RCStepMaskNearstSampler);
-        }
-
-        //Volume 
-        if (_interpolation_mode == LINEAR)
-        {
-            STEP_PUSH_BACK(RCStepVolumeLinearSampler);
-        }
-        else if (_interpolation_mode == NEARST)
-        {
-            STEP_PUSH_BACK(RCStepVolumeNearstSampler);
-        }
-        else if (_interpolation_mode == CUBIC)
-        {
-            //TODO
-        }
-
-        //Shading
-        if (_shading_mode == SHADING_NONE)
-        {
-            STEP_PUSH_BACK(RCStepShadingNone);
-        }
-        else if (_shading_mode == SHADING_PHONG)
-        {
-            STEP_PUSH_BACK(RCStepShadingPhong);
-        }
-
-        //Color inverse
-        if (_color_inverse_mode == COLOR_INVERSE_DISABLE)
-        {
-            STEP_PUSH_BACK(RCStepColorInverseDisable);
-        }
-        else //(_color_inverse_mode == COLOR_INVERSE_ENABLE)
-        {
-            STEP_PUSH_BACK(RCStepColorInverseEnable);
-        }
-
-        //Overlay mask label
-        if (_mask_overlay_mode == MASK_OVERLAY_DISABLE)
-        {
-            STEP_PUSH_BACK(RCStepMaskOverlayDisable);
+            //Main
+            STEP_PUSH_BACK(RCStepMainVert);
+            STEP_PUSH_BACK(RCStepMainTestFrag);
         }
         else
         {
-            STEP_PUSH_BACK(RCStepMaskOverlayEnable);
+            //Main
+            STEP_PUSH_BACK(RCStepMainVert);
+            STEP_PUSH_BACK(RCStepMainFrag);
+
+            //Utils
+            STEP_PUSH_BACK(RCStepUtils);
+
+            //Composite
+            if (_composite_mode == COMPOSITE_DVR)
+            {
+
+            }
+            else if (_composite_mode == COMPOSITE_AVERAGE)
+            {
+                STEP_PUSH_BACK(RCStepRayCastingAverage);
+                STEP_PUSH_BACK(RCStepCompositeAverage);
+            }
+            else if (_composite_mode == COMPOSITE_MIP)
+            {
+                STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
+                STEP_PUSH_BACK(RCStepCompositeMIP);
+            }
+            else if (_composite_mode == COMPOSITE_MINIP)
+            {
+                STEP_PUSH_BACK(RCStepRayCastingMIPMinIP);
+                STEP_PUSH_BACK(RCStepCompositeMinIP);
+            }
+
+            //Mask
+            if (_mask_mode == MASK_NONE)
+            {
+                STEP_PUSH_BACK(RCStepMaskNoneSampler);
+            }
+            else if (_mask_mode == MASK_MULTI_LABEL)
+            {
+                STEP_PUSH_BACK(RCStepMaskNearstSampler);
+            }
+
+            //Volume 
+            if (_interpolation_mode == LINEAR)
+            {
+                STEP_PUSH_BACK(RCStepVolumeLinearSampler);
+            }
+            else if (_interpolation_mode == NEARST)
+            {
+                STEP_PUSH_BACK(RCStepVolumeNearstSampler);
+            }
+            else if (_interpolation_mode == CUBIC)
+            {
+                //TODO
+            }
+
+            //Shading
+            if (_shading_mode == SHADING_NONE)
+            {
+                STEP_PUSH_BACK(RCStepShadingNone);
+            }
+            else if (_shading_mode == SHADING_PHONG)
+            {
+                STEP_PUSH_BACK(RCStepShadingPhong);
+            }
+
+            //Color inverse
+            if (_color_inverse_mode == COLOR_INVERSE_DISABLE)
+            {
+                STEP_PUSH_BACK(RCStepColorInverseDisable);
+            }
+            else //(_color_inverse_mode == COLOR_INVERSE_ENABLE)
+            {
+                STEP_PUSH_BACK(RCStepColorInverseEnable);
+            }
+
+            //Overlay mask label
+            if (_mask_overlay_mode == MASK_OVERLAY_DISABLE)
+            {
+                STEP_PUSH_BACK(RCStepMaskOverlayDisable);
+            }
+            else
+            {
+                STEP_PUSH_BACK(RCStepMaskOverlayEnable);
+            }
         }
-
-#undef STEP_PUSH_BACK
-
-
 
         //compile
         std::vector<GLShaderInfo> shaders;
@@ -225,6 +234,8 @@ void RayCastingGPU::update_i()
             (*it)->get_uniform_location();
         }
     }
+
+#undef STEP_PUSH_BACK
 
     CHECK_GL_ERROR;
 }

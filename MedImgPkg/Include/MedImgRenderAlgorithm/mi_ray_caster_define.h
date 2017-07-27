@@ -10,7 +10,6 @@ MED_IMG_BEGIN_NAMESPACE
 enum RayCastingStrategy
 {
     CPU_BASE,
-    CPU_BRICK_ACCELERATE,
     GPU_BASE,
 };
 
@@ -72,6 +71,13 @@ enum MaskOverlayMode
 {
     MASK_OVERLAY_DISABLE = 0,
     MASK_OVERLAY_ENABLE,
+};
+
+//for VR entry exit points
+enum ProxyGeometry
+{
+    PG_CUBE,
+    PG_BRICKS,
 };
 
 #define BUFFER_BINDING_VISIBLE_LABEL_BUCKET 1

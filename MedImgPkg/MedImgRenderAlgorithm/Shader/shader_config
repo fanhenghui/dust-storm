@@ -3,10 +3,15 @@ EncoderDst = ../mi_shader_collection.h
 //MPR entry exit points
 EncoderItem = mpr_entry_exit_points.glsl S_MPR_ENTRY_EXIT_POINTS_COMP
 
+//VR entry exit points
+EncoderItem = vr_entry_exit_points.vert S_VR_ENTRY_EXIT_POINTS_VERTEX
+EncoderItem = vr_entry_exit_points.frag S_VR_ENTRY_EXIT_POINTS_FRAG
+
 //GPU ray caster
 //1 Main
 EncoderItem = rc_main.vert S_RC_MAIN_VERTEX
 EncoderItem = rc_main.frag S_RC_MAIN_FRAGMENT
+EncoderItem = rc_main_test.frag S_RC_MAIN_TEST_FRAGMENT
 
 //2 Ray casting
 EncoderItem = rc_ray_casting_dvr.frag S_RC_RAY_CASTING_DVR_FRAG

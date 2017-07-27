@@ -3,6 +3,7 @@
 #include "MedImgGLResource/mi_gl_program.h"
 #include "MedImgGLResource/mi_gl_texture_2d.h"
 #include "MedImgGLResource/mi_gl_texture_3d.h"
+#include "MedImgGLResource/mi_gl_buffer.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_ray_caster.h"

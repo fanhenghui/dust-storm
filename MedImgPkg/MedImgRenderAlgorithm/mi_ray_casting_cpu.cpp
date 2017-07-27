@@ -62,7 +62,7 @@ void RayCastingCPU::render(int test_code )
         //For testing entry & exit points
         if (0 != test_code)
         {
-           render_entry_exit_points_i(test_code);
+            render_entry_exit_points_i(test_code);
             ray_caster->_canvas->update_color_array();
             return;
         }

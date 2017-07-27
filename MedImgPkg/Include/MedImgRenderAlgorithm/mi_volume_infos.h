@@ -45,8 +45,6 @@ public:
     std::shared_ptr<ImageDataHeader> get_data_header();
 
     BrickCorner* get_brick_corner();
-    BrickUnit* get_volume_brick_unit();
-    BrickUnit* get_mask_brick_unit();
     VolumeBrickInfo* get_volume_brick_info();
     MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
 
@@ -54,11 +52,9 @@ public:
     void update_mask(const unsigned int (&begin)[3] ,const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed = true);
 
 private:
-    void load_volume_resource_i();
-    void release_volume_resource_i();
-
-    void load_mask_resource_i();
-    void release_mask_resource_i();
+    void refresh_upload_volume_i();
+    void refresh_upload_mask_i();
+    void refresh_update_mask_i();
 
 private:
     std::shared_ptr<ImageData> _volume_data;
@@ -74,6 +70,12 @@ private:
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
 
+    //cache
+    //volume upload
+    bool _volume_dirty;
+    //mask upload
+    bool _mask_dirty;
+    //mask update
     std::vector<AABBUI> _mask_aabb_to_be_update;
     std::vector<unsigned char*> _mask_array_to_be_update;
 

@@ -5,6 +5,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+class GLTextureBase;
 class GLTexture1D;
 class GLTexture2D;
 class GLTexture3D;
@@ -14,6 +15,7 @@ class GLVAO;
 class GLFBO;
 class GLProgram;
 
+typedef std::shared_ptr<GLTextureBase> GLTextureBasePtr;
 typedef std::shared_ptr<GLTexture1D> GLTexture1DPtr;
 typedef std::shared_ptr<GLTexture2D> GLTexture2DPtr;
 typedef std::shared_ptr<GLTexture3D> GLTexture3DPtr;

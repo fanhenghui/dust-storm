@@ -9,7 +9,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class RayCaster;
-
+//Just MPR 
 class RayCastingCPU
 {
 public:

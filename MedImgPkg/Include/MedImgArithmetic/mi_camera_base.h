@@ -46,7 +46,7 @@ public:
 
     virtual void zoom(double rate) = 0;
 
-    virtual void pan(const Vector2& pan) = 0;
+    virtual void pan(const Vector2& pan);
 
     CameraBase& operator =(const CameraBase& camera);
 

@@ -5,6 +5,8 @@
 #include "MedImgGLResource/mi_gl_texture_1d.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
+#include "MedImgIO/mi_image_data.h"
+
 #include "mi_ray_caster.h"
 
 MED_IMG_BEGIN_NAMESPACE

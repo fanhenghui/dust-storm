@@ -13,7 +13,6 @@ bool check_opacity(in out float opacity)
     }
 }
 
-
 //Encoding label to intger array 4*32 can contain 0~127 labels
 void label_encode(int label , in out int mask_flag[4])
 {

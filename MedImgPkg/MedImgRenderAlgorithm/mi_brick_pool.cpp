@@ -20,6 +20,16 @@ BrickPool::~BrickPool()
 
 }
 
+void BrickPool::set_volume( std::shared_ptr<ImageData> image_data )
+{
+    _volume = image_data;
+}
+
+void BrickPool::set_mask( std::shared_ptr<ImageData> image_data )
+{
+    _mask = image_data;
+}
+
 void BrickPool::get_brick_dim(unsigned int (&brick_dim)[3])
 {
     memcpy(brick_dim , _brick_dim , sizeof(unsigned int)*3);
@@ -48,16 +58,6 @@ void BrickPool::set_brick_expand( unsigned int brick_expand )
 unsigned int BrickPool::get_brick_expand() const
 {
     return _brick_expand;
-}
-
-void BrickPool::set_volume( std::shared_ptr<ImageData> image_data )
-{
-    _volume = image_data;
-}
-
-void BrickPool::set_mask( std::shared_ptr<ImageData> image_data )
-{
-    _mask = image_data;
 }
 
 BrickCorner* BrickPool::get_brick_corner()
@@ -260,7 +260,7 @@ void BrickPool::calculate_mask_brick()
     }
 }
 
-void BrickPool::update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3])
+void BrickPool::update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3] , LabelKey label_key)
 {
 
 }

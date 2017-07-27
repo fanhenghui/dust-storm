@@ -14,6 +14,7 @@
 #include "MedImgGLResource/mi_gl_texture_2d.h"
 #include "MedImgGLResource/mi_gl_program.h"
 #include "MedImgGLResource/mi_gl_utils.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 #include "mi_shader_collection.h"
 #include "mi_camera_calculator.h"
@@ -89,11 +90,6 @@ void MPREntryExitPoints::calculate_entry_exit_points()
     if (CPU_BASE == _strategy)
     {
         cal_entry_exit_points_cpu_i();
-    }
-    else if (CPU_BRICK_ACCELERATE == _strategy)
-    {
-        cal_entry_exit_points_cpu_i();
-        cal_entry_exit_plane_cpu_i();
     }
     else if (GPU_BASE == _strategy)
     {
@@ -256,52 +252,6 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i()
     }
 }
 
-void MPREntryExitPoints::cal_entry_exit_plane_cpu_i()
-{
-    try
-    {
-        RENDERALGO_CHECK_NULL_EXCEPTION(_camera);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
-
-        Vector3f vDim((float)_volume_data->_dim[0],
-            (float)_volume_data->_dim[1],
-            (float)_volume_data->_dim[2]);
-
-        //Calculate base plane of MPR
-        const Matrix4 mat_v2w = _camera_calculator->get_volume_to_world_matrix();
-        const Matrix4 mat_vp = _camera->get_view_projection_matrix();
-        const Matrix4 mat_mvp = mat_vp*mat_v2w;
-        const Matrix4 mat_mvp_inv = mat_mvp.get_inverse();
-
-        Vector3 view_dir = _camera->get_look_at() - _camera->get_eye();
-        view_dir = mat_v2w.get_transpose().transform(view_dir);
-        view_dir.normalize();
-        const Vector3 ray_dir = view_dir;
-        _ray_dir_norm = ArithmeticUtils::convert_vector(ray_dir);
-
-        const float thickness = _thickness;
-        const float thickness_half = thickness*0.5f;
-
-        const Point3 ptCenter = mat_mvp_inv.transform(Point3(0.0,0.0,0));
-        const Point3 ptEntry = ptCenter - ray_dir*thickness_half;
-        const Point3 ptExit = ptCenter + ray_dir*thickness_half;
-
-        double dDisEntry = ray_dir.dot_product(ptEntry - Point3::S_ZERO_POINT);
-        double dDisExit = (-ray_dir).dot_product(ptExit - Point3::S_ZERO_POINT);
-
-        _entry_plane = Vector4f((float)ray_dir.x ,(float)ray_dir.y , (float)ray_dir.z , (float)dDisEntry);
-        _exit_plane = Vector4f(-(float)ray_dir.x ,-(float)ray_dir.y , -(float)ray_dir.z , (float)dDisExit);
-
-    }
-    catch (const Exception& e)
-    {
-        std::cout  << e.what();
-        assert(false);
-        throw e;
-    }
-}
-
 void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point , Vector4f& exit_point , Vector3f& ray_dir_norm)
 {
     entry_point = _entry_plane;
@@ -331,51 +281,33 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
             RENDERALGO_THROW_EXCEPTION("Program ID is 0!");
         }
 
-        CHECK_GL_ERROR;
-
-        _program->bind();
-
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-        CHECK_GL_ERROR;
+        _program->bind();
 
         _entry_points_texture->bind_image(IMAGE_ENTRY_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
         _exit_points_texture->bind_image(IMAGE_EXIT_POINT , 0 , false , 0 , GL_READ_WRITE , GL_RGBA32F);
 
-        CHECK_GL_ERROR;
-
         glProgramUniform2ui(uiProgram , DISPLAY_SIZE , (GLuint)_width , (GLuint)_height);
-
-        CHECK_GL_ERROR;
 
         const float fDim[3] = {(float)_volume_data->_dim[0] , (float)_volume_data->_dim[1] , (float)_volume_data->_dim[2]};
         glProgramUniform3f(uiProgram , VOLUME_DIM , fDim[0] , fDim[1] , fDim[2]);
-
-        CHECK_GL_ERROR;
 
         const Matrix4 mat_v2w = _camera_calculator->get_volume_to_world_matrix();
         const Matrix4 mat_vp = _camera->get_view_projection_matrix();
         const Matrix4 mat_mvp = mat_vp*mat_v2w;
         const Matrix4 mat_mvp_inv = mat_mvp.get_inverse();
 
-        CHECK_GL_ERROR;
-
         float fMat[16] = {0.0f};
         mat_mvp_inv.to_float16(fMat);
         glProgramUniformMatrix4fv(uiProgram , MVP_INVERSE , 1 , GL_FALSE , fMat);
 
-        CHECK_GL_ERROR;
-
         glProgramUniform1f(uiProgram , THICKNESS , _thickness);
-
-        CHECK_GL_ERROR;
 
         Vector3 view_dir = _camera->get_look_at() - _camera->get_eye();
         view_dir = mat_v2w.get_transpose().transform(view_dir);
         view_dir.normalize();
         glProgramUniform3f(uiProgram , RAY_DIRECTION , (float)view_dir.x ,(float)view_dir.y , (float)view_dir.z);
-
-        CHECK_GL_ERROR;
 
         const unsigned int aLocalWorkGroupCount[2] = {4,4};
         unsigned int aWorkGroupsNum[2] = {(unsigned int)_width/aLocalWorkGroupCount[0], (unsigned int)_height/aLocalWorkGroupCount[1]};
@@ -389,13 +321,9 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
         }
         glDispatchCompute(aWorkGroupsNum[0] , aWorkGroupsNum[1] , 1);
 
-        CHECK_GL_ERROR;
-        
-        glPopAttrib();
-
-        CHECK_GL_ERROR;
-
         _program->unbind();
+
+        glPopAttrib();
 
         CHECK_GL_ERROR;
 
@@ -411,7 +339,6 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i()
 
         //this->debug_output_entry_points("/home/wr/data/entry_points.raw");
 
-        //CHECK_GL_ERROR;
 
 #undef IMAGE_ENTRY_POINT
 #undef IMAGE_EXIT_POINT

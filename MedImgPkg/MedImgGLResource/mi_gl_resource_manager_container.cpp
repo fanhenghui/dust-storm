@@ -48,6 +48,14 @@ void GLResourceManagerContainer::update_all()
 {
     _program_manager->update();
     _buffer_manager->update();
+    _texture_1d_manager->update();
+    _texture_2d_manager->update();
+    _texture_3d_manager->update();
+    _vao_manager->update();
+    _fbo_manager->update();
+    _texture_1d_array_manager->update();
+    _context_manager->update();
+    _time_query_manager->update();
 }
 
 GLResourceManagerContainer::GLResourceManagerContainer():

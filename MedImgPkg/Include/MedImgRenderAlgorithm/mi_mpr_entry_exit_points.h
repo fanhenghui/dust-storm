@@ -6,6 +6,7 @@
 #include "MedImgArithmetic/mi_vector3f.h"
 #include "MedImgArithmetic/mi_vector4f.h"
 #include "MedImgRenderAlgorithm/mi_ray_caster_define.h"
+#include "MedImgGLResource/mi_gl_resource_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -38,8 +39,6 @@ public:
 
 private:
     void cal_entry_exit_points_cpu_i();
-
-    void cal_entry_exit_plane_cpu_i();
 
     void cal_entry_exit_points_gpu_i();
 

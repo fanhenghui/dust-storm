@@ -26,8 +26,6 @@ public:
 
     virtual void zoom(double rate);
 
-    virtual void pan(const Vector2& pan);
-
     double get_near_clip_distance() const;
 
     double get_far_clip_distance() const;
@@ -51,7 +49,6 @@ private:
 
     //Zoom
     double _ZoomFactor;
-    Vector2 _VecPan;
 };
 
 MED_IMG_END_NAMESPACE

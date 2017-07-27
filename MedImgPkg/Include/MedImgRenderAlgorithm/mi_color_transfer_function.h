@@ -1,6 +1,7 @@
 #ifndef COLOR_TRNASFER_FUNCTION_H_
 #define COLOR_TRNASFER_FUNCTION_H_
 
+#include <vector>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 
 MED_IMG_BEGIN_NAMESPACE

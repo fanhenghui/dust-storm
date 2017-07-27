@@ -100,8 +100,8 @@ MED_IMG_BEGIN_NAMESPACE
     Det = _mm_mul_ps(sum,_L1);
     Det = _mm_add_ps(Det,_mm_movehl_ps(Det,Det));
 
-    MCSF_3D_ALIGN16 const unsigned int _vmathPNPN[4] = {0x00000000, 0x80000000, 0x00000000, 0x80000000};
-    MCSF_3D_ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000, 0x80000000, 0x00000000};
+    ALIGN16 const unsigned int _vmathPNPN[4] = {0x00000000, 0x80000000, 0x00000000, 0x80000000};
+    ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000, 0x80000000, 0x00000000};
     const __m128 Sign_PNPN = _mm_load_ps((float *)_vmathPNPN);
     const __m128 Sign_NPNP = _mm_load_ps((float *)_vmathNPNP);
 
@@ -132,7 +132,7 @@ MED_IMG_BEGIN_NAMESPACE
     __m128 mtL3 = _mm_xor_ps(sum,Sign_PNPN);
 
     // Dividing is FASTER than rcp_nr! (Because rcp_nr causes many register-memory RWs).
-    MCSF_3D_ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+    ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
     RDet = _mm_div_ss(_mm_load_ss((float *)&_vmathZERONE), Det); // TODO: just 1.0f?
     RDet = _mm_shuffle_ps(RDet,RDet,0x00);
 

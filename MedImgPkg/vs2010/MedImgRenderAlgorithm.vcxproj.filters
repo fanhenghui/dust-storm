@@ -23,9 +23,6 @@
     <Filter Include="Ray caster">
       <UniqueIdentifier>{575d9c36-bcec-4247-8029-5d47ecbe93dc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Ray caster\CPU Ray Casting">
-      <UniqueIdentifier>{59db66a3-5d51-4a1e-880f-71fd6d71b017}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Ray caster\GPU Ray Casting">
       <UniqueIdentifier>{e2c5d223-9061-48d2-8e5d-11d3404b3575}</UniqueIdentifier>
     </Filter>
@@ -113,9 +110,6 @@
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu.h">
       <Filter>Ray caster</Filter>
     </ClInclude>
-    <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu_brick_acc.h">
-      <Filter>Ray caster</Filter>
-    </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_entry_exit_points.h">
       <Filter>Entry exit points</Filter>
     </ClInclude>
@@ -146,9 +140,6 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_render_algo_export.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_shader_collection.h">
       <Filter>Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_geometry.h">
-      <Filter>Brick</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
       <Filter>Scene</Filter>
@@ -233,9 +224,6 @@
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu.cpp">
       <Filter>Ray caster</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu_brick_acc.cpp">
-      <Filter>Ray caster</Filter>
-    </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_mpr_scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -249,9 +237,6 @@
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_mask_label_store.cpp">
-      <Filter>Brick</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_geometry.cpp">
       <Filter>Brick</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp">
@@ -330,6 +315,15 @@
     </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points_culling.glsl">
       <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.frag">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.vert">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\rc_main_test.frag">
+      <Filter>Shader\Ray caster</Filter>
     </None>
   </ItemGroup>
 </Project>

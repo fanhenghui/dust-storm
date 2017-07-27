@@ -3,6 +3,8 @@
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgArithmetic/mi_point2.h"
+#include "MedImgArithmetic/mi_camera_base.h"
 
 #include "boost/thread/mutex.hpp"
 
@@ -33,7 +35,7 @@ public:
 
     std::shared_ptr<CameraBase> get_camera();
 
-    virtual void render(int test_code);
+    virtual void render();
     void render_to_back();
     
     void download_image_buffer(bool jpeg = true);//TODO Temp change for scene FBO download error
@@ -75,6 +77,8 @@ protected:
     //cudaEvent_t _gpujpeg_encoding_start;
     //cudaEvent_t _gpujpeg_encoding_stop;
 
+private:
+    DISALLOW_COPY_AND_ASSIGN(SceneBase);
 };
 
 MED_IMG_END_NAMESPACE

@@ -23,7 +23,7 @@
 #include "MedImgRenderAlgorithm/mi_ray_caster.h"
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "MedImgRenderAlgorithm/mi_vr_scene.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -43,7 +43,7 @@ namespace
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<VolumeInfos> _volumeinfos;
 
-    std::shared_ptr<MPRScene> _scene;
+    std::shared_ptr<VRScene> _scene;
 
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
@@ -70,7 +70,7 @@ namespace
     void Init()
     {
         Configuration::instance()->set_processing_unit_type(GPU);
-        GLUtils::set_check_gl_flag(true);
+        GLUtils::set_check_gl_flag(false);
 
         std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
@@ -89,18 +89,18 @@ namespace
         _volumeinfos->set_mask(mask_data);
 
 
-        _scene.reset(new MPRScene(_width , _height));
+        _scene.reset(new VRScene(_width , _height));
         const float PRESET_CT_LUNGS_WW = 1500;
         const float PRESET_CT_LUNGS_WL = -400;
 
         _scene->set_volume_infos(_volumeinfos);
         _scene->set_sample_rate(1.0);
         _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
-        _scene->set_composite_mode(COMPOSITE_AVERAGE);
+        _scene->set_composite_mode(COMPOSITE_DVR);
         _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         _scene->set_mask_mode(MASK_NONE);
         _scene->set_interpolation_mode(LINEAR);
-        _scene->place_mpr(TRANSVERSE);
+        _scene->set_proxy_geometry(PG_CUBE);
         _scene->initialize();
 
         //Time query
@@ -122,7 +122,6 @@ namespace
             glClear(GL_COLOR_BUFFER_BIT);
             
             //_time_query->begin();
-            _scene->set_test_code(m_iTestCode);
             _scene->set_dirty(true);
 
             _scene->render();
@@ -164,46 +163,6 @@ namespace
     {
         switch(key)
         {
-        case 't':
-            {
-                // std::cout << "W H :" << _width << " " << _height << std::endl;
-                // m_pMPREE->debug_output_entry_points("D:/entry_exit.rgb.raw");
-                std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(_scene->get_camera());
-                int cur_page = _scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
-                std::cout << "current page : " << cur_page << std::endl;
-                if(cur_page >= _volume_data->_dim[2] - 2)
-                {
-                    _scene->page_to(1);
-                }
-                else
-                {
-                    _scene->page(1);
-                }
-            
-
-                break;
-            }
-        // case 'a':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , TRANSVERSE , Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
-        // case 's':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , SAGITTAL , Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
-        // case 'c':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , CORONAL, Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
         case 'f':
             {
                 m_iTestCode = 1- m_iTestCode;
@@ -291,7 +250,7 @@ namespace
     }
 }
 
-int TE_MPRScene(int argc , char* argv[])
+int TE_VRScene(int argc , char* argv[])
 {
     try
     {

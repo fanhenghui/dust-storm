@@ -13,14 +13,12 @@
 
 #include "mi_volume_infos.h"
 
-
-
 MED_IMG_BEGIN_NAMESPACE
 
 MPRScene::MPRScene():RayCastScene()
 {
-    std::shared_ptr<MPREntryExitPoints> pMPREE(new MPREntryExitPoints());
-    _entry_exit_points = pMPREE;
+    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints());
+    _entry_exit_points = mpr_entry_exit_points;
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
         _entry_exit_points->set_strategy(CPU_BASE);
@@ -33,8 +31,8 @@ MPRScene::MPRScene():RayCastScene()
 
 MPRScene::MPRScene(int width , int height):RayCastScene(width , height)
 {
-    std::shared_ptr<MPREntryExitPoints> pMPREE(new MPREntryExitPoints());
-    _entry_exit_points = pMPREE;
+    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints());
+    _entry_exit_points = mpr_entry_exit_points;
     if (CPU == Configuration::instance()->get_processing_unit_type())
     {
         _entry_exit_points->set_strategy(CPU_BASE);

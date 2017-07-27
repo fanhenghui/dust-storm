@@ -36,7 +36,10 @@ public:
 
     void finialize();
 
-    void render(int test_code = 0);
+    void render();
+
+    void set_test_code(int test_code);
+    int get_test_code() const;
 
     //Ray casting strategy
     void set_strategy(RayCastingStrategy strategy);
@@ -66,8 +69,6 @@ public:
     void set_brick_size(unsigned int brick_size);
     void set_brick_expand(unsigned int brick_expand);
     void set_brick_corner(BrickCorner* brick_corner_array);
-    void set_volume_brick_unit(BrickUnit* volume_brick_unit_array);
-    void set_mask_brick_unit(BrickUnit* mask_brick_unit_array);
     void set_volume_brick_info(VolumeBrickInfo* volume_brick_info_array);
     void set_mask_brick_info(MaskBrickInfo* mask_brick_info_array);//Here don't need label visibility status , just set current info
 
@@ -75,7 +76,6 @@ public:
     void set_entry_exit_points(std::shared_ptr<EntryExitPoints> entry_exit_points);
 
     std::shared_ptr<EntryExitPoints> get_entry_exit_points() const;
-
 
     //////////////////////////////////////////////////////////////////////////
     //Ray casting parameter
@@ -87,7 +87,6 @@ public:
 
     //Sample rate
     void set_sample_rate(float sample_rate);
-
     float get_sample_rate() const;
 
     //Label parameter
@@ -153,12 +152,6 @@ public:
     //Inner buffer
     std::shared_ptr<RayCasterInnerBuffer> get_inner_buffer();
 
-
-    //////////////////////////////////////////////////////////////////////////
-    //For testing
-    const std::vector<BrickDistance>& get_brick_distance() const;
-    unsigned int get_ray_casting_brick_count() const;
-
 protected:
     //Input data
     std::shared_ptr<ImageData> _volume_data;
@@ -169,8 +162,6 @@ protected:
 
     //Brick acceleration
     BrickCorner* _brick_corner_array;
-    BrickUnit* _volume_brick_unit_array;
-    BrickUnit* _mask_brick_unit_array;
     VolumeBrickInfo* _volume_brick_info_array;
     MaskBrickInfo* _mask_brick_info_array;
     unsigned int _brick_size;
@@ -225,10 +216,12 @@ protected:
 
     std::shared_ptr<RayCastingCPU> _ray_casting_cpu;
     std::shared_ptr<RayCastingGPU> _ray_casting_gpu;
-    std::shared_ptr<RayCastingCPUBrickAcc> _ray_casting_cpu_brick_acc;
 
     //Canvas for rendering
     std::shared_ptr<RayCasterCanvas> _canvas;
+
+    //Test code for debug
+    int _test_code;
 };
 
 MED_IMG_END_NAMESPACE

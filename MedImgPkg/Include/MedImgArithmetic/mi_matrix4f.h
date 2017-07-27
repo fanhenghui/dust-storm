@@ -291,8 +291,8 @@ public:
     {
         __m128 s, c, res1, res2;
         __m128 zero;
-        MCSF_3D_ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
+        ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
+        ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
         zero = _mm_setzero_ps();
         sincosf4( _mm_set1_ps(radians), &s, &c );
         res1 = vec_sel( zero, c, select_y );
@@ -312,8 +312,8 @@ public:
     {
         __m128 s, c, res0, res2;
         __m128 zero;
-        MCSF_3D_ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
+        ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
+        ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
         zero = _mm_setzero_ps();
         sincosf4( _mm_set1_ps(radians), &s, &c );
         res0 = vec_sel( zero, c, select_x );
@@ -333,8 +333,8 @@ public:
     {
         __m128 s, c, res0, res1;
         __m128 zero;
-        MCSF_3D_ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
+        ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
+        ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
         zero = _mm_setzero_ps();
         sincosf4( _mm_set1_ps(radians), &s, &c );
         res0 = vec_sel( zero, c, select_x );
@@ -361,9 +361,9 @@ public:
         oneMinusC = vec_sub( _mm_set1_ps(1.0f), c );
         axisS = vec_mul( axis, s );
         negAxisS = negatef4( axisS );
-        MCSF_3D_ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
+        ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
+        ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
+        ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
         //tmp0 = vec_perm( axisS, negAxisS, _VECTORMATH_PERM_XZBX );
         tmp0 = _mm_shuffle_ps( axisS, axisS, _MM_SHUFFLE(0,0,2,0) );
         tmp0 = vec_sel(tmp0, vec_splat(negAxisS, 1), select_z);
@@ -375,7 +375,7 @@ public:
         tmp0 = vec_sel( tmp0, c, select_x );
         tmp1 = vec_sel( tmp1, c, select_y );
         tmp2 = vec_sel( tmp2, c, select_z );
-        MCSF_3D_ALIGN16 unsigned int select_xyz[4] = {0xffffffff, 0xffffffff, 0xffffffff, 0};
+        ALIGN16 unsigned int select_xyz[4] = {0xffffffff, 0xffffffff, 0xffffffff, 0};
         axis = vec_and( axis, _mm_load_ps( (float *)select_xyz ) );
         tmp0 = vec_and( tmp0, _mm_load_ps( (float *)select_xyz ) );
         tmp1 = vec_and( tmp1, _mm_load_ps( (float *)select_xyz ) );
@@ -392,9 +392,9 @@ public:
         const Matrix4f scale( const Vector3f &scaleVec )
     {
         __m128 zero = _mm_setzero_ps();
-        MCSF_3D_ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
-        MCSF_3D_ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
+        ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
+        ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
+        ALIGN16 unsigned int select_z[4] = {0, 0, 0xffffffff, 0};
         return Matrix4f(
             Vector4f( vec_sel( zero, scaleVec._m128, select_x ) ),
             Vector4f( vec_sel( zero, scaleVec._m128, select_y ) ),
@@ -496,8 +496,8 @@ public:
         Det = _mm_mul_ps(sum,_L1);
         Det = _mm_add_ps(Det,_mm_movehl_ps(Det,Det));
 
-        MCSF_3D_ALIGN16 const unsigned int _vmathPNPN[4] = {0x00000000, 0x80000000, 0x00000000, 0x80000000};
-        MCSF_3D_ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000, 0x80000000, 0x00000000};
+        ALIGN16 const unsigned int _vmathPNPN[4] = {0x00000000, 0x80000000, 0x00000000, 0x80000000};
+        ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000, 0x80000000, 0x00000000};
         const __m128 Sign_PNPN = _mm_load_ps((float *)_vmathPNPN);
         const __m128 Sign_NPNP = _mm_load_ps((float *)_vmathNPNP);
 
@@ -528,7 +528,7 @@ public:
         __m128 mtL3 = _mm_xor_ps(sum,Sign_PNPN);
 
         // Dividing is FASTER than rcp_nr! (Because rcp_nr causes many register-memory RWs).
-        MCSF_3D_ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+        ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
         RDet = _mm_div_ss(_mm_load_ss((float *)&_vmathZERONE), Det); // TODO: just 1.0f?
         RDet = _mm_shuffle_ps(RDet,RDet,0x00);
 

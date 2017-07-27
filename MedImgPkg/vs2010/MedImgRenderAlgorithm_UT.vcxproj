@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_main.cpp" />
     <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_mpr_scene.cpp" />
+    <ClCompile Include="mi_render_algo_vr_scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

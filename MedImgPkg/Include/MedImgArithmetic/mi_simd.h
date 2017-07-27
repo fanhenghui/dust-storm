@@ -13,14 +13,9 @@ MED_IMG_BEGIN_NAMESPACE
 
 #if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400)
 #define USE_SSE3_LDDQU
-
-#define MCSF_3D_ALIGNED_CLASS16(a) __declspec(align(16)) a
-#define MCSF_3D_ALIGN16 __declspec(align(16))
-#define MCSF3DARITHMETIC_FORCE_INLINE inline //__forceinline 
+#define ALIGN16 __declspec(align(16))
 #else
-#define MCSF_3D_ALIGNED_CLASS16(a) a __attribute__ ((aligned (16)))	
-#define MCSF_3D_ALIGN16 __attribute__ ((aligned (16)))	
-#define MCSF3DARITHMETIC_FORCE_INLINE inline __attribute__ ((always_inline))
+#define ALIGN16 __attribute__ ((aligned (16)))	
 #ifdef __SSE3__
 #define USE_SSE3_LDDQU
 #endif //__SSE3__
@@ -30,42 +25,11 @@ MED_IMG_BEGIN_NAMESPACE
 #include <pmmintrin.h>//_mm_lddqu_si128
 #endif //USE_SSE3_LDDQU
 
-
-    typedef __m128 vec_float4;
+typedef __m128 vec_float4;
 typedef __m128 vec_uint4;
 typedef __m128 vec_int4;
 typedef __m128i vec_uchar16;
 typedef __m128i vec_ushort8;
-
-//-----------------------------------------------------------------------------
-// Constants
-// for permutes words are labeled [x,y,z,w] [a,b,c,d]
-#define _VECTORMATH_PERM_X 0x00010203
-#define _VECTORMATH_PERM_Y 0x04050607
-#define _VECTORMATH_PERM_Z 0x08090a0b
-#define _VECTORMATH_PERM_W 0x0c0d0e0f
-#define _VECTORMATH_PERM_A 0x10111213
-#define _VECTORMATH_PERM_B 0x14151617
-#define _VECTORMATH_PERM_C 0x18191a1b
-#define _VECTORMATH_PERM_D 0x1c1d1e1f
-#define _VECTORMATH_PERM_XYZA (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_X, _VECTORMATH_PERM_Y, _VECTORMATH_PERM_Z, _VECTORMATH_PERM_A }
-#define _VECTORMATH_PERM_ZXYW (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_Z, _VECTORMATH_PERM_X, _VECTORMATH_PERM_Y, _VECTORMATH_PERM_W }
-#define _VECTORMATH_PERM_YZXW (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_Y, _VECTORMATH_PERM_Z, _VECTORMATH_PERM_X, _VECTORMATH_PERM_W }
-#define _VECTORMATH_PERM_YZAB (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_Y, _VECTORMATH_PERM_Z, _VECTORMATH_PERM_A, _VECTORMATH_PERM_B }
-#define _VECTORMATH_PERM_ZABC (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_Z, _VECTORMATH_PERM_A, _VECTORMATH_PERM_B, _VECTORMATH_PERM_C }
-#define _VECTORMATH_PERM_XYAW (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_X, _VECTORMATH_PERM_Y, _VECTORMATH_PERM_A, _VECTORMATH_PERM_W }
-#define _VECTORMATH_PERM_XAZW (vec_uchar16)(vec_uint4){ _VECTORMATH_PERM_X, _VECTORMATH_PERM_A, _VECTORMATH_PERM_Z, _VECTORMATH_PERM_W }
-#define _VECTORMATH_MASK_0xF000 (vec_uint4){ 0xffffffff, 0, 0, 0 }
-#define _VECTORMATH_MASK_0x0F00 (vec_uint4){ 0, 0xffffffff, 0, 0 }
-#define _VECTORMATH_MASK_0x00F0 (vec_uint4){ 0, 0, 0xffffffff, 0 }
-#define _VECTORMATH_MASK_0x000F (vec_uint4){ 0, 0, 0, 0xffffffff }
-#define _VECTORMATH_UNIT_1000 _mm_setr_ps(1.0f,0.0f,0.0f,0.0f) // (__m128){ 1.0f, 0.0f, 0.0f, 0.0f }
-#define _VECTORMATH_UNIT_0100 _mm_setr_ps(0.0f,1.0f,0.0f,0.0f) // (__m128){ 0.0f, 1.0f, 0.0f, 0.0f }
-#define _VECTORMATH_UNIT_0010 _mm_setr_ps(0.0f,0.0f,1.0f,0.0f) // (__m128){ 0.0f, 0.0f, 1.0f, 0.0f }
-#define _VECTORMATH_UNIT_0001 _mm_setr_ps(0.0f,0.0f,0.0f,1.0f) // (__m128){ 0.0f, 0.0f, 0.0f, 1.0f }
-#define _VECTORMATH_SLERP_TOL 0.999f
-
-//-----------------------------------------------------------------------------
 
 #define vec_splat(x, e) _mm_shuffle_ps(x, x, _MM_SHUFFLE(e,e,e,e))
 

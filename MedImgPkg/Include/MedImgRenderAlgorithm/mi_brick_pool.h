@@ -3,16 +3,13 @@
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgRenderAlgorithm/mi_brick_define.h"
-#include "boost/noncopyable.hpp"
 
-//TODO dont need brick pool?
-//Use brick info array to GPU&CPU
-// VolumeInfos to contain volume & mask & volumebrick & maskbrick & volumebrickinfo & maskbrickinfo
+
 MED_IMG_BEGIN_NAMESPACE
 
-//TODO should not separate volume to bircks when GPU based 
+//GPU rendering use brick pool to accelerate
 class ImageData;
-class RenderAlgo_Export BrickPool : public boost::noncopyable
+class RenderAlgo_Export BrickPool
 {
 public:
     BrickPool();
@@ -44,12 +41,10 @@ public:
 
     void calculate_mask_brick();
 
-    void update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3]);
+    void update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3] , LabelKey label_key);
 
+public:
     static void calculate_intercect_brick_index_range();
-
-
-protected:
 
 private:
     std::shared_ptr<ImageData> _volume;
@@ -65,6 +60,9 @@ private:
 
     std::unique_ptr<VolumeBrickInfo[]> _volume_brick_info_array;
     std::map<LabelKey , std::unique_ptr<MaskBrickInfo[]>> _mask_brick_info_array_set;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(BrickPool);
 };
 
 MED_IMG_END_NAMESPACE

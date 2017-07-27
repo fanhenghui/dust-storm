@@ -15,6 +15,7 @@ public:
 
     unsigned char acquire_label();
     std::vector<unsigned char> acquire_labels(int num);
+
     void recycle_label(unsigned char label);
     void recycle_labels(std::vector<unsigned char> labels);
 

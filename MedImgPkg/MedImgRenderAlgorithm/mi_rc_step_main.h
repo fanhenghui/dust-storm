@@ -48,6 +48,30 @@ private:
     int _loc_sample_rate;
 };
 
+class RCStepMainTestFrag : public RCStepBase
+{
+public:
+    RCStepMainTestFrag(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program),
+          _loc_volume_dim(-1),
+          _loc_test_code(-1)
+      {
+
+      };
+
+      virtual ~RCStepMainTestFrag(){};
+
+      virtual GLShaderInfo get_shader_info();
+
+      virtual void set_gpu_parameter();
+
+      virtual void get_uniform_location();
+
+private:
+    int _loc_volume_dim;
+    int _loc_test_code;
+};
+
 MED_IMG_END_NAMESPACE
 
 #endif

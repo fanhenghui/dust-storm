@@ -11,15 +11,28 @@
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_camera_calculator.h"
-#include "mi_brick_generator.h"
 #include "mi_brick_info_generator.h"
 #include "mi_brick_pool.h"
 #include "mi_brick_utils.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
+namespace 
+{
+    template<typename SrcType , typename DstType >
+    std::unique_ptr<DstType[]>  signed_to_unsigned(unsigned int length, double min_gray , void* data_src)
+    {
+        std::unique_ptr<DstType[]> data_dst(new DstType[length]);
+        SrcType* data_src0 = (SrcType*)(data_src);
+        for (unsigned int i = 0 ; i< length ; ++i)
+        {
+            data_dst[i] = static_cast<DstType>( static_cast<double>(data_src0[i]) - min_gray);
+        }
+        return std::move(data_dst);
+    }
+}
 
-VolumeInfos::VolumeInfos()
+VolumeInfos::VolumeInfos():_volume_dirty(false),_mask_dirty(false)
 {
 
 }
@@ -31,7 +44,8 @@ VolumeInfos::~VolumeInfos()
 
 void VolumeInfos::finialize()
 {
-    release_volume_resource_i();
+    //release all resource 
+
 }
 
 void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
@@ -41,31 +55,13 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
         RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
 
         _volume_data = image_data;
+        _volume_dirty = true;
+
+        //TODO initialize brick pool
 
         //////////////////////////////////////////////////////////////////////////
         //Create camera calculator
         _camera_calculator.reset( new CameraCalculator(_volume_data));
-
-        //////////////////////////////////////////////////////////////////////////
-        //Create brick pool & calculate volume brick
-        //TODO brick info used in GPU , but brick unit useless 
-        //////////////////////////////////////////////////////////////////////////
-        //_brick_pool.reset(new BrickPool());//Reset brick pool
-        //_brick_pool->set_volume(_volume_data);
-        //_brick_pool->set_brick_size(BrickUtils::instance()->GetBrickSize());
-        //_brick_pool->set_brick_expand(BrickUtils::instance()->get_brick_expand());
-
-        //_brick_pool->calculate_volume_brick();
-
-        //Upload volume texture(TODO using data loader to wrap it . for separate volume later)
-
-        //////////////////////////////////////////////////////////////////////////
-        //release previous resource
-        release_volume_resource_i();
-
-        //////////////////////////////////////////////////////////////////////////
-        //Upload volume
-        load_volume_resource_i();
 
     }
     catch (const Exception& e)
@@ -83,21 +79,9 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
         RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
 
         _mask_data = image_data;
+        _mask_dirty = true;
 
-        //RENDERALGO_CHECK_NULL_EXCEPTION(_brick_pool);
-        //_brick_pool->set_mask(_mask_data);
-        //_brick_pool->calculate_mask_brick();
-
-        //////////////////////////////////////////////////////////////////////////
-        //Upload mask texture(TODO using data loader to wrap it . for separate volume later)
-
-        //////////////////////////////////////////////////////////////////////////
-        //release previous resource
-        release_mask_resource_i();
-
-        //////////////////////////////////////////////////////////////////////////
-        //Upload mask
-        load_mask_resource_i();
+        //TODO initialize brick pool mask part
     }
     catch (const Exception& e)
     {
@@ -182,172 +166,8 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
     _mask_array_to_be_update.push_back(data_updated);
 }
 
-void VolumeInfos::release_volume_resource_i()
-{
-    //release volume textures
-    if (!_volume_textures.empty())
-    {
-        for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
-        {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
-        }
 
-        _volume_textures.clear();
-        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
-    }
-
-    //release volume brick info
-    if (_volume_brick_info_buffer)
-    {
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
-        _volume_brick_info_buffer.reset();
-        GLResourceManagerContainer::instance()->get_buffer_manager()->update();
-    }
-}
-
-namespace 
-{
-    template<typename SrcType , typename DstType >
-    std::unique_ptr<DstType[]>  signed_to_unsigned(unsigned int length, double min_gray , void* data_src)
-    {
-        std::unique_ptr<DstType[]> data_dst(new DstType[length]);
-        SrcType* data_src0 = (SrcType*)(data_src);
-        for (unsigned int i = 0 ; i< length ; ++i)
-        {
-            data_dst[i] = static_cast<DstType>( static_cast<double>(data_src0[i]) - min_gray);
-        }
-        return std::move(data_dst);
-    }
-}
-void VolumeInfos::load_volume_resource_i()
-{
-    if (GPU == Configuration::instance()->get_processing_unit_type())
-    {
-        //////////////////////////////////////////////////////////////////////////
-        // 1 Volume texture
-        _volume_textures.clear();
-
-        //Single volume
-        UIDType uid(0);
-        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-        if (_data_header)
-        {
-            tex->set_description("Volume : " + _data_header->series_uid);
-        }
-        else
-        {
-            tex->set_description("Volume : Undefined series UID");
-        }
-
-        tex->initialize();
-        tex->bind();
-        GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
-        GLenum internal_format , format , type;
-        GLUtils::get_gray_texture_format(_volume_data->_data_type , internal_format , format ,type);
-
-        const unsigned int length = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
-        const double min_gray = _volume_data->get_min_scalar();
-        if (_volume_data->_data_type == SHORT)
-        {
-            std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short , unsigned short>(length , min_gray , _volume_data->get_pixel_pointer());
-            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
-        }
-        else if (_volume_data->_data_type == CHAR)
-        {
-            std::unique_ptr<unsigned char[]> dst_data = signed_to_unsigned<char , unsigned char>(length , min_gray , _volume_data->get_pixel_pointer());
-            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
-        }
-        else
-        {
-            tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
-        }
-        tex->unbind();
-
-        _volume_textures.push_back(tex);
-
-        //TODO separate volumes
-
-        //////////////////////////////////////////////////////////////////////////
-        //2 Volume brick info
-        /*m_pVolumeBrickInfoBuffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        m_pVolumeBrickInfoBuffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-        m_pVolumeBrickInfoBuffer->initialize();
-        m_pVolumeBrickInfoBuffer->bind();
-
-        unsigned int brick_dim[3] = {1,1,1};
-        m_pBrickPool->get_brick_dim(brick_dim);
-        const unsigned int brick_count = brick_dim[0]*brick_dim[1]*brick_dim[2];
-        m_pVolumeBrickInfoBuffer->load(brick_count*sizeof(VolumeBrickInfo) , m_pBrickPool->get_volume_brick_info() , GL_STATIC_DRAW);
-        m_pVolumeBrickInfoBuffer->unbind();*/
-    }
-}
-
-std::shared_ptr<ImageDataHeader> VolumeInfos::get_data_header()
-{
-    return _data_header;
-}
-
-std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator()
-{
-    return _camera_calculator;
-}
-
-void VolumeInfos::load_mask_resource_i()
-{
-    if (GPU == Configuration::instance()->get_processing_unit_type())
-    {
-        //////////////////////////////////////////////////////////////////////////
-        // 1 Volume texture
-        _mask_textures.clear();
-
-        //Single volume
-        UIDType uid(0);
-        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-        if (_data_header)
-        {
-            tex->set_description("Mask : " + _data_header->series_uid);
-        }
-        else
-        {
-            tex->set_description("Mask : Undefined series UID");
-        }
-
-        CHECK_GL_ERROR;
-        tex->initialize();
-        tex->bind();
-        GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
-        GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_NEAREST);
-        tex->load(GL_R8 ,_mask_data->_dim[0] , _mask_data->_dim[1] , _mask_data->_dim[2] , GL_RED, GL_UNSIGNED_BYTE, _mask_data->get_pixel_pointer());
-        tex->unbind();
-        CHECK_GL_ERROR;
-
-        _mask_textures.push_back(tex);
-
-        //TODO separate volumes
-
-        //TODO mask bricks
-    }
-}
-
-void VolumeInfos::release_mask_resource_i()
-{
-    //release volume textures
-    if (!_mask_textures.empty())
-    {
-        for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
-        {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
-        }
-
-        _mask_textures.clear();
-        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
-    }
-
-    // TODO release mask brick info
-}
-
-void VolumeInfos::refresh()
+void VolumeInfos::refresh_update_mask_i()
 {
     if (!_mask_aabb_to_be_update.empty())
     {
@@ -381,6 +201,151 @@ void VolumeInfos::refresh()
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
     }
+}
+
+void VolumeInfos::refresh_upload_mask_i()
+{
+    if (!_mask_dirty)
+    {
+        return;
+    }
+
+    //release volume textures
+    if (!_mask_textures.empty())
+    {
+        for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
+        {
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+        }
+
+        _mask_textures.clear();
+        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
+    }
+
+    // TODO release mask brick info
+
+    //upload mask
+    _mask_textures.clear();
+
+    //Single mask
+    UIDType uid(0);
+    GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
+    if (_data_header)
+    {
+        tex->set_description("Mask : " + _data_header->series_uid);
+    }
+    else
+    {
+        tex->set_description("Mask : Undefined series UID");
+    }
+
+    CHECK_GL_ERROR;
+    tex->initialize();
+    tex->bind();
+    GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
+    GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_NEAREST);
+    tex->load(GL_R8 ,_mask_data->_dim[0] , _mask_data->_dim[1] , _mask_data->_dim[2] , GL_RED, GL_UNSIGNED_BYTE, _mask_data->get_pixel_pointer());
+    tex->unbind();
+    CHECK_GL_ERROR;
+
+    _mask_textures.push_back(tex);
+
+}
+
+void VolumeInfos::refresh_upload_volume_i()
+{
+    if (!_volume_dirty)
+    {
+        return;
+    }
+
+    //release volume textures
+    if (!_volume_textures.empty())
+    {
+        for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
+        {
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+        }
+
+        _volume_textures.clear();
+        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
+    }
+
+    //release volume brick info
+    if (_volume_brick_info_buffer)
+    {
+        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
+        _volume_brick_info_buffer.reset();
+        GLResourceManagerContainer::instance()->get_buffer_manager()->update();
+    }
+
+    //upload volume
+    _volume_textures.clear();
+
+    //Single volume
+    UIDType uid(0);
+    GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
+    if (_data_header)
+    {
+        tex->set_description("Volume : " + _data_header->series_uid);
+    }
+    else
+    {
+        tex->set_description("Volume : Undefined series UID");
+    }
+
+    tex->initialize();
+    tex->bind();
+    GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
+    GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
+    GLenum internal_format , format , type;
+    GLUtils::get_gray_texture_format(_volume_data->_data_type , internal_format , format ,type);
+
+    const unsigned int length = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
+    const double min_gray = _volume_data->get_min_scalar();
+
+    //signed interger should conter to unsigned
+    if (_volume_data->_data_type == SHORT)
+    {
+        std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short , unsigned short>(length , min_gray , _volume_data->get_pixel_pointer());
+        tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
+    }
+    else if (_volume_data->_data_type == CHAR)
+    {
+        std::unique_ptr<unsigned char[]> dst_data = signed_to_unsigned<char , unsigned char>(length , min_gray , _volume_data->get_pixel_pointer());
+        tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , dst_data.get());
+    }
+    else
+    {
+        tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
+    }
+    tex->unbind();
+
+    _volume_textures.push_back(tex);
+}
+
+std::shared_ptr<ImageDataHeader> VolumeInfos::get_data_header()
+{
+    return _data_header;
+}
+
+std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator()
+{
+    return _camera_calculator;
+}
+
+void VolumeInfos::refresh()
+{
+    if (Configuration::instance()->get_processing_unit_type() == CPU)
+    {
+        return;
+    }
+
+    refresh_upload_volume_i();
+
+    refresh_upload_mask_i();
+
+    refresh_update_mask_i();
 }
 
 MED_IMG_END_NAMESPACE

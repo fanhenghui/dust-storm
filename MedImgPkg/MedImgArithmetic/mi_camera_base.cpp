@@ -109,6 +109,23 @@ void CameraBase::rotate(const Matrix4& mat)
 
 }
 
+
+void CameraBase::pan(const Vector2& pan)
+{
+    Matrix4 viewmat = get_view_matrix();
+    if (!viewmat.has_inverse())
+    {
+        return;
+    }
+    Matrix4 mat= viewmat;
+    mat.prepend(make_translate(Point3::S_ZERO_POINT - Point3(pan.x,pan.y,0.0)));
+    mat.prepend(viewmat.get_inverse());
+    _eye = mat.transform(_eye);
+    _at  = mat.transform(_at);
+
+    _is_view_mat_cal = false;
+}
+
 CameraBase& CameraBase::operator=(const CameraBase& camera)
 {
 #define COPY_PARAMETER(p) this->p = camera.p

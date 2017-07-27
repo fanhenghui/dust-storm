@@ -176,7 +176,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h" />
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_geometry.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h" />
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_camera_calculator.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_vr_scene.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_caster_inner_buffer.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu.h" />
-    <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu_brick_acc.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_ray_casting_gpu.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_rc_step_base.h" />
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_rc_step_color_inverse.h" />
@@ -216,7 +214,6 @@
     <ClInclude Include="..\MedImgRenderAlgorithm\mi_vr_entry_exit_points_culling.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_geometry.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_info_generator.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_pool.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_camera_calculator.cpp" />
@@ -231,7 +228,6 @@
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_caster_canvas.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_caster_inner_buffer.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu.cpp" />
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_cpu_brick_acc.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_casting_gpu.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp" />
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_rc_step_color_inverse.cpp" />
@@ -261,6 +257,7 @@
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_composite_mip.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_main.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_main.vert" />
+    <None Include="..\MedImgRenderAlgorithm\Shader\rc_main_test.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_mask_linear_sampler.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_mask_nearst_sampler.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_mask_none_sampler.frag" />
@@ -275,6 +272,8 @@
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_volume_linear_samper.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_volume_nearst_samper.frag" />
     <None Include="..\MedImgRenderAlgorithm\Shader\shader_config" />
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.frag" />
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.vert" />
     <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points_culling.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

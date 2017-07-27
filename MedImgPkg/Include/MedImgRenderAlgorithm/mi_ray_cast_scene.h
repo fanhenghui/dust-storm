@@ -26,13 +26,14 @@ public:
 
     virtual void set_display_size(int width , int height);
 
-    virtual void render(int test_code);
+    virtual void render();
 
-    void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
+    virtual void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
     std::shared_ptr<VolumeInfos> get_volume_infos() const;
 
     std::shared_ptr<CameraCalculator> get_camera_calculator() const;
 
+    //0 for ray casting 1 for entry points 2 for exit points
     void set_test_code(int test_code);
 
     //Mask label level
@@ -79,7 +80,6 @@ protected:
     //TODO Temp default pseudo color texture 
     //should design a wrap to contain global pseudo colors because its constant
     GLTexture1DPtr _pseudo_color_texture;
-    int _test_code;
 
 };
 

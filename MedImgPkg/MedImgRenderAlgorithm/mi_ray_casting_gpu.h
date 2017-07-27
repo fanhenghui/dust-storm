@@ -15,7 +15,7 @@ public:
     RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingGPU();
 
-    void render(int test_code = 0);
+    void render();
 
 private:
     void update_i();
@@ -39,6 +39,9 @@ private:
     //VAO
     GLVAOPtr _gl_vao;
     GLBufferPtr _gl_buffer_vertex;
+
+    //For Testing
+    int _last_test_code;
 };
 
 MED_IMG_END_NAMESPACE

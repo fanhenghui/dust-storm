@@ -110,6 +110,63 @@ void RCStepMainFrag::get_uniform_location()
     }
 }
 
+GLShaderInfo RCStepMainTestFrag::get_shader_info()
+{
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_MAIN_TEST_FRAGMENT , "RCStepMainTestFrag");
+}
+
+void RCStepMainTestFrag::set_gpu_parameter()
+{
+    CHECK_GL_ERROR;
+
+    GLProgramPtr program = _program.lock();
+    std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
+    std::shared_ptr<ImageData> volume_img = ray_caster->get_volume_data();
+
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume_img);
+
+    //1 Entry exit points
+    std::shared_ptr<EntryExitPoints> entry_exit_points = ray_caster->get_entry_exit_points();
+    RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
+
+    GLTexture2DPtr entry_texture = entry_exit_points->get_entry_points_texture();
+    GLTexture2DPtr exit_texture = entry_exit_points->get_exit_points_texture();
+
+
+#define IMG_BINDING_ENTRY_POINTS  0
+#define IMG_BINDING_EXIT_POINTS  1
+
+    entry_texture->bind_image(IMG_BINDING_ENTRY_POINTS , 0 , GL_FALSE , 0 , GL_READ_ONLY , GL_RGBA32F);
+    exit_texture->bind_image(IMG_BINDING_EXIT_POINTS , 0 , GL_FALSE , 0 , GL_READ_ONLY , GL_RGBA32F);
+
+
+#undef IMG_BINDING_ENTRY_POINTS
+#undef IMG_BINDING_EXIT_POINTS
+
+    //2 Volume dimension
+    glUniform3f(_loc_volume_dim , (float)volume_img->_dim[0] , 
+        (float)volume_img->_dim[1] , (float)volume_img->_dim[2]);
+
+    //3 Test code
+    glUniform1i(_loc_test_code , ray_caster->get_test_code());
+
+
+    CHECK_GL_ERROR;
+}
+
+void RCStepMainTestFrag::get_uniform_location()
+{
+    GLProgramPtr program = _program.lock();
+    _loc_volume_dim = program->get_uniform_location("volume_dim");
+    _loc_test_code = program->get_uniform_location("test_code");
+
+    if (-1 == _loc_volume_dim ||
+        -1 == _loc_test_code)
+    {
+        RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
+    }
+}
+
 
 
 MED_IMG_END_NAMESPACE

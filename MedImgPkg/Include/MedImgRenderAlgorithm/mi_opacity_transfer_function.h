@@ -1,6 +1,7 @@
 #ifndef OPACITY_TRNASFER_FUNCTION_H_
 #define OPACITY_TRNASFER_FUNCTION_H_
 
+#include <vector>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 
 MED_IMG_BEGIN_NAMESPACE

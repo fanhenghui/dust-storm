@@ -183,7 +183,7 @@ void SceneBase::set_display_size(int width , int height)
     set_dirty(true);
 }
 
-void SceneBase::render(int)
+void SceneBase::render()
 {
 
 }

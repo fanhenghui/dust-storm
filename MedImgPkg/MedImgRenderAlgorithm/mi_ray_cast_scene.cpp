@@ -14,6 +14,7 @@
 #include "MedImgGLResource/mi_gl_fbo.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 #include "MedImgGLResource/mi_gl_texture_1d.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 #include "MedImgRenderAlgorithm/mi_camera_calculator.h"
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
@@ -25,7 +26,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastScene::RayCastScene():SceneBase(),_test_code(0),_global_ww(0),_global_wl(0)
+RayCastScene::RayCastScene():SceneBase(),_global_ww(0),_global_wl(0)
 {
     _ray_cast_camera.reset(new OrthoCamera());
     _camera = _ray_cast_camera;
@@ -47,7 +48,7 @@ RayCastScene::RayCastScene():SceneBase(),_test_code(0),_global_ww(0),_global_wl(
     }
 }
 
-RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),_test_code(0),
+RayCastScene::RayCastScene(int width , int height):SceneBase(width , height),
     _global_ww(0),
     _global_wl(0)
 {
@@ -83,6 +84,8 @@ void RayCastScene::initialize()
 
     //Canvas
     _canvas->initialize();
+    _entry_exit_points->initialize();
+    _ray_caster->initialize();
 }
 
 void RayCastScene::finalize()
@@ -101,7 +104,7 @@ void RayCastScene::set_display_size(int width , int height)
     _camera_interactor->resize(width , height);
 }
 
-void RayCastScene::render(int test_code)
+void RayCastScene::render()
 {
     //Skip render scene
     if (!get_dirty())
@@ -111,9 +114,13 @@ void RayCastScene::render(int test_code)
 
     CHECK_GL_ERROR;
 
+    //refresh volume & mask & their infos
+    _volume_infos->refresh();
+
+    //scene FBO , ray casting program ...
     initialize();
 
-    _volume_infos->refresh();
+    GLResourceManagerContainer::instance()->update_all();
 
     //////////////////////////////////////////////////////////////////////////
     //TODO other common graphic object rendering list
@@ -128,7 +135,7 @@ void RayCastScene::render(int test_code)
 
     _entry_exit_points->calculate_entry_exit_points();
 
-    _ray_caster->render(_test_code);
+    _ray_caster->render();
     //glPopAttrib();
 
     //////////////////////////////////////////////////////////////////////////
@@ -212,7 +219,6 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         _entry_exit_points->set_camera(_camera);
         _entry_exit_points->set_display_size(_width , _height);
         _entry_exit_points->set_camera_calculator(_camera_calculator);
-        _entry_exit_points->initialize();
 
         //Ray caster
         _ray_caster->set_canvas(_canvas);
@@ -350,7 +356,7 @@ void RayCastScene::set_color_inverse_mode(ColorInverseMode mode)
 
 void RayCastScene::set_test_code(int test_code)
 {
-    _test_code = test_code;
+    _ray_caster->set_test_code(test_code);
 
     set_dirty(true);
 }

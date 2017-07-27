@@ -9,7 +9,6 @@
 #include "mi_ray_caster_inner_buffer.h"
 #include "mi_ray_casting_cpu.h"
 #include "mi_ray_casting_gpu.h"
-#include "mi_ray_casting_cpu_brick_acc.h"
 #include "mi_ray_caster_canvas.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -33,12 +32,11 @@ _color_inverse_mode(COLOR_INVERSE_DISABLE),
 _mask_overlay_mode(MASK_OVERLAY_DISABLE),
 _strategy(CPU_BASE),
 _brick_corner_array(nullptr),
-_volume_brick_unit_array(nullptr),
-_mask_brick_unit_array(nullptr),
 _volume_brick_info_array(nullptr),
 _mask_brick_info_array(nullptr),
 _brick_size(32),
-_brick_expand(2)
+_brick_expand(2),
+_test_code(0)
 {
 
 }
@@ -58,7 +56,7 @@ RayCaster::~RayCaster()
 
 }
 
-void RayCaster::render(int test_code)
+void RayCaster::render()
 {
     //clock_t t0 = clock();
 
@@ -68,15 +66,7 @@ void RayCaster::render(int test_code)
         {
             _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));
         }
-        _ray_casting_cpu->render(test_code);
-    }
-    else if (CPU_BRICK_ACCELERATE == _strategy)
-    {
-        if (!_ray_casting_cpu_brick_acc)
-        {
-            _ray_casting_cpu_brick_acc.reset(new RayCastingCPUBrickAcc(shared_from_this()));
-        }
-        _ray_casting_cpu_brick_acc->render(test_code);
+        _ray_casting_cpu->render();
     }
     else if (GPU_BASE == _strategy)
     {
@@ -90,12 +80,7 @@ void RayCaster::render(int test_code)
 
             FBOStack fboStack;
             _canvas->get_fbo()->bind();
-
-            CHECK_GL_ERROR;
-
             glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-            CHECK_GL_ERROR;
 
             //Clear 
             glClearColor(0,0,0,0);
@@ -109,7 +94,7 @@ void RayCaster::render(int test_code)
 
             CHECK_GL_ERROR;
 
-            _ray_casting_gpu->render(test_code);
+            _ray_casting_gpu->render();
         }
     }
 
@@ -304,16 +289,6 @@ void RayCaster::set_brick_corner(BrickCorner* brick_corner_array)
     _brick_corner_array = brick_corner_array;
 }
 
-void RayCaster::set_volume_brick_unit(BrickUnit* volume_brick_unit_array)
-{
-    _volume_brick_unit_array = volume_brick_unit_array;
-}
-
-void RayCaster::set_mask_brick_unit(BrickUnit* mask_brick_unit_array)
-{
-    _mask_brick_unit_array = mask_brick_unit_array;
-}
-
 void RayCaster::set_mask_brick_info(MaskBrickInfo* mask_brick_info_array)
 {
     _mask_brick_info_array = mask_brick_info_array;
@@ -322,16 +297,6 @@ void RayCaster::set_mask_brick_info(MaskBrickInfo* mask_brick_info_array)
 void RayCaster::set_volume_brick_info(VolumeBrickInfo* volume_brick_info_array)
 {
     _volume_brick_info_array = volume_brick_info_array;
-}
-
-const std::vector<BrickDistance>& RayCaster::get_brick_distance() const
-{
-    return _ray_casting_cpu_brick_acc->get_brick_distance();
-}
-
-unsigned int RayCaster::get_ray_casting_brick_count() const
-{
-    return _ray_casting_cpu_brick_acc->get_ray_casting_brick_count();
 }
 
 std::shared_ptr<ImageData> RayCaster::get_volume_data()
@@ -420,6 +385,15 @@ std::vector<GLTexture3DPtr> RayCaster::get_mask_data_texture()
     return _mask_textures;
 }
 
+void RayCaster::set_test_code(int test_code)
+{
+    _test_code = test_code;
+}
+
+int RayCaster::get_test_code() const
+{
+    return _test_code;
+}
 
 
 MED_IMG_END_NAMESPACE

@@ -19,4 +19,19 @@ typedef double Real;
 const double DOUBLE_EPSILON = 1e-15;
 const float FLOAT_EPSILON = 1e-6f;
 
+#ifndef DISALLOW_COPY
+#define DISALLOW_COPY(class_name) class_name(const class_name & );
+#endif
+
+#ifndef DISALLOW_ASSIGN
+#define DISALLOW_ASSIGN(class_name) void operator = (const class_name & );
+#endif
+
+#ifndef DISALLOW_COPY_AND_ASSIGN
+#define DISALLOW_COPY_AND_ASSIGN(class_name)\
+    DISALLOW_COPY  (class_name)\
+    DISALLOW_ASSIGN(class_name)
+#endif
+
+
 #endif

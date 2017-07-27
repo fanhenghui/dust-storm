@@ -7,7 +7,6 @@ MED_IMG_BEGIN_NAMESPACE
     , _left(0), _right(0), _bottom(0), _top(0), _near(0), _far(0), _ZoomFactor(1.0)
 {
     _mat_projection = Matrix4::S_IDENTITY_MATRIX;
-    _VecPan = Vector2::S_ZERO_VECTOR;
 }
 
 OrthoCamera::OrthoCamera(
@@ -16,7 +15,6 @@ OrthoCamera::OrthoCamera(
     , _is_proj_mat_cal(false)
 {
     _mat_projection = Matrix4::S_IDENTITY_MATRIX;
-    _VecPan = Vector2::S_ZERO_VECTOR;
 }
 
 OrthoCamera::~OrthoCamera()
@@ -68,8 +66,8 @@ void OrthoCamera::calculate_projection_matrix_i()
         _mat_projection[2][2] = -2.0f / (_far - _near);
         //这里是因为_Near和_Far是距离视点的距离（负的），即认为近远平面都在视点的观察反方向，即左下角点(left , bottom , -near)
         //右上角点(right , top , -far) 则 -far < -near 即 far > near
-        _mat_projection[3][0] = -(_right + _left + _VecPan.x*(_right - _left)) / (_right - _left);
-        _mat_projection[3][1] = -(_top + _bottom + _VecPan.y*(_right - _left)) / (_top - _bottom);
+        _mat_projection[3][0] = -(_right + _left ) / (_right - _left);
+        _mat_projection[3][1] = -(_top + _bottom) / (_top - _bottom);
         _mat_projection[3][2] = -(_far + _near) / (_far - _near);
         _is_proj_mat_cal = true;
     }
@@ -85,28 +83,6 @@ void OrthoCamera::zoom(double rate)
     }
 }
 
-void OrthoCamera::pan(const Vector2& pan)
-{
-    _VecPan += pan;
-    //只能移动一半窗口
-    //if (_VecPan.x > 1.0)
-    //{
-    //    _VecPan.x = 1.0;
-    //}
-    //if (_VecPan.x < -1.0)
-    //{
-    //    _VecPan.x = -1.0;
-    //}
-    //if (_VecPan.y > 1.0)
-    //{
-    //    _VecPan.y = 1.0;
-    //}
-    //if (_VecPan.y < -1.0)
-    //{
-    //    _VecPan.y = -1.0;
-    //}
-    _is_proj_mat_cal = false;
-}
 
 double OrthoCamera::get_near_clip_distance() const
 {
@@ -132,7 +108,6 @@ OrthoCamera& OrthoCamera::operator=(const OrthoCamera& camera)
     COPY_PARAMETER(_mat_projection);
     COPY_PARAMETER(_is_proj_mat_cal);
     COPY_PARAMETER(_ZoomFactor);
-    COPY_PARAMETER(_VecPan);
 #undef COPY_PARAMETER
     return *this;
 }

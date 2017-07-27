@@ -74,7 +74,7 @@ public:
 
     inline Vector4f & set_xyz( const Vector3f &vec )
     {
-        MCSF_3D_ALIGN16 unsigned int sw[4] = {0, 0, 0, 0xffffffff};
+        ALIGN16 unsigned int sw[4] = {0, 0, 0, 0xffffffff};
         _m128 = vec_sel( vec._m128, _m128, sw );
         return *this;
     }

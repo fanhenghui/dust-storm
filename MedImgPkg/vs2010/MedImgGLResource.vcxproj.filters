@@ -69,6 +69,12 @@
     <ClInclude Include="..\Include\MedImgGLResource\mi_gl_time_query.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_cache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_buffer_cache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Include\MedImgGLResource\mi_gl_resource_manager.inl">
@@ -119,6 +125,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgGLResource\mi_gl_time_query.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_cache.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

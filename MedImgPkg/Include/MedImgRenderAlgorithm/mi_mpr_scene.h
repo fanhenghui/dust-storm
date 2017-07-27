@@ -11,9 +11,7 @@ class RenderAlgo_Export MPRScene : public RayCastScene
 {
 public:
     MPRScene();
-
     MPRScene(int width , int height);
-
     virtual ~MPRScene();
 
     void set_mask_overlay_mode(MaskOverlayMode mode);
@@ -54,6 +52,7 @@ public:
 
 protected:
 private:
+
 };
 
 MED_IMG_END_NAMESPACE
