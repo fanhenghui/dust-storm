@@ -239,7 +239,7 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files , DcmFileForm
 
 IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
 {
-    //sort based on slice location
+    //sort based on slice lotation
     std::map<double , int> locs;
     for(int i = 0 ; i< file_format_set.size() ; ++i){
         DcmDataset* data_set = file_format_set[i]->getDataset();
@@ -262,7 +262,24 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set)
         new_set[idx++] = file_format_set[it->second];
     }
 
-    file_format_set = std::move(new_set);
+    DcmDataset* data_set_first = new_set[0]->getDataset();
+    DcmDataset* data_set_last = new_set[new_set.size()-1]->getDataset();
+    Point3 pt_first , pt_last;
+    get_image_position_i(data_set_first , pt_first);
+    get_image_position_i(data_set_last , pt_last);
+    if (pt_first.z < pt_last.z)//image postion is the same sequence with slice location
+    {
+        file_format_set = std::move(new_set);
+    }
+    else
+    {
+        DcmFileFormatSet new_set2(file_format_set.size());
+        for (int i = 0 ;i<new_set.size() ; ++i)
+        {
+            new_set2[i] = new_set[new_set.size() - i - 1];
+        }
+        file_format_set = std::move(new_set2);
+    }
 
     return IO_SUCCESS;
 }
@@ -581,7 +598,7 @@ IOStatus DICOMLoader::construct_image_data_i(DcmFileFormatSet& file_format_set ,
     image_data->_spacing[1] = data_header->pixel_spacing[0];
     const double slice_location_first= data_header->slice_location[0];
     const double slice_location_last= data_header->slice_location[slice_count-1];
-    image_data->_spacing[2] = abs( (slice_location_last - slice_location_first)/static_cast<double>(slice_count-1));
+    image_data->_spacing[2] = fabs( (slice_location_last - slice_location_first)/static_cast<double>(slice_count-1));
 
     //Image position in patient
     image_data->_image_position = data_header->image_position[0];

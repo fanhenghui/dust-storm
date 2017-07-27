@@ -260,6 +260,16 @@ int resample_z_backup(std::vector<std::vector<Nodule>>& nodules , std::shared_pt
         slice_location.push_back(header->image_position[i].z);
     }
 
+    if (save_slice_location_less)
+    {
+        std::sort(slice_location.begin() , slice_location.end() , std::less<double>());//slice location from max to min
+    }
+    else
+    {
+        std::sort(slice_location.begin() , slice_location.end() , std::greater<double>());//slice location from max to min
+    }
+    
+
     double delta = 0;
     for(int i = 1; i<slice_location.size() ; ++i)
     {
@@ -271,28 +281,41 @@ int resample_z_backup(std::vector<std::vector<Nodule>>& nodules , std::shared_pt
 
     const double slice0 = slice_location[0];
 
+    
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader)
     {
         for(auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it)
         {
             Nodule& nodule = *it;
             std::vector<Point3>& pts = nodule._points;
+
+            
             for (int  i= 0 ; i< pts.size() ; ++i)
             {
-                double slice = pts[i].z;
-                double delta_slice = slice - slice0;
-                int tmp_idx = 0;
+                const double slice = pts[i].z;
+
+                double min_error = std::numeric_limits<double>::max();
+                int min_id = 0;
                 for (int j = 0 ; j<slice_location.size() ; ++j)
                 {
-                    if (fabs(slice_location[j] - slice) < LOCATION_EPSILON )
+                    double err = fabs(slice_location[j] - slice);
+                    if (err < min_error)
                     {
-                        pts[i].z = static_cast<double>(j);
+                        min_error = err;
+                        min_id = j;
+                    }
+
+                    if (min_error < LOCATION_EPSILON )
+                    {
+                        pts[i].z = static_cast<double>(min_id);
                         goto FIND_LOCATION;
                     }
                 }
 
-                LOG_OUT(  "find slice lotation failed!\n");
-                return -1;
+                pts[i].z = static_cast<double>(min_id);
+
+                LOG_OUT(  "warning : find slice location gap more than 0.0001 !\n");
+                //return -1;
 
 FIND_LOCATION:;
             }
@@ -1000,6 +1023,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
         //resample position z from slice location to pixel coordinate
         if( 0 != resample_z(nodules , data_header , save_slice_location_less) )
         {
+            LOG_OUT("warning : use image position z replace silce location.")
             if (0 != resample_z_backup(nodules , data_header , save_slice_location_less))
             {
                 LOG_OUT( "resample z failed!\n");

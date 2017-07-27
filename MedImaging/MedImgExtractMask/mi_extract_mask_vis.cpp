@@ -237,9 +237,9 @@ void mouse(int btn , int status , int x , int y)
 void mousewheel(int btn , int dir, int x , int y)
 {
     _cur_z += dir;
-    if (_cur_z > _max_z)
+    if (_cur_z > _max_z-1)
     {
-        _cur_z = _max_z;
+        _cur_z = _max_z-1;
     }
     if (_cur_z < 0)
     {
