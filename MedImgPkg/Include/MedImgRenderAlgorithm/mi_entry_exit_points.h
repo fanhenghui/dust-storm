@@ -17,7 +17,7 @@ public:
     EntryExitPoints();
     virtual ~EntryExitPoints();
 
-    void set_display_size(int width , int height);
+    virtual void set_display_size(int width , int height);
     void get_display_size(int& width , int& height);
 
     void set_strategy( RayCastingStrategy strategy );

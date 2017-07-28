@@ -1,10 +1,10 @@
 #version 430 core
 
-in vec4 in_color;
-out vec4 out_color;
+in vec4 v_out_color;
+out vec4 f_out_color;
 
 void main()
 {
-    out_color = in_color;
-    out_color.a = 0.0;
+    f_out_color = v_out_color;
+    f_out_color.a = 0.0;
 }

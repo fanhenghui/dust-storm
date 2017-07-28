@@ -30,6 +30,19 @@ void EntryExitPoints::initialize()
 
         _entry_points_texture->initialize();
         _exit_points_texture->initialize();
+
+        _entry_points_texture->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        _entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
+        _entry_points_texture->unbind();
+
+        _exit_points_texture->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        _exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA , GL_FLOAT , NULL);
+        _exit_points_texture->unbind();
+
         _has_init = true;
     }
 }
@@ -58,10 +71,8 @@ void EntryExitPoints::set_display_size(int width , int height)
     _exit_points_buffer.reset(new Vector4f[_width*_height]);
 
     //resize texture
-    if (GPU_BASE == _strategy)
+    if (GPU_BASE == _strategy && _entry_points_texture && _exit_points_texture)
     { 
-        initialize();
-
         CHECK_GL_ERROR;
 
         _entry_points_texture->bind();

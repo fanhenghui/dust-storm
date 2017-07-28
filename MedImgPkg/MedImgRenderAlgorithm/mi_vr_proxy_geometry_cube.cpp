@@ -59,13 +59,15 @@ void ProxyGeometryCube::initialize()
         //VAO
         _gl_vao->bind();
 
+        _gl_vertex_buffer->set_buffer_target(GL_ARRAY_BUFFER);
         _gl_vertex_buffer->bind();
-        _gl_vertex_buffer->load(0, nullptr , GL_STATIC_DRAW);
+        _gl_vertex_buffer->load(0, nullptr , GL_DYNAMIC_DRAW);
         glVertexAttribPointer(0,3,GL_FLOAT  , GL_FALSE , 0 , NULL);
         glEnableVertexAttribArray(0);
 
+        _gl_color_buffer->set_buffer_target(GL_ARRAY_BUFFER);
         _gl_color_buffer->bind();
-        _gl_color_buffer->load(0, nullptr , GL_STATIC_DRAW);
+        _gl_color_buffer->load(0, nullptr , GL_DYNAMIC_DRAW);
         glVertexAttribPointer(1,4,GL_FLOAT  , GL_FALSE , 0 , NULL);
         glEnableVertexAttribArray(1);
 
@@ -122,18 +124,22 @@ void ProxyGeometryCube::calculate_entry_exit_points()
             }
 
             _gl_vertex_buffer->bind();
-            _gl_vertex_buffer->load(36*3*sizeof(float) , vertex, GL_STATIC_DRAW);
+            _gl_vertex_buffer->load(36*3*sizeof(float) , vertex, GL_DYNAMIC_DRAW);
 
             _gl_color_buffer->bind();
-            _gl_color_buffer->load(36*4*sizeof(float) , color , GL_STATIC_DRAW);
+            _gl_color_buffer->load(36*4*sizeof(float) , color , GL_DYNAMIC_DRAW);
         }
 
         CHECK_GL_ERROR;
+
+        entry_exit_points->_gl_fbo->bind();
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
         _gl_vao->bind();
         _gl_program->bind();
+
+        CHECK_GL_ERROR;
 
         const Matrix4 mat_vp = entry_exit_points->get_camera()->get_view_projection_matrix();
         const Matrix4 mat_m = entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
@@ -146,9 +152,11 @@ void ProxyGeometryCube::calculate_entry_exit_points()
         }
         float mat_mvp_f[16];
         mat_mvp.to_float16(mat_mvp_f);
-        glUniformMatrix4fv(loc , 4 , GL_FALSE , mat_mvp_f);
+        glUniformMatrix4fv(loc , 1 , GL_FALSE , mat_mvp_f);
 
-        entry_exit_points->_gl_fbo->bind();
+        CHECK_GL_ERROR;
+
+        glEnable(GL_DEPTH_TEST);
 
         //1 render entry points
         glDrawBuffer(GL_COLOR_ATTACHMENT0);
@@ -156,11 +164,12 @@ void ProxyGeometryCube::calculate_entry_exit_points()
         glClearColor(0.0,0.0,0.0,0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
 
         glDrawArrays(GL_TRIANGLES , 0 , 36);
+
+        CHECK_GL_ERROR;
 
         //2 render exit points
         glDrawBuffer(GL_COLOR_ATTACHMENT1);
@@ -169,16 +178,19 @@ void ProxyGeometryCube::calculate_entry_exit_points()
         glClearColor(0.0,0.0,0.0,0.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_GEQUAL);
 
         glDrawArrays(GL_TRIANGLES , 0 , 36);
 
-        _gl_vao->unbind();
         _gl_program->unbind();
+        _gl_vao->unbind();
+
+        CHECK_GL_ERROR;
 
         glPopAttrib();
+
+        entry_exit_points->_gl_fbo->unbind();
 
         CHECK_GL_ERROR;
 

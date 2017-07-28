@@ -51,17 +51,20 @@ VRScene::~VRScene()
 
 void VRScene::rotate(const Point2& pre_pt , const Point2& cur_pt)
 {
-
+    _camera_interactor->rotate(pre_pt , cur_pt , _width , _height );
+    set_dirty(true);
 }
 
 void VRScene::zoom(const Point2& pre_pt , const Point2& cur_pt)
 {
-
+    _camera_interactor->zoom(pre_pt , cur_pt , _width , _height );
+    set_dirty(true);
 }
 
 void VRScene::pan(const Point2& pre_pt , const Point2& cur_pt)
 {
-
+    _camera_interactor->pan(pre_pt , cur_pt , _width , _height );
+    set_dirty(true);
 }
 
 void VRScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
@@ -70,6 +73,12 @@ void VRScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
 
     //place default VR
     _camera_calculator->init_vr_placement(_ray_cast_camera);
+
+    //Set initial camera to interactor
+    _camera_interactor->set_initial_status(_ray_cast_camera);
+
+    //resize because initial camera's ratio between width and height  is 1, but current ratio may not.
+    _camera_interactor->resize(_width , _height);
 
     //initialize bounding box
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points = 

@@ -10,17 +10,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-VREntryExitPoints::VREntryExitPoints()
+VREntryExitPoints::VREntryExitPoints():EntryExitPoints()
 {
 
 }
 
 VREntryExitPoints::~VREntryExitPoints()
-{
-
-}
-
-void VREntryExitPoints::finialize()
 {
 
 }
@@ -58,8 +53,8 @@ void VREntryExitPoints::initialize()
         _gl_depth_texture->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
-         _gl_depth_texture->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , NULL);
-
+        _gl_depth_texture->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , NULL);
+        _gl_fbo->attach_texture(GL_DEPTH_ATTACHMENT , _gl_depth_texture);
 
          _gl_fbo->unbind();
 
@@ -69,6 +64,24 @@ void VREntryExitPoints::initialize()
 
          /*_proxy_geo_brick.reset(new ProxyGeometryBrick);
          _proxy_geo_brick->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));*/
+    }
+}
+
+void VREntryExitPoints::finialize()
+{
+
+}
+
+void VREntryExitPoints::set_display_size(int width , int height)
+{
+    EntryExitPoints::set_display_size(width , height);
+    if (GPU_BASE == _strategy && _gl_depth_texture)
+    {
+        _gl_depth_texture->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D , GL_LINEAR);
+        _gl_depth_texture->load(GL_DEPTH_COMPONENT16 , _width , _height , GL_DEPTH_COMPONENT , GL_UNSIGNED_SHORT , NULL);
+        _gl_depth_texture->unbind();
     }
 }
 

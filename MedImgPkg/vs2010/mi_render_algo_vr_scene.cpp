@@ -52,7 +52,7 @@ namespace
     int _height = 512;
     int _iButton = -1;
     Point2 _ptPre;
-    int _iTestCode = 1;
+    int _iTestCode = 0;
 
     std::vector<std::string> GetFiles()
     {
@@ -70,7 +70,7 @@ namespace
     void Init()
     {
         Configuration::instance()->set_processing_unit_type(GPU);
-        GLUtils::set_check_gl_flag(false);
+        GLUtils::set_check_gl_flag(true);
 
         std::vector<std::string> files = GetFiles();
         DICOMLoader loader;

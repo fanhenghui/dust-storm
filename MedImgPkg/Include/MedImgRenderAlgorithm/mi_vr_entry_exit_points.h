@@ -37,6 +37,8 @@ public:
     virtual void initialize();
     virtual void finialize();
 
+    virtual void set_display_size(int width , int height);
+
     virtual void calculate_entry_exit_points();
 
     void set_brick_pool(std::shared_ptr<BrickPool> brick_pool);

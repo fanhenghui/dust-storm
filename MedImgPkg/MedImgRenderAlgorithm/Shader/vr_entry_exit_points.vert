@@ -3,10 +3,10 @@
 layout (location = 0) in vec4 vertex ;
 layout (location = 1) in vec4 color;
 layout (location = 0) uniform mat4 mat_mvp;
-out vec4 out_color;
+out vec4 v_out_color;
 
 void main()
 {
-    out_color = vertex;
+    v_out_color = color;
     gl_Position = mat_mvp*vertex;
 }

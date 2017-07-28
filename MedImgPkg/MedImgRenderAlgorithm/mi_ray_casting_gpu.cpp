@@ -41,8 +41,8 @@ void RayCastingGPU::render()
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    _gl_vao->bind();
     _program->bind();
+    _gl_vao->bind();
 
     for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
     {
