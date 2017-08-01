@@ -3,6 +3,7 @@
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgArithmetic/mi_point2.h"
 #include "MedImgArithmetic/mi_camera_base.h"
 
@@ -24,7 +25,6 @@ public:
     const std::string& get_name() const;
 
     virtual void initialize();
-    virtual void finalize();
 
     virtual void set_display_size(int width , int height);
     void get_display_size(int& width, int& height) const;
@@ -56,6 +56,7 @@ protected:
     GLFBOPtr _scene_fbo;
     GLTexture2DPtr _scene_color_attach_0;
     GLTexture2DPtr _scene_depth_attach;
+    GLResourceShield _res_shield;
 
     std::shared_ptr<CameraBase> _camera;
 

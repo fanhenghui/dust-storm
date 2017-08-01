@@ -1,6 +1,5 @@
 #include "mi_entry_exit_points.h"
 
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_texture_2d.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -18,16 +17,21 @@ EntryExitPoints::EntryExitPoints():_width(4),_height(4),_has_init(false),_strate
 {
     _entry_points_buffer.reset(new Vector4f[_width*_height]);
     _exit_points_buffer.reset(new Vector4f[_width*_height]);
+
+    UIDType uid;
+    _entry_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+    _entry_points_texture->set_description("entry points texture");
+    _exit_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+    _exit_points_texture->set_description("exit points texture");
+
+    _res_shield.add_shield<GLTexture2D>(_entry_points_texture);
+    _res_shield.add_shield<GLTexture2D>(_exit_points_texture);
 }
 
 void EntryExitPoints::initialize()
 {
     if (!_has_init)
     {
-        UIDType uid;
-        _entry_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
-        _exit_points_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
-
         _entry_points_texture->initialize();
         _exit_points_texture->initialize();
 
@@ -44,17 +48,6 @@ void EntryExitPoints::initialize()
         _exit_points_texture->unbind();
 
         _has_init = true;
-    }
-}
-
-void EntryExitPoints::finialize()
-{
-    if (_has_init)
-    {
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_entry_points_texture->get_uid());
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_exit_points_texture->get_uid());
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
-        _has_init = false;
     }
 }
 

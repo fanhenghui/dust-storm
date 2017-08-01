@@ -34,16 +34,6 @@ GLResourceManagerContainer::~GLResourceManagerContainer()
 
 }
 
-GLProgramManagerPtr GLResourceManagerContainer::get_program_manager() const
-{
-    return _program_manager;
-}
-
-GLBufferManagerPtr GLResourceManagerContainer::get_buffer_manager() const
-{
-    return _buffer_manager;
-}
-
 void GLResourceManagerContainer::update_all()
 {
     _program_manager->update();
@@ -71,6 +61,16 @@ _program_manager(new GLProgramManager()),
     _time_query_manager(new GLTimeQueryManager())
 {
 
+}
+
+GLProgramManagerPtr GLResourceManagerContainer::get_program_manager() const
+{
+    return _program_manager;
+}
+
+GLBufferManagerPtr GLResourceManagerContainer::get_buffer_manager() const
+{
+    return _buffer_manager;
 }
 
 GLTexture1DManagerPtr GLResourceManagerContainer::get_texture_1d_manager() const

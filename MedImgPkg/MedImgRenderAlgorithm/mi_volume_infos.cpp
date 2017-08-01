@@ -39,13 +39,37 @@ VolumeInfos::VolumeInfos():_volume_dirty(false),_mask_dirty(false)
 
 VolumeInfos::~VolumeInfos()
 {
-    
+    finialize();
 }
 
 void VolumeInfos::finialize()
 {
     //release all resource 
+    if (!_volume_textures.empty())
+    {
+        for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
+        {
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+        }
+        _volume_textures.clear();
+    }
 
+    if (_volume_brick_info_buffer)
+    {
+        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
+        _volume_brick_info_buffer.reset();
+    }
+
+    if (!_mask_textures.empty())
+    {
+        for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
+        {
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+        }
+        _mask_textures.clear();
+    }
+
+    // TODO release mask brick info
 }
 
 void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
@@ -57,7 +81,36 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
         _volume_data = image_data;
         _volume_dirty = true;
 
-        //TODO initialize brick pool
+        //release textures
+        if (!_volume_textures.empty())
+        {
+            for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
+            {
+                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+            }
+            _volume_textures.clear();
+        }
+        if (_volume_brick_info_buffer)
+        {
+            GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
+            _volume_brick_info_buffer.reset();
+        }
+
+        //create texture
+        UIDType uid(0);
+        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
+        if (_data_header)
+        {
+            tex->set_description("volume : " + _data_header->series_uid);
+        }
+        else
+        {
+            tex->set_description("volume : undefined series UID");
+        }
+        _volume_textures.resize(1);
+        _volume_textures[0] = tex;
+
+        //TODO create brick pool
 
         //////////////////////////////////////////////////////////////////////////
         //Create camera calculator
@@ -80,6 +133,31 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
 
         _mask_data = image_data;
         _mask_dirty = true;
+
+        //release textures
+        if (!_mask_textures.empty())
+        {
+            for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
+            {
+                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+            }
+            _mask_textures.clear();
+        }
+        // TODO release mask brick info
+
+        //create texture
+        UIDType uid(0);
+        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
+        if (_data_header)
+        {
+            tex->set_description("mask : " + _data_header->series_uid);
+        }
+        else
+        {
+            tex->set_description("mask : undefined series UID");
+        }
+        _mask_textures.resize(1);
+        _mask_textures[0] = tex;
 
         //TODO initialize brick pool mask part
     }
@@ -166,7 +244,6 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned in
     _mask_array_to_be_update.push_back(data_updated);
 }
 
-
 void VolumeInfos::refresh_update_mask_i()
 {
     if (!_mask_aabb_to_be_update.empty())
@@ -210,36 +287,8 @@ void VolumeInfos::refresh_upload_mask_i()
         return;
     }
 
-    //release volume textures
-    if (!_mask_textures.empty())
-    {
-        for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
-        {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
-        }
-
-        _mask_textures.clear();
-        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
-    }
-
-    // TODO release mask brick info
-
-    //upload mask
-    _mask_textures.clear();
-
-    //Single mask
-    UIDType uid(0);
-    GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-    if (_data_header)
-    {
-        tex->set_description("Mask : " + _data_header->series_uid);
-    }
-    else
-    {
-        tex->set_description("Mask : Undefined series UID");
-    }
-
     CHECK_GL_ERROR;
+    GLTexture3DPtr &tex = _mask_textures[0];
     tex->initialize();
     tex->bind();
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
@@ -247,8 +296,6 @@ void VolumeInfos::refresh_upload_mask_i()
     tex->load(GL_R8 ,_mask_data->_dim[0] , _mask_data->_dim[1] , _mask_data->_dim[2] , GL_RED, GL_UNSIGNED_BYTE, _mask_data->get_pixel_pointer());
     tex->unbind();
     CHECK_GL_ERROR;
-
-    _mask_textures.push_back(tex);
 
 }
 
@@ -259,41 +306,8 @@ void VolumeInfos::refresh_upload_volume_i()
         return;
     }
 
-    //release volume textures
-    if (!_volume_textures.empty())
-    {
-        for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
-        {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
-        }
-
-        _volume_textures.clear();
-        GLResourceManagerContainer::instance()->get_texture_3d_manager()->update();
-    }
-
-    //release volume brick info
-    if (_volume_brick_info_buffer)
-    {
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
-        _volume_brick_info_buffer.reset();
-        GLResourceManagerContainer::instance()->get_buffer_manager()->update();
-    }
-
-    //upload volume
-    _volume_textures.clear();
-
-    //Single volume
-    UIDType uid(0);
-    GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-    if (_data_header)
-    {
-        tex->set_description("Volume : " + _data_header->series_uid);
-    }
-    else
-    {
-        tex->set_description("Volume : Undefined series UID");
-    }
-
+    CHECK_GL_ERROR;
+    GLTexture3DPtr& tex = _volume_textures[0];
     tex->initialize();
     tex->bind();
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
@@ -320,8 +334,7 @@ void VolumeInfos::refresh_upload_volume_i()
         tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
     }
     tex->unbind();
-
-    _volume_textures.push_back(tex);
+    CHECK_GL_ERROR;
 }
 
 std::shared_ptr<ImageDataHeader> VolumeInfos::get_data_header()

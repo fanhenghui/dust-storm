@@ -8,6 +8,7 @@
 #include "MedImgRenderAlgorithm/mi_ray_caster_define.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
 
+
 MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export MPREntryExitPoints : public EntryExitPoints
@@ -18,8 +19,6 @@ public:
     virtual ~MPREntryExitPoints();
 
     virtual void initialize();
-
-    virtual void finialize();
 
     void set_thickness(float thickness);// In volume coordinate
 
@@ -56,7 +55,6 @@ private:
 
     //GPU entry exit points cal
     GLProgramPtr _program;
-
 };
 
 

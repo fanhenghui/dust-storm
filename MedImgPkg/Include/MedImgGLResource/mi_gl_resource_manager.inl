@@ -42,6 +42,7 @@ void GLResourceManager<ResourceType>::remove_object(UIDType uid)
     auto it = _objects.find(uid);
     if (it != _objects.end())
     {
+        std::cout << "remove useless " << it->second->get_description() << uid << std::endl;
         _discard.push_back(it->second);
         _objects.erase(it);
     }

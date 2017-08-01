@@ -1,6 +1,7 @@
 #ifndef MED_IMG_GL_RESOURCE_MANAGER_CONTAINER_H
 #define MED_IMG_GL_RESOURCE_MANAGER_CONTAINER_H
 
+#include <list>
 #include "MedImgGLResource/mi_gl_resource_manager.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -45,6 +46,62 @@ public:
 
     ~GLResourceManagerContainer();
 
+    template<class ResourceType>
+    std::shared_ptr<GLResourceManager<ResourceType>> get_resource_manager()
+    {
+        GLRESOURCE_THROW_EXCEPTION("get resource mananger failed!");
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLProgram>> get_resource_manager<GLProgram>()
+    {
+        return _program_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLBuffer>> get_resource_manager<GLBuffer>()
+    {
+        return _buffer_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLTexture1D>> get_resource_manager<GLTexture1D>()
+    {
+        return _texture_1d_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLTexture1DArray>> get_resource_manager<GLTexture1DArray>()
+    {
+        return _texture_1d_array_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLTexture2D>> get_resource_manager<GLTexture2D>()
+    {
+        return _texture_2d_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLTexture3D>> get_resource_manager<GLTexture3D>()
+    {
+        return _texture_3d_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLVAO>> get_resource_manager<GLVAO>()
+    {
+        return _vao_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLFBO>> get_resource_manager<GLFBO>()
+    {
+        return _fbo_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLContext>> get_resource_manager<GLContext>()
+    {
+        return _context_manager;
+    }
+    template<>
+    std::shared_ptr<GLResourceManager<GLTimeQuery>> get_resource_manager<GLTimeQuery>()
+    {
+        return _time_query_manager;
+    }
+
     GLProgramManagerPtr get_program_manager() const;
 
     GLBufferManagerPtr get_buffer_manager() const;
@@ -85,6 +142,56 @@ private:
     GLTimeQueryManagerPtr _time_query_manager;
 };
 
+
+class GLObjectShieldBase
+{
+public:
+    GLObjectShieldBase() {};
+    virtual ~GLObjectShieldBase() {};
+};
+
+template<class ResourceType>
+class GLObjectShield : public GLObjectShieldBase
+{
+public:
+    GLObjectShield(std::shared_ptr<ResourceType> obj):_obj(obj)
+    {
+    };
+
+    ~GLObjectShield()
+    {
+        if (_obj)
+        {
+            GLResourceManagerContainer::instance()->get_resource_manager<ResourceType>()->remove_object(_obj->get_uid());
+        }
+    };
+private:
+    std::shared_ptr<ResourceType> _obj;
+};
+
+class GLResourceShield
+{
+public:
+    GLResourceShield(){};
+
+    ~GLResourceShield()
+    {
+        for (auto it = _shields.begin() ; it != _shields.end() ; ++it)
+        {
+            delete *it;
+        }
+        _shields.clear();
+    }
+
+    template<class ResourceType>
+    void add_shield(std::shared_ptr<ResourceType> obj)
+    {
+        _shields.push_back(new GLObjectShield<ResourceType>(obj));
+    }
+
+private:
+    std::list<GLObjectShieldBase*> _shields;
+};
 
 MED_IMG_END_NAMESPACE
 

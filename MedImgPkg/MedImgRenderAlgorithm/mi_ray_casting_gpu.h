@@ -3,6 +3,7 @@
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgRenderAlgorithm/mi_ray_caster_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -22,7 +23,6 @@ private:
 
 private:
     std::weak_ptr<RayCaster> _ray_caster;
-    GLProgramPtr _program;
     std::shared_ptr<GLActiveTextureCounter> _gl_act_tex_counter;
 
     //render steps
@@ -36,9 +36,11 @@ private:
     ColorInverseMode _color_inverse_mode;
     MaskOverlayMode _mask_overlay_mode;
 
-    //VAO
+    //Resource
     GLVAOPtr _gl_vao;
     GLBufferPtr _gl_buffer_vertex;
+    GLProgramPtr _program;
+    GLResourceShield _res_shield;
 
     //For Testing
     int _last_test_code;

@@ -2,7 +2,6 @@
 
 #include "MedImgGLResource/mi_gl_fbo.h"
 #include "MedImgGLResource/mi_gl_texture_2d.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_vr_proxy_geometry_cube.h"
@@ -32,7 +31,7 @@ void VREntryExitPoints::initialize()
         _gl_fbo->initialize();
 
         _gl_depth_texture = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
-        _gl_depth_texture->set_description("VR entry exit points FBO depth texture.");
+        _gl_depth_texture->set_description("VR entry exit points FBO depth texture");
         _gl_depth_texture->initialize();
 
         _gl_fbo->bind();
@@ -64,12 +63,10 @@ void VREntryExitPoints::initialize()
 
          /*_proxy_geo_brick.reset(new ProxyGeometryBrick);
          _proxy_geo_brick->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));*/
+
+         _res_shield.add_shield<GLFBO>(_gl_fbo);
+         _res_shield.add_shield<GLTexture2D>(_gl_depth_texture);
     }
-}
-
-void VREntryExitPoints::finialize()
-{
-
 }
 
 void VREntryExitPoints::set_display_size(int width , int height)

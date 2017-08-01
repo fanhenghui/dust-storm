@@ -1,14 +1,15 @@
 #include "mi_ray_caster_inner_buffer.h"
 #include "MedImgGLResource/mi_gl_utils.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_buffer.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 struct RayCasterInnerBuffer::GLResource
 {
-    std::map<BufferType , GLBufferPtr> buffer_ids;
+    std::map<RayCasterInnerBuffer::BufferType , GLBufferPtr> buffer_ids;
     bool dirty_flag[TYPE_END];
+    GLResourceShield res_shield;
 
     GLResource()
     {
@@ -17,15 +18,38 @@ struct RayCasterInnerBuffer::GLResource
 
     void release()
     {
-        for (auto it = buffer_ids.begin() ; it != buffer_ids.end() ; ++it)
-        {
-            GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it->second->get_uid());
-        }
         buffer_ids.clear();
         memset(dirty_flag , 0 , sizeof(bool)*TYPE_END);
     }
 
-    GLBufferPtr GetBuffer(BufferType type)
+    std::string get_buffer_type_name(RayCasterInnerBuffer::BufferType type)
+    {
+        switch(type)
+        {
+        case WINDOW_LEVEL_BUCKET:
+            {
+                return "window level bucket";
+            }
+        case VISIBLE_LABEL_BUCKET:
+            {
+                return "visible label bucket";
+            }
+        case VISIBLE_LABEL_ARRAY:
+            {
+                return "visible label array";
+            }
+        case MASK_OVERLAY_COLOR_BUCKET:
+            {
+                return "mask overlay color bucket";
+            }
+        default:
+            {
+                return "undefined buffer type";
+            }
+        }
+    }
+
+    GLBufferPtr GetBuffer(RayCasterInnerBuffer::BufferType type)
     {
         auto it = buffer_ids.find(type);
         if (it != buffer_ids.end())
@@ -36,9 +60,11 @@ struct RayCasterInnerBuffer::GLResource
         {
             UIDType buffer_id= 0;
             GLBufferPtr buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(buffer_id);
+            buffer->set_description("ray caster inner buffer : " + get_buffer_type_name(type) );
             buffer->initialize();
             buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
             buffer_ids[type] = buffer;
+            res_shield.add_shield<GLBuffer>(buffer);
             return buffer;
         }
     }
@@ -52,12 +78,7 @@ RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource()),_
 
 RayCasterInnerBuffer::~RayCasterInnerBuffer()
 {
-    release_buffer();
-}
 
-void RayCasterInnerBuffer::release_buffer()
-{
-    _inner_resource->release();
 }
 
 GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)

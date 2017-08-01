@@ -14,7 +14,6 @@
 #include "MedImgGLResource/mi_gl_texture_2d.h"
 #include "MedImgGLResource/mi_gl_program.h"
 #include "MedImgGLResource/mi_gl_utils.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 #include "mi_shader_collection.h"
 #include "mi_camera_calculator.h"
@@ -371,24 +370,10 @@ void MPREntryExitPoints::initialize()
             _program->set_shaders(std::vector<GLShaderInfo>(1 , GLShaderInfo(GL_COMPUTE_SHADER , S_MPR_ENTRY_EXIT_POINTS_COMP , "MPR entry exit compute shader")));
             _program->initialize();
             _program->compile();
+
+            _res_shield.add_shield<GLProgram>(_program);
         }
     }
 }
-
-void MPREntryExitPoints::finialize()
-{
-    EntryExitPoints::finialize();
-
-    if (_program)
-    {
-        GLResourceManagerContainer::instance()->get_program_manager()->remove_object(_program->get_uid());
-        _program.reset();
-        GLResourceManagerContainer::instance()->get_program_manager()->update();
-    }
-}
-
-
-
-
 
 MED_IMG_END_NAMESPACE

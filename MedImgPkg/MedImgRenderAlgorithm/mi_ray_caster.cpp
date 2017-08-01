@@ -43,12 +43,7 @@ _test_code(0)
 
 void RayCaster::initialize()
 {
-    
-}
 
-void RayCaster::finialize()
-{
-    _inner_buffer->release_buffer();
 }
 
 RayCaster::~RayCaster()

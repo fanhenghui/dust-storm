@@ -16,12 +16,14 @@ public:
     ~GLTextureCache();
 
     //upload
-    void cache(GLenum target , GLTextureBasePtr texture , GLint internalformat , 
+    void cache_load(GLenum target , GLTextureBasePtr texture , 
+        GLint wrap_type , GLint filter_type , 
+        GLint internalformat , 
         GLsizei width, GLsizei height , GLsizei depth , 
         GLenum format , GLenum type , char* data , GLint level = 0);
 
     //update
-    void cache(GLenum target , GLTextureBasePtr texture , 
+    void cache_update(GLenum target , GLTextureBasePtr texture , 
         GLint xoffset , GLint yoffset , GLint zoffset ,
         GLsizei width , GLsizei height , GLsizei depth , 
         GLenum format , GLenum type , char* data , GLint level = 0);
@@ -37,7 +39,7 @@ private:
 
     boost::mutex _mutex;
     struct TextureUnit;
-    std::list<TextureUnit> _cache_list;
+    std::list<std::shared_ptr<TextureUnit>> _cache_list;
 
 private:
 };

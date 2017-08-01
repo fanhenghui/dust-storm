@@ -5,6 +5,7 @@
 #include "MedImgRenderAlgorithm/mi_ray_caster_define.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
 #include "MedImgArithmetic/mi_vector4f.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -23,7 +24,6 @@ public:
     void set_strategy( RayCastingStrategy strategy );
 
     virtual void initialize();
-    virtual void finialize();
 
     GLTexture2DPtr get_entry_points_texture();
     GLTexture2DPtr get_exit_points_texture();
@@ -50,6 +50,8 @@ public:
 protected:
     GLTexture2DPtr _entry_points_texture;
     GLTexture2DPtr _exit_points_texture;
+    GLResourceShield _res_shield;
+
     std::unique_ptr<Vector4f[]> _entry_points_buffer;
     std::unique_ptr<Vector4f[]> _exit_points_buffer;
     int _width;

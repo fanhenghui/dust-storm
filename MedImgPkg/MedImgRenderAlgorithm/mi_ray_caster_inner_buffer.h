@@ -34,8 +34,6 @@ public:
 
     ~RayCasterInnerBuffer();
 
-    void release_buffer();
-
     GLBufferPtr get_buffer(BufferType type);
 
     void set_mask_label_level(LabelLevel level);
@@ -54,6 +52,8 @@ private:
     std::unique_ptr<GLResource> _inner_resource;
 
     std::unique_ptr<char[]> _shared_buffer_array;
+
+
 };
 
 MED_IMG_END_NAMESPACE

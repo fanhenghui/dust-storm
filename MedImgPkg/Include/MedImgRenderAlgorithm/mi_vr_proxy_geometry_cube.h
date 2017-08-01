@@ -5,6 +5,7 @@
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgArithmetic/mi_aabb.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -29,6 +30,7 @@ private:
     GLBufferPtr _gl_color_buffer;
     GLBufferPtr _gl_vertex_buffer;
     GLProgramPtr _gl_program;
+    GLResourceShield _res_shield;
 
     std::weak_ptr<VREntryExitPoints> _vr_entry_exit_points;
     AABB _last_aabb;

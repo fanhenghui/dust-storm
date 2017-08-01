@@ -22,7 +22,6 @@ public:
     virtual ~RayCastScene();
 
     virtual void initialize();
-    virtual void finalize();
 
     virtual void set_display_size(int width , int height);
 

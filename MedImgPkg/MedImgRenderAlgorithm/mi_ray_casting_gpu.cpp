@@ -3,7 +3,6 @@
 #include "MedImgGLResource/mi_gl_program.h"
 #include "MedImgGLResource/mi_gl_vao.h"
 #include "MedImgGLResource/mi_gl_buffer.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_ray_caster.h"
@@ -67,11 +66,11 @@ void RayCastingGPU::update_i()
     {
         UIDType uid;
         _gl_vao = GLResourceManagerContainer::instance()->get_vao_manager()->create_object(uid);
-        _gl_vao->set_description("Ray casting GPU VAO");
+        _gl_vao->set_description("ray casting GPU VAO");
         _gl_vao->initialize();
 
         _gl_buffer_vertex = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        _gl_buffer_vertex->set_description("Ray casting GPU vertex buffer (-1 -1)~ (1,1)");
+        _gl_buffer_vertex->set_description("ray casting GPU vertex buffer (-1 -1)~ (1,1)");
         _gl_buffer_vertex->initialize();
         _gl_buffer_vertex->set_buffer_target(GL_ARRAY_BUFFER);
 
@@ -89,6 +88,9 @@ void RayCastingGPU::update_i()
 
         _gl_vao->unbind();
         _gl_buffer_vertex->unbind();
+
+        _res_shield.add_shield<GLVAO>(_gl_vao);
+        _res_shield.add_shield<GLBuffer>(_gl_buffer_vertex);
     }
 
     CHECK_GL_ERROR;
@@ -98,8 +100,9 @@ void RayCastingGPU::update_i()
     {
         UIDType uid;
         _program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
-        _program->set_description("Ray casting GPU program");
+        _program->set_description("ray casting GPU program");
         _program->initialize();
+        _res_shield.add_shield<GLProgram>(_program);
     }
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();

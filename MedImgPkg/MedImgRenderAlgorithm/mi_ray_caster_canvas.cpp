@@ -1,5 +1,4 @@
 #include "mi_ray_caster_canvas.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_fbo.h"
 #include "MedImgGLResource/mi_gl_texture_2d.h"
 #include "MedImgGLResource/mi_gl_utils.h"
@@ -13,7 +12,6 @@ RayCasterCanvas::RayCasterCanvas():_has_init(false),_width(32),_height(32)
 
 RayCasterCanvas::~RayCasterCanvas()
 {
-    finialize();
 }
 
 void RayCasterCanvas::initialize()
@@ -24,11 +22,13 @@ void RayCasterCanvas::initialize()
 
         UIDType fbo_id=0;
         _gl_fbo = GLResourceManagerContainer::instance()->get_fbo_manager()->create_object(fbo_id);
+        _gl_fbo->set_description("ray caster canvas FBO");
         _gl_fbo->initialize();
         _gl_fbo->set_target(GL_FRAMEBUFFER);
 
         UIDType texture_color_id = 0;
         _color_attach_0 = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(texture_color_id);
+        _color_attach_0->set_description("ray caster canvas FBO color attachment 0 texture");
         _color_attach_0->initialize();
         _color_attach_0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -37,6 +37,7 @@ void RayCasterCanvas::initialize()
 
         UIDType depth_color_id = 0;
         _depth_attach = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(depth_color_id);
+        _depth_attach->set_description("ray caster canvas FBO depth attachment texture");
         _depth_attach->initialize();
         _depth_attach->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -47,7 +48,6 @@ void RayCasterCanvas::initialize()
         _gl_fbo->bind();
         
         _gl_fbo->attach_texture(GL_COLOR_ATTACHMENT0 , _color_attach_0);
-        //_gl_fbo->attach_texture(GL_COLOR_ATTACHMENT1 , m_pGrayAttach1);
         _gl_fbo->attach_texture(GL_DEPTH_ATTACHMENT , _depth_attach);
 
         _gl_fbo->unbind();
@@ -58,20 +58,10 @@ void RayCasterCanvas::initialize()
         _color_array.reset(new RGBAUnit[_width*_height]);
 
         _has_init = true;
-    }
-}
 
-void RayCasterCanvas::finialize()
-{
-    if (_has_init)
-    {
-        GLResourceManagerContainer::instance()->get_fbo_manager()->remove_object(_gl_fbo->get_uid());
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_color_attach_0->get_uid());
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->remove_object(_depth_attach->get_uid());
-
-        GLResourceManagerContainer::instance()->get_fbo_manager()->update();
-        GLResourceManagerContainer::instance()->get_texture_2d_manager()->update();
-        _has_init = false;
+        _res_shield.add_shield<GLFBO>(_gl_fbo);
+        _res_shield.add_shield<GLTexture2D>(_color_attach_0);
+        _res_shield.add_shield<GLTexture2D>(_depth_attach);
     }
 }
 

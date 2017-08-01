@@ -169,6 +169,25 @@ namespace
                 _iTestCode = 1- _iTestCode;
                 break;
             }
+        case 'r':
+            {
+                _scene.reset(new VRScene(_width , _height));
+                const float PRESET_CT_LUNGS_WW = 1500;
+                const float PRESET_CT_LUNGS_WL = -400;
+
+                _scene->set_volume_infos(_volumeinfos);
+                _scene->set_sample_rate(1.0);
+                _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
+                _scene->set_composite_mode(COMPOSITE_MIP);
+                _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+                _scene->set_mask_mode(MASK_NONE);
+                _scene->set_interpolation_mode(LINEAR);
+                _scene->set_proxy_geometry(PG_CUBE);
+                _scene->set_test_code(_iTestCode);
+                _scene->initialize();
+                _scene->set_display_size(_width , _height);
+                break;
+            }
         default:
             break;
         }

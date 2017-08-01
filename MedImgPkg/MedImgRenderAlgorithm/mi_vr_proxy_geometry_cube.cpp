@@ -34,20 +34,20 @@ void ProxyGeometryCube::initialize()
     {
         UIDType uid;
         _gl_program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
-        _gl_program->initialize();
         _gl_program->set_description("proxy geometry cube program");
+        _gl_program->initialize();
 
         _gl_vao = GLResourceManagerContainer::instance()->get_vao_manager()->create_object(uid);
-        _gl_vao->initialize();
         _gl_vao->set_description("proxy geometry cube VAO");
+        _gl_vao->initialize();
 
         _gl_vertex_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        _gl_vertex_buffer->initialize();
         _gl_vertex_buffer->set_description("proxy geometry cube vertex buffer");
+        _gl_vertex_buffer->initialize();
 
         _gl_color_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        _gl_color_buffer->initialize();
         _gl_color_buffer->set_description("proxy geometry cube vertex buffer");
+        _gl_color_buffer->initialize();
 
         //program
         std::vector<GLShaderInfo> shaders;
@@ -72,6 +72,11 @@ void ProxyGeometryCube::initialize()
         glEnableVertexAttribArray(1);
 
         _gl_vao->unbind();
+
+        _res_shield.add_shield<GLVAO>(_gl_vao);
+        _res_shield.add_shield<GLBuffer>(_gl_color_buffer);
+        _res_shield.add_shield<GLBuffer>(_gl_vertex_buffer);
+        _res_shield.add_shield<GLProgram>(_gl_program);
     }
 }
 

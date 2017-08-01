@@ -15,6 +15,7 @@
 #include "MedImgGLResource/mi_gl_utils.h"
 #include "MedImgGLResource/mi_gl_texture_1d.h"
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
+#include "MedImgGLResource/mi_gl_texture_cache.h"
 
 #include "MedImgRenderAlgorithm/mi_camera_calculator.h"
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
@@ -88,13 +89,6 @@ void RayCastScene::initialize()
     _ray_caster->initialize();
 }
 
-void RayCastScene::finalize()
-{
-    _canvas->finialize();
-    _entry_exit_points->finialize();
-    _ray_caster->finialize();
-}
-
 void RayCastScene::set_display_size(int width , int height)
 {
     SceneBase::set_display_size(width ,height);
@@ -115,8 +109,11 @@ void RayCastScene::pre_render()
     //entry exit points initialize
     _entry_exit_points->initialize();
 
-    //GL resource update
+    //GL resource update (discard)
     GLResourceManagerContainer::instance()->update_all();
+
+    //GL texture udpate
+    GLTextureCache::instance()->process_cache();
 }
 
 void RayCastScene::render()
@@ -220,9 +217,6 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         std::shared_ptr<ImageDataHeader> data_header = _volume_infos->get_data_header();
         RENDERALGO_CHECK_NULL_EXCEPTION(data_header);
 
-        _volume_infos->refresh();//TODOTODOTODO
-
-
         //Camera calculator
         _camera_calculator = volume_infos->get_camera_calculator();
 
@@ -239,7 +233,6 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
         _ray_caster->set_volume_to_world_matrix(_camera_calculator->get_volume_to_world_matrix());
         _ray_caster->set_volume_data(volume);
         _ray_caster->set_mask_data(mask);
-        //_ray_caster->set_mask_data(pMask);
 
         if (GPU == Configuration::instance()->get_processing_unit_type())
         {
@@ -248,20 +241,25 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos)
             {
                 UIDType uid;
                 _pseudo_color_texture = GLResourceManagerContainer::instance()->get_texture_1d_manager()->create_object(uid);
-                _pseudo_color_texture->set_description("Pseudo color texture gray");
-                _pseudo_color_texture->initialize();
-                _pseudo_color_texture->bind();
-                GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_EDGE);
-                GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
-                unsigned char pData[] = {0,0,0,0,255,255,255,255};
-                _pseudo_color_texture->load(GL_RGBA8 , 2, GL_RGBA , GL_UNSIGNED_BYTE , pData);
+                _pseudo_color_texture->set_description("pseudo color texture gray");
+                _res_shield.add_shield<GLTexture1D>(_pseudo_color_texture);
+
+                unsigned char* gray_array = new unsigned char[8];
+                gray_array[0] = 0;
+                gray_array[1] = 0;
+                gray_array[2] = 0;
+                gray_array[3] = 0;
+                gray_array[4] = 255;
+                gray_array[5] = 255;
+                gray_array[6] = 255;
+                gray_array[7] = 255;
+                GLTextureCache::instance()->cache_load(GL_TEXTURE_1D , _pseudo_color_texture , 
+                    GL_CLAMP_TO_EDGE ,GL_LINEAR , GL_RGBA8 , 2, 0,0, GL_RGBA , GL_UNSIGNED_BYTE , (char*)gray_array);
             }
+
+            //set texture
             _ray_caster->set_pseudo_color_texture(_pseudo_color_texture , 2);
-
-            //Volume texture
             _ray_caster->set_volume_data_texture(volume_infos->get_volume_texture());
-
-            //Mask texture
             _ray_caster->set_mask_data_texture(volume_infos->get_mask_texture());
         }
         _ray_caster->initialize();

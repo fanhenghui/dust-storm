@@ -34,8 +34,6 @@ public:
 
     void initialize();
 
-    void finialize();
-
     void render();
 
     void set_test_code(int test_code);

@@ -3,6 +3,7 @@
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgArithmetic/mi_color_unit.h"
 #include "MedImgIO/mi_io_define.h"
 
@@ -16,8 +17,6 @@ public:
     ~RayCasterCanvas();
 
     void initialize();
-
-    void finialize();
 
     void set_display_size(int width , int height);
 
@@ -43,6 +42,8 @@ private:
     GLFBOPtr _gl_fbo;
     GLTexture2DPtr _color_attach_0;//For RGBA Color
     GLTexture2DPtr _depth_attach;
+    GLResourceShield _res_shield;
+
     int _width;
     int _height;
     std::unique_ptr<RGBAUnit[]> _color_array;

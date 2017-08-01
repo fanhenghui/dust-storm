@@ -35,7 +35,6 @@ public:
     virtual ~VREntryExitPoints();
 
     virtual void initialize();
-    virtual void finialize();
 
     virtual void set_display_size(int width , int height);
 
