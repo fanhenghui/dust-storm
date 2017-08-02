@@ -48,13 +48,14 @@ vec4 shade(vec3 sample_pos, vec4 input_color, vec3 ray_dir , sampler3D sampler ,
     light_dir = normalize(light_dir);
 
     vec3 ambient_part = ambient_color.xyz*ambient_color.w*input_color.xyz;
- 
-    if (dot(light_dir, normal) < 0.0) 
+    float ln = dot(light_dir, normal);
+    if (ln < 0.0) 
     {
         normal = -normal;
+        ln = -ln;
     }
 
-    float diffuse = max(dot(normal, light_dir), 0.0);
+    float diffuse = max(ln, 0.0);
     vec3 diffuse_part = diffuse * material[label].diffuse_color.xyz * material[label].diffuse_color.w *input_color.xyz;
 
     //Classic phong
@@ -71,7 +72,16 @@ vec4 shade(vec3 sample_pos, vec4 input_color, vec3 ray_dir , sampler3D sampler ,
     vec3 specular_part = specular * material[label].specular_color.xyz * material[label].specular_color.w *input_color.xyz;
 
     vec3 output_color = ambient_part + diffuse_part + specular_part;
+
+    //silhouettes enhance alpha
+    float fn = 1.0 - ln;
+    float kss = 1;
+    float kse = 0.5;
+    float ksc = 0.0;
+    float alpha =  input_color.w*(0.5 + kss * pow(fn, kse));
+
+    alpha = clamp(alpha , 0, 1);
     output_color = clamp(output_color , 0 , 1);
 
-    return vec4(output_color , input_color.w);
+    return vec4(output_color , alpha);
 }
