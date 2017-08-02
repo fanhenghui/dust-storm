@@ -2,8 +2,8 @@
 #define MED_IMG_LABEL_STORE_H_
 
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
-#include "MedImgRenderAlgorithm/mi_ray_caster_define.h"
 #include "boost/thread/mutex.hpp"
+#include "boost/thread/locks.hpp"
 
 MED_IMG_BEGIN_NAMESPACE
 

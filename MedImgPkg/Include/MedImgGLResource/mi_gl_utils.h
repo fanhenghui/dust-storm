@@ -1,7 +1,7 @@
 #ifndef MED_IMG_GL_UTILS_H_
 #define MED_IMG_GL_UTILS_H_
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "MedImgGLResource/mi_gl_resource_export.h"
 #include "MedImgIO/mi_io_define.h"
 

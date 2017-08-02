@@ -30,7 +30,7 @@ VRScene::VRScene():RayCastScene()
     }
 }
 
-VRScene::VRScene(int width , int height)
+VRScene::VRScene(int width , int height):RayCastScene(width,height)
 {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(new VREntryExitPoints());
     _entry_exit_points = vr_entry_exit_points;

@@ -1,6 +1,7 @@
 #ifndef MED_IMG_CAMERA_INTERACTOR_H
 #define MED_IMG_CAMERA_INTERACTOR_H
 
+#include <memory>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgArithmetic/mi_point2.h"
 #include "MedImgArithmetic/mi_vector2.h"
@@ -14,7 +15,7 @@ class CameraCalculator;
 class RenderAlgo_Export OrthoCameraInteractor
 {
 public:
-    OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera );
+    OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera);
     ~OrthoCameraInteractor();
 
     void reset_camera();

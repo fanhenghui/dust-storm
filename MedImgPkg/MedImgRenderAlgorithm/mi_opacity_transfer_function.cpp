@@ -1,5 +1,6 @@
 #include "mi_opacity_transfer_function.h"
 #include <cassert>
+#include <cmath>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -75,7 +76,7 @@ void OpacityTransFunc::get_point_list(std::vector<OpacityTFPoint>& result_list)
         int idx = 0;
         for (size_t i = 0; i < tp_point_size - 1; ++i)
         {
-            int gap = static_cast<int>(std::fabs(_tp_points[i + 1].v - _tp_points[i].v));
+            int gap = static_cast<int>(fabs(_tp_points[i + 1].v - _tp_points[i].v));
             if (0 == gap)
             {
                 continue;

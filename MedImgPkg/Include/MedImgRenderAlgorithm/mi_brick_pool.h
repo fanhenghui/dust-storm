@@ -1,6 +1,9 @@
 #ifndef MED_IMG_BRICK_POOL_H_
 #define MED_IMG_BRICK_POOL_H_
 
+
+#include <memory>
+#include <map>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgRenderAlgorithm/mi_brick_define.h"
 

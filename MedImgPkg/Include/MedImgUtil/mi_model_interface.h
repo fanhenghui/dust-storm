@@ -1,7 +1,7 @@
 #ifndef MEDIMGUTIL_MI_MODEL_INTERFACE_H
 #define MEDIMGUTIL_MI_MODEL_INTERFACE_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 #include <vector>
 #include <memory>
 

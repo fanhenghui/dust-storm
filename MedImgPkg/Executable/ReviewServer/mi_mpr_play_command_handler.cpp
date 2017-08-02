@@ -23,7 +23,7 @@ MPRPlayCommandHandler::~MPRPlayCommandHandler()
 
 }
 
-int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , void* buffer)
+int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
 {
     if(_playing){
         return 0;
@@ -51,7 +51,7 @@ int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , void*
 }
 
 
-void MPRPlayCommandHandler::logic_i(OpDataHeader& op_header, void* buffer)
+void MPRPlayCommandHandler::logic_i(OpDataHeader& op_header, char* buffer)
 {
     _playing = true;
     std::shared_ptr<AppController> controller = _controller.lock();

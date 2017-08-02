@@ -1,8 +1,8 @@
 #ifndef MEDIMGUTIL_MI_MESSAGE_QUEUE_H
 #define MEDIMGUTIL_MI_MESSAGE_QUEUE_H
 
-#include "medimgutil/mi_util_export.h"
-#include "medimgutil/mi_exception.h"
+#include "MedImgUtil/mi_util_export.h"
+#include "MedImgUtil/mi_exception.h"
 
 #include <vector>
 #include <deque>

@@ -1,4 +1,5 @@
 #include "mi_color_transfer_function.h"
+#include <cmath>
 #include <cassert>
 
 MED_IMG_BEGIN_NAMESPACE
@@ -180,7 +181,7 @@ int ColorTransFunc::get_width() const
 
 ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv)
 {
-    /// \ÊäÈëµÄHSVµÄ·¶Î§ÊÇ H£¨hue£©0~360
+    /// \ï¿½ï¿½ï¿½ï¿½ï¿½HSVï¿½Ä·ï¿½Î§ï¿½ï¿½ Hï¿½ï¿½hueï¿½ï¿½0~360
     //S(saturation) 0 ~ 1(0~100%)
     //V(value) 0~1(0~100%)
     float h = hsv.x / 360.0f;
@@ -246,7 +247,7 @@ ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv)
 
 ColorTFPoint ColorTransFunc::rgb_to_hsv(const ColorTFPoint& rgb)
 {
-    /// \ÊäÈëµÄRGBµÄ·¶Î§ÊÇ 0~1
+    /// \ï¿½ï¿½ï¿½ï¿½ï¿½RGBï¿½Ä·ï¿½Î§ï¿½ï¿½ 0~1
     float onethird = 1.0f / 3.0f;
     float onesixth = 1.0f / 6.0f;
     float twothird = 2.0f / 3.0f;

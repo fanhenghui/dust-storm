@@ -16,7 +16,7 @@ ShutDownCommandHandler::~ShutDownCommandHandler()
 
 }
 
-int ShutDownCommandHandler::handle_command(const IPCDataHeader& ipcheader , void* buffer)
+int ShutDownCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
 {
     std::shared_ptr<AppController> controller = _controller.lock();
     if(nullptr == controller){

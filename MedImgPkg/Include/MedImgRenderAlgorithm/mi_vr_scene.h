@@ -29,7 +29,6 @@ public:
     void set_clipping_plane(std::vector<Plane> planes);
 
     //void place_vr(ScanSliceType type , bool positive); TODO
-    //void set_transfer_function();//TODO
 
     void set_proxy_geometry(ProxyGeometry pg_type);
 

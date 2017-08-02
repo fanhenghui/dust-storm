@@ -15,7 +15,7 @@ public:
 
     virtual ~LoadSeriesCommandHandler();
 
-    virtual int handle_command(const IPCDataHeader& datahaeder , void* buffer);
+    virtual int handle_command(const IPCDataHeader& datahaeder , char* buffer);
 
 private:
     std::weak_ptr<ReviewController> _controller;

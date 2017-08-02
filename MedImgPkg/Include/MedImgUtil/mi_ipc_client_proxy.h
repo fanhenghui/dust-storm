@@ -1,14 +1,14 @@
 #ifndef MEDIMGUTIL_MI_IPC_CLIENT_PROXY_H
 #define MEDIMGUTIL_MI_IPC_CLIENT_PROXY_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 #include <memory>
 
 #include "boost/noncopyable.hpp"
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/thread.hpp"
 
-#include "medimgutil/mi_ipc_common.h"
+#include "MedImgUtil/mi_ipc_common.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

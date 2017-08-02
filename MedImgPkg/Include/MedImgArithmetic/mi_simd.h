@@ -8,7 +8,6 @@ MED_IMG_BEGIN_NAMESPACE
 #include <math.h>
 #include <xmmintrin.h>
 #include <emmintrin.h>
-#include <assert.h>
 #include <stdio.h>
 
 #if (defined (_WIN32) && (_MSC_VER) && _MSC_VER >= 1400)

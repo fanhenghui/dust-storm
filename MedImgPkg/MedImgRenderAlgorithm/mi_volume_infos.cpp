@@ -13,7 +13,6 @@
 #include "mi_camera_calculator.h"
 #include "mi_brick_info_generator.h"
 #include "mi_brick_pool.h"
-#include "mi_brick_utils.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

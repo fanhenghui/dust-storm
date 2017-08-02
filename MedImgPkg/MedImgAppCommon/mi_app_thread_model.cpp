@@ -182,7 +182,7 @@ void AppThreadModel::process_rendering()
                     if(scene->get_dirty()){
                         dirty_cells.push_back(it->first);
                         dirty_scenes.push_back(scene);
-                        scene->render(0);
+                        scene->render();
                         scene->set_dirty(false);
                     }
                 }
@@ -291,7 +291,7 @@ void AppThreadModel::process_sending()
                 //For testing wirte image to disk
                 //FileUtil::write_raw("/home/wr/data/img_buffer.jpeg" , buffer , buffer_size);
 
-                _proxy->async_send_message(header , buffer);
+                _proxy->async_send_message(header , (char*)buffer);
             }
             
             ////////////////////////////////////////

@@ -113,4 +113,56 @@ GLTimeQueryManagerPtr GLResourceManagerContainer::get_time_query_manager() const
     return _time_query_manager;
 }
 
+template<>
+std::shared_ptr<GLResourceManager<GLProgram>> GLResourceManagerContainer::get_resource_manager<GLProgram>()
+{
+    return _program_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLBuffer>> GLResourceManagerContainer::get_resource_manager<GLBuffer>()
+{
+    return _buffer_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLTexture1D>> GLResourceManagerContainer::get_resource_manager<GLTexture1D>()
+{
+    return _texture_1d_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLTexture1DArray>> GLResourceManagerContainer::get_resource_manager<GLTexture1DArray>()
+{
+    return _texture_1d_array_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLTexture2D>> GLResourceManagerContainer::get_resource_manager<GLTexture2D>()
+{
+    return _texture_2d_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLTexture3D>> GLResourceManagerContainer::get_resource_manager<GLTexture3D>()
+{
+    return _texture_3d_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLVAO>> GLResourceManagerContainer::get_resource_manager<GLVAO>()
+{
+    return _vao_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLFBO>> GLResourceManagerContainer::get_resource_manager<GLFBO>()
+{
+    return _fbo_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLContext>> GLResourceManagerContainer::get_resource_manager<GLContext>()
+{
+    return _context_manager;
+};
+template<>
+std::shared_ptr<GLResourceManager<GLTimeQuery>> GLResourceManagerContainer::get_resource_manager<GLTimeQuery>()
+{
+    return _time_query_manager;
+};
+
+
 MED_IMG_END_NAMESPACE

@@ -1,6 +1,7 @@
 #ifndef MED_IMG_RAY_CASTING_CPU_H_
 #define MED_IMG_RAY_CASTING_CPU_H_
 
+#include <memory>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgArithmetic/mi_color_unit.h"
 #include "MedImgArithmetic/mi_vector4f.h"

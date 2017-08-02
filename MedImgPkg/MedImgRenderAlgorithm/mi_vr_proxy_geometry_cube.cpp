@@ -1,4 +1,4 @@
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "mi_vr_proxy_geometry_cube.h"
 
 #include "MedImgArithmetic/mi_camera_base.h"

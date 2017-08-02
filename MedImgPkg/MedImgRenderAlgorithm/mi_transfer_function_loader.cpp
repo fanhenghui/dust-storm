@@ -5,8 +5,14 @@
 #include "mi_color_transfer_function.h"
 #include "mi_opacity_transfer_function.h"
 
+#ifdef WIN32
 #include "pugixml/pugiconfig.hpp"
 #include "pugixml/pugixml.hpp"
+#else
+#include "pugiconfig.hpp"
+#include "pugixml.hpp"
+#endif
+
 
 MED_IMG_BEGIN_NAMESPACE
 

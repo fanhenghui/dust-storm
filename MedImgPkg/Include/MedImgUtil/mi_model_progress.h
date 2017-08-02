@@ -1,7 +1,7 @@
 #ifndef MEDIMGUTIL_MI_MODEL_PROGRESS_H
 #define MEDIMGUTIL_MI_MODEL_PROGRESS_H
 
-#include "medimgutil/mi_model_interface.h"
+#include "MedImgUtil/mi_model_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

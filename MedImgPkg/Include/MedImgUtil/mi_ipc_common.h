@@ -1,7 +1,7 @@
 #ifndef MEDIMGUTIL_MI_IPC_COMMON_H
 #define MEDIMGUTIL_MI_IPC_COMMON_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 
 #include <memory>
 

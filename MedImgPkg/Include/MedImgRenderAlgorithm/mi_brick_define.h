@@ -1,16 +1,12 @@
-#ifndef MED_IMG_BRICK_UNIT_H
-#define MED_IMG_BRICK_UNIT_H
+#ifndef MED_IMG_BRICK_DEFINE_H
+#define MED_IMG_BRICK_DEFINE_H
 
+#include <vector>
+#include <algorithm>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
-#include "MedImgArithmetic/mi_vector3f.h"
 #include "MedImgUtil/mi_string_number_converter.h"
 
-#include "boost/format.hpp"
-#include "boost/tokenizer.hpp"
-#include "boost/algorithm/string.hpp"  
-
 MED_IMG_BEGIN_NAMESPACE
-
 
 /// \ Brick mesh structure
 struct BrickEleIndex

@@ -23,12 +23,24 @@
 #include "MedImgRenderAlgorithm/mi_ray_caster.h"
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "MedImgRenderAlgorithm/mi_vr_scene.h"
+#include "MedImgRenderAlgorithm/mi_transfer_function_loader.h"
+#include "MedImgRenderAlgorithm/mi_color_transfer_function.h"
+#include "MedImgRenderAlgorithm/mi_opacity_transfer_function.h"
 
+#ifdef WIN32
+#include "GL/glut.h"
+#else
 #include "GL/freeglut.h"
+#include "cuda_runtime.h"
+#include <stdio.h>
+#include <string.h>
+#include <libgen.h>
+#include <unistd.h>
+#endif
+
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
-#include "cuda_runtime.h"
 
 
 using namespace medical_imaging;
@@ -38,21 +50,27 @@ namespace
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<VolumeInfos> _volumeinfos;
 
-    std::shared_ptr<MPRScene> _scene;
+    std::shared_ptr<VRScene> _scene;
+    int _ww;
+    int _wl;
 
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
 
-    int _width = 1920;
-    int _height = 1080;
-    int m_iButton = -1;
-    Point2 m_ptPre;
-    int m_iTestCode = 0;
+    int _width = 1024;
+    int _height = 1024;
+    int _iButton = -1;
+    Point2 _ptPre;
+    int _iTestCode = 0;
 
     std::vector<std::string> GetFiles()
     {
-
+#ifdef WIN32
+        const std::string root  = "E:/data/MyData/AB_CTA_01/";
+#else
         const std::string root  = "/home/wr/data/AB_CTA_01/";
+#endif
+        
         std::vector<std::string> files;
         FileUtil::get_all_file_recursion(root , std::vector<std::string>() , files);
         return files;
@@ -80,18 +98,24 @@ namespace
         _volumeinfos->set_mask(mask_data);
 
 
-        _scene.reset(new MPRScene(_width , _height));
+        _scene.reset(new VRScene(_width , _height));
         const float PRESET_CT_LUNGS_WW = 1500;
         const float PRESET_CT_LUNGS_WL = -400;
+        _ww = PRESET_CT_LUNGS_WW;
+        _wl = PRESET_CT_LUNGS_WL;
 
         _scene->set_volume_infos(_volumeinfos);
-        _scene->set_sample_rate(1.0);
-        _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
-        _scene->set_composite_mode(COMPOSITE_AVERAGE);
+        _scene->set_sample_rate(0.5);
+        _scene->set_global_window_level(_ww,_wl );
+        _scene->set_window_level(_ww , _wl , 0);
+        _scene->set_composite_mode(COMPOSITE_MIP);
         _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         _scene->set_mask_mode(MASK_NONE);
         _scene->set_interpolation_mode(LINEAR);
-        _scene->place_mpr(TRANSVERSE);
+        _scene->set_shading_mode(SHADING_NONE);
+
+        _scene->set_proxy_geometry(PG_CUBE);
+        _scene->set_test_code(_iTestCode);
         _scene->initialize();
 
         //Time query
@@ -101,7 +125,39 @@ namespace
 
         _time_query2 = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(uid);
         _time_query2->initialize();
-        
+
+        //Transfer function
+        std::shared_ptr<ColorTransFunc> pseudo_color;
+#ifdef WIN32
+        const std::string pseudo_color_xml = "../../../Config/lut/2d/hot_green.xml";
+#else
+        const std::string pseudo_color_xml = "../Config/lut/2d/hot_green.xml";
+#endif
+        if(IO_SUCCESS !=  TransferFuncLoader::load_pseudo_color(pseudo_color_xml , pseudo_color))
+        {
+            std::cout << "load pseudo failed!\n";
+        }
+        _scene->set_pseudo_color(pseudo_color);
+
+        std::shared_ptr<ColorTransFunc> color;
+        std::shared_ptr<OpacityTransFunc> opacity;
+        float ww , wl;
+        RGBAUnit background;
+        Material material;
+#ifdef WIN32
+        const std::string color_opacity_xml = "../../../Config/lut/3d/ct_cta.xml";
+#else
+        const std::string color_opacity_xml = "../Config/lut/3d/ct_cta.xml";
+#endif
+        if(IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml , color , opacity , ww ,wl , background , material))
+        {
+            std::cout << "load color opacity failed!\n";
+        }
+        _scene->set_color_opacity(color , opacity , 0);
+        _scene->set_ambient_color(1.0f,1.0f,1.0f,0.28f);
+        _scene->set_material(material , 0);
+        _scene->set_window_level(ww , wl , 0);
+        _ww = ww; _wl = wl;
     }
 
     void Display()
@@ -112,29 +168,34 @@ namespace
             glClearColor(0.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            _time_query->begin();
+            //_time_query->begin();
             _scene->set_dirty(true);
-            //_scene->initialize();
-            _scene->render(0);
-            
+
+            _scene->render();
+
             _scene->render_to_back();
 
             
 
             //_time_query2->begin();
             //glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
-            _scene->download_image_buffer();
+            
+           /* _scene->download_image_buffer();
             _scene->swap_image_buffer();
             unsigned char* buffer = nullptr;
             int buffer_size=0;
-            _scene->get_image_buffer(buffer,buffer_size);
+            _scene->get_image_buffer(buffer,buffer_size);*/
+
+#ifdef WIN32
+            //FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
+#else
             //FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
+#endif
             //std::cout << "compressing time : " << _scene->get_compressing_time() << std::endl;
-            
 
             //std::cout << "gl compressing time : " << _time_query2->end() << std::endl;
 
-            std::cout << "rendering time : " << _time_query->end() << std::endl;
+            //std::cout << "rendering time : " << _time_query->end() << std::endl;
 
             glutSwapBuffers();
         }
@@ -149,49 +210,59 @@ namespace
     {
         switch(key)
         {
-        case 't':
-            {
-                // std::cout << "W H :" << _width << " " << _height << std::endl;
-                // m_pMPREE->debug_output_entry_points("D:/entry_exit.rgb.raw");
-                std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(_scene->get_camera());
-                int cur_page = _scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
-                std::cout << "current page : " << cur_page << std::endl;
-                if(cur_page >= _volume_data->_dim[2] - 2)
-                {
-                    _scene->page_to(1);
-                }
-                else
-                {
-                    _scene->page(1);
-                }
-            
-
-                break;
-            }
-        // case 'a':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , TRANSVERSE , Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
-        // case 's':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , SAGITTAL , Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
-        // case 'c':
-        //     {
-        //         m_pCameraCal->init_mpr_placement(_camera , CORONAL, Point3(0,0,0));
-        //         m_pCameraInteractor->set_initial_status(_camera);
-        //         m_pCameraInteractor->resize(_width , _height);
-        //         break;
-        //     }
         case 'f':
             {
-                m_iTestCode = 1- m_iTestCode;
+                _iTestCode = 1- _iTestCode;
+                _scene->set_test_code(_iTestCode);
+                break;
+            }
+        case 'r':
+            {
+                _scene.reset(new VRScene(_width , _height));
+                const float PRESET_CT_LUNGS_WW = 1500;
+                const float PRESET_CT_LUNGS_WL = -400;
+                _ww = PRESET_CT_LUNGS_WW;
+                _wl = PRESET_CT_LUNGS_WL;
+
+                _scene->set_volume_infos(_volumeinfos);
+                _scene->set_sample_rate(1.0);
+                _scene->set_global_window_level(_ww,_wl);
+                _scene->set_window_level(_ww , _wl , 0);
+                _scene->set_composite_mode(COMPOSITE_MIP);
+                _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+                _scene->set_mask_mode(MASK_NONE);
+                _scene->set_interpolation_mode(LINEAR);
+                _scene->set_proxy_geometry(PG_CUBE);
+                _scene->set_test_code(_iTestCode);
+                _scene->initialize();
+                _scene->set_display_size(_width , _height);
+                break;
+            }
+        case 'l':
+            {
+                std::shared_ptr<ColorTransFunc> color;
+                std::shared_ptr<OpacityTransFunc> opacity;
+                float ww , wl;
+                RGBAUnit background;
+                Material material;
+#ifdef WIN32
+        const std::string color_opacity_xml = "../../../Config/lut/3d/ct_cta.xml";
+#else
+        const std::string color_opacity_xml = "../Config/lut/3d/ct_cta.xml";
+#endif
+                if(IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml , color , opacity , ww ,wl , background , material))
+                {
+                    std::cout << "load color opacity failed!\n";
+                }
+                _scene->set_color_opacity(color , opacity , 0);
+                _scene->set_ambient_color(1.0f,1.0f,1.0f,0.28f);
+                _scene->set_material(material , 0);
+                _scene->set_window_level(ww , wl , 0);
+                _ww = ww; _wl = wl;
+
+                _scene->set_composite_mode(COMPOSITE_DVR);
+                _scene->set_shading_mode(SHADING_PHONG);
+
                 break;
             }
         default:
@@ -203,6 +274,10 @@ namespace
 
     void resize(int x , int y)
     {
+        if(x == 0  || y == 0){
+            return;
+        }
+
         _width = x;
         _height = y;
         _scene->set_display_size(_width , _height);
@@ -211,7 +286,7 @@ namespace
 
     void Idle()
     {
-        //glutPostRedisplay();
+        glutPostRedisplay();
     }
 
     void MouseClick(int button , int status , int x , int y)
@@ -221,23 +296,23 @@ namespace
         y = y< 0 ? 0 : y;
         y = y> _height-1 ?  _height-1 : y;
 
-        m_iButton = button;
+        _iButton = button;
 
-        if (m_iButton == GLUT_LEFT_BUTTON)
+        if (_iButton == GLUT_LEFT_BUTTON)
         {
             
         }
-        else if (m_iButton == GLUT_MIDDLE_BUTTON)
+        else if (_iButton == GLUT_MIDDLE_BUTTON)
         {
 
         }
-        else if (m_iButton == GLUT_RIGHT_BUTTON)
+        else if (_iButton == GLUT_RIGHT_BUTTON)
         {
 
         }
 
         
-        m_ptPre = Point2(x,y);
+        _ptPre = Point2(x,y);
         glutPostRedisplay();
     }
 
@@ -252,28 +327,39 @@ namespace
 
         //std::cout << "Pre : " << m_ptPre.x << " " <<m_ptPre.y << std::endl;
         //std::cout << "Cur : " << cur_pt.x << " " <<cur_pt.y << std::endl;
-        if (m_iButton == GLUT_LEFT_BUTTON)
+        if (_iButton == GLUT_LEFT_BUTTON)
         {
-            _scene->rotate(m_ptPre , cur_pt);
+            _scene->rotate(_ptPre , cur_pt);
             
         }
-        else if (m_iButton == GLUT_MIDDLE_BUTTON)
+        else if (_iButton == GLUT_MIDDLE_BUTTON)
         {
-            _scene->pan(m_ptPre , cur_pt);
+            //_scene->pan(_ptPre , cur_pt);
+            _ww += (x - (int)_ptPre.x);
+            _wl += ((int)_ptPre.y - y);
+            _ww = _ww < 0 ? 1 : _ww;
+            _scene->set_global_window_level(_ww , _wl);
+            _scene->set_window_level(_ww , _wl , 0);
+            std::cout << "wl : " << _ww << " " << _wl << std::endl;
+
         }
-        else if (m_iButton == GLUT_RIGHT_BUTTON)
+        else if (_iButton == GLUT_RIGHT_BUTTON)
         {
-            _scene->zoom(m_ptPre , cur_pt);
+            _scene->zoom(_ptPre , cur_pt);
         }
 
-        m_ptPre = cur_pt;
+        _ptPre = cur_pt;
         glutPostRedisplay();
 
     }
 }
 
-int main(int argc , char* argv[])
+int TE_VRScene(int argc , char* argv[])
 {
+    #ifndef WIN32
+    chdir(dirname(argv[0]));
+    #endif
+    
     try
     {
         glutInit(&argc , argv);

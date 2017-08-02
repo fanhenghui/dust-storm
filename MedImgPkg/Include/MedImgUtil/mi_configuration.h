@@ -1,7 +1,7 @@
 #ifndef MEDIMGUTIL_MI_CONFIGURATION_H
 #define MEDIMGUTIL_MI_CONFIGURATION_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 #include "boost/thread/mutex.hpp"
 
 MED_IMG_BEGIN_NAMESPACE

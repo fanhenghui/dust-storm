@@ -1,6 +1,7 @@
 #ifndef MED_IMG_GL_RESOUECE_DEFINE_H_
 #define MED_IMG_GL_RESOUECE_DEFINE_H_
 
+#include <memory>
 #include "MedImgGLResource/mi_gl_resource_export.h"
 
 MED_IMG_BEGIN_NAMESPACE

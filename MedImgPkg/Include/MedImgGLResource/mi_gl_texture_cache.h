@@ -2,7 +2,7 @@
 #define MEDIMGGLRESOURCE_TEXTURE_CACHE_H
 
 #include <list>
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "boost/thread/mutex.hpp"
 #include "MedImgGLResource/mi_gl_resource_export.h"
 #include "MedImgGLResource/mi_gl_resource_define.h"

@@ -4,12 +4,12 @@
 
 #ifndef WIN32
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 
 #include <string>
 #include "boost/noncopyable.hpp"
 
-#include "medimgutil/mi_ipc_common.h"
+#include "MedImgUtil/mi_ipc_common.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

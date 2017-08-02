@@ -1,7 +1,7 @@
 #ifndef MEDIMGUTIL_MI_FILE_UTIL_H
 #define MEDIMGUTIL_MI_FILE_UTIL_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 #include <string>
 #include <vector>
 

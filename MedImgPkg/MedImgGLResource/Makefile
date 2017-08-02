@@ -15,7 +15,7 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 OBJS = mi_gl_buffer.o mi_gl_context.o mi_gl_environment.o mi_gl_fbo.o mi_gl_program.o  \
 mi_gl_resource_manager_container.o mi_gl_texture_1d_array.o mi_gl_texture_1d.o mi_gl_texture_2d.o mi_gl_texture_3d.o \
-mi_gl_texture_base.o mi_gl_utils.o mi_gl_vao.o mi_gl_time_query.o
+mi_gl_texture_base.o mi_gl_utils.o mi_gl_vao.o mi_gl_time_query.o mi_gl_texture_cache.o
 TARGET = $(BIN_DIR)/libmedimg_glresource.so
 
 EXPORT_HEADER = mi_gl_resource_export.h mi_gl_object.h
@@ -49,6 +49,10 @@ mi_gl_vao.o: $(EXPORT_HEADER) mi_gl_vao.h mi_gl_vao.cpp mi_gl_texture_2d.o
 
 mi_gl_program.o: $(EXPORT_HEADER) mi_gl_program.h mi_gl_program.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_gl_program.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_gl_texture_cache.o: $(EXPORT_HEADER) mi_gl_texture_cache.h mi_gl_texture_cache.cpp \
+mi_gl_texture_1d.o mi_gl_texture_2d.o mi_gl_texture_3d.o mi_gl_texture_1d_array.o
+	$(CC) -c -fPIC $(CFLAGS) mi_gl_texture_cache.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_gl_texture_1d.o: $(EXPORT_HEADER) mi_gl_texture_1d.h mi_gl_texture_1d.cpp mi_gl_texture_base.o
 	$(CC) -c -fPIC $(CFLAGS) mi_gl_texture_1d.cpp $(ADDITINAL_INCLUDE_DIR)

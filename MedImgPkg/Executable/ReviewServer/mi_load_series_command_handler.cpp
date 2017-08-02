@@ -30,7 +30,7 @@ LoadSeriesCommandHandler::~LoadSeriesCommandHandler()
 
 }
 
-int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , void* buffer)
+int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
 {
 
     //Test

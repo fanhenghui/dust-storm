@@ -1,7 +1,7 @@
 #ifndef MEDUTIL_MI_STRING_NUMBER_CONVERTER_H
 #define MEDUTIL_MI_STRING_NUMBER_CONVERTER_H
 
-#include "medimgutil/mi_util_export.h"
+#include "MedImgUtil/mi_util_export.h"
 
 #include <string>
 #include <sstream>

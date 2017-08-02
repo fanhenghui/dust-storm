@@ -114,8 +114,7 @@ void BrickPool::calculate_brick_corner()
     catch (const Exception& e)
     {
         std::cout << e.what();
-        assert(false);
-        throw e;
+        //throw;
     }
 }
 
@@ -225,8 +224,7 @@ void BrickPool::calculate_brick_geometry()
     catch (const Exception& e)
     {
         std::cout << e.what();
-        assert(false);
-        throw e;
+        //throw;
     }
 }
 
@@ -240,8 +238,7 @@ void BrickPool::calculate_volume_brick()
     catch (const Exception& e)
     {
         std::cout << e.what();
-        assert(false);
-        throw e;
+        //throw;
     }
 }
 
@@ -255,8 +252,7 @@ void BrickPool::calculate_mask_brick()
     catch (const Exception& e)
     {
         std::cout << e.what();
-        assert(false);
-        throw e;
+        //throw;
     }
 }
 

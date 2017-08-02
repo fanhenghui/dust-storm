@@ -17,10 +17,10 @@ public:
 
     virtual ~MPRPlayCommandHandler();
 
-    virtual int handle_command(const IPCDataHeader& datahaeder , void* buffer);
+    virtual int handle_command(const IPCDataHeader& datahaeder , char* buffer);
 
 private:
-    void logic_i(OpDataHeader& op_header, void* buffer);
+    void logic_i(OpDataHeader& op_header, char* buffer);
 
 private:
     std::weak_ptr<AppController> _controller;

@@ -1,6 +1,7 @@
 #ifndef MI_MED_IMG_CAMERA_CALCULATOR_H_
 #define MI_MED_IMG_CAMERA_CALCULATOR_H_
 
+#include <memory>
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgArithmetic/mi_point3.h"
 #include "MedImgArithmetic/mi_vector3.h"
@@ -13,7 +14,7 @@ class ImageData;
 class CameraBase;
 class OrthoCamera;
 
-//volume×ø±êÏµ×ø±êÖá
+//volumeï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 enum CoordinateAxis
 {
     POSX = 0,
@@ -24,16 +25,16 @@ enum CoordinateAxis
     NEGZ = 5,
 };
 
-//²¡ÈË·½Î»ÐÅÏ¢
+//ï¿½ï¿½ï¿½Ë·ï¿½Î»ï¿½ï¿½Ï¢
 struct PatientAxisInfo
 {
-    //Óë¸Ãpatient·½Î»£¨head  left  posteriorÖ®Ò»£©×î¿¿½ü µÄ volume×ø±êÏµÖá·½Ïò
-    //EG£ºPatientAxisInfo leftAxisInfo; leftAxisInfo.eVolumeCoord = POSX ËµÃ÷²¡ÈË×ø±êÏµLeft·½Ïò×î½üµÄÌå×ø±êÏµÊÇÕýX·½Ïò
+    //ï¿½ï¿½ï¿½patientï¿½ï¿½Î»ï¿½ï¿½head  left  posteriorÖ®Ò»ï¿½ï¿½ï¿½î¿¿ï¿½ï¿½ ï¿½ï¿½ volumeï¿½ï¿½ï¿½ï¿½Ïµï¿½á·½ï¿½ï¿½
+    //EGï¿½ï¿½PatientAxisInfo leftAxisInfo; leftAxisInfo.eVolumeCoord = POSX Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµLeftï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
     CoordinateAxis volume_coord;
 
-    //ÔÚ¸Ãpatient·½Î»£¨head  left  posteriorÖ®Ò»£© ×î¿¿½ü µÄ volume×ø±êÏµÖá·½Ïò Ëù¶ÔÓ¦µÄÊµ¼Êpatient·½Ïò
-    //EG : Í¬ÉÏ£¬leftAxisInfo.vecPatient = (0.9 0 0) , ËµÃ÷ºÍ±ê×¼µÄ (1,0,0) ÓÐÆ«ÒÆ
-    // ÕâÊÇÎªÁËÔÚworld ×ø±êÏµÏÂ£¨·½ÏòºÍ²¡ÈË×ø±êÏµÏàÍ¬£©£¬ÄÜ¹»µ÷ÕûÏà»úµÄÎ»ÖÃ£¨Î´±ØºÍ²¡ÈË×ø±êÏµÖáÆ½ÐÐ£©À´¹Û²ìvolumeµÄÕý·½Ïò£¨ÎªÁË¿´É¨ÃèÎ»£©£¬¶ø·Çpatient×ø±êÏµµÄÕý·½Ïò
+    //ï¿½Ú¸ï¿½patientï¿½ï¿½Î»ï¿½ï¿½head  left  posteriorÖ®Ò»ï¿½ï¿½ ï¿½î¿¿ï¿½ï¿½ ï¿½ï¿½ volumeï¿½ï¿½ï¿½ï¿½Ïµï¿½á·½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Êµï¿½ï¿½patientï¿½ï¿½ï¿½ï¿½
+    //EG : Í¬ï¿½Ï£ï¿½leftAxisInfo.vecPatient = (0.9 0 0) , Ëµï¿½ï¿½ï¿½Í±ï¿½×¼ï¿½ï¿½ (1,0,0) ï¿½ï¿½Æ«ï¿½ï¿½
+    // ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½world ï¿½ï¿½ï¿½ï¿½Ïµï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½Î´ï¿½ØºÍ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Æ½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Û²ï¿½volumeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ë¿ï¿½É¨ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½patientï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Vector3 patient_orientation;
 };
 
@@ -56,24 +57,24 @@ public:
     //Initializion 
     //////////////////////////////////////////////////////////////////////////
 
-    //½ö½ö¸Ä±äÁË¶ÈÁ¿£¬´Ópixel µ½ mm £¬ÇÒÔÚÕâ¸ö×ø±êÏµÏÂµÄVolume bounding boxÈÔÈ»ÊÇaxis aligned
+    //ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½pixel ï¿½ï¿½ mm ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½Âµï¿½Volume bounding boxï¿½ï¿½È»ï¿½ï¿½axis aligned
     const Matrix4& get_volume_to_physical_matrix() const;
 
-    //Ðý×ªµ½ÁËºÍ²¡ÈË×ø±êÏµÖá¶ÔÆë£¬ÊÀ½ç×ø±êÏµµÄÔ­µãÊÇÌåÊý¾ÝÌåËØÖÐÐÄµã
+    //ï¿½ï¿½×ªï¿½ï¿½ï¿½ËºÍ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ë£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½
     const Matrix4& get_physical_to_world_matrix() const;
 
     const Matrix4& get_volume_to_world_matrix() const;
 
     const Matrix4& get_world_to_volume_matrix() const;
 
-    //²¡ÈË×ø±êÏµºÍÊÀ½ç×ø±êÏµ½ö½öÊÇ×ø±êÔ­µã²»Ò»Ñù¶øÒÑ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ã²»Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     const Matrix4& get_world_to_patient_matrix() const;
 
     const Matrix4& get_patient_to_world_matrix() const;
 
     const Point3& get_default_mpr_center_world() const;
 
-    void init_mpr_placement(std::shared_ptr<OrthoCamera> camera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//ÊµÊ±»ñÈ¡
+    void init_mpr_placement(std::shared_ptr<OrthoCamera> camera , ScanSliceType eScanSliceType , const Point3& ptWorldCenterPoint) const;//ÊµÊ±ï¿½ï¿½È¡
 
     void init_mpr_placement(std::shared_ptr<OrthoCamera> camera , ScanSliceType eScanSliceType ) const;//Default replacement
 
