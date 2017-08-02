@@ -21,7 +21,7 @@
     <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="mi_render_algo_vr_scene.cpp">
+    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_vr_scene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
