@@ -66,9 +66,9 @@ void RCStepShadingPhong::set_gpu_parameter()
     Point3 eye = camera->get_eye(); 
     Point3 lookat = camera->get_look_at();
     Vector3 view = camera->get_view_direction();
-    unsigned int max_dim = (std::max)(  (std::max)( volume_img->_dim[0]*volume_img->_spacing[0],volume_img->_dim[1]*volume_img->_spacing[1]) ,volume_img->_dim[2]*volume_img->_spacing[2]);
+    double max_dim = (std::max)(  (std::max)( volume_img->_dim[0]*volume_img->_spacing[0],volume_img->_dim[1]*volume_img->_spacing[1]) ,volume_img->_dim[2]*volume_img->_spacing[2]);
     const float magic_num = 1.5f;
-    Point3 light_pos = lookat - view* static_cast<double>(max_dim)*magic_num;
+    Point3 light_pos = lookat - view* max_dim*magic_num;
     light_pos = camera_cal->get_world_to_volume_matrix().transform(light_pos);
     glUniform3f(_loc_light_position , static_cast<float>(light_pos.x) , static_cast<float>(light_pos.y) , static_cast<float>(light_pos.z));
 

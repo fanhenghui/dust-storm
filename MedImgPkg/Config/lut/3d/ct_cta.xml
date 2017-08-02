@@ -88,14 +88,14 @@
 		<R>255</R>
 		<G>255</G>
 		<B>255</B>
-		<Factor>0.7</Factor>
+		<Factor>0.8</Factor>
 	  </DiffuseColor>
 	  <SpecularColor>
 		<R>255</R>
 		<G>255</G>
 		<B>255</B>
-		<Factor>0.72</Factor>
-		<Shininess>2.0</Shininess>
+		<Factor>0.65</Factor>
+		<Shininess>8.0</Shininess>
 	  </SpecularColor>
    </Material>
 </Lut>

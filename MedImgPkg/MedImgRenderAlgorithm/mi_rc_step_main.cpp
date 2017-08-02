@@ -103,13 +103,13 @@ void RCStepMainFrag::get_uniform_location()
     _loc_mask_data = program->get_uniform_location("mask_sampler");
     _loc_sample_rate = program->get_uniform_location("sample_rate");
 
-    //if (-1 == _loc_volume_dim ||
-    //    -1 == _loc_volume_data ||
-    //    //-1 == m_iLocMaskData ||
-    //    -1 == _loc_sample_rate)
-    //{
-    //    RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
-    //}
+    if (-1 == _loc_volume_dim ||
+        -1 == _loc_volume_data ||
+        //-1 == m_iLocMaskData ||
+        -1 == _loc_sample_rate)
+    {
+        RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
+    }
 }
 
 GLShaderInfo RCStepMainTestFrag::get_shader_info()

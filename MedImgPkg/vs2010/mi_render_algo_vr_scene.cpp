@@ -53,8 +53,8 @@ namespace
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
 
-    int _width = 512;
-    int _height = 512;
+    int _width = 1024;
+    int _height = 1024;
     int _iButton = -1;
     Point2 _ptPre;
     int _iTestCode = 0;
@@ -224,6 +224,25 @@ namespace
                 _scene->set_display_size(_width , _height);
                 break;
             }
+        case 'l':
+            {
+                std::shared_ptr<ColorTransFunc> color;
+                std::shared_ptr<OpacityTransFunc> opacity;
+                float ww , wl;
+                RGBAUnit background;
+                Material material;
+                if(IO_SUCCESS != TransferFuncLoader::load_color_opacity("../../../config/lut/3d/ct_cta.xml" , color , opacity , ww ,wl , background , material))
+                {
+                    std::cout << "load color opacity failed!\n";
+                }
+                _scene->set_color_opacity(color , opacity , 0);
+                _scene->set_ambient_color(1.0f,1.0f,1.0f,0.28f);
+                _scene->set_material(material , 0);
+                _scene->set_window_level(ww , wl , 0);
+                _ww = ww; _wl = wl;
+
+                break;
+            }
         default:
             break;
         }
@@ -295,7 +314,7 @@ namespace
         {
             //_scene->pan(_ptPre , cur_pt);
             _ww += (x - (int)_ptPre.x);
-            _wl += (y - (int)_ptPre.y);
+            _wl += ((int)_ptPre.y - y);
             _ww = _ww < 0 ? 1 : _ww;
             _scene->set_global_window_level(_ww , _wl);
             _scene->set_window_level(_ww , _wl , 0);

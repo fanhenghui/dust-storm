@@ -89,13 +89,13 @@ void RCStepCompositeDVR::get_uniform_location()
     _loc_opacity_correction = program->get_uniform_location("opacity_correction");
     _loc_sample_rate = program->get_uniform_location("sample_rate");
 
-    //if (-1 == _loc_color_opacity_array ||
-    //    -1 == _loc_color_opacity_texture_shift ||
-    //    -1 == _loc_opacity_correction ||
-    //    -1 == _loc_sample_rate)
-    //{
-    //    RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
-    //}
+    if (-1 == _loc_color_opacity_array ||
+        -1 == _loc_color_opacity_texture_shift ||
+        -1 == _loc_opacity_correction ||
+        -1 == _loc_sample_rate)
+    {
+        RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
+    }
 }
 
 MED_IMG_END_NAMESPACE
