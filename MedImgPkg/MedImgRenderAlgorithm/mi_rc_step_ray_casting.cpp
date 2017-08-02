@@ -15,7 +15,7 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
 {
     CHECK_GL_ERROR;
 
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
 
     //Pseudo color
@@ -24,11 +24,12 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
     RENDERALGO_CHECK_NULL_EXCEPTION(pPseudoColorTex);
 
     glEnable(GL_TEXTURE_1D);
-    glActiveTexture(GL_TEXTURE3);
+    const int act_tex = _act_tex_counter->tick();
+    glActiveTexture(GL_TEXTURE0 + act_tex);
     pPseudoColorTex->bind();
     GLTextureUtils::set_1d_wrap_s(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_1D , GL_LINEAR);
-    glUniform1i(_loc_pseudo_color , 3);
+    glUniform1i(_loc_pseudo_color , act_tex);
     glDisable(GL_TEXTURE_1D);
 
     //Linear change: discrete array (0 ~ length -1) to texture coordinate(0 ~ 1)
@@ -49,7 +50,7 @@ void RCStepRayCastingMIPBase::set_gpu_parameter()
 
 void RCStepRayCastingMIPBase::get_uniform_location()
 {
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     _loc_pseudo_color = program->get_uniform_location("pseudo_color");
     _loc_pseudo_color_slope =  program->get_uniform_location("pseudo_color_slope");
     _loc_pseudo_color_intercept = program->get_uniform_location("pseudo_color_intercept");
@@ -75,5 +76,10 @@ GLShaderInfo RCStepRayCastingMIPMinIP::get_shader_info()
     return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_RAY_CASTING_MIP_MINIP_FRAG , "RCStepRayCastingAverage");
 }
 
+
+GLShaderInfo RCStepRayCastingDVR::get_shader_info()
+{
+    return GLShaderInfo(GL_FRAGMENT_SHADER , S_RC_RAY_CASTING_DVR_FRAG , "RCStepRayCastingDVR");
+}
 
 MED_IMG_END_NAMESPACE

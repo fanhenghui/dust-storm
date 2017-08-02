@@ -18,6 +18,7 @@ public:
         VISIBLE_LABEL_BUCKET,
         VISIBLE_LABEL_ARRAY,
         MASK_OVERLAY_COLOR_BUCKET,
+        MATERIAL_BUCKET,
         TYPE_END,
     };
 
@@ -28,6 +29,8 @@ public:
     std::map<unsigned char, Vector2f> _window_levels;
 
     std::map<unsigned char , RGBAUnit> _mask_overlay_colors;
+
+    std::map<unsigned char , Material> _material;
 
 public:
     RayCasterInnerBuffer();
@@ -44,16 +47,16 @@ public:
     const std::vector<unsigned char>& get_visible_labels() const;
 
     void set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors);
-    void set_mask_overlay_color(RGBAUnit color , unsigned char label);
+    void set_mask_overlay_color(const RGBAUnit& color , unsigned char label);
     const std::map<unsigned char , RGBAUnit>& get_mask_overlay_color() const;
+
+    void set_material(const Material& matrial , unsigned char label);
 
 private:
     struct GLResource;
     std::unique_ptr<GLResource> _inner_resource;
 
     std::unique_ptr<char[]> _shared_buffer_array;
-
-
 };
 
 MED_IMG_END_NAMESPACE

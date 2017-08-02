@@ -144,7 +144,7 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_ray_cast_scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_lut_loader.h">
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_transfer_function_loader.h">
       <Filter>Transfer function</Filter>
     </ClInclude>
   </ItemGroup>
@@ -245,13 +245,16 @@
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_ray_cast_scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_lut_loader.cpp">
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_transfer_function_loader.cpp">
       <Filter>Transfer function</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\MedImgRenderAlgorithm\Shader\shader_config">
-      <Filter>Shader</Filter>
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.vert">
+      <Filter>Shader\Entry exit points</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points_culling.glsl">
+      <Filter>Shader\Ray caster</Filter>
     </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_color_inverse_disable.frag">
       <Filter>Shader\Ray caster</Filter>
@@ -275,6 +278,9 @@
       <Filter>Shader\Ray caster</Filter>
     </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_main.vert">
+      <Filter>Shader\Ray caster</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\rc_main_test.frag">
       <Filter>Shader\Ray caster</Filter>
     </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\rc_mask_linear_sampler.frag">
@@ -319,17 +325,11 @@
     <None Include="..\MedImgRenderAlgorithm\Shader\mpr_entry_exit_points.glsl">
       <Filter>Shader\Entry exit points</Filter>
     </None>
-    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points_culling.glsl">
-      <Filter>Shader\Entry exit points</Filter>
-    </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.frag">
       <Filter>Shader\Entry exit points</Filter>
     </None>
-    <None Include="..\MedImgRenderAlgorithm\Shader\vr_entry_exit_points.vert">
-      <Filter>Shader\Entry exit points</Filter>
-    </None>
-    <None Include="..\MedImgRenderAlgorithm\Shader\rc_main_test.frag">
-      <Filter>Shader\Ray caster</Filter>
+    <None Include="..\MedImgRenderAlgorithm\Shader\shader_config">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

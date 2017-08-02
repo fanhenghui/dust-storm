@@ -24,6 +24,9 @@
 #include "MedImgRenderAlgorithm/mi_camera_interactor.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgRenderAlgorithm/mi_vr_scene.h"
+#include "MedImgRenderAlgorithm/mi_transfer_function_loader.h"
+#include "MedImgRenderAlgorithm/mi_color_transfer_function.h"
+#include "MedImgRenderAlgorithm/mi_opacity_transfer_function.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -44,6 +47,8 @@ namespace
     std::shared_ptr<VolumeInfos> _volumeinfos;
 
     std::shared_ptr<VRScene> _scene;
+    int _ww;
+    int _wl;
 
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
@@ -92,14 +97,19 @@ namespace
         _scene.reset(new VRScene(_width , _height));
         const float PRESET_CT_LUNGS_WW = 1500;
         const float PRESET_CT_LUNGS_WL = -400;
+        _ww = PRESET_CT_LUNGS_WW;
+        _wl = PRESET_CT_LUNGS_WL;
 
         _scene->set_volume_infos(_volumeinfos);
-        _scene->set_sample_rate(1.0);
-        _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
-        _scene->set_composite_mode(COMPOSITE_MIP);
+        _scene->set_sample_rate(0.5);
+        _scene->set_global_window_level(_ww,_wl );
+        _scene->set_window_level(_ww , _wl , 0);
+        _scene->set_composite_mode(COMPOSITE_DVR);
         _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         _scene->set_mask_mode(MASK_NONE);
         _scene->set_interpolation_mode(LINEAR);
+        _scene->set_shading_mode(SHADING_PHONG);
+
         _scene->set_proxy_geometry(PG_CUBE);
         _scene->set_test_code(_iTestCode);
         _scene->initialize();
@@ -111,7 +121,29 @@ namespace
 
         _time_query2 = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(uid);
         _time_query2->initialize();
-        
+
+        //Transfer function
+        std::shared_ptr<ColorTransFunc> pseudo_color;
+        if(IO_SUCCESS !=  TransferFuncLoader::load_pseudo_color("../../../config/lut/2d/hot_green.xml" , pseudo_color))
+        {
+            std::cout << "load pseudo failed!\n";
+        }
+        _scene->set_pseudo_color(pseudo_color);
+
+        std::shared_ptr<ColorTransFunc> color;
+        std::shared_ptr<OpacityTransFunc> opacity;
+        float ww , wl;
+        RGBAUnit background;
+        Material material;
+        if(IO_SUCCESS != TransferFuncLoader::load_color_opacity("../../../config/lut/3d/ct_cta.xml" , color , opacity , ww ,wl , background , material))
+        {
+            std::cout << "load color opacity failed!\n";
+        }
+        _scene->set_color_opacity(color , opacity , 0);
+        _scene->set_ambient_color(1.0f,1.0f,1.0f,0.28f);
+        _scene->set_material(material , 0);
+        _scene->set_window_level(ww , wl , 0);
+        _ww = ww; _wl = wl;
     }
 
     void Display()
@@ -167,6 +199,7 @@ namespace
         case 'f':
             {
                 _iTestCode = 1- _iTestCode;
+                _scene->set_test_code(_iTestCode);
                 break;
             }
         case 'r':
@@ -174,10 +207,13 @@ namespace
                 _scene.reset(new VRScene(_width , _height));
                 const float PRESET_CT_LUNGS_WW = 1500;
                 const float PRESET_CT_LUNGS_WL = -400;
+                _ww = PRESET_CT_LUNGS_WW;
+                _wl = PRESET_CT_LUNGS_WL;
 
                 _scene->set_volume_infos(_volumeinfos);
                 _scene->set_sample_rate(1.0);
-                _scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
+                _scene->set_global_window_level(_ww,_wl);
+                _scene->set_window_level(_ww , _wl , 0);
                 _scene->set_composite_mode(COMPOSITE_MIP);
                 _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
                 _scene->set_mask_mode(MASK_NONE);
@@ -257,7 +293,14 @@ namespace
         }
         else if (_iButton == GLUT_MIDDLE_BUTTON)
         {
-            _scene->pan(_ptPre , cur_pt);
+            //_scene->pan(_ptPre , cur_pt);
+            _ww += (x - (int)_ptPre.x);
+            _wl += (y - (int)_ptPre.y);
+            _ww = _ww < 0 ? 1 : _ww;
+            _scene->set_global_window_level(_ww , _wl);
+            _scene->set_window_level(_ww , _wl , 0);
+            std::cout << "wl : " << _ww << " " << _wl << std::endl;
+
         }
         else if (_iButton == GLUT_RIGHT_BUTTON)
         {

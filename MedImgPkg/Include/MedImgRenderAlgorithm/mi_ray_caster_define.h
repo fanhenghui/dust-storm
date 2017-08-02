@@ -83,10 +83,47 @@ enum ProxyGeometry
 #define BUFFER_BINDING_VISIBLE_LABEL_BUCKET 1
 #define BUFFER_BINDING_VISIBLE_LABEL_ARRAY 2
 #define BUFFER_BINDING_MASK_OVERLAY_COLOR_BUCKET 3
+#define BUFFER_BINDING_WINDOW_LEVEL_BUCKET 4
+#define BUFFER_BINDING_MATERIAL_BUCKET 5
 
 static const RGBUnit kColorTransverse = RGBUnit(237 , 25, 35);//横断面 红色
 static const RGBUnit kColorCoronal = RGBUnit(255 , 128 , 0);//冠状面 桔黄色
 static const RGBUnit kColorSagittal = RGBUnit(1 , 255, 64);//矢状面 绿色
+
+static const int S_TRANSFER_FUNC_WIDTH = 512;
+
+struct Material
+{
+    float diffuse[4];
+    float specular[4];
+    float specular_shiness;
+
+    bool operator == (const Material& m) const
+    {
+        return ( fabs(diffuse[0] - m.diffuse[0]) < FLOAT_EPSILON &&
+            fabs(diffuse[1] - m.diffuse[1]) < FLOAT_EPSILON &&
+            fabs(diffuse[2] - m.diffuse[2]) < FLOAT_EPSILON &&
+            fabs(diffuse[3] - m.diffuse[3]) < FLOAT_EPSILON &&
+            fabs(specular[0] - m.specular[0]) < FLOAT_EPSILON &&
+            fabs(specular[1] - m.specular[1]) < FLOAT_EPSILON &&
+            fabs(specular[2] - m.specular[2]) < FLOAT_EPSILON &&
+            fabs(specular[3] - m.specular[3]) < FLOAT_EPSILON &&
+            fabs(specular_shiness - m.specular_shiness) < FLOAT_EPSILON);
+    }
+
+    bool operator != (const Material& m) const
+    {
+        return ( fabs(diffuse[0] - m.diffuse[0]) > FLOAT_EPSILON ||
+            fabs(diffuse[1] - m.diffuse[1]) > FLOAT_EPSILON ||
+            fabs(diffuse[2] - m.diffuse[2]) > FLOAT_EPSILON ||
+            fabs(diffuse[3] - m.diffuse[3]) > FLOAT_EPSILON ||
+            fabs(specular[0] - m.specular[0]) > FLOAT_EPSILON ||
+            fabs(specular[1] - m.specular[1]) > FLOAT_EPSILON ||
+            fabs(specular[2] - m.specular[2]) > FLOAT_EPSILON ||
+            fabs(specular[3] - m.specular[3]) > FLOAT_EPSILON ||
+            fabs(specular_shiness - m.specular_shiness) > FLOAT_EPSILON);
+    }
+};
 
 MED_IMG_END_NAMESPACE
 #endif

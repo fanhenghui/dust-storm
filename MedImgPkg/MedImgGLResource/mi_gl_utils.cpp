@@ -344,6 +344,16 @@ void GLTextureUtils::set_1d_wrap_s( GLint wrap_type )
     }
 }
 
+void GLTextureUtils::set_1d_array_wrap_s( GLint wrap_type )
+{
+    glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_WRAP_S, wrap_type); 
+    if (GL_CLAMP_TO_BORDER == wrap_type)
+    {
+        const float board[4] = {0.0f,0.0f,0.0f,0.0f};
+        glTexParameterfv(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_BORDER_COLOR , board);
+    }
+}
+
 void GLTextureUtils::set_2d_wrap_s_t( GLint wrap_type )
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_type); 

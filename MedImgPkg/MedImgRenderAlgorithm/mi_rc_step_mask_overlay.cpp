@@ -34,7 +34,7 @@ void RCStepMaskOverlayEnable::set_gpu_parameter()
 
 void RCStepMaskOverlayEnable::get_uniform_location()
 {
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     _loc_visible_label_count = program->get_uniform_location("visible_label_count");
 
     if (-1 == _loc_visible_label_count)

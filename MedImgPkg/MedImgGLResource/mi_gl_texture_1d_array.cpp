@@ -37,7 +37,7 @@ void GLTexture1DArray::load(GLint internalformat , GLsizei width, GLsizei arrays
     _type= type;
 }
 
-void GLTexture1DArray::update(GLint xoffset , GLsizei width , GLsizei arrayidx, GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
+void GLTexture1DArray::update(GLint xoffset , GLsizei arrayidx, GLsizei width , GLenum format , GLenum type , const void* data , GLint level /*= 0*/)
 {
     glTexSubImage2D(GL_TEXTURE_1D_ARRAY , level , xoffset , arrayidx , width ,1 , format ,type ,data);
 }

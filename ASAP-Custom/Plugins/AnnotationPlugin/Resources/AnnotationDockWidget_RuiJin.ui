@@ -27,6 +27,30 @@
     </sizepolicy>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="0">
+     <widget class="Line" name="currentAnnotationLine">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="currentAnnotationLabel">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="currentAnnotationHeaderLabel">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Current annotation:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QTreeWidget" name="AnnotationTreeWidget">
       <property name="sizePolicy">
@@ -124,29 +148,18 @@
       </item>
      </layout>
     </item>
-    <item row="3" column="0">
-     <widget class="Line" name="currentAnnotationLine">
+    <item row="2" column="0">
+     <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="currentAnnotationLabel">
-      <property name="text">
-       <string>TextLabel</string>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
       </property>
-      <property name="textFormat">
-       <enum>Qt::RichText</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="currentAnnotationHeaderLabel">
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Current annotation:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
+     </spacer>
     </item>
     <item row="4" column="0">
      <widget class="QTreeWidget" name="PathologyTreeWidget">
@@ -172,6 +185,11 @@
       <item>
        <property name="text">
         <string>不确定的病变</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>正常腺体</string>
        </property>
       </item>
       <item>
@@ -252,6 +270,11 @@
           <string>印戒细胞癌</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>经典型</string>
+         </property>
+        </item>
        </item>
        <item>
         <property name="text">
@@ -325,19 +348,6 @@
        </item>
       </item>
      </widget>
-    </item>
-    <item row="2" column="0">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>

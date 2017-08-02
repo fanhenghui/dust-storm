@@ -28,6 +28,8 @@ public:
 
     virtual GLShaderInfo get_shader_info();
 
+    virtual void set_gpu_parameter();
+
 private:
 };
 

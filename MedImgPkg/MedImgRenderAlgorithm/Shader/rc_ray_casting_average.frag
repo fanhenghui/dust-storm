@@ -1,7 +1,5 @@
 #version 430
 
-#define BUFFER_BINDING_WINDOW_LEVEL_BUCKET 5
-
 uniform sampler1D pseudo_color;
 uniform float pseudo_color_slope;
 uniform float pseudo_color_intercept;

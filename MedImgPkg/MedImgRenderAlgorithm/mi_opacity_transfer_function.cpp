@@ -1,4 +1,5 @@
 #include "mi_opacity_transfer_function.h"
+#include <cassert>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -10,15 +11,25 @@ OpacityTransFunc::~OpacityTransFunc()
 
 }
 
+
+void OpacityTransFunc::set_name(const std::string& lut_name)
+{
+    _name = lut_name;
+}
+
 void OpacityTransFunc::set_width(int width)
 {
+    if (width < 2)
+    {
+        RENDERALGO_THROW_EXCEPTION("invalid color transfer function width.");
+    }
     _width = width;
     _is_dirty = true;
 }
 
 void OpacityTransFunc::add_point(float real_value, float a)
 {
-    _tp_points.push_back(OpacityTFPoint(real_value, a*255.0f));
+    _tp_points.push_back(OpacityTFPoint(real_value, a));
     _is_dirty = true;
 }
 
@@ -60,6 +71,8 @@ void OpacityTransFunc::get_point_list(std::vector<OpacityTFPoint>& result_list)
 
         //Interpolation
         _result_points.clear();
+        _result_points.resize(_width);
+        int idx = 0;
         for (size_t i = 0; i < tp_point_size - 1; ++i)
         {
             int gap = static_cast<int>(std::fabs(_tp_points[i + 1].v - _tp_points[i].v));
@@ -74,12 +87,14 @@ void OpacityTransFunc::get_point_list(std::vector<OpacityTFPoint>& result_list)
             {
                 begin_alpha += step_alpha;
                 begin_value += 1.0f;
-                _result_points.push_back(OpacityTFPoint(
+                _result_points[idx++] = (OpacityTFPoint(
                     begin_value,
                     begin_alpha));
             }
         }
-        _result_points.push_back(_tp_points[tp_point_size - 1]);//Add last one
+        _result_points[idx] = (_tp_points[tp_point_size - 1]);//Add last one
+        assert(idx == _width-1);
+
         result_list = _result_points;
         _is_dirty = false;
     }

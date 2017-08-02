@@ -19,7 +19,7 @@ public:
     void load(GLint internalformat , GLsizei width, GLsizei arraysize , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
-    void update(GLint xoffset , GLsizei width , GLsizei arrayidx, GLenum format , GLenum type , 
+    void update(GLint xoffset ,  GLsizei arrayidx, GLsizei width , GLenum format , GLenum type , 
         const void* data , GLint level = 0);
 
     void download(GLenum format , GLenum type ,  void* buffer , GLint level = 0) const;

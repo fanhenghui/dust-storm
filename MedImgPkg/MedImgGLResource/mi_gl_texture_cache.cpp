@@ -3,6 +3,7 @@
 #include "mi_gl_texture_1d.h"
 #include "mi_gl_texture_2d.h"
 #include "mi_gl_texture_3d.h"
+#include "mi_gl_texture_1d_array.h"
 #include "mi_gl_utils.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -210,6 +211,27 @@ void GLTextureCache::process_cache()
                     cache_tex3d->bind();
                     cache_tex3d->update(unit->xoffset , unit->yoffset , unit->zoffset , unit->width , unit->height , unit->depth ,unit->format , unit->type , unit->data , unit->level);
                     cache_tex3d->unbind();
+                }
+                break;
+            }
+        case GL_TEXTURE_1D_ARRAY:
+            {
+                GLTexture1DArrayPtr cache_tex_array = std::dynamic_pointer_cast<GLTexture1DArray>(unit->texture);
+                GLRESOURCE_CHECK_NULL_EXCEPTION(cache_tex_array);
+                if (0 == unit->cache_type )
+                {
+                    cache_tex_array->initialize();
+                    cache_tex_array->bind();
+                    GLTextureUtils::set_1d_array_wrap_s(unit->wrap_type);
+                    GLTextureUtils::set_filter(GL_TEXTURE_1D_ARRAY , unit->filter_type);
+                    cache_tex_array->load(unit->internalformat , unit->width , unit->height , unit->format , unit->type , unit->data , unit->level);
+                    cache_tex_array->unbind();
+                }
+                else if(1 ==  unit->cache_type)
+                {
+                    cache_tex_array->bind();
+                    cache_tex_array->update(unit->xoffset , unit->yoffset , unit->width  ,unit->format , unit->type , unit->data , unit->level);
+                    cache_tex_array->unbind();
                 }
                 break;
             }

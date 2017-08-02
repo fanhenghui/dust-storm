@@ -56,7 +56,11 @@ class RCStepCompositeDVR : public RCStepBase
 {
 public:
     RCStepCompositeDVR(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
-      RCStepBase(ray_caster , program)
+      RCStepBase(ray_caster , program),
+      _loc_color_opacity_array(-1),
+      _loc_color_opacity_texture_shift(-1),
+      _loc_opacity_correction(-1),
+      _loc_sample_rate(-1)
       {};
 
       virtual ~RCStepCompositeDVR(){};
@@ -68,6 +72,10 @@ public:
       virtual void get_uniform_location();
 
 private:
+    int _loc_color_opacity_array;
+    int _loc_color_opacity_texture_shift;
+    int _loc_opacity_correction;
+    int _loc_sample_rate;
 };
 
 MED_IMG_END_NAMESPACE

@@ -27,8 +27,9 @@ class RenderAlgo_Export OpacityTransFunc
 {
 public:
     OpacityTransFunc(int width = 512);
-
     ~OpacityTransFunc();
+
+    void set_name(const std::string& lut_name);
 
     void set_width(int width);
 
@@ -41,6 +42,7 @@ public:
 protected:
 
 private:
+    std::string _name;
     std::vector<OpacityTFPoint> _tp_points;
     std::vector<OpacityTFPoint> _result_points;
     int _width;

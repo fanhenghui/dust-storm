@@ -15,6 +15,7 @@ MED_IMG_BEGIN_NAMESPACE
 class EntryExitPoints;
 class ImageData;
 class CameraBase;
+class CameraCalculator;
 class RayCasterInnerBuffer;
 class RayCasterCanvas;
 class RayCastingCPU;
@@ -31,8 +32,6 @@ public:
     RayCaster();
 
     ~RayCaster();
-
-    void initialize();
 
     void render();
 
@@ -81,7 +80,10 @@ public:
 
     //Volume modeling parameter
     void set_camera(std::shared_ptr<CameraBase> camera);
-    void set_volume_to_world_matrix(const Matrix4& mat);
+    std::shared_ptr<CameraBase> get_camera() const;
+
+    void set_camera_calculator(std::shared_ptr<CameraCalculator> camera_cal);
+    std::shared_ptr<CameraCalculator>  get_camera_calculator() const;
 
     //Sample rate
     void set_sample_rate(float sample_rate);
@@ -98,13 +100,13 @@ public:
 
     void get_global_window_level(float& ww , float& wl) const;
 
-    //Transfer function & pseudo color parameter
+    //Pseudo color parameter
     void set_pseudo_color_texture(GLTexture1DPtr tex , unsigned int length);
     GLTexture1DPtr get_pseudo_color_texture(unsigned int& length) const;
-
-    //RGB8 array
     void set_pseudo_color_array(unsigned char* color_array , unsigned int length);
-    void set_transfer_function_texture(GLTexture1DArrayPtr tex_array);
+
+    void set_color_opacity_texture_array(GLTexture1DArrayPtr tex_array);
+    GLTexture1DArrayPtr get_color_opacity_texture_array() const;
 
     //Mask overlay color
     void set_mask_overlay_color(std::map<unsigned char , RGBAUnit> colors);
@@ -116,9 +118,9 @@ public:
     void set_boundary_enhancement();
 
     //Shading parameter
-    void set_material();
-    void set_light_color();
-    void set_light_factor();
+    void set_ambient_color(float r , float g , float b , float factor);
+    void get_ambient_color(float(& rgba)[4]);
+    void set_material(const Material& m , unsigned char label);
 
     //SSD gray value
     void set_ssd_gray(float ssd_gray);
@@ -169,8 +171,7 @@ protected:
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
 
     std::shared_ptr<CameraBase> _camera;
-
-    Matrix4 _mat_v2w;
+    std::shared_ptr<CameraCalculator> _camera_cal;
 
     //Data sample rate(DVR 0.5 , MIPs 1.0) 
     float _sample_rate;
@@ -180,7 +181,7 @@ protected:
     float _global_wl;
 
     //Transfer function & pseudo color 
-    GLTexture1DArrayPtr _transfer_function;
+    GLTexture1DArrayPtr _color_opacity_texture_array;
     GLTexture1DPtr _pseudo_color_texture;
     unsigned char* _pseudo_color_array;
     unsigned int _pseudo_color_length;
@@ -208,6 +209,9 @@ protected:
     ShadingMode _shading_mode;
     ColorInverseMode _color_inverse_mode;
     MaskOverlayMode _mask_overlay_mode;
+
+    //Ambient
+    float _ambient_color[4];
 
     //Processing unit type
     RayCastingStrategy _strategy;

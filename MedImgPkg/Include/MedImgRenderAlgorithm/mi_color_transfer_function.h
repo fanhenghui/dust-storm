@@ -39,18 +39,20 @@ public:
     ColorTransFunc(int width = 512);
     ~ColorTransFunc();
 
+    void set_name(const std::string& lut_name);
+
     void set_width(int width);
     int get_width() const;
 
-    void set_color_type(ColorType input_type, ColorType interpolation_type);
+    void set_color_type(ColorType input_type, ColorType interpolation_type);//output type is always rgb
 
     /// \输入的RGB的范围是 0~255
-    void add_rgb_point(float real_value, float x, float y, float z);
+    void add_rgb_point(float real_value, float r, float g, float b);
 
-    /// \输入的HSV的范围是 H（hue）0~359
+    /// \输入的HSV的范围是 H（hue）0~360
     //S(saturation) 0 ~ 1(0~100%)
     //V(value) 0~1(0~100%)
-    void add_hsv_point(float real_value, float x, float y, float z);
+    void add_hsv_point(float real_value, float h, float s, float v);
 
     void get_point_list(std::vector<ColorTFPoint>& result_list);
 
@@ -60,6 +62,7 @@ public:
 protected:
 
 private:
+    std::string _name;
     std::vector<ColorTFPoint> _tp_points;
     std::vector<ColorTFPoint> _result_points;
     int _width;

@@ -13,6 +13,8 @@ class RayCasterCanvas;
 class CameraCalculator;
 class OrthoCameraInteractor;
 class OrthoCamera;
+class ColorTransFunc;
+class OpacityTransFunc;
 
 class RenderAlgo_Export RayCastScene : public SceneBase
 {
@@ -58,8 +60,17 @@ public:
     void set_shading_mode(ShadingMode mode);
     void set_color_inverse_mode(ColorInverseMode mode);
 
+    void set_ambient_color(float r , float g , float b , float factor);
+    void set_material(const Material& m , unsigned char label);
+
+    //Transfer function
+    void set_pseudo_color(std::shared_ptr<ColorTransFunc> color);
+    void set_color_opacity(std::shared_ptr<ColorTransFunc> color , std::shared_ptr<OpacityTransFunc> opacity , unsigned char label);
+
 protected:
-    virtual void pre_render();
+    virtual void pre_render_i();
+    void init_default_color_texture_i();
+
 protected:
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
@@ -78,10 +89,9 @@ protected:
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
-    //TODO Temp default pseudo color texture 
     //should design a wrap to contain global pseudo colors because its constant
     GLTexture1DPtr _pseudo_color_texture;
-
+    GLTexture1DArrayPtr _color_opacity_texture_array;
 };
 
 MED_IMG_END_NAMESPACE

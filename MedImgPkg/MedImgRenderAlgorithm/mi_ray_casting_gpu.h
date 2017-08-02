@@ -39,7 +39,7 @@ private:
     //Resource
     GLVAOPtr _gl_vao;
     GLBufferPtr _gl_buffer_vertex;
-    GLProgramPtr _program;
+    GLProgramPtr _gl_program;
     GLResourceShield _res_shield;
 
     //For Testing

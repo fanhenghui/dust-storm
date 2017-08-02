@@ -48,7 +48,7 @@ public:
     bool get_dirty() const;
 
 protected:
-    virtual void pre_render();
+    virtual void pre_render_i();
 
 protected:
     int _width , _height;

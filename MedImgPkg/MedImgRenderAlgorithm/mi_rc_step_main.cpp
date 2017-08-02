@@ -30,7 +30,7 @@ void RCStepMainFrag::set_gpu_parameter()
 {
     CHECK_GL_ERROR;
 
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
     std::shared_ptr<ImageData> volume_img = ray_caster->get_volume_data();
 
@@ -62,11 +62,12 @@ void RCStepMainFrag::set_gpu_parameter()
     }
 
     glEnable(GL_TEXTURE_3D);
-    glActiveTexture(GL_TEXTURE1);
+    int act_tex = _act_tex_counter->tick();
+    glActiveTexture(GL_TEXTURE0 + act_tex);
     volume_textures[0]->bind();
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_LINEAR);
-    glUniform1i(_loc_volume_data , 1);
+    glUniform1i(_loc_volume_data , act_tex);
     glDisable(GL_TEXTURE_3D);
 
     //3 Volume dimension
@@ -81,11 +82,12 @@ void RCStepMainFrag::set_gpu_parameter()
     if (!mask_textures.empty())
     {
         glEnable(GL_TEXTURE_3D);
-        glActiveTexture(GL_TEXTURE2);
+        act_tex = _act_tex_counter->tick();
+        glActiveTexture(GL_TEXTURE0 + act_tex);
         mask_textures[0]->bind();
         GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_3D , GL_NEAREST);
-        glUniform1i(_loc_mask_data , 2);
+        glUniform1i(_loc_mask_data , act_tex);
         glDisable(GL_TEXTURE_3D);
     }
 
@@ -95,19 +97,19 @@ void RCStepMainFrag::set_gpu_parameter()
 
 void RCStepMainFrag::get_uniform_location()
 {
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     _loc_volume_dim = program->get_uniform_location("volume_dim");
     _loc_volume_data = program->get_uniform_location("volume_sampler");
     _loc_mask_data = program->get_uniform_location("mask_sampler");
     _loc_sample_rate = program->get_uniform_location("sample_rate");
 
-    if (-1 == _loc_volume_dim ||
-        -1 == _loc_volume_data ||
-        //-1 == m_iLocMaskData ||
-        -1 == _loc_sample_rate)
-    {
-        RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
-    }
+    //if (-1 == _loc_volume_dim ||
+    //    -1 == _loc_volume_data ||
+    //    //-1 == m_iLocMaskData ||
+    //    -1 == _loc_sample_rate)
+    //{
+    //    RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
+    //}
 }
 
 GLShaderInfo RCStepMainTestFrag::get_shader_info()
@@ -119,7 +121,7 @@ void RCStepMainTestFrag::set_gpu_parameter()
 {
     CHECK_GL_ERROR;
 
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
     std::shared_ptr<ImageData> volume_img = ray_caster->get_volume_data();
 
@@ -156,7 +158,7 @@ void RCStepMainTestFrag::set_gpu_parameter()
 
 void RCStepMainTestFrag::get_uniform_location()
 {
-    GLProgramPtr program = _program.lock();
+    GLProgramPtr program = _gl_program.lock();
     _loc_volume_dim = program->get_uniform_location("volume_dim");
     _loc_test_code = program->get_uniform_location("test_code");
 

@@ -105,7 +105,6 @@ class GLResource_Export GLActiveTextureCounter
 {
 public:
     GLActiveTextureCounter();
-
     ~GLActiveTextureCounter();
 
     int tick();
@@ -126,6 +125,7 @@ class GLResource_Export GLTextureUtils
 {
 public:
     static void set_1d_wrap_s(GLint wrap_type);
+    static void set_1d_array_wrap_s(GLint wrap_type);
     static void set_2d_wrap_s_t(GLint wrap_type);
     static void set_3d_wrap_s_t_r(GLint wrap_type);
     static void set_filter(GLenum texture_target , GLint filter_type);

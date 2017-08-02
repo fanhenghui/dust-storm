@@ -14,7 +14,6 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCaster::RayCaster():_inner_buffer(new RayCasterInnerBuffer()),
-_mat_v2w(Matrix4::S_IDENTITY_MATRIX),
 _sample_rate(0.5f),
 _global_ww(1.0f),
 _global_wl(0.0f),
@@ -38,12 +37,10 @@ _brick_size(32),
 _brick_expand(2),
 _test_code(0)
 {
-
-}
-
-void RayCaster::initialize()
-{
-
+    _ambient_color[0] = 1.0;
+    _ambient_color[1] = 1.0;
+    _ambient_color[2] = 1.0;
+    _ambient_color[3] = 0.3;
 }
 
 RayCaster::~RayCaster()
@@ -129,9 +126,19 @@ void RayCaster::set_camera(std::shared_ptr<CameraBase> camera)
     _camera = camera;
 }
 
-void RayCaster::set_volume_to_world_matrix(const Matrix4& mat)
+std::shared_ptr<CameraBase> RayCaster::get_camera() const
 {
-    _mat_v2w = mat;
+    return _camera;
+}
+
+void RayCaster::set_camera_calculator(std::shared_ptr<CameraCalculator> camera_cal)
+{
+    _camera_cal = camera_cal;
+}
+
+std::shared_ptr<CameraCalculator> RayCaster::get_camera_calculator() const
+{
+    return _camera_cal;
 }
 
 void RayCaster::set_sample_rate(float sample_rate)
@@ -183,9 +190,14 @@ void RayCaster::set_pseudo_color_array(unsigned char* color_array , unsigned int
     _pseudo_color_length = length;
 }
 
-void RayCaster::set_transfer_function_texture(GLTexture1DArrayPtr tex_array)
+void RayCaster::set_color_opacity_texture_array(GLTexture1DArrayPtr tex_array)
 {
-    _transfer_function = tex_array;
+    _color_opacity_texture_array = tex_array;
+}
+
+GLTexture1DArrayPtr RayCaster::get_color_opacity_texture_array() const
+{
+    return _color_opacity_texture_array;
 }
 
 void RayCaster::set_sillhouette_enhancement()
@@ -198,19 +210,22 @@ void RayCaster::set_boundary_enhancement()
 
 }
 
-void RayCaster::set_material()
+void RayCaster::set_ambient_color(float r , float g , float b , float factor)
 {
-
+    _ambient_color[0] = r;
+    _ambient_color[1] = g;
+    _ambient_color[2] = b;
+    _ambient_color[3] = factor;
 }
 
-void RayCaster::set_light_color()
+void RayCaster::get_ambient_color(float(& rgba)[4])
 {
-
+    memcpy(rgba , _ambient_color, 4*sizeof(float));
 }
 
-void RayCaster::set_light_factor()
+void RayCaster::set_material(const Material& m , unsigned char label)
 {
-
+    _inner_buffer->set_material(m , label);
 }
 
 void RayCaster::set_ssd_gray(float ssd_gray)

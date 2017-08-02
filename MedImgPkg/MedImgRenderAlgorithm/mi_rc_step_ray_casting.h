@@ -59,6 +59,21 @@ public:
 private:;
 };
 
+class RCStepRayCastingDVR : public RCStepBase
+{
+public:
+    RCStepRayCastingDVR(std::shared_ptr<RayCaster> ray_caster , std::shared_ptr<GLProgram>  program):
+      RCStepBase(ray_caster , program)
+      {};
+
+      virtual ~RCStepRayCastingDVR(){};
+
+      virtual GLShaderInfo get_shader_info();
+
+private:;
+};
+
+
 MED_IMG_END_NAMESPACE
 
 #endif

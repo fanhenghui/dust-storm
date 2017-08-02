@@ -19,7 +19,10 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):_ray_caster(ray_caster),_last_test_code(-1)
+RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):
+    _ray_caster(ray_caster),
+    _last_test_code(-1),
+    _gl_act_tex_counter(new GLActiveTextureCounter())
 {
 
 }
@@ -40,9 +43,10 @@ void RayCastingGPU::render()
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    _program->bind();
+    _gl_program->bind();
     _gl_vao->bind();
 
+    _gl_act_tex_counter->reset();
     for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
     {
         (*it)->set_gpu_parameter();
@@ -51,7 +55,7 @@ void RayCastingGPU::render()
     glDrawArrays(GL_TRIANGLES , 0 , 6);
 
     _gl_vao->unbind();
-    _program->unbind();
+    _gl_program->unbind();
     glPopAttrib();
 
     CHECK_GL_ERROR;
@@ -96,13 +100,13 @@ void RayCastingGPU::update_i()
     CHECK_GL_ERROR;
 
     //Create Program
-    if (!_program)
+    if (!_gl_program)
     {
         UIDType uid;
-        _program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
-        _program->set_description("ray casting GPU program");
-        _program->initialize();
-        _res_shield.add_shield<GLProgram>(_program);
+        _gl_program = GLResourceManagerContainer::instance()->get_program_manager()->create_object(uid);
+        _gl_program->set_description("ray casting GPU program");
+        _gl_program->initialize();
+        _res_shield.add_shield<GLProgram>(_gl_program);
     }
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
@@ -128,7 +132,7 @@ void RayCastingGPU::update_i()
         _last_test_code = test_code;
 
 #define STEP_PUSH_BACK(step_class_name) \
-    _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _program)));
+    _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(new step_class_name(ray_caster , _gl_program)));
 
         if (_last_test_code == 1 || _last_test_code == 2)
         {
@@ -148,7 +152,8 @@ void RayCastingGPU::update_i()
             //Composite
             if (_composite_mode == COMPOSITE_DVR)
             {
-
+                STEP_PUSH_BACK(RCStepRayCastingDVR);
+                STEP_PUSH_BACK(RCStepCompositeDVR);
             }
             else if (_composite_mode == COMPOSITE_AVERAGE)
             {
@@ -227,13 +232,14 @@ void RayCastingGPU::update_i()
         {
             shaders.push_back((*it)->get_shader_info());
         }
-        _program->finalize();
-        _program->initialize();
-        _program->set_shaders(shaders);
-        _program->compile();
+        _gl_program->finalize();
+        _gl_program->initialize();
+        _gl_program->set_shaders(shaders);
+        _gl_program->compile();
 
         for (auto it = _ray_casting_steps.begin() ; it != _ray_casting_steps.end() ; ++it)
         {
+            (*it)->set_active_texture_counter(_gl_act_tex_counter);
             (*it)->get_uniform_location();
         }
     }

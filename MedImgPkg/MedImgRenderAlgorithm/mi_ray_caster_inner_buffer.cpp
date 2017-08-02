@@ -42,6 +42,10 @@ struct RayCasterInnerBuffer::GLResource
             {
                 return "mask overlay color bucket";
             }
+        case MATERIAL_BUCKET:
+            {
+                return "material bucket";
+            }
         default:
             {
                 return "undefined buffer type";
@@ -112,7 +116,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                     }
 
                     buffer->bind();
-                    buffer->load(static_cast<int>(_label_level)*sizeof(float)*2 , wl_array, GL_DYNAMIC_DRAW);
+                    buffer->load(static_cast<int>(_label_level)*sizeof(float)*2 , wl_array, GL_STATIC_DRAW);
 
                     _inner_resource->dirty_flag[type] = false;
                 }
@@ -203,6 +207,34 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type)
                 break;
             }
 
+        case MATERIAL_BUCKET:
+            {
+                if (_inner_resource->dirty_flag[type])
+                {
+                    Material* material_array = (Material*)_shared_buffer_array.get();
+                    memset(material_array , 0 , sizeof(Material)*static_cast<int>(_label_level));
+
+                    unsigned char label =  0;
+                    for (auto it = _material.begin() ; it != _material.end() ; ++it)
+                    {
+                        label = it->first;
+                        if (label > static_cast<int>(_label_level) - 1)
+                        {
+                            std::stringstream ss;
+                            ss << "Input visible label : " << (int)(it->first ) << " is greater than the limit : " << static_cast<int>(_label_level) - 1 << " !";
+                            RENDERALGO_THROW_EXCEPTION(ss.str());
+                        }
+                        material_array[label] = it->second;
+                    }
+
+                    buffer->bind();
+                    buffer->load(static_cast<int>(_label_level)*sizeof(Material) , material_array , GL_STATIC_DRAW);
+
+                    _inner_resource->dirty_flag[type] = false;
+                }
+                break;
+            }
+
         default:
             {
                 RENDERALGO_THROW_EXCEPTION("Invalid buffer type!");
@@ -230,7 +262,7 @@ void RayCasterInnerBuffer::set_mask_label_level(LabelLevel eLevel)
     {
         _label_level = eLevel;
         memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
-        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*2]);
+        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*sizeof(float)*9]);
     }
 }
 
@@ -277,7 +309,7 @@ void RayCasterInnerBuffer::set_mask_overlay_color(std::map<unsigned char , RGBAU
     }
 }
 
-void RayCasterInnerBuffer::set_mask_overlay_color(RGBAUnit color , unsigned char label)
+void RayCasterInnerBuffer::set_mask_overlay_color(const RGBAUnit& color , unsigned char label)
 {
     auto it = _mask_overlay_colors.find(label);
     if (it != _mask_overlay_colors.end())
@@ -300,5 +332,22 @@ const std::map<unsigned char , RGBAUnit>& RayCasterInnerBuffer::get_mask_overlay
     return _mask_overlay_colors;
 }
 
+void RayCasterInnerBuffer::set_material(const Material& matrial , unsigned char label)
+{
+    auto it = _material.find(label);
+    if (it == _material.end())
+    {
+        _material.insert(std::make_pair(label ,matrial));
+        _inner_resource->dirty_flag[MATERIAL_BUCKET] = true;
+    }
+    else
+    {
+        if (matrial != it->second)
+        {
+            it->second = matrial;
+            _inner_resource->dirty_flag[MATERIAL_BUCKET] = true;
+        }
+    }
+}
 
 MED_IMG_END_NAMESPACE
