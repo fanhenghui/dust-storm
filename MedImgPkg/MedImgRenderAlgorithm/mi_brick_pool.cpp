@@ -1,4 +1,4 @@
-#include "mi_brick_pool.h"
+﻿#include "mi_brick_pool.h"
 
 #include <fstream>
 
@@ -350,6 +350,131 @@ void BrickPool::calculate_brick_geometry()
 const BrickGeometry& BrickPool::get_brick_geometry() const
 {
     return _brick_geometry;
+}
+
+void BrickPool::calculate_intercect_brick_range(const AABB& bounding , AABBI& brick_range)
+{
+    const float brick_size = float(_brick_size);
+    float range_min[3] = {
+        (float)bounding._min.x / brick_size,
+        (float)bounding._min.y / brick_size,
+        (float)bounding._min.z / brick_size
+    };
+
+    float range_max[3] = {
+        (float)bounding._max.x / brick_size,
+        (float)bounding._max.y / brick_size,
+        (float)bounding._max.z / brick_size
+    };
+
+    for (int i = 0 ; i<3 ; ++i)
+    {
+        if (fabs(range_min[i] - int(range_min[i])) < 1e-6f)
+        {
+            range_min[i] = float(int(range_min[i]));
+            brick_range._min[i] = (int)floor(range_min[i]);
+        }
+        else
+        {
+            brick_range._min[i] = (int)floor(range_min[i]);
+        }
+
+        if (fabs(range_max[i] - int(range_max[i])) < 1e-6f)
+        {
+            range_max[i] = float(int(range_max[i]));
+            brick_range._max[i] = (int)floor(range_max[i]) - 1;
+        }
+        else
+        {
+            brick_range._max[i] = (int)floor(range_max[i]);
+        }
+    }
+}
+
+void BrickPool::get_clipping_brick_geometry(const AABB& bounding, float* brick_vertex, float* brick_color)
+{
+    RENDERALGO_CHECK_NULL_EXCEPTION(brick_vertex);
+    RENDERALGO_CHECK_NULL_EXCEPTION(brick_color);
+
+    //get intersect brick index range
+    AABBI brick_range;
+    calculate_intercect_brick_range(bounding , brick_range);
+
+    memcpy(brick_vertex , _brick_geometry.vertex_array, sizeof(float)*3*_brick_geometry.vertex_count);
+    memcpy(brick_color , _brick_geometry.color_array , sizeof(float)*4*_brick_geometry.vertex_count);
+
+    //Change 6 plane vertex coordinate
+    //Vertex ID minus brick ID is 1. So here vertex ID should plus 1 , otherwise can cause a slope in the edge
+    const int brick_dim_layout_jump = (_brick_dim[0]+1)*(_brick_dim[1]+1);
+    int idx_min(0),idx_max(0);
+    int change_min(0),change_max(0);
+    int iYJump(0),z_jump(0);
+
+    float bounding_min[3] = {
+        (float)bounding._min.x ,
+        (float)bounding._min.y ,
+        (float)bounding._min.z
+    };
+
+    float bounding_max[3] = {
+        (float)bounding._max.x,
+        (float)bounding._max.y,
+        (float)bounding._max.z
+    };
+
+    //Plane X
+    change_min = brick_range._min[0];
+    change_max = brick_range._max[0] + 1;
+    for (int z = brick_range._min[2] ; z <= brick_range._max[2]+1 ; ++z)
+    {
+        z_jump = z*brick_dim_layout_jump;
+        for (int y = brick_range._min[1] ; y <= brick_range._max[1]+1 ; ++y)
+        {
+            idx_min = z_jump + y*(_brick_dim[0]+1) + change_min;
+            idx_max = z_jump + y*(_brick_dim[0]+1) + change_max;
+
+            brick_vertex[idx_min*3 + 0] = bounding_min[0];
+            brick_vertex[idx_max*3 + 0] = bounding_max[0];
+            brick_color[idx_min*4 + 0] = bounding_min[0];
+            brick_color[idx_max*4 + 0] = bounding_max[0];
+        }
+    }
+
+    //Plane Y
+    change_min = brick_range._min[1];
+    change_max = brick_range._max[1] + 1;
+    for (int z = brick_range._min[2] ; z <= brick_range._max[2]+1 ; ++z)
+    {
+        z_jump = z*brick_dim_layout_jump;
+        for (int x = brick_range._min[0] ; x <= brick_range._max[0]+1 ; ++x)
+        {
+            idx_min = z_jump + change_min*(_brick_dim[0]+1) + x;
+            idx_max = z_jump + change_max*(_brick_dim[0]+1) + x;
+
+            brick_vertex[idx_min*3 + 1] = bounding_min[1];
+            brick_vertex[idx_max*3 + 1] = bounding_max[1];
+            brick_color[idx_min*4 + 1] = bounding_min[1];
+            brick_color[idx_max*4 + 1] = bounding_max[1];
+        }
+    }
+
+    //Plane Z
+    change_min = brick_range._min[2];
+    change_max = brick_range._max[2] + 1;
+    for (int y = brick_range._min[1] ; y <= brick_range._max[1]+1 ; ++y)
+    {
+        iYJump = y*(_brick_dim[0]+1);
+        for (int x = brick_range._min[0] ; x <= brick_range._max[0]+1 ; ++x)
+        {
+            idx_min = change_min*brick_dim_layout_jump + iYJump + x;
+            idx_max = change_max*brick_dim_layout_jump + iYJump + x;
+
+            brick_vertex[idx_min*3 + 2] = bounding_min[2];
+            brick_vertex[idx_max*3 + 2] = bounding_max[2];
+            brick_color[idx_min*4 + 2] = bounding_min[2];
+            brick_color[idx_max*4 + 2] = bounding_max[2];
+        }
+    }
 }
 
 MED_IMG_END_NAMESPACE

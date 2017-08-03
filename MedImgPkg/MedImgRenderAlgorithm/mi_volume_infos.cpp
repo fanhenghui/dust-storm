@@ -316,8 +316,7 @@ void VolumeInfos::refresh_upload_volume_i()
 
     _brick_pool->calculate_brick_geometry();
     _brick_pool->calculate_volume_brick_info();
-    //Test
-    _brick_pool->write_volume_brick_info("D:/temp/volume_brick_info.txt");
+
     CHECK_GL_ERROR;
 }
 

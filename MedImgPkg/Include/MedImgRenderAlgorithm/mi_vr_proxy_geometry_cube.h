@@ -17,7 +17,6 @@ public:
     ~ProxyGeometryCube();
 
     void initialize();
-    void finialize();
 
     void set_vr_entry_exit_poitns(std::shared_ptr<VREntryExitPoints> vr_entry_exit_points);
 

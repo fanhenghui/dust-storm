@@ -51,6 +51,9 @@ public:
     void remove_mask_brick_info(const std::vector<unsigned char>& vis_labels);
     void remove_all_mask_brick_info();
 
+public:
+    void calculate_intercect_brick_range(const AABB& bounding , AABBI& brick_range);
+    void get_clipping_brick_geometry(const AABB& bounding, float* brick_vertex, float* brick_color);
 
 private:
     std::shared_ptr<ImageData> _volume;

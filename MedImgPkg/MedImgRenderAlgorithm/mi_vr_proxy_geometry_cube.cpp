@@ -80,131 +80,113 @@ void ProxyGeometryCube::initialize()
     }
 }
 
-void ProxyGeometryCube::finialize()
-{
-    if (_gl_program)
-    {
-        //TODO delete program
-    }
-}
-
 void ProxyGeometryCube::set_vr_entry_exit_poitns(std::shared_ptr<VREntryExitPoints> vr_entry_exit_points)
 {
     _vr_entry_exit_points = vr_entry_exit_points;
 }
 
-
 void ProxyGeometryCube::calculate_entry_exit_points()
 {
-    try
-    {
-        std::shared_ptr<VREntryExitPoints> entry_exit_points = _vr_entry_exit_points.lock();
-        RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
+    std::shared_ptr<VREntryExitPoints> entry_exit_points = _vr_entry_exit_points.lock();
+    RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
-        //update VAO
-        if(_last_aabb != entry_exit_points->_aabb)
-        {
-            _last_aabb = entry_exit_points->_aabb;
-            const float pt_min[3] = {(float)_last_aabb._min.x , (float)_last_aabb._min.y , (float)_last_aabb._min.z};
-            const float pt_max[3] = {(float)_last_aabb._max.x , (float)_last_aabb._max.y , (float)_last_aabb._max.z};
+    //update VAO
+    if(_last_aabb != entry_exit_points->_aabb)
+    {
+        _last_aabb = entry_exit_points->_aabb;
+        const float pt_min[3] = {(float)_last_aabb._min.x , (float)_last_aabb._min.y , (float)_last_aabb._min.z};
+        const float pt_max[3] = {(float)_last_aabb._max.x , (float)_last_aabb._max.y , (float)_last_aabb._max.z};
 
 #define VERTEX(pt0,pt1,pt2) pt0[0], pt1[1], pt2[2]
 
-            float vertex[] = { VERTEX(pt_max,pt_min,pt_max), VERTEX(pt_max,pt_min,pt_min), VERTEX(pt_max,pt_max,pt_min),   VERTEX(pt_max,pt_min,pt_max), VERTEX(pt_max,pt_max,pt_min) , VERTEX(pt_max,pt_max,pt_max),
-                VERTEX(pt_max,pt_max,pt_max), VERTEX(pt_max,pt_max,pt_min), VERTEX(pt_min,pt_max,pt_min),  VERTEX(pt_max,pt_max,pt_max) , VERTEX(pt_min,pt_max,pt_min) , VERTEX(pt_min,pt_max,pt_max),
-                VERTEX(pt_max,pt_max,pt_max),VERTEX(pt_min,pt_max,pt_max), VERTEX(pt_min,pt_min,pt_max),   VERTEX(pt_max,pt_max,pt_max), VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_max,pt_min,pt_max),
-                VERTEX(pt_min,pt_min,pt_max), VERTEX(pt_min,pt_max,pt_max),VERTEX(pt_min,pt_max,pt_min),      VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_min,pt_max,pt_min), VERTEX(pt_min,pt_min,pt_min),
-                VERTEX(pt_min,pt_min,pt_max), VERTEX(pt_min,pt_min,pt_min), VERTEX(pt_max,pt_min,pt_min),    VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_max,pt_min,pt_min), VERTEX(pt_max,pt_min,pt_max),
-                VERTEX(pt_min,pt_min,pt_min),VERTEX(pt_min,pt_max,pt_min),VERTEX(pt_max,pt_max,pt_min),     VERTEX(pt_min,pt_min,pt_min), VERTEX(pt_max,pt_max,pt_min), VERTEX(pt_max,pt_min,pt_min)};
+        float vertex[] = { VERTEX(pt_max,pt_min,pt_max), VERTEX(pt_max,pt_min,pt_min), VERTEX(pt_max,pt_max,pt_min),   VERTEX(pt_max,pt_min,pt_max), VERTEX(pt_max,pt_max,pt_min) , VERTEX(pt_max,pt_max,pt_max),
+            VERTEX(pt_max,pt_max,pt_max), VERTEX(pt_max,pt_max,pt_min), VERTEX(pt_min,pt_max,pt_min),  VERTEX(pt_max,pt_max,pt_max) , VERTEX(pt_min,pt_max,pt_min) , VERTEX(pt_min,pt_max,pt_max),
+            VERTEX(pt_max,pt_max,pt_max),VERTEX(pt_min,pt_max,pt_max), VERTEX(pt_min,pt_min,pt_max),   VERTEX(pt_max,pt_max,pt_max), VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_max,pt_min,pt_max),
+            VERTEX(pt_min,pt_min,pt_max), VERTEX(pt_min,pt_max,pt_max),VERTEX(pt_min,pt_max,pt_min),      VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_min,pt_max,pt_min), VERTEX(pt_min,pt_min,pt_min),
+            VERTEX(pt_min,pt_min,pt_max), VERTEX(pt_min,pt_min,pt_min), VERTEX(pt_max,pt_min,pt_min),    VERTEX(pt_min,pt_min,pt_max),  VERTEX(pt_max,pt_min,pt_min), VERTEX(pt_max,pt_min,pt_max),
+            VERTEX(pt_min,pt_min,pt_min),VERTEX(pt_min,pt_max,pt_min),VERTEX(pt_max,pt_max,pt_min),     VERTEX(pt_min,pt_min,pt_min), VERTEX(pt_max,pt_max,pt_min), VERTEX(pt_max,pt_min,pt_min)};
 
 #undef VERTEX
 
-            float color[36*4];
-            for (int i = 0 ; i< 36 ; ++i)
-            {
-                color[i*4] = vertex[i*3];
-                color[i*4+1] = vertex[i*3+1];
-                color[i*4+2] = vertex[i*3+2];
-                color[i*4+3] = 0.0f;
-            }
-
-            _gl_vertex_buffer->bind();
-            _gl_vertex_buffer->load(36*3*sizeof(float) , vertex, GL_DYNAMIC_DRAW);
-
-            _gl_color_buffer->bind();
-            _gl_color_buffer->load(36*4*sizeof(float) , color , GL_DYNAMIC_DRAW);
-        }
-
-        CHECK_GL_ERROR;
-
-        entry_exit_points->_gl_fbo->bind();
-
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-        _gl_vao->bind();
-        _gl_program->bind();
-
-        CHECK_GL_ERROR;
-
-        const Matrix4 mat_vp = entry_exit_points->get_camera()->get_view_projection_matrix();
-        const Matrix4 mat_m = entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
-        const Matrix4 mat_mvp = mat_vp*mat_m;
-            
-        int loc = _gl_program->get_uniform_location("mat_mvp");
-        if (-1 == loc)
+        float color[36*4];
+        for (int i = 0 ; i< 36 ; ++i)
         {
-            RENDERALGO_THROW_EXCEPTION("get uniform mat_mvp failed!");
+            color[i*4] = vertex[i*3];
+            color[i*4+1] = vertex[i*3+1];
+            color[i*4+2] = vertex[i*3+2];
+            color[i*4+3] = 0.0f;
         }
-        float mat_mvp_f[16];
-        mat_mvp.to_float16(mat_mvp_f);
-        glUniformMatrix4fv(loc , 1 , GL_FALSE , mat_mvp_f);
 
-        CHECK_GL_ERROR;
+        _gl_vertex_buffer->bind();
+        _gl_vertex_buffer->load(36*3*sizeof(float) , vertex, GL_DYNAMIC_DRAW);
 
-        glEnable(GL_DEPTH_TEST);
-
-        //1 render entry points
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
-        glClearDepth(1.0);
-        glClearColor(0.0,0.0,0.0,0.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glDepthMask(GL_TRUE);
-        glDepthFunc(GL_LEQUAL);
-
-        glDrawArrays(GL_TRIANGLES , 0 , 36);
-
-        CHECK_GL_ERROR;
-
-        //2 render exit points
-        glDrawBuffer(GL_COLOR_ATTACHMENT1);
-
-        glClearDepth(0.0);
-        glClearColor(0.0,0.0,0.0,0.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glDepthMask(GL_TRUE);
-        glDepthFunc(GL_GEQUAL);
-
-        glDrawArrays(GL_TRIANGLES , 0 , 36);
-
-        _gl_program->unbind();
-        _gl_vao->unbind();
-
-        CHECK_GL_ERROR;
-
-        glPopAttrib();
-
-        entry_exit_points->_gl_fbo->unbind();
-
-        CHECK_GL_ERROR;
-
+        _gl_color_buffer->bind();
+        _gl_color_buffer->load(36*4*sizeof(float) , color , GL_DYNAMIC_DRAW);
     }
-    catch (Exception& e)
+
+    CHECK_GL_ERROR;
+
+    entry_exit_points->_gl_fbo->bind();
+
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    _gl_vao->bind();
+    _gl_program->bind();
+
+    CHECK_GL_ERROR;
+
+    const Matrix4 mat_vp = entry_exit_points->get_camera()->get_view_projection_matrix();
+    const Matrix4 mat_m = entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
+    const Matrix4 mat_mvp = mat_vp*mat_m;
+
+    int loc = _gl_program->get_uniform_location("mat_mvp");
+    if (-1 == loc)
     {
-        std::cout << "proxy geometry cube calculate entry exit points failed : " << e.what();
-        assert(false);
+        RENDERALGO_THROW_EXCEPTION("get uniform mat_mvp failed!");
     }
+    float mat_mvp_f[16];
+    mat_mvp.to_float16(mat_mvp_f);
+    glUniformMatrix4fv(loc , 1 , GL_FALSE , mat_mvp_f);
+
+    CHECK_GL_ERROR;
+
+    glEnable(GL_DEPTH_TEST);
+
+    //1 render entry points
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glClearDepth(1.0);
+    glClearColor(0.0,0.0,0.0,0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+
+    glDrawArrays(GL_TRIANGLES , 0 , 36);
+
+    CHECK_GL_ERROR;
+
+    //2 render exit points
+    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+    glClearDepth(0.0);
+    glClearColor(0.0,0.0,0.0,0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_GEQUAL);
+
+    glDrawArrays(GL_TRIANGLES , 0 , 36);
+
+    _gl_program->unbind();
+    _gl_vao->unbind();
+
+    CHECK_GL_ERROR;
+
+    glPopAttrib();
+
+    entry_exit_points->_gl_fbo->unbind();
+
+    CHECK_GL_ERROR;
 }
 
 

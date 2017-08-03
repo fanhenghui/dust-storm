@@ -37,6 +37,23 @@ public:
     void Print();
 };
 
+class Arithmetic_Export AABBI : public IShape
+{
+public:
+    int _min[3];//Lower Left Back
+    int _max[3];//Upper Right Front
+
+public:
+    AABBI();
+    AABBI(const int (&min0)[3] , const int (&max0)[3]);
+    virtual ~AABBI();
+
+    bool operator == (const AABBI& aabb) const;
+    bool operator != (const AABBI& aabb) const;
+
+    void Print();
+};
+
 MED_IMG_END_NAMESPACE
 
 #endif
