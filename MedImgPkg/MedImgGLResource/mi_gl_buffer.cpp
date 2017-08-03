@@ -65,6 +65,13 @@ void GLBuffer::load(GLsizei size, const void* data, GLenum usage)
     glBufferData(_target , size , data, usage);
 }
 
+void GLBuffer::download(GLsizei size ,void* data)
+{
+    void *buffer_data = glMapBuffer(_target, GL_READ_ONLY);
+    memcpy(data , buffer_data, size);
+    glUnmapBuffer(_target);
+}
+
 void GLBuffer::bind_buffer_base(GLenum target , GLuint index)
 {
     glBindBufferBase(target , index, _buffer_id);

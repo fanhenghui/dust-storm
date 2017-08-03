@@ -4,65 +4,78 @@
 
 #include <memory>
 #include <map>
+#include <string>
+
 #include "MedImgRenderAlgorithm/mi_render_algo_export.h"
 #include "MedImgRenderAlgorithm/mi_brick_define.h"
-
+#include "MedImgGLResource/mi_gl_resource_define.h"
+#include "MedImgGLResource/mi_gl_resource_manager_container.h"
+#include "MedImgArithmetic/mi_aabb.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 //GPU rendering use brick pool to accelerate
 class ImageData;
+class VolumeBrickInfoCalculator;
+class MaskBrickInfoCalculator;
 class RenderAlgo_Export BrickPool
 {
 public:
-    BrickPool();
+    BrickPool(unsigned int brick_size , unsigned int brick_margin);
     ~BrickPool();
 
     void set_volume(std::shared_ptr<ImageData> image_data);
     void set_mask(std::shared_ptr<ImageData> mask_data);
 
-    void set_brick_size(unsigned int size);
-    unsigned int get_brick_size() const;
+    void set_volume_texture(GLTexture3DPtr tex);
+    void set_mask_texture(GLTexture3DPtr tex);
 
-    void set_brick_expand(unsigned int expand);
-    unsigned int get_brick_expand() const;
+    unsigned int get_brick_size() const;
+    unsigned int get_brick_margin() const;
 
     void get_brick_dim(unsigned int(&brick_dim)[3]);
     unsigned int get_brick_count() const;
 
-    BrickCorner* get_brick_corner();
-
-    VolumeBrickInfo* get_volume_brick_info();
-
-    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
-
-    void calculate_brick_corner();
-
     void calculate_brick_geometry();
+    const BrickGeometry& get_brick_geometry() const;
 
-    void calculate_volume_brick();
+    void calculate_volume_brick_info();
+    VolumeBrickInfo* get_volume_brick_info() const;
+    void write_volume_brick_info(const std::string& path);
 
-    void calculate_mask_brick();
+    void calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels);
+    void update_mask_brick_info(const AABBUI& aabb);
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const;
+    void write_mask_brick_info(const std::string& path , const std::vector<unsigned char>& visible_labels);
 
-    void update_mask_brick(unsigned int (&begin)[3] , unsigned int (&end)[3] , LabelKey label_key);
+    void remove_mask_brick_info(const std::vector<unsigned char>& vis_labels);
+    void remove_all_mask_brick_info();
 
-public:
-    static void calculate_intercect_brick_index_range();
 
 private:
     std::shared_ptr<ImageData> _volume;
     std::shared_ptr<ImageData> _mask;
+    GLTexture3DPtr _volume_texture;
+    GLTexture3DPtr _mask_texture;
 
     unsigned int _brick_size;
-    unsigned int _brick_expand;
+    unsigned int _brick_margin;
     unsigned int _brick_dim[3];
     unsigned int _brick_count;
 
-    std::unique_ptr<BrickCorner[]> _brick_corner_array;
     BrickGeometry _brick_geometry;//For GL rendering
 
     std::unique_ptr<VolumeBrickInfo[]> _volume_brick_info_array;
+    GLBufferPtr _volume_brick_info_buffer;
+
     std::map<LabelKey , std::unique_ptr<MaskBrickInfo[]>> _mask_brick_info_array_set;
+    std::map<LabelKey , GLBufferPtr> _mask_brick_info_buffer_set;
+
+    GLResourceShield _res_shield;
+
+private:
+    std::unique_ptr<VolumeBrickInfoCalculator> _volume_brick_info_cal;
+    std::unique_ptr<MaskBrickInfoCalculator> _mask_brick_info_cal;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(BrickPool);

@@ -337,6 +337,13 @@ void RayCastScene::set_sample_rate(float sample_rate)
 
 void RayCastScene::set_visible_labels(std::vector<unsigned char> labels)
 {
+    for (auto it = labels.begin() ; it != labels.end() ; ++it)
+    {
+        if (*it == 0)
+        {
+            RENDERALGO_THROW_EXCEPTION("visible labels contain zero");
+        }
+    }
     if(_ray_caster->get_visible_labels() != labels)
     {
         _ray_caster->set_visible_labels(labels);

@@ -20,6 +20,8 @@ public:
 
     void remove_object(UIDType uid);
 
+    void remove_object(std::shared_ptr<ResourceType> obj);
+
     void remove_all();
 
     void update();

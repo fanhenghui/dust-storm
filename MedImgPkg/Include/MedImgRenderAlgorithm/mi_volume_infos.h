@@ -24,29 +24,22 @@ public:
 
     void finialize();
 
-    //Set input
     void set_volume(std::shared_ptr<ImageData> image_data);
     void set_mask(std::shared_ptr<ImageData> image_data);
     void set_data_header(std::shared_ptr<ImageDataHeader> data_header);
 
-    //Get camera calculator
     std::shared_ptr<CameraCalculator> get_camera_calculator();
 
-    //Get GPU resource
     std::vector<GLTexture3DPtr> get_volume_texture();
     std::vector<GLTexture3DPtr> get_mask_texture();
 
-    GLBufferPtr get_volume_brick_info_buffer();
-    //GLBufferPtr GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vis_labels);
-
-    //Get GPU resource
     std::shared_ptr<ImageData> get_volume();
     std::shared_ptr<ImageData> get_mask();
     std::shared_ptr<ImageDataHeader> get_data_header();
 
-    BrickCorner* get_brick_corner();
-    VolumeBrickInfo* get_volume_brick_info();
-    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels);
+    VolumeBrickInfo* get_volume_brick_info() const;
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const;
+    const BrickGeometry& get_brick_geometry() const;
 
     //update(should update to CPU and GPU)
     void update_mask(const unsigned int (&begin)[3] ,const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed = true);
@@ -60,13 +53,11 @@ private:
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<ImageData> _mask_data;
     std::shared_ptr<ImageDataHeader> _data_header;
-    std::unique_ptr<BrickPool> _brick_pool;
 
     std::vector<GLTexture3DPtr> _volume_textures;//P.S here use vector for separate volume later
     std::vector<GLTexture3DPtr> _mask_textures;
 
-    GLBufferPtr _volume_brick_info_buffer;
-    std::map<LabelKey , GLBufferPtr> _mask_brick_info_buffer_set;
+    std::unique_ptr<BrickPool> _brick_pool;
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
 

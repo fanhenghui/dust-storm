@@ -33,12 +33,12 @@
     <Filter Include="Transfer function">
       <UniqueIdentifier>{5f811d20-d8b8-4c9c-8a53-7dc596019601}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Brick info">
+      <UniqueIdentifier>{9a75628d-4bb7-40d5-8b18-fec08e6a5b11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_define.h">
-      <Filter>Brick</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_generator.h">
       <Filter>Brick</Filter>
     </ClInclude>
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_pool.h">
@@ -147,6 +147,9 @@
     <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_transfer_function_loader.h">
       <Filter>Transfer function</Filter>
     </ClInclude>
+    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_brick_info_calculator.h">
+      <Filter>Brick</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_entry_exit_points.cpp">
@@ -168,9 +171,6 @@
       <Filter>Entry exit points</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_pool.cpp">
-      <Filter>Brick</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_info_generator.cpp">
       <Filter>Brick</Filter>
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_camera_calculator.cpp">
@@ -247,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="..\MedImgRenderAlgorithm\mi_transfer_function_loader.cpp">
       <Filter>Transfer function</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MedImgRenderAlgorithm\mi_brick_info_calculator.cpp">
+      <Filter>Brick</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +333,15 @@
     </None>
     <None Include="..\MedImgRenderAlgorithm\Shader\shader_config">
       <Filter>Shader</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\brick_info_cal_mask.glsl">
+      <Filter>Shader\Brick info</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\brick_info_cal_utils.glsl">
+      <Filter>Shader\Brick info</Filter>
+    </None>
+    <None Include="..\MedImgRenderAlgorithm\Shader\brick_info_cal_volume.glsl">
+      <Filter>Shader\Brick info</Filter>
     </None>
   </ItemGroup>
 </Project>

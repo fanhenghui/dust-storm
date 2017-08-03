@@ -30,6 +30,8 @@ public:
 
     void load(GLsizei size, const void* data, GLenum usage);
 
+    void download(GLsizei size ,void* data);
+
 private:
     GLenum _target;
     unsigned int _buffer_id;

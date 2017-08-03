@@ -53,21 +53,16 @@ public:
 
     //Volume & mask texture/array
     void set_volume_data(std::shared_ptr<ImageData> image_data);
-    void set_mask_data(std::shared_ptr<ImageData> image_data);
-    void set_volume_data_texture(std::vector<GLTexture3DPtr> volume_textures);
-    void set_mask_data_texture(std::vector<GLTexture3DPtr> mask_textures);
-
     std::shared_ptr<ImageData> get_volume_data();
+
+    void set_mask_data(std::shared_ptr<ImageData> image_data);
+    std::shared_ptr<ImageData> get_mask_data();
+
+    void set_volume_data_texture(std::vector<GLTexture3DPtr> volume_textures);
     std::vector<GLTexture3DPtr> get_volume_data_texture( );
 
+    void set_mask_data_texture(std::vector<GLTexture3DPtr> mask_textures);
     std::vector<GLTexture3DPtr> get_mask_data_texture( );
-
-    //Brick acceleration
-    void set_brick_size(unsigned int brick_size);
-    void set_brick_expand(unsigned int brick_expand);
-    void set_brick_corner(BrickCorner* brick_corner_array);
-    void set_volume_brick_info(VolumeBrickInfo* volume_brick_info_array);
-    void set_mask_brick_info(MaskBrickInfo* mask_brick_info_array);//Here don't need label visibility status , just set current info
 
     //Entry exit points
     void set_entry_exit_points(std::shared_ptr<EntryExitPoints> entry_exit_points);
@@ -159,13 +154,6 @@ protected:
 
     std::shared_ptr<ImageData> _mask_data;
     std::vector<GLTexture3DPtr> _mask_textures;
-
-    //Brick acceleration
-    BrickCorner* _brick_corner_array;
-    VolumeBrickInfo* _volume_brick_info_array;
-    MaskBrickInfo* _mask_brick_info_array;
-    unsigned int _brick_size;
-    unsigned int _brick_expand;
 
     //Entry exit points
     std::shared_ptr<EntryExitPoints> _entry_exit_points;

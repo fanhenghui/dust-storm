@@ -49,6 +49,12 @@ void GLResourceManager<ResourceType>::remove_object(UIDType uid)
 }
 
 template<class ResourceType>
+void GLResourceManager<ResourceType>::remove_object(std::shared_ptr<ResourceType> obj)
+{
+    this->remove_object(obj->get_uid());
+}
+
+template<class ResourceType>
 std::shared_ptr<ResourceType> GLResourceManager<ResourceType>::get_object(UIDType uid)
 {
     boost::unique_lock<boost::mutex> locker(_mutex);

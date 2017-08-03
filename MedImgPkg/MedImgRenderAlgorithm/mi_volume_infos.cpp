@@ -6,12 +6,11 @@
 #include "MedImgIO/mi_image_data_header.h"
 
 #include "MedImgGLResource/mi_gl_texture_3d.h"
-#include "MedImgGLResource/mi_gl_buffer.h"
 #include "MedImgGLResource/mi_gl_resource_manager_container.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_camera_calculator.h"
-#include "mi_brick_info_generator.h"
+#include "mi_brick_info_calculator.h"
 #include "mi_brick_pool.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -33,7 +32,7 @@ namespace
 
 VolumeInfos::VolumeInfos():_volume_dirty(false),_mask_dirty(false)
 {
-
+    _brick_pool.reset(new BrickPool(16,2));
 }
 
 VolumeInfos::~VolumeInfos()
@@ -48,27 +47,19 @@ void VolumeInfos::finialize()
     {
         for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
         {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object(*it);
         }
         _volume_textures.clear();
-    }
-
-    if (_volume_brick_info_buffer)
-    {
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
-        _volume_brick_info_buffer.reset();
     }
 
     if (!_mask_textures.empty())
     {
         for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
         {
-            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object(*it);
         }
         _mask_textures.clear();
     }
-
-    // TODO release mask brick info
 }
 
 void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
@@ -85,14 +76,9 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
         {
             for (auto it = _volume_textures.begin() ; it != _volume_textures.end() ; ++it)
             {
-                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object(*it);
             }
             _volume_textures.clear();
-        }
-        if (_volume_brick_info_buffer)
-        {
-            GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(_volume_brick_info_buffer->get_uid());
-            _volume_brick_info_buffer.reset();
         }
 
         //create texture
@@ -109,7 +95,9 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data)
         _volume_textures.resize(1);
         _volume_textures[0] = tex;
 
-        //TODO create brick pool
+        //brick pool
+        _brick_pool->set_volume(_volume_data);
+        _brick_pool->set_volume_texture(_volume_textures[0]);
 
         //////////////////////////////////////////////////////////////////////////
         //Create camera calculator
@@ -138,7 +126,7 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
         {
             for (auto it = _mask_textures.begin() ; it != _mask_textures.end() ; ++it)
             {
-                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object((*it)->get_uid());
+                GLResourceManagerContainer::instance()->get_texture_3d_manager()->remove_object(*it);
             }
             _mask_textures.clear();
         }
@@ -158,7 +146,9 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data)
         _mask_textures.resize(1);
         _mask_textures[0] = tex;
 
-        //TODO initialize brick pool mask part
+        //brick pool
+        _brick_pool->set_mask(_mask_data);
+        _brick_pool->set_mask_texture(_mask_textures[0]);
     }
     catch (const Exception& e)
     {
@@ -183,16 +173,6 @@ std::vector<GLTexture3DPtr> VolumeInfos::get_mask_texture()
     return _mask_textures;
 }
 
-GLBufferPtr VolumeInfos::get_volume_brick_info_buffer()
-{
-    return _volume_brick_info_buffer;
-}
-
-//GLBufferPtr VolumeInfos::GetMaskBrickInfoBuffer(const std::vector<unsigned char>& vis_labels)
-//{
-//    //TODO check dirty
-//}
-
 std::shared_ptr<ImageData> VolumeInfos::get_volume()
 {
     return _volume_data;
@@ -203,19 +183,19 @@ std::shared_ptr<ImageData> VolumeInfos::get_mask()
     return _mask_data;
 }
 
-BrickCorner* VolumeInfos::get_brick_corner()
-{
-    return _brick_pool->get_brick_corner();
-}
-
-VolumeBrickInfo* VolumeInfos::get_volume_brick_info()
+VolumeBrickInfo* VolumeInfos::get_volume_brick_info() const
 {
     return _brick_pool->get_volume_brick_info();
 }
 
-MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>& vis_labels)
+MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const
 {
     return _brick_pool->get_mask_brick_info(vis_labels);
+}
+
+const BrickGeometry& VolumeInfos::get_brick_geometry() const
+{
+    return _brick_pool->get_brick_geometry();
 }
 
 void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed /*= true*/)
@@ -333,6 +313,11 @@ void VolumeInfos::refresh_upload_volume_i()
         tex->load(internal_format ,_volume_data->_dim[0] , _volume_data->_dim[1] , _volume_data->_dim[2] , format, type , _volume_data->get_pixel_pointer());
     }
     tex->unbind();
+
+    _brick_pool->calculate_brick_geometry();
+    _brick_pool->calculate_volume_brick_info();
+    //Test
+    _brick_pool->write_volume_brick_info("D:/temp/volume_brick_info.txt");
     CHECK_GL_ERROR;
 }
 

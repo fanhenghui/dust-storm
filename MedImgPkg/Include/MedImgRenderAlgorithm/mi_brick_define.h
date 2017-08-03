@@ -49,12 +49,6 @@ struct BrickGeometry
 
 };
 
-/// \ Brick corner image coordinate
-struct BrickCorner
-{
-    unsigned int min[3];
-};
-
 /// \ Brick info
 struct VolumeBrickInfo
 {
@@ -96,8 +90,14 @@ struct LabelKey
         key = label;
     }
 
-    std::vector<unsigned char> ExtractLabels() const
+    std::vector<unsigned char> extract_labels() const
     {
+        return LabelKey::extract_labels(*this);
+    }
+
+    static std::vector<unsigned char> extract_labels(const LabelKey& label_key)
+    {
+        const std::string& key = label_key.key;
         if (key == "Empty")
         {
             return std::vector<unsigned char>();
@@ -120,6 +120,8 @@ struct LabelKey
                     tmp.clear();
                 }
             }
+
+            return labels;
         }
     }
 
@@ -128,6 +130,7 @@ struct LabelKey
         return this->key < lk.key;
     }
 };
+
 
 struct BrickDistance
 {

@@ -30,17 +30,12 @@ _shading_mode(SHADING_NONE),
 _color_inverse_mode(COLOR_INVERSE_DISABLE),
 _mask_overlay_mode(MASK_OVERLAY_DISABLE),
 _strategy(CPU_BASE),
-_brick_corner_array(nullptr),
-_volume_brick_info_array(nullptr),
-_mask_brick_info_array(nullptr),
-_brick_size(32),
-_brick_expand(2),
 _test_code(0)
 {
-    _ambient_color[0] = 1.0;
-    _ambient_color[1] = 1.0;
-    _ambient_color[2] = 1.0;
-    _ambient_color[3] = 0.3;
+    _ambient_color[0] = 1.0f;
+    _ambient_color[1] = 1.0f;
+    _ambient_color[2] = 1.0f;
+    _ambient_color[3] = 0.3f;
 }
 
 RayCaster::~RayCaster()
@@ -284,34 +279,14 @@ void RayCaster::set_strategy(RayCastingStrategy strategy)
     _strategy = strategy;
 }
 
-void RayCaster::set_brick_size(unsigned int brick_size)
-{
-    _brick_size = brick_size;
-}
-
-void RayCaster::set_brick_expand(unsigned int brick_expand)
-{
-    _brick_expand = brick_expand;
-}
-
-void RayCaster::set_brick_corner(BrickCorner* brick_corner_array)
-{
-    _brick_corner_array = brick_corner_array;
-}
-
-void RayCaster::set_mask_brick_info(MaskBrickInfo* mask_brick_info_array)
-{
-    _mask_brick_info_array = mask_brick_info_array;
-}
-
-void RayCaster::set_volume_brick_info(VolumeBrickInfo* volume_brick_info_array)
-{
-    _volume_brick_info_array = volume_brick_info_array;
-}
-
 std::shared_ptr<ImageData> RayCaster::get_volume_data()
 {
     return _volume_data;
+}
+
+std::shared_ptr<ImageData> RayCaster::get_mask_data()
+{
+    return _mask_data;
 }
 
 std::vector<GLTexture3DPtr> RayCaster::get_volume_data_texture()

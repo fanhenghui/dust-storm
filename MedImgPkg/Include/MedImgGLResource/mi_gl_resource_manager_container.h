@@ -97,6 +97,8 @@ class GLObjectShieldBase
 public:
     GLObjectShieldBase() {};
     virtual ~GLObjectShieldBase() {};
+
+    virtual bool shield(std::shared_ptr<GLObject> obj) = 0;
 };
 
 template<class ResourceType>
@@ -107,13 +109,23 @@ public:
     {
     };
 
-    ~GLObjectShield()
+    virtual ~GLObjectShield()
     {
         if (_obj)
         {
             GLResourceManagerContainer::instance()->get_resource_manager<ResourceType>()->remove_object(_obj->get_uid());
         }
     };
+
+    virtual bool shield(std::shared_ptr<GLObject> obj)
+    {
+        if (!_obj)
+        {
+            return false;
+        }
+        return obj == _obj;
+    }
+
 private:
     std::shared_ptr<ResourceType> _obj;
 };
@@ -136,6 +148,19 @@ public:
     void add_shield(std::shared_ptr<ResourceType> obj)
     {
         _shields.push_back(new GLObjectShield<ResourceType>(obj));
+    }
+
+    template<class ResourceType>
+    void remove_shield(std::shared_ptr<ResourceType> obj)
+    {
+        for (auto it = _shields.begin() ; it != _shields.end() ; ++it)
+        {
+            if ((*it)->shield(obj) )
+            {
+                _shields.erase(it);
+                break;
+            }
+        }
     }
 
 private:

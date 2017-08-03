@@ -7,6 +7,11 @@ EncoderItem = mpr_entry_exit_points.glsl S_MPR_ENTRY_EXIT_POINTS_COMP
 EncoderItem = vr_entry_exit_points.vert S_VR_ENTRY_EXIT_POINTS_VERTEX
 EncoderItem = vr_entry_exit_points.frag S_VR_ENTRY_EXIT_POINTS_FRAG
 
+//Brick info calculator
+EncoderItem = brick_info_cal_volume.glsl S_BRICK_INFO_CAL_VOLUME
+EncoderItem = brick_info_cal_mask.glsl S_BRICK_INFO_CAL_MASK
+EncoderItem = brick_info_cal_utils.glsl S_BRICK_INFO_CAL_UTILS
+
 //GPU ray caster
 //1 Main
 EncoderItem = rc_main.vert S_RC_MAIN_VERTEX
