@@ -183,21 +183,6 @@ std::shared_ptr<ImageData> VolumeInfos::get_mask()
     return _mask_data;
 }
 
-VolumeBrickInfo* VolumeInfos::get_volume_brick_info() const
-{
-    return _brick_pool->get_volume_brick_info();
-}
-
-MaskBrickInfo* VolumeInfos::get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const
-{
-    return _brick_pool->get_mask_brick_info(vis_labels);
-}
-
-const BrickGeometry& VolumeInfos::get_brick_geometry() const
-{
-    return _brick_pool->get_brick_geometry();
-}
-
 void VolumeInfos::update_mask(const unsigned int (&begin)[3] , const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed /*= true*/)
 {
     //update mask CPU
@@ -327,6 +312,11 @@ void VolumeInfos::refresh_upload_volume_i()
 std::shared_ptr<ImageDataHeader> VolumeInfos::get_data_header()
 {
     return _data_header;
+}
+
+std::shared_ptr<BrickPool> VolumeInfos::get_brick_pool()
+{
+    return _brick_pool;
 }
 
 std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator()

@@ -61,7 +61,7 @@ namespace
     int _height = 1024;
     int _iButton = -1;
     Point2 _ptPre;
-    int _iTestCode = 0;
+    int _iTestCode = 1;
 
     std::vector<std::string> GetFiles()
     {
@@ -114,7 +114,8 @@ namespace
         _scene->set_interpolation_mode(LINEAR);
         _scene->set_shading_mode(SHADING_NONE);
 
-        _scene->set_proxy_geometry(PG_CUBE);
+        //_scene->set_proxy_geometry(PG_CUBE);
+        _scene->set_proxy_geometry(PG_BRICKS);
         _scene->set_test_code(_iTestCode);
         _scene->initialize();
 

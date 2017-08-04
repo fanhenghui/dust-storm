@@ -26,6 +26,8 @@ public:
 private:
     bool need_brick_filtering_i();
 
+    void update_vertex_color_i();
+
     void brick_flitering_mask_i();
 
     void brick_filtering_non_mask_i();
@@ -41,6 +43,8 @@ private:
     std::weak_ptr<VREntryExitPoints> _vr_entry_exit_points;
 
     unsigned int _draw_element_count;
+    std::unique_ptr<float[]> _cur_vertex_array;
+    std::unique_ptr<float[]> _cur_color_array;
 
     //cache
     AABB _last_aabb;

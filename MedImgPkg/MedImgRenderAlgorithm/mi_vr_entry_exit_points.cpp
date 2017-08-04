@@ -61,8 +61,9 @@ void VREntryExitPoints::initialize()
          _proxy_geo_cube->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));
          _proxy_geo_cube->initialize();
 
-         /*_proxy_geo_brick.reset(new ProxyGeometryBrick);
-         _proxy_geo_brick->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));*/
+         _proxy_geo_brick.reset(new ProxyGeometryBrick);
+         _proxy_geo_brick->set_vr_entry_exit_poitns(std::dynamic_pointer_cast<VREntryExitPoints>(shared_from_this()));
+         _proxy_geo_brick->initialize();
 
          _res_shield.add_shield<GLFBO>(_gl_fbo);
          _res_shield.add_shield<GLTexture2D>(_gl_depth_texture);
@@ -144,7 +145,7 @@ void VREntryExitPoints::calculate_entry_exit_points()
     }
     else if (_proxy_geometry == PG_BRICKS)
     {
-        //_proxy_geo_brick->calculate_entry_exit_points();
+        _proxy_geo_brick->calculate_entry_exit_points();
     }
 }
 

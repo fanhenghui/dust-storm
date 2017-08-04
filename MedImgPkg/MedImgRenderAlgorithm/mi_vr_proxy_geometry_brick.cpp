@@ -184,31 +184,68 @@ bool ProxyGeometryBrick::need_brick_filtering_i()
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
     bool no_changed = true;
-    if (_last_aabb != entry_exit_points->_aabb)//TODO need calculate clipping vertex/color value
+    if (_last_aabb != entry_exit_points->_aabb)
     {
+        update_vertex_color_i();
         _last_aabb = entry_exit_points->_aabb;
-        no_changed |= false;
+        no_changed &= false;
     }
 
     if (_last_window_levels != entry_exit_points->_window_levels)
     {
         _last_window_levels = entry_exit_points->_window_levels;
-        no_changed |= false;
+        no_changed &= false;
     }
 
     if (_last_vis_labels != entry_exit_points->_vis_labels)
     {
         _last_vis_labels = entry_exit_points->_vis_labels;
-        no_changed |= false;
+        no_changed &= false;
     }
 
     if (_last_brick_filter_items != entry_exit_points->_brick_filter_items)
     {
         _last_brick_filter_items = entry_exit_points->_brick_filter_items;
-        no_changed |= false;
+        no_changed &= false;
     }
 
     return !no_changed;
+}
+
+void ProxyGeometryBrick::update_vertex_color_i()
+{
+    std::shared_ptr<VREntryExitPoints> entry_exit_points = _vr_entry_exit_points.lock();
+    RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
+
+     const std::shared_ptr<BrickPool>& brick_pool = entry_exit_points->_brick_pool;
+     const BrickGeometry& brick_geometry = brick_pool->get_brick_geometry();
+
+    std::shared_ptr<ImageData> volume = entry_exit_points->_volume_data;
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume);
+
+    if (nullptr == _cur_vertex_array || nullptr == _cur_color_array)
+    {
+        _cur_vertex_array.reset(new float[brick_geometry.vertex_count*3]);
+        _cur_color_array.reset(new float[brick_geometry.vertex_count*4]);
+    }
+
+    AABB aabb_wv;
+    aabb_wv._min = Point3::S_ZERO_POINT;
+    aabb_wv._max = Point3(volume->_dim[0] , volume->_dim[1] , volume->_dim[2]);
+    if (entry_exit_points->_aabb == aabb_wv)
+    {
+        memcpy(_cur_vertex_array.get() , brick_geometry.vertex_array , brick_geometry.vertex_count*3*sizeof(float));
+        memcpy(_cur_color_array.get() , brick_geometry.color_array , brick_geometry.vertex_count*4*sizeof(float));
+    }
+    else
+    {
+        brick_pool->get_clipping_brick_geometry(entry_exit_points->_aabb , _cur_vertex_array.get() , _cur_color_array.get());
+    }
+
+    _gl_vertex_buffer->bind();
+    _gl_vertex_buffer->load(brick_geometry.vertex_count*3*sizeof(float) , _cur_vertex_array.get() , GL_STATIC_DRAW);
+    _gl_color_buffer->bind();
+    _gl_color_buffer->load(brick_geometry.vertex_count*4*sizeof(float) , _cur_color_array.get() , GL_STATIC_DRAW);
 }
 
 void ProxyGeometryBrick::brick_filtering_non_mask_i()
@@ -270,7 +307,6 @@ void ProxyGeometryBrick::brick_filtering_non_mask_i()
 
     _gl_element_buffer->bind();
     _gl_element_buffer->load(sizeof(unsigned int)*_draw_element_count , ele_idx_array, GL_DYNAMIC_DRAW);
-    _gl_element_buffer->unbind();
 }
 
 void ProxyGeometryBrick::brick_flitering_mask_i()

@@ -36,10 +36,7 @@ public:
     std::shared_ptr<ImageData> get_volume();
     std::shared_ptr<ImageData> get_mask();
     std::shared_ptr<ImageDataHeader> get_data_header();
-
-    VolumeBrickInfo* get_volume_brick_info() const;
-    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const;
-    const BrickGeometry& get_brick_geometry() const;
+    std::shared_ptr<BrickPool> get_brick_pool();
 
     //update(should update to CPU and GPU)
     void update_mask(const unsigned int (&begin)[3] ,const unsigned int (&end)[3] , unsigned char* data_updated , bool has_data_array_changed = true);
@@ -57,7 +54,7 @@ private:
     std::vector<GLTexture3DPtr> _volume_textures;//P.S here use vector for separate volume later
     std::vector<GLTexture3DPtr> _mask_textures;
 
-    std::unique_ptr<BrickPool> _brick_pool;
+    std::shared_ptr<BrickPool> _brick_pool;
 
     std::shared_ptr<CameraCalculator> _camera_calculator;
 

@@ -24,6 +24,9 @@ public:
 
     virtual void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
 
+    virtual void set_window_level(float ww , float wl , unsigned char label);
+    virtual void set_global_window_level(float ww , float wl);
+
     void set_bounding_box(const AABB& aabb);
 
     void set_clipping_plane(std::vector<Plane> planes);
@@ -33,6 +36,7 @@ public:
     void set_proxy_geometry(ProxyGeometry pg_type);
 
 protected:
+    virtual void pre_render_i();
 private:
 };
 

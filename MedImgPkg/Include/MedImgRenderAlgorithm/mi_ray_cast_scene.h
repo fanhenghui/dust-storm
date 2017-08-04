@@ -49,8 +49,8 @@ public:
 
     //Window level parameter ( unregulated)
     // EG: CT modality , the unit is HU
-    void set_window_level(float ww , float wl , unsigned char label);
-    void set_global_window_level(float ww , float wl);
+    virtual void set_window_level(float ww , float wl , unsigned char label);
+    virtual void set_global_window_level(float ww , float wl);
     void get_global_window_level(float& ww , float& wl) const;
 
     //Ray casting mode parameter
