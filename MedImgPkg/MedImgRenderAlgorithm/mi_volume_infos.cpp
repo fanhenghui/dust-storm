@@ -276,6 +276,8 @@ void VolumeInfos::refresh_upload_mask_i()
     tex->unbind();
     CHECK_GL_ERROR;
 
+    _mask_dirty = false;
+
 }
 
 void VolumeInfos::refresh_upload_volume_i()
@@ -316,6 +318,8 @@ void VolumeInfos::refresh_upload_volume_i()
 
     _brick_pool->calculate_brick_geometry();
     _brick_pool->calculate_volume_brick_info();
+
+    _volume_dirty = false;
 
     CHECK_GL_ERROR;
 }
