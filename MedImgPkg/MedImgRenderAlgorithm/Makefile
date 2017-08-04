@@ -16,7 +16,7 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_brick_info_generator.o mi_brick_pool.o mi_mask_label_store.o \
+OBJS = mi_brick_info_calculator.o mi_brick_pool.o mi_mask_label_store.o \
 mi_camera_calculator.o  mi_camera_interactor.o \
 mi_color_transfer_function.o mi_opacity_transfer_function.o mi_transfer_function_loader.o \
 mi_entry_exit_points.o mi_mpr_entry_exit_points.o mi_vr_entry_exit_points.o mi_vr_proxy_geometry_cube.o \
@@ -60,7 +60,7 @@ mi_scene_base.o: $(EXPORT_HEADER) mi_scene_base.h mi_scene_base.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_scene_base.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_volume_infos.o: $(EXPORT_HEADER) mi_volume_infos.h mi_volume_infos.cpp \
-mi_camera_calculator.o mi_brick_info_generator.o mi_brick_pool.o 
+mi_camera_calculator.o mi_brick_info_calculator.o mi_brick_pool.o 
 	$(CC) -c -fPIC $(CFLAGS) mi_volume_infos.cpp $(ADDITINAL_INCLUDE_DIR)
 
 #Ray casting
@@ -149,11 +149,11 @@ mi_camera_calculator.o: $(EXPORT_HEADER) mi_camera_calculator.h mi_camera_calcul
 
 #Brick related
 mi_brick_pool.o: $(EXPORT_HEADER) mi_brick_pool.h mi_brick_pool.cpp \
-mi_brick_define.h mi_brick_info_generator.o
+mi_brick_define.h mi_brick_info_calculator.o	
 	$(CC) -c -fPIC $(CFLAGS) mi_brick_pool.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_brick_info_generator.o: $(EXPORT_HEADER) mi_brick_info_generator.h mi_brick_info_generator.cpp mi_brick_define.h
-	$(CC) -c -fPIC $(CFLAGS) mi_brick_info_generator.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_brick_info_calculator.o: $(EXPORT_HEADER) mi_brick_info_calculator.h mi_brick_info_calculator.cpp mi_brick_define.h
+	$(CC) -c -fPIC $(CFLAGS) mi_brick_info_calculator.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_mask_label_store.o: $(EXPORT_HEADER) mi_mask_label_store.h mi_mask_label_store.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_mask_label_store.cpp $(ADDITINAL_INCLUDE_DIR)	

@@ -158,6 +158,10 @@ namespace
         _scene->set_material(material , 0);
         _scene->set_window_level(ww , wl , 0);
         _ww = ww; _wl = wl;
+
+        _scene->set_composite_mode(COMPOSITE_DVR);
+        _scene->set_shading_mode(SHADING_PHONG);
+
     }
 
     void Display()

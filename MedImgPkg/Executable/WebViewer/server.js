@@ -183,10 +183,10 @@ io.on("connection", function(socket) {
         console.log("path: " + "/tmp/app." + obj.username);
 
         //TODO Test 自己起C++ BE
-        const out = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
-        const err = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
-        var worker = child_process.spawn('/home/wr/program/git/dust-storm/MedImgPkg/bin/review_server', ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out, err] });
-        onlineLogicProcessID[obj.userid] = worker;
+        // const out = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
+        // const err = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
+        // var worker = child_process.spawn('/home/wr/program/git/dust-storm/MedImgPkg/bin/review_server', ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out, err] });
+        // onlineLogicProcessID[obj.userid] = worker;
 
         console.log("<><><><><><> logining success <><><><><><>");
 
@@ -289,7 +289,7 @@ io.on("connection", function(socket) {
 
 
 
-var server = http.listen(8080, function() {
+var server = http.listen(8000, function() {
     var address = server.address();
     console.log("address is ", util.inspect(address));
 });

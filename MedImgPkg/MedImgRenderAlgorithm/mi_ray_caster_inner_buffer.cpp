@@ -77,7 +77,7 @@ struct RayCasterInnerBuffer::GLResource
 RayCasterInnerBuffer::RayCasterInnerBuffer():_inner_resource(new GLResource()),_label_level(L_8)
 {
     memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
-    _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*4*4]);
+    _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*sizeof(Material)]);
 }
 
 RayCasterInnerBuffer::~RayCasterInnerBuffer()
@@ -262,7 +262,7 @@ void RayCasterInnerBuffer::set_mask_label_level(LabelLevel eLevel)
     {
         _label_level = eLevel;
         memset(_inner_resource->dirty_flag , 1 , sizeof(bool)*TYPE_END);
-        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*sizeof(float)*9]);
+        _shared_buffer_array.reset(new char[static_cast<int>(_label_level)*sizeof(Material)]);
     }
 }
 

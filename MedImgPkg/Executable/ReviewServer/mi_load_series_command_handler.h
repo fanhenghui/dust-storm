@@ -8,6 +8,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class ReviewController;
+class PACSCommunicator;
 class LoadSeriesCommandHandler : public ICommandHandler
 {
 public:
@@ -19,6 +20,7 @@ public:
 
 private:
     std::weak_ptr<ReviewController> _controller;
+    std::unique_ptr<PACSCommunicator> _pacs_communicator;
 
 };
 

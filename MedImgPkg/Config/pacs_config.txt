@@ -1,0 +1,6 @@
+Client_Port = 11115
+Client_Title = SelfSCU
+Server_Host = 172.20.70.27
+Server_Port = 11112
+Server_Title = DCM4CHEE
+Cache_Path = "/home/wr/data/cache"

@@ -5,6 +5,9 @@
 #include "MedImgIO/mi_image_data.h"
 #include "MedImgIO/mi_image_data_header.h"
 
+#include "MedImgIO/mi_pacs_communicator.h"
+#include "MedImgIO/mi_worklist_info.h"
+
 #include "MedImgGLResource/mi_gl_context.h"
 
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
@@ -20,7 +23,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-LoadSeriesCommandHandler::LoadSeriesCommandHandler(std::shared_ptr<ReviewController> controller):_controller(controller)
+LoadSeriesCommandHandler::LoadSeriesCommandHandler(std::shared_ptr<ReviewController> controller):
+    _controller(controller),_pacs_communicator(new PACSCommunicator())
 {
 
 }
@@ -32,7 +36,7 @@ LoadSeriesCommandHandler::~LoadSeriesCommandHandler()
 
 int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
 {
-
+    std::cout << "IN load serise\n";
     //Test
     //目前只能load一次
     static bool load = false;
@@ -59,9 +63,33 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , ch
     const unsigned int op_id = ipcheader._msg_info1;
 
     //1 load series
-    const std::string series_path("/home/wr/data/AB_CTA_01/");
-    std::vector<std::string> dcm_files;
+//#define LOAD_LOCAL
+// #define LOAD_PACS
 
+// #ifdef LOAD_LOCAL
+//     const std::string series_path("/home/wr/data/AB_CTA_01/");
+// #else
+    if(!_pacs_communicator->initialize("/home/wr/program/git/dust-storm/MedImgPkg/Config/pacs_config.txt"))
+    {
+        std::cout << "connect PACS failed!\n";
+    }
+    if(!_pacs_communicator->populate_whole_work_list())
+    {
+        std::cout << "get work list failed!\n";
+    }
+    const std::vector<WorkListInfo>& ls = _pacs_communicator->get_work_list();
+    std::cout << "worklist : \n";
+    for (auto it=ls.begin(); it != ls.end(); ++it)
+    {
+        std::cout << it->GetStudyInsUID() << "   " << it->GetSeriesInsUID() << std::endl;
+    }
+    std::cout << "choose first one : " << ls[0].GetSeriesInsUID();
+    const std::string series_path = _pacs_communicator->fetch_dicom(ls[0].GetSeriesInsUID());
+    std::cout << "path is : " << series_path << std::endl;
+
+//#endif
+
+    std::vector<std::string> dcm_files;
     FileUtil::get_all_file_recursion(series_path , std::vector<std::string>() , dcm_files);
 
     if(dcm_files.empty()){
