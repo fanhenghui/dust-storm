@@ -99,7 +99,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib/x86;../../Lib/x86/Ext/boost;../../Lib/x86/Ext/dcmtk;../../Lib/x86/Ext/mbedtls;../../Lib/x86/Ext/openslide;../../Lib/x86/Ext/pugixml;../../Lib/x86/Ext/opencv;../../Lib/x86/Ext/mysql;../../Lib/x86/Ext/gl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MultiResolutionImageInterface_d.lib;Annotation_d.lib;Core_d.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MultiResolutionImageInterface_d.lib;Annotation_d.lib;Core_d.lib;opengl32.lib;glew32.lib;freeglut.lib;libjpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,7 +116,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib/x64;../../Lib/x64/Ext/boost;../../Lib/x64/Ext/dcmtk;../../Lib/x64/Ext/mbedtls;../../Lib/x64/Ext/openslide;../../Lib/x64/Ext/pugixml;../../Lib/x64/Ext/opencv;../../Lib/x64/Ext/mysql;../../Lib/x64/Ext/gl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MultiResolutionImageInterface_d.lib;Annotation_d.lib;Core_d.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MultiResolutionImageInterface_d.lib;Annotation_d.lib;Core_d.lib;opengl32.lib;glew32.lib;freeglut.lib;libjpegd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +137,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib/x86;../../Lib/x86/Ext/boost;../../Lib/x86/Ext/dcmtk;../../Lib/x86/Ext/mbedtls;../../Lib/x86/Ext/openslide;../../Lib/x86/Ext/pugixml;../../Lib/x86/Ext/opencv;../../Lib/x86/Ext/mysql;../../Lib/x86/Ext/gl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MultiResolutionImageInterface.lib;Annotation.lib;Core.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MultiResolutionImageInterface.lib;Annotation.lib;Core.lib;opengl32.lib;glew32.lib;freeglut.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,7 +158,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../Lib/x64;../../Lib/x64/Ext/boost;../../Lib/x64/Ext/dcmtk;../../Lib/x64/Ext/mbedtls;../../Lib/x64/Ext/openslide;../../Lib/x64/Ext/pugixml;../../Lib/x64/Ext/opencv;../../Lib/x64/Ext/mysql;../../Lib/x64/Ext/gl;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MultiResolutionImageInterface.lib;Annotation.lib;Core.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MultiResolutionImageInterface.lib;Annotation.lib;Core.lib;opengl32.lib;glew32.lib;freeglut.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="arithmetic.h" />
     <ClInclude Include="connected_domain_analysis.h" />
+    <ClInclude Include="jpeg_parser.h" />
     <ClInclude Include="morphology.h" />
     <ClInclude Include="scan_line_analysis.h" />
     <ClInclude Include="segment_analysis.h" />

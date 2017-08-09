@@ -137,7 +137,7 @@ public:
         }
     }
 
-    std::vector<AABB<int>> get_connected_domain_aabb(unsigned int num_th)
+    std::vector<AABB<int>> get_connected_domain_aabb(unsigned int num_th, double border_ratio)
     {
         unsigned short* roi = _roi_cache.get();
 
@@ -178,8 +178,8 @@ public:
             }
         }
 
-        //Debug
-        write_raw("D:/temp/cd.raw", (char*)(_roi_cache.get()), _roi_dim[0] * _roi_dim[1] * 2);
+        //TODO Debug
+        //write_raw("D:/temp/cd.raw", (char*)(_roi_cache.get()), _roi_dim[0] * _roi_dim[1] * 2);
 
         //////////////////////////////////////////////////////////////////////////
         //Test
@@ -284,27 +284,38 @@ public:
         }
 
         std::vector<AABB<int>> aabbs;
+        int discard_border = 0;
         for (auto it = aabbs_set.begin(); it != aabbs_set.end(); ++it)
         {
+            double aabb_area = it->second.area();
+            double area = (double)tmp_cd[it->first];
+            if (area / aabb_area < border_ratio)
+            {
+                ++discard_border;
+                continue;
+            }
+
             //expand 1
-            if (it->second._min[0] > 1)
+            if (it->second._min[0] > 10)
             {
-                it->second._min[0] -= 1;
+                it->second._min[0] -= 10;
             }
-            if (it->second._min[1] > 1)
+            if (it->second._min[1] > 10)
             {
-                it->second._min[1] -= 1;
+                it->second._min[1] -= 10;
             }
-            if (it->second._max[0] <_roi_dim[0])
+            if (it->second._max[0] <_roi_dim[0]-11)
             {
-                it->second._max[0] += 1;
+                it->second._max[0] += 10;
             }
-            if (it->second._min[1] > _roi_dim[1])
+            if (it->second._min[1] > _roi_dim[1]-11)
             {
-                it->second._max[1] += 1;
+                it->second._max[1] += 10;
             }
             aabbs.push_back(it->second);
         }
+
+        std::cout << "Discard border aabb : " << discard_border << std::endl;
 
         return aabbs;
 

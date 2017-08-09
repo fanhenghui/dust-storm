@@ -35,5 +35,8 @@
     <ClInclude Include="morphology.h">
       <Filter>tools</Filter>
     </ClInclude>
+    <ClInclude Include="jpeg_parser.h">
+      <Filter>tools</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

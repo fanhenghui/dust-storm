@@ -45,9 +45,9 @@ public:
         }
     }
 
-    int area() const
+    double area() const
     {
-        return abs( (_max[1] - _min[1])*(_max[0] - _min[0]) );
+        return fabs( double(_max[1] - _min[1])*double(_max[0] - _min[0]) );
     }
 
     bool valid()const

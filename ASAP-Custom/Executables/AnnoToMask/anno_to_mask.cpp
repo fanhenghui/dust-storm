@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <list>
 
 #include "gl/glew.h"
 #include "gl/freeglut.h"
@@ -28,6 +29,7 @@
 #include "connected_domain_analysis.h"
 #include "segment_analysis.h"
 #include "morphology.h"
+#include "jpeg_parser.h"
 
 #include <time.h>
 
@@ -296,6 +298,101 @@ std::vector <AABB<int>> combine_aabb(const std::vector<AABB<int>>& aabbs , int s
     return c_aabbs;
 }
 
+bool op_less(const AABB<int>& l, const AABB<int>& r)
+{
+    return l.area() < r.area();
+}
+
+std::vector <AABB<int>> combine_aabb_sort(const std::vector<AABB<int>>& aabbs, int sensitive_border, double area_limit)
+{
+    std::vector<AABB<int>> c_aabbs;
+    for (int i = 0 ; i<aabbs.size() ; ++i)
+    {
+        c_aabbs.push_back(aabbs[i]);
+    }
+    std::sort(c_aabbs.begin(), c_aabbs.end(), op_less);
+
+    bool no_combine = false;
+    while (!no_combine)
+    {
+        no_combine = true;
+
+        for (int i = 0; i < (int)c_aabbs.size(); ++i)
+        {
+            for (int j = i + 1; j < (int)c_aabbs.size(); ++j)
+            {
+                AABB<int> com_aabb;
+                if (aabb_to_aabb_combine<int>(c_aabbs[i], c_aabbs[j], com_aabb))
+                {
+                    if (com_aabb.area() > area_limit)
+                    {
+                        continue;
+                    }
+
+                    std::vector<AABB<int>> new_aabbs;
+                    new_aabbs.push_back(com_aabb);
+                    for (int k = 0; k < (int)c_aabbs.size(); ++k)
+                    {
+                        if (k == i || k == j)
+                        {
+                            continue;
+                        }
+                        new_aabbs.push_back(c_aabbs[k]);
+                    }
+                    std::swap(c_aabbs, new_aabbs);
+                    std::sort(c_aabbs.begin(), c_aabbs.end(), op_less);
+                    no_combine = false;
+                    goto HAS_COMBINE;
+                }
+                else
+                {
+                    float c0[2] = {
+                        (c_aabbs[i]._min[0] + c_aabbs[i]._max[0])*0.5f,
+                        (c_aabbs[i]._min[1] + c_aabbs[i]._max[1])*0.5f };
+                    float c1[2] = {
+                        (c_aabbs[j]._min[0] + c_aabbs[j]._max[0])*0.5f,
+                        (c_aabbs[j]._min[1] + c_aabbs[j]._max[1])*0.5f };
+                    const float dis = sqrt((c0[0] - c1[0])*(c0[0] - c1[0]) + (c0[1] - c1[1])*(c0[1] - c1[1]));
+                    if (dis < (float)sensitive_border)
+                    {
+                        for (int q = 0; q < 2; ++q)
+                        {
+                            com_aabb._max[q] = (std::max)(c_aabbs[i]._max[q], c_aabbs[j]._max[q]);
+                            com_aabb._min[q] = (std::min)(c_aabbs[i]._min[q], c_aabbs[j]._min[q]);
+                        }
+
+                        if (com_aabb.area() > area_limit)
+                        {
+                            continue;
+                        }
+
+                        std::vector<AABB<int>> new_aabbs;
+                        new_aabbs.push_back(com_aabb);
+                        for (int k = 0; k < (int)c_aabbs.size(); ++k)
+                        {
+                            if (k == i || k == j)
+                            {
+                                continue;
+                            }
+                            new_aabbs.push_back(c_aabbs[k]);
+                        }
+                        std::swap(c_aabbs, new_aabbs);
+                        no_combine = false;
+                        goto HAS_COMBINE;
+                    }
+                }
+
+            }
+        }
+
+    HAS_COMBINE:;
+
+    }
+
+    return c_aabbs;
+
+}
+
 //std::vector <AABB<int>> expand_aabb(const std::vector<AABB<int>>& aabbs, int (&dim)[2] , double expand_ratio)
 //{
 //    std::vector<AABB<int>> ex_aabbs;
@@ -329,8 +426,8 @@ std::vector <AABB<int>> combine_aabb(const std::vector<AABB<int>>& aabbs , int s
 //    return ex_aabbs;
 //}
 
-std::vector<AABB<int>> cal_image_connected_domain_aabb(int(&dim)[2] , unsigned char* img_gray , std::vector<AABB<int>>c_aabb ,
-    int sensitive_cd_border, int filter_cd_th)
+ int get_image_connected_domain_aabb(int(&dim)[2] , unsigned char* img_gray , std::vector<AABB<int>>c_aabb ,
+    int sensitive_cd_border, int filter_cd_th , double cd_border_ratio , std::vector<AABB<int>>&  c_img_aabb)
 {
     //1 get mask
     SegmentAnalysis seg;
@@ -377,16 +474,31 @@ std::vector<AABB<int>> cal_image_connected_domain_aabb(int(&dim)[2] , unsigned c
     int roi_min[2] = { 0,0 };
     int roi_max[2] = {dim[0],dim[1]};
     cd.set_roi(roi_min, roi_max);
-    std::vector<AABB<int>> aabb = cd.get_connected_domain_aabb(filter_cd_th);
+    std::vector<AABB<int>> c_img_aabb_tmp = cd.get_connected_domain_aabb(filter_cd_th , cd_border_ratio);
 
-    std::vector<AABB<int>> c_img_aabb = combine_aabb(aabb, 1);
+    c_img_aabb = combine_aabb(c_img_aabb_tmp, sensitive_cd_border);
+    if ((double)c_img_aabb.size() / (double)c_img_aabb_tmp.size() < 0.2 || c_img_aabb.size() < 10)
+    {
+        //combine to much
+        LOG_OUT("WARNING : combine image connecetd domain disaster . the image may be bias . using trick way.")
+        c_img_aabb = combine_aabb_sort(c_img_aabb_tmp, sensitive_cd_border, dim[0] * dim[1] / 16.0);
+    }
 
-    c_img_aabb = aabb;
+    //check border removal failed
+    if (c_img_aabb.size() == 1)
+    {
+        if((c_img_aabb[0]._min[0] == 0 && c_img_aabb[0]._min[1] == 0) ||
+            (c_img_aabb[0]._max[0] == dim[0]-1 && c_img_aabb[0]._min[1] == dim[1]-1) )
+        {
+            LOG_OUT("ERROR : image border disaster")
+            return -1;
+        }
+    }
 
-    return c_img_aabb;
+    return 0;
 }
 
-int cal_extract_aabbs( const std::vector<AABB<int>>& anno_aabbs , const std::vector<AABB<int>>& c_aabbs , std::vector<AABB<int>>& img_cd_aabbs , std::vector<AABB<int>>& ext_aabbs)
+int get_extract_region_aabbs( const std::vector<AABB<int>>& anno_aabbs , const std::vector<AABB<int>>& c_aabbs , std::vector<AABB<int>>& img_cd_aabbs , std::vector<AABB<int>>& ext_aabbs)
 {
     ext_aabbs.clear();
     for (auto it = c_aabbs.begin() ; it != c_aabbs.end() ; ++it)
@@ -537,6 +649,12 @@ std::vector<Point> catmull_rom_to_bezier(const std::vector<Point>& pts)
         float d1 = sqrt(pow(p1.getX() - p0.getX(), 2) + pow(p1.getY() - p0.getY(), 2));
         float d2 = sqrt(pow(p2.getX() - p1.getX(), 2) + pow(p2.getY() - p1.getY(), 2));
         float d3 = sqrt(pow(p3.getX() - p2.getX(), 2) + pow(p3.getY() - p2.getY(), 2));
+        if (fabs(d1)< 1e-6 || fabs(d2)< 1e-6 || fabs(d3)< 1e-6)
+        {
+            bezier_pts.push_back(p2);
+            continue;
+        }
+
         float rd1 = sqrt(d1);
         float rd2 = sqrt(d2);
         float rd3 = sqrt(d3);
@@ -614,9 +732,10 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
             //////////////////////////////////////////////////////////////////////////
             //Image
             //TODO Here openslide interface result of other level is wrong ! TODO check
+            unsigned char* img_data = nullptr;
             if (level == 0)
             {
-                unsigned char* img_data = nullptr;
+                /*unsigned char* */img_data = nullptr;
                 img->getRawRegion(src_x0, src_y0, width, height, level, img_data);
                 if (img_data == nullptr)
                 {
@@ -626,12 +745,12 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
                     //return -1;
                 }
                 write_raw(name + std::string(".rbg"), (char*)img_data, width*height * 3);
-                delete[] img_data;
-                img_data = nullptr;
+                //delete[] img_data;
+                //img_data = nullptr;
             }
             else
             {
-                unsigned char* img_data = new unsigned char[width*height * 3];
+                /*unsigned char* */img_data = new unsigned char[width*height * 3];
                 if (0 != extract_image(raw_image_cur_level, dim[0], dim[1], src_x0, src_y0, width, height, img_data))
                 {
                     delete[] raw_image_cur_level;
@@ -642,8 +761,10 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
                 }
 
                 write_raw(name + std::string(".rbg"), (char*)img_data, width*height * 3);
-                delete[] img_data;
-                img_data = nullptr;
+                
+
+                /*delete[] img_data;
+                img_data = nullptr;*/
             }
 
             //////////////////////////////////////////////////////////////////////////
@@ -659,6 +780,10 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
                 {
                     typedef ScanLineAnalysis<unsigned char>::Pt2 PointS;
                     std::vector<Point>pts = anno->getCoordinates();
+                    if (pts.size() < 2)
+                    {
+                        continue;
+                    }
                     if (anno->getType() == Annotation::SPLINE)
                     {
                         pts = catmull_rom_to_bezier(pts);
@@ -669,13 +794,35 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
                     {
                         int coord_x = int(pts[jj].getX() / ratio) - src_x0;
                         int coord_y = int(pts[jj].getY() / ratio) - src_y0;
-                        if (coord_x < 0 || coord_y < 0)
+                        if (coord_x < -9 || coord_y < -9 || coord_x > width + 8 || coord_y > height + 8)
                         {
-                            LOG_OUT("ERROR : scan coordinate overflow!");
-                            error_flag -= 1; 
-                            continue;
-                            //return -1;
+                            LOG_OUT("WARNING : scan coordinate overflow more than 10 pixel!\n");
                         }
+                        if (coord_x< 0)
+                        {
+                            coord_x = 0;
+                        }
+                        if (coord_y < 0)
+                        {
+                            coord_y = 0;
+                        }
+                        if (coord_x > width-1)
+                        {
+                            coord_x = width - 1;
+                        }
+                        if (coord_y > height - 1)
+                        {
+                            coord_y = height - 1;
+                        }
+                        //if (coord_x < 0 || coord_y < 0)
+                        //{
+                        //    coord_x = 0;
+                        //    coord_y = 0;
+                        //    LOG_OUT("ERROR : scan coordinate overflow!");
+                        //    error_flag -= 1;
+                        //    continue;
+                        //    //return -1;
+                        //}
                         pts2.push_back(PointS(coord_x , coord_y));
                     }
                     ScanLineAnalysis<unsigned char> scan;
@@ -684,6 +831,43 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
                 }
             }
             write_raw(name + std::string(".mask"), (char*)mask, width*height);
+
+
+            //DEBUG ouput to check
+            if (level !=0 && level != img->getNumberOfLevels()-1)
+            {
+                std::unique_ptr<unsigned char[]> img_overlay_t(new unsigned char[width*height * 3]);
+                unsigned char* img_overlay = img_overlay_t.get();
+                for (int i = 0 ; i< width*height ; ++i)
+                {
+                    if (mask[i] == 0)
+                    {
+                        img_overlay[i * 3] = img_data[i * 3];
+                        img_overlay[i * 3+1] = img_data[i * 3+1];
+                        img_overlay[i * 3+2] = img_data[i * 3+2];
+                    }
+                    else
+                    {
+                        img_overlay[i * 3] = img_data[i * 3];
+                        img_overlay[i * 3+2] = img_data[i * 3+2];
+
+                        double g = 0.5*img_data[i * 3 + 1] + 255;
+                        if (g > 255.0)
+                        {
+                            g = 255.0;
+                        }
+                        img_overlay[i * 3 + 1] = (unsigned char)g;
+                    }
+                }
+                JpegParser::write_to_jpeg(name + std::string(".jpeg"), (char*)img_overlay, width, height);
+            }
+
+
+            if (img_data)
+            {
+                delete[] img_data;
+                img_data = nullptr;
+            }
 
         }
 
@@ -710,7 +894,7 @@ int extract_mask_image(MultiResolutionImage* img , std::vector<std::shared_ptr<A
 }
 
 int process_one_anno(const std::string& anno_file, const std::string& img_file,  const std::string& output_dir , const std::string& base_name , 
-    int sensitive_anno_border, int sensitive_cd_border, int filter_cd_th)
+    int sensitive_anno_border, int sensitive_cd_border, int filter_cd_th , double cd_border_ratio)
 {
     clock_t t0 = clock();
 
@@ -758,13 +942,18 @@ int process_one_anno(const std::string& anno_file, const std::string& img_file, 
 
     std::vector<AABB<int>> expand_aabbs;// = expand_aabb(combine_aabbs, pp_dim, expand_ratio);
 
-    std::vector<AABB<int>> img_cd_aabbs = cal_image_connected_domain_aabb(pp_dim, pp_img_gray , combine_aabbs , sensitive_cd_border , filter_cd_th);
+    std::vector<AABB<int>> img_cd_aabbs;
+    if (0 != get_image_connected_domain_aabb(pp_dim, pp_img_gray, combine_aabbs, sensitive_cd_border, filter_cd_th, cd_border_ratio, img_cd_aabbs))
+    {
+        LOG_OUT("ERROR : calculate image connected domain aabb failed!");
+        return -1;
+    }
 
     clock_t t4 = clock();
     //std::cout << "TIME : calculate image connected domain cost : " << (double)(t4 - t3) << " ms\n";
 
     std::vector<AABB<int>> extract_aabbs;
-    if (0 != cal_extract_aabbs(annos_aabbs, combine_aabbs, img_cd_aabbs, extract_aabbs))
+    if (0 != get_extract_region_aabbs(annos_aabbs, combine_aabbs, img_cd_aabbs, extract_aabbs))
     {
         LOG_OUT("ERROR : calculate extract aabb failed!");
         return -1;
@@ -830,7 +1019,8 @@ int anno_to_mask_image(
     const std::string& output_dir,
     int sensitive_anno_border, 
     int sensitive_cd_border,
-    int filter_cd_th)
+    int filter_cd_th,
+    double border_cd_ratio)
 {
     for (auto it = anno_files.begin(); it != anno_files.end(); ++it)
     {
@@ -850,7 +1040,7 @@ int anno_to_mask_image(
         if (!img_file.empty())
         {
             LOG_OUT("process : " + anno_base + "start.\n");
-            if (0 != process_one_anno(anno_file, img_file , output_dir , anno_base , sensitive_anno_border , sensitive_cd_border , filter_cd_th))
+            if (0 != process_one_anno(anno_file, img_file , output_dir , anno_base , sensitive_anno_border , sensitive_cd_border , filter_cd_th , border_cd_ratio))
             {
                 LOG_OUT("ERROR : annotation file : " + anno_file + std::string(" processing failed!"));
                 continue;
@@ -1103,8 +1293,9 @@ int main(int argc, char* argv[])
     std::string annotation_dir = image_dir;
     std::string output_dir = image_dir;
     int sensitive_anno_border = 50;
-    int sensitive_cd_border = 50;
+    int sensitive_cd_border = 20;
     int filter_cd_th = 50;
+    double cd_border_ratio = 0.3;
     bool vis = false;
 
     if (argc == 1)
@@ -1115,8 +1306,9 @@ int main(int argc, char* argv[])
         LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
         LOG_OUT("\t-output <path] : save mask root\n");
         LOG_OUT("\t-sens_anno : the distance between two annotation's aabb combine to one. default is 50 pixel in around 1024 image level \n");
-        LOG_OUT("\t-sens_cd : the distance between two image connected domain aabb combine to one. default is 50 pixel in around 1024 image level \n");
+        LOG_OUT("\t-sens_cd : the distance between two image connected domain aabb combine to one. default is 20 pixel in around 1024 image level \n");
         LOG_OUT("\t-filter_cd : the threshold of connected domain which be discard . default is 50 pixel in around 1024 image level \n");
+        LOG_OUT("\t-border_cd : the border ratio of connected domain's aabb(less than this value will be consider as border and discard). default is 0.3\n");
         LOG_OUT("\t-vis: if vis debug\n");
         return -1;
     }
@@ -1131,8 +1323,9 @@ int main(int argc, char* argv[])
                 LOG_OUT("\t-annotation <path> : annotation root(.xml)\n");
                 LOG_OUT("\t-output <path] : save mask root\n");
                 LOG_OUT("\t-sens_anno : the distance between two annotation's aabb combine to one. default is 50 pixel in around 1024 image level \n");
-                LOG_OUT("\t-sens_cd : the distance between two image connected domain aabb combine to one. default is 50 pixel in around 1024 image level \n");
+                LOG_OUT("\t-sens_cd : the distance between two image connected domain aabb combine to one. default is 20 pixel in around 1024 image level \n");
                 LOG_OUT("\t-filter_cd : the threshold of connected domain which be discard . default is 50 pixel in around 1024 image level \n");
+                LOG_OUT("\t-border_cd : the border ratio of connected domain's aabb(less than this value will be consider as border and discard). default is 0.3\n");
                 LOG_OUT("\t-vis: if vis debug\n");
                 return 0;
             }
@@ -1205,6 +1398,18 @@ int main(int argc, char* argv[])
                 ss >> filter_cd_th;
                 ++i;
             }
+            else if (std::string(argv[i]) == "-border_cd")
+            {
+                if (i + 1 > argc - 1)
+                {
+                    LOG_OUT("invalid arguments!\n");
+                    return -1;
+                }
+                std::string arg = std::string(argv[i + 1]);
+                std::stringstream ss(arg);
+                ss >> cd_border_ratio;
+                ++i;
+            }
             else if (std::string(argv[i]) == "-vis")
             {
                 vis = true;
@@ -1220,6 +1425,7 @@ int main(int argc, char* argv[])
     ss << "\tannotation sensitity : " << sensitive_anno_border << std::endl;
     ss << "\timage connected domain sensitity : " << sensitive_cd_border << std::endl;
     ss << "\timage connected filter threshold : " << filter_cd_th << std::endl;
+    ss << "\timage connexted border ratio : " << cd_border_ratio << std::endl;
     ss << "extracting >>>>>>\n";
     LOG_OUT(ss.str());
 
@@ -1258,7 +1464,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (0 != anno_to_mask_image(anno_files ,img_files, output_dir , sensitive_anno_border , sensitive_cd_border , filter_cd_th))
+    if (0 != anno_to_mask_image(anno_files ,img_files, output_dir , sensitive_anno_border , sensitive_cd_border , filter_cd_th , cd_border_ratio))
     {
         LOG_OUT("ERROR : annotation to mask image faild!");
         return -1;
