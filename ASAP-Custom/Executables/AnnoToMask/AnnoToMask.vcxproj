@@ -93,6 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../include;../../include/Ext;../../include/Ext/pugixml;../../include/Ext/opencv;../../include/Ext/opencv/3rdparty;../../include/Ext/opencv/3rdparty/libtiff;../../include/Ext/opencv/3rdparty/libjasper;../../include/Ext/mysql/Connector.c++;../../include/ImgProc/BasicFilters;../../include/io/;../../include/IO/MultiResolutionImageInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -109,6 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../include;../../include/Ext;../../include/Ext/pugixml;../../include/Ext/opencv;../../include/Ext/opencv/3rdparty;../../include/Ext/opencv/3rdparty/libtiff;../../include/Ext/opencv/3rdparty/libjasper;../../include/Ext/mysql/Connector.c++;../../include/ImgProc/BasicFilters;../../include/io/;../../include/IO/MultiResolutionImageInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +129,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../include;../../include/Ext;../../include/Ext/pugixml;../../include/Ext/opencv;../../include/Ext/opencv/3rdparty;../../include/Ext/opencv/3rdparty/libtiff;../../include/Ext/opencv/3rdparty/libjasper;../../include/Ext/mysql/Connector.c++;../../include/ImgProc/BasicFilters;../../include/io/;../../include/IO/MultiResolutionImageInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,6 +150,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../../include;../../include/Ext;../../include/Ext/pugixml;../../include/Ext/opencv;../../include/Ext/opencv/3rdparty;../../include/Ext/opencv/3rdparty/libtiff;../../include/Ext/opencv/3rdparty/libjasper;../../include/Ext/mysql/Connector.c++;../../include/ImgProc/BasicFilters;../../include/io/;../../include/IO/MultiResolutionImageInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

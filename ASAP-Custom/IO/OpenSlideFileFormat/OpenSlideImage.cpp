@@ -109,8 +109,8 @@ void* OpenSlideImage::readDataFromImage(const long long& startX, const long long
         return NULL;
     }
 
-    std::cout << "start X Y: " << startX << " " << startY << std::endl;
-    std::cout << "width X Y: " << width << " " << height << std::endl;
+    //std::cout << "start X Y: " << startX << " " << startY << std::endl;
+    //std::cout << "width X Y: " << width << " " << height << std::endl;
     boost::shared_lock<boost::shared_mutex> l(*_openCloseMutex);
     unsigned int* temp = new unsigned int[width*height];
     std::vector<unsigned long long> levelDims = this->getLevelDimensions(level);

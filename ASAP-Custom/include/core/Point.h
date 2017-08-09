@@ -10,6 +10,21 @@ public:
   inline float getY() const { return _y; };
   inline void  setX(const float& x) { _x = x; }
   inline void  setY(const float& y) { _y = y; }
+  inline const Point operator - (const Point& l) const
+  {
+      Point t;
+      t._x = this->_x - l._x;
+      t._y = this->_y - l._y;
+      return t;
+  };
+
+  inline const Point operator + (const Point& l) const
+  {
+      Point t;
+      t._x = this->_x + l._x;
+      t._y = this->_y + l._y;
+      return t;
+  };
 
 private:
 	float _x;

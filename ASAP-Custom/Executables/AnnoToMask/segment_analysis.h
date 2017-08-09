@@ -4,10 +4,26 @@
 #include <memory>
 #include <limits>
 #include <iostream>
+#include <stack>
 
 
 class SegmentAnalysis
 {
+public:
+    struct POS
+    {
+        int x;
+        int y;
+        POS()
+        {
+
+        }
+        POS(int xx, int yy) :x(xx), y(yy)
+        {
+
+        }
+    };
+
 public:
     unsigned char get_threshold_otus_low(unsigned char* img_gray, int width , int height , AABB<int> aabb)
     {
@@ -75,6 +91,52 @@ public:
             {
                 mask[i] = 1;
             }
+        }
+    }
+
+    void remove_border_9_n(unsigned char* img_gray , int width, int height , unsigned char* mask , const int x, const int y, std::stack<POS>& s , unsigned char similar , unsigned char th)
+    {
+        const int yyy = y + 2 >height ? height : y + 2;
+        const int xxx = x + 2 >width ? width : x + 2;
+
+        for (int yy = y - 1 < 0 ? 0 : y - 1; yy < yyy; ++yy)
+        {
+            for (int xx = x - 1 < 0 ? 0 : x - 1; xx < xxx; ++xx)
+            {
+                if (xx != x || yy != y)
+                {
+                    int idx = yy*width + xx;
+                    if (mask[idx] != 0 && 255 - img_gray[idx] > th && abs(img_gray[idx] - img_gray[y*width + x]) < similar)
+                    {
+                        mask[idx] = 0;
+                        s.push(POS(xx, yy));
+                    }
+                }
+            }
+        }
+    }
+
+    void remove_border(unsigned char* img_gray, int width, int height , unsigned char* mask, unsigned char similar , unsigned char th)
+    {
+        //corner seeds
+        std::stack<POS> seeds;
+        seeds.push(POS(0, 0));
+        seeds.push(POS(width-1, 0));
+        seeds.push(POS(0, height-1));
+        seeds.push(POS(width-1, height-1));
+        /*for (int y = height/4 ; y<height ; y +=height/4)
+        {
+            for (int x = width/ 4; x < width; x+= width/ 4)
+            {
+                seeds.push(POS(x, y));
+            }
+        }*/
+
+        while (!seeds.empty())
+        {
+            POS ps = seeds.top();
+            seeds.pop();
+            remove_border_9_n(img_gray, width, height, mask, ps.x, ps.y, seeds , similar , th);
         }
     }
 

@@ -87,7 +87,6 @@ static void get_all_files(const std::string& root, const std::vector<std::string
     }
 }
 
-//单个字符转十六进制字符串，长度增大2倍
 static void char_to_hex(unsigned char ch, char *szHex)
 {
     int i;
@@ -104,7 +103,6 @@ static void char_to_hex(unsigned char ch, char *szHex)
     szHex[2] = 0;
 }
 
-//字符串转换函数，中间调用上面的函数
 void char_str_to_hex_str(char *pucCharStr, int iSize, char *pszHexStr)
 {
     int i;

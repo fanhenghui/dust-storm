@@ -256,13 +256,13 @@ public:
             }
             else
             {
-                ++it;
                 AABB<int> new_aabb;
                 new_aabb._min[0] = std::numeric_limits<int>::max();
                 new_aabb._min[1] = std::numeric_limits<int>::max();
                 new_aabb._max[0] = std::numeric_limits<int>::min();
                 new_aabb._max[1] = std::numeric_limits<int>::min();
                 aabbs_set.insert(std::make_pair(it->first, new_aabb));
+                ++it;
             }
         }
 
@@ -286,6 +286,23 @@ public:
         std::vector<AABB<int>> aabbs;
         for (auto it = aabbs_set.begin(); it != aabbs_set.end(); ++it)
         {
+            //expand 1
+            if (it->second._min[0] > 1)
+            {
+                it->second._min[0] -= 1;
+            }
+            if (it->second._min[1] > 1)
+            {
+                it->second._min[1] -= 1;
+            }
+            if (it->second._max[0] <_roi_dim[0])
+            {
+                it->second._max[0] += 1;
+            }
+            if (it->second._min[1] > _roi_dim[1])
+            {
+                it->second._max[1] += 1;
+            }
             aabbs.push_back(it->second);
         }
 
@@ -315,7 +332,7 @@ public:
             if (s.empty() && cd_num == 0)
             {
                 _roi_cache.get()[ pos.y*_roi_dim[0] + pos.x] = 0;//isolated point
-                std::cout << "isolated point\n";
+                /*std::cout << "isolated point\n";*/
                 break;
             }
             _roi_cache.get()[pos.y*_roi_dim[0] + pos.x] = label;

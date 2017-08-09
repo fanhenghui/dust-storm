@@ -1,7 +1,7 @@
 #ifndef TUMOR_TYPE_DEFINE_H_H_
 #define TUMOR_TYPE_DEFINE_H_H_
 
-#define RUIJIN
+#define SHANGHAI_NO1
 
 #ifdef SHANGHAI_NO1
 #include "TumorTypeShanghaiNo1.h"

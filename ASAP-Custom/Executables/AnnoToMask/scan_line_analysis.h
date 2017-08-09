@@ -124,7 +124,7 @@ public:
                 const int ymax = net_edge->ymax;
                 const float x = net_edge->x;
                 const float dx = net_edge->dx;
-                for (int j = ymin; j < ymax; ++j)//not include ymax(floor)
+                for (int j = ymin; j < (std::min)(height , ymax); ++j)//not include ymax(floor)
                 {
                     Edge* new_edge = new Edge();
                     new_edge->ymax = ymax;
@@ -176,6 +176,7 @@ public:
 
                 int x00 = static_cast<int>(x0);
                 int x11 = static_cast<int>(x1);
+                x11 = (std::min)(x11, width - 1);
 
                 for (int x = x00; x <= x11; ++x)
                 {
@@ -205,6 +206,8 @@ public:
                 delete to_be_delete;
             }
         }
+
+        return 0;
 
     };
 

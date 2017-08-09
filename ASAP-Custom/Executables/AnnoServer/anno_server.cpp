@@ -54,7 +54,6 @@ protected:
 private:
 };
 
-//单个字符转十六进制字符串，长度增大2倍
 static void char_to_hex(unsigned char ch, char *szHex)
 {
     int i;
@@ -71,7 +70,6 @@ static void char_to_hex(unsigned char ch, char *szHex)
     szHex[2] = 0;
 }
 
-//字符串转换函数，中间调用上面的函数
 static void char_str_to_hex_str(char *pucCharStr, int iSize, char *pszHexStr)
 {
     int i;
@@ -318,7 +316,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        //关闭套接字
+        
 #ifdef WIN32
         closesocket(clntSock);
 #else
