@@ -149,14 +149,9 @@ OFCondition MIDcmSCU::handleFINDResponse(const T_ASC_PresentationContextID presI
     {
         this->addFindResult2List(response, *this->_p_work_list);
     }
-    
-    static int count = 0;
-    const char* cSeriesInsUID = NULL;
-    response->m_dataset->findAndGetString(DCM_SeriesInstanceUID, cSeriesInsUID);
-    std::cout << count++ << "\t" << cSeriesInsUID << std::endl;
 
     // call base handler
-    return this->MIDcmSCU::handleFINDResponse(presID, response, waitForNextResponse);
+    return DcmSCU::handleFINDResponse(presID, response, waitForNextResponse);
 }
 
 void MIDcmSCU::set_work_list(std::vector<WorkListInfo> * p_work_list)

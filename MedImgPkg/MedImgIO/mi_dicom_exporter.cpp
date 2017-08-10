@@ -52,7 +52,7 @@ MED_IMG_BEGIN_NAMESPACE
     _taglist.push_back(DCM_PatientAge);
     _taglist.push_back(DCM_PatientWeight);
     _taglist.push_back(DCM_PatientAddress);
-    _taglist.push_back(DCM_OtherPatientIDs);
+    //_taglist.push_back(DCM_OtherPatientIDs);
     _taglist.push_back(DCM_OtherPatientNames);
 }
 

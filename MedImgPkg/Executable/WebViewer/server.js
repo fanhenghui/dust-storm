@@ -182,14 +182,24 @@ io.on("connection", function(socket) {
 
         console.log("path: " + "/tmp/app." + obj.username);
 
-        //TODO Test 自己起C++ BE
-        // const out = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
-        // const err = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
-        // var worker = child_process.spawn('/home/wr/program/git/dust-storm/MedImgPkg/bin/review_server', ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out, err] });
-        // onlineLogicProcessID[obj.userid] = worker;
+        //从配置文件读取review server路径:
+        var review_server_path;
+        fs.readFile(__dirname + "/public/config/run_time.config",
+            function(err, data) {
+                if (err) {
+                    throw err;
+                }
+                review_server_path = data;
+                console.log("app path : " + review_server_path);
 
-        console.log("<><><><><><> logining success <><><><><><>");
+                //TODO Test 自己起C++ BE
+                const out_log = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
+                const err_log = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
+                var worker = child_process.spawn(review_server_path.toString(), ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out_log, err_log] });
+                onlineLogicProcessID[obj.userid] = worker;
 
+                console.log("<><><><><><> logining success <><><><><><>");
+            });
     });
 
     //监听用户退出

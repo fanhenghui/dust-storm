@@ -28,7 +28,7 @@ public:
     };
 
     const std::string fetch_dicom(const std::string & series_idx);
-    const std::string fetch_dicom(WorkListInfo& item);
+    const std::string fetch_dicom(const WorkListInfo& item);
 
 private:
     bool _initialized;

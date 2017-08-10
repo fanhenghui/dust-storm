@@ -137,7 +137,7 @@ const std::string PACSCommunicator::fetch_dicom(const std::string & series_idx)
         return "";
 }
 
-const std::string PACSCommunicator::fetch_dicom(WorkListInfo& item)
+const std::string PACSCommunicator::fetch_dicom(const WorkListInfo& item)
 {
     if (!this->_initialized)
     {

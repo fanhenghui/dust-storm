@@ -4,6 +4,7 @@
 #include "MedImgAppCommon/mi_app_cell.h"
 
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "MedImgRenderAlgorithm/mi_vr_scene.h"
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgIO/mi_image_data.h"
 
@@ -40,6 +41,8 @@ int OpMPRPaging::execute()
     std::shared_ptr<SceneBase> scene = cell->get_scene();
     REVIEW_CHECK_NULL_EXCEPTION(scene);
 
+#ifdef MPR
+
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(scene);
     REVIEW_CHECK_NULL_EXCEPTION(mpr_scene);
 
@@ -60,7 +63,18 @@ int OpMPRPaging::execute()
     {
         mpr_scene->page(1);
     }
+#else
+    std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(scene);
+    REVIEW_CHECK_NULL_EXCEPTION(vr_scene);
 
+    std::shared_ptr<VolumeInfos> volumeinfos = review_controller->get_volume_infos();
+    std::shared_ptr<CameraBase> camera = vr_scene->get_camera();
+    
+    Quat4 q(5.0/360.0*2.0*3.1415926 , Vector3(0,1,0));
+    camera->rotate(q);
+    vr_scene->set_dirty(true);
+    
+#endif
     return 0;
 }
 

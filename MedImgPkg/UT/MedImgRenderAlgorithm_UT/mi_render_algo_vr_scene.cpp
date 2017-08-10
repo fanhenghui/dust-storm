@@ -32,7 +32,7 @@
 #include "GL/glut.h"
 #else
 #include "GL/freeglut.h"
-#include "cuda_runtime.h"
+//#include "cuda_runtime.h"
 #include <stdio.h>
 #include <string.h>
 #include <libgen.h>
@@ -57,11 +57,11 @@ namespace
     std::shared_ptr<GLTimeQuery> _time_query;
     std::shared_ptr<GLTimeQuery> _time_query2;
 
-    int _width = 1024;
-    int _height = 1024;
+    int _width = 512;
+    int _height = 512;
     int _iButton = -1;
     Point2 _ptPre;
-    int _iTestCode = 1;
+    int _iTestCode = 0;
 
     std::vector<std::string> GetFiles()
     {
@@ -162,7 +162,6 @@ namespace
 
         _scene->set_composite_mode(COMPOSITE_DVR);
         _scene->set_shading_mode(SHADING_PHONG);
-
     }
 
     void Display()
@@ -173,23 +172,28 @@ namespace
             glClearColor(0.0,0.0,0.0,1.0);
             glClear(GL_COLOR_BUFFER_BIT);
             
-            //_time_query->begin();
+            std::shared_ptr<CameraBase> camera = _scene->get_camera();
+            Quat4 q(5.0/360.0*2.0*3.1415926 , Vector3(0,1,0));
+            camera->rotate(q);
+
+            _time_query->begin();
             _scene->set_dirty(true);
 
             _scene->render();
 
             _scene->render_to_back();
 
+
             
 
             //_time_query2->begin();
             //glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
             
-           /* _scene->download_image_buffer();
+            _scene->download_image_buffer();
             _scene->swap_image_buffer();
             unsigned char* buffer = nullptr;
             int buffer_size=0;
-            _scene->get_image_buffer(buffer,buffer_size);*/
+            _scene->get_image_buffer(buffer,buffer_size);
 
 #ifdef WIN32
             //FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
@@ -200,7 +204,7 @@ namespace
 
             //std::cout << "gl compressing time : " << _time_query2->end() << std::endl;
 
-            //std::cout << "rendering time : " << _time_query->end() << std::endl;
+            std::cout << "rendering time : " << _time_query->end() << " " << buffer_size << std::endl;
 
             glutSwapBuffers();
         }

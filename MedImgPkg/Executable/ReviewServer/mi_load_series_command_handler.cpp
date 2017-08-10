@@ -12,6 +12,11 @@
 
 #include "MedImgRenderAlgorithm/mi_volume_infos.h"
 #include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "MedImgRenderAlgorithm/mi_vr_scene.h"
+
+#include "MedImgRenderAlgorithm/mi_transfer_function_loader.h"
+#include "MedImgRenderAlgorithm/mi_color_transfer_function.h"
+#include "MedImgRenderAlgorithm/mi_opacity_transfer_function.h"
 
 #include "MedImgAppCommon/mi_app_cell.h"
 #include "MedImgAppCommon//mi_app_thread_model.h"
@@ -20,6 +25,7 @@
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "mi_review_controller.h"
+#include "mi_review_config.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -64,12 +70,12 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , ch
 
     //1 load series
 //#define LOAD_LOCAL
-// #define LOAD_PACS
+//#define LOAD_PACS
 
-// #ifdef LOAD_LOCAL
-//     const std::string series_path("/home/wr/data/AB_CTA_01/");
-// #else
-    if(!_pacs_communicator->initialize("/home/wr/program/git/dust-storm/MedImgPkg/Config/pacs_config.txt"))
+ #ifdef LOAD_LOCAL
+     const std::string series_path(ReviewConfig::instance()->get_test_data_root() + "/AB_CTA_01/");
+ #else
+    if(!_pacs_communicator->initialize("../Config/pacs_config.txt"))
     {
         std::cout << "connect PACS failed!\n";
     }
@@ -83,11 +89,11 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , ch
     {
         std::cout << it->GetStudyInsUID() << "   " << it->GetSeriesInsUID() << std::endl;
     }
-    std::cout << "choose first one : " << ls[0].GetSeriesInsUID();
-    const std::string series_path = _pacs_communicator->fetch_dicom(ls[0].GetSeriesInsUID());
-    std::cout << "path is : " << series_path << std::endl;
+    std::cout << "choose first one : " << ls[3].GetSeriesInsUID();
+    const std::string series_path = _pacs_communicator->fetch_dicom(ls[3]);
+    std::cout << "path is : " << series_path << std::endl; 
 
-//#endif
+#endif
 
     std::vector<std::string> dcm_files;
     FileUtil::get_all_file_recursion(series_path , std::vector<std::string>() , dcm_files);
@@ -122,6 +128,9 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , ch
 
     //3 construct cell
     std::shared_ptr<AppCell> cell(new AppCell);
+
+#ifdef MPR
+
     std::shared_ptr<MPRScene> mpr_scene(new MPRScene(512,512));
     cell->set_scene(mpr_scene);
 
@@ -136,6 +145,44 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader& ipcheader , ch
     mpr_scene->set_mask_mode(MASK_NONE);
     mpr_scene->set_interpolation_mode(LINEAR);
     mpr_scene->place_mpr(TRANSVERSE);
+
+#else
+
+    std::shared_ptr<VRScene> vr_scene(new VRScene(512,512));
+    cell->set_scene(vr_scene);
+
+    const float PRESET_CT_LUNGS_WW = 1500;
+    const float PRESET_CT_LUNGS_WL = -400;
+
+    vr_scene->set_volume_infos(volume_infos);
+    vr_scene->set_sample_rate(1.0);
+    vr_scene->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL );
+    vr_scene->set_composite_mode(COMPOSITE_DVR);
+    vr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
+    vr_scene->set_mask_mode(MASK_NONE);
+    vr_scene->set_interpolation_mode(LINEAR);
+    vr_scene->set_shading_mode(SHADING_PHONG);
+    vr_scene->set_proxy_geometry(PG_BRICKS);
+
+    //load color opacity 
+    const std::string color_opacity_xml = "/home/wr/program/git/dust-storm/MedImgPkg/Config/lut/3d/ct_cta.xml";
+
+    std::shared_ptr<ColorTransFunc> color;
+    std::shared_ptr<OpacityTransFunc> opacity;
+    float ww , wl;
+    RGBAUnit background;
+    Material material;
+    if(IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml , color , opacity , ww ,wl , background , material))
+    {
+        std::cout << "load color opacity failed!\n";
+    }
+    vr_scene->set_color_opacity(color , opacity , 0);
+    vr_scene->set_ambient_color(1.0f,1.0f,1.0f,0.28f);
+    vr_scene->set_material(material , 0);
+    vr_scene->set_window_level(ww , wl , 0);
+    vr_scene->set_test_code(0);
+
+#endif    
     controller->add_cell(0 , cell);
 
     CHECK_GL_ERROR;

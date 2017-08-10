@@ -29,7 +29,7 @@
 #include "GL/glut.h"
 #else
 #include "GL/freeglut.h"
-#include "cuda_runtime.h"
+//#include "cuda_runtime.h"
 #endif
 
 #include "libgpujpeg/gpujpeg.h"

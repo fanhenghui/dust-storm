@@ -519,7 +519,7 @@ int get_extract_region_aabbs( const std::vector<AABB<int>>& anno_aabbs , const s
                     major_cross_aabb = &(*it2);
                     anno_img_ratio = cur_ratio0;
                 }
-                cross_cd_aabbs.push_back(&(*it2));
+                cross_cd_aabbs.push_back(&(*it2));//TODO Here combine annotation with image cd will be better ?
             }
         }
 

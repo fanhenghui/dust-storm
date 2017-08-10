@@ -48,7 +48,7 @@
             this.username = username;
 
             //链接websocket服务器
-            this.socket = io.connect("http://172.23.237.239:8000");
+            this.socket = io.connect("http://172.23.237.128:8000");
 
             //通知服务器有用户登录
             this.socket.emit("login", { userid: this.userid, username: this.username });
