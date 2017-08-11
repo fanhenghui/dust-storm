@@ -28,7 +28,9 @@ public:
 
     virtual ~IOperation()
     {
-
+        if(nullptr != _buffer){
+            delete [] _buffer;
+        }
     };
 
     void set_data(const OpDataHeader& data , void* buffer)

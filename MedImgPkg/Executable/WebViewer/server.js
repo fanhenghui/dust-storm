@@ -272,24 +272,37 @@ io.on("connection", function(socket) {
 
         console.log("web send to server : username " + obj.username);
         var buffer = obj.content;
+        var command_id = buffer.readUIntLE(8, 4);
+
+        console.log("buffer length : " + buffer.byteLength);
+        console.log("command id :" + command_id);
+
+        ipc.server.emit(local_socket, buffer);
+
+        return;
+
+        //ipc.server.emit(local_socket, buffer);
+        //console.log(buffer.bytelength());
+        //return;
+
 
         //这里是hardcoding　强制发送paging 的 operation,还不是非常清楚如何讲web传递过来的数据转换成buffer传递出去
-        var command_id = buffer[2];
-        if (command_id == COMMAND_ID_FE_OPERATION) {
-            const msgBE = new Buffer(32);
-            msgBE.writeUIntLE(COMMAND_ID_FE_OPERATION, 8, 4);
-            msgBE.writeUIntLE(0, 12, 4);
-            msgBE.writeUIntLE(OPERATION_ID_MPR_PAGING, 16, 4);
-            ipc.server.emit(local_socket, msgBE);
-        } else if (command_id == COMMAND_ID_FE_LOAD_SERIES) {
-            const msgBE = new Buffer(32);
-            msgBE.writeUIntLE(COMMAND_ID_FE_LOAD_SERIES, 8, 4);
-            ipc.server.emit(local_socket, msgBE);
-        } else if (command_id == COMMAND_ID_FE_MPR_PLAY) {
-            const msgBE = new Buffer(32);
-            msgBE.writeUIntLE(COMMAND_ID_FE_MPR_PLAY, 8, 4);
-            ipc.server.emit(local_socket, msgBE);
-        }
+        //var command_id = buffer[2];
+        // if (command_id == COMMAND_ID_FE_OPERATION) {
+        //     const msgBE = new Buffer(32);
+        //     msgBE.writeUIntLE(COMMAND_ID_FE_OPERATION, 8, 4);
+        //     msgBE.writeUIntLE(0, 12, 4);
+        //     msgBE.writeUIntLE(OPERATION_ID_MPR_PAGING, 16, 4);
+        //     ipc.server.emit(local_socket, msgBE);
+        // } else if (command_id == COMMAND_ID_FE_LOAD_SERIES) {
+        //     const msgBE = new Buffer(32);
+        //     msgBE.writeUIntLE(COMMAND_ID_FE_LOAD_SERIES, 8, 4);
+        //     ipc.server.emit(local_socket, msgBE);
+        // } else if (command_id == COMMAND_ID_FE_MPR_PLAY) {
+        //     const msgBE = new Buffer(32);
+        //     msgBE.writeUIntLE(COMMAND_ID_FE_MPR_PLAY, 8, 4);
+        //     ipc.server.emit(local_socket, msgBE);
+        // }
 
         //ipc.server.emit(local_socket , buffer);
     });

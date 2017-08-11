@@ -48,7 +48,7 @@
             this.username = username;
 
             //链接websocket服务器
-            this.socket = io.connect("http://172.23.237.128:8000");
+            this.socket = io.connect("http://172.23.237.253:8000");
 
             //通知服务器有用户登录
             this.socket.emit("login", { userid: this.userid, username: this.username });
@@ -152,17 +152,45 @@
         },
 
         paging: function() {
-            var header_buffer = new ArrayBuffer(32);
-            var header = new Uint32Array(header_buffer);
-            header[0] = 0;
-            header[1] = 0;
-            header[2] = COMMAND_ID_FE_MPR_PAGE;
-            header[3] = 11; //paging
-            header[4] = 0;
-            header[5] = 0;
-            header[6] = 0;
-            header[7] = 0;
-            this.socket.emit("data", { userid: this.userid, username: this.username, content: header })
+
+            var binding_func = (function(err, root) {
+                if (err) {
+                    console.log("load proto failed!");
+                    throw err;
+                }
+                var MsgPaging = root.lookup("medical_imaging.MsgPaging");
+                var msgPaging = MsgPaging.create({ page: 5 });
+                var msg_buffer = MsgPaging.encode(msgPaging).finish();
+                var msg_length = msg_buffer.byteLength;
+
+                var cmd_buffer = new ArrayBuffer(32 + msg_length);
+
+                //header
+                var header = new Uint32Array(cmd_buffer, 0, 8);
+                header[0] = 0;
+                header[1] = 0;
+                header[2] = COMMAND_ID_FE_MPR_PAGE;
+                header[3] = 11; //paging
+                header[4] = 0;
+                header[5] = 0;
+                header[6] = 0;
+                header[7] = msg_length;
+
+                //data
+                var src_buffer = new Uint8Array(msg_buffer);
+                var data_buffer = new Uint8Array(cmd_buffer, 8 * 4, msg_length)
+                for (var index = 0; index < msg_length; index++) {
+                    data_buffer[index] = src_buffer[index];
+                }
+                console.log(this.userid);
+
+                this.socket.emit("data", { userid: this.userid, username: this.username, content: cmd_buffer });
+
+            }).bind(this);
+
+
+            protobuf.load("./data/mi_message.proto", binding_func);
+
         },
 
         loadSeries: function() {
@@ -176,7 +204,7 @@
             header[5] = 0;
             header[6] = 0;
             header[7] = 0;
-            this.socket.emit("data", { userid: this.userid, username: this.username, content: header })
+            this.socket.emit("data", { userid: this.userid, username: this.username, content: header_buffer })
         }
     }
 

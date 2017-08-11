@@ -11,6 +11,7 @@
 #include "MedImgArithmetic/mi_ortho_camera.h"
 
 #include "mi_review_controller.h"
+#include "mi_message.pb.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -28,6 +29,14 @@ int OpMPRPaging::execute()
 {
     //Parse data
     const unsigned int cell_id = _header._cell_id;
+    int page_num = 1;
+    if(_buffer != nullptr){
+        MsgPaging msg;
+        if(msg.ParseFromArray(_buffer , _header._data_len)){
+            page_num = msg.page();
+            std::cout << "paging num : " << page_num << std::endl;
+        }
+    }
 
     std::shared_ptr<AppController> controller = _controller.lock();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
@@ -61,7 +70,7 @@ int OpMPRPaging::execute()
     }
     else
     {
-        mpr_scene->page(1);
+        mpr_scene->page(page_num);
     }
 #else
     std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(scene);
