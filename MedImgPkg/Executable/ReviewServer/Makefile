@@ -1,6 +1,6 @@
 ver = debug
 CC  = g++ -std=c++11 -Wall 
-DEFS = -D MPR -D LOAD_LOCAL
+DEFS = -D VR -D LOAD_LOCAL
 
 ifeq ($(ver) , release)
 else
@@ -17,9 +17,8 @@ PROTOCO_INCLUDE_DIR = /usr/local/protobuf/include/
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-
 OBJS = mi_review_controller.o mi_load_series_command_handler.o mi_operation_mpr_paging.o mi_review_main.o mi_mpr_play_command_handler.o \
-mi_review_config.o mi_message.pb.o
+mi_review_config.o mi_message.pb.o mi_operation_be_ready.o mi_operation_init.o
 TARGET = $(BIN_DIR)/review_server
 
 COMMON_HEADER = mi_review_common.h
@@ -29,6 +28,8 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(PROTOCO_LIB_DIR) -lmedimg_util -lmedim
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so $(BIN_DIR)/libmedimg_io.so $(BIN_DIR)/libmedimg_appcommon.so $(BIN_DIR)/libmedimg_renderalgorithm.so
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES) $(ADDITINAL_INCLUDE_DIR)
+
+EXPORT_HEADER = mi_review_common.h
 
 mi_review_main.o: $(EXPORT_HEADER)  mi_review_main.cpp  mi_review_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_review_main.cpp $(ADDITINAL_INCLUDE_DIR)
@@ -40,6 +41,14 @@ mi_review_controller.o mi_review_config.o mi_message.pb.o
 mi_mpr_play_command_handler.o: $(EXPORT_HEADER) mi_mpr_play_command_handler.h mi_mpr_play_command_handler.cpp \
 mi_review_controller.o mi_message.pb.o
 	$(CC) -c -fPIC $(CFLAGS) mi_mpr_play_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_init.o: $(EXPORT_HEADER) mi_operation_init.h mi_operation_init.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_init.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_be_ready.o: $(EXPORT_HEADER) mi_operation_be_ready.h mi_operation_be_ready.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_be_ready.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_operation_mpr_paging.o: $(EXPORT_HEADER) mi_operation_mpr_paging.h mi_operation_mpr_paging.cpp \
 mi_review_controller.o mi_message.pb.o

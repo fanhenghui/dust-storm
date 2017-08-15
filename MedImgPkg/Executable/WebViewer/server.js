@@ -18,6 +18,11 @@ app.get("/index.html", function(req, res) {
     console.log("get index.html");
 });
 
+app.get("/review.html", function(req, res) {
+    res.sendFile(__dirname + "/review.html");
+    console.log("get review.html");
+});
+
 //登录表单的提交
 // app.post("/login_in" , uRLEncoderParser , function(req , res){
 //     //这里查数据库，匹配用户名和密码
@@ -39,19 +44,13 @@ var onlineLogicProcessID = {};
 var onlineCount = 0;
 
 ////////////////////////////////////////////////////////////
-//这里是暂时用来测试用的，作为转发层，server不需要解析具体的command ID
+//作为转发层，server仅仅需要某些解析具体的command ID
 //FE to BE
 var COMMAND_ID_FE_READY = 120001;
-var COMMAND_ID_FE_OPERATION = 120002;
 var COMMAND_ID_FE_SHUT_DOWN = 121112;
-var COMMAND_ID_FE_LOAD_SERIES = 120003;
-var COMMAND_ID_FE_MPR_PLAY = 120004;
 //BE to FE
 var COMMAND_ID_BE_READY = 270001;
 var COMMAND_ID_BE_SEND_IMAGE = 270002;
-
-//OPERATION
-var OPERATION_ID_MPR_PAGING = 310001;
 ////////////////////////////////////////////////////////////
 
 io.on("connection", function(socket) {
@@ -193,12 +192,12 @@ io.on("connection", function(socket) {
                 console.log("app path : " + review_server_path);
 
                 //TODO Test 自己起C++ BE
-                const out_log = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
-                const err_log = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
-                var worker = child_process.spawn(review_server_path.toString(), ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out_log, err_log] });
-                onlineLogicProcessID[obj.userid] = worker;
+                // const out_log = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
+                // const err_log = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
+                // var worker = child_process.spawn(review_server_path.toString(), ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out_log, err_log] });
+                // onlineLogicProcessID[obj.userid] = worker;
 
-                console.log("<><><><><><> logining success <><><><><><>");
+                // console.log("<><><><><><> logining success <><><><><><>");
             });
     });
 

@@ -2,6 +2,10 @@ syntax="proto2";
 
 package medical_imaging;
 
+message MsgString{
+    required string context = 1;
+};
+
 message MsgPoint2 {
     required float x = 1;
     required float y = 2;
@@ -11,10 +15,22 @@ message MsgPaging {
     required int32 page = 1;
 };
 
-message MsgRotate {
+message MsgMouse {
     required MsgPoint2 pre = 1;
     required MsgPoint2 cur = 2;
+    required int32 tag = 3;
 };
 
+message MsgCellInfo{
+    required int32 id = 1;
+    required int32 width = 2;
+    required int32 height = 3;
+    required int32 direction = 4;
+};
 
-
+message MsgInit{
+    required int32 pid = 1;
+    required string series_uid = 2;
+    repeated MsgCellInfo cells = 3;
+    
+};
