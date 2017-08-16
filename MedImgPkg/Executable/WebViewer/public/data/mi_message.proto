@@ -23,9 +23,10 @@ message MsgMouse {
 
 message MsgCellInfo{
     required int32 id = 1;
-    required int32 width = 2;
-    required int32 height = 3;
-    required int32 direction = 4;
+    required int32 type = 2;
+    required int32 direction = 3;
+    required int32 width = 4;
+    required int32 height = 5;
 };
 
 message MsgInit{

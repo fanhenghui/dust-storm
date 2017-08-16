@@ -91,7 +91,7 @@ void SocketClient::run() {
 
         if (header._data_len <= 0) {
             //TODO WARNING Handle
-            std::cout << "buffer length is less than 0";
+            std::cout << "buffer length is less than 0\n";
         } else {
             buffer = new char[header._data_len];
 

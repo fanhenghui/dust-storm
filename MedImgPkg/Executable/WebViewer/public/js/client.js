@@ -27,7 +27,7 @@
     COMMAND_ID_FE_MPR_PAGE = 120004;
 
     //BE to FE
-    COMMAND_ID_BE_READY = 270001;
+    COMMAND_ID_BE_READY = 270000;
     COMMAND_ID_BE_SEND_IMAGE = 270002;
 
     function renderToCanvas(curImgLen, bufferOffset, arraybuffer) {

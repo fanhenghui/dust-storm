@@ -17,7 +17,7 @@ OBJS = mi_app_controller.o mi_app_thread_model.o mi_operation_command_handler.o 
 mi_ready_command_handler.o mi_shut_down_command_handler.o
 TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
-EXPORT_HEADER = mi_app_common_export.h
+EXPORT_HEADER = mi_app_common_export.h mi_app_common_define.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lboost_system -lboost_filesystem -lboost_thread 
 

@@ -1,68 +1,105 @@
 (function() {
+    msgEnd = true;
+    msgRest = 0;
+    msgLen = 0;
 
-    // myCanvas = document.getElementById("myCanvas");
-    // myCtx = myCanvas.getContext("2d");
-    // //myCanvasImg = myCtx.createImageData(myCanvas.width, myCanvas.height);
-    // myCanvasImgJpeg = new Image();
-    // myDataJpeg = null;
+    ipc_sender = 0;
+    ipc_receiver = 0;
+    ipc_msg_id = 0;
+    ipc_msg_info0 = 0;
+    ipc_msg_info1 = 0;
+    ipc_data_type = 0;
+    ipc_big_end = 0;
+    ipc_data_len = 0;
 
-    // msgEnd = true;
-    // msgRest = 0;
-    // msgLen = 0;
+    //FE to BE
+    COMMAND_ID_FE_SHUT_DOWN = 120000;
+    COMMAND_ID_FE_READY = 120001;
+    COMMAND_ID_FE_OPERATION = 120002;
+    COMMAND_ID_FE_MPR_PLAY = 120003;
+    COMMAND_ID_FE_VR_PLAY = 120004;
 
-    // ipc_sender = 0;
-    // ipc_receiver = 0;
-    // ipc_msg_id = 0;
-    // ipc_msg_info0 = 0;
-    // ipc_msg_info1 = 0;
-    // ipc_data_type = 0;
-    // ipc_big_end = 0;
-    // ipc_data_len = 0;
+    //BE to FE
+    COMMAND_ID_BE_SEND_IMAGE = 270001;
+    COMMAND_ID_BE_READY = 270000;
 
-    // //FE to BE
-    // COMMAND_ID_FE_READY = 120001;
-    // COMMAND_ID_FE_OPERATION = 120002;
-    // COMMAND_ID_FE_SHUT_DOWN = 121112;
-    // COMMAND_ID_FE_LOAD_SERIES = 120003;
-    // COMMAND_ID_FE_MPR_PAGE = 120004;
-
-    // //BE to FE
-    // COMMAND_ID_BE_READY = 270001;
-    // COMMAND_ID_BE_SEND_IMAGE = 270002;
+    //FE to BE Operation ID
+    OPERATION_ID_INIT = 310000;
+    OPERATION_ID_MPR_PAGING = 310001;
+    OPERATION_ID_PAN = 310002;
+    OPERATION_ID_ZOOM = 310003;
+    OPERATION_ID_ROTATE = 310004;
 
     //init
+    cellCanvas = [
+        document.getElementById("canvas0"),
+        document.getElementById("canvas1"),
+        document.getElementById("canvas2"),
+        document.getElementById("canvas3")
+    ];
 
+    cellJpeg = "";
+    cellImage = new Image();
+    myDataJpeg = null;
 
+    //init canvas size
+    console.log("w:" + window.innerWidth);
+    console.log("h:" + window.innerHeight);
 
-    function renderToCanvas(curImgLen, bufferOffset, arraybuffer) {
+    cellContainerWidth = document.getElementById("cell-container").offsetWidth;
+    cellContainerHeight = document.getElementById("cell-container").offsetHeight;
+    navigatorHeight = document.getElementById("navigator-div").offsetHeight;
+
+    console.log("cells w:" + cellContainerWidth);
+    console.log("cells h:" + cellContainerHeight);
+
+    for (var index = 0; index < cellCanvas.length; index++) {
+        cellCanvas[index].width = (cellContainerWidth - 20) / 2;
+        cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
+
+    }
+
+    function renderToCanvas(curImgLen, bufferOffset, arrayBuffer, cellID) {
 
         //Construct jpeg data
         if (bufferOffset == 32) {
             myDataJpeg = "";
-            //myDataJpeg = "data:image/jpg;base64,";
         } else {
             //console.log("second input");
         }
-        //Draw jpeg buffer
-        var imgBuffer = new Uint8Array(arraybuffer, bufferOffset, curImgLen);
-        // var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
-        // myDataJpeg += b64encoded;
-        myDataJpeg += String.fromCharCode.apply(null, imgBuffer);
+        var imgBuffer = new Uint8Array(arrayBuffer, bufferOffset, curImgLen);
+        cellJpeg += String.fromCharCode.apply(null, imgBuffer);
 
         if (msgRest - curImgLen <= 0) {
-            myCanvasImgJpeg.src = "data:image/jpg;base64," + btoa(myDataJpeg);
-            myCanvasImgJpeg.onload = function() {
+            myDataJpeg.src = "data:image/jpg;base64," + btoa(cellJpeg);
+            myDataJpeg.onload = function() {
                 console.log("Image Onload");
-                myCtx.drawImage(myCanvasImgJpeg, 0, 0, myCanvas.width, myCanvas.height);
+                cellCanvas[cellID].getContext("2d").drawImage(myDataJpeg, 0, 0, cellCanvas[cellID].width, cellCanvas[cellID].height);
             };
         }
     }
-
 
     window.FE = {
         username: null,
         userid: null,
         socket: null,
+
+        resize: function() {
+            console.log("resize");
+
+            cellContainerWidth = document.getElementById("cell-container").offsetWidth;
+            cellContainerHeight = document.getElementById("cell-container").offsetHeight;
+            navigatorHeight = document.getElementById("navigator-div").offsetHeight;
+
+            console.log("cells w:" + cellContainerWidth);
+            console.log("cells h:" + cellContainerHeight);
+
+            for (var index = 0; index < cellCanvas.length; index++) {
+                cellCanvas[index].width = (cellContainerWidth - 20) / 2;
+                cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
+
+            }
+        },
 
         genUID: function(username) {
             return username + new Date().getTime() + "" + Math.floor(Math.random() * 173 + 511);
@@ -76,40 +113,23 @@
             //链接websocket服务器
             this.socket = io.connect("http://172.23.237.157:8000");
 
-            //通知服务器有用户登录
+            //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
             this.socket.emit("login", { userid: this.userid, username: this.username });
 
             //发送一段message
             this.socket.emit("message", { userid: this.userid, username: this.username, content: "first message" });
 
 
-
-            // this.socket.on("tick" , function(obj))
-            // {
-
-            // }
-
-
             this.socket.on("data", function(arraybuffer) {
+                console.log("receive data.")
                 curImgLen = arraybuffer.byteLength;
                 bufferOffset = 0;
                 if (msgEnd) {
-                    //data command handler
-                    //解析IPC data header 32 byte
-                    //unsigned int _sender;//sender pid
-                    //unsigned int _receiver;//receiver pid
-                    //unsigned int _msg_id;//message ID : thus command ID
-                    //unsigned int _msg_info0;//message info : thus cell ID
-                    //unsigned int _msg_info1;//message info : thus operation ID
-                    //unsigned int _data_type;//0 raw_data 1 protocol buffer
-                    //unsigned int _big_end;//0 small end 1 big_end 
-                    //unsigned int _data_len;//data length
                     var header = new Uint32Array(arraybuffer, 0, 8);
-
                     ipc_sender = header[0];
                     ipc_receiver = header[1];
                     ipc_msg_id = header[2];
-                    ipc_msg_info0 = header[3];
+                    ipc_msg_cell_id = header[3];
                     ipc_msg_info1 = header[4];
                     ipc_data_type = header[5];
                     ipc_big_end = header[6];
@@ -123,17 +143,15 @@
                     bufferOffset = 32;
                 }
 
-
-                if (curImgLen > 0) {
+                if (curImgLen >= 0) {
                     //Handle data
                     if (ipc_msg_id == COMMAND_ID_BE_READY) {
                         console.log("Ready");
-                        //this.socket.emit
+                        window.FE.triggerOnBE();
                     } else if (ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE) {
                         //Draw jpeg buffer
-                        renderToCanvas(curImgLen, bufferOffset, arraybuffer);
+                        renderToCanvas(curImgLen, bufferOffset, arraybuffer, ipc_msg_cell_id);
                     }
-
                 }
 
                 msgRest -= curImgLen;
@@ -146,14 +164,11 @@
 
         },
 
-
-
         userLogOut: function() {
             //this.socket.emit("logout",{userid:this.userid , username:this.username , content:"last message"});
             //this.socket.emit("disconnect" , {userid:this.userid , username:this.username});
             location.reload();
         },
-
 
         userLogIn: function() {
             var username = document.getElementById("username").value;
@@ -162,45 +177,113 @@
         },
 
         paging: function() {
-
             var binding_func = (function(err, root) {
                 if (err) {
                     console.log("load proto failed!");
                     throw err;
                 }
                 var MsgPaging = root.lookup("medical_imaging.MsgPaging");
-                var msgPaging = MsgPaging.create({ page: 5 });
-                var msg_buffer = MsgPaging.encode(msgPaging).finish();
-                var msg_length = msg_buffer.byteLength;
-
-                var cmd_buffer = new ArrayBuffer(32 + msg_length);
+                var msgPaging = MsgPaging.create({ page: 1 });
+                var msgBuffer = MsgPaging.encode(msgPaging).finish();
+                var msgLength = msgBuffer.byteLength;
+                var cmdBuffer = new ArrayBuffer(32 + msgLength);
 
                 //header
-                var header = new Uint32Array(cmd_buffer, 0, 8);
+                var header = new Uint32Array(cmdBuffer, 0, 8);
                 header[0] = 0;
                 header[1] = 0;
-                header[2] = COMMAND_ID_FE_MPR_PAGE;
-                header[3] = 11; //paging
+                header[2] = COMMAND_ID_FE_MPR_PLAY;
+                header[3] = 0;
                 header[4] = 0;
                 header[5] = 0;
                 header[6] = 0;
-                header[7] = msg_length;
+                header[7] = msgLength;
 
                 //data
-                var src_buffer = new Uint8Array(msg_buffer);
-                var data_buffer = new Uint8Array(cmd_buffer, 8 * 4, msg_length)
-                for (var index = 0; index < msg_length; index++) {
-                    data_buffer[index] = src_buffer[index];
+                var srcBuffer = new Uint8Array(msgBuffer);
+                var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength)
+                for (var index = 0; index < msgLength; index++) {
+                    dstBuffer[index] = srcBuffer[index];
                 }
-                console.log(this.userid);
+                console.log("emit paging message.");
 
-                this.socket.emit("data", { userid: this.userid, username: this.username, content: cmd_buffer });
-
+                this.socket.emit("data", { userid: this.userid, username: this.username, content: cmdBuffer });
             }).bind(this);
 
+            protobuf.load("./data/mi_message.proto", binding_func);
+        },
+
+        triggerOnBE: function() {
+            var binding_func = (function(err, root) {
+                if (err) {
+                    console.log("load proto failed!");
+                    throw err;
+                }
+                var MsgInit = root.lookup("medical_imaging.MsgInit");
+                var msgInit = MsgInit.create();
+                msgInit.series_uid = "test_uid";
+                msgInit.pid = 0;
+
+                //MPR
+                msgInit.cells.push({
+                    id: 0,
+                    type: 1,
+                    direction: 0,
+                    width: cellCanvas[0].width,
+                    height: cellCanvas[0].height
+                });
+
+                msgInit.cells.push({
+                    id: 1,
+                    type: 1,
+                    direction: 1,
+                    width: cellCanvas[1].width,
+                    height: cellCanvas[1].height
+                });
+
+                msgInit.cells.push({
+                    id: 2,
+                    type: 1,
+                    direction: 2,
+                    width: cellCanvas[2].width,
+                    height: cellCanvas[2].height
+                });
+
+                msgInit.cells.push({
+                    id: 3,
+                    type: 2,
+                    direction: 0,
+                    width: cellCanvas[3].width,
+                    height: cellCanvas[3].height
+                });
+
+                var msgBuffer = MsgInit.encode(msgInit).finish();
+                var msgLength = msgBuffer.byteLength;
+                var cmdBuffer = new ArrayBuffer(32 + msgLength);
+
+                //header
+                var header = new Uint32Array(cmdBuffer, 0, 8);
+                header[0] = 0;
+                header[1] = 0;
+                header[2] = COMMAND_ID_FE_OPERATION;
+                header[3] = 0;
+                header[4] = OPERATION_ID_INIT;
+                header[5] = 0;
+                header[6] = 0;
+                header[7] = msgLength;
+
+                //data
+                var srcBuffer = new Uint8Array(msgBuffer);
+                var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength)
+                for (var index = 0; index < msgLength; index++) {
+                    dstBuffer[index] = srcBuffer[index];
+                }
+                console.log("emit paging message.");
+
+                this.socket.emit("data", { userid: this.userid, username: this.username, content: cmdBuffer });
+            }).bind(this);
 
             protobuf.load("./data/mi_message.proto", binding_func);
-
         },
 
         loadSeries: function() {
@@ -217,35 +300,31 @@
             this.socket.emit("data", { userid: this.userid, username: this.username, content: header_buffer })
         },
 
-        changeLayout1x1: function() {
-            document.getElementById("cell1").style.visibility = "hidden";
-            document.getElementById("cell2").style.visibility = "hidden";
-            document.getElementById("cell3").style.visibility = "hidden";
+        // changeLayout1x1: function() {
+        //     document.getElementById("cell1").style.visibility = "hidden";
+        //     document.getElementById("cell2").style.visibility = "hidden";
+        //     document.getElementById("cell3").style.visibility = "hidden";
 
-            var cell0 = document.getElementById("cell0").style.visibility = "visible";
-            cell0.width = 1040;
-            cell0.height = 1024;
+        //     var cell0 = document.getElementById("cell0").style.visibility = "visible";
+        //     cell0.width = 1040;
+        //     cell0.height = 1024;
 
-            document.getElementById("cell0Canvas").width = 1024;
-            document.getElementById("cell0Canvas").height = 1024;
+        //     document.getElementById("cell0Canvas").width = 1024;
+        //     document.getElementById("cell0Canvas").height = 1024;
+        // },
 
+        // changeLayout2x2: function() {
+        //     document.getElementById("cell1").style.visibility = "visible";
+        //     document.getElementById("cell2").style.visibility = "visible";
+        //     document.getElementById("cell3").style.visibility = "visible";
 
-        },
+        //     var cell0 = document.getElementById("cell0").style.visibility = "visible";
+        //     cell0.width = 518;
+        //     cell0.height = 518;
 
-        changeLayout2x2: function() {
-            document.getElementById("cell1").style.visibility = "visible";
-            document.getElementById("cell2").style.visibility = "visible";
-            document.getElementById("cell3").style.visibility = "visible";
-
-            var cell0 = document.getElementById("cell0").style.visibility = "visible";
-            cell0.width = 518;
-            cell0.height = 518;
-
-            document.getElementById("cell0Canvas").width = 512;
-            document.getElementById("cell0Canvas").height = 512;
-
-
-        }
+        //     document.getElementById("cell0Canvas").width = 512;
+        //     document.getElementById("cell0Canvas").height = 512;
+        // }
 
     }
 

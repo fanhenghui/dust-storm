@@ -18,7 +18,7 @@ PROTOCO_INCLUDE_DIR = /usr/local/protobuf/include/
 VPATH = $(INCLUDE_ROOT_DIR)
 
 OBJS = mi_review_controller.o mi_load_series_command_handler.o mi_operation_mpr_paging.o mi_review_main.o mi_mpr_play_command_handler.o \
-mi_review_config.o mi_message.pb.o mi_operation_be_ready.o mi_operation_init.o
+mi_review_config.o mi_message.pb.o mi_operation_init.o
 TARGET = $(BIN_DIR)/review_server
 
 COMMON_HEADER = mi_review_common.h
@@ -45,10 +45,6 @@ mi_review_controller.o mi_message.pb.o
 mi_operation_init.o: $(EXPORT_HEADER) mi_operation_init.h mi_operation_init.cpp \
 mi_review_controller.o mi_message.pb.o
 	$(CC) -c -fPIC $(CFLAGS) mi_operation_init.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_operation_be_ready.o: $(EXPORT_HEADER) mi_operation_be_ready.h mi_operation_be_ready.cpp \
-mi_review_controller.o mi_message.pb.o
-	$(CC) -c -fPIC $(CFLAGS) mi_operation_be_ready.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_operation_mpr_paging.o: $(EXPORT_HEADER) mi_operation_mpr_paging.h mi_operation_mpr_paging.cpp \
 mi_review_controller.o mi_message.pb.o

@@ -564,37 +564,46 @@ class MsgCellInfo : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::int32 id() const;
   void set_id(::google::protobuf::int32 value);
 
-  // required int32 width = 2;
+  // required int32 type = 2;
+  bool has_type() const;
+  void clear_type();
+  static const int kTypeFieldNumber = 2;
+  ::google::protobuf::int32 type() const;
+  void set_type(::google::protobuf::int32 value);
+
+  // required int32 direction = 3;
+  bool has_direction() const;
+  void clear_direction();
+  static const int kDirectionFieldNumber = 3;
+  ::google::protobuf::int32 direction() const;
+  void set_direction(::google::protobuf::int32 value);
+
+  // required int32 width = 4;
   bool has_width() const;
   void clear_width();
-  static const int kWidthFieldNumber = 2;
+  static const int kWidthFieldNumber = 4;
   ::google::protobuf::int32 width() const;
   void set_width(::google::protobuf::int32 value);
 
-  // required int32 height = 3;
+  // required int32 height = 5;
   bool has_height() const;
   void clear_height();
-  static const int kHeightFieldNumber = 3;
+  static const int kHeightFieldNumber = 5;
   ::google::protobuf::int32 height() const;
   void set_height(::google::protobuf::int32 value);
-
-  // required int32 direction = 4;
-  bool has_direction() const;
-  void clear_direction();
-  static const int kDirectionFieldNumber = 4;
-  ::google::protobuf::int32 direction() const;
-  void set_direction(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:medical_imaging.MsgCellInfo)
  private:
   void set_has_id();
   void clear_has_id();
+  void set_has_type();
+  void clear_has_type();
+  void set_has_direction();
+  void clear_has_direction();
   void set_has_width();
   void clear_has_width();
   void set_has_height();
   void clear_has_height();
-  void set_has_direction();
-  void clear_has_direction();
 
   // helper for ByteSizeLong()
   size_t RequiredFieldsByteSizeFallback() const;
@@ -603,9 +612,10 @@ class MsgCellInfo : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::int32 id_;
+  ::google::protobuf::int32 type_;
+  ::google::protobuf::int32 direction_;
   ::google::protobuf::int32 width_;
   ::google::protobuf::int32 height_;
-  ::google::protobuf::int32 direction_;
   friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
@@ -1031,15 +1041,63 @@ inline void MsgCellInfo::set_id(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.id)
 }
 
-// required int32 width = 2;
-inline bool MsgCellInfo::has_width() const {
+// required int32 type = 2;
+inline bool MsgCellInfo::has_type() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void MsgCellInfo::set_has_width() {
+inline void MsgCellInfo::set_has_type() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void MsgCellInfo::clear_has_width() {
+inline void MsgCellInfo::clear_has_type() {
   _has_bits_[0] &= ~0x00000002u;
+}
+inline void MsgCellInfo::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+inline ::google::protobuf::int32 MsgCellInfo::type() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.type)
+  return type_;
+}
+inline void MsgCellInfo::set_type(::google::protobuf::int32 value) {
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.type)
+}
+
+// required int32 direction = 3;
+inline bool MsgCellInfo::has_direction() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void MsgCellInfo::set_has_direction() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void MsgCellInfo::clear_has_direction() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void MsgCellInfo::clear_direction() {
+  direction_ = 0;
+  clear_has_direction();
+}
+inline ::google::protobuf::int32 MsgCellInfo::direction() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
+  return direction_;
+}
+inline void MsgCellInfo::set_direction(::google::protobuf::int32 value) {
+  set_has_direction();
+  direction_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
+}
+
+// required int32 width = 4;
+inline bool MsgCellInfo::has_width() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void MsgCellInfo::set_has_width() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void MsgCellInfo::clear_has_width() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void MsgCellInfo::clear_width() {
   width_ = 0;
@@ -1055,15 +1113,15 @@ inline void MsgCellInfo::set_width(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.width)
 }
 
-// required int32 height = 3;
+// required int32 height = 5;
 inline bool MsgCellInfo::has_height() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void MsgCellInfo::set_has_height() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void MsgCellInfo::clear_has_height() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void MsgCellInfo::clear_height() {
   height_ = 0;
@@ -1077,30 +1135,6 @@ inline void MsgCellInfo::set_height(::google::protobuf::int32 value) {
   set_has_height();
   height_ = value;
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.height)
-}
-
-// required int32 direction = 4;
-inline bool MsgCellInfo::has_direction() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void MsgCellInfo::set_has_direction() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void MsgCellInfo::clear_has_direction() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void MsgCellInfo::clear_direction() {
-  direction_ = 0;
-  clear_has_direction();
-}
-inline ::google::protobuf::int32 MsgCellInfo::direction() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
-  return direction_;
-}
-inline void MsgCellInfo::set_direction(::google::protobuf::int32 value) {
-  set_has_direction();
-  direction_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
 }
 
 // -------------------------------------------------------------------

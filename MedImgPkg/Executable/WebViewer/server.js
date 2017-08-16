@@ -1,4 +1,3 @@
-//用sockio来构造server（本质上还是HTTPserver）
 var app = require("express")();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
@@ -46,11 +45,8 @@ var onlineCount = 0;
 ////////////////////////////////////////////////////////////
 //作为转发层，server仅仅需要某些解析具体的command ID
 //FE to BE
+var COMMAND_ID_FE_SHUT_DOWN = 120000;
 var COMMAND_ID_FE_READY = 120001;
-var COMMAND_ID_FE_SHUT_DOWN = 121112;
-//BE to FE
-var COMMAND_ID_BE_READY = 270001;
-var COMMAND_ID_BE_SEND_IMAGE = 270002;
 ////////////////////////////////////////////////////////////
 
 io.on("connection", function(socket) {
@@ -107,29 +103,36 @@ io.on("connection", function(socket) {
                 ///////////////////////////////////////
                 //这里在生产环境下要注意，虽然一个逻辑是ipc仅仅构造一个C++逻辑进程，但这样做也是不合适的
                 ///////////////////////////////////////
-                console.log('IPC connect');
+
+                console.log('IPC connect. Send FE ready to BE.');
+
+                const msgFEReady = new Buffer(32);
+                msgFEReady.writeUIntLE(1, 0, 4);
+                msgFEReady.writeUIntLE(0, 4, 4);
+                msgFEReady.writeUIntLE(COMMAND_ID_FE_READY, 8, 4);
+                msgFEReady.writeUIntLE(0, 12, 4);
+                msgFEReady.writeUIntLE(0, 16, 4);
+                msgFEReady.writeUIntLE(0, 20, 4);
+                msgFEReady.writeUIntLE(0, 24, 4);
+                msgFEReady.writeUIntLE(0, 28, 4);
+
+                if (ipc != undefined) {
+                    ipc.server.emit(local_socket, msgFEReady);
+                    ipc.server.stop(); //关闭IPC
+                }
                 onlineLocalSockets[obj.userid] = local_socket;
             });
 
             ///////////////////////////////////////
             //FE socket 收到BE的数据然后转发给Web FE
-            //需要解析包以及发包
+            //需要解析包发包 以及处理粘包问题
             ///////////////////////////////////////
             ipc.server.on('data', function(buffer, local_socket) {
 
-                //ipc.log('got a data : ' + buffer.length);
+                ipc.log('got a data : ' + buffer.length);
                 //解析下一个报文
                 if (msgEnd) {
-                    //解析IPC data header 32 byte
-                    //unsigned int _sender;//sender pid
-                    //unsigned int _receiver;//receiver pid
-                    //unsigned int _msg_id;//message ID : thus command ID
-                    //unsigned int _msg_info0;//message info : thus cell ID
-                    //unsigned int _msg_info1;//message info : thus operation ID
-                    //unsigned int _data_type;//0 raw_data 1 protocol buffer
-                    //unsigned int _big_end;//0 small end 1 big_end 
-                    //unsigned int _data_len;//data length
-
+                    //parse  data header 32 byte
                     ipc_sender = buffer.readUIntLE(0, 4);
                     ipc_receiver = buffer.readUIntLE(4, 4);
                     ipc_msg_id = buffer.readUIntLE(8, 4);
@@ -194,10 +197,9 @@ io.on("connection", function(socket) {
                 //TODO Test 自己起C++ BE
                 // const out_log = fs.openSync('./out_' + util.inspect(obj.username) + '.log', 'a');
                 // const err_log = fs.openSync('./err_' + util.inspect(obj.username) + '.log', 'a');
-                // var worker = child_process.spawn(review_server_path.toString(), ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out_log, err_log] });
-                // onlineLogicProcessID[obj.userid] = worker;
-
-                // console.log("<><><><><><> logining success <><><><><><>");
+                //var worker = child_process.spawn(review_server_path.toString(), ["/tmp/app." + obj.username], { detached: true, stdio: ['ignore', out_log, err_log] });
+                //onlineLogicProcessID[obj.userid] = worker;
+                //console.log("<><><><><><> login in success <><><><><><>");
             });
     });
 
@@ -255,6 +257,7 @@ io.on("connection", function(socket) {
     });
 
     socket.on("data", function(obj) {
+        //TODO 这里也要考虑分包的问题
         userid = obj.userid;
         console.log("socket on data , userid : " + userid);
         var ipc = onlineLocalIPC[userid];
@@ -277,33 +280,6 @@ io.on("connection", function(socket) {
         console.log("command id :" + command_id);
 
         ipc.server.emit(local_socket, buffer);
-
-        return;
-
-        //ipc.server.emit(local_socket, buffer);
-        //console.log(buffer.bytelength());
-        //return;
-
-
-        //这里是hardcoding　强制发送paging 的 operation,还不是非常清楚如何讲web传递过来的数据转换成buffer传递出去
-        //var command_id = buffer[2];
-        // if (command_id == COMMAND_ID_FE_OPERATION) {
-        //     const msgBE = new Buffer(32);
-        //     msgBE.writeUIntLE(COMMAND_ID_FE_OPERATION, 8, 4);
-        //     msgBE.writeUIntLE(0, 12, 4);
-        //     msgBE.writeUIntLE(OPERATION_ID_MPR_PAGING, 16, 4);
-        //     ipc.server.emit(local_socket, msgBE);
-        // } else if (command_id == COMMAND_ID_FE_LOAD_SERIES) {
-        //     const msgBE = new Buffer(32);
-        //     msgBE.writeUIntLE(COMMAND_ID_FE_LOAD_SERIES, 8, 4);
-        //     ipc.server.emit(local_socket, msgBE);
-        // } else if (command_id == COMMAND_ID_FE_MPR_PLAY) {
-        //     const msgBE = new Buffer(32);
-        //     msgBE.writeUIntLE(COMMAND_ID_FE_MPR_PLAY, 8, 4);
-        //     ipc.server.emit(local_socket, msgBE);
-        // }
-
-        //ipc.server.emit(local_socket , buffer);
     });
 
 

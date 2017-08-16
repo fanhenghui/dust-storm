@@ -94,12 +94,13 @@ int OpInit::execute() {
     const int height = it->height();
     const int direction = it->direction();
     const int cell_id = it->id();
+    const int type_id = it->type();
 
     const float DEFAULT_WW = 1500;
     const float DEFAULT_WL = -400;
 
     std::shared_ptr<AppCell> cell(new AppCell);
-    if (cell_id == 1) { // MPR
+    if (type_id == 1) { // MPR
       std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
       cell->set_scene(mpr_scene);
 
@@ -112,7 +113,7 @@ int OpInit::execute() {
       mpr_scene->set_interpolation_mode(LINEAR);
       mpr_scene->place_mpr(static_cast<ScanSliceType>(direction));
 
-    } else if (cell_id == 2) { // VR
+    } else if (type_id == 2) { // VR
       std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
       cell->set_scene(vr_scene);
 

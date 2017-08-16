@@ -100,13 +100,15 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, id_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, type_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, direction_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, width_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, height_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgCellInfo, direction_),
   0,
   1,
   2,
   3,
+  4,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgInit, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgInit, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -125,8 +127,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] = {
   { 7, 14, sizeof(MsgPoint2)},
   { 16, 22, sizeof(MsgPaging)},
   { 23, 31, sizeof(MsgMouse)},
-  { 34, 43, sizeof(MsgCellInfo)},
-  { 47, 55, sizeof(MsgInit)},
+  { 34, 44, sizeof(MsgCellInfo)},
+  { 49, 57, sizeof(MsgInit)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -204,14 +206,15 @@ void AddDescriptorsImpl() {
       "\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\"\031\n\tMsgPaging\022\014\n\004pag"
       "e\030\001 \002(\005\"i\n\010MsgMouse\022\'\n\003pre\030\001 \002(\0132\032.medic"
       "al_imaging.MsgPoint2\022\'\n\003cur\030\002 \002(\0132\032.medi"
-      "cal_imaging.MsgPoint2\022\013\n\003tag\030\003 \002(\005\"K\n\013Ms"
-      "gCellInfo\022\n\n\002id\030\001 \002(\005\022\r\n\005width\030\002 \002(\005\022\016\n\006"
-      "height\030\003 \002(\005\022\021\n\tdirection\030\004 \002(\005\"W\n\007MsgIn"
-      "it\022\013\n\003pid\030\001 \002(\005\022\022\n\nseries_uid\030\002 \002(\t\022+\n\005c"
-      "ells\030\003 \003(\0132\034.medical_imaging.MsgCellInfo"
+      "cal_imaging.MsgPoint2\022\013\n\003tag\030\003 \002(\005\"Y\n\013Ms"
+      "gCellInfo\022\n\n\002id\030\001 \002(\005\022\014\n\004type\030\002 \002(\005\022\021\n\td"
+      "irection\030\003 \002(\005\022\r\n\005width\030\004 \002(\005\022\016\n\006height\030"
+      "\005 \002(\005\"W\n\007MsgInit\022\013\n\003pid\030\001 \002(\005\022\022\n\nseries_"
+      "uid\030\002 \002(\t\022+\n\005cells\030\003 \003(\0132\034.medical_imagi"
+      "ng.MsgCellInfo"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 400);
+      descriptor, 414);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "mi_message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&TableStruct::Shutdown);
@@ -1665,9 +1668,10 @@ void MsgMouse::set_tag(::google::protobuf::int32 value) {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int MsgCellInfo::kIdFieldNumber;
+const int MsgCellInfo::kTypeFieldNumber;
+const int MsgCellInfo::kDirectionFieldNumber;
 const int MsgCellInfo::kWidthFieldNumber;
 const int MsgCellInfo::kHeightFieldNumber;
-const int MsgCellInfo::kDirectionFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MsgCellInfo::MsgCellInfo()
@@ -1685,15 +1689,15 @@ MsgCellInfo::MsgCellInfo(const MsgCellInfo& from)
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&id_, &from.id_,
-    reinterpret_cast<char*>(&direction_) -
-    reinterpret_cast<char*>(&id_) + sizeof(direction_));
+    reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&id_) + sizeof(height_));
   // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgCellInfo)
 }
 
 void MsgCellInfo::SharedCtor() {
   _cached_size_ = 0;
-  ::memset(&id_, 0, reinterpret_cast<char*>(&direction_) -
-    reinterpret_cast<char*>(&id_) + sizeof(direction_));
+  ::memset(&id_, 0, reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&id_) + sizeof(height_));
 }
 
 MsgCellInfo::~MsgCellInfo() {
@@ -1729,9 +1733,9 @@ MsgCellInfo* MsgCellInfo::New(::google::protobuf::Arena* arena) const {
 
 void MsgCellInfo::Clear() {
 // @@protoc_insertion_point(message_clear_start:medical_imaging.MsgCellInfo)
-  if (_has_bits_[0 / 32] & 15u) {
-    ::memset(&id_, 0, reinterpret_cast<char*>(&direction_) -
-      reinterpret_cast<char*>(&id_) + sizeof(direction_));
+  if (_has_bits_[0 / 32] & 31u) {
+    ::memset(&id_, 0, reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&id_) + sizeof(height_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -1761,10 +1765,38 @@ bool MsgCellInfo::MergePartialFromCodedStream(
         break;
       }
 
-      // required int32 width = 2;
+      // required int32 type = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(16u)) {
+          set_has_type();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &type_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required int32 direction = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(24u)) {
+          set_has_direction();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &direction_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required int32 width = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(32u)) {
           set_has_width();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
@@ -1775,28 +1807,14 @@ bool MsgCellInfo::MergePartialFromCodedStream(
         break;
       }
 
-      // required int32 height = 3;
-      case 3: {
+      // required int32 height = 5;
+      case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(24u)) {
+            static_cast< ::google::protobuf::uint8>(40u)) {
           set_has_height();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &height_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // required int32 direction = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u)) {
-          set_has_direction();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &direction_)));
         } else {
           goto handle_unusual;
         }
@@ -1837,19 +1855,24 @@ void MsgCellInfo::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->id(), output);
   }
 
-  // required int32 width = 2;
+  // required int32 type = 2;
   if (cached_has_bits & 0x00000002u) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->width(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->type(), output);
   }
 
-  // required int32 height = 3;
+  // required int32 direction = 3;
   if (cached_has_bits & 0x00000004u) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->height(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->direction(), output);
   }
 
-  // required int32 direction = 4;
+  // required int32 width = 4;
   if (cached_has_bits & 0x00000008u) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->direction(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->width(), output);
+  }
+
+  // required int32 height = 5;
+  if (cached_has_bits & 0x00000010u) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->height(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1871,19 +1894,24 @@ void MsgCellInfo::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->id(), target);
   }
 
-  // required int32 width = 2;
+  // required int32 type = 2;
   if (cached_has_bits & 0x00000002u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->width(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->type(), target);
   }
 
-  // required int32 height = 3;
+  // required int32 direction = 3;
   if (cached_has_bits & 0x00000004u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->height(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->direction(), target);
   }
 
-  // required int32 direction = 4;
+  // required int32 width = 4;
   if (cached_has_bits & 0x00000008u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->direction(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->width(), target);
+  }
+
+  // required int32 height = 5;
+  if (cached_has_bits & 0x00000010u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->height(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1905,25 +1933,32 @@ size_t MsgCellInfo::RequiredFieldsByteSizeFallback() const {
         this->id());
   }
 
+  if (has_type()) {
+    // required int32 type = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->type());
+  }
+
+  if (has_direction()) {
+    // required int32 direction = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->direction());
+  }
+
   if (has_width()) {
-    // required int32 width = 2;
+    // required int32 width = 4;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->width());
   }
 
   if (has_height()) {
-    // required int32 height = 3;
+    // required int32 height = 5;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->height());
-  }
-
-  if (has_direction()) {
-    // required int32 direction = 4;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->direction());
   }
 
   return total_size;
@@ -1937,26 +1972,31 @@ size_t MsgCellInfo::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
-  if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x0000001f) ^ 0x0000001f) == 0) {  // All required fields are present.
     // required int32 id = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->id());
 
-    // required int32 width = 2;
+    // required int32 type = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->type());
+
+    // required int32 direction = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->direction());
+
+    // required int32 width = 4;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->width());
 
-    // required int32 height = 3;
+    // required int32 height = 5;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int32Size(
         this->height());
-
-    // required int32 direction = 4;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->direction());
 
   } else {
     total_size += RequiredFieldsByteSizeFallback();
@@ -1991,18 +2031,21 @@ void MsgCellInfo::MergeFrom(const MsgCellInfo& from) {
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 15u) {
+  if (cached_has_bits & 31u) {
     if (cached_has_bits & 0x00000001u) {
       id_ = from.id_;
     }
     if (cached_has_bits & 0x00000002u) {
-      width_ = from.width_;
+      type_ = from.type_;
     }
     if (cached_has_bits & 0x00000004u) {
-      height_ = from.height_;
+      direction_ = from.direction_;
     }
     if (cached_has_bits & 0x00000008u) {
-      direction_ = from.direction_;
+      width_ = from.width_;
+    }
+    if (cached_has_bits & 0x00000010u) {
+      height_ = from.height_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -2023,7 +2066,7 @@ void MsgCellInfo::CopyFrom(const MsgCellInfo& from) {
 }
 
 bool MsgCellInfo::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
   return true;
 }
 
@@ -2033,9 +2076,10 @@ void MsgCellInfo::Swap(MsgCellInfo* other) {
 }
 void MsgCellInfo::InternalSwap(MsgCellInfo* other) {
   std::swap(id_, other->id_);
+  std::swap(type_, other->type_);
+  std::swap(direction_, other->direction_);
   std::swap(width_, other->width_);
   std::swap(height_, other->height_);
-  std::swap(direction_, other->direction_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -2073,15 +2117,63 @@ void MsgCellInfo::set_id(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.id)
 }
 
-// required int32 width = 2;
-bool MsgCellInfo::has_width() const {
+// required int32 type = 2;
+bool MsgCellInfo::has_type() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-void MsgCellInfo::set_has_width() {
+void MsgCellInfo::set_has_type() {
   _has_bits_[0] |= 0x00000002u;
 }
-void MsgCellInfo::clear_has_width() {
+void MsgCellInfo::clear_has_type() {
   _has_bits_[0] &= ~0x00000002u;
+}
+void MsgCellInfo::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+::google::protobuf::int32 MsgCellInfo::type() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.type)
+  return type_;
+}
+void MsgCellInfo::set_type(::google::protobuf::int32 value) {
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.type)
+}
+
+// required int32 direction = 3;
+bool MsgCellInfo::has_direction() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void MsgCellInfo::set_has_direction() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void MsgCellInfo::clear_has_direction() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void MsgCellInfo::clear_direction() {
+  direction_ = 0;
+  clear_has_direction();
+}
+::google::protobuf::int32 MsgCellInfo::direction() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
+  return direction_;
+}
+void MsgCellInfo::set_direction(::google::protobuf::int32 value) {
+  set_has_direction();
+  direction_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
+}
+
+// required int32 width = 4;
+bool MsgCellInfo::has_width() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void MsgCellInfo::set_has_width() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void MsgCellInfo::clear_has_width() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 void MsgCellInfo::clear_width() {
   width_ = 0;
@@ -2097,15 +2189,15 @@ void MsgCellInfo::set_width(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.width)
 }
 
-// required int32 height = 3;
+// required int32 height = 5;
 bool MsgCellInfo::has_height() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 void MsgCellInfo::set_has_height() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000010u;
 }
 void MsgCellInfo::clear_has_height() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 void MsgCellInfo::clear_height() {
   height_ = 0;
@@ -2119,30 +2211,6 @@ void MsgCellInfo::set_height(::google::protobuf::int32 value) {
   set_has_height();
   height_ = value;
   // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.height)
-}
-
-// required int32 direction = 4;
-bool MsgCellInfo::has_direction() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-void MsgCellInfo::set_has_direction() {
-  _has_bits_[0] |= 0x00000008u;
-}
-void MsgCellInfo::clear_has_direction() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-void MsgCellInfo::clear_direction() {
-  direction_ = 0;
-  clear_has_direction();
-}
-::google::protobuf::int32 MsgCellInfo::direction() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
-  return direction_;
-}
-void MsgCellInfo::set_direction(::google::protobuf::int32 value) {
-  set_has_direction();
-  direction_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
