@@ -249,7 +249,6 @@ void AppThreadModel::process_sending() {
         header._msg_info1 = 0;
         header._data_type = 0;
         header._big_end = 0;
-        header._data_len = static_cast<unsigned int>(width * height * 3);
 
         unsigned char *buffer = nullptr;
         int buffer_size = 0;
@@ -257,9 +256,15 @@ void AppThreadModel::process_sending() {
         APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
         header._data_len = static_cast<unsigned int>(buffer_size);
 
-        // For testing wirte image to disk
-        // FileUtil::write_raw("/home/wr/data/img_buffer.jpeg" , buffer ,
-        // buffer_size);
+        std::cout << "send data length : "
+                  << static_cast<unsigned int>(buffer_size) << std::endl;
+
+        // For testing write image to disk
+        {
+          std::stringstream ss;
+          ss << "/home/wr/data/img_buffer_cell_" << cell_id << ".jpeg";
+          FileUtil::write_raw(ss.str(), buffer, buffer_size);
+        }
 
         _proxy->async_send_message(header, (char *)buffer);
       }

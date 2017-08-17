@@ -50,6 +50,12 @@ int OpInit::execute() {
     return -1;
   }
 
+  // std::shared_ptr<AppThreadModel> thread_model =
+  // controller->get_thread_model();
+  // REVIEW_CHECK_NULL_EXCEPTION(thread_model);
+  // std::shared_ptr<GLContext> gl_context = thread_model->get_gl_context();
+  // gl_context->make_current(MAIN_CONTEXT);
+
   // load series
   // const std::string series_uid = msg_init.series_uid();
 
@@ -88,13 +94,13 @@ int OpInit::execute() {
   controller->set_volume_infos(volume_infos);
 
   // create cells
-  auto cell_infos = msg_init.cells();
-  for (auto it = cell_infos.begin(); it != cell_infos.end(); ++it) {
-    const int width = it->width();
-    const int height = it->height();
-    const int direction = it->direction();
-    const int cell_id = it->id();
-    const int type_id = it->type();
+  for (int i = 0; i < msg_init.cells_size(); ++i) {
+    const MsgCellInfo &cell_info = msg_init.cells(i);
+    const int width = cell_info.width();
+    const int height = cell_info.height();
+    const int direction = cell_info.direction();
+    const int cell_id = cell_info.id();
+    const int type_id = cell_info.type();
 
     const float DEFAULT_WW = 1500;
     const float DEFAULT_WL = -400;
@@ -103,6 +109,12 @@ int OpInit::execute() {
     if (type_id == 1) { // MPR
       std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
       cell->set_scene(mpr_scene);
+      mpr_scene->set_test_code(0);
+      {
+        std::stringstream ss;
+        ss << "cell_" << cell_id;
+        mpr_scene->set_name(ss.str());
+      }
 
       mpr_scene->set_volume_infos(volume_infos);
       mpr_scene->set_sample_rate(1.0);
@@ -111,12 +123,17 @@ int OpInit::execute() {
       mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
       mpr_scene->set_mask_mode(MASK_NONE);
       mpr_scene->set_interpolation_mode(LINEAR);
-      mpr_scene->place_mpr(static_cast<ScanSliceType>(direction));
+      mpr_scene->place_mpr(TRANSVERSE);
 
     } else if (type_id == 2) { // VR
       std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
       cell->set_scene(vr_scene);
-
+      vr_scene->set_test_code(0);
+      {
+        std::stringstream ss;
+        ss << "cell_" << cell_id;
+        vr_scene->set_name(ss.str());
+      }
       vr_scene->set_volume_infos(volume_infos);
       vr_scene->set_sample_rate(1.0);
       vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);

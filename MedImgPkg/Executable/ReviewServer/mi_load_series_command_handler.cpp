@@ -156,7 +156,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader &ipcheader,
   vr_scene->set_mask_mode(MASK_NONE);
   vr_scene->set_interpolation_mode(LINEAR);
   vr_scene->set_shading_mode(SHADING_PHONG);
-  vr_scene->set_proxy_geometry(PG_BRICKS); 
+  vr_scene->set_proxy_geometry(PG_BRICKS);
 
   // load color opacity
   const std::string color_opacity_xml =

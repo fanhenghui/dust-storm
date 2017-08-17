@@ -3,15 +3,6 @@
     msgRest = 0;
     msgLen = 0;
 
-    ipc_sender = 0;
-    ipc_receiver = 0;
-    ipc_msg_id = 0;
-    ipc_msg_info0 = 0;
-    ipc_msg_info1 = 0;
-    ipc_data_type = 0;
-    ipc_big_end = 0;
-    ipc_data_len = 0;
-
     //FE to BE
     COMMAND_ID_FE_SHUT_DOWN = 120000;
     COMMAND_ID_FE_READY = 120001;
@@ -60,7 +51,7 @@
     }
 
     function renderToCanvas(curImgLen, bufferOffset, arrayBuffer, cellID) {
-
+        console.log("in render");
         //Construct jpeg data
         if (bufferOffset == 32) {
             myDataJpeg = "";
@@ -83,6 +74,9 @@
         username: null,
         userid: null,
         socket: null,
+        lastMsgID: 0,
+        lastMsgCellID: 0,
+
 
         resize: function() {
             console.log("resize");
@@ -126,16 +120,16 @@
                 bufferOffset = 0;
                 if (msgEnd) {
                     var header = new Uint32Array(arraybuffer, 0, 8);
-                    ipc_sender = header[0];
-                    ipc_receiver = header[1];
-                    ipc_msg_id = header[2];
-                    ipc_msg_cell_id = header[3];
-                    ipc_msg_info1 = header[4];
-                    ipc_data_type = header[5];
-                    ipc_big_end = header[6];
-                    ipc_data_len = header[7];
+                    var ipcSender = header[0];
+                    var ipcReceiver = header[1];
+                    window.FE.lastMsgID = header[2];
+                    window.FE.lastMsgCellID = header[3];
+                    var ipcMsgInfo1 = header[4];
+                    var ipcDataType = header[5];
+                    var ipcBigEnd = header[6];
+                    var ipcDataLen = header[7];
 
-                    msgLen = ipc_data_len;
+                    msgLen = ipcDataLen;
                     msgRest = msgLen;
                     msgEnd = false;
 
@@ -144,13 +138,18 @@
                 }
 
                 if (curImgLen >= 0) {
-                    //Handle data
-                    if (ipc_msg_id == COMMAND_ID_BE_READY) {
-                        console.log("Ready");
-                        window.FE.triggerOnBE();
-                    } else if (ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE) {
-                        //Draw jpeg buffer
-                        renderToCanvas(curImgLen, bufferOffset, arraybuffer, ipc_msg_cell_id);
+                    switch (window.FE.lastMsgID) {
+                        case COMMAND_ID_BE_READY:
+                            console.log("Ready");
+                            window.FE.triggerOnBE();
+                            break;
+
+                        case COMMAND_ID_BE_SEND_IMAGE:
+                            console.log("get BE sending img buffer.")
+                            renderToCanvas(curImgLen, bufferOffset, arraybuffer, window.FE.lastMsgCellID);
+
+                        default:
+                            break;
                     }
                 }
 
@@ -233,29 +232,29 @@
                     height: cellCanvas[0].height
                 });
 
-                msgInit.cells.push({
-                    id: 1,
-                    type: 1,
-                    direction: 1,
-                    width: cellCanvas[1].width,
-                    height: cellCanvas[1].height
-                });
+                // msgInit.cells.push({
+                //     id: 1,
+                //     type: 1,
+                //     direction: 0,
+                //     width: cellCanvas[1].width,
+                //     height: cellCanvas[1].height
+                // });
 
-                msgInit.cells.push({
-                    id: 2,
-                    type: 1,
-                    direction: 2,
-                    width: cellCanvas[2].width,
-                    height: cellCanvas[2].height
-                });
+                // msgInit.cells.push({
+                //     id: 2,
+                //     type: 1,
+                //     direction: 0,
+                //     width: cellCanvas[2].width,
+                //     height: cellCanvas[2].height
+                // });
 
-                msgInit.cells.push({
-                    id: 3,
-                    type: 2,
-                    direction: 0,
-                    width: cellCanvas[3].width,
-                    height: cellCanvas[3].height
-                });
+                // msgInit.cells.push({
+                //     id: 3,
+                //     type: 1,
+                //     direction: 0,
+                //     width: cellCanvas[3].width,
+                //     height: cellCanvas[3].height
+                // });
 
                 var msgBuffer = MsgInit.encode(msgInit).finish();
                 var msgLength = msgBuffer.byteLength;
