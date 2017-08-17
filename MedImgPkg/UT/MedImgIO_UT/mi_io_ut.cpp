@@ -33,10 +33,19 @@ int main(int argc, char* argv[])
             std::cout << it->GetStudyInsUID() << "   " << it->GetSeriesInsUID() << std::endl;
         }
 
-        std::string series_uid;
-        while (std::cin >> series_uid)
+        int series_uid_idx = 1;
+        // std::string output = test.fetch_dicom(ls[series_uid_idx]);
+        // if (output == "")
+        // {
+        //     //break;
+        // }
+        // else
+        // {
+        //     std::cout << "Output directory : " << output << std::endl;
+        // }
+        while (std::cin >> series_uid_idx)
         {
-            std::string output = test.fetch_dicom(series_uid);
+            std::string output = test.fetch_dicom(ls[series_uid_idx]);
             if (output == "")
             {
                 break;

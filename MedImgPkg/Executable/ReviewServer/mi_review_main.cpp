@@ -4,12 +4,21 @@
 #include "mi_review_controller.h"
 #include "MedImgUtil/mi_exception.h"
 
+#ifdef WIN32
+#else
+#include <libgen.h>
+#endif
+
 using namespace medical_imaging;
 
 int main(int argc , char* argv[])
 {
     try
     {
+        #ifndef WIN32
+        chdir(dirname(argv[0]));
+        #endif
+
         std::cout << "hello review\n";
         if(argc != 2) {
             std::cout << "invalid input\n";

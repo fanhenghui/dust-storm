@@ -1,0 +1,1 @@
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/wr/program/git/dust-storm/MedImgPkg/bin:/home/wr/program/git/dust-storm/MedImgPkg/:/usr/local/lib:/usr/local/protobuf/lib/

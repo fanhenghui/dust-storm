@@ -4,6 +4,7 @@
     myCtx = myCanvas.getContext("2d");
     //myCanvasImg = myCtx.createImageData(myCanvas.width, myCanvas.height);
     myCanvasImgJpeg = new Image();
+    myDataJpeg = null;
 
     msgEnd = true;
     msgRest = 0;
@@ -18,7 +19,6 @@
     ipc_big_end = 0;
     ipc_data_len = 0;
 
-
     //FE to BE
     COMMAND_ID_FE_READY = 120001;
     COMMAND_ID_FE_OPERATION = 120002;
@@ -27,10 +27,32 @@
     COMMAND_ID_FE_MPR_PAGE = 120004;
 
     //BE to FE
-    COMMAND_ID_BE_READY = 270001;
+    COMMAND_ID_BE_READY = 270000;
     COMMAND_ID_BE_SEND_IMAGE = 270002;
 
+    function renderToCanvas(curImgLen, bufferOffset, arraybuffer) {
 
+        //Construct jpeg data
+        if (bufferOffset == 32) {
+            myDataJpeg = "";
+            //myDataJpeg = "data:image/jpg;base64,";
+        } else {
+            //console.log("second input");
+        }
+        //Draw jpeg buffer
+        var imgBuffer = new Uint8Array(arraybuffer, bufferOffset, curImgLen);
+        // var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
+        // myDataJpeg += b64encoded;
+        myDataJpeg += String.fromCharCode.apply(null, imgBuffer);
+
+        if (msgRest - curImgLen <= 0) {
+            myCanvasImgJpeg.src = "data:image/jpg;base64," + btoa(myDataJpeg);
+            myCanvasImgJpeg.onload = function() {
+                console.log("Image Onload");
+                myCtx.drawImage(myCanvasImgJpeg, 0, 0, myCanvas.width, myCanvas.height);
+            };
+        }
+    }
 
 
     window.FE = {
@@ -48,7 +70,7 @@
             this.username = username;
 
             //链接websocket服务器
-            this.socket = io.connect("http://172.23.237.239:8000");
+            this.socket = io.connect("http://172.23.237.109:8000");
 
             //通知服务器有用户登录
             this.socket.emit("login", { userid: this.userid, username: this.username });
@@ -105,22 +127,7 @@
                         //this.socket.emit
                     } else if (ipc_msg_id == COMMAND_ID_BE_SEND_IMAGE) {
                         //Draw jpeg buffer
-                        var imgBuffer = new Uint8Array(arraybuffer, bufferOffset, curImgLen);
-                        var b64encoded = btoa(String.fromCharCode.apply(null, imgBuffer));
-                        var datajpg = "data:image/jpg;base64," + b64encoded;
-
-                        //var img = new Image();
-                        myCanvasImgJpeg.src = datajpg;
-                        myCanvasImgJpeg.onload = function() {
-                            console.log("Image Onload");
-                            myCtx.drawImage(myCanvasImgJpeg, 0, 0, myCanvas.width, myCanvas.height);
-                        };
-
-                        ////Draw raw image 
-                        //var imgBuffer = new Uint8Array(arraybuffer , bufferOffset, curImgLen);
-                        // for(var i = 0 ; i< curImgLen ; ++i){
-                        // myCanvasImg.data[msgLen - msgRest + i] = imgBuffer[i];
-                        // }
+                        renderToCanvas(curImgLen, bufferOffset, arraybuffer);
                     }
 
                 }
@@ -130,7 +137,6 @@
                     msgRest = 0;
                     msgLen = 0;
                     msgEnd = true;
-                    myCtx.putImageData(myCanvasImg, 0, 0);
                 }
             });
 
@@ -152,17 +158,45 @@
         },
 
         paging: function() {
-            var header_buffer = new ArrayBuffer(32);
-            var header = new Uint32Array(header_buffer);
-            header[0] = 0;
-            header[1] = 0;
-            header[2] = COMMAND_ID_FE_MPR_PAGE;
-            header[3] = 11; //paging
-            header[4] = 0;
-            header[5] = 0;
-            header[6] = 0;
-            header[7] = 0;
-            this.socket.emit("data", { userid: this.userid, username: this.username, content: header })
+
+            var binding_func = (function(err, root) {
+                if (err) {
+                    console.log("load proto failed!");
+                    throw err;
+                }
+                var MsgPaging = root.lookup("medical_imaging.MsgPaging");
+                var msgPaging = MsgPaging.create({ page: 5 });
+                var msg_buffer = MsgPaging.encode(msgPaging).finish();
+                var msg_length = msg_buffer.byteLength;
+
+                var cmd_buffer = new ArrayBuffer(32 + msg_length);
+
+                //header
+                var header = new Uint32Array(cmd_buffer, 0, 8);
+                header[0] = 0;
+                header[1] = 0;
+                header[2] = COMMAND_ID_FE_MPR_PAGE;
+                header[3] = 11; //paging
+                header[4] = 0;
+                header[5] = 0;
+                header[6] = 0;
+                header[7] = msg_length;
+
+                //data
+                var src_buffer = new Uint8Array(msg_buffer);
+                var data_buffer = new Uint8Array(cmd_buffer, 8 * 4, msg_length)
+                for (var index = 0; index < msg_length; index++) {
+                    data_buffer[index] = src_buffer[index];
+                }
+                console.log(this.userid);
+
+                this.socket.emit("data", { userid: this.userid, username: this.username, content: cmd_buffer });
+
+            }).bind(this);
+
+
+            protobuf.load("./data/mi_message.proto", binding_func);
+
         },
 
         loadSeries: function() {
@@ -176,7 +210,7 @@
             header[5] = 0;
             header[6] = 0;
             header[7] = 0;
-            this.socket.emit("data", { userid: this.userid, username: this.username, content: header })
+            this.socket.emit("data", { userid: this.userid, username: this.username, content: header_buffer })
         }
     }
 

@@ -19,7 +19,7 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 OBJS = mi_brick_info_calculator.o mi_brick_pool.o mi_mask_label_store.o \
 mi_camera_calculator.o  mi_camera_interactor.o \
 mi_color_transfer_function.o mi_opacity_transfer_function.o mi_transfer_function_loader.o \
-mi_entry_exit_points.o mi_mpr_entry_exit_points.o mi_vr_entry_exit_points.o mi_vr_proxy_geometry_cube.o \
+mi_entry_exit_points.o mi_mpr_entry_exit_points.o mi_vr_entry_exit_points.o mi_vr_proxy_geometry_cube.o mi_vr_proxy_geometry_brick.o\
 mi_ray_caster_canvas.o mi_ray_caster_inner_buffer.o mi_ray_caster.o mi_ray_casting_cpu.o mi_ray_casting_gpu.o \
 mi_rc_step_color_inverse.o mi_rc_step_composite.o mi_rc_step_main.o mi_rc_step_mask_overlay.o \
 mi_rc_step_mask_sampler.o mi_rc_step_ray_casting.o mi_rc_step_shading.o mi_rc_step_utils.o mi_rc_step_volume_sampler.o \
@@ -115,12 +115,16 @@ mi_rc_step_volume_sampler.o: $(EXPORT_HEADER) mi_rc_step_base.h mi_rc_step_volum
 
 #Entry exit points(VR)
 mi_vr_entry_exit_points.o: $(EXPORT_HEADER) mi_vr_entry_exit_points.h mi_vr_entry_exit_points.cpp mi_ray_caster_define.h \
-mi_camera_calculator.o mi_entry_exit_points.o mi_vr_proxy_geometry_cube.o
+mi_camera_calculator.o mi_entry_exit_points.o mi_vr_proxy_geometry_cube.o mi_vr_proxy_geometry_brick.o
 	$(CC) -c -fPIC $(CFLAGS) mi_vr_entry_exit_points.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_vr_proxy_geometry_cube.o: $(EXPORT_HEADER) mi_vr_proxy_geometry_cube.h mi_vr_proxy_geometry_cube.cpp mi_ray_caster_define.h \
 mi_camera_calculator.o
 	$(CC) -c -fPIC $(CFLAGS) mi_vr_proxy_geometry_cube.cpp $(ADDITINAL_INCLUDE_DIR)	
+
+mi_vr_proxy_geometry_brick.o: $(EXPORT_HEADER) mi_vr_proxy_geometry_brick.h mi_vr_proxy_geometry_brick.cpp mi_ray_caster_define.h \
+mi_camera_calculator.o
+	$(CC) -c -fPIC $(CFLAGS) mi_vr_proxy_geometry_brick.cpp $(ADDITINAL_INCLUDE_DIR)		
 
 #Entry exit points(MPR)
 mi_mpr_entry_exit_points.o: $(EXPORT_HEADER) mi_mpr_entry_exit_points.h mi_mpr_entry_exit_points.cpp mi_ray_caster_define.h \
