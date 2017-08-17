@@ -76,7 +76,6 @@ std::vector<std::string> GetFiles() {
 void Init() {
   Configuration::instance()->set_processing_unit_type(GPU);
   GLUtils::set_check_gl_flag(true);
-  GLUtils::set_pixel_pack_alignment(1);
 
   std::vector<std::string> files = GetFiles();
   DICOMLoader loader;
@@ -168,6 +167,8 @@ void Init() {
 
 void Display() {
   try {
+      GLUtils::set_pixel_pack_alignment(1);
+
     glViewport(0, 0, _width, _height);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -180,21 +181,34 @@ void Display() {
     _time_query->begin();
     _scene->set_dirty(true);
 
+    CHECK_GL_ERROR;
+
     _scene->render();
 
+    CHECK_GL_ERROR;
+
     _scene->render_to_back();
+
+    CHECK_GL_ERROR;
 
     //_time_query2->begin();
     // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
     _scene->download_image_buffer();
+
+    CHECK_GL_ERROR;
     _scene->swap_image_buffer();
     unsigned char *buffer = nullptr;
     int buffer_size = 0;
+
+    CHECK_GL_ERROR;
+
     _scene->get_image_buffer(buffer, buffer_size);
 
+    CHECK_GL_ERROR;
+
 #ifdef WIN32
-// FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
+    FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
 #else
     FileUtil::write_raw("/home/wr/data/output_ut.jpeg", buffer, buffer_size);
 #endif
@@ -371,7 +385,7 @@ int TE_VRScene(int argc, char *argv[]) {
     glutMouseFunc(MouseClick);
     glutMotionFunc(MouseMotion);
 
-    // Init();
+    //Init();
 
     glutMainLoop();
     return 0;

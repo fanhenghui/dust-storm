@@ -24,16 +24,6 @@ SceneBase::SceneBase() : _width(128), _height(128) {
   _gpujpeg_encoder = nullptr;
   _gpujpeg_texture = nullptr;
 
-  gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
-  gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
-
-  gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
-  _gpujpeg_image_param.width = _width;
-  _gpujpeg_image_param.height = _height;
-  _gpujpeg_image_param.comp_count = 3;
-  _gpujpeg_image_param.color_space = GPUJPEG_RGB;
-  _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
-
   //_gpujpeg_encoding_duration = 0;
 }
 
@@ -50,16 +40,6 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
   // init gpujepg parameter
   _gpujpeg_encoder = nullptr;
   _gpujpeg_texture = nullptr;
-
-  gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
-  gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
-
-  gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
-  _gpujpeg_image_param.width = _width;
-  _gpujpeg_image_param.height = _height;
-  _gpujpeg_image_param.comp_count = 3;
-  _gpujpeg_image_param.color_space = GPUJPEG_RGB;
-  _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
 
   //_gpujpeg_encoding_duration = 0;
 }
@@ -127,6 +107,17 @@ void SceneBase::initialize() {
     // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in
     // multi-scene)
     gpujpeg_init_device(0, 0);
+
+    gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
+    gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
+
+    gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+    _gpujpeg_image_param.comp_count = 3;
+    _gpujpeg_image_param.color_space = GPUJPEG_RGB;
+    _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
     // bind GL texture to cuda(by PBO)
     unsigned int tex_id = _scene_color_attach_0->get_id();
     _gpujpeg_texture =
@@ -216,9 +207,13 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
     // Record cuda time of encoding(在OpenGL的环境下时间不对,得加一个glFinish)
     //::glFinish();
     // cudaEventRecord(_gpujpeg_encoding_start,0);
+     CHECK_GL_ERROR;
 
     int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input,
                                      &image_compressed, &image_compressed_size);
+
+     CHECK_GL_ERROR;
+
     if (err != 0) {
       RENDERALGO_THROW_EXCEPTION("GPU jpeg encoding failed!");
     }

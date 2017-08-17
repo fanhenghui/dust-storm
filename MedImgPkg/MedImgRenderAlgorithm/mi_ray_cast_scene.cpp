@@ -229,10 +229,17 @@ void RayCastScene::render() {
     _scene_color_attach_0->bind();
     unsigned char *color_array = new unsigned char[_width * _height * 3];
     _scene_color_attach_0->download(GL_RGB, GL_UNSIGNED_BYTE, color_array);
+#ifdef WIN32
     std::stringstream ss;
-    ss << "/home/wr/data/scene_img_" << _name << "_" << _width << "_" << _height
+    ss << "D:/temp/scene_img_" << _name << "_" << _width << "_" << _height
        << ".rgb";
     FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height * 3);
+#else
+    std::stringstream ss;
+    ss << "/home/wr/data/scene_img_" << _name << "_" << _width << "_" << _height
+        << ".rgb";
+    FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height * 3);
+#endif
   }
 
   set_dirty(false);
