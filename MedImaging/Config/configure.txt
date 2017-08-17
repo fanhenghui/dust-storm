@@ -1,3 +1,3 @@
 ProcessingUnit = GPU
 NoduleOutput = TEXT
-LastOpenDirection = E:\data\LIDC\12\1.3.6.1.4.1.14519.5.2.1.6279.6001.154677396354641150280013275227
+LastOpenDirection = E:/data/LUNA/test1

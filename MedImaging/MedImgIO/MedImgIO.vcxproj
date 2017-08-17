@@ -117,7 +117,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>advapi32.lib;oflog.lib;netapi32.lib;wsock32.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;zlib_d.lib;MedImgCommon.lib;MedImgArithmetic.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;oflog.lib;netapi32.lib;wsock32.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;zlib_d.lib;libjpegd.lib;MedImgCommon.lib;MedImgArithmetic.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -167,7 +167,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\;$(SolutionDir)\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>advapi32.lib;oflog.lib;netapi32.lib;wsock32.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;zlib_o.lib;MedImgCommon.lib;MedImgArithmetic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;oflog.lib;netapi32.lib;wsock32.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;zlib_o.lib;libjpeg.lib;MedImgCommon.lib;MedImgArithmetic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -178,6 +178,7 @@
     <ClInclude Include="..\Include\MedImgIO\mi_image_data_header.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_image_data.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_io_stdafx.h" />
+    <ClInclude Include="..\Include\MedImgIO\mi_jpeg_parser.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_mask_voi_converter.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_model_progress.h" />
     <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h" />
@@ -193,6 +194,7 @@
     <ClCompile Include="mi_dicom_rt_struct_loader.cpp" />
     <ClCompile Include="mi_image_data.cpp" />
     <ClCompile Include="mi_io_stdafx.cpp" />
+    <ClCompile Include="mi_jpeg_parser.cpp" />
     <ClCompile Include="mi_mask_voi_converter.cpp" />
     <ClCompile Include="mi_meta_object_loader.cpp" />
     <ClCompile Include="mi_nodule_set.cpp" />

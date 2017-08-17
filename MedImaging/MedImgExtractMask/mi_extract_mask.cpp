@@ -12,6 +12,7 @@
 #include "MedImgIO/mi_image_data_header.h"
 #include "MedImgIO/mi_image_data.h"
 #include "MedImgIO/mi_run_length_operator.h"
+#include "MedImgIO/mi_jpeg_parser.h"
 #include "Ext/pugixml/pugixml.hpp"
 #include "Ext/pugixml/pugiconfig.hpp"
 
@@ -786,6 +787,115 @@ int browse_root_dcm(const std::string& root, std::map<std::string, std::vector<s
     return 0;
 }
 
+void produce_one_test_jpeg(std::shared_ptr<ImageData> img , std::shared_ptr<ImageData> mask , int slice , std::string&save_path)
+{
+    const float PRESET_CT_LUNGS_WW = 1500;
+    const float PRESET_CT_LUNGS_WL = -400;
+
+    float ww = PRESET_CT_LUNGS_WW;
+    float wl = PRESET_CT_LUNGS_WL;
+
+    const float min_wl = wl - img->_intercept - ww*0.5f;
+
+    const int w = img->_dim[0];
+    const int h = img->_dim[1];
+    std::unique_ptr<unsigned char[]> buffer(new unsigned char[w*h*3]);
+    if (img->_data_type == DataType::USHORT)
+    {
+        unsigned short* volume_data = (unsigned short*)img->get_pixel_pointer();
+        unsigned char* mask_data = (unsigned char*)mask->get_pixel_pointer();
+        for (int y  = 0 ; y <h; ++y)
+        {
+            int yy = h - y - 1;
+            for (int x = 0; x < w ; ++x)
+            {
+                unsigned int idx = slice*w*h + yy*w + x;
+                unsigned short v = volume_data[idx];
+                float v0 = ((float)v  - min_wl)/ww;
+                v0 = v0 > 1.0f ? 1.0f : v0;
+                v0 = v0 < 0.0f ? 0.0f : v0;
+                unsigned char rgb = static_cast<unsigned char>(v0*255.0f);
+
+               if (mask_data[idx] != 0)
+               {
+                   float rrr = (float)rgb  + 125;
+                   rrr = rrr > 255.0f? 255.0f:rrr;
+                   buffer.get()[(y*w + x)*3] = static_cast<unsigned char>(rrr);
+                   buffer.get()[(y*w + x)*3+1] = rgb;
+                   buffer.get()[(y*w + x)*3+2] = rgb;
+               }
+               else
+               {
+                   buffer.get()[(y*w + x)*3] = rgb;
+                   buffer.get()[(y*w + x)*3+1] = rgb;
+                   buffer.get()[(y*w + x)*3+2] = rgb;
+               }
+            }
+        }
+    }
+    else if (img->_data_type == DataType::SHORT)
+    {
+        short* volume_data = (short*)img->get_pixel_pointer();
+        unsigned char* mask_data = (unsigned char*)mask->get_pixel_pointer();
+        for (int y  = 0 ; y <h ; ++y)
+        {
+            int yy = h - y - 1;
+            for (int x = 0; x < w ; ++x)
+            {
+                 unsigned int idx = slice*w*h + yy*w + x;
+                short v = volume_data[idx];
+                float v0 = ((float)v   - min_wl)/ww;
+                v0 = v0 > 1.0f ? 1.0f : v0;
+                v0 = v0 < 0.0f ? 0.0f : v0;
+                unsigned char rgb = static_cast<unsigned char>(v0*255.0f);
+
+                if (mask_data[idx] != 0)
+                {
+                    float rrr = (float)rgb  + 125;
+                    rrr = rrr > 255.0f? 255.0f:rrr;
+                    buffer.get()[(y*w + x)*3] = static_cast<unsigned char>(rrr);
+                    buffer.get()[(y*w + x)*3+1] = rgb;
+                    buffer.get()[(y*w + x)*3+2] = rgb;
+                }
+                else
+                {
+                    buffer.get()[(y*w + x)*3] = rgb;
+                    buffer.get()[(y*w + x)*3+1] = rgb;
+                    buffer.get()[(y*w + x)*3+2] = rgb;
+                }
+            }
+        }
+    }
+
+    //decode to jpeg
+    JpegParser::write_to_jpeg(save_path , (char*)buffer.get() , img->_dim[0] , img->_dim[1]);
+}
+
+void produce_test_jpeg(std::shared_ptr<ImageData> img , std::shared_ptr<ImageData> mask , const std::string& base_name)
+{
+#pragma omp parallel for
+    for (int i = 0; i< img->_dim[2] ; ++i)
+    {
+        unsigned char* raw_mask = (unsigned char*)mask->get_pixel_pointer();
+        bool got_it = false;
+        for (int j = 0; j < img->_dim[0]*img->_dim[1] ; ++j)
+        {
+            if (raw_mask[j+i*img->_dim[0]*img->_dim[1]] != 0)
+            {
+                got_it = true;
+                break;
+            }
+        }
+
+        if (got_it)
+        {
+            std::stringstream ss;
+            ss << base_name << "_slice_" << i <<".jpeg";
+            produce_one_test_jpeg(img , mask , i , ss.str());
+        }
+    }
+}
+
 int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img , std::shared_ptr<ImageDataHeader>& last_header , std::vector<std::vector<Nodule>>& last_nodule)
 {
     /*arguments list:
@@ -812,6 +922,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
     int confidence = 2;
     int pixel_confidence = 2;
     int setlogic = 0;//0 for intersection 1 for union
+    bool jpeg_output = false;
 
     if (argc == 1)
     {
@@ -827,6 +938,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
         LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
         LOG_OUT("\t-setlogic<inter/union> default is inter\n");
         LOG_OUT("\t-vis: if vis contour in 2D\n");
+        LOG_OUT("\t-jpegout : if vis mask&img blending slice");
         return -1;
     }
     else
@@ -846,6 +958,7 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
                LOG_OUT("\t-pixelconfidence<1~4> default is 2\n");
                LOG_OUT("\t-setlogic<inter/union> default is inter\n");
                LOG_OUT("\t-vis: if vis contour in 2D\n");
+               LOG_OUT("\t-jpegout : if vis mask&img blending slice");
                return 0;
            }
            if (std::string(argv[i]) == "-data")
@@ -884,6 +997,10 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
            else if (std::string(argv[i]) == "-compress")
            {
                compressed = true;
+           }
+           else if (std::string(argv[i]) == "-jpegout")
+           {
+               jpeg_output = true;
            }
            else if (std::string(argv[i]) == "-slicelocation")
            {
@@ -1059,6 +1176,11 @@ int extract_mask(int argc , char* argv[] , std::shared_ptr<ImageData>& last_img 
         {
             LOG_OUT( "save mask failed!\n");
             return -1;
+        }
+
+        if (jpeg_output)
+        {
+            produce_test_jpeg(volume_data , mask , output_direction+ "/" + series_uid);
         }
 
         LOG_OUT( "extract mask done.\n");
