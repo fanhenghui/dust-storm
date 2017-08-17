@@ -62,6 +62,8 @@ void SceneBase::initialize() {
     // Init FBO
     CHECK_GL_ERROR;
 
+    GLUtils::set_pixel_pack_alignment(1);
+
     UIDType fbo_id = 0;
     _scene_fbo = GLResourceManagerContainer::instance()
                      ->get_fbo_manager()
@@ -207,12 +209,12 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
     // Record cuda time of encoding(在OpenGL的环境下时间不对,得加一个glFinish)
     //::glFinish();
     // cudaEventRecord(_gpujpeg_encoding_start,0);
-     CHECK_GL_ERROR;
+    CHECK_GL_ERROR;
 
     int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input,
                                      &image_compressed, &image_compressed_size);
 
-     CHECK_GL_ERROR;
+    CHECK_GL_ERROR;
 
     if (err != 0) {
       RENDERALGO_THROW_EXCEPTION("GPU jpeg encoding failed!");

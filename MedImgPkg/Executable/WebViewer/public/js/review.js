@@ -105,7 +105,7 @@
             this.username = username;
 
             //链接websocket服务器
-            this.socket = io.connect("http://172.23.237.157:8000");
+            this.socket = io.connect("http://172.23.237.208:8000");
 
             //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
             this.socket.emit("login", { userid: this.userid, username: this.username });
