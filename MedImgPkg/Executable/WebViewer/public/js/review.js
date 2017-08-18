@@ -22,10 +22,8 @@
         document.getElementById('canvas0'), document.getElementById('canvas1'),
         document.getElementById('canvas2'), document.getElementById('canvas3')
     ];
-
     cellJpeg = ['', '', '', ''];
     cellImage = [new Image(), new Image(), new Image(), new Image()];
-
 
     // init canvas size
     console.log('w:' + window.innerWidth);
@@ -43,7 +41,13 @@
         cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
     }
 
-    function renderToCanvas(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    function refreshCanvas(cellID) {
+        cellCanvas[cellID].getContext('2d').drawImage(
+            cellImage[cellID], 0, 0, cellCanvas[cellID].width,
+            cellCanvas[cellID].height);
+    }
+
+    function handleImage(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         console.log('in render');
         if (withHeader) { //receive a new image
             cellJpeg[cellID] = '';
@@ -56,18 +60,15 @@
             cellImage[cellID].src = 'data:image/jpg;base64,' + btoa(cellJpeg[cellID]);
             cellImage[cellID].onload = function() {
                 //console.log('Image Onload');
-                cellCanvas[cellID].getContext('2d').drawImage(
-                    cellImage[cellID], 0, 0, cellCanvas[cellID].width,
-                    cellCanvas[cellID].height);
+                refreshCanvas(cellID);
             };
         }
     }
 
-
     function msgHandle(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
             case COMMAND_ID_BE_SEND_IMAGE:
-                renderToCanvas(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                handleImage(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_READY:
                 window.FE.triggerOnBE();
@@ -79,10 +80,10 @@
 
     //TCP package related
     tcpPackageEnd = 0; //0 msg header 1 data for last msg 2 msg header for last msg header
-    lastMsgCmdID = 0;
-    lastMsgCellID = 0;
-    lastMsgOpID = 0;
-    lastMsgRestDataLen = 0;
+    msgCmdID = 0;
+    msgCellID = 0;
+    msgOpID = 0;
+    msgRestDataLen = 0;
     lastMsgHeader = new ArrayBuffer(32);
     lastMsgHeaderLen = 0;
 
@@ -97,38 +98,37 @@
                 return;
             }
             var header = new Uint32Array(tcpBuffer, 0, 8);
-            lastMsgCmdID = header[2];
-            lastMsgCellID = header[3];
-            lastMsgOpID = header[4];
+            msgCmdID = header[2];
+            msgCellID = header[3];
+            msgOpID = header[4];
             var lastMsgDatalen = header[7];
 
             if (tcpPackageLen - 32 == lastMsgDatalen) { //completed one Msg
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 32, lastMsgDatalen, 0, true);
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 32, lastMsgDatalen, 0, true);
             } else if (tcpPackageLen - 32 < lastMsgDatalen) { //not completed one Msg
-                lastMsgRestDataLen = lastMsgDatalen - (tcpPackageLen - 32);
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 32, tcpPackageLen - 32, lastMsgRestDataLen, true);
+                msgRestDataLen = lastMsgDatalen - (tcpPackageLen - 32);
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 32, tcpPackageLen - 32, msgRestDataLen, true);
                 tcpPackageEnd = 1;
             } else { //this buffer carry next Msg
                 //process current one
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 32, lastMsgDatalen, 0, true);
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 32, lastMsgDatalen, 0, true);
                 //recursion process rest
                 var tcpBufferSub = tcpBuffer.slice(lastMsgDatalen + 32);
                 tcpPackageEnd = 0;
                 processTCPMsg(tcpBufferSub);
             }
-
         } else if (tcpPackageEnd == 1) { //data for last msg
-            if (tcpPackageLen - lastMsgRestDataLen == 0) { //complete last msg
-                lastMsgRestDataLen = 0;
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 0, tcpPackageLen, 0, false);
-            } else if (tcpPackageLen - lastMsgRestDataLen < 0) { //not complete data yet
-                lastMsgRestDataLen -= tcpPackageLen;
+            if (tcpPackageLen - msgRestDataLen == 0) { //complete last msg
+                msgRestDataLen = 0;
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 0, tcpPackageLen, 0, false);
+            } else if (tcpPackageLen - msgRestDataLen < 0) { //not complete data yet
+                msgRestDataLen -= tcpPackageLen;
                 tcpPackageEnd = 1;
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 0, tcpPackageLen, lastMsgRestDataLen, false);
-            } else { //this buffer carray next Msg
-                msgHandle(lastMsgCmdID, lastMsgCellID, lastMsgOpID, tcpBuffer, 0, lastMsgRestDataLen, 0, false);
-                var tcpBufferSub2 = tcpBuffer.slice(lastMsgRestDataLen);
-                lastMsgRestDataLen = 0;
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 0, tcpPackageLen, msgRestDataLen, false);
+            } else { //this buffer carry next Msg
+                msgHandle(msgCmdID, msgCellID, msgOpID, tcpBuffer, 0, msgRestDataLen, 0, false);
+                var tcpBufferSub2 = tcpBuffer.slice(msgRestDataLen);
+                msgRestDataLen = 0;
                 tcpPackageEnd = 0;
                 processTCPMsg(tcpBufferSub2);
             }
@@ -145,10 +145,10 @@
                 var tcpBufferSub3 = tcpBuffer.slice(lastRestHeaderLen);
 
                 var header2 = new Uint32Array(lastMsgHeader, 0, 8);
-                lastMsgCmdID = header2[2];
-                lastMsgCellID = header2[3];
-                lastMsgOpID = header2[4];
-                lastMsgRestDataLen = header2[7];
+                msgCmdID = header2[2];
+                msgCellID = header2[3];
+                msgOpID = header2[4];
+                msgRestDataLen = header2[7];
 
                 tcpPackageEnd = 1;
                 lastMsgHeaderLen = 0;
@@ -156,6 +156,47 @@
             }
         }
     }
+
+    //////////////////////////////////////////////////////////////////
+    //mouse event for test
+    //ACTION ID
+    ACTION_ID_ARROW = 400000;
+    ACTION_ID_ZOOM = 400001;
+    ACTION_ID_PAN = 400002;
+    ACTION_ID_ROTATE = 400003;
+    ACTION_ID_WINDOWING = 400004;
+
+    BTN_NONE = 0;
+    BTN_LEFT = 1;
+    BTN_RIGHT = 2;
+    BTN_MIDDLE = 3;
+
+    BTN_DOWN = 0;
+    BTN_UP = 1;
+
+    //Btn status
+    btnType = [BTN_NONE, BTN_NONE, BTN_NONE, BTN_NONE];
+    btnStatus = [BTN_UP, BTN_UP, BTN_UP, BTN_UP];
+    preMousePos = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
+
+    function mouseMoveEvent(event) {
+        document.getElementById("test-info").innerText = "move";
+        console.log("motion\n");
+
+    }
+
+    function mouseDownEvent(event) {
+        console.log("down\n");
+    }
+
+    function mouseUpEvent(event) {
+        console.log("up\n");
+    }
+
+    cellCanvas[0].addEventListener("mousemove", mouseMoveEvent);
+    cellCanvas[0].addEventListener("mousedown", mouseMoveEvent);
+    cellCanvas[0].addEventListener("mouseup", mouseMoveEvent);
+
 
     window.FE = {
             username: null,
