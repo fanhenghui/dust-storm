@@ -123,7 +123,17 @@ int OpInit::execute() {
       mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
       mpr_scene->set_mask_mode(MASK_NONE);
       mpr_scene->set_interpolation_mode(LINEAR);
-      mpr_scene->place_mpr(TRANSVERSE);
+      switch (direction) {
+      case 0:
+        mpr_scene->place_mpr(SAGITTAL);
+        break;
+      case 1:
+        mpr_scene->place_mpr(CORONAL);
+        break;
+      default: // 2
+        mpr_scene->place_mpr(TRANSVERSE);
+        break;
+      }
 
     } else if (type_id == 2) { // VR
       std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));

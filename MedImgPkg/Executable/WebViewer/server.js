@@ -3,13 +3,13 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var util = require("util");
 var fs = require("fs");
-var child_process = require("child_process");
-var body_parser = require("body-parser");
+var childProcess = require("child_process");
+var bodyParser = require("body-parser");
 
 //添加静态目录
 app.use(require("express").static(__dirname + "/public"));
 
-var uRLEncoderParser = body_parser.urlencoded({ extended: false });
+var uRLEncoderParser = bodyParser.urlencoded({ extended: false });
 
 //主页的响应
 app.get("/index.html", function(req, res) {
@@ -43,7 +43,7 @@ var onlineLogicProcessID = {};
 var onlineCount = 0;
 
 ////////////////////////////////////////////////////////////
-//作为转发层，server仅仅需要某些解析具体的command ID
+//server as transmit level . just need to know a little command ID
 //FE to BE
 var COMMAND_ID_FE_SHUT_DOWN = 120000;
 var COMMAND_ID_FE_READY = 120001;
@@ -52,18 +52,17 @@ var COMMAND_ID_FE_READY = 120001;
 io.on("connection", function(socket) {
     console.log("<><><><><><> connecting <><><><><><>");
 
-    var msgEnd = true;
+    var thisMsgEnd = 0; //0 msg header 1 data for last msg 2 msg header for last msg header
     var msgLen = 0;
-    var msgRest = 0;
+    var lastMsgRest = 0;
 
-    var ipc_sender = 0;
-    var ipc_receiver = 0;
-    var ipc_msg_id = 0;
-    var ipc_msg_info0 = 0;
-    var ipc_msg_info1 = 0;
-    var ipc_data_type = 0;
-    var ipc_big_end = 0;
-    var ipc_data_len = 0;
+    var lastMsgDataType = 0;
+    var lastMsgBigEnd = 0;
+    var lastMsgDataLen = 0;
+
+    var lastMsgCmdID = 0;
+    var lastHeader = new Buffer(32);
+    var lastHeaderByteLength = 0;
 
     //监听用户加入
     socket.on("login", function(obj) {
@@ -72,7 +71,7 @@ io.on("connection", function(socket) {
             return;
         }
 
-        socket.name = obj.userid; //标示socket
+        socket.name = obj.userid; //uid to locate web socket
 
         console.log("<><><><><><> logining <><><><><><>");
         console.log(obj.username + " has login.");
@@ -85,11 +84,9 @@ io.on("connection", function(socket) {
             console.log(obj.username + " is online now.");
         }
 
-
-        ///////////////////////////////////////
-        //1 建立一个FE IPC实例 用来和即将建立的C++业务逻辑进程通信
-        var node_ipc = require('node-ipc');
-        const ipc = new node_ipc.IPC;
+        //create a server IPC between server and BE
+        var nodeIpc = require('node-ipc');
+        const ipc = new nodeIpc.IPC;
 
         console.log("UNIX path is : " + obj.username);
         ipc.config.id = obj.username;
@@ -100,10 +97,8 @@ io.on("connection", function(socket) {
         ipc.serve(function() {
 
             ipc.server.on('connect', function(local_socket) {
-                ///////////////////////////////////////
-                //这里在生产环境下要注意，虽然一个逻辑是ipc仅仅构造一个C++逻辑进程，但这样做也是不合适的
-                ///////////////////////////////////////
-
+                //when IPC is constructed between server and BE
+                //server send a ready MSG to BE to make sure BE is ready
                 console.log('IPC connect. Send FE ready to BE.');
 
                 const msgFEReady = new Buffer(32);
@@ -117,58 +112,18 @@ io.on("connection", function(socket) {
                 msgFEReady.writeUIntLE(0, 28, 4);
 
                 if (ipc != undefined) {
+                    //close IPC
                     ipc.server.emit(local_socket, msgFEReady);
-                    ipc.server.stop(); //关闭IPC
+                    ipc.server.stop();
                 }
                 onlineLocalSockets[obj.userid] = local_socket;
             });
 
-            ///////////////////////////////////////
-            //FE socket 收到BE的数据然后转发给Web FE
-            //需要解析包发包 以及处理粘包问题
-            ///////////////////////////////////////
+            //sever get logic process's tcp package and transfer to FE directly(not parse)
             ipc.server.on('data', function(buffer, local_socket) {
-
                 ipc.log('got a data : ' + buffer.length);
-                //解析下一个报文
-                if (msgEnd) {
-                    //parse  data header 32 byte
-                    ipc_sender = buffer.readUIntLE(0, 4);
-                    ipc_receiver = buffer.readUIntLE(4, 4);
-                    ipc_msg_id = buffer.readUIntLE(8, 4);
-                    ipc_msg_info0 = buffer.readUIntLE(12, 4);
-                    ipc_msg_info1 = buffer.readUIntLE(16, 4);
-                    ipc_data_type = buffer.readUIntLE(20, 4);
-                    ipc_big_end = buffer.readUIntLE(24, 4);
-                    ipc_data_len = buffer.readUIntLE(28, 4);
-
-                    msgLen = ipc_data_len;
-                    msgRest = ipc_data_len;
-                    msgEnd = false;
-
-                    //console.log("receive be message : tag " + msgTag);
-                    socket.emit("data", buffer)
-                    msgRest -= (buffer.length - 32);
-                    //一次报文包含了所有信息，不需要分包发送
-                    if (msgRest <= 0) {
-                        msgEnd = true;
-                        msgLen = 0;
-                    }
-
-                }
-                //持续传递上一个报文
-                else {
-                    //console.log("sending message : " + buffer.length);
-                    socket.emit("data", buffer);
-
-                    msgRest -= buffer.length;
-                    if (msgRest <= 0) {
-                        msgEnd = true;
-                        msgLen = 0;
-                    }
-                }
+                socket.emit("data", buffer);
             });
-
 
             ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {
                 ipc.log('client ' + destroyedSocketID + ' has disconnected!');
@@ -177,14 +132,11 @@ io.on("connection", function(socket) {
         });
         ipc.server.start();
         onlineLocalIPC[obj.userid] = ipc;
-        ///////////////////////////////////////
 
-        ///////////////////////////////////////
-        //2 建立一个C++业务逻辑后台进程
 
+        //Create BE process
         console.log("path: " + "/tmp/app." + obj.username);
-
-        //从配置文件读取review server路径:
+        //reader BE process path form config file
         var review_server_path;
         fs.readFile(__dirname + "/public/config/run_time.config",
             function(err, data) {
@@ -205,7 +157,6 @@ io.on("connection", function(socket) {
 
     //监听用户退出
     socket.on("disconnect", function(obj) {
-
         if (obj.username == "") {
             console.log("invalid null username when disconnect!");
             return;
@@ -220,9 +171,9 @@ io.on("connection", function(socket) {
         console.log(obj.username + " has disconnecting.");
         console.log("id : " + userid);
 
-        //发最后一个消息给c++ 业务逻辑进程来关闭该进程
+        //send last msg tp BE to notify it to shut down
         var ipc = onlineLocalIPC[userid];
-        var local_socket = onlineLocalSockets[userid];
+        var localSocket = onlineLocalSockets[userid];
         //ipc.config.encoding='hex';
 
         const quitMsg = new Buffer(32);
@@ -236,11 +187,11 @@ io.on("connection", function(socket) {
         quitMsg.writeUIntLE(0, 28, 4);
 
         if (ipc != undefined) {
-            ipc.server.emit(local_socket, quitMsg);
-            ipc.server.stop(); //关闭IPC
+            ipc.server.emit(localSocket, quitMsg);
+            ipc.server.stop();
         }
 
-        //删除user的信息
+        //purge user's infos
         delete onlineUsers[userid];
         delete onlineLocalSockets[userid];
         //delete onlineLogicProcessID[userid];
@@ -251,13 +202,13 @@ io.on("connection", function(socket) {
     });
 
 
-    //监听用户消息
+    //listen string message for test
     socket.on("message", function(obj) {
         console.log(obj.username + " message : " + obj.content);
     });
 
     socket.on("data", function(obj) {
-        //TODO 这里也要考虑分包的问题
+        //TODO FE 的　TCP 粘包问题是在BE端解?
         userid = obj.userid;
         console.log("socket on data , userid : " + userid);
         var ipc = onlineLocalIPC[userid];
@@ -266,23 +217,21 @@ io.on("connection", function(socket) {
             return;
         }
 
-        var local_socket = onlineLocalSockets[userid];
-        if (local_socket === undefined || local_socket == null) {
+        var localSocket = onlineLocalSockets[userid];
+        if (localSocket === undefined || localSocket == null) {
             console.log("socket on data , ERROR SOCKET");
             return;
         }
 
         console.log("web send to server : username " + obj.username);
         var buffer = obj.content;
-        var command_id = buffer.readUIntLE(8, 4);
+        var commandID = buffer.readUIntLE(8, 4);
 
         console.log("buffer length : " + buffer.byteLength);
-        console.log("command id :" + command_id);
+        console.log("command id :" + commandID);
 
-        ipc.server.emit(local_socket, buffer);
+        ipc.server.emit(localSocket, buffer);
     });
-
-
 })
 
 
