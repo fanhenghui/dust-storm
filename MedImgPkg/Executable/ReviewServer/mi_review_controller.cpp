@@ -13,8 +13,9 @@
 
 #include "mi_load_series_command_handler.h"
 #include "mi_mpr_play_command_handler.h"
-#include "mi_operation_mpr_paging.h"
 #include "mi_operation_init.h"
+#include "mi_operation_mpr_paging.h"
+#include "mi_operation_rotate.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -58,6 +59,8 @@ void ReviewController::initialize() {
       OPERATION_ID_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
   OperationFactory::instance()->register_operation(
       OPERATION_ID_INIT, std::shared_ptr<OpInit>(new OpInit()));
+  OperationFactory::instance()->register_operation(
+      OPERATION_ID_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
 }
 
 void ReviewController::set_volume_infos(

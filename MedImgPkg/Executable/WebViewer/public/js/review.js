@@ -166,10 +166,11 @@
     ACTION_ID_ROTATE = 400003;
     ACTION_ID_WINDOWING = 400004;
 
-    BTN_NONE = 0;
-    BTN_LEFT = 1;
+
+    BTN_NONE = -1;
+    BTN_LEFT = 0;
+    BTN_MIDDLE = 1;
     BTN_RIGHT = 2;
-    BTN_MIDDLE = 3;
 
     BTN_DOWN = 0;
     BTN_UP = 1;
@@ -179,23 +180,69 @@
     btnStatus = [BTN_UP, BTN_UP, BTN_UP, BTN_UP];
     preMousePos = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }];
 
-    function mouseMoveEvent(event) {
-        document.getElementById("test-info").innerText = "move";
-        console.log("motion\n");
+    lastMouseMsg = { preX: 0, preY: 0, curX: 0, curY: 0 };
 
+    function mouseMoveEvent(event) {
+        var cellname = event.toElement.id;
+        var cellid_s = cellname.slice(cellname.length - 1);
+        var cellid = parseInt(cellid_s);
+        if (btnStatus[cellid] != BTN_DOWN) {
+            document.getElementById("test-info").innerText = "";
+        } else {
+            var button = event.button;
+            var x = event.clientX - event.toElement.getBoundingClientRect().left;
+            var y = event.clientY - event.toElement.getBoundingClientRect().top;
+            document.getElementById("test-info").innerText = "move cell id : " + cellid.toString() +
+                " " + x.toString() + " " + y.toString();
+
+            if (preMousePos[cellid].x != x || preMousePos[cellid].y != y) {
+                window.FE.rotate(cellid, { x: preMousePos[cellid].x, y: preMousePos[cellid].y }, { x: x, y: y });
+                preMousePos[cellid].x = x;
+                preMousePos[cellid].y = y;
+            }
+        }
     }
 
     function mouseDownEvent(event) {
-        console.log("down\n");
+        var cellname = event.toElement.id;
+        var cellid_s = cellname.slice(cellname.length - 1);
+        var cellid = parseInt(cellid_s);
+        btnStatus[cellid] = BTN_DOWN;
+        btnType[cellid] = event.button;
+
+        var button = event.button;
+        var x = event.clientX - event.toElement.getBoundingClientRect().left;
+        var y = event.clientY - event.toElement.getBoundingClientRect().top;
+        preMousePos[cellid].x = x;
+        preMousePos[cellid].y = y;
+
+        document.getElementById("test-info").innerText = "down" + cellname;
     }
 
     function mouseUpEvent(event) {
-        console.log("up\n");
+        var cellname = event.toElement.id;
+        var cellid_s = cellname.slice(cellname.length - 1);
+        var cellid = parseInt(cellid_s);
+        btnStatus[cellid] = BTN_UP;
+        btnType[cellid] = BTN_NONE;
+        document.getElementById("test-info").innerText = "up" + cellname;
     }
 
     cellCanvas[0].addEventListener("mousemove", mouseMoveEvent);
-    cellCanvas[0].addEventListener("mousedown", mouseMoveEvent);
-    cellCanvas[0].addEventListener("mouseup", mouseMoveEvent);
+    cellCanvas[0].addEventListener("mousedown", mouseDownEvent);
+    cellCanvas[0].addEventListener("mouseup", mouseUpEvent);
+
+    cellCanvas[1].addEventListener("mousemove", mouseMoveEvent);
+    cellCanvas[1].addEventListener("mousedown", mouseDownEvent);
+    cellCanvas[1].addEventListener("mouseup", mouseUpEvent);
+
+    cellCanvas[2].addEventListener("mousemove", mouseMoveEvent);
+    cellCanvas[2].addEventListener("mousedown", mouseDownEvent);
+    cellCanvas[2].addEventListener("mouseup", mouseUpEvent);
+
+    cellCanvas[3].addEventListener("mousemove", mouseMoveEvent);
+    cellCanvas[3].addEventListener("mousedown", mouseDownEvent);
+    cellCanvas[3].addEventListener("mouseup", mouseUpEvent);
 
 
     window.FE = {
@@ -234,7 +281,7 @@
                 this.username = username;
 
                 //链接websocket服务器
-                this.socket = io.connect('http://172.23.237.208:8000');
+                this.socket = io.connect('http://172.23.237.226:8000');
 
                 //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
                 this.socket.emit('login', { userid: this.userid, username: this.username });
@@ -275,7 +322,6 @@
                             console.log('load proto failed!');
                             throw err;
                         }
-                        var COMMAND_ID_FE_READY = 120001;
                         var MsgPaging = root.lookup('medical_imaging.MsgPaging');
                         var msgPaging = MsgPaging.create({ page: 1 });
                         var msgBuffer = MsgPaging.encode(msgPaging).finish();
@@ -289,6 +335,52 @@
                         header[2] = COMMAND_ID_FE_MPR_PLAY;
                         header[3] = 0;
                         header[4] = 0;
+                        header[5] = 0;
+                        header[6] = 0;
+                        header[7] = msgLength;
+
+                        // data
+                        var srcBuffer = new Uint8Array(msgBuffer);
+                        var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
+                        for (var index = 0; index < msgLength; index++) {
+                            dstBuffer[index] = srcBuffer[index];
+                        }
+                        console.log('emit paging message.');
+
+                        this.socket.emit('data', {
+                            userid: this.userid,
+                            username: this.username,
+                            content: cmdBuffer
+                        });
+                    }).bind(this);
+
+                protobuf.load('./data/mi_message.proto', binding_func);
+            },
+
+            rotate: function(cellid, prePos, curPos) {
+                var binding_func =
+                    (function(err, root) {
+                        if (err) {
+                            console.log('load proto failed!');
+                            throw err;
+                        }
+                        var MsgMouse = root.lookup('medical_imaging.MsgMouse');
+                        var msgMouse = MsgMouse.create({
+                            pre: { x: prePos.x, y: prePos.y },
+                            cur: { x: curPos.x, y: curPos.y },
+                            tag: 0
+                        });
+                        var msgBuffer = MsgMouse.encode(msgMouse).finish();
+                        var msgLength = msgBuffer.byteLength;
+                        var cmdBuffer = new ArrayBuffer(32 + msgLength);
+
+                        // header
+                        var header = new Uint32Array(cmdBuffer, 0, 8);
+                        header[0] = 0;
+                        header[1] = 0;
+                        header[2] = COMMAND_ID_FE_OPERATION;
+                        header[3] = cellid;
+                        header[4] = OPERATION_ID_ROTATE;
                         header[5] = 0;
                         header[6] = 0;
                         header[7] = msgLength;
