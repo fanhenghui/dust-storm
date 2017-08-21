@@ -246,6 +246,7 @@ void init_dic()
     dic["Uncertain_GEIEN"] = std::string("不确定的上皮内瘤变");
     dic["Uncertain"] = std::string("不确定的病变");
     dic["NoAnno"] = std::string("！没有标注！");
+    dic["SuspectedObject"] = std::string("疑似病变");
 }
 
 

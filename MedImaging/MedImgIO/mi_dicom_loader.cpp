@@ -328,8 +328,8 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
         //4.4 Get Date
         if (!get_content_time_i(data_set_first , img_data_header))
         {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag ContentTime failed!");
+            //io_status = IO_DATA_DAMAGE;
+            //IO_THROW_EXCEPTION("Parse tag ContentTime failed!");
         }
 
         //4.5 Get Modality
@@ -365,15 +365,15 @@ IOStatus DICOMLoader::construct_data_header_i(DcmFileFormatSet& file_format_set 
         //4.6 Manufacturer
         if (!get_manufacturer_i(data_set_first , img_data_header))
         {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag Manufacturer failed!");
+            //io_status = IO_DATA_DAMAGE;
+            //IO_THROW_EXCEPTION("Parse tag Manufacturer failed!");
         }
 
         //4.7 Manufacturer model
         if (!get_manufacturer_model_name_i(data_set_first , img_data_header))
         {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag ManufacturerModelName failed!");
+            //io_status = IO_DATA_DAMAGE;
+            //IO_THROW_EXCEPTION("Parse tag ManufacturerModelName failed!");
         }
 
         //4.8 Patient name
