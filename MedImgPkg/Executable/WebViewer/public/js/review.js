@@ -67,7 +67,7 @@
 
     function msgHandle(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
-            case COMMAND_ID_BE_SEND_IMAGE:
+            case COMMAND_ID_BE_SEND_IMAGE:0
                 handleImage(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_READY:
@@ -234,7 +234,7 @@
                 this.username = username;
 
                 //链接websocket服务器
-                this.socket = io.connect('http://172.23.237.208:8000');
+                this.socket = io.connect('http://172.23.236.32:8000');
 
                 //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
                 this.socket.emit('login', { userid: this.userid, username: this.username });

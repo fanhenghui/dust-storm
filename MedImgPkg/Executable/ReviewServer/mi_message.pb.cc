@@ -198,6 +198,7 @@ void InitDefaults() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
   ::google::protobuf::GoogleOnceInit(&once, &TableStruct::InitDefaultsImpl);
 }
+namespace {
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] = {
@@ -219,12 +220,13 @@ void AddDescriptorsImpl() {
     "mi_message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&TableStruct::Shutdown);
 }
+} // anonymous namespace
 
 void AddDescriptors() {
   static GOOGLE_PROTOBUF_DECLARE_ONCE(once);
   ::google::protobuf::GoogleOnceInit(&once, &AddDescriptorsImpl);
 }
-// Force AddDescriptors() to be called at static initialization time.
+// Force AddDescriptors() to be called at dynamic initialization time.
 struct StaticDescriptorInitializer {
   StaticDescriptorInitializer() {
     AddDescriptors();
@@ -325,7 +327,7 @@ bool MsgString::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_context()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->context().data(), this->context().length(),
+            this->context().data(), static_cast<int>(this->context().length()),
             ::google::protobuf::internal::WireFormat::PARSE,
             "medical_imaging.MsgString.context");
         } else {
@@ -366,7 +368,7 @@ void MsgString::SerializeWithCachedSizes(
   // required string context = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->context().data(), this->context().length(),
+      this->context().data(), static_cast<int>(this->context().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "medical_imaging.MsgString.context");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -382,6 +384,7 @@ void MsgString::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgString::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgString)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -390,7 +393,7 @@ void MsgString::SerializeWithCachedSizes(
   // required string context = 1;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->context().data(), this->context().length(),
+      this->context().data(), static_cast<int>(this->context().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "medical_imaging.MsgString.context");
     target =
@@ -581,15 +584,16 @@ MsgPoint2::MsgPoint2(const MsgPoint2& from)
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&x_, &from.x_,
-    reinterpret_cast<char*>(&y_) -
-    reinterpret_cast<char*>(&x_) + sizeof(y_));
+    static_cast<size_t>(reinterpret_cast<char*>(&y_) -
+    reinterpret_cast<char*>(&x_)) + sizeof(y_));
   // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgPoint2)
 }
 
 void MsgPoint2::SharedCtor() {
   _cached_size_ = 0;
-  ::memset(&x_, 0, reinterpret_cast<char*>(&y_) -
-    reinterpret_cast<char*>(&x_) + sizeof(y_));
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&y_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(y_));
 }
 
 MsgPoint2::~MsgPoint2() {
@@ -626,8 +630,9 @@ MsgPoint2* MsgPoint2::New(::google::protobuf::Arena* arena) const {
 void MsgPoint2::Clear() {
 // @@protoc_insertion_point(message_clear_start:medical_imaging.MsgPoint2)
   if (_has_bits_[0 / 32] & 3u) {
-    ::memset(&x_, 0, reinterpret_cast<char*>(&y_) -
-      reinterpret_cast<char*>(&x_) + sizeof(y_));
+    ::memset(&x_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&y_) -
+        reinterpret_cast<char*>(&x_)) + sizeof(y_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -719,6 +724,7 @@ void MsgPoint2::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgPoint2::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgPoint2)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1041,6 +1047,7 @@ void MsgPaging::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgPaging::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgPaging)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1210,8 +1217,9 @@ MsgMouse::MsgMouse(const MsgMouse& from)
 
 void MsgMouse::SharedCtor() {
   _cached_size_ = 0;
-  ::memset(&pre_, 0, reinterpret_cast<char*>(&tag_) -
-    reinterpret_cast<char*>(&pre_) + sizeof(tag_));
+  ::memset(&pre_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&tag_) -
+      reinterpret_cast<char*>(&pre_)) + sizeof(tag_));
 }
 
 MsgMouse::~MsgMouse() {
@@ -1371,6 +1379,7 @@ void MsgMouse::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgMouse::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgMouse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -1689,15 +1698,16 @@ MsgCellInfo::MsgCellInfo(const MsgCellInfo& from)
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&id_, &from.id_,
-    reinterpret_cast<char*>(&height_) -
-    reinterpret_cast<char*>(&id_) + sizeof(height_));
+    static_cast<size_t>(reinterpret_cast<char*>(&height_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(height_));
   // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgCellInfo)
 }
 
 void MsgCellInfo::SharedCtor() {
   _cached_size_ = 0;
-  ::memset(&id_, 0, reinterpret_cast<char*>(&height_) -
-    reinterpret_cast<char*>(&id_) + sizeof(height_));
+  ::memset(&id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&height_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(height_));
 }
 
 MsgCellInfo::~MsgCellInfo() {
@@ -1734,8 +1744,9 @@ MsgCellInfo* MsgCellInfo::New(::google::protobuf::Arena* arena) const {
 void MsgCellInfo::Clear() {
 // @@protoc_insertion_point(message_clear_start:medical_imaging.MsgCellInfo)
   if (_has_bits_[0 / 32] & 31u) {
-    ::memset(&id_, 0, reinterpret_cast<char*>(&height_) -
-      reinterpret_cast<char*>(&id_) + sizeof(height_));
+    ::memset(&id_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&height_) -
+        reinterpret_cast<char*>(&id_)) + sizeof(height_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -1884,6 +1895,7 @@ void MsgCellInfo::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgCellInfo::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgCellInfo)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -2327,7 +2339,7 @@ bool MsgInit::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_series_uid()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->series_uid().data(), this->series_uid().length(),
+            this->series_uid().data(), static_cast<int>(this->series_uid().length()),
             ::google::protobuf::internal::WireFormat::PARSE,
             "medical_imaging.MsgInit.series_uid");
         } else {
@@ -2385,7 +2397,7 @@ void MsgInit::SerializeWithCachedSizes(
   // required string series_uid = 2;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->series_uid().data(), this->series_uid().length(),
+      this->series_uid().data(), static_cast<int>(this->series_uid().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "medical_imaging.MsgInit.series_uid");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
@@ -2393,9 +2405,10 @@ void MsgInit::SerializeWithCachedSizes(
   }
 
   // repeated .medical_imaging.MsgCellInfo cells = 3;
-  for (unsigned int i = 0, n = this->cells_size(); i < n; i++) {
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->cells_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->cells(i), output);
+      3, this->cells(static_cast<int>(i)), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2407,6 +2420,7 @@ void MsgInit::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* MsgInit::InternalSerializeWithCachedSizesToArray(
     bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
   // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgInit)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
@@ -2420,7 +2434,7 @@ void MsgInit::SerializeWithCachedSizes(
   // required string series_uid = 2;
   if (cached_has_bits & 0x00000001u) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->series_uid().data(), this->series_uid().length(),
+      this->series_uid().data(), static_cast<int>(this->series_uid().length()),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "medical_imaging.MsgInit.series_uid");
     target =
@@ -2429,10 +2443,11 @@ void MsgInit::SerializeWithCachedSizes(
   }
 
   // repeated .medical_imaging.MsgCellInfo cells = 3;
-  for (unsigned int i = 0, n = this->cells_size(); i < n; i++) {
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->cells_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageNoVirtualToArray(
-        3, this->cells(i), deterministic, target);
+        3, this->cells(static_cast<int>(i)), deterministic, target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2488,12 +2503,12 @@ size_t MsgInit::ByteSizeLong() const {
   }
   // repeated .medical_imaging.MsgCellInfo cells = 3;
   {
-    unsigned int count = this->cells_size();
+    unsigned int count = static_cast<unsigned int>(this->cells_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-          this->cells(i));
+          this->cells(static_cast<int>(i)));
     }
   }
 

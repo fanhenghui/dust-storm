@@ -126,7 +126,8 @@ int OpInit::execute() {
       switch (direction) {
       case 0:
         mpr_scene->place_mpr(SAGITTAL);
-        break;
+  std::cout << "out init op\n";
+  break;
       case 1:
         mpr_scene->place_mpr(CORONAL);
         break;
@@ -156,8 +157,7 @@ int OpInit::execute() {
 
       // load color opacity
       const std::string color_opacity_xml =
-          "/home/wr/program/git/dust-storm/MedImgPkg/Config/lut/3d/ct_cta.xml";
-
+          "../Config/lut/3d/ct_cta.xml";
       std::shared_ptr<ColorTransFunc> color;
       std::shared_ptr<OpacityTransFunc> opacity;
       float ww, wl;

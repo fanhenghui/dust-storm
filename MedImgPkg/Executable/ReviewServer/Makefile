@@ -11,9 +11,9 @@ ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/Include
 BIN_DIR = $(ROOT)/bin
 
-PROTOCO_LIB_DIR = /usr/local/protobuf/lib
-GOOGLE_INCLUDE_DIR = /usr/local/protobuf/include/google/
-PROTOCO_INCLUDE_DIR = /usr/local/protobuf/include/
+PROTOCO_LIB_DIR = /usr/local/lib
+GOOGLE_INCLUDE_DIR = /usr/local/include/google/
+PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
