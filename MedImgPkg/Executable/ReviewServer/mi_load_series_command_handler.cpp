@@ -160,7 +160,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader &ipcheader,
 
   // load color opacity
   const std::string color_opacity_xml =
-      "/home/wr/program/git/dust-storm/MedImgPkg/Config/lut/3d/ct_cta.xml";
+      "/home/zhangchanggong/git/dust-storm/MedImgPkg/Config/lut/3d/ct_cta.xml";
 
   std::shared_ptr<ColorTransFunc> color;
   std::shared_ptr<OpacityTransFunc> opacity;

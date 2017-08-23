@@ -38,17 +38,16 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 
+// //主页的响应
+// app.get('/index.html', function(req, res) {
+//   res.sendFile(__dirname + '/index.html');
+//   console.log('get index.html');
+// });
 
-//主页的响应
-app.get('/index.html', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
-  console.log('get index.html');
-});
-
-app.get('/review.html', function(req, res) {
-  res.sendFile(__dirname + '/review.html');
-  console.log('get review.html');
-});
+// app.get('/review.html', function(req, res) {
+//   res.sendFile(__dirname + '/review.html');
+//   console.log('get review.html');
+// });
 
 app.use('/', routes);
 //登录表单的提交
@@ -185,15 +184,16 @@ io.on(
               console.log('app path : ' + review_server_path);
 
               // TODO Test 自己起C++ BE
-              // const out_log = fs.openSync('./out_' +
-              // util.inspect(obj.username) + '.log', 'a');
-              // const err_log = fs.openSync('./err_' +
-              // util.inspect(obj.username) + '.log', 'a');
-              // var worker = child_process.spawn(review_server_path.toString(),
-              // ["/tmp/app." + obj.username], { detached: true, stdio:
-              // ['ignore', out_log, err_log] });
+              // const out_log = fs.openSync(
+              //     './out_' + util.inspect(obj.username) + '.log', 'a');
+              // const err_log = fs.openSync(
+              //     './err_' + util.inspect(obj.username) + '.log', 'a');
+              // var worker = childProcess.spawn(
+              //     review_server_path.toString(), ['/tmp/app.' +
+              //     obj.username],
+              //     {detached: true, stdio: ['ignore', out_log, err_log]});
               // onlineLogicProcessID[obj.userid] = worker;
-              // console.log("<><><><><><> login in success <><><><><><>");
+              // console.log('<><><><><><> login in success <><><><><><>');
             });
       });
 
