@@ -94,6 +94,8 @@ void AppThreadModel::stop() {
   _th_rendering->_th.join();
   _th_sending->_th.join();
   _th_operating->_th.join();
+
+  _op_queue->_msg_queue.deactivate();
 }
 
 void AppThreadModel::process_operating() {

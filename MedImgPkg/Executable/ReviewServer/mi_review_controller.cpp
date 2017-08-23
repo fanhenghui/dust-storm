@@ -15,7 +15,10 @@
 #include "mi_mpr_play_command_handler.h"
 #include "mi_operation_init.h"
 #include "mi_operation_mpr_paging.h"
+#include "mi_operation_pan.h"
 #include "mi_operation_rotate.h"
+#include "mi_operation_windowing.h"
+#include "mi_operation_zoom.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -61,6 +64,12 @@ void ReviewController::initialize() {
       OPERATION_ID_INIT, std::shared_ptr<OpInit>(new OpInit()));
   OperationFactory::instance()->register_operation(
       OPERATION_ID_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
+  OperationFactory::instance()->register_operation(
+      OPERATION_ID_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
+  OperationFactory::instance()->register_operation(
+      OPERATION_ID_PAN, std::shared_ptr<OpPan>(new OpPan()));
+  OperationFactory::instance()->register_operation(
+    OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
 }
 
 void ReviewController::set_volume_infos(
