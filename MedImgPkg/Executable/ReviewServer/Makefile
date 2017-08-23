@@ -18,7 +18,8 @@ PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 VPATH = $(INCLUDE_ROOT_DIR)
 
 OBJS = mi_review_controller.o mi_load_series_command_handler.o mi_operation_mpr_paging.o mi_review_main.o mi_mpr_play_command_handler.o \
-mi_review_config.o mi_message.pb.o mi_operation_init.o mi_operation_rotate.o
+mi_review_config.o mi_message.pb.o mi_operation_init.o \
+mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o mi_operation_windowing.o
 TARGET = $(BIN_DIR)/review_server
 
 COMMON_HEADER = mi_review_common.h
@@ -53,6 +54,18 @@ mi_review_controller.o mi_message.pb.o
 mi_operation_rotate.o: $(EXPORT_HEADER) mi_operation_rotate.h mi_operation_rotate.cpp \
 mi_review_controller.o mi_message.pb.o
 	$(CC) -c -fPIC $(CFLAGS) mi_operation_rotate.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_zoom.o: $(EXPORT_HEADER) mi_operation_zoom.h mi_operation_zoom.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_zoom.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_pan.o: $(EXPORT_HEADER) mi_operation_pan.h mi_operation_pan.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_pan.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_windowing.o: $(EXPORT_HEADER) mi_operation_windowing.h mi_operation_windowing.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_windowing.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_review_controller.o: $(EXPORT_HEADER) mi_review_controller.h mi_review_controller.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_review_controller.cpp $(ADDITINAL_INCLUDE_DIR)

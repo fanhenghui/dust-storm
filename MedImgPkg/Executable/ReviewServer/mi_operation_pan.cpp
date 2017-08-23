@@ -1,4 +1,4 @@
-#include "mi_operation_zoom.h"
+#include "mi_operation_pan.h"
 
 #include "MedImgAppCommon/mi_app_cell.h"
 #include "MedImgAppCommon/mi_app_controller.h"
@@ -15,11 +15,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpZoom::OpZoom() {}
+OpPan::OpPan() {}
 
-OpZoom::~OpZoom() {}
+OpPan::~OpPan() {}
 
-int OpZoom::execute() {
+int OpPan::execute() {
   const unsigned int cell_id = _header._cell_id;
   REVIEW_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -42,7 +42,7 @@ int OpZoom::execute() {
   std::shared_ptr<SceneBase> scene = cell->get_scene();
   REVIEW_CHECK_NULL_EXCEPTION(scene);
 
-  scene->zoom(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
+  scene->pan(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
   std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
   std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
   return 0;

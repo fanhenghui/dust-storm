@@ -65,7 +65,6 @@ public:
     }
 
     ~MessageQueue() {
-
     }
 
     void wait_to_push(boost::mutex::scoped_lock& locker , int time_wait_limit) {

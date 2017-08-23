@@ -1,4 +1,4 @@
-#include "mi_operation_zoom.h"
+#include "mi_operation_windowing.h"
 
 #include "MedImgAppCommon/mi_app_cell.h"
 #include "MedImgAppCommon/mi_app_controller.h"
@@ -15,11 +15,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpZoom::OpZoom() {}
+OpWindowing::OpWindowing() {}
 
-OpZoom::~OpZoom() {}
+OpWindowing::~OpWindowing() {}
 
-int OpZoom::execute() {
+int OpWindowing::execute() {
   const unsigned int cell_id = _header._cell_id;
   REVIEW_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -42,7 +42,22 @@ int OpZoom::execute() {
   std::shared_ptr<SceneBase> scene = cell->get_scene();
   REVIEW_CHECK_NULL_EXCEPTION(scene);
 
-  scene->zoom(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
+  std::shared_ptr<VRScene> scene_ext =
+      std::dynamic_pointer_cast<VRScene>(scene);
+  if (scene_ext) {
+    float ww, wl;
+    scene_ext->get_global_window_level(ww, wl);
+    ww += (cur_x - pre_x);
+    wl += (pre_y - cur_y);
+  } else {
+    std::shared_ptr<MPRScene> scene_ext =
+        std::dynamic_pointer_cast<MPRScene>(scene);
+    float ww, wl;
+    scene_ext->get_global_window_level(ww, wl);
+    ww += (cur_x - pre_x);
+    wl += (pre_y - cur_y);
+  }
+
   std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
   std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
   return 0;

@@ -237,7 +237,7 @@ void RayCastScene::render() {
 #else
     std::stringstream ss;
     ss << "/home/wr/data/scene_img_" << _name << "_" << _width << "_" << _height
-        << ".rgb";
+       << ".rgb";
     FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height * 3);
 #endif
   }
@@ -345,11 +345,27 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
 
 void RayCastScene::set_window_level(float ww, float wl, unsigned char label) {
   RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
-  _volume_infos->get_volume()->regulate_normalize_wl(ww, wl);
+  if (_window_levels.find(label) == _window_levels.end()) {
+    _window_levels.insert(std::make_pair(label, Vector2f(ww, wl)));
+  }
 
+  _volume_infos->get_volume()->regulate_normalize_wl(ww, wl);
   _ray_caster->set_window_level(ww, wl, label);
 
   set_dirty(true);
+}
+
+int RayCastScene::get_window_level(float &ww, float &wl,
+                                   unsigned char label) const {
+  const std::map<unsigned char, Vector2f>::const_iterator it =
+      _window_levels.find(label);
+  if (it == _window_levels.end()) {
+    return -1;
+  } else {
+    ww = it->second[0];
+    wl = it->second[1];
+    return 0;
+  }
 }
 
 void RayCastScene::set_global_window_level(float ww, float wl) {
