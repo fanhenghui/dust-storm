@@ -67,7 +67,8 @@
 
     function msgHandle(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
-            case COMMAND_ID_BE_SEND_IMAGE:0
+            case COMMAND_ID_BE_SEND_IMAGE:
+                0
                 handleImage(cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_READY:
@@ -249,7 +250,7 @@
             username: null,
             userid: null,
             socket: null,
-
+            rotateTik: new Date().getTime(),
 
             resize: function() {
                 console.log('resize');
@@ -281,7 +282,7 @@
                 this.username = username;
 
                 //链接websocket服务器
-                this.socket = io.connect('http://172.23.236.32:8000');
+                this.socket = io.connect('http://172.23.237.228:8000');
 
                 //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
                 this.socket.emit('login', { userid: this.userid, username: this.username });
@@ -317,8 +318,8 @@
 
             paging: function() {
                 var binding_func =
-                    (function(err, root) {     this.socket = io.connect('http://172.23.237.226:8000');
-                    >>>>>>> c61824adf26f1133d9e2a83868119dd18a601cdf
+                    (function(err, root) {
+                        this.socket = io.connect('http://172.23.237.226:8000');
                         if (err) {
                             console.log('load proto failed!');
                             throw err;
@@ -365,6 +366,13 @@
                             console.log('load proto failed!');
                             throw err;
                         }
+
+                        var curTick = new Date().getTime();
+                        if (Math.abs(window.FE.rotateTik - curTick) < 10) {
+                            return;
+                        }
+                        window.FE.rotateTik = curTick;
+
                         var MsgMouse = root.lookup('medical_imaging.MsgMouse');
                         var msgMouse = MsgMouse.create({
                             pre: { x: prePos.x, y: prePos.y },
