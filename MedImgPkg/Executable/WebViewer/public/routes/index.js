@@ -10,12 +10,13 @@ router.get('/', function(req, res, next) {
 
 /* GET login page. */
 router.route('/login')
-	.get(function(req, res) 
-	{  // 到达此路径则渲染login文件，并传出title值供 login.html使用
+    .get(function(
+        req,
+        res) {  // 到达此路径则渲染login文件，并传出title值供 login.html使用
       res.render('login', {title: 'User Login'});
     })
-    .post(
-		function(req, res) {  // 从此路径检测到post方式则进行post数据的处理操作
+    .post(function(
+        req, res) {  // 从此路径检测到post方式则进行post数据的处理操作
       // get User info
       //这里的User就是从model中获取user对象，通过global.dbHandel全局方法（这个方法在app.js中已经实现)
       var User = global.dbHandel.getModel('user');
@@ -91,7 +92,9 @@ router.get('/home', function(req, res) {
     req.session.error = '请先登录'
     res.redirect('/login');  //未登录则重定向到 /login 路径
   }
-  res.render('home', {title: 'Home', name : req.session.user.name});  //已登录则渲染home页面
+  res.render(
+      'home',
+      {title: 'Home', name: req.session.user.name});  //已登录则渲染home页面
 });
 
 /* GET logout page. */
@@ -102,11 +105,17 @@ router.get('/logout', function(req, res) {  // 到达 /logout 路径则登出，
   res.redirect('/');
 });
 
-router.route('/review').get(function(req, res){
+router.route('/review').get(function(req, res) {
   if (!req.session.user) {  //到达/home路径首先判断是否已经登录
     req.session.error = '请先登录'
     res.redirect('/login');  //未登录则重定向到 /login 路径
+    }
+  else {
+    console.log('login name is : ', req.session.user.name);
+    // res.redirect('/review');
+    res.render(
+        'review',
+        {username: req.session.user.name});  // go directly to review page
   }
-  res.render('review', {name : req.session.user.name});  //已登录则渲染home页面
 });
 module.exports = router;

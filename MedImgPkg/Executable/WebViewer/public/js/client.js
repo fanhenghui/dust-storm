@@ -70,7 +70,7 @@
       this.username = username;
 
       //链接websocket服务器
-      this.socket = io.connect('http://172.23.236.32:8000');
+      this.socket = io.connect('http://172.23.236.72:8000');
 
       //通知服务器有用户登录
       this.socket.emit('login', {userid: this.userid, username: this.username});
@@ -227,10 +227,9 @@
         content: header_buffer
       })
     }
-  }
+  };
 
-              window.LOGIC = {
-
+  window.LOGIC = {
     drawImg: function() {
       for (var i = 0; i < myCanvasImg.data.length; i += 4) {
         myCanvasImg.data[i] =
@@ -242,10 +241,6 @@
       myCtx.putImageData(
           myCanvasImg, 0, 0);  //把图像数据（从指定的 ImageData 对象）放回画布上
     },
-
-
-  }
-
-
+  };
 
 })()

@@ -27,7 +27,7 @@ int height = 512;
 
 std::shared_ptr<ImgSeqGen> _imgGen;
 int deep = 713;
-std::string data_path = "/home/wr/data/AB_CTA_01.raw";
+std::string data_path = "/home/zhangchanggong/data/AB_CTA_01.raw";
 
 
 
