@@ -1,6 +1,7 @@
 #include "mi_entry_exit_points.h"
 
 #include "MedImgGLResource/mi_gl_texture_2d.h"
+#include "MedImgGLResource/mi_gl_texture_cache.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 
 #include "MedImgIO/mi_image_data.h"
@@ -65,23 +66,30 @@ void EntryExitPoints::set_display_size(int width, int height) {
 
   // resize texture
   if (GPU_BASE == _strategy && _has_init) {
-    CHECK_GL_ERROR;
 
-    _entry_points_texture->bind();
-    GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
-    GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-    _entry_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
-                                NULL);
-    _entry_points_texture->unbind();
+    GLTextureCache::instance()->cache_load(
+        GL_TEXTURE_2D, _entry_points_texture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+        GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
-    _exit_points_texture->bind();
-    GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
-    GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-    _exit_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
-                               NULL);
-    _exit_points_texture->unbind();
+    GLTextureCache::instance()->cache_load(
+        GL_TEXTURE_2D, _exit_points_texture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+        GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
-    CHECK_GL_ERROR;
+    // _entry_points_texture->bind();
+    // GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+    // GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+    // _entry_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA,
+    // GL_FLOAT,
+    //                             NULL);
+    // _entry_points_texture->unbind();
+
+    // _exit_points_texture->bind();
+    // GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+    // GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+    // _exit_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA,
+    // GL_FLOAT,
+    //                            NULL);
+    // _exit_points_texture->unbind();
   }
 }
 

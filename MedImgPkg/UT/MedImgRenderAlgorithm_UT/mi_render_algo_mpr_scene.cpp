@@ -114,7 +114,7 @@ void Init() {
 void Display() {
   try {
 
-   GLUtils::set_pixel_pack_alignment(1);
+    GLUtils::set_pixel_pack_alignment(1);
 
     glViewport(0, 0, _width, _height);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -129,17 +129,17 @@ void Display() {
 
     _scene->render_to_back();
 
-//_time_query2->begin();
-// glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
+    //_time_query2->begin();
+    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
     _scene->download_image_buffer();
     _scene->swap_image_buffer();
-    unsigned char* buffer = nullptr;
-    int buffer_size=0;
-    _scene->get_image_buffer(buffer,buffer_size);
+    unsigned char *buffer = nullptr;
+    int buffer_size = 0;
+    _scene->get_image_buffer(buffer, buffer_size);
 
 #ifdef WIN32
-    FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
+    FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
 // FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
 #endif
@@ -221,7 +221,9 @@ void resize(int x, int y) {
   glutPostRedisplay();
 }
 
-void Idle() { glutPostRedisplay(); }
+void Idle() {
+  // glutPostRedisplay();
+}
 
 void MouseClick(int button, int status, int x, int y) {
   x = x < 0 ? 0 : x;

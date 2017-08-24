@@ -81,7 +81,6 @@ void RayCastScene::initialize() {
 void RayCastScene::set_display_size(int width, int height) {
   SceneBase::set_display_size(width, height);
   _canvas->set_display_size(width, height);
-  _canvas->update_fbo(); // update texture size
   _entry_exit_points->set_display_size(width, height);
   _camera_interactor->resize(width, height);
 }
@@ -101,6 +100,9 @@ void RayCastScene::pre_render_i() {
 
   // GL texture udpate
   GLTextureCache::instance()->process_cache();
+
+  //scene base prerender to recreate jpeg encoder
+  SceneBase::pre_render_i();
 }
 
 void RayCastScene::init_default_color_texture_i() {
@@ -225,21 +227,26 @@ void RayCastScene::render() {
 
   // TODO Test code
   {
-    FBOStack fbo_stack;
-    _scene_color_attach_0->bind();
-    unsigned char *color_array = new unsigned char[_width * _height * 3];
-    _scene_color_attach_0->download(GL_RGB, GL_UNSIGNED_BYTE, color_array);
-#ifdef WIN32
-    std::stringstream ss;
-    ss << "D:/temp/scene_img_" << _name << "_" << _width << "_" << _height
-       << ".rgb";
-    FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height * 3);
-#else
-    std::stringstream ss;
-    ss << "/home/wr/data/scene_img_" << _name << "_" << _width << "_" << _height
-       << ".rgb";
-    FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height * 3);
-#endif
+    //     FBOStack fbo_stack;
+    //     _scene_color_attach_0->bind();
+    //     unsigned char *color_array = new unsigned char[_width * _height * 3];
+    //     _scene_color_attach_0->download(GL_RGB, GL_UNSIGNED_BYTE,
+    //     color_array);
+    // #ifdef WIN32
+    //     std::stringstream ss;
+    //     ss << "D:/temp/scene_img_" << _name << "_" << _width << "_" <<
+    //     _height
+    //        << ".rgb";
+    //     FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height *
+    //     3);
+    // #else
+    //     std::stringstream ss;
+    //     ss << "/home/wr/data/scene_img_" << _name << "_" << _width << "_" <<
+    //     _height
+    //        << ".rgb";
+    //     FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height *
+    //     3);
+    // #endif
   }
 
   set_dirty(false);
@@ -345,8 +352,12 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
 
 void RayCastScene::set_window_level(float ww, float wl, unsigned char label) {
   RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
-  if (_window_levels.find(label) == _window_levels.end()) {
+  auto it = _window_levels.find(label);
+  if (it == _window_levels.end()) {
     _window_levels.insert(std::make_pair(label, Vector2f(ww, wl)));
+  } else {
+    it->second.set_x(ww);
+    it->second.set_y(wl);
   }
 
   _volume_infos->get_volume()->regulate_normalize_wl(ww, wl);
@@ -362,8 +373,8 @@ int RayCastScene::get_window_level(float &ww, float &wl,
   if (it == _window_levels.end()) {
     return -1;
   } else {
-    ww = it->second[0];
-    wl = it->second[1];
+    ww = it->second.get_x();
+    wl = it->second.get_y();
     return 0;
   }
 }
@@ -413,6 +424,26 @@ void RayCastScene::set_color_inverse_mode(ColorInverseMode mode) {
     _ray_caster->set_color_inverse_mode(mode);
     set_dirty(true);
   }
+}
+
+MaskMode RayCastScene::get_mask_mode() const {
+  return _ray_caster->get_mask_mode();
+}
+
+CompositeMode RayCastScene::get_composite_mode() const {
+  return _ray_caster->get_composite_mode();
+}
+
+InterpolationMode RayCastScene::get_interpolation_mode() const {
+  return _ray_caster->get_interpolation_mode();
+}
+
+ShadingMode RayCastScene::get_shading_mode() const {
+  return _ray_caster->get_shading_mode();
+}
+
+ColorInverseMode RayCastScene::get_color_inverse_mode() const {
+  return _ray_caster->get_color_inverse_mode();
 }
 
 void RayCastScene::set_ambient_color(float r, float g, float b, float factor) {

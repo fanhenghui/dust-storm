@@ -33,5 +33,8 @@ message MsgInit{
     required int32 pid = 1;
     required string series_uid = 2;
     repeated MsgCellInfo cells = 3;
-    
+};
+
+message MsgResize{
+    repeated MsgCellInfo cells = 1;
 };
