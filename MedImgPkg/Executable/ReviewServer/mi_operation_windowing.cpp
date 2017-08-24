@@ -46,9 +46,18 @@ int OpWindowing::execute() {
       std::dynamic_pointer_cast<VRScene>(scene);
   if (scene_ext) {
     float ww, wl;
-    scene_ext->get_global_window_level(ww, wl);
-    ww += (cur_x - pre_x);
-    wl += (pre_y - cur_y);
+    if (scene_ext->get_composite_mode() == COMPOSITE_DVR) {
+      // TODO consider when has mask
+      scene_ext->get_window_level(ww, wl, 0);
+      ww += (cur_x - pre_x);
+      wl += (pre_y - cur_y);
+      scene_ext->set_window_level(ww, wl, 0);
+    } else {
+      scene_ext->get_global_window_level(ww, wl);
+      ww += (cur_x - pre_x);
+      wl += (pre_y - cur_y);
+      scene_ext->set_global_window_level(ww, wl);
+    }
   } else {
     std::shared_ptr<MPRScene> scene_ext =
         std::dynamic_pointer_cast<MPRScene>(scene);
@@ -56,6 +65,7 @@ int OpWindowing::execute() {
     scene_ext->get_global_window_level(ww, wl);
     ww += (cur_x - pre_x);
     wl += (pre_y - cur_y);
+    scene_ext->set_global_window_level(ww, wl);
   }
 
   std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";

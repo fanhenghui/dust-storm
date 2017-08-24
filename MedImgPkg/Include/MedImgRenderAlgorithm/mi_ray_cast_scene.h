@@ -62,6 +62,13 @@ public:
   void set_shading_mode(ShadingMode mode);
   void set_color_inverse_mode(ColorInverseMode mode);
 
+  MaskMode get_mask_mode() const;
+  CompositeMode get_composite_mode() const;
+  InterpolationMode get_interpolation_mode() const;
+  ShadingMode get_shading_mode() const;
+  ColorInverseMode get_color_inverse_mode() const;
+
+
   void set_ambient_color(float r, float g, float b, float factor);
   void set_material(const Material &m, unsigned char label);
 

@@ -40,6 +40,10 @@ message MsgInit{
     repeated MsgCellInfo cells = 3; 
 };
 
+message MsgResize{
+    repeated MsgCellInfo cells = 1;
+};
+
 message MsgWorklistItem{
     required string patient_name = 1;
     required string patient_id = 2;
@@ -49,4 +53,4 @@ message MsgWorklistItem{
 
 message MsgWorklist{
     repeated MsgWorklistItem items = 1;
-}
+};

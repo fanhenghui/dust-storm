@@ -17,6 +17,7 @@
 #include "mi_operation_init.h"
 #include "mi_operation_mpr_paging.h"
 #include "mi_operation_pan.h"
+#include "mi_operation_resize.h"
 #include "mi_operation_rotate.h"
 #include "mi_operation_windowing.h"
 #include "mi_operation_zoom.h"
@@ -73,7 +74,9 @@ void ReviewController::initialize() {
   OperationFactory::instance()->register_operation(
       OPERATION_ID_PAN, std::shared_ptr<OpPan>(new OpPan()));
   OperationFactory::instance()->register_operation(
-    OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
+      OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
+  OperationFactory::instance()->register_operation(
+      OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
 }
 
 void ReviewController::set_volume_infos(

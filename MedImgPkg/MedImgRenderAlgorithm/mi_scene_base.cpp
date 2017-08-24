@@ -2,6 +2,7 @@
 
 #include "MedImgGLResource/mi_gl_fbo.h"
 #include "MedImgGLResource/mi_gl_texture_2d.h"
+#include "MedImgGLResource/mi_gl_texture_cache.h"
 #include "MedImgGLResource/mi_gl_utils.h"
 #include "MedImgUtil/mi_file_util.h"
 
@@ -23,6 +24,7 @@ SceneBase::SceneBase() : _width(128), _height(128) {
   // init gpujepg parameter
   _gpujpeg_encoder = nullptr;
   _gpujpeg_texture = nullptr;
+  _gpujpeg_encoder_dirty = false;
 
   //_gpujpeg_encoding_duration = 0;
 }
@@ -40,6 +42,7 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
   // init gpujepg parameter
   _gpujpeg_encoder = nullptr;
   _gpujpeg_texture = nullptr;
+  _gpujpeg_encoder_dirty = false;
 
   //_gpujpeg_encoding_duration = 0;
 }
@@ -81,7 +84,7 @@ void SceneBase::initialize() {
     _scene_color_attach_0->bind();
     GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
     GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-    _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGBA,
+    _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGB,
                                 GL_UNSIGNED_BYTE, nullptr);
 
     UIDType depth_color_id = 0;
@@ -149,29 +152,33 @@ void SceneBase::set_display_size(int width, int height) {
     return;
   }
 
+  // reset image buffer
   _image_buffer[0].reset(new unsigned char[_width * _height * 3]);
   _image_buffer[1].reset(new unsigned char[_width * _height * 3]);
+  _image_buffer_size[0] = _width * _height * 3;
+  _image_buffer_size[1] = _width * _height * 3;
+  _front_buffer_id = 0;
 
-  _scene_color_attach_0->bind();
-  _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGBA,
-                              GL_UNSIGNED_BYTE, nullptr);
-
-  _scene_depth_attach->bind();
-  _scene_depth_attach->load(GL_DEPTH_COMPONENT16, _width, _height,
-                            GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
-
-  // change gpujpeg parameter
   _gpujpeg_image_param.width = _width;
   _gpujpeg_image_param.height = _height;
+  _gpujpeg_encoder_dirty = true;
 
-  if (_gpujpeg_encoder) {
-    gpujpeg_encoder_destroy(_gpujpeg_encoder);
-    _gpujpeg_encoder = nullptr;
-    // recreate encoder
-    _gpujpeg_encoder =
-        gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
-    RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
-  }
+  GLTextureCache::instance()->cache_load(
+      GL_TEXTURE_2D, _scene_color_attach_0, GL_CLAMP_TO_EDGE, GL_LINEAR,
+      GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+  GLTextureCache::instance()->cache_load(
+      GL_TEXTURE_2D, _scene_depth_attach, GL_CLAMP_TO_EDGE, GL_LINEAR,
+      GL_DEPTH_COMPONENT16, _width, _height, 0, GL_DEPTH_COMPONENT,
+      GL_UNSIGNED_SHORT, nullptr);
+
+  // _scene_color_attach_0->bind();
+  // _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGBA,
+  //                             GL_UNSIGNED_BYTE, nullptr);
+
+  // _scene_depth_attach->bind();
+  // _scene_depth_attach->load(GL_DEPTH_COMPONENT16, _width, _height,
+  //                           GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
 
   set_dirty(true);
 }
@@ -193,7 +200,33 @@ void SceneBase::set_dirty(bool flag) { _dirty = flag; }
 
 bool SceneBase::get_dirty() const { return _dirty; }
 
-void SceneBase::pre_render_i() {}
+void SceneBase::pre_render_i() {
+  if (_gpujpeg_encoder && _gpujpeg_encoder_dirty) {
+    gpujpeg_encoder_destroy(_gpujpeg_encoder);
+    _gpujpeg_encoder = nullptr;
+
+    gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+    _gpujpeg_image_param.comp_count = 3;
+    _gpujpeg_image_param.color_space = GPUJPEG_RGB;
+    _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
+    // bind GL texture to cuda(by PBO)
+    unsigned int tex_id = _scene_color_attach_0->get_id();
+    _gpujpeg_texture =
+        gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
+    // create encoder
+    _gpujpeg_encoder =
+        gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+    // set texture as input
+    gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input,
+                                      _gpujpeg_texture);
+
+    _gpujpeg_encoder_dirty = false;
+  }
+}
 
 void SceneBase::set_name(const std::string &name) { _name = name; }
 

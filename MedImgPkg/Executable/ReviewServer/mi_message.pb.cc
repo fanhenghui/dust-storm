@@ -22,6 +22,8 @@ class MsgStringDefaultTypeInternal : public ::google::protobuf::internal::Explic
 } _MsgString_default_instance_;
 class MsgPoint2DefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgPoint2> {
 } _MsgPoint2_default_instance_;
+class MsgPoint2ArrayDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgPoint2Array> {
+} _MsgPoint2Array_default_instance_;
 class MsgPagingDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgPaging> {
 } _MsgPaging_default_instance_;
 class MsgMouseDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgMouse> {
@@ -30,6 +32,8 @@ class MsgCellInfoDefaultTypeInternal : public ::google::protobuf::internal::Expl
 } _MsgCellInfo_default_instance_;
 class MsgInitDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgInit> {
 } _MsgInit_default_instance_;
+class MsgResizeDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgResize> {
+} _MsgResize_default_instance_;
 class MsgWorklistItemDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgWorklistItem> {
 } _MsgWorklistItem_default_instance_;
 class MsgWorklistDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgWorklist> {
@@ -40,7 +44,7 @@ namespace protobuf_mi_5fmessage_2eproto {
 
 namespace {
 
-::google::protobuf::Metadata file_level_metadata[8];
+::google::protobuf::Metadata file_level_metadata[10];
 
 }  // namespace
 
@@ -55,6 +59,8 @@ PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::AuxillaryParseTableField
 };
 PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::ParseTable const
     TableStruct::schema[] = {
+  { NULL, NULL, 0, -1, -1, false },
+  { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
@@ -80,6 +86,15 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   ~0u,  // no _weak_field_map_
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2, x_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2, y_),
+  0,
+  1,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2Array, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2Array, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2Array, x_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPoint2Array, y_),
   0,
   1,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgPaging, _has_bits_),
@@ -126,6 +141,13 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   1,
   0,
   ~0u,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgResize, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgResize, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgResize, cells_),
+  ~0u,
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, _has_bits_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -151,21 +173,25 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
 static const ::google::protobuf::internal::MigrationSchema schemas[] = {
   { 0, 6, sizeof(MsgString)},
   { 7, 14, sizeof(MsgPoint2)},
-  { 16, 22, sizeof(MsgPaging)},
-  { 23, 31, sizeof(MsgMouse)},
-  { 34, 44, sizeof(MsgCellInfo)},
-  { 49, 57, sizeof(MsgInit)},
-  { 60, 69, sizeof(MsgWorklistItem)},
-  { 73, 79, sizeof(MsgWorklist)},
+  { 16, 23, sizeof(MsgPoint2Array)},
+  { 25, 31, sizeof(MsgPaging)},
+  { 32, 40, sizeof(MsgMouse)},
+  { 43, 53, sizeof(MsgCellInfo)},
+  { 58, 66, sizeof(MsgInit)},
+  { 69, 75, sizeof(MsgResize)},
+  { 76, 85, sizeof(MsgWorklistItem)},
+  { 89, 95, sizeof(MsgWorklist)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgString_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgPoint2_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&_MsgPoint2Array_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgPaging_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgMouse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgCellInfo_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgInit_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&_MsgResize_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgWorklistItem_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgWorklist_default_instance_),
 };
@@ -188,7 +214,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 8);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 10);
 }
 
 }  // namespace
@@ -198,18 +224,22 @@ void TableStruct::Shutdown() {
   delete file_level_metadata[0].reflection;
   _MsgPoint2_default_instance_.Shutdown();
   delete file_level_metadata[1].reflection;
-  _MsgPaging_default_instance_.Shutdown();
+  _MsgPoint2Array_default_instance_.Shutdown();
   delete file_level_metadata[2].reflection;
-  _MsgMouse_default_instance_.Shutdown();
+  _MsgPaging_default_instance_.Shutdown();
   delete file_level_metadata[3].reflection;
-  _MsgCellInfo_default_instance_.Shutdown();
+  _MsgMouse_default_instance_.Shutdown();
   delete file_level_metadata[4].reflection;
-  _MsgInit_default_instance_.Shutdown();
+  _MsgCellInfo_default_instance_.Shutdown();
   delete file_level_metadata[5].reflection;
-  _MsgWorklistItem_default_instance_.Shutdown();
+  _MsgInit_default_instance_.Shutdown();
   delete file_level_metadata[6].reflection;
-  _MsgWorklist_default_instance_.Shutdown();
+  _MsgResize_default_instance_.Shutdown();
   delete file_level_metadata[7].reflection;
+  _MsgWorklistItem_default_instance_.Shutdown();
+  delete file_level_metadata[8].reflection;
+  _MsgWorklist_default_instance_.Shutdown();
+  delete file_level_metadata[9].reflection;
 }
 
 void TableStruct::InitDefaultsImpl() {
@@ -218,10 +248,12 @@ void TableStruct::InitDefaultsImpl() {
   ::google::protobuf::internal::InitProtobufDefaults();
   _MsgString_default_instance_.DefaultConstruct();
   _MsgPoint2_default_instance_.DefaultConstruct();
+  _MsgPoint2Array_default_instance_.DefaultConstruct();
   _MsgPaging_default_instance_.DefaultConstruct();
   _MsgMouse_default_instance_.DefaultConstruct();
   _MsgCellInfo_default_instance_.DefaultConstruct();
   _MsgInit_default_instance_.DefaultConstruct();
+  _MsgResize_default_instance_.DefaultConstruct();
   _MsgWorklistItem_default_instance_.DefaultConstruct();
   _MsgWorklist_default_instance_.DefaultConstruct();
   _MsgMouse_default_instance_.get_mutable()->pre_ = const_cast< ::medical_imaging::MsgPoint2*>(
@@ -240,6 +272,7 @@ void AddDescriptorsImpl() {
   static const char descriptor[] = {
       "\n\020mi_message.proto\022\017medical_imaging\"\034\n\tM"
       "sgString\022\017\n\007context\030\001 \002(\t\"!\n\tMsgPoint2\022\t"
+      "\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\"&\n\016MsgPoint2Array\022\t"
       "\n\001x\030\001 \002(\002\022\t\n\001y\030\002 \002(\002\"\031\n\tMsgPaging\022\014\n\004pag"
       "e\030\001 \002(\005\"i\n\010MsgMouse\022\'\n\003pre\030\001 \002(\0132\032.medic"
       "al_imaging.MsgPoint2\022\'\n\003cur\030\002 \002(\0132\032.medi"
@@ -248,14 +281,16 @@ void AddDescriptorsImpl() {
       "irection\030\003 \002(\005\022\r\n\005width\030\004 \002(\005\022\016\n\006height\030"
       "\005 \002(\005\"W\n\007MsgInit\022\013\n\003pid\030\001 \002(\005\022\022\n\nseries_"
       "uid\030\002 \002(\t\022+\n\005cells\030\003 \003(\0132\034.medical_imagi"
-      "ng.MsgCellInfo\"i\n\017MsgWorklistItem\022\024\n\014pat"
-      "ient_name\030\001 \002(\t\022\022\n\npatient_id\030\002 \002(\t\022\022\n\ns"
-      "eries_uid\030\003 \002(\t\022\030\n\020imaging_modality\030\004 \002("
-      "\t\">\n\013MsgWorklist\022/\n\005items\030\001 \003(\0132 .medica"
-      "l_imaging.MsgWorklistItem"
+      "ng.MsgCellInfo\"8\n\tMsgResize\022+\n\005cells\030\001 \003"
+      "(\0132\034.medical_imaging.MsgCellInfo\"i\n\017MsgW"
+      "orklistItem\022\024\n\014patient_name\030\001 \002(\t\022\022\n\npat"
+      "ient_id\030\002 \002(\t\022\022\n\nseries_uid\030\003 \002(\t\022\030\n\020ima"
+      "ging_modality\030\004 \002(\t\">\n\013MsgWorklist\022/\n\005it"
+      "ems\030\001 \003(\0132 .medical_imaging.MsgWorklistI"
+      "tem"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 585);
+      descriptor, 683);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "mi_message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&TableStruct::Shutdown);
@@ -949,6 +984,357 @@ void MsgPoint2::set_y(float value) {
   set_has_y();
   y_ = value;
   // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2.y)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int MsgPoint2Array::kXFieldNumber;
+const int MsgPoint2Array::kYFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+MsgPoint2Array::MsgPoint2Array()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    protobuf_mi_5fmessage_2eproto::InitDefaults();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:medical_imaging.MsgPoint2Array)
+}
+MsgPoint2Array::MsgPoint2Array(const MsgPoint2Array& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _has_bits_(from._has_bits_),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::memcpy(&x_, &from.x_,
+    static_cast<size_t>(reinterpret_cast<char*>(&y_) -
+    reinterpret_cast<char*>(&x_)) + sizeof(y_));
+  // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgPoint2Array)
+}
+
+void MsgPoint2Array::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(&x_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&y_) -
+      reinterpret_cast<char*>(&x_)) + sizeof(y_));
+}
+
+MsgPoint2Array::~MsgPoint2Array() {
+  // @@protoc_insertion_point(destructor:medical_imaging.MsgPoint2Array)
+  SharedDtor();
+}
+
+void MsgPoint2Array::SharedDtor() {
+}
+
+void MsgPoint2Array::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MsgPoint2Array::descriptor() {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const MsgPoint2Array& MsgPoint2Array::default_instance() {
+  protobuf_mi_5fmessage_2eproto::InitDefaults();
+  return *internal_default_instance();
+}
+
+MsgPoint2Array* MsgPoint2Array::New(::google::protobuf::Arena* arena) const {
+  MsgPoint2Array* n = new MsgPoint2Array;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void MsgPoint2Array::Clear() {
+// @@protoc_insertion_point(message_clear_start:medical_imaging.MsgPoint2Array)
+  if (_has_bits_[0 / 32] & 3u) {
+    ::memset(&x_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&y_) -
+        reinterpret_cast<char*>(&x_)) + sizeof(y_));
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool MsgPoint2Array::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:medical_imaging.MsgPoint2Array)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required float x = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(13u)) {
+          set_has_x();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &x_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required float y = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(21u)) {
+          set_has_y();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &y_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:medical_imaging.MsgPoint2Array)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:medical_imaging.MsgPoint2Array)
+  return false;
+#undef DO_
+}
+
+void MsgPoint2Array::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:medical_imaging.MsgPoint2Array)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required float x = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(1, this->x(), output);
+  }
+
+  // required float y = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(2, this->y(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:medical_imaging.MsgPoint2Array)
+}
+
+::google::protobuf::uint8* MsgPoint2Array::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgPoint2Array)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required float x = 1;
+  if (cached_has_bits & 0x00000001u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(1, this->x(), target);
+  }
+
+  // required float y = 2;
+  if (cached_has_bits & 0x00000002u) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(2, this->y(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:medical_imaging.MsgPoint2Array)
+  return target;
+}
+
+size_t MsgPoint2Array::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:medical_imaging.MsgPoint2Array)
+  size_t total_size = 0;
+
+  if (has_x()) {
+    // required float x = 1;
+    total_size += 1 + 4;
+  }
+
+  if (has_y()) {
+    // required float y = 2;
+    total_size += 1 + 4;
+  }
+
+  return total_size;
+}
+size_t MsgPoint2Array::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:medical_imaging.MsgPoint2Array)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required float x = 1;
+    total_size += 1 + 4;
+
+    // required float y = 2;
+    total_size += 1 + 4;
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MsgPoint2Array::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:medical_imaging.MsgPoint2Array)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MsgPoint2Array* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const MsgPoint2Array>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:medical_imaging.MsgPoint2Array)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:medical_imaging.MsgPoint2Array)
+    MergeFrom(*source);
+  }
+}
+
+void MsgPoint2Array::MergeFrom(const MsgPoint2Array& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:medical_imaging.MsgPoint2Array)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 3u) {
+    if (cached_has_bits & 0x00000001u) {
+      x_ = from.x_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      y_ = from.y_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+}
+
+void MsgPoint2Array::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:medical_imaging.MsgPoint2Array)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MsgPoint2Array::CopyFrom(const MsgPoint2Array& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:medical_imaging.MsgPoint2Array)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MsgPoint2Array::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  return true;
+}
+
+void MsgPoint2Array::Swap(MsgPoint2Array* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void MsgPoint2Array::InternalSwap(MsgPoint2Array* other) {
+  std::swap(x_, other->x_);
+  std::swap(y_, other->y_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata MsgPoint2Array::GetMetadata() const {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// MsgPoint2Array
+
+// required float x = 1;
+bool MsgPoint2Array::has_x() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void MsgPoint2Array::set_has_x() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void MsgPoint2Array::clear_has_x() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void MsgPoint2Array::clear_x() {
+  x_ = 0;
+  clear_has_x();
+}
+float MsgPoint2Array::x() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.x)
+  return x_;
+}
+void MsgPoint2Array::set_x(float value) {
+  set_has_x();
+  x_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.x)
+}
+
+// required float y = 2;
+bool MsgPoint2Array::has_y() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void MsgPoint2Array::set_has_y() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void MsgPoint2Array::clear_has_y() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void MsgPoint2Array::clear_y() {
+  y_ = 0;
+  clear_has_y();
+}
+float MsgPoint2Array::y() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.y)
+  return y_;
+}
+void MsgPoint2Array::set_y(float value) {
+  set_has_y();
+  y_ = value;
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.y)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
@@ -2750,6 +3136,281 @@ MsgInit::mutable_cells() {
 const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
 MsgInit::cells() const {
   // @@protoc_insertion_point(field_list:medical_imaging.MsgInit.cells)
+  return cells_;
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int MsgResize::kCellsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+MsgResize::MsgResize()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    protobuf_mi_5fmessage_2eproto::InitDefaults();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:medical_imaging.MsgResize)
+}
+MsgResize::MsgResize(const MsgResize& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _has_bits_(from._has_bits_),
+      _cached_size_(0),
+      cells_(from.cells_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgResize)
+}
+
+void MsgResize::SharedCtor() {
+  _cached_size_ = 0;
+}
+
+MsgResize::~MsgResize() {
+  // @@protoc_insertion_point(destructor:medical_imaging.MsgResize)
+  SharedDtor();
+}
+
+void MsgResize::SharedDtor() {
+}
+
+void MsgResize::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MsgResize::descriptor() {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const MsgResize& MsgResize::default_instance() {
+  protobuf_mi_5fmessage_2eproto::InitDefaults();
+  return *internal_default_instance();
+}
+
+MsgResize* MsgResize::New(::google::protobuf::Arena* arena) const {
+  MsgResize* n = new MsgResize;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void MsgResize::Clear() {
+// @@protoc_insertion_point(message_clear_start:medical_imaging.MsgResize)
+  cells_.Clear();
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool MsgResize::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:medical_imaging.MsgResize)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .medical_imaging.MsgCellInfo cells = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_cells()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:medical_imaging.MsgResize)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:medical_imaging.MsgResize)
+  return false;
+#undef DO_
+}
+
+void MsgResize::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:medical_imaging.MsgResize)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .medical_imaging.MsgCellInfo cells = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->cells_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->cells(static_cast<int>(i)), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:medical_imaging.MsgResize)
+}
+
+::google::protobuf::uint8* MsgResize::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgResize)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .medical_imaging.MsgCellInfo cells = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->cells_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageNoVirtualToArray(
+        1, this->cells(static_cast<int>(i)), deterministic, target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:medical_imaging.MsgResize)
+  return target;
+}
+
+size_t MsgResize::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:medical_imaging.MsgResize)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  // repeated .medical_imaging.MsgCellInfo cells = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->cells_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->cells(static_cast<int>(i)));
+    }
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MsgResize::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:medical_imaging.MsgResize)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MsgResize* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const MsgResize>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:medical_imaging.MsgResize)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:medical_imaging.MsgResize)
+    MergeFrom(*source);
+  }
+}
+
+void MsgResize::MergeFrom(const MsgResize& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:medical_imaging.MsgResize)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cells_.MergeFrom(from.cells_);
+}
+
+void MsgResize::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:medical_imaging.MsgResize)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MsgResize::CopyFrom(const MsgResize& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:medical_imaging.MsgResize)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MsgResize::IsInitialized() const {
+  if (!::google::protobuf::internal::AllAreInitialized(this->cells())) return false;
+  return true;
+}
+
+void MsgResize::Swap(MsgResize* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void MsgResize::InternalSwap(MsgResize* other) {
+  cells_.InternalSwap(&other->cells_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata MsgResize::GetMetadata() const {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// MsgResize
+
+// repeated .medical_imaging.MsgCellInfo cells = 1;
+int MsgResize::cells_size() const {
+  return cells_.size();
+}
+void MsgResize::clear_cells() {
+  cells_.Clear();
+}
+const ::medical_imaging::MsgCellInfo& MsgResize::cells(int index) const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgResize.cells)
+  return cells_.Get(index);
+}
+::medical_imaging::MsgCellInfo* MsgResize::mutable_cells(int index) {
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgResize.cells)
+  return cells_.Mutable(index);
+}
+::medical_imaging::MsgCellInfo* MsgResize::add_cells() {
+  // @@protoc_insertion_point(field_add:medical_imaging.MsgResize.cells)
+  return cells_.Add();
+}
+::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
+MsgResize::mutable_cells() {
+  // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgResize.cells)
+  return &cells_;
+}
+const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
+MsgResize::cells() const {
+  // @@protoc_insertion_point(field_list:medical_imaging.MsgResize.cells)
   return cells_;
 }
 
