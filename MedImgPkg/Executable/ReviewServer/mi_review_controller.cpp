@@ -12,6 +12,7 @@
 #include "MedImgUtil/mi_configuration.h"
 
 #include "mi_load_series_command_handler.h"
+#include "mi_search_worklist_command_handler.h"
 #include "mi_mpr_play_command_handler.h"
 #include "mi_operation_init.h"
 #include "mi_operation_mpr_paging.h"
@@ -49,6 +50,9 @@ void ReviewController::initialize() {
   std::shared_ptr<MPRPlayCommandHandler> handler_mpr_play(
       new MPRPlayCommandHandler(app_controller));
   _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
+
+  std::shared_ptr<SearchWorklistCommandHandler> handler_search_worklist( new SearchWorklistCommandHandler(app_controller));
+  _proxy->register_command_handler(COMMAND_ID_WORKLIST, handler_search_worklist);
 
   //   std::shared_ptr<ReviewController> review_controller =
   //       std::dynamic_pointer_cast<ReviewController>(app_controller);

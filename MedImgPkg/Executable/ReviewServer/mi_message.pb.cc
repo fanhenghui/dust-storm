@@ -30,13 +30,17 @@ class MsgCellInfoDefaultTypeInternal : public ::google::protobuf::internal::Expl
 } _MsgCellInfo_default_instance_;
 class MsgInitDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgInit> {
 } _MsgInit_default_instance_;
+class MsgWorklistItemDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgWorklistItem> {
+} _MsgWorklistItem_default_instance_;
+class MsgWorklistDefaultTypeInternal : public ::google::protobuf::internal::ExplicitlyConstructed<MsgWorklist> {
+} _MsgWorklist_default_instance_;
 
 namespace protobuf_mi_5fmessage_2eproto {
 
 
 namespace {
 
-::google::protobuf::Metadata file_level_metadata[6];
+::google::protobuf::Metadata file_level_metadata[8];
 
 }  // namespace
 
@@ -51,6 +55,8 @@ PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::AuxillaryParseTableField
 };
 PROTOBUF_CONSTEXPR_VAR ::google::protobuf::internal::ParseTable const
     TableStruct::schema[] = {
+  { NULL, NULL, 0, -1, -1, false },
+  { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
   { NULL, NULL, 0, -1, -1, false },
@@ -120,6 +126,26 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   1,
   0,
   ~0u,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, patient_name_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, patient_id_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, series_uid_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklistItem, imaging_modality_),
+  0,
+  1,
+  2,
+  3,
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklist, _has_bits_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklist, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MsgWorklist, items_),
+  ~0u,
 };
 
 static const ::google::protobuf::internal::MigrationSchema schemas[] = {
@@ -129,6 +155,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] = {
   { 23, 31, sizeof(MsgMouse)},
   { 34, 44, sizeof(MsgCellInfo)},
   { 49, 57, sizeof(MsgInit)},
+  { 60, 69, sizeof(MsgWorklistItem)},
+  { 73, 79, sizeof(MsgWorklist)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -138,6 +166,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgMouse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgCellInfo_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&_MsgInit_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&_MsgWorklistItem_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&_MsgWorklist_default_instance_),
 };
 
 namespace {
@@ -158,7 +188,7 @@ void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) GOOGLE_ATTRIBUTE_COLD;
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 6);
+  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 8);
 }
 
 }  // namespace
@@ -176,6 +206,10 @@ void TableStruct::Shutdown() {
   delete file_level_metadata[4].reflection;
   _MsgInit_default_instance_.Shutdown();
   delete file_level_metadata[5].reflection;
+  _MsgWorklistItem_default_instance_.Shutdown();
+  delete file_level_metadata[6].reflection;
+  _MsgWorklist_default_instance_.Shutdown();
+  delete file_level_metadata[7].reflection;
 }
 
 void TableStruct::InitDefaultsImpl() {
@@ -188,6 +222,8 @@ void TableStruct::InitDefaultsImpl() {
   _MsgMouse_default_instance_.DefaultConstruct();
   _MsgCellInfo_default_instance_.DefaultConstruct();
   _MsgInit_default_instance_.DefaultConstruct();
+  _MsgWorklistItem_default_instance_.DefaultConstruct();
+  _MsgWorklist_default_instance_.DefaultConstruct();
   _MsgMouse_default_instance_.get_mutable()->pre_ = const_cast< ::medical_imaging::MsgPoint2*>(
       ::medical_imaging::MsgPoint2::internal_default_instance());
   _MsgMouse_default_instance_.get_mutable()->cur_ = const_cast< ::medical_imaging::MsgPoint2*>(
@@ -212,10 +248,14 @@ void AddDescriptorsImpl() {
       "irection\030\003 \002(\005\022\r\n\005width\030\004 \002(\005\022\016\n\006height\030"
       "\005 \002(\005\"W\n\007MsgInit\022\013\n\003pid\030\001 \002(\005\022\022\n\nseries_"
       "uid\030\002 \002(\t\022+\n\005cells\030\003 \003(\0132\034.medical_imagi"
-      "ng.MsgCellInfo"
+      "ng.MsgCellInfo\"i\n\017MsgWorklistItem\022\024\n\014pat"
+      "ient_name\030\001 \002(\t\022\022\n\npatient_id\030\002 \002(\t\022\022\n\ns"
+      "eries_uid\030\003 \002(\t\022\030\n\020imaging_modality\030\004 \002("
+      "\t\">\n\013MsgWorklist\022/\n\005items\030\001 \003(\0132 .medica"
+      "l_imaging.MsgWorklistItem"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 414);
+      descriptor, 585);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "mi_message.proto", &protobuf_RegisterTypes);
   ::google::protobuf::internal::OnShutdown(&TableStruct::Shutdown);
@@ -2711,6 +2751,1012 @@ const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
 MsgInit::cells() const {
   // @@protoc_insertion_point(field_list:medical_imaging.MsgInit.cells)
   return cells_;
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int MsgWorklistItem::kPatientNameFieldNumber;
+const int MsgWorklistItem::kPatientIdFieldNumber;
+const int MsgWorklistItem::kSeriesUidFieldNumber;
+const int MsgWorklistItem::kImagingModalityFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+MsgWorklistItem::MsgWorklistItem()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    protobuf_mi_5fmessage_2eproto::InitDefaults();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:medical_imaging.MsgWorklistItem)
+}
+MsgWorklistItem::MsgWorklistItem(const MsgWorklistItem& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _has_bits_(from._has_bits_),
+      _cached_size_(0) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  patient_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.has_patient_name()) {
+    patient_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.patient_name_);
+  }
+  patient_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.has_patient_id()) {
+    patient_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.patient_id_);
+  }
+  series_uid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.has_series_uid()) {
+    series_uid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.series_uid_);
+  }
+  imaging_modality_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.has_imaging_modality()) {
+    imaging_modality_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.imaging_modality_);
+  }
+  // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgWorklistItem)
+}
+
+void MsgWorklistItem::SharedCtor() {
+  _cached_size_ = 0;
+  patient_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  patient_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  series_uid_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  imaging_modality_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+MsgWorklistItem::~MsgWorklistItem() {
+  // @@protoc_insertion_point(destructor:medical_imaging.MsgWorklistItem)
+  SharedDtor();
+}
+
+void MsgWorklistItem::SharedDtor() {
+  patient_name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  patient_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  series_uid_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  imaging_modality_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void MsgWorklistItem::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MsgWorklistItem::descriptor() {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const MsgWorklistItem& MsgWorklistItem::default_instance() {
+  protobuf_mi_5fmessage_2eproto::InitDefaults();
+  return *internal_default_instance();
+}
+
+MsgWorklistItem* MsgWorklistItem::New(::google::protobuf::Arena* arena) const {
+  MsgWorklistItem* n = new MsgWorklistItem;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void MsgWorklistItem::Clear() {
+// @@protoc_insertion_point(message_clear_start:medical_imaging.MsgWorklistItem)
+  if (_has_bits_[0 / 32] & 15u) {
+    if (has_patient_name()) {
+      GOOGLE_DCHECK(!patient_name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
+      (*patient_name_.UnsafeRawStringPointer())->clear();
+    }
+    if (has_patient_id()) {
+      GOOGLE_DCHECK(!patient_id_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
+      (*patient_id_.UnsafeRawStringPointer())->clear();
+    }
+    if (has_series_uid()) {
+      GOOGLE_DCHECK(!series_uid_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
+      (*series_uid_.UnsafeRawStringPointer())->clear();
+    }
+    if (has_imaging_modality()) {
+      GOOGLE_DCHECK(!imaging_modality_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
+      (*imaging_modality_.UnsafeRawStringPointer())->clear();
+    }
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool MsgWorklistItem::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:medical_imaging.MsgWorklistItem)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required string patient_name = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_patient_name()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->patient_name().data(), static_cast<int>(this->patient_name().length()),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "medical_imaging.MsgWorklistItem.patient_name");
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required string patient_id = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(18u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_patient_id()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->patient_id().data(), static_cast<int>(this->patient_id().length()),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "medical_imaging.MsgWorklistItem.patient_id");
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required string series_uid = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(26u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_series_uid()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->series_uid().data(), static_cast<int>(this->series_uid().length()),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "medical_imaging.MsgWorklistItem.series_uid");
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // required string imaging_modality = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(34u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_imaging_modality()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->imaging_modality().data(), static_cast<int>(this->imaging_modality().length()),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "medical_imaging.MsgWorklistItem.imaging_modality");
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:medical_imaging.MsgWorklistItem)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:medical_imaging.MsgWorklistItem)
+  return false;
+#undef DO_
+}
+
+void MsgWorklistItem::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:medical_imaging.MsgWorklistItem)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required string patient_name = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->patient_name().data(), static_cast<int>(this->patient_name().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.patient_name");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->patient_name(), output);
+  }
+
+  // required string patient_id = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->patient_id().data(), static_cast<int>(this->patient_id().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.patient_id");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->patient_id(), output);
+  }
+
+  // required string series_uid = 3;
+  if (cached_has_bits & 0x00000004u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->series_uid().data(), static_cast<int>(this->series_uid().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.series_uid");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->series_uid(), output);
+  }
+
+  // required string imaging_modality = 4;
+  if (cached_has_bits & 0x00000008u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->imaging_modality().data(), static_cast<int>(this->imaging_modality().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.imaging_modality");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->imaging_modality(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:medical_imaging.MsgWorklistItem)
+}
+
+::google::protobuf::uint8* MsgWorklistItem::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgWorklistItem)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // required string patient_name = 1;
+  if (cached_has_bits & 0x00000001u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->patient_name().data(), static_cast<int>(this->patient_name().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.patient_name");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->patient_name(), target);
+  }
+
+  // required string patient_id = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->patient_id().data(), static_cast<int>(this->patient_id().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.patient_id");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->patient_id(), target);
+  }
+
+  // required string series_uid = 3;
+  if (cached_has_bits & 0x00000004u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->series_uid().data(), static_cast<int>(this->series_uid().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.series_uid");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->series_uid(), target);
+  }
+
+  // required string imaging_modality = 4;
+  if (cached_has_bits & 0x00000008u) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->imaging_modality().data(), static_cast<int>(this->imaging_modality().length()),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "medical_imaging.MsgWorklistItem.imaging_modality");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->imaging_modality(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:medical_imaging.MsgWorklistItem)
+  return target;
+}
+
+size_t MsgWorklistItem::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:medical_imaging.MsgWorklistItem)
+  size_t total_size = 0;
+
+  if (has_patient_name()) {
+    // required string patient_name = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->patient_name());
+  }
+
+  if (has_patient_id()) {
+    // required string patient_id = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->patient_id());
+  }
+
+  if (has_series_uid()) {
+    // required string series_uid = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->series_uid());
+  }
+
+  if (has_imaging_modality()) {
+    // required string imaging_modality = 4;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->imaging_modality());
+  }
+
+  return total_size;
+}
+size_t MsgWorklistItem::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:medical_imaging.MsgWorklistItem)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
+    // required string patient_name = 1;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->patient_name());
+
+    // required string patient_id = 2;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->patient_id());
+
+    // required string series_uid = 3;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->series_uid());
+
+    // required string imaging_modality = 4;
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->imaging_modality());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MsgWorklistItem::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:medical_imaging.MsgWorklistItem)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MsgWorklistItem* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const MsgWorklistItem>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:medical_imaging.MsgWorklistItem)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:medical_imaging.MsgWorklistItem)
+    MergeFrom(*source);
+  }
+}
+
+void MsgWorklistItem::MergeFrom(const MsgWorklistItem& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:medical_imaging.MsgWorklistItem)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 15u) {
+    if (cached_has_bits & 0x00000001u) {
+      set_has_patient_name();
+      patient_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.patient_name_);
+    }
+    if (cached_has_bits & 0x00000002u) {
+      set_has_patient_id();
+      patient_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.patient_id_);
+    }
+    if (cached_has_bits & 0x00000004u) {
+      set_has_series_uid();
+      series_uid_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.series_uid_);
+    }
+    if (cached_has_bits & 0x00000008u) {
+      set_has_imaging_modality();
+      imaging_modality_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.imaging_modality_);
+    }
+  }
+}
+
+void MsgWorklistItem::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:medical_imaging.MsgWorklistItem)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MsgWorklistItem::CopyFrom(const MsgWorklistItem& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:medical_imaging.MsgWorklistItem)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MsgWorklistItem::IsInitialized() const {
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+  return true;
+}
+
+void MsgWorklistItem::Swap(MsgWorklistItem* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void MsgWorklistItem::InternalSwap(MsgWorklistItem* other) {
+  patient_name_.Swap(&other->patient_name_);
+  patient_id_.Swap(&other->patient_id_);
+  series_uid_.Swap(&other->series_uid_);
+  imaging_modality_.Swap(&other->imaging_modality_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata MsgWorklistItem::GetMetadata() const {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// MsgWorklistItem
+
+// required string patient_name = 1;
+bool MsgWorklistItem::has_patient_name() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+void MsgWorklistItem::set_has_patient_name() {
+  _has_bits_[0] |= 0x00000001u;
+}
+void MsgWorklistItem::clear_has_patient_name() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+void MsgWorklistItem::clear_patient_name() {
+  patient_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_patient_name();
+}
+const ::std::string& MsgWorklistItem::patient_name() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_name)
+  return patient_name_.GetNoArena();
+}
+void MsgWorklistItem::set_patient_name(const ::std::string& value) {
+  set_has_patient_name();
+  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_name)
+}
+#if LANG_CXX11
+void MsgWorklistItem::set_patient_name(::std::string&& value) {
+  set_has_patient_name();
+  patient_name_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_name)
+}
+#endif
+void MsgWorklistItem::set_patient_name(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_patient_name();
+  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_name)
+}
+void MsgWorklistItem::set_patient_name(const char* value, size_t size) {
+  set_has_patient_name();
+  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_name)
+}
+::std::string* MsgWorklistItem::mutable_patient_name() {
+  set_has_patient_name();
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_name)
+  return patient_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* MsgWorklistItem::release_patient_name() {
+  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_name)
+  clear_has_patient_name();
+  return patient_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void MsgWorklistItem::set_allocated_patient_name(::std::string* patient_name) {
+  if (patient_name != NULL) {
+    set_has_patient_name();
+  } else {
+    clear_has_patient_name();
+  }
+  patient_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), patient_name);
+  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_name)
+}
+
+// required string patient_id = 2;
+bool MsgWorklistItem::has_patient_id() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+void MsgWorklistItem::set_has_patient_id() {
+  _has_bits_[0] |= 0x00000002u;
+}
+void MsgWorklistItem::clear_has_patient_id() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+void MsgWorklistItem::clear_patient_id() {
+  patient_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_patient_id();
+}
+const ::std::string& MsgWorklistItem::patient_id() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_id)
+  return patient_id_.GetNoArena();
+}
+void MsgWorklistItem::set_patient_id(const ::std::string& value) {
+  set_has_patient_id();
+  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_id)
+}
+#if LANG_CXX11
+void MsgWorklistItem::set_patient_id(::std::string&& value) {
+  set_has_patient_id();
+  patient_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_id)
+}
+#endif
+void MsgWorklistItem::set_patient_id(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_patient_id();
+  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_id)
+}
+void MsgWorklistItem::set_patient_id(const char* value, size_t size) {
+  set_has_patient_id();
+  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_id)
+}
+::std::string* MsgWorklistItem::mutable_patient_id() {
+  set_has_patient_id();
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_id)
+  return patient_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* MsgWorklistItem::release_patient_id() {
+  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_id)
+  clear_has_patient_id();
+  return patient_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void MsgWorklistItem::set_allocated_patient_id(::std::string* patient_id) {
+  if (patient_id != NULL) {
+    set_has_patient_id();
+  } else {
+    clear_has_patient_id();
+  }
+  patient_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), patient_id);
+  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_id)
+}
+
+// required string series_uid = 3;
+bool MsgWorklistItem::has_series_uid() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+void MsgWorklistItem::set_has_series_uid() {
+  _has_bits_[0] |= 0x00000004u;
+}
+void MsgWorklistItem::clear_has_series_uid() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+void MsgWorklistItem::clear_series_uid() {
+  series_uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_series_uid();
+}
+const ::std::string& MsgWorklistItem::series_uid() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.series_uid)
+  return series_uid_.GetNoArena();
+}
+void MsgWorklistItem::set_series_uid(const ::std::string& value) {
+  set_has_series_uid();
+  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.series_uid)
+}
+#if LANG_CXX11
+void MsgWorklistItem::set_series_uid(::std::string&& value) {
+  set_has_series_uid();
+  series_uid_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.series_uid)
+}
+#endif
+void MsgWorklistItem::set_series_uid(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_series_uid();
+  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.series_uid)
+}
+void MsgWorklistItem::set_series_uid(const char* value, size_t size) {
+  set_has_series_uid();
+  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.series_uid)
+}
+::std::string* MsgWorklistItem::mutable_series_uid() {
+  set_has_series_uid();
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.series_uid)
+  return series_uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* MsgWorklistItem::release_series_uid() {
+  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.series_uid)
+  clear_has_series_uid();
+  return series_uid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void MsgWorklistItem::set_allocated_series_uid(::std::string* series_uid) {
+  if (series_uid != NULL) {
+    set_has_series_uid();
+  } else {
+    clear_has_series_uid();
+  }
+  series_uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), series_uid);
+  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.series_uid)
+}
+
+// required string imaging_modality = 4;
+bool MsgWorklistItem::has_imaging_modality() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+void MsgWorklistItem::set_has_imaging_modality() {
+  _has_bits_[0] |= 0x00000008u;
+}
+void MsgWorklistItem::clear_has_imaging_modality() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+void MsgWorklistItem::clear_imaging_modality() {
+  imaging_modality_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  clear_has_imaging_modality();
+}
+const ::std::string& MsgWorklistItem::imaging_modality() const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.imaging_modality)
+  return imaging_modality_.GetNoArena();
+}
+void MsgWorklistItem::set_imaging_modality(const ::std::string& value) {
+  set_has_imaging_modality();
+  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.imaging_modality)
+}
+#if LANG_CXX11
+void MsgWorklistItem::set_imaging_modality(::std::string&& value) {
+  set_has_imaging_modality();
+  imaging_modality_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.imaging_modality)
+}
+#endif
+void MsgWorklistItem::set_imaging_modality(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  set_has_imaging_modality();
+  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.imaging_modality)
+}
+void MsgWorklistItem::set_imaging_modality(const char* value, size_t size) {
+  set_has_imaging_modality();
+  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.imaging_modality)
+}
+::std::string* MsgWorklistItem::mutable_imaging_modality() {
+  set_has_imaging_modality();
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.imaging_modality)
+  return imaging_modality_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+::std::string* MsgWorklistItem::release_imaging_modality() {
+  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.imaging_modality)
+  clear_has_imaging_modality();
+  return imaging_modality_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+void MsgWorklistItem::set_allocated_imaging_modality(::std::string* imaging_modality) {
+  if (imaging_modality != NULL) {
+    set_has_imaging_modality();
+  } else {
+    clear_has_imaging_modality();
+  }
+  imaging_modality_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), imaging_modality);
+  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.imaging_modality)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int MsgWorklist::kItemsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+MsgWorklist::MsgWorklist()
+  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
+  if (GOOGLE_PREDICT_TRUE(this != internal_default_instance())) {
+    protobuf_mi_5fmessage_2eproto::InitDefaults();
+  }
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:medical_imaging.MsgWorklist)
+}
+MsgWorklist::MsgWorklist(const MsgWorklist& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(NULL),
+      _has_bits_(from._has_bits_),
+      _cached_size_(0),
+      items_(from.items_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:medical_imaging.MsgWorklist)
+}
+
+void MsgWorklist::SharedCtor() {
+  _cached_size_ = 0;
+}
+
+MsgWorklist::~MsgWorklist() {
+  // @@protoc_insertion_point(destructor:medical_imaging.MsgWorklist)
+  SharedDtor();
+}
+
+void MsgWorklist::SharedDtor() {
+}
+
+void MsgWorklist::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* MsgWorklist::descriptor() {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
+}
+
+const MsgWorklist& MsgWorklist::default_instance() {
+  protobuf_mi_5fmessage_2eproto::InitDefaults();
+  return *internal_default_instance();
+}
+
+MsgWorklist* MsgWorklist::New(::google::protobuf::Arena* arena) const {
+  MsgWorklist* n = new MsgWorklist;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void MsgWorklist::Clear() {
+// @@protoc_insertion_point(message_clear_start:medical_imaging.MsgWorklist)
+  items_.Clear();
+  _has_bits_.Clear();
+  _internal_metadata_.Clear();
+}
+
+bool MsgWorklist::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:medical_imaging.MsgWorklist)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .medical_imaging.MsgWorklistItem items = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_items()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:medical_imaging.MsgWorklist)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:medical_imaging.MsgWorklist)
+  return false;
+#undef DO_
+}
+
+void MsgWorklist::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:medical_imaging.MsgWorklist)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .medical_imaging.MsgWorklistItem items = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->items_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->items(static_cast<int>(i)), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:medical_imaging.MsgWorklist)
+}
+
+::google::protobuf::uint8* MsgWorklist::InternalSerializeWithCachedSizesToArray(
+    bool deterministic, ::google::protobuf::uint8* target) const {
+  (void)deterministic; // Unused
+  // @@protoc_insertion_point(serialize_to_array_start:medical_imaging.MsgWorklist)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .medical_imaging.MsgWorklistItem items = 1;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->items_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageNoVirtualToArray(
+        1, this->items(static_cast<int>(i)), deterministic, target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:medical_imaging.MsgWorklist)
+  return target;
+}
+
+size_t MsgWorklist::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:medical_imaging.MsgWorklist)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  // repeated .medical_imaging.MsgWorklistItem items = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->items_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->items(static_cast<int>(i)));
+    }
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = cached_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void MsgWorklist::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:medical_imaging.MsgWorklist)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MsgWorklist* source =
+      ::google::protobuf::internal::DynamicCastToGenerated<const MsgWorklist>(
+          &from);
+  if (source == NULL) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:medical_imaging.MsgWorklist)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:medical_imaging.MsgWorklist)
+    MergeFrom(*source);
+  }
+}
+
+void MsgWorklist::MergeFrom(const MsgWorklist& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:medical_imaging.MsgWorklist)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  items_.MergeFrom(from.items_);
+}
+
+void MsgWorklist::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:medical_imaging.MsgWorklist)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MsgWorklist::CopyFrom(const MsgWorklist& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:medical_imaging.MsgWorklist)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MsgWorklist::IsInitialized() const {
+  if (!::google::protobuf::internal::AllAreInitialized(this->items())) return false;
+  return true;
+}
+
+void MsgWorklist::Swap(MsgWorklist* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void MsgWorklist::InternalSwap(MsgWorklist* other) {
+  items_.InternalSwap(&other->items_);
+  std::swap(_has_bits_[0], other->_has_bits_[0]);
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::google::protobuf::Metadata MsgWorklist::GetMetadata() const {
+  protobuf_mi_5fmessage_2eproto::protobuf_AssignDescriptorsOnce();
+  return protobuf_mi_5fmessage_2eproto::file_level_metadata[kIndexInFileMessages];
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// MsgWorklist
+
+// repeated .medical_imaging.MsgWorklistItem items = 1;
+int MsgWorklist::items_size() const {
+  return items_.size();
+}
+void MsgWorklist::clear_items() {
+  items_.Clear();
+}
+const ::medical_imaging::MsgWorklistItem& MsgWorklist::items(int index) const {
+  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklist.items)
+  return items_.Get(index);
+}
+::medical_imaging::MsgWorklistItem* MsgWorklist::mutable_items(int index) {
+  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklist.items)
+  return items_.Mutable(index);
+}
+::medical_imaging::MsgWorklistItem* MsgWorklist::add_items() {
+  // @@protoc_insertion_point(field_add:medical_imaging.MsgWorklist.items)
+  return items_.Add();
+}
+::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >*
+MsgWorklist::mutable_items() {
+  // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgWorklist.items)
+  return &items_;
+}
+const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >&
+MsgWorklist::items() const {
+  // @@protoc_insertion_point(field_list:medical_imaging.MsgWorklist.items)
+  return items_;
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
