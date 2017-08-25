@@ -16,13 +16,13 @@
 #include "boost/filesystem.hpp"
 
 // mysql begin
-#include "cppconn/driver.h"
-#include "cppconn/exception.h"
-#include "cppconn/prepared_statement.h"
-#include "cppconn/resultset.h"
-#include "cppconn/sqlstring.h"
-#include "cppconn/statement.h"
-#include "mysql_connection.h"
+// #include "cppconn/driver.h"
+// #include "cppconn/exception.h"
+// #include "cppconn/prepared_statement.h"
+// #include "cppconn/resultset.h"
+// #include "cppconn/sqlstring.h"
+// #include "cppconn/statement.h"
+// #include "mysql_connection.h"
 // mysql end
 
 #ifndef WIN32
@@ -33,8 +33,11 @@
 #include "MedImgIO/mi_image_data.h"
 #include "MedImgIO/mi_image_data_header.h"
 #include "MedImgUtil/mi_file_util.h"
+#include "MedImgAppCommon/mi_app_data_base.h"
 
 using namespace medical_imaging;
+
+AppDataBase data_base;
 
 static std::ofstream out_log;
 class LogSheild {
@@ -51,45 +54,16 @@ public:
   std::cout << info;                                                           \
   out_log << info;
 
-
-struct SeriesInfo{
-  std::string study_id;
-  std::string patient_name;
-  std::string patient_id;
-  std::string modality;
-};
-
-int connect_db(sql::Connection *&con, const std::string &user,
+int connect_db(const std::string &user,
                const std::string &ip_port, const std::string &pwd,
                const std::string &db) {
-  con = nullptr;
-  try {
-    // create connect
-    sql::Driver *driver = get_driver_instance();
-    con = driver->connect(ip_port.c_str(), user.c_str(), pwd.c_str());
-    // con = driver->connect("tcp://127.0.0.1:3306", "root", "0123456");
-    con->setSchema(db.c_str());
-    return 0;
-  } catch (const sql::SQLException &e) {
-    std::stringstream ss;
-    ss << "ERROR : ";
-    ss << "# ERR: SQLException in " << __FILE__;
-    ss << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-    ss << "# ERR: " << e.what();
-    ss << " (MySQL error code: " << e.getErrorCode();
-    ss << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-    LOG_OUT(ss.str());
-    delete con;
-    con = nullptr;
-
-    return -1;
-  }
+  return data_base.connect(user , ip_port , pwd , db);
 }
 
 int parse_root(
     std::string &root,
     std::map<std::string, std::vector<std::string>> &study_series_col,
-    std::map<std::string, SeriesInfo> &series_info_map,
+    std::map<std::string, ImgItem> &series_info_map,
     std::map<std::string, std::vector<std::string>> &series_col) {
   std::vector<std::string> files;
   FileUtil::get_all_file_recursion(root, std::vector<std::string>(1, ".dcm"),
@@ -112,7 +86,8 @@ int parse_root(
     if (IO_SUCCESS == loader.check_series_uid(files[i], study_id, 
       series_id, patient_name, patient_id, modality)) {
       if (series_info_map.find(series_id) == series_info_map.end()) {
-        SeriesInfo info;
+        ImgItem info;
+        info.series_id = series_id;
         info.study_id = study_id;
         info.patient_name = patient_name;
         info.patient_id = patient_id;
@@ -210,11 +185,12 @@ int create_folder(
   return 0;
 }
 
-int import_one_series(sql::Connection *con, const std::string &map_path,
-                      const SeriesInfo &series_info, const std::string &series,
+int import_one_series(const std::string &map_path,
+                      ImgItem &series_info, const std::string &series,
                       const std::vector<std::string> &files) {
   // copy src file to dst map
   const std::string series_dst = map_path + "/" + series_info.study_id + "/" + series;
+  series_info.path = series_dst;
   for (size_t i = 0; i < files.size(); i++) {
     boost::filesystem::path p(files[i].c_str());
     std::string base_name = p.filename().string();
@@ -227,95 +203,17 @@ int import_one_series(sql::Connection *con, const std::string &map_path,
     }
   }
 
-  // write to DB (find ; delete if exit ; insert)
-  try {
-    sql::Statement *stmt = con->createStatement();
-    delete stmt;
-    sql::PreparedStatement *pstmt = nullptr;
-    sql::ResultSet *res = nullptr;
-
-    // find
-    std::string sql_str;
-    {
-      std::stringstream ss;
-      ss << "SELECT * FROM img_tbl where series_id=\'" << series << "\';";
-      sql_str = ss.str();
-    }
-    pstmt = con->prepareStatement(sql_str.c_str());
-    res = pstmt->executeQuery();
-    delete pstmt;
-    pstmt = nullptr;
-
-    // delete if exit
-    if (res->next()) {
-      std::stringstream ss;
-      ss << "WARNING : already has the same series item : " << series
-         << " , use the new one replace it.\n";
-      delete res;
-      res = nullptr;
-
-      // delete old one
-      {
-        std::stringstream ss;
-        ss << "DELETE FROM img_tbl where series_id=\'" << series << "\';";
-        sql_str = ss.str();
-      }
-      sql::PreparedStatement *pstmt = con->prepareStatement(sql_str.c_str());
-      sql::ResultSet *res = pstmt->executeQuery();
-      delete pstmt;
-      pstmt = nullptr;
-      delete res;
-      res = nullptr;
-    }
-
-    // insert new item
-    {
-      std::stringstream ss;
-      ss << "INSERT INTO img_tbl (series_id , study_id , patient_name , "
-            "patient_id ,modality , path) values (";
-      ss << "\'" << series << "\',";
-      ss << "\'" << series_info.study_id << "\',";
-      ss << "\'" << series_info.patient_name << "\',";
-      ss << "\'" << series_info.patient_id << "\',";
-      ss << "\'" << series_info.modality << "\',";
-      ss << "\'" << series_dst << "\'";
-      ss << ");";
-      sql_str = ss.str();
-    }
-    pstmt = con->prepareStatement(sql_str.c_str());
-    res = pstmt->executeQuery();
-    delete pstmt;
-    pstmt = nullptr;
-    delete res;
-    res = nullptr;
-
-  } catch (const sql::SQLException &e) {
-    out_log << "ERROR : ";
-    out_log << "# ERR: SQLException in " << __FILE__;
-    out_log << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-    out_log << "# ERR: " << e.what();
-    out_log << " (MySQL error code: " << e.getErrorCode();
-    out_log << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-
-    delete con;
-    con = nullptr;
-
-    // TODO recovery DB
-
-    return -1;
-  }
-
-  return 0;
+  return data_base.insert_item(series_info);
 };
 
-int import_db(sql::Connection *con, std::string map_path,
-              std::map<std::string, SeriesInfo> &series_info_map,
+int import_db(std::string map_path,
+              std::map<std::string, ImgItem> &series_info_map,
               std::map<std::string, std::vector<std::string>> &series_col) {
 
   for (auto it = series_col.begin(); it != series_col.end(); it++) {
     const std::string series = it->first;
-    const SeriesInfo &series_info = series_info_map[series];
-    if (-1 == import_one_series(con, map_path, series_info, series, it->second)) {
+    ImgItem &series_info = series_info_map[series];
+    if (-1 == import_one_series(map_path, series_info, series, it->second)) {
       std::stringstream ss;
       ss << "ERROR : import series " << series << "failed, skip it.\n";
       LOG_OUT(ss.str());
@@ -436,7 +334,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::map<std::string, std::vector<std::string>> study_series_col;
-  std::map<std::string, SeriesInfo> series_info_map;
+  std::map<std::string, ImgItem> series_info_map;
   std::map<std::string, std::vector<std::string>> series_col;
 
   if (0 != parse_root(root, study_series_col, series_info_map, series_col)) {
@@ -449,15 +347,32 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  sql::Connection *con = nullptr;
-  if (0 != connect_db(con, user, "tcp://" + ip, pwd, db)) {
+  if (0 != connect_db(user, "tcp://" + ip, pwd, db)) {
     LOG_OUT("ERROR : connect DB failed.");
     return -1;
   }
 
-  if (0 != import_db(con, map_path, series_info_map, series_col)) {
+  if (0 != import_db(map_path, series_info_map, series_col)) {
     LOG_OUT("ERROR : import DB failed.");
     return -1;
+  }
+
+  //test
+  std::vector<ImgItem> items;
+  if (0 == data_base.get_all_item(items)) {
+    for (size_t i = 0; i < items.size(); ++i) {
+      printf("series : %s ; study : %s ; patient_name : % s ; patient_id : %s "
+             "; modality : % s\n",
+             items[i].series_id.c_str(), items[i].study_id.c_str(),
+             items[i].patient_name.c_str(), items[i].patient_id.c_str(),
+             items[i].modality.c_str());
+    }
+    std::string path;
+    if (0 == data_base.get_series_path(items[0].series_id, path)) {
+      printf("get items 0 path : %s\n", path.c_str());
+    }
+  } else {
+    LOG_OUT("ERROR : get all item failed.\n");
   }
 
   return 0;

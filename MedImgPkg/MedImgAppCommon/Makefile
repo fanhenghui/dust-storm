@@ -14,12 +14,12 @@ BIN_DIR = $(ROOT)/bin
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 OBJS = mi_app_controller.o mi_app_thread_model.o mi_operation_command_handler.o mi_operation_factory.o mi_app_cell.o \
-mi_ready_command_handler.o mi_shut_down_command_handler.o
+mi_ready_command_handler.o mi_shut_down_command_handler.o mi_app_data_base.o
 TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
 EXPORT_HEADER = mi_app_common_export.h mi_app_common_define.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lboost_system -lboost_filesystem -lboost_thread 
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lmedimg_renderalgorithm -lboost_system -lboost_filesystem -lboost_thread -lmysqlcppconn
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
@@ -44,6 +44,9 @@ mi_operation_factory.o: $(EXPORT_HEADER) mi_operation_interface.h mi_operation_f
 
 mi_app_cell.o: $(EXPORT_HEADER) mi_app_cell.h mi_app_cell.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_app_cell.cpp $(ADDITINAL_INCLUDE_DIR)	
+
+mi_app_data_base.o : $(EXPORT_HEADER) mi_app_data_base.h mi_app_data_base.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_app_data_base.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 .PHONY : clean
 clean:
