@@ -1,0 +1,1 @@
+./dcmdbimporter -u root -i 127.0.0.1:3306 -d med_img_cache_db -r /home/wr/data/AB_CTA_01/ -m /home/wr/mysql_db/med_img_cache_db/

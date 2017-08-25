@@ -15,6 +15,7 @@ subsystem:
 	$(MAKE) -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) -C ./UT/MedImgIO_UT
 	$(MAKE) -C ./Executable/ReviewServer
+	$(MAKE) -C ./Executable/MedImgDcmDBImporter
 
 PHONY.:clean
 clean:
@@ -30,4 +31,5 @@ clean:
 	$(MAKE) clean -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) clean -C ./UT/MedImgIO_UT
 	$(MAKE) clean -C ./Executable/ReviewServer
+	$(MAKE) clean -C ./Executable/MedImgDcmDBImporter
 	-rm -r bin

@@ -101,7 +101,8 @@ void RayCastScene::pre_render_i() {
   // GL texture udpate
   GLTextureCache::instance()->process_cache();
 
-  //scene base prerender to recreate jpeg encoder
+  // scene base prerender to recreate jpeg encoder(this must be call after gl
+  // resource update)
   SceneBase::pre_render_i();
 }
 
