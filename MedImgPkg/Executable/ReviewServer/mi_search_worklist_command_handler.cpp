@@ -1,11 +1,13 @@
 #include "mi_search_worklist_command_handler.h"
 
+#include <iostream>
+#include <vector>
+
 #include "mi_message.pb.h"
 #include "MedImgAppCommon/mi_app_controller.h"
 #include "MedImgAppCommon/mi_app_common_define.h"
+#include "MedImgAppCommon/mi_app_data_base.h"
 #include "MedImgUtil/mi_ipc_client_proxy.h"
-
-#include <iostream>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -51,14 +53,25 @@ int SearchWorklistCommandHandler::handle_command(const IPCDataHeader &datahaeder
 // TODO: connect to pacs and do a real search
 MsgWorklist * SearchWorklistCommandHandler::createWorklist()
 {
+    AppDataBase db;
+    if(0 != db.connect("root","127.0.0.1:3006","6ckj1sWR","med_img_cache_db")){
+        //TODO LOG
+        return nullptr;
+    }
+    std::vector<ImgItem> items;
+    if(0 != db.get_all_item(items) ){
+        //TODO LOG
+        return nullptr;
+    }
+
     MsgWorklist* list = new MsgWorklist;
-    for (int i=0; i<2; i++)
+    for (size_t i = 0; i<items.size() ; ++i)
     {
         MsgWorklistItem *item = list->add_items();
-        item->set_patient_id("pid_" + std::to_string(i+1));
-        item->set_patient_name("pname_" + std::to_string(i+1));
-        item->set_series_uid("sid_" + std::to_string(i+1));
-        item->set_imaging_modality("CT");
+        item->set_patient_id(items[i].patient_id);
+        item->set_patient_name(items[i].patient_name);
+        item->set_series_uid(items[i].series_id);
+        item->set_imaging_modality(items[i].modality);
     }
     return list;
 }

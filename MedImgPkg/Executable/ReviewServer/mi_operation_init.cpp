@@ -24,6 +24,7 @@
 #include "MedImgAppCommon//mi_app_thread_model.h"
 #include "MedImgAppCommon/mi_app_cell.h"
 #include "MedImgAppCommon/mi_app_common_define.h"
+#include "MedImgAppCommon/mi_app_data_base.h"
 
 #include "MedImgGLResource/mi_gl_utils.h"
 
@@ -57,12 +58,24 @@ int OpInit::execute() {
   // gl_context->make_current(MAIN_CONTEXT);
 
   // load series
-  // const std::string series_uid = msg_init.series_uid();
+  const std::string series_uid = msg_init.series_uid();
+  AppDataBase db;
+  if(0 != db.connect("root","127.0.0.1:3006","6ckj1sWR","med_img_cache_db")){
+      //TODO LOG
+      return -1;
+  }
+
+  std::string data_path;
+  if(0 != db.get_series_path(series_uid , data_path) ){
+      //TODO LOG
+      return -1;
+  }
+  const std::string series_path(data_path);
 
   ////////////////////////////////////////////////////////////////////////
   // TODO TEST
-  const std::string series_path(ReviewConfig::instance()->get_test_data_root() +
-                                "/AB_CTA_01/");
+  // const std::string series_path(ReviewConfig::instance()->get_test_data_root() +
+  //                               "/AB_CTA_01/");
   ////////////////////////////////////////////////////////////////////////
 
   std::vector<std::string> dcm_files;
