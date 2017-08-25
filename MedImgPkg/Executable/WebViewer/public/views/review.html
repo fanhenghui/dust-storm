@@ -19,6 +19,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
 
+    <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/bootstrap.min.js"></script> -->
+
     <script src="socket.io/socket.io.js"></script>
     <script src="js/bytebuffer.js"></script>
     <script src="js/bcrypt.js"></script>
@@ -68,7 +71,7 @@
                 <h3 class="text-primary">
                     Study List
                 </h3>
-                <table class="table table-condensed table-hover" id="worklist">
+                <table class="table table-condensed table-hover" id="table">
                     <thead>
                         <tr>
                             <th>
@@ -85,7 +88,9 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id = "worklist">
+                        <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
+                        <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
                     </tbody>
                 </table>
                 <div class="row">
@@ -102,8 +107,8 @@
                     </div>
                 </div>
             </div>
-        </div
-    </div
+        </div>
+    </div>
     <hr>
     <div class="container-fluid">
         <div class="row clearfix">
@@ -209,7 +214,6 @@
         </div>
     </div>
 </body>
-
 
 <script src="js/review.js"></script>
 

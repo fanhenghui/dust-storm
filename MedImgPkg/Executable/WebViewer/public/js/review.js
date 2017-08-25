@@ -7,9 +7,9 @@
   COMMAND_ID_FE_VR_PLAY = 120004;
   COMMAND_ID_FE_SEARCH_WORKLIST = 120005;
   // BE to FE
-  COMMAND_ID_BE_SEND_IMAGE = 270001;
   COMMAND_ID_BE_READY = 270000;
-
+  COMMAND_ID_BE_SEND_IMAGE = 270001;
+  COMMAND_ID_BE_SEND_WORKLIST = 270002;
   // FE to BE Operation ID
   OPERATION_ID_INIT = 310000;
   OPERATION_ID_MPR_PAGING = 310001;
@@ -49,8 +49,7 @@
         cellCanvas[cellID].height);
     }
 
-  function handleImage(
-      cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+  function handleImage( cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     console.log('in render');
     if (withHeader) {  // receive a new image
       cellJpeg[cellID] = '';
@@ -66,12 +65,7 @@
         refreshCanvas(cellID);
       };
     }
-    }
-
-    function showWorklist()
-    {
-      console.log ('should show worklist!');
-    };
+  }
 
   function msgHandle(
       cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen,
@@ -82,10 +76,10 @@
             cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_READY:
-        window.FE.triggerOnBE('test_uid');
+        //window.FE.triggerOnBE('test_uid');
         break;
       case COMMAND_ID_BE_SEND_WORKLIST:
-        showWorklist();
+        showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       default:
         break;
@@ -289,31 +283,65 @@
   searchBtn = document.getElementById('searchBtn');
   loadBtn = document.getElementById('loadBtn');
 
+  
+  var worklistBuffer;
+  function showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader)
+  {
+    console.log ('prepare data 4 worklist!');
+    if (withHeader) { 
+      worklistBuffer = new ArrayBuffer(dataLen);
+    }
+
+    // TODO: handle multiple parts later, now assume passing as a whole
+    var dstview = new Uint8Array(worklistBuffer);
+    var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+
+    for(var i=0; i<dataLen; i++)
+    {
+        dstview[i] = srcview[i];
+    }
+
+    if (restDataLen <= 0) 
+    {
+      window.FE.showWorklist();
+    }
+  };
+
   function searchWorkList(event)
   {
     console.log('searchWorkList');
     window.FE.searchWorkList();
   }
 
-  function loadOneSeries(event)
-  {
-    console.log('loadOneSeries');
-    // get the element currently selected by usr
-    document.getElementById('worklist');
-    // read its innerHTML as seriesID
-    
-    // load this series
-    window.FE.triggerOnBE('test_uid');
-  }
+  // function loadOneSeries(event)
+  // {
+  //   console.log('loadOneSeries');
+  //   // get the element currently selected by usr
+  //   wl = document.getElementById('worklist');
+  //   // TODO: get seriesID from $("#worklist")
+
+  //   // load this series
+  //   window.FE.triggerOnBE('test_uid');
+  // }
 
   searchBtn.addEventListener('click', searchWorkList);
-  loadBtn.addEventListener('click', loadOneSeries);
+  // loadBtn.addEventListener('click', loadOneSeries);
+
+ $("#loadBtn").on('click', function(e){
+   var series_id = $("#table tbody tr.success td:nth-child(3)").html();
+   console.log('loadOneSeries: ', series_id);
+   alert(series_id);
+   window.FE.triggerOnBE(series_id); //'test_uid'
+ });
+
+
 
   window.FE = {
     username: null,
     userid: null,
     socket: null,
     mouseActionTik: new Date().getTime(),
+    series_uid : "",
 
     genUID: function(username) {
       return username + new Date().getTime() + '' +
@@ -326,7 +354,7 @@
       this.username = username;
 
       //链接websocket服务器
-      this.socket = io.connect('http://172.23.237.243:8000');
+      this.socket = io.connect('http://172.23.236.80:8000');
 
       //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
       this.socket.emit('login', {userid: this.userid, username: this.username});
@@ -448,6 +476,7 @@
     },
 
     triggerOnBE: function(series_uid) {
+      this.series_uid = series_uid;
       var binding_func = (function(err, root) {
                            if (err) {
                              console.log('load proto failed!');
@@ -455,8 +484,8 @@
                              }
                            var MsgInit = root.lookup('medical_imaging.MsgInit');
                            var msgInit = MsgInit.create();
-                           msgInit.series_uid = series_uid;
-                           msgInit.pid = 0;
+                           msgInit.seriesUid = this.series_uid;
+                           msgInit.pid = 1000;
 
                            // MPR
                            msgInit.cells.push({
@@ -617,7 +646,6 @@
           }).bind(this);
 
       protobuf.load('./data/mi_message.proto', binding_func);
-
     },
 
     loadSeries: function() {
@@ -662,6 +690,42 @@
       //   content: 'searchWorkList'
       // });
     },
+
+    showWorklist : function () {
+      protobuf.load('./data/mi_message.proto', function(err, root) {
+          if (err) { console.log('load proto failed!'); throw err;}
+          var MsgWorklistType = root.lookup('medical_imaging.MsgWorklist');
+          var worklistView = new Uint8Array(worklistBuffer)
+          var message = MsgWorklistType.decode(worklistView);
+          console.log(worklist);
+          var obj = MsgWorklistType.toObject(message, {
+              patient_name : String, 
+              patient_id: String,
+              series_uid: String,
+              imaging_modality: String}).items;
+
+          var tbody = document.getElementById("worklist");
+          tbody.innerHTML = "";
+          for (var i = 0; i < obj.length; i++) {
+              var tr = "<tr>";
+              for(var propt in obj[i])
+              {
+                tr += "<td>" + obj[i][propt] + "</td>"
+              }
+              tr += "</tr>";
+
+              /* We add the table row to the table body */
+              tbody.innerHTML += tr;
+          }
+
+          $("#table tbody tr").click(function(){
+            $(this).addClass('success').siblings().removeClass('success');    
+            // var value = $(this).find('td:nth-child(3)').html();
+            // alert(value);
+         });
+        }
+      );
+    }
     // changeLayout1x1: function() {
     //     document.getElementById("cell1").style.visibility = "hidden";
     //     document.getElementById("cell2").style.visibility = "hidden";
