@@ -8,7 +8,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
-
+class MsgWorklist;
+class MsgWorklistItem;
 class SearchWorklistCommandHandler : public ICommandHandler {
 public:
     SearchWorklistCommandHandler(std::shared_ptr<AppController> controller);
@@ -17,7 +18,8 @@ public:
     virtual int handle_command(const IPCDataHeader &datahaeder, char *buffer);
 
 private:
-    void ConstructWorklist();
+    MsgWorklist * createWorklist();
+    MsgWorklistItem * createWorklistItem();
     
 private:
     std::weak_ptr<AppController> _controller;
