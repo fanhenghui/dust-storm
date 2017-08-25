@@ -299,3 +299,5 @@ mi_shader_collection.h
 *.so
 *.a
 .vscode/
+configure.txt
+run_time.config

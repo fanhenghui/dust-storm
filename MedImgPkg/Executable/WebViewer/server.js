@@ -114,7 +114,6 @@ io.on(
           onlineCount++;
         } else {
           console.log(obj.username + ' is online now.');
-          io
           }
 
         // create a server IPC between server and BE
@@ -128,7 +127,6 @@ io.on(
         ipc.config.encoding = 'hex';
 
         ipc.serve(function() {
-
           ipc.server.on('connect', function(local_socket) {
             // when IPC is constructed between server and BE
             // server send a ready MSG to BE to make sure BE is ready
@@ -147,7 +145,7 @@ io.on(
             if (ipc != undefined) {
               // close IPC
               ipc.server.emit(local_socket, msgFEReady);
-              ipc.server.stop();
+              //ipc.server.stop(); // @r.wang why close it here? commented by c.zhang
             }
             onlineLocalSockets[obj.userid] = local_socket;
           });
@@ -160,41 +158,37 @@ io.on(
           });
 
           ipc.server.on(
-              'socket.disconnected', function(local_socket, destroyedSocketID) {
-                ipc.log('client ' + destroyedSocketID + ' has disconnected!');
-              });
-
+            'socket.disconnected', function(local_socket, destroyedSocketID) {
+              ipc.log('client ' + destroyedSocketID + ' has disconnected!');
+            });
         });
         ipc.server.start();
         onlineLocalIPC[obj.userid] = ipc;
 
-
         // Create BE process
-        console.log(
-            'path: ' +
-            '/tmp/app.' + obj.username);
+        console.log( 'path: ' + '/tmp/app.' + obj.username);
+
         // reader BE process path form config file
         var review_server_path;
-        fs.readFile(
-            __dirname + '/public/config/run_time.config', function(err, data) {
-              if (err) {
-                throw err;
-              }
-              review_server_path = data;
-              console.log('app path : ' + review_server_path);
+        fs.readFile(__dirname + '/public/config/run_time.config', function(err, data) {
+          if (err) {
+            throw err;
+          }
+          review_server_path = data;
+          console.log('app path : ' + review_server_path);
 
-              // TODO Test 自己起C++ BE
-              // const out_log = fs.openSync(
-              //     './out_' + util.inspect(obj.username) + '.log', 'a');
-              // const err_log = fs.openSync(
-              //     './err_' + util.inspect(obj.username) + '.log', 'a');
-              // var worker = childProcess.spawn(
-              //     review_server_path.toString(), ['/tmp/app.' +
-              //     obj.username],
-              //     {detached: true, stdio: ['ignore', out_log, err_log]});
-              // onlineLogicProcessID[obj.userid] = worker;
-              // console.log('<><><><><><> login in success <><><><><><>');
-            });
+          // TODO Test 自己起C++ BE
+          // const out_log = fs.openSync(
+          //     './out_' + util.inspect(obj.username) + '.log', 'a');
+          // const err_log = fs.openSync(
+          //     './err_' + util.inspect(obj.username) + '.log', 'a');
+          // var worker = childProcess.spawn(
+          //     review_server_path.toString(), ['/tmp/app.' +
+          //     obj.username],
+          //     {detached: true, stdio: ['ignore', out_log, err_log]});
+          // onlineLogicProcessID[obj.userid] = worker;
+          // console.log('<><><><><><> login in success <><><><><><>');
+          });
       });
 
       //监听用户退出
@@ -276,9 +270,8 @@ io.on(
       });
     })
 
-
-
     var server = http.listen(8000, function() {
-  var address = server.address();
-  console.log('address is ', util.inspect(address));
-});
+      var address = server.address();
+      console.log('address is ', util.inspect(address));
+    }
+);

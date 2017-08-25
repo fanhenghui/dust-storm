@@ -5,7 +5,7 @@
   COMMAND_ID_FE_OPERATION = 120002;
   COMMAND_ID_FE_MPR_PLAY = 120003;
   COMMAND_ID_FE_VR_PLAY = 120004;
-
+  COMMAND_ID_FE_SEARCH_WORKLIST = 120005;
   // BE to FE
   COMMAND_ID_BE_SEND_IMAGE = 270001;
   COMMAND_ID_BE_READY = 270000;
@@ -68,6 +68,11 @@
     }
     }
 
+    function showWorklist()
+    {
+      console.log ('should show worklist!');
+    };
+
   function msgHandle(
       cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen,
       withHeader) {
@@ -77,7 +82,10 @@
             cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_READY:
-        window.FE.triggerOnBE();
+        window.FE.triggerOnBE('test_uid');
+        break;
+      case COMMAND_ID_BE_SEND_WORKLIST:
+        showWorklist();
         break;
       default:
         break;
@@ -278,6 +286,29 @@
   cellCanvas[3].addEventListener('mouseup', mouseUpEvent);
 
 
+  searchBtn = document.getElementById('searchBtn');
+  loadBtn = document.getElementById('loadBtn');
+
+  function searchWorkList(event)
+  {
+    console.log('searchWorkList');
+    window.FE.searchWorkList();
+  }
+
+  function loadOneSeries(event)
+  {
+    console.log('loadOneSeries');
+    // get the element currently selected by usr
+    document.getElementById('worklist');
+    // read its innerHTML as seriesID
+    
+    // load this series
+    window.FE.triggerOnBE('test_uid');
+  }
+
+  searchBtn.addEventListener('click', searchWorkList);
+  loadBtn.addEventListener('click', loadOneSeries);
+
   window.FE = {
     username: null,
     userid: null,
@@ -416,7 +447,7 @@
       protobuf.load('./data/mi_message.proto', binding_func);
     },
 
-    triggerOnBE: function() {
+    triggerOnBE: function(series_uid) {
       var binding_func = (function(err, root) {
                            if (err) {
                              console.log('load proto failed!');
@@ -424,7 +455,7 @@
                              }
                            var MsgInit = root.lookup('medical_imaging.MsgInit');
                            var msgInit = MsgInit.create();
-                           msgInit.series_uid = 'test_uid';
+                           msgInit.series_uid = series_uid;
                            msgInit.pid = 0;
 
                            // MPR
@@ -607,6 +638,30 @@
       })
     },
 
+    searchWorkList: function () {
+      var header_buffer = new ArrayBuffer(32);
+      var header = new Uint32Array(header_buffer);
+      header[0] = 0;
+      header[1] = 0;
+      header[2] = COMMAND_ID_FE_SEARCH_WORKLIST;
+      header[3] = 0;
+      header[4] = 0;
+      header[5] = 0;
+      header[6] = 0;
+      header[7] = 0;
+
+      this.socket.emit('data', {
+        userid: this.userid,
+        username: this.username,
+        content: header_buffer
+      });
+      // for test 
+      // this.socket.emit('message', {
+      //   userid: this.userid,
+      //   username: this.username,
+      //   content: 'searchWorkList'
+      // });
+    },
     // changeLayout1x1: function() {
     //     document.getElementById("cell1").style.visibility = "hidden";
     //     document.getElementById("cell2").style.visibility = "hidden";

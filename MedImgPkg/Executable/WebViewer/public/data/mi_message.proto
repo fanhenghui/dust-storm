@@ -11,6 +11,11 @@ message MsgPoint2 {
     required float y = 2;
 };
 
+message MsgPoint2Array {
+    required float x = 1;
+    required float y = 2;
+};
+
 message MsgPaging {
     required int32 page = 1;
 };
@@ -32,9 +37,20 @@ message MsgCellInfo{
 message MsgInit{
     required int32 pid = 1;
     required string series_uid = 2;
-    repeated MsgCellInfo cells = 3;
+    repeated MsgCellInfo cells = 3; 
 };
 
 message MsgResize{
     repeated MsgCellInfo cells = 1;
+};
+
+message MsgWorklistItem{
+    required string patient_name = 1;
+    required string patient_id = 2;
+    required string series_uid = 3;
+    required string imaging_modality = 4; 
+};
+
+message MsgWorklist{
+    repeated MsgWorklistItem items = 1;
 };
