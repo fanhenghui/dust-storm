@@ -4,7 +4,7 @@
 #include "util/mi_exception.h"
 #include "med_img_pkg_config.h"
 
-#include "MedImgAppCommon/mi_app_common_define.h"
+#include "appcommon/mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

@@ -1,7 +1,7 @@
 #include "mi_operation_pan.h"
 
-#include "MedImgAppCommon/mi_app_cell.h"
-#include "MedImgAppCommon/mi_app_controller.h"
+#include "appcommon/mi_app_cell.h"
+#include "appcommon/mi_app_controller.h"
 
 #include "io/mi_image_data.h"
 #include "renderalgo/mi_mpr_scene.h"

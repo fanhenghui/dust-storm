@@ -1,8 +1,8 @@
 #include "mi_mpr_play_command_handler.h"
 
-#include "MedImgAppCommon/mi_app_controller.h"
-#include "MedImgAppCommon/mi_app_thread_model.h"
-#include "MedImgAppCommon/mi_operation_factory.h"
+#include "appcommon/mi_app_controller.h"
+#include "appcommon/mi_app_thread_model.h"
+#include "appcommon/mi_operation_factory.h"
 
 #include "boost/thread.hpp"
 

@@ -1,7 +1,7 @@
 #include "mi_operation_mpr_paging.h"
 
-#include "MedImgAppCommon/mi_app_controller.h"
-#include "MedImgAppCommon/mi_app_cell.h"
+#include "appcommon/mi_app_controller.h"
+#include "appcommon/mi_app_cell.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"

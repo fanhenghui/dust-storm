@@ -1,7 +1,7 @@
 #ifndef MED_IMG_MOUSE_OP_MIN_MAX_HINT_H_
 #define MED_IMG_MOUSE_OP_MIN_MAX_HINT_H_
 
-#include "MedImgQtPackage/mi_mouse_op_interface.h"
+#include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
 #include <QObject>
 

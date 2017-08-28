@@ -9,7 +9,7 @@ boost::mutex ReviewConfig::_mutex;
 
 ReviewConfig::ReviewConfig()
 {
-    std::ifstream in("../Config/configure.txt");
+    std::ifstream in("../config/configure.txt");
     if(!in.is_open()){
         //TODO ERROR LOG
         return;

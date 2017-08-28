@@ -21,10 +21,10 @@
 #include "renderalgo/mi_opacity_transfer_function.h"
 #include "renderalgo/mi_transfer_function_loader.h"
 
-#include "MedImgAppCommon//mi_app_thread_model.h"
-#include "MedImgAppCommon/mi_app_cell.h"
-#include "MedImgAppCommon/mi_app_common_define.h"
-#include "MedImgAppCommon/mi_app_data_base.h"
+#include "appcommon//mi_app_thread_model.h"
+#include "appcommon/mi_app_cell.h"
+#include "appcommon/mi_app_common_define.h"
+#include "appcommon/mi_app_data_base.h"
 
 #include "glresource/mi_gl_utils.h"
 
@@ -170,7 +170,7 @@ int OpInit::execute() {
 
       // load color opacity
       const std::string color_opacity_xml =
-          "../Config/lut/3d/ct_cta.xml";
+          "../config/lut/3d/ct_cta.xml";
       std::shared_ptr<ColorTransFunc> color;
       std::shared_ptr<OpacityTransFunc> opacity;
       float ww, wl;

@@ -1,7 +1,7 @@
 #ifndef MED_IMG_OPERATION_ROTATE_H
 #define MED_IMG_OPERATION_ROTATE_H
 
-#include "MedImgAppCommon/mi_operation_interface.h"
+#include "appcommon/mi_operation_interface.h"
 #include "mi_review_common.h"
 
 MED_IMG_BEGIN_NAMESPACE

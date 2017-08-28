@@ -10,7 +10,7 @@
 #include "io/mi_dicom_exporter.h"
 #include "io/mi_model_progress.h"
 
-#include "MedImgQtPackage/mi_observer_progress.h"
+#include "qtpackage/mi_observer_progress.h"
 
 using namespace medical_imaging;
 

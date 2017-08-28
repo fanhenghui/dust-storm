@@ -18,9 +18,9 @@
 #include "renderalgo/mi_opacity_transfer_function.h"
 #include "renderalgo/mi_transfer_function_loader.h"
 
-#include "MedImgAppCommon//mi_app_thread_model.h"
-#include "MedImgAppCommon/mi_app_cell.h"
-#include "MedImgAppCommon/mi_app_common_define.h"
+#include "appcommon//mi_app_thread_model.h"
+#include "appcommon/mi_app_cell.h"
+#include "appcommon/mi_app_common_define.h"
 
 #include "glresource/mi_gl_utils.h"
 
@@ -70,7 +70,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader &ipcheader,
   const std::string series_path(ReviewConfig::instance()->get_test_data_root() +
                                 "/AB_CTA_01/");
 #else
-  if (!_pacs_communicator->initialize("../Config/pacs_config.txt")) {
+  if (!_pacs_communicator->initialize("../config/pacs_config.txt")) {
     std::cout << "connect PACS failed!\n";
   }
   if (!_pacs_communicator->populate_whole_work_list()) {
@@ -160,7 +160,7 @@ int LoadSeriesCommandHandler::handle_command(const IPCDataHeader &ipcheader,
 
   // load color opacity
   const std::string color_opacity_xml =
-      "/home/zhangchanggong/git/dust-storm/MedImgPkg/Config/lut/3d/ct_cta.xml";
+      "/home/zhangchanggong/git/dust-storm/MedImgPkg/config/lut/3d/ct_cta.xml";
 
   std::shared_ptr<ColorTransFunc> color;
   std::shared_ptr<OpacityTransFunc> opacity;

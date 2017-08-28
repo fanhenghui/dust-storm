@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "MedImgAppCommon/mi_app_controller.h"
+#include "appcommon/mi_app_controller.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

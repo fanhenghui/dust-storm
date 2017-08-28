@@ -1,2 +1,0 @@
-ProcessingUnit = CPU
-TestDataRoot = /home/wr/data/

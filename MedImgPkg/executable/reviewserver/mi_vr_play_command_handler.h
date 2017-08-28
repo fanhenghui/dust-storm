@@ -1,7 +1,7 @@
 #ifndef MED_IMG_VR_PLAY_COMMAND_HANDLER_H
 #define MED_IMG_VR_PLAY_COMMAND_HANDLER_H
 
-#include "MedImgAppCommon/mi_operation_interface.h"
+#include "appcommon/mi_operation_interface.h"
 #include "util/mi_ipc_common.h"
 #include "mi_review_common.h"
 #include <memory>

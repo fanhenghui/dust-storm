@@ -2,12 +2,12 @@
 
 #include "renderalgo/mi_volume_infos.h"
 
-#include "MedImgAppCommon/mi_app_common_define.h"
-#include "MedImgAppCommon/mi_app_thread_model.h"
-#include "MedImgAppCommon/mi_operation_command_handler.h"
-#include "MedImgAppCommon/mi_operation_factory.h"
-#include "MedImgAppCommon/mi_ready_command_handler.h"
-#include "MedImgAppCommon/mi_shut_down_command_handler.h"
+#include "appcommon/mi_app_common_define.h"
+#include "appcommon/mi_app_thread_model.h"
+#include "appcommon/mi_operation_command_handler.h"
+#include "appcommon/mi_operation_factory.h"
+#include "appcommon/mi_ready_command_handler.h"
+#include "appcommon/mi_shut_down_command_handler.h"
 
 #include "util/mi_configuration.h"
 

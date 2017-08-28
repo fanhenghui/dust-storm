@@ -33,7 +33,7 @@
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
 #include "util/mi_file_util.h"
-#include "MedImgAppCommon/mi_app_data_base.h"
+#include "appcommon/mi_app_data_base.h"
 
 using namespace medical_imaging;
 

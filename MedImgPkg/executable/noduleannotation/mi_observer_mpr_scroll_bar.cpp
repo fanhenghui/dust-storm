@@ -1,6 +1,6 @@
 #include "mi_observer_mpr_scroll_bar.h"
 #include "renderalgo/mi_mpr_scene.h"
-#include "MedImgQtPackage/mi_model_cross_hair.h"
+#include "qtpackage/mi_model_cross_hair.h"
 
 #include "qt/qscrollbar.h"
 

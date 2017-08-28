@@ -1,7 +1,7 @@
 #ifndef MED_IMG_SEARCH_WORKLIST_COMMAND_HANDLER_H
 #define MED_IMG_SEARCH_WORKLIST_COMMAND_HANDLER_H
 
-#include "MedImgAppCommon/mi_app_common_export.h"
+#include "appcommon/mi_app_common_export.h"
 #include "util/mi_ipc_common.h"
 #include <memory>
 

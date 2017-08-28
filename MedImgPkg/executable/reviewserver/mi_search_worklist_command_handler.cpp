@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "mi_message.pb.h"
-#include "MedImgAppCommon/mi_app_controller.h"
-#include "MedImgAppCommon/mi_app_common_define.h"
-#include "MedImgAppCommon/mi_app_data_base.h"
+#include "appcommon/mi_app_controller.h"
+#include "appcommon/mi_app_common_define.h"
+#include "appcommon/mi_app_data_base.h"
 #include "util/mi_ipc_client_proxy.h"
 
 MED_IMG_BEGIN_NAMESPACE
