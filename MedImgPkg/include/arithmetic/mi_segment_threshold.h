@@ -1,36 +1,31 @@
-#ifndef MED_IMG_THRESHOLD_SEGMENATATION_H_
-#define MED_IMG_THRESHOLD_SEGMENATATION_H_
+#ifndef MEDIMGARITHMETIC_THRESHOLD_SEGMENATATION_H
+#define MEDIMGARITHMETIC_THRESHOLD_SEGMENATATION_H
 
-#include "arithmetic/mi_segment_interface.h"
 #include "arithmetic/mi_sampler.h"
-//#include "ext/boost/atomic/atomic.hpp"
+#include "arithmetic/mi_segment_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-
-template<class T>
-class SegmentThreshold : public ISegment<T>
-{
+template <class T> class SegmentThreshold : public ISegment<T> {
 public:
-    enum ThresholdType
-    {
-        Center,
-        Otsu,
-    };
+  enum ThresholdType {
+    Center,
+    Otsu,
+  };
 
 public:
-    SegmentThreshold() {};
-    virtual ~SegmentThreshold() {};
+  SegmentThreshold(){};
+  virtual ~SegmentThreshold(){};
 
-    void segment(const Ellipsoid& region_ellipsoid , T threshold);
+  void segment(const Ellipsoid &region_ellipsoid, T threshold);
 
-    void segment_auto_threshold(const Ellipsoid& region_ellipsoid , ThresholdType type = Otsu);
+  void segment_auto_threshold(const Ellipsoid &region_ellipsoid,
+                              ThresholdType type = Otsu);
 
 private:
-    T get_threshold_otsu_i(const Ellipsoid& region_ellipsoid);
+  T get_threshold_otsu_i(const Ellipsoid &region_ellipsoid);
 
-    T get_threshold_center_i(const Ellipsoid& region_ellipsoid);
-
+  T get_threshold_center_i(const Ellipsoid &region_ellipsoid);
 };
 
 #include "arithmetic/mi_segment_threshold.inl"
