@@ -1,5 +1,5 @@
-#ifndef MED_IMG_SCENE_BASE_H_H
-#define MED_IMG_SCENE_BASE_H_H
+#ifndef MEDIMGRENDERALGO_SCENE_BASE_H_H
+#define MEDIMGRENDERALGO_SCENE_BASE_H_H
 
 #include "arithmetic/mi_camera_base.h"
 #include "arithmetic/mi_point2.h"
@@ -12,7 +12,7 @@
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export SceneBase {
 public:

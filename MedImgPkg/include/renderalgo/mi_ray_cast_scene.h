@@ -1,12 +1,12 @@
-#ifndef MED_IMG_RAY_CAST_SCENE_QT_H
-#define MED_IMG_RAY_CAST_SCENE_QT_H
+#ifndef MEDIMGRENDERALGO_RAY_CAST_SCENE_H
+#define MEDIMGRENDERALGO_RAY_CAST_SCENE_H
 
-#include <map>
 #include "arithmetic/mi_vector2f.h"
 #include "renderalgo/mi_ray_caster_define.h"
 #include "renderalgo/mi_scene_base.h"
+#include <map>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class VolumeInfos;
 class EntryExitPoints;
@@ -67,7 +67,6 @@ public:
   InterpolationMode get_interpolation_mode() const;
   ShadingMode get_shading_mode() const;
   ColorInverseMode get_color_inverse_mode() const;
-
 
   void set_ambient_color(float r, float g, float b, float factor);
   void set_material(const Material &m, unsigned char label);

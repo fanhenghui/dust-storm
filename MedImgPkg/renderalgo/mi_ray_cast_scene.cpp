@@ -26,7 +26,7 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_volume_infos.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
   _ray_cast_camera.reset(new OrthoCamera());

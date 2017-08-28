@@ -1,5 +1,5 @@
-#ifndef MED_IMG_RAY_CASTER_CANVAS_H_
-#define MED_IMG_RAY_CASTER_CANVAS_H_
+#ifndef MEDIMGRENDERALGO_RAY_CASTER_CANVAS_H
+#define MEDIMGRENDERALGO_RAY_CASTER_CANVAS_H
 
 #include "arithmetic/mi_color_unit.h"
 #include "glresource/mi_gl_resource_define.h"
@@ -7,7 +7,7 @@
 #include "io/mi_io_define.h"
 #include "renderalgo/mi_render_algo_export.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export RayCasterCanvas {
 public:
