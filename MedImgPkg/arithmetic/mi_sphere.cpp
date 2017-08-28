@@ -2,9 +2,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-Sphere::Sphere(){
-
-}
+Sphere::Sphere() {}
 
 Sphere::~Sphere() {}
 

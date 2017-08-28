@@ -1,5 +1,5 @@
-#ifndef MED_IMG_DICOM_LOADER_H
-#define MED_IMG_DICOM_LOADER_H
+#ifndef MEDIMGIO_DICOM_LOADER_H
+#define MEDIMGIO_DICOM_LOADER_H
 
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3.h"
@@ -13,7 +13,7 @@ class DcmMetaInfo;
 typedef std::shared_ptr<DcmFileFormat> DcmFileFormatPtr;
 typedef std::vector<DcmFileFormatPtr> DcmFileFormatSet;
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class ImageData;
 class ImageDataHeader;

@@ -12,7 +12,7 @@
 
 #include "util/mi_model_progress.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 DICOMLoader::DICOMLoader() : _progress(0.0f) {}
 
@@ -52,12 +52,9 @@ IOStatus DICOMLoader::check_series_uid(const std::string &file,
   return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::check_series_uid(const std::string &file,
-                                       std::string &study_uid,
-                                       std::string &series_uid,
-                                       std::string &patient_name,
-                                       std::string &patient_id,
-                                       std::string &modality) {
+IOStatus DICOMLoader::check_series_uid(
+    const std::string &file, std::string &study_uid, std::string &series_uid,
+    std::string &patient_name, std::string &patient_id, std::string &modality) {
   if (file.empty()) {
     return IO_EMPTY_INPUT;
   }
@@ -92,7 +89,7 @@ IOStatus DICOMLoader::check_series_uid(const std::string &file,
   }
   modality = std::string(context.c_str());
 
-  //name & id may be null
+  // name & id may be null
   status = data_set->findAndGetOFString(DCM_PatientName, context);
   patient_name = std::string(context.c_str());
 
@@ -102,7 +99,8 @@ IOStatus DICOMLoader::check_series_uid(const std::string &file,
   return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::load_series(std::vector<std::string> &files,
+IOStatus
+DICOMLoader::load_series(std::vector<std::string> &files,
                          std::shared_ptr<ImageData> &image_data,
                          std::shared_ptr<ImageDataHeader> &img_data_header) {
   if (files.empty()) {
