@@ -29,11 +29,11 @@
 #include <dlfcn.h>
 #endif
 
+#include "appcommon/mi_app_data_base.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
 #include "util/mi_file_util.h"
-#include "appcommon/mi_app_data_base.h"
 
 using namespace medical_imaging;
 
@@ -54,10 +54,9 @@ public:
   std::cout << info;                                                           \
   out_log << info;
 
-int connect_db(const std::string &user,
-               const std::string &ip_port, const std::string &pwd,
-               const std::string &db) {
-  return data_base.connect(user , ip_port , pwd , db);
+int connect_db(const std::string &user, const std::string &ip_port,
+               const std::string &pwd, const std::string &db) {
+  return data_base.connect(user, ip_port, pwd, db);
 }
 
 int parse_root(
@@ -83,8 +82,9 @@ int parse_root(
     std::string patient_name;
     std::string patient_id;
     std::string modality;
-    if (IO_SUCCESS == loader.check_series_uid(files[i], study_id, 
-      series_id, patient_name, patient_id, modality)) {
+    if (IO_SUCCESS ==
+        loader.check_series_uid(files[i], study_id, series_id, patient_name,
+                                patient_id, modality)) {
       if (series_info_map.find(series_id) == series_info_map.end()) {
         ImgItem info;
         info.series_id = series_id;
@@ -167,7 +167,8 @@ int copy_file(const std::string &src, const std::string &dst) {
 int create_folder(
     std::string map_path,
     std::map<std::string, std::vector<std::string>> &study_series_col) {
-  for (auto study = study_series_col.begin(); study != study_series_col.end(); ++study) {
+  for (auto study = study_series_col.begin(); study != study_series_col.end();
+       ++study) {
     const std::string study_path = map_path + "/" + study->first;
     if (-1 == access(study_path.c_str(), F_OK)) {
       mkdir(study_path.c_str(), S_IRWXU);
@@ -185,11 +186,12 @@ int create_folder(
   return 0;
 }
 
-int import_one_series(const std::string &map_path,
-                      ImgItem &series_info, const std::string &series,
+int import_one_series(const std::string &map_path, ImgItem &series_info,
+                      const std::string &series,
                       const std::vector<std::string> &files) {
   // copy src file to dst map
-  const std::string series_dst = map_path + "/" + series_info.study_id + "/" + series;
+  const std::string series_dst =
+      map_path + "/" + series_info.study_id + "/" + series;
   series_info.path = series_dst;
   for (size_t i = 0; i < files.size(); i++) {
     boost::filesystem::path p(files[i].c_str());
@@ -357,7 +359,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  //test
+  // test
   std::vector<ImgItem> items;
   if (0 == data_base.get_all_item(items)) {
     for (size_t i = 0; i < items.size(); ++i) {

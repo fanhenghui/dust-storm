@@ -4,32 +4,30 @@
 #include <memory>
 #include <string>
 
-class ImgGen
-{
+class ImgGen {
 public:
-    ImgGen();
-    ~ImgGen();
+  ImgGen();
+  ~ImgGen();
 
-    unsigned char* gen_img(int width , int height);
+  unsigned char *gen_img(int width, int height);
 };
 
-class ImgSeqGen 
-{
+class ImgSeqGen {
 public:
-    ImgSeqGen();
-    ~ImgSeqGen();
+  ImgSeqGen();
+  ~ImgSeqGen();
 
-    void set_raw_data(const std::string& path , int width, int height , int deep);
-    
-    unsigned char* gen_img(int slice);
+  void set_raw_data(const std::string &path, int width, int height, int deep);
+
+  unsigned char *gen_img(int slice);
 
 private:
-    std::unique_ptr<unsigned char[]> _data;
-    int _width;
-    int _height;
-    int _deep;
-    float _min;
-    float _max;
+  std::unique_ptr<unsigned char[]> _data;
+  int _width;
+  int _height;
+  int _deep;
+  float _min;
+  float _max;
 };
 
 #endif
