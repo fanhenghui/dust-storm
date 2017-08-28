@@ -22,7 +22,7 @@
 #include "mi_operation_windowing.h"
 #include "mi_operation_zoom.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ReviewController::ReviewController() {}
 

@@ -14,7 +14,7 @@
 #include "boost/noncopyable.hpp"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 template<class T>
 class Queue {

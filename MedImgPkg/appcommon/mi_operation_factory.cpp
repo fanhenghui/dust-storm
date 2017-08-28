@@ -1,6 +1,6 @@
 #include "mi_operation_factory.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 boost::mutex OperationFactory::_mutex;
 

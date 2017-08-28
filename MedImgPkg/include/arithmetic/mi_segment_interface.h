@@ -4,7 +4,7 @@
 #include "arithmetic/mi_arithmetic_export.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 template<class T>
 class ISegment

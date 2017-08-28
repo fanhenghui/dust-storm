@@ -9,7 +9,7 @@
 #include "mi_ray_caster_inner_buffer.h"
 #include "mi_camera_calculator.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GLShaderInfo RCStepShadingNone::get_shader_info()
 {

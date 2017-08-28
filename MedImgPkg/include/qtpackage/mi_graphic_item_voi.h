@@ -96,7 +96,7 @@ private:
 };
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class QtPackage_Export GraphicItemVOI : public GraphicItemBase
 {

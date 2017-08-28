@@ -4,7 +4,7 @@
 #include <vector>
 #include "io/mi_voi.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class IO_Export NoduleSet
 {

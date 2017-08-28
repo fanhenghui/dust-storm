@@ -14,7 +14,7 @@
 #include <string.h>
 #endif
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RSAUtils::RSAUtils()
 {

@@ -9,7 +9,7 @@
 
 #include "mi_ray_caster.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 void RCStepRayCastingMIPBase::set_gpu_parameter()
 {

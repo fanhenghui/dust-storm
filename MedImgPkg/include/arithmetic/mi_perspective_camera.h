@@ -5,7 +5,7 @@
 #include "arithmetic/mi_vector2.h"
 #include "arithmetic/mi_matrix4.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export PerspectiveCamera : public CameraBase
 {

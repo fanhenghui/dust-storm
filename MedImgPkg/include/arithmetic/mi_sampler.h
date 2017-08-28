@@ -3,7 +3,7 @@
 
 #include "arithmetic/mi_arithmetic_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 template<class T>
 class Sampler

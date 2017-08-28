@@ -12,7 +12,7 @@
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export SceneBase {
 public:

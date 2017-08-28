@@ -8,7 +8,7 @@
 
 #include "mi_brick_info_calculator.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 BrickPool::BrickPool(unsigned int brick_size , unsigned int brick_margin):
     _brick_size(brick_size),

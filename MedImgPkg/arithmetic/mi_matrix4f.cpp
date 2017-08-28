@@ -1,6 +1,6 @@
 #include "mi_matrix4f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
      
     const Matrix4f append_scale( const Matrix4f & mat, const Vector3f &scaleVec )

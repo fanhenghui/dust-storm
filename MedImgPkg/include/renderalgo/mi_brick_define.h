@@ -6,7 +6,7 @@
 #include "renderalgo/mi_render_algo_export.h"
 #include "util/mi_string_number_converter.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 /// \ Brick mesh structure
 struct BrickEleIndex

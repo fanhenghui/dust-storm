@@ -6,7 +6,7 @@
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/locks.hpp"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export MaskLabelStore
 {

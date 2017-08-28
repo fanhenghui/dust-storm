@@ -6,7 +6,7 @@
 #include "renderalgo/mi_ray_caster_define.h"
 #include "renderalgo/mi_scene_base.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class VolumeInfos;
 class EntryExitPoints;

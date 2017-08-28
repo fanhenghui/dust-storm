@@ -8,7 +8,7 @@
 
 #include "appcommon/mi_app_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class VolumeInfos;
 class ReviewController : public AppController {

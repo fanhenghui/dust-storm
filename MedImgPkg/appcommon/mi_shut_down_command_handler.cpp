@@ -5,7 +5,7 @@
 
 #include <arpa/inet.h>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ShutDownCommandHandler::ShutDownCommandHandler(std::shared_ptr<AppController> controller):_controller(controller)
 {

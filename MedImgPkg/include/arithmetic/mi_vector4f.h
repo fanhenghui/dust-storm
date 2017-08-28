@@ -4,7 +4,7 @@
 #include "arithmetic/mi_simd.h"
 #include "arithmetic/mi_vector3f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 /// \class Vector4f
 /// 

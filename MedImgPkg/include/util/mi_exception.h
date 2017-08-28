@@ -8,7 +8,7 @@
 #include <sstream>
 #include <typeinfo>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Util_Export Exception : public std::exception {
 public:

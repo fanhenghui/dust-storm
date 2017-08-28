@@ -2,7 +2,7 @@
 #include "io/mi_image_data.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 CameraCalculator::CameraCalculator(std::shared_ptr<ImageData> image_data):_volume_data(image_data),_is_volume_orthogonal(true)
 {

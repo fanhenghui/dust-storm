@@ -5,7 +5,7 @@
 #include <QGraphicsLineItem>
 #include <QPen>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GraphicItemCrosshair::GraphicItemCrosshair()
 {

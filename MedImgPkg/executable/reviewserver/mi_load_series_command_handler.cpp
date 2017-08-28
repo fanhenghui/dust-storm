@@ -27,7 +27,7 @@
 #include "mi_review_config.h"
 #include "mi_review_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 LoadSeriesCommandHandler::LoadSeriesCommandHandler(
     std::shared_ptr<ReviewController> controller)

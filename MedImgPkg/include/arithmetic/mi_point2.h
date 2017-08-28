@@ -3,7 +3,7 @@
 
 #include "arithmetic/mi_vector2.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export Point2
 {

@@ -1,7 +1,7 @@
 #include "mi_intersection_test.h"
 #include "mi_vector2f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 bool IntersectionTest::plane_to_plane(const Plane& plane1,const Plane& plane2,Line3D& intersected_line)
 {

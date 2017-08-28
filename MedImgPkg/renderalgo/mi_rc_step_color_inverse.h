@@ -3,7 +3,7 @@
 
 #include "mi_rc_step_base.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RCStepColorInverseEnable : public RCStepBase
 {

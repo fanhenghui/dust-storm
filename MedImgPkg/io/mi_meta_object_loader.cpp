@@ -6,7 +6,7 @@
 #include "mi_image_data_header.h"
 #include "mi_zlib_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 IOStatus MetaObjectLoader::load(
 const std::string& info_file, 

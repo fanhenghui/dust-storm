@@ -1,6 +1,6 @@
 #include "mi_mask_label_store.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 MaskLabelStore* MaskLabelStore::instance()

@@ -10,7 +10,7 @@
 
 #include "glresource/mi_gl_resource_define.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class EntryExitPoints;
 class ImageData;

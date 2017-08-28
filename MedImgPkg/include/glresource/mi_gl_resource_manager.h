@@ -1,38 +1,36 @@
-#ifndef MED_IMG_GL_RESOURCE_MANAGER_H_
-#define MED_IMG_GL_RESOURCE_MANAGER_H_
+#ifndef MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H_
+#define MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H_
 
 #include "boost/thread/mutex.hpp"
 #include "glresource/mi_gl_object.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
-template<class ResourceType>
-class GLResourceManager
-{
+template <class ResourceType> class GLResourceManager {
 public:
-    GLResourceManager();
+  GLResourceManager();
 
-    ~GLResourceManager();
+  ~GLResourceManager();
 
-    std::shared_ptr<ResourceType> create_object(UIDType &uid);
+  std::shared_ptr<ResourceType> create_object(UIDType &uid);
 
-    std::shared_ptr<ResourceType> get_object(UIDType uid);
+  std::shared_ptr<ResourceType> get_object(UIDType uid);
 
-    void remove_object(UIDType uid);
+  void remove_object(UIDType uid);
 
-    void remove_object(std::shared_ptr<ResourceType> obj);
+  void remove_object(std::shared_ptr<ResourceType> obj);
 
-    void remove_all();
+  void remove_all();
 
-    void update();
+  void update();
 
-    std::string get_type() const;
+  std::string get_type() const;
 
 private:
-    std::map<UIDType, std::shared_ptr<ResourceType>> _objects;
-    std::vector<std::shared_ptr<ResourceType>> _discard;
-    std::unique_ptr<GLUIDGenerator> _uid_generator;
-    boost::mutex _mutex;
+  std::map<UIDType, std::shared_ptr<ResourceType>> _objects;
+  std::vector<std::shared_ptr<ResourceType>> _discard;
+  std::unique_ptr<GLUIDGenerator> _uid_generator;
+  boost::mutex _mutex;
 };
 
 #include "glresource/mi_gl_resource_manager.inl"

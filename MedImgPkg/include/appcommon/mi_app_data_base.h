@@ -9,7 +9,7 @@ namespace sql {
 class Connection;
 }
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct ImgItem{
   std::string series_id;

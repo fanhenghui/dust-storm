@@ -11,7 +11,7 @@
 #endif
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export Matrix4
 {

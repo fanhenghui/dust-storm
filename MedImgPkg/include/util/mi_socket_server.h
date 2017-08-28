@@ -5,7 +5,7 @@
 #include "util/mi_util_export.h"
 #include "util/mi_message_queue.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 class SocketServer

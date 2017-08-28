@@ -18,7 +18,7 @@
 #include "util/mi_exception.h"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #ifdef WIN32
     #ifdef MEDIMGIO_EXPORTS

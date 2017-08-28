@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 WorkListInfo::WorkListInfo() :
     m_sPatientID(""),

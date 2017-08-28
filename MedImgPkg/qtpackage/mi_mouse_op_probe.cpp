@@ -5,7 +5,7 @@
 #include "renderalgo/mi_volume_infos.h"
 #include "io/mi_image_data.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MouseOpProbe::MouseOpProbe()
 {

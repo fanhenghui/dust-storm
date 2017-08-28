@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <cmath>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #ifdef WIN32
     #ifdef MEDIMGARITHMETIC_EXPORTS

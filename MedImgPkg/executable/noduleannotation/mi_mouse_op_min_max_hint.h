@@ -20,7 +20,7 @@ protected:
 private:
 };
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 class MouseOpMinMaxHint : public IMouseOp

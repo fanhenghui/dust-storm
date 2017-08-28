@@ -5,7 +5,7 @@
 #include "arithmetic/mi_ellipsoid.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct IntensityInfo
 {

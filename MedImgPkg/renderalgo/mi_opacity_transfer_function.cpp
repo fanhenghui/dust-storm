@@ -2,7 +2,7 @@
 #include <cassert>
 #include <cmath>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OpacityTransFunc::OpacityTransFunc(int width /*= 512*/) :_width(width), _is_dirty(false)
 {}

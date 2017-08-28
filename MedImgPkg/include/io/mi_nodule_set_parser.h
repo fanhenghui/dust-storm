@@ -5,7 +5,7 @@
 #include "io/mi_io_define.h"
 #include "mbedtls/rsa.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class NoduleSet;
 class IO_Export NoduleSetParser

@@ -3,7 +3,7 @@
 #include "arithmetic/mi_point2.h"
 #include "renderalgo/mi_ray_cast_scene.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MouseOpWindowing::MouseOpWindowing()
 {

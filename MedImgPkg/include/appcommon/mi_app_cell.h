@@ -4,7 +4,7 @@
 #include "appcommon/mi_app_common_export.h"
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class SceneBase;
 class AppCommon_Export AppCell

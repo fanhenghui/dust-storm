@@ -13,7 +13,7 @@
 #include "mi_brick_info_calculator.h"
 #include "mi_brick_pool.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 namespace 
 {

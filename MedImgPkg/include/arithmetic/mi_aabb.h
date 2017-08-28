@@ -4,7 +4,7 @@
 #include "arithmetic/mi_shape_interface.h"
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export AABB : public IShape
 {

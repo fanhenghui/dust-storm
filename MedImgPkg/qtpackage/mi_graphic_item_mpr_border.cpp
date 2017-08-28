@@ -8,7 +8,7 @@
 #include "mi_model_focus.h"
 #include "mi_scene_container.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GraphicItemMPRBorder::GraphicItemMPRBorder():_pre_color(0,0,0),_pre_pen_width(0),_pre_window_width(-1),_pre_window_height(-1)
 {

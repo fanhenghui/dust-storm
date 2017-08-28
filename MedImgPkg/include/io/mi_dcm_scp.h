@@ -4,7 +4,7 @@
 #include "io/mi_io_export.h"
 #include "dcmtk/dcmnet/dstorscp.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class IO_Export MIDcmSCP : public DcmStorageSCP
 {

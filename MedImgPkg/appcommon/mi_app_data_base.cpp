@@ -8,7 +8,7 @@
 #include "cppconn/statement.h"
 #include "mysql_connection.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 const static std::string IMG_TBL = "img_tbl";
 

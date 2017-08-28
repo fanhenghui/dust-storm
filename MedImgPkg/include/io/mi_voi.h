@@ -4,7 +4,7 @@
 #include "io/mi_io_export.h"
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct VOISphere
 {

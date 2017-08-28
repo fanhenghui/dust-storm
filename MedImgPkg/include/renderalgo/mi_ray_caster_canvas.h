@@ -7,7 +7,7 @@
 #include "io/mi_io_define.h"
 #include "renderalgo/mi_render_algo_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export RayCasterCanvas {
 public:

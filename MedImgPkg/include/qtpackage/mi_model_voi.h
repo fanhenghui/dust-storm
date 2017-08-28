@@ -7,7 +7,7 @@
 #include "io/mi_voi.h"
 #include "arithmetic/mi_volume_statistician.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 //Notify code ID:
 //0 �޸Ľ��� 

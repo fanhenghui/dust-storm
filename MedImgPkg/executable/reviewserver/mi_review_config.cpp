@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ReviewConfig* ReviewConfig::_instance = nullptr;
 boost::mutex ReviewConfig::_mutex;

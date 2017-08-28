@@ -1,6 +1,6 @@
 #include "mi_matrix4.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
     const Matrix4 Matrix4::S_ZERO_MATRIX = Matrix4(
     0,0,0,0,

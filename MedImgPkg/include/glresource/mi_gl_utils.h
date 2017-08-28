@@ -1,11 +1,11 @@
-#ifndef MED_IMG_GL_UTILS_H_
-#define MED_IMG_GL_UTILS_H_
+#ifndef MEDIMGRESOURCE_GL_UTILS_H_
+#define MEDIMGRESOURCE_GL_UTILS_H_
 
 #include "GL/glew.h"
 #include "glresource/mi_gl_resource_export.h"
 #include "io/mi_io_define.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #define CHECK_GL_ERROR                                                         \
   if (GLUtils::get_check_gl_flag()) {                                          \

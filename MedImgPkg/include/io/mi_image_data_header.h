@@ -7,7 +7,7 @@
 
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 //////////////////////////////////////////////////////////////////////////
 //The image data header contains basic tag info,including :

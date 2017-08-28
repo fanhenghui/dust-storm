@@ -6,7 +6,7 @@
 #include "renderalgo/mi_brick_define.h"
 #include "arithmetic/mi_aabb.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class ImageData;
 class ImageDataHeader;

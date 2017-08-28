@@ -6,7 +6,7 @@
 #include "mi_ray_caster.h"
 #include "mi_ray_caster_inner_buffer.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GLShaderInfo RCStepMaskNoneSampler::get_shader_info()
 {

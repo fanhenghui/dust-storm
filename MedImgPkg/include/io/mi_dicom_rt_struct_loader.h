@@ -11,7 +11,7 @@ class DcmMetaInfo;
 
 typedef std::shared_ptr<DcmFileFormat> DcmFileFormatPtr;
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 class RTStruct;
 class IO_Export DICOMRTLoader
 {

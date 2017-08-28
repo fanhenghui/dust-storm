@@ -9,7 +9,7 @@
 #include "appcommon/mi_app_data_base.h"
 #include "util/mi_ipc_client_proxy.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 SearchWorklistCommandHandler::SearchWorklistCommandHandler(std::shared_ptr<AppController> controller)
     : _controller(controller) {}

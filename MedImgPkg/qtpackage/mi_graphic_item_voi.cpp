@@ -17,7 +17,7 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QTextDocument>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GraphicItemVOI::GraphicItemVOI():_pre_item_num(0),_pre_width(0),_pre_height(0)
 {

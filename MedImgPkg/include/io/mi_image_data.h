@@ -7,7 +7,7 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_matrix4.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class IO_Export ImageData
 {

@@ -33,7 +33,7 @@ Vector3 Triangle::get_normal() const
 
 bool Triangle::in_triangle(const Point3 &pt0)
 {
-    //P╣ЦтзABCдз╣д╥╫╥╗©иртсцPAB PBC PCAЁйожкЁй╠уКееап╩РуъдФй╠уКееап ё╛╪фкЦ╡НЁк╫А╧Шеп╤о╥╫оРр╩жбпт
+    //PО©╫О©╫О©╫О©╫ABCО©╫з╣д╥О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫PAB PBC PCAО©╫О©╫О©╫О©╫кЁй╠О©╫О©╫О©╫О©╫О©╫п╩О©╫О©╫О©╫О©╫О©╫й╠О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫к╫О©╫О©╫О©╫п╤о╥О©╫О©╫О©╫р╩О©╫О©╫О©╫О©╫
     const Vector3 a = _pt[0] - pt0;
     const Vector3 b = _pt[1] - pt0;
     const Vector3 c = _pt[2] - pt0;

@@ -12,7 +12,7 @@
 #include <QTextDocument>
 #include <QTextOption>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 namespace
 {

@@ -2,7 +2,7 @@
 
 #include "boost/thread.hpp"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MIDcmSCP::MIDcmSCP(const char * self_AE_title)
 {

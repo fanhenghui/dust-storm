@@ -9,7 +9,7 @@
 #include "arithmetic/mi_line.h"
 #include "renderalgo/mi_camera_calculator.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class MPRScene;
 class SceneBase;

@@ -7,7 +7,7 @@
 #include "appcommon/mi_operation_interface.h"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class AppController;
 class MPRPlayCommandHandler : public ICommandHandler

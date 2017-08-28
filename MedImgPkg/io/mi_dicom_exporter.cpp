@@ -38,7 +38,7 @@
 
 #include "util/mi_model_progress.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
     DICOMExporter::DICOMExporter():_progress(0.0f),_skip_derived_image(false)
 {

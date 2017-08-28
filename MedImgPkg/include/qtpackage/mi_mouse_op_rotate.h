@@ -3,7 +3,7 @@
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class QtPackage_Export MouseOpRotate : public IMouseOp
 {

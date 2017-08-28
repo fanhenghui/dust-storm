@@ -1,7 +1,7 @@
 #include "mi_shared_widget.h"
 
 
-//MED_IMG_BEGIN_NAMESPACE
+//MED_IMG_BEGIN_NAMESPACE 
 
 boost::mutex SharedWidget::_mutex;
 

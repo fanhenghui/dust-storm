@@ -7,7 +7,7 @@
 #include "arithmetic/mi_vector4f.h"
 #include "arithmetic/mi_sampler.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RayCaster;
 //Just MPR 

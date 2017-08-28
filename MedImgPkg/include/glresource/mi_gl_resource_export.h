@@ -1,5 +1,5 @@
-#ifndef MED_IMG_GL_RESOURCE_H
-#define MED_IMG_GL_RESOURCE_H
+#ifndef MEDIMGRESOURCE_GL_RESOURCE_H
+#define MEDIMGRESOURCE_GL_RESOURCE_H
 
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <cmath>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #ifdef WIN32
     #ifdef MEDIMGGLRESOURCE_EXPORTS

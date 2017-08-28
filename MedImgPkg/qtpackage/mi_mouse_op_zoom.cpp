@@ -2,7 +2,7 @@
 #include "renderalgo/mi_scene_base.h"
 #include "arithmetic/mi_point2.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MouseOpZoom::MouseOpZoom()
 {

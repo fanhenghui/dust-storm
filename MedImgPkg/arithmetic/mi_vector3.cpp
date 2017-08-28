@@ -1,6 +1,6 @@
 #include "mi_vector3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 const Vector3 Vector3::S_ZERO_VECTOR = Vector3(0, 0,0);
 

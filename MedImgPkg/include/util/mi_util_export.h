@@ -3,7 +3,7 @@
 
 #include "med_img_pkg_config.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #ifdef WIN32
 #ifdef MEDIMGUTIL_EXPORTS

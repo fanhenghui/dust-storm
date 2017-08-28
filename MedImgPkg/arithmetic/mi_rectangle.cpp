@@ -1,6 +1,6 @@
 #include "mi_rectangle.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 Rectangle::Rectangle()
 {

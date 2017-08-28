@@ -31,7 +31,7 @@
 #include "mi_review_config.h"
 #include "mi_review_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OpInit::OpInit() {}
 

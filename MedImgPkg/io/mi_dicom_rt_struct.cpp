@@ -1,6 +1,6 @@
 #include "mi_dicom_rt_struct.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RTStruct::RTStruct()
 {

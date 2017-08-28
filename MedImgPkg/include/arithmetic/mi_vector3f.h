@@ -3,7 +3,7 @@
 
 #include "arithmetic/mi_simd.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Point3f;
 

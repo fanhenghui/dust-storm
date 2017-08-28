@@ -11,7 +11,7 @@
 #include <unistd.h>
 #endif
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MPRPlayCommandHandler::MPRPlayCommandHandler(std::shared_ptr<AppController> controller):_controller(controller),_playing(false)
 {

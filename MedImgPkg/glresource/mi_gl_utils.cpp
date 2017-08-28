@@ -6,7 +6,7 @@
 #include <string.h>
 #endif
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 bool GLUtils::check_framebuffer_state() {
   bool fbo_status_complete = false;

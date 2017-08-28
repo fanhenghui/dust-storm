@@ -2,7 +2,7 @@
 #include "mi_vector2.h"
 #include "mi_vector3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 Point3 TrackBall::convert_screen_point_to_sphere_i( const Point2& ptPos, double width , double height , const Point2& ptBottomLeftCorner )

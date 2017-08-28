@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cassert>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ColorTransFunc::ColorTransFunc(int width /*= 512 */) :_width(width), _interpolation_type(RGB), _input_type(RGB), _is_dirty(false)
 {}

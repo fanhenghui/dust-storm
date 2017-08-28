@@ -6,7 +6,7 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_line_segment.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export Triangle : public IShape
 {

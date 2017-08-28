@@ -15,7 +15,7 @@
 #include "dcmtk/dcmdata/dcpxitem.h" 
 #include "dcmtk/dcmjpeg/djdecode.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 DICOMRTLoader::DICOMRTLoader()
 {

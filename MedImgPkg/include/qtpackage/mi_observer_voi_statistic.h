@@ -4,7 +4,7 @@
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_observer_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class VOIModel;
 class VolumeInfos;

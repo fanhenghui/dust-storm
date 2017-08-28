@@ -4,7 +4,7 @@
 #include "mi_dcm_scu.h"
 #include "mi_dcm_scp.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 PACSCommunicator::PACSCommunicator() : _initialized(false)
 {

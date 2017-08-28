@@ -8,7 +8,7 @@
 #include "mi_vr_proxy_geometry_brick.h"
 #include "mi_vr_proxy_geometry_cube.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 VREntryExitPoints::VREntryExitPoints() : EntryExitPoints() {}
 

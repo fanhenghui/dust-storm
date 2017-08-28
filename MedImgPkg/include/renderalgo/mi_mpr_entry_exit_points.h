@@ -9,7 +9,7 @@
 #include "glresource/mi_gl_resource_define.h"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export MPREntryExitPoints : public EntryExitPoints
 {

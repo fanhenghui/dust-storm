@@ -14,7 +14,7 @@
 #endif
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 IOStatus TransferFuncLoader::load_pseudo_color(const std::string& xml , std::shared_ptr<ColorTransFunc>& color)
 {

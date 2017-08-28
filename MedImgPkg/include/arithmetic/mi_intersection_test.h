@@ -9,7 +9,7 @@
 #include "arithmetic/mi_aabb.h"
 #include "arithmetic/mi_sphere.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export IntersectionTest
 {

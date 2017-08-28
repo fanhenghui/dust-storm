@@ -10,7 +10,7 @@
 
 #include "util/mi_ipc_common.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class SocketClient;
 class IPCClientProxy : public boost::noncopyable {

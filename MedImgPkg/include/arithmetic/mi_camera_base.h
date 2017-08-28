@@ -7,7 +7,7 @@
 #include "arithmetic/mi_matrix4.h"
 #include "arithmetic/mi_quat4.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export CameraBase
 {

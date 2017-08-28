@@ -7,7 +7,7 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export Line2D : public IShape
 {

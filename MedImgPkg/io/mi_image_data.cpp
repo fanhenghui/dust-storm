@@ -2,7 +2,7 @@
 #include "arithmetic/mi_sampler.h"
 #include "util/mi_configuration.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ImageData::ImageData(): 
         _data_type(SHORT), 

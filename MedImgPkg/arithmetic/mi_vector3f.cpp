@@ -1,6 +1,6 @@
 #include "mi_vector3f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
      
     const Vector3f mul_per_elem( const Vector3f &vec0, const Vector3f &vec1 )

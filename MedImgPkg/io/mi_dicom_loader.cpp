@@ -12,7 +12,7 @@
 
 #include "util/mi_model_progress.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 DICOMLoader::DICOMLoader() : _progress(0.0f) {}
 

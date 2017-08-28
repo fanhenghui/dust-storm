@@ -21,7 +21,7 @@ void QMinMaxHintObject::trigger(const std::string& s)
     emit triggered(s);
 }
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MouseOpMinMaxHint::MouseOpMinMaxHint():_min_max_hint_object(nullptr)
 {

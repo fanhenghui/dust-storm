@@ -13,7 +13,7 @@
 
 #include "mi_volume_infos.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 VRScene::VRScene() : RayCastScene() {
   std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(

@@ -1,7 +1,7 @@
 #include "mi_rc_step_color_inverse.h"
 #include "mi_shader_collection.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 GLShaderInfo RCStepColorInverseDisable::get_shader_info()
 {

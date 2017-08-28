@@ -1,7 +1,7 @@
 #include "mi_observer_scene_container.h"
 #include "mi_scene_container.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 SceneContainerObserver::SceneContainerObserver()
 {

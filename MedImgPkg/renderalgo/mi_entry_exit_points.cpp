@@ -12,7 +12,7 @@
 
 #include "mi_camera_calculator.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 EntryExitPoints::EntryExitPoints()
     : _width(4), _height(4), _has_init(false), _strategy(CPU_BASE) {

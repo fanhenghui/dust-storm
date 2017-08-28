@@ -7,7 +7,7 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/rsa.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export RSAUtils
 {

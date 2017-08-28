@@ -11,7 +11,7 @@
 #include "mi_model_voi.h"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 const static std::string  S_DEFAULT_NODULE_TYPE = std::string("W");
 

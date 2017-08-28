@@ -6,7 +6,7 @@
 #include "glresource/mi_gl_resource_define.h"
 #include "glresource/mi_gl_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RayCaster;
 class RCStepBase

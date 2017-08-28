@@ -4,7 +4,7 @@
 #include "mi_app_thread_model.h"
 #include "mi_operation_factory.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OperationCommandHandler::OperationCommandHandler(std::shared_ptr<AppController> controller):_controller(controller)
 {

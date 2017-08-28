@@ -6,7 +6,7 @@
 #include "mi_app_thread_model.h"
 #include "mi_app_common_define.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 AppController::AppController()
 {

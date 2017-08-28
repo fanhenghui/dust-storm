@@ -3,7 +3,7 @@
 
 #include "mi_exception.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 Exception::Exception(const std::string& module, const std::string& file, long line,
                      const std::string& function, const std::string& description) : std::exception()

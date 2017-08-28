@@ -3,7 +3,7 @@
 
 #include "appcommon/mi_app_common_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 // GL Context
 #define MAIN_CONTEXT 0

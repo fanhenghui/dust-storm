@@ -7,7 +7,7 @@
 
 class QGraphicsLineItem;
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class CrosshairModel;
 class QtPackage_Export GraphicItemCrosshair : public GraphicItemBase

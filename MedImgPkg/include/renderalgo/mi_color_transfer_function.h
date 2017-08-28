@@ -4,7 +4,7 @@
 #include <vector>
 #include "renderalgo/mi_render_algo_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 enum ColorType
 {

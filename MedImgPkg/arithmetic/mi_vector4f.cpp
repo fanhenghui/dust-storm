@@ -1,7 +1,7 @@
 
 #include "mi_vector4f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
  
     const Vector4f mul_per_elem( const Vector4f &vec0, const Vector4f &vec1 )
 {

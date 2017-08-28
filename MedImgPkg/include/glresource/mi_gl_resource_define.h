@@ -1,10 +1,10 @@
-#ifndef MED_IMG_GL_RESOUECE_DEFINE_H_
-#define MED_IMG_GL_RESOUECE_DEFINE_H_
+#ifndef MEDIMGRESOURCE_GL_RESOUECE_DEFINE_H_
+#define MEDIMGRESOURCE_GL_RESOUECE_DEFINE_H_
 
 #include <memory>
 #include "glresource/mi_gl_resource_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class GLTextureBase;
 class GLTexture1D;

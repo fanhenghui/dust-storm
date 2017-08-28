@@ -4,7 +4,7 @@
 #include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class VOIModel;
 

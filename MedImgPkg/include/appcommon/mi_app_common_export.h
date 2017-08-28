@@ -4,7 +4,7 @@
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 #ifdef WIN32
     #ifdef MEDIMGAPPCOMMON_EXPORTS

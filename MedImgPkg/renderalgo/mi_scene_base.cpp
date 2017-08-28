@@ -9,7 +9,7 @@
 // #include "libgpujpeg/gpujpeg_encoder.h"
 // #include "libgpujpeg/gpujpeg_encoder_internal.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 SceneBase::SceneBase() : _width(128), _height(128) {
   _image_buffer[0].reset(new unsigned char[_width * _height * 3]);

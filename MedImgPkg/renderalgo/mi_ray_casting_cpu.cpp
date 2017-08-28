@@ -10,7 +10,7 @@
 #include "mi_entry_exit_points.h"
 #include "mi_ray_caster_canvas.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RayCastingCPU::RayCastingCPU(std::shared_ptr<RayCaster> ray_caster):
         _ray_caster(ray_caster),

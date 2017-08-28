@@ -9,7 +9,7 @@
 #include "renderalgo/mi_color_transfer_function.h"
 #include "renderalgo/mi_opacity_transfer_function.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export VRScene : public RayCastScene
 {

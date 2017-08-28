@@ -1,6 +1,6 @@
 #include "mi_camera_base.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 CameraBase::CameraBase():
         _eye(Point3::S_ZERO_POINT),

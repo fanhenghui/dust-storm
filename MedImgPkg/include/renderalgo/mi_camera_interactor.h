@@ -8,7 +8,7 @@
 #include "arithmetic/mi_matrix4.h"
 #include "arithmetic/mi_ortho_camera.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class OrthoCamera;
 class CameraCalculator;

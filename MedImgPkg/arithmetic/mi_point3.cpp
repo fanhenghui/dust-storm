@@ -1,6 +1,6 @@
 #include "mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 const Point3 Point3::S_ZERO_POINT = Point3(0, 0, 0);
 

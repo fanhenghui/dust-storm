@@ -13,7 +13,7 @@
 #include "mi_review_controller.h"
 #include "mi_message.pb.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OpMPRPaging::OpMPRPaging()
 {

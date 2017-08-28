@@ -9,7 +9,7 @@ namespace medical_imaging
     class SceneBase;
 }
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class QtPackage_Export IMouseOp
 {

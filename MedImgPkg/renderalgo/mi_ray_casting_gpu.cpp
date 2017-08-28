@@ -17,7 +17,7 @@
 #include "mi_rc_step_shading.h"
 #include "mi_rc_step_mask_overlay.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster):
     _ray_caster(ray_caster),

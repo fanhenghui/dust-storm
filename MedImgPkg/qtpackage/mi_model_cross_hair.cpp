@@ -7,7 +7,7 @@
 
 #include "renderalgo/mi_mpr_scene.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 CrosshairModel::CrosshairModel():_is_visible(true)
 {

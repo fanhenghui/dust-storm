@@ -11,7 +11,7 @@
 #include "arithmetic/mi_sphere.h"
 #include "arithmetic/mi_ellipsoid.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export ArithmeticUtils
 {

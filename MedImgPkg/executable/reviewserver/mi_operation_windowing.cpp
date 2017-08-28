@@ -13,7 +13,7 @@
 #include "mi_message.pb.h"
 #include "mi_review_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OpWindowing::OpWindowing() {}
 

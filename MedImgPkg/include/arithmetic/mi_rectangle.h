@@ -5,7 +5,7 @@
 #include "arithmetic/mi_point2.h"
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export Rectangle : public IShape
 {

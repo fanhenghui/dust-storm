@@ -7,7 +7,7 @@
 #include "glresource/mi_gl_resource_define.h"
 #include "arithmetic/mi_color_unit.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RayCasterInnerBuffer
 {

@@ -1,6 +1,6 @@
 #include "mi_arithmetic_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 Matrix4f ArithmeticUtils::convert_matrix(const Matrix4& mat)
@@ -43,7 +43,7 @@ Vector3f ArithmeticUtils::convert_point(const Point3& v)
 //{
 //    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
 //    double tmp = x;
-//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //Èç¹ûÐèÒª4Éá5ÈëÈ¡Õû¾ÍÈ¥µôÕâÒ»ÐÐ
+//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //ï¿½ï¿½ï¿½ï¿½ï¿½Òª4ï¿½ï¿½5ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 //    tmp += magic;
 //    return tmp;
 //}
@@ -52,7 +52,7 @@ Vector3f ArithmeticUtils::convert_point(const Point3& v)
 //{
 //    static const double magic = 6755399441055744.0; // (1<<51) | (1<<52)
 //    double tmp = x;
-//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //Èç¹ûÐèÒª4Éá5ÈëÈ¡Õû¾ÍÈ¥µôÕâÒ»ÐÐ
+//    tmp += (x > 0) ? -0.499999999999 : +0.499999999999; //ï¿½ï¿½ï¿½ï¿½ï¿½Òª4ï¿½ï¿½5ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 //    tmp += magic;
 //    return *(int*)&tmp;
 //}

@@ -1,7 +1,7 @@
 #include "mi_app_cell.h"
 #include "renderalgo/mi_scene_base.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 AppCell::AppCell()
 {

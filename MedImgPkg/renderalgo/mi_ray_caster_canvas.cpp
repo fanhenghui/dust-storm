@@ -4,7 +4,7 @@
 #include "glresource/mi_gl_texture_cache.h"
 #include "glresource/mi_gl_utils.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RayCasterCanvas::RayCasterCanvas()
     : _has_init(false), _width(32), _height(32) {}

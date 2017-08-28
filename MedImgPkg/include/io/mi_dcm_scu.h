@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class WorkListInfo;
 

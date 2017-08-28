@@ -1,6 +1,6 @@
 #include "mi_line_segment.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 LineSegment2D::LineSegment2D()
 {

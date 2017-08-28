@@ -7,7 +7,7 @@
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ReadyCommandHandler::ReadyCommandHandler(
     std::shared_ptr<AppController> controller)

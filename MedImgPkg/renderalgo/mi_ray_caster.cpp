@@ -11,7 +11,7 @@
 #include "mi_ray_casting_gpu.h"
 #include "mi_ray_caster_canvas.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 RayCaster::RayCaster():_inner_buffer(new RayCasterInnerBuffer()),
 _sample_rate(0.5f),

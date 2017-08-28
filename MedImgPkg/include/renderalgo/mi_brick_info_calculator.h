@@ -8,7 +8,7 @@
 #include "glresource/mi_gl_resource_manager_container.h"
 #include "arithmetic/mi_aabb.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class ImageData;
 class BrickPool;

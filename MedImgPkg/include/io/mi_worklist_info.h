@@ -4,7 +4,7 @@
 #include <string>
 #include "io/mi_io_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class IO_Export WorkListInfo
 {

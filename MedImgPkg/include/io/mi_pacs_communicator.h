@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class MIDcmSCP;
 class MIDcmSCU;

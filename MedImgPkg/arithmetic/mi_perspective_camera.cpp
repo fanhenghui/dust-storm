@@ -1,7 +1,7 @@
 #include "mi_perspective_camera.h"
 #include <cmath>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 PerspectiveCamera::PerspectiveCamera() :CameraBase(),
 _Fovy(0), _Aspect(0), _Near(0), _Far(0), _bIsPCalculated(false)

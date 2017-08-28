@@ -7,7 +7,7 @@
 #include "renderalgo/mi_ray_caster_define.h"
 #include "io/mi_io_define.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class ColorTransFunc;
 class OpacityTransFunc;

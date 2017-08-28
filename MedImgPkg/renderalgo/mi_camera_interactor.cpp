@@ -2,7 +2,7 @@
 #include "arithmetic/mi_quat4.h"
 #include "arithmetic/mi_track_ball.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 OrthoCameraInteractor::OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera )
 {

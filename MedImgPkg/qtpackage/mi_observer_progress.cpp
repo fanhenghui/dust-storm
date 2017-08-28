@@ -4,7 +4,7 @@
 
 #include <QProgressDialog>
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ProgressObserver::ProgressObserver():_progress_dialog (nullptr)
 {

@@ -1,6 +1,6 @@
 #include "mi_model_focus.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 FocusModel::FocusModel():_container(nullptr)
 {

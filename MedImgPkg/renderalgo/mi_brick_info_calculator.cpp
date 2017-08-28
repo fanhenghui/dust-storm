@@ -9,7 +9,7 @@
 
 #include "mi_shader_collection.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 BrickInfoCalculator::BrickInfoCalculator():_info_array(nullptr),_brick_size(16),_brick_margin(2)
 {

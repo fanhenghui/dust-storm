@@ -13,7 +13,7 @@
 
 #include "mi_volume_infos.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MPRScene::MPRScene():RayCastScene()
 {

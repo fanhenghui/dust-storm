@@ -3,7 +3,7 @@
 #include "arithmetic/mi_point2.h"
 #include "mi_model_cross_hair.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 MouseOpMPRPage::MouseOpMPRPage()
 {

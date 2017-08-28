@@ -9,7 +9,7 @@
 
 #include "mi_model_voi.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 VOIStatisticObserver::VOIStatisticObserver()
 {

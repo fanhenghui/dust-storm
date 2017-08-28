@@ -9,7 +9,7 @@
 
 #include "mi_nodule_set.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 namespace
 {

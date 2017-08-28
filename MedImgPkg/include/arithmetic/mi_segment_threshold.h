@@ -5,7 +5,7 @@
 #include "arithmetic/mi_sampler.h"
 //#include "ext/boost/atomic/atomic.hpp"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 template<class T>

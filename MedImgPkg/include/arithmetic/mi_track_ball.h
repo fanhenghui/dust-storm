@@ -5,7 +5,7 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_quat4.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class Arithmetic_Export TrackBall
 {

@@ -5,7 +5,7 @@
 #include "renderalgo/mi_camera_calculator.h"
 #include "arithmetic/mi_plane.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class RenderAlgo_Export MPRScene : public RayCastScene
 {

@@ -15,7 +15,7 @@
 #include "mi_app_controller.h"
 #include "mi_operation_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct AppThreadModel::InnerThreadData {
   boost::thread _th;

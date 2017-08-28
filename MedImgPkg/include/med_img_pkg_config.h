@@ -5,8 +5,8 @@
 #define MED_IMG_NAMESPACE                 medical_imaging
 #endif
 
-#ifndef MED_IMG_BEGIN_NAMESPACE
-#define MED_IMG_BEGIN_NAMESPACE           \
+#ifndef MED_IMG_BEGIN_NAMESPACE 
+#define MED_IMG_BEGIN_NAMESPACE            \
 namespace MED_IMG_NAMESPACE           {    /* begin namespace medical_imaging */
 #endif
 #ifndef MED_IMG_END_NAMESPACE

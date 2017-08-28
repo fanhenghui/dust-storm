@@ -18,7 +18,7 @@
 #include "mi_brick_pool.h"
 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 ProxyGeometryBrick::ProxyGeometryBrick():_draw_element_count(0),_last_brick_filter_items(-1)
 {

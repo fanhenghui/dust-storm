@@ -13,7 +13,7 @@ class DcmMetaInfo;
 typedef std::shared_ptr<DcmFileFormat> DcmFileFormatPtr;
 typedef std::vector<DcmFileFormatPtr> DcmFileFormatSet;
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class ImageData;
 class ImageDataHeader;

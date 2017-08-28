@@ -1,6 +1,6 @@
 #include "mi_ortho_camera.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
     OrthoCamera::OrthoCamera() : CameraBase()
     , _is_proj_mat_cal(false)
@@ -64,8 +64,8 @@ void OrthoCamera::calculate_projection_matrix_i()
         _mat_projection[0][0] = 2.0f / ((_right - _left) * _ZoomFactor);
         _mat_projection[1][1] = 2.0f / ((_top - _bottom) * _ZoomFactor);
         _mat_projection[2][2] = -2.0f / (_far - _near);
-        //这里是因为_Near和_Far是距离视点的距离（负的），即认为近远平面都在视点的观察反方向，即左下角点(left , bottom , -near)
-        //右上角点(right , top , -far) 则 -far < -near 即 far > near
+        //锟斤拷锟斤拷锟斤拷锟斤拷为_Near锟斤拷_Far锟角撅拷锟斤拷锟接碉拷木锟斤拷耄拷锟斤拷模锟斤拷锟斤拷锟斤拷锟轿拷锟皆镀斤拷娑硷拷锟斤拷拥锟侥观察反锟斤拷锟津，硷拷锟斤拷锟铰角碉拷(left , bottom , -near)
+        //锟斤拷锟较角碉拷(right , top , -far) 锟斤拷 -far < -near 锟斤拷 far > near
         _mat_projection[3][0] = -(_right + _left ) / (_right - _left);
         _mat_projection[3][1] = -(_top + _bottom) / (_top - _bottom);
         _mat_projection[3][2] = -(_far + _near) / (_far - _near);

@@ -5,7 +5,7 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct ContourData
 {

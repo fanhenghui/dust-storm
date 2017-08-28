@@ -5,7 +5,7 @@
 #include "dcmtk/config/osconfig.h"  /* make sure OS specific configuration is included first */ 
 #include "dcmtk/dcmnet/diutil.h" 
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 static Uint8 findUncompressedPC(const OFString& sopClass, MIDcmSCU& scu)
 {

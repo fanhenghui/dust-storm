@@ -9,7 +9,7 @@
 #include "mi_ray_caster.h"
 #include "mi_entry_exit_points.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 
 GLShaderInfo RCStepMainVert::get_shader_info()

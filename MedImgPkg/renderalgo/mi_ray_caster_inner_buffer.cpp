@@ -3,7 +3,7 @@
 #include "glresource/mi_gl_buffer.h"
 #include "glresource/mi_gl_resource_manager_container.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct RayCasterInnerBuffer::GLResource
 {

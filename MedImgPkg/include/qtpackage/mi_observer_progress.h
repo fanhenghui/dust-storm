@@ -6,7 +6,7 @@
 
 class QProgressDialog;
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class ProgressModel;
 class QtPackage_Export ProgressObserver : public IObserver

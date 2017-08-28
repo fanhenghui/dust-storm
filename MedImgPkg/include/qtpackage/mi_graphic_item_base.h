@@ -7,7 +7,7 @@
 
 class QPainter;
 class QGraphicsItem;
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 class QtPackage_Export GraphicItemBase
 {

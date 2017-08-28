@@ -3,7 +3,7 @@
 #include <fstream>
 #include "boost/filesystem.hpp"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 namespace {
 void get_files(const std::string& root , const std::vector<std::string>& postfix,

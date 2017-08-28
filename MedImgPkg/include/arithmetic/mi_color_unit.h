@@ -5,7 +5,7 @@
 #include <iostream>
 #include "arithmetic/mi_vector4f.h"
 
-MED_IMG_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE 
 
 struct RGBUnit
 {
