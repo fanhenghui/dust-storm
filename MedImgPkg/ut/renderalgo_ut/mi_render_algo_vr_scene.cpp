@@ -167,7 +167,7 @@ void Init() {
 
 void Display() {
   try {
-      GLUtils::set_pixel_pack_alignment(1);
+    GLUtils::set_pixel_pack_alignment(1);
 
     glViewport(0, 0, _width, _height);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -208,7 +208,7 @@ void Display() {
     CHECK_GL_ERROR;
 
 #ifdef WIN32
-    FileUtil::write_raw("D:/temp/output_ut.jpeg",buffer , buffer_size);
+    FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
     FileUtil::write_raw("/home/wr/data/output_ut.jpeg", buffer, buffer_size);
 #endif
@@ -385,7 +385,7 @@ int TE_VRScene(int argc, char *argv[]) {
     glutMouseFunc(MouseClick);
     glutMotionFunc(MouseMotion);
 
-    //Init();
+    // Init();
 
     glutMainLoop();
     return 0;
