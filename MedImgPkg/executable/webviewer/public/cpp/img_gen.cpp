@@ -19,7 +19,7 @@ ImgGen::~ImgGen()
 
 unsigned char* ImgGen::gen_img(int width , int height )
 {
-    static int tag = 0;
+    static int tag = 0; 
     tag += 5;
     if(tag > 255) {
         tag = 0;

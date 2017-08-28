@@ -15,7 +15,7 @@ struct Msg
         if(buffer)
         {
             delete [] buffer;
-            buffer = nullptr;
+            buffer = nullptr; 
         }
     }
 

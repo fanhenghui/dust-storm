@@ -13,7 +13,7 @@ public:
     unsigned char* gen_img(int width , int height);
 };
 
-class ImgSeqGen
+class ImgSeqGen 
 {
 public:
     ImgSeqGen();
