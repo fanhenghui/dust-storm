@@ -60,7 +60,7 @@ int OpInit::execute() {
   // load series
   const std::string series_uid = msg_init.series_uid();
   AppDataBase db;
-  if(0 != db.connect("root","127.0.0.1:3006","6ckj1sWR","med_img_cache_db")){
+  if(0 != db.connect("root","127.0.0.1:3306","6ckj1sWR","med_img_cache_db")){
       //TODO LOG
       return -1;
   }
