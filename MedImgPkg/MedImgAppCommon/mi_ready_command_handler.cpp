@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "MedImgUtil/mi_ipc_client_proxy.h"
+#include "util/mi_ipc_client_proxy.h"
 
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"

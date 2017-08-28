@@ -1,7 +1,7 @@
 #include "mi_app_controller.h"
 
-#include "MedImgUtil/mi_ipc_client_proxy.h"
-#include "MedImgGLResource/mi_gl_context.h"
+#include "util/mi_ipc_client_proxy.h"
+#include "glresource/mi_gl_context.h"
 
 #include "mi_app_thread_model.h"
 #include "mi_app_common_define.h"

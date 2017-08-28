@@ -1,11 +1,11 @@
 #include "mi_model_cross_hair.h"
-#include "MedImgArithmetic/mi_intersection_test.h"
-#include "MedImgArithmetic/mi_camera_base.h"
+#include "arithmetic/mi_intersection_test.h"
+#include "arithmetic/mi_camera_base.h"
 
-#include "MedImgIO/mi_image_data.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
+#include "io/mi_image_data.h"
+#include "renderalgo/mi_volume_infos.h"
 
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

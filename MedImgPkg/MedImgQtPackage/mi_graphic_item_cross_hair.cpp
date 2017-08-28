@@ -1,6 +1,6 @@
 #include "mi_graphic_item_cross_hair.h"
 #include "mi_model_cross_hair.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 #include <QGraphicsLineItem>
 #include <QPen>

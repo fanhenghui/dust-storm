@@ -3,33 +3,33 @@ ver = debug
 
 subsystem:
 	-mkdir bin
-	$(MAKE) -C ./MedImgUtil
-	$(MAKE) -C ./MedImgGLResource
-	$(MAKE) -C ./MedImgArithmetic
-	$(MAKE) -C ./MedImgIO
-	$(MAKE) -C ./Executable/MedImgShaderEncoder
-	$(MAKE) -C ./MedImgRenderAlgorithm
+	$(MAKE) -C ./util
+	$(MAKE) -C ./glresource
+	$(MAKE) -C ./arithmetic
+	$(MAKE) -C ./io
+	$(MAKE) -C ./executable/shaderencoder
+	$(MAKE) -C ./renderalgo
 	$(MAKE) -C ./MedImgAppCommon
 	$(MAKE) -C ./UT/MedImgUtil_UT
 	$(MAKE) -C ./UT/MedImgGLResource_UT
 	$(MAKE) -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) -C ./UT/MedImgIO_UT
-	$(MAKE) -C ./Executable/ReviewServer
-	$(MAKE) -C ./Executable/MedImgDcmDBImporter
+	$(MAKE) -C ./executable/reviewserver
+	$(MAKE) -C ./executable/dcmdbimporter
 
 PHONY.:clean
 clean:
-	$(MAKE) clean -C ./MedImgUtil
-	$(MAKE) clean -C ./MedImgGLResource
-	$(MAKE) clean -C ./MedImgArithmetic
-	$(MAKE) clean -C ./MedImgIO
-	$(MAKE) clean -C ./Executable/MedImgShaderEncoder
-	$(MAKE) clean -C ./MedImgRenderAlgorithm
+	$(MAKE) clean -C ./util
+	$(MAKE) clean -C ./glresource
+	$(MAKE) clean -C ./arithmetic
+	$(MAKE) clean -C ./io
+	$(MAKE) clean -C ./executable/shaderencoder
+	$(MAKE) clean -C ./renderalgo
 	$(MAKE) clean -C ./MedImgAppCommon
 	$(MAKE) clean -C ./UT/MedImgUtil_UT
 	$(MAKE) clean -C ./UT/MedImgGLResource_UT
 	$(MAKE) clean -C ./UT/MedImgRenderAlgorithm_UT
 	$(MAKE) clean -C ./UT/MedImgIO_UT
-	$(MAKE) clean -C ./Executable/ReviewServer
-	$(MAKE) clean -C ./Executable/MedImgDcmDBImporter
+	$(MAKE) clean -C ./executable/reviewserver
+	$(MAKE) clean -C ./executable/dcmdbimporter
 	-rm -r bin

@@ -1,12 +1,12 @@
 #include "mi_graphic_item_voi.h"
 
-#include "MedImgUtil/mi_string_number_converter.h"
+#include "util/mi_string_number_converter.h"
 
-#include "MedImgArithmetic/mi_arithmetic_utils.h"
+#include "arithmetic/mi_arithmetic_utils.h"
 
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_camera_calculator.h"
+#include "renderalgo/mi_mpr_scene.h"
+#include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_camera_calculator.h"
 
 #include "mi_model_voi.h"
 

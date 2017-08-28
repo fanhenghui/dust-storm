@@ -1,9 +1,9 @@
 #include "mi_mouse_op_test.h"
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
-#include "MedImgArithmetic/mi_point2.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgIO/mi_image_data.h"
+#include "renderalgo/mi_scene_base.h"
+#include "arithmetic/mi_point2.h"
+#include "renderalgo/mi_mpr_scene.h"
+#include "renderalgo/mi_volume_infos.h"
+#include "io/mi_image_data.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

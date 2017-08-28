@@ -1,5 +1,5 @@
 #include "mi_app_cell.h"
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
+#include "renderalgo/mi_scene_base.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

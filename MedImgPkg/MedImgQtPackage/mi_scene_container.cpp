@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QApplication>
 
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
+#include "renderalgo/mi_scene_base.h"
 
 #include "mi_shared_widget.h"
 #include "mi_mouse_op_interface.h"
@@ -351,9 +351,9 @@ void SceneContainer::wheelEvent(QWheelEvent *event)
             return;
         }
 
-        //¹öÂÖÏòÏÂÊÇ¸ºÊý£¬ÏòÉÏÊÇÕýÊý
-        const int degree = event->delta() / 8;//¹ö¶¯µÄ½Ç¶È£¬*8¾ÍÊÇÊó±ê¹ö¶¯µÄ¾àÀë
-        const int step = degree/ 15;//¹ö¶¯µÄ²½Êý£¬*15¾ÍÊÇÊó±ê¹ö¶¯µÄ½Ç¶È
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        const int degree = event->delta() / 8;//ï¿½ï¿½ï¿½ï¿½ï¿½Ä½Ç¶È£ï¿½*8ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
+        const int step = degree/ 15;//ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½*15ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä½Ç¶ï¿½
 
         for (auto it = _mouse_wheel_ops.begin() ; it != _mouse_wheel_ops.end() ; ++it)
         {

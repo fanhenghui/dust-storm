@@ -1,7 +1,7 @@
 #include "mi_mouse_op_windowing.h"
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
-#include "MedImgArithmetic/mi_point2.h"
-#include "MedImgRenderAlgorithm/mi_ray_cast_scene.h"
+#include "renderalgo/mi_scene_base.h"
+#include "arithmetic/mi_point2.h"
+#include "renderalgo/mi_ray_cast_scene.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

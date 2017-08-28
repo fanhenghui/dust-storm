@@ -1,0 +1,1 @@
+protoc --proto_path=..//public/data/ --cpp_out=./ ..//public/data/mi_message.proto

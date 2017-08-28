@@ -1,5 +1,5 @@
-#include "MedImgIO/mi_pacs_communicator.h"
-#include "MedImgIO/mi_worklist_info.h"
+#include "io/mi_pacs_communicator.h"
+#include "io/mi_worklist_info.h"
 #include "dcmtk/oflog/oflog.h"
 #include <iostream>
 #include <string>

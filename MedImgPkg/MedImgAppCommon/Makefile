@@ -7,7 +7,7 @@ CFLAGS += -g
 endif
 
 ROOT = ..
-INCLUDE_ROOT_DIR = $(ROOT)/Include
+INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/MedImgAppCommon
 BIN_DIR = $(ROOT)/bin
 
@@ -19,7 +19,7 @@ TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
 EXPORT_HEADER = mi_app_common_export.h mi_app_common_define.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lmedimg_renderalgorithm -lboost_system -lboost_filesystem -lboost_thread -lmysqlcppconn
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_glresource -lmedimg_renderalgo -lboost_system -lboost_filesystem -lboost_thread -lmysqlcppconn
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

@@ -9,7 +9,7 @@
 
 #include "boost/thread.hpp"
 
-#include "MedImgUtil/mi_message_queue.h"
+#include "util/mi_message_queue.h"
 
 using namespace medical_imaging;
 

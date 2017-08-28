@@ -1,8 +1,8 @@
 #include "GL/glew.h"
 #include "GL/glxew.h"
 
-#include "MedImgGLResource/mi_gl_context.h"
-#include "MedImgGLResource/mi_gl_utils.h"
+#include "glresource/mi_gl_context.h"
+#include "glresource/mi_gl_utils.h"
 
 #include <unistd.h>
 #include "GL/glew.h"

@@ -1,6 +1,6 @@
 #include "mi_mouse_op_zoom.h"
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
-#include "MedImgArithmetic/mi_point2.h"
+#include "renderalgo/mi_scene_base.h"
+#include "arithmetic/mi_point2.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

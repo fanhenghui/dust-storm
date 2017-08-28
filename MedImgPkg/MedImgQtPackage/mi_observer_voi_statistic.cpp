@@ -1,10 +1,10 @@
 #include "mi_observer_voi_statistic.h"
 
-#include "MedImgArithmetic/mi_volume_statistician.h"
-#include "MedImgIO/mi_image_data.h"
+#include "arithmetic/mi_volume_statistician.h"
+#include "io/mi_image_data.h"
 
-#include "MedImgRenderAlgorithm/mi_camera_calculator.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
+#include "renderalgo/mi_camera_calculator.h"
+#include "renderalgo/mi_volume_infos.h"
 
 
 #include "mi_model_voi.h"

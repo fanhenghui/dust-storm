@@ -3,12 +3,12 @@
 #include "boost/thread/condition.hpp"
 #include "boost/thread/thread.hpp"
 
-#include "MedImgGLResource/mi_gl_context.h"
-#include "MedImgGLResource/mi_gl_resource_manager_container.h"
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
-#include "MedImgUtil/mi_file_util.h"
-#include "MedImgUtil/mi_ipc_client_proxy.h"
-#include "MedImgUtil/mi_message_queue.h"
+#include "glresource/mi_gl_context.h"
+#include "glresource/mi_gl_resource_manager_container.h"
+#include "renderalgo/mi_scene_base.h"
+#include "util/mi_file_util.h"
+#include "util/mi_ipc_client_proxy.h"
+#include "util/mi_message_queue.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_common_define.h"

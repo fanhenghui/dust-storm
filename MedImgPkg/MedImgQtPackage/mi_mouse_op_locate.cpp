@@ -1,6 +1,6 @@
 #include "mi_mouse_op_locate.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
-#include "MedImgArithmetic/mi_point2.h"
+#include "renderalgo/mi_mpr_scene.h"
+#include "arithmetic/mi_point2.h"
 #include "mi_model_cross_hair.h"
 
 MED_IMG_BEGIN_NAMESPACE

@@ -1,7 +1,7 @@
 #include "mi_shut_down_command_handler.h"
 
 #include "mi_app_controller.h"
-#include "MedImgUtil/mi_ipc_common.h"
+#include "util/mi_ipc_common.h"
 
 #include <arpa/inet.h>
 

@@ -8,7 +8,7 @@ CFLAGS += -g
 endif
 
 ROOT = ../..
-INCLUDE_ROOT_DIR = $(ROOT)/Include
+INCLUDE_ROOT_DIR = $(ROOT)/include
 BIN_DIR = $(ROOT)/bin
 PROTOCO_LIB_DIR = /usr/local/protobuf/lib
 GOOGLE_DIR = /usr/local/protobuf/include/google/

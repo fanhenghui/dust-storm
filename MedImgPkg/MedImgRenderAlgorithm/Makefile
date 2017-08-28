@@ -7,8 +7,8 @@ CFLAGS += -g
 endif
 
 ROOT = ..
-INCLUDE_ROOT_DIR = $(ROOT)/Include
-INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/MedImgRenderAlgorithm
+INCLUDE_ROOT_DIR = $(ROOT)/include
+INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/renderalgo
 BIN_DIR = $(ROOT)/bin
 
 #CUDA_INCLUDE_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/include
@@ -25,7 +25,7 @@ mi_rc_step_color_inverse.o mi_rc_step_composite.o mi_rc_step_main.o mi_rc_step_m
 mi_rc_step_mask_sampler.o mi_rc_step_ray_casting.o mi_rc_step_shading.o mi_rc_step_utils.o mi_rc_step_volume_sampler.o \
 mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o mi_vr_scene.o
 
-TARGET = $(BIN_DIR)/libmedimg_renderalgorithm.so
+TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
 EXPORT_HEADER = mi_render_algo_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
@@ -36,7 +36,7 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmedimg_arithmetic -lmedimg
 all: pre-build main-build
 
 pre-build:
-	../bin/medimg_shaderencoder ./Shader/shader_config
+	../bin/shaderencoder ./Shader/shader_config
 
 main-build: $(TARGET)
 

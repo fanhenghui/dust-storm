@@ -1,14 +1,14 @@
 #include "mi_observer_voi_segment.h"
 
-#include "MedImgUtil/mi_configuration.h"
+#include "util/mi_configuration.h"
 
-#include "MedImgArithmetic/mi_segment_threshold.h"
+#include "arithmetic/mi_segment_threshold.h"
 
-#include "MedImgIO/mi_image_data.h"
+#include "io/mi_image_data.h"
 
-#include "MedImgRenderAlgorithm/mi_camera_calculator.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "renderalgo/mi_camera_calculator.h"
+#include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 
 #include "mi_model_voi.h"

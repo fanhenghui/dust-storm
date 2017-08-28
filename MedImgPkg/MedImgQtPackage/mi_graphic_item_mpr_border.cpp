@@ -1,5 +1,5 @@
 #include "mi_graphic_item_mpr_border.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 #include <QGraphicsLineItem>
 #include <QPen>

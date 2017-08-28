@@ -1,12 +1,12 @@
 #include "mi_mouse_op_annotate.h"
 
-#include "MedImgArithmetic/mi_point2.h"
-#include "MedImgArithmetic/mi_vector3.h"
+#include "arithmetic/mi_point2.h"
+#include "arithmetic/mi_vector3.h"
 
-#include "MedImgRenderAlgorithm/mi_scene_base.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_mask_label_store.h"
+#include "renderalgo/mi_scene_base.h"
+#include "renderalgo/mi_mpr_scene.h"
+#include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_mask_label_store.h"
 
 #include "mi_model_voi.h"
 

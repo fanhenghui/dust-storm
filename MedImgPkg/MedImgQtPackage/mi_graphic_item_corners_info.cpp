@@ -1,11 +1,11 @@
 #include "mi_graphic_item_corners_info.h"
 
 //Medical imaging
-#include "MedImgIO/mi_image_data_header.h"
-#include "MedImgUtil/mi_string_number_converter.h"
-#include "MedImgRenderAlgorithm/mi_ray_cast_scene.h"
-#include "MedImgRenderAlgorithm/mi_volume_infos.h"
-#include "MedImgRenderAlgorithm/mi_mpr_scene.h"
+#include "io/mi_image_data_header.h"
+#include "util/mi_string_number_converter.h"
+#include "renderalgo/mi_ray_cast_scene.h"
+#include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 #include <QGraphicsTextItem>
 #include <QFont>
