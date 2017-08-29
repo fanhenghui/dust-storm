@@ -6,11 +6,10 @@
 
 class SceneContainer;
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export SceneContainerObserver : public IObserver
-{
-public: 
+class QtPackage_Export SceneContainerObserver : public IObserver {
+public:
     SceneContainerObserver();
     virtual ~SceneContainerObserver();
 
@@ -22,7 +21,7 @@ public:
     void clear_scene_container();
 protected:
 private:
-    std::vector<SceneContainer*> _scene_containers; 
+    std::vector<SceneContainer*> _scene_containers;
 };
 
 MED_IMG_END_NAMESPACE

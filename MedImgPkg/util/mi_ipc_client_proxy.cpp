@@ -2,7 +2,7 @@
 #include "mi_ipc_client_proxy.h"
 #include "mi_socket_client.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class IPCDataRecvHandlerExt : public IPCDataRecvHandler {
 public:

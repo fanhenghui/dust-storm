@@ -6,23 +6,23 @@
 #include "mi_review_common.h"
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
 class VRPlayCommandHandler : public ICommandHandler {
 public:
-  VRPlayCommandHandler(std::shared_ptr<AppController> controller);
+    VRPlayCommandHandler(std::shared_ptr<AppController> controller);
 
-  virtual ~VRPlayCommandHandler();
+    virtual ~VRPlayCommandHandler();
 
-  virtual int handle_command(const IPCDataHeader &datahaeder, char *buffer);
-
-private:
-  void logic_i(OpDataHeader &op_header, char *buffer);
+    virtual int handle_command(const IPCDataHeader& datahaeder, char* buffer);
 
 private:
-  std::weak_ptr<AppController> _controller;
-  bool _playing;
+    void logic_i(OpDataHeader& op_header, char* buffer);
+
+private:
+    std::weak_ptr<AppController> _controller;
+    bool _playing;
 };
 
 MED_IMG_END_NAMESPACE

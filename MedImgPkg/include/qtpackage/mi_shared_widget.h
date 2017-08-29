@@ -7,10 +7,9 @@
 #include "QtOpenGL/qgl.h"
 #include "boost/thread/mutex.hpp"
 
-//MED_IMG_BEGIN_NAMESPACE 
+//MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export SharedWidget : public QGLWidget
-{
+class QtPackage_Export SharedWidget : public QGLWidget {
     Q_OBJECT
 public:
     static SharedWidget* instance();

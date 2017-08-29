@@ -2,41 +2,33 @@
 
 using namespace medical_imaging;
 
-VOITableObserver::VOITableObserver():_nodule_object(nullptr)
-{
+VOITableObserver::VOITableObserver(): _nodule_object(nullptr) {
 
 }
 
-VOITableObserver::~VOITableObserver()
-{
+VOITableObserver::~VOITableObserver() {
 
 }
 
-void VOITableObserver::update(int)
-{
-    if (_nodule_object)
-    {
+void VOITableObserver::update(int) {
+    if (_nodule_object) {
         _nodule_object->add_nodule();
     }
 }
 
 
-void VOITableObserver::set_nodule_object(QNoduleObject* obj)
-{
+void VOITableObserver::set_nodule_object(QNoduleObject* obj) {
     _nodule_object = obj;
 }
 
-QNoduleObject::QNoduleObject(QObject* parent /*=0*/)
-{
+QNoduleObject::QNoduleObject(QObject* parent /*=0*/) {
 
 }
 
-void QNoduleObject::delete_nodule(int id)
-{
+void QNoduleObject::delete_nodule(int id) {
     emit nodule_deleted(id);
 }
 
-void QNoduleObject::add_nodule()
-{
+void QNoduleObject::add_nodule() {
     emit nodule_added();
 }

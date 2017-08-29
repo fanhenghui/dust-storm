@@ -14,7 +14,7 @@
 #include "mi_exception.h"
 
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 
 SocketClient::SocketClient(): _path(""), _fd_server(-1) {

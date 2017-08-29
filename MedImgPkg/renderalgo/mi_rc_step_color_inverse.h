@@ -7,26 +7,26 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RCStepColorInverseEnable : public RCStepBase {
 public:
-  RCStepColorInverseEnable(std::shared_ptr<RayCaster> ray_caster,
-                           std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepColorInverseEnable(std::shared_ptr<RayCaster> ray_caster,
+                             std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepColorInverseEnable(){};
+    virtual ~RCStepColorInverseEnable() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
 
 class RCStepColorInverseDisable : public RCStepBase {
 public:
-  RCStepColorInverseDisable(std::shared_ptr<RayCaster> ray_caster,
-                            std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepColorInverseDisable(std::shared_ptr<RayCaster> ray_caster,
+                              std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepColorInverseDisable(){};
+    virtual ~RCStepColorInverseDisable() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };

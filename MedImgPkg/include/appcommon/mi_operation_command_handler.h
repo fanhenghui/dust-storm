@@ -5,11 +5,10 @@
 #include "util/mi_ipc_common.h"
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
-class AppCommon_Export OperationCommandHandler : public ICommandHandler
-{
+class AppCommon_Export OperationCommandHandler : public ICommandHandler {
 public:
     OperationCommandHandler(std::shared_ptr<AppController> controller);
 

@@ -8,14 +8,13 @@
 #include "arithmetic/mi_ellipsoid.h"
 
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class VOIModel;
 class VolumeInfos;
 class MPRScene;
 
-class QtPackage_Export VOISegmentObserver : public IObserver
-{
+class QtPackage_Export VOISegmentObserver : public IObserver {
 public:
     VOISegmentObserver();
     virtual ~VOISegmentObserver();
@@ -24,7 +23,7 @@ public:
 
     void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
 
-    void set_scenes(std::vector<std::shared_ptr<MPRScene>> scenes );
+    void set_scenes(std::vector<std::shared_ptr<MPRScene>> scenes);
 
     virtual void update(int code_id = 0);
 

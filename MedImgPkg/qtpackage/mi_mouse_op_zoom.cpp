@@ -2,32 +2,26 @@
 #include "renderalgo/mi_scene_base.h"
 #include "arithmetic/mi_point2.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-MouseOpZoom::MouseOpZoom()
-{
-
-}
-
-MouseOpZoom::~MouseOpZoom()
-{
+MouseOpZoom::MouseOpZoom() {
 
 }
 
-void MouseOpZoom::press(const QPointF& pt)
-{
-    if (!_scene)
-    {
+MouseOpZoom::~MouseOpZoom() {
+
+}
+
+void MouseOpZoom::press(const QPointF& pt) {
+    if (!_scene) {
         return;
     }
 
     _pre_point = pt;
 }
 
-void MouseOpZoom::move(const QPointF& pt)
-{
-    if (!_scene)
-    {
+void MouseOpZoom::move(const QPointF& pt) {
+    if (!_scene) {
         return;
     }
 
@@ -35,26 +29,23 @@ void MouseOpZoom::move(const QPointF& pt)
     _pre_point = pt;
 }
 
-void MouseOpZoom::release(const QPointF& pt)
-{
-    if (!_scene)
-    {
+void MouseOpZoom::release(const QPointF& pt) {
+    if (!_scene) {
         return;
     }
+
     _pre_point = pt;
 }
 
-void MouseOpZoom::double_click(const QPointF& pt)
-{
-    if (!_scene)
-    {
+void MouseOpZoom::double_click(const QPointF& pt) {
+    if (!_scene) {
         return;
     }
+
     _pre_point = pt;
 }
 
-void MouseOpZoom::wheel_slide(int)
-{
+void MouseOpZoom::wheel_slide(int) {
 
 }
 

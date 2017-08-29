@@ -4,16 +4,16 @@
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
-    #ifdef MEDIMGAPPCOMMON_EXPORTS
-    #define AppCommon_Export __declspec(dllexport)
-    #else
-    #define AppCommon_Export __declspec(dllimport)
-    #endif
+#ifdef MEDIMGAPPCOMMON_EXPORTS
+#define AppCommon_Export __declspec(dllexport)
 #else
-    #define AppCommon_Export
+#define AppCommon_Export __declspec(dllimport)
+#endif
+#else
+#define AppCommon_Export
 #endif
 
 #ifndef APPCOMMON_THROW_EXCEPTION

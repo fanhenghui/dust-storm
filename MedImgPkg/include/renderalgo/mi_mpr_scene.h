@@ -9,44 +9,44 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export MPRScene : public RayCastScene {
 public:
-  MPRScene();
-  MPRScene(int width, int height);
-  virtual ~MPRScene();
+    MPRScene();
+    MPRScene(int width, int height);
+    virtual ~MPRScene();
 
-  void set_mask_overlay_mode(MaskOverlayMode mode);
+    void set_mask_overlay_mode(MaskOverlayMode mode);
 
-  void set_mask_overlay_color(std::map<unsigned char, RGBAUnit> colors);
-  void set_mask_overlay_color(RGBAUnit color, unsigned char label);
+    void set_mask_overlay_color(std::map<unsigned char, RGBAUnit> colors);
+    void set_mask_overlay_color(RGBAUnit color, unsigned char label);
 
-  virtual void rotate(const Point2 &pre_pt, const Point2 &cur_pt);
+    virtual void rotate(const Point2& pre_pt, const Point2& cur_pt);
 
-  virtual void zoom(const Point2 &pre_pt, const Point2 &cur_pt);
+    virtual void zoom(const Point2& pre_pt, const Point2& cur_pt);
 
-  virtual void pan(const Point2 &pre_pt, const Point2 &cur_pt);
+    virtual void pan(const Point2& pre_pt, const Point2& cur_pt);
 
-  // Default positive direction
-  // Axial F->H
-  // Sagittal R->L
-  // Coronal A -> P
-  void page(int step);
+    // Default positive direction
+    // Axial F->H
+    // Sagittal R->L
+    // Coronal A -> P
+    void page(int step);
 
-  void page_to(int page);
+    void page_to(int page);
 
-  // Call to initialize MPR placement
-  void place_mpr(ScanSliceType type);
+    // Call to initialize MPR placement
+    void place_mpr(ScanSliceType type);
 
-  bool get_volume_position(const Point2 &pt_dc, Point3 &pos_v);
+    bool get_volume_position(const Point2& pt_dc, Point3& pos_v);
 
-  bool get_world_position(const Point2 &pt_dc, Point3 &pos_w);
+    bool get_world_position(const Point2& pt_dc, Point3& pos_w);
 
-  bool get_patient_position(const Point2 &pt_dc, Point3 &pos_p);
+    bool get_patient_position(const Point2& pt_dc, Point3& pos_p);
 
-  Plane to_plane() const;
+    Plane to_plane() const;
 
-  //////////////////////////////////////////////////////////////////////////
-  // For debug
-  Point3 get_entry_point(int x, int y);
-  //////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    // For debug
+    Point3 get_entry_point(int x, int y);
+    //////////////////////////////////////////////////////////////////////////
 
 protected:
 private:

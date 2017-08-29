@@ -11,26 +11,25 @@
 #include <unistd.h>
 #endif
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-MPRPlayCommandHandler::MPRPlayCommandHandler(std::shared_ptr<AppController> controller):_controller(controller),_playing(false)
-{
-
-}
-
-MPRPlayCommandHandler::~MPRPlayCommandHandler()
-{
+MPRPlayCommandHandler::MPRPlayCommandHandler(std::shared_ptr<AppController> controller):
+    _controller(controller), _playing(false) {
 
 }
 
-int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
-{
-    if(_playing){
+MPRPlayCommandHandler::~MPRPlayCommandHandler() {
+
+}
+
+int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
+    if (_playing) {
         return 0;
     }
 
     std::shared_ptr<AppController> controller = _controller.lock();
-    if(nullptr == controller){
+
+    if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
     }
 
@@ -44,33 +43,33 @@ int MPRPlayCommandHandler::handle_command(const IPCDataHeader& ipcheader , char*
     op_header._big_end = ipcheader._big_end;
     op_header._data_len = ipcheader._data_len;
 
-    boost::thread th(boost::bind(&MPRPlayCommandHandler::logic_i , this , boost::ref(op_header) , buffer));
+    boost::thread th(boost::bind(&MPRPlayCommandHandler::logic_i , this , boost::ref(op_header) ,
+                                 buffer));
     th.detach();
 
     return 0;
 }
 
 
-void MPRPlayCommandHandler::logic_i(OpDataHeader& op_header, char* buffer)
-{
+void MPRPlayCommandHandler::logic_i(OpDataHeader& op_header, char* buffer) {
     _playing = true;
     std::shared_ptr<AppController> controller = _controller.lock();
-    if(nullptr == controller){
+
+    if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
     }
-    
-    for(int i = 0 ; i< 2000 ; ++i){
+
+    for (int i = 0 ; i < 2000 ; ++i) {
         usleep(50000);//50 ms 的播放速度
-        std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(OPERATION_ID_MPR_PAGING);
-        if(op)
-        {
-            
+        std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(
+                                             OPERATION_ID_MPR_PAGING);
+
+        if (op) {
+
             op->set_data(op_header , buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation(op);
-        }
-        else
-        {
+        } else {
             //TODO
             APPCOMMON_THROW_EXCEPTION("cant find operation!");
         }

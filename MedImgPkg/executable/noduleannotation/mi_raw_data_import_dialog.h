@@ -5,17 +5,15 @@
 #include <QDialog>
 #include "ui_mi_raw_data_dialog.h"
 
-namespace medical_imaging
-{
-    class ImageData;
-    class ImageDataHeader;
+namespace medical_imaging {
+class ImageData;
+class ImageDataHeader;
 }
 
-class RawDataImportDlg : public QDialog
-{
+class RawDataImportDlg : public QDialog {
     Q_OBJECT
 public:
-    RawDataImportDlg(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    RawDataImportDlg(QWidget* parent = 0, Qt::WindowFlags f = 0);
     virtual ~RawDataImportDlg();
 
 Q_SIGNALS:

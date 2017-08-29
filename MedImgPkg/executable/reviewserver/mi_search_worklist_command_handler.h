@@ -5,7 +5,7 @@
 #include "util/mi_ipc_common.h"
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
 class MsgWorklist;
@@ -15,12 +15,12 @@ public:
     SearchWorklistCommandHandler(std::shared_ptr<AppController> controller);
     virtual ~SearchWorklistCommandHandler();
 
-    virtual int handle_command(const IPCDataHeader &datahaeder, char *buffer);
+    virtual int handle_command(const IPCDataHeader& datahaeder, char* buffer);
 
 private:
-    MsgWorklist * createWorklist();
-    MsgWorklistItem * createWorklistItem();
-    
+    MsgWorklist* createWorklist();
+    MsgWorklistItem* createWorklistItem();
+
 private:
     std::weak_ptr<AppController> _controller;
 };

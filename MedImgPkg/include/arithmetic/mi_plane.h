@@ -1,5 +1,5 @@
-#ifndef MEDIMGARITHMETIC_PLANE_H
-#define MEDIMGARITHMETIC_PLANE_H
+#ifndef MEDIMGARITHMETIC_MI_PLANE_H
+#define MEDIMGARITHMETIC_MI_PLANE_H
 
 #include "arithmetic/mi_point2.h"
 #include "arithmetic/mi_point3.h"
@@ -14,15 +14,15 @@ class LineSegment;
 //////////////////////////////////////////////////////////////////////////
 class Arithmetic_Export Plane : public IShape {
 public:
-  Vector3 _norm;
-  double _distance;
+    Vector3 _norm;
+    double _distance;
 
 public:
-  Plane();
+    Plane();
 
-  virtual ~Plane();
+    virtual ~Plane();
 
-  double distance_to_point(const Point3 &pt) const;
+    double distance_to_point(const Point3 &pt) const;
 };
 
 MED_IMG_END_NAMESPACE

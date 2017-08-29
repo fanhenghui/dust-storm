@@ -3,10 +3,9 @@
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 class CrosshairModel;
-class QtPackage_Export MouseOpMPRPage : public IMouseOp
-{
+class QtPackage_Export MouseOpMPRPage : public IMouseOp {
 public:
     MouseOpMPRPage();
     virtual ~MouseOpMPRPage();

@@ -1,2 +1,2 @@
-rm err*.log
-rm out*.log
+rm err* .log
+rm out* .log

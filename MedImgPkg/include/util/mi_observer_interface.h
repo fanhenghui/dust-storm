@@ -3,7 +3,7 @@
 
 #include "util/mi_util_export.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class Util_Export IObserver {
 public:

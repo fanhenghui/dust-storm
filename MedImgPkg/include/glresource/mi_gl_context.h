@@ -12,22 +12,22 @@
 #include "GL/glxew.h"
 #endif
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
 
 class GLResource_Export MSGLContext : public GLObject {
 public:
-  MSGLContext(UIDType uid);
-  ~MSGLContext();
+    MSGLContext(UIDType uid);
+    ~MSGLContext();
 
-  virtual void initialize();
-  virtual void finalize();
+    virtual void initialize();
+    virtual void finalize();
 
-  void create_shared_context(int id);
+    void create_shared_context(int id);
 
-  void make_current(int id = 0); // 0 is main context
-  void make_noncurrent();
+    void make_current(int id = 0); // 0 is main context
+    void make_noncurrent();
 
 protected:
 private:
@@ -37,28 +37,28 @@ private:
 
 class GLResource_Export XGLContext : public GLObject {
 public:
-  XGLContext(UIDType uid);
-  ~XGLContext();
+    XGLContext(UIDType uid);
+    ~XGLContext();
 
-  virtual void initialize();
-  virtual void finalize();
+    virtual void initialize();
+    virtual void finalize();
 
-  void create_shared_context(int id);
+    void create_shared_context(int id);
 
-  void make_current(int id = 0); // 0 is main context
-  void make_noncurrent();
-
-private:
-  void create_window();
+    void make_current(int id = 0); // 0 is main context
+    void make_noncurrent();
 
 private:
-  GLXContext _ctx;
-  std::map<int, GLXContext> _shared_ctx;
-  Display *_dpy;
-  XVisualInfo *_vis;
-  Window _win;
-  boost::mutex
-      _ctx_mutex; // TODO add mutex context in command handler and operation
+    void create_window();
+
+private:
+    GLXContext _ctx;
+    std::map<int, GLXContext> _shared_ctx;
+    Display* _dpy;
+    XVisualInfo* _vis;
+    Window _win;
+    boost::mutex
+    _ctx_mutex; // TODO add mutex context in command handler and operation
 };
 
 #endif
@@ -71,18 +71,18 @@ class GLResource_Export GLContext : public XGLContext
 {
 public:
 #ifdef WIN32
-  GLContext(UIDType uid)
-      : MSGLContext(uid){
+    GLContext(UIDType uid)
+        : MSGLContext(uid) {
 
-        };
+    };
 #else
-  GLContext(UIDType uid)
-      : XGLContext(uid){
+    GLContext(UIDType uid)
+        : XGLContext(uid) {
 
-        };
+    };
 #endif
 
-  ~GLContext(){};
+    ~GLContext() {};
 
 protected:
 private:

@@ -6,10 +6,9 @@
 
 #include "boost/thread/mutex.hpp"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export OperationFactory
-{
+class AppCommon_Export OperationFactory {
 public:
     static OperationFactory* instance();
     ~OperationFactory();

@@ -68,12 +68,12 @@ namespace medical_imaging {
 namespace protobuf_mi_5fmessage_2eproto {
 // Internal implementation detail -- do not call these.
 struct TableStruct {
-  static const ::google::protobuf::internal::ParseTableField entries[];
-  static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[];
-  static const ::google::protobuf::uint32 offsets[];
-  static void InitDefaultsImpl();
-  static void Shutdown();
+    static const ::google::protobuf::internal::ParseTableField entries[];
+    static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
+    static const ::google::protobuf::internal::ParseTable schema[];
+    static const ::google::protobuf::uint32 offsets[];
+    static void InitDefaultsImpl();
+    static void Shutdown();
 };
 void AddDescriptors();
 void InitDefaults();
@@ -81,1132 +81,1182 @@ void InitDefaults();
 
 // ===================================================================
 
-class MsgString : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgString) */ {
- public:
-  MsgString();
-  virtual ~MsgString();
+class MsgString : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgString) */
+public:
+    MsgString();
+    virtual ~MsgString();
 
-  MsgString(const MsgString& from);
+    MsgString(const MsgString& from);
 
-  inline MsgString& operator=(const MsgString& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgString& operator=(const MsgString& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgString& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgString& default_instance();
 
-  static inline const MsgString* internal_default_instance() {
-    return reinterpret_cast<const MsgString*>(
-               &_MsgString_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    0;
+    static inline const MsgString* internal_default_instance() {
+        return reinterpret_cast<const MsgString*>(
+                   &_MsgString_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        0;
 
-  void Swap(MsgString* other);
+    void Swap(MsgString* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgString* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgString* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgString* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgString& from);
-  void MergeFrom(const MsgString& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgString* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgString& from);
+    void MergeFrom(const MsgString& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgString* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgString* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required string context = 1;
-  bool has_context() const;
-  void clear_context();
-  static const int kContextFieldNumber = 1;
-  const ::std::string& context() const;
-  void set_context(const ::std::string& value);
-  #if LANG_CXX11
-  void set_context(::std::string&& value);
-  #endif
-  void set_context(const char* value);
-  void set_context(const char* value, size_t size);
-  ::std::string* mutable_context();
-  ::std::string* release_context();
-  void set_allocated_context(::std::string* context);
+    // required string context = 1;
+    bool has_context() const;
+    void clear_context();
+    static const int kContextFieldNumber = 1;
+    const ::std::string& context() const;
+    void set_context(const ::std::string& value);
+#if LANG_CXX11
+    void set_context(::std::string&& value);
+#endif
+    void set_context(const char* value);
+    void set_context(const char* value, size_t size);
+    ::std::string* mutable_context();
+    ::std::string* release_context();
+    void set_allocated_context(::std::string* context);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgString)
- private:
-  void set_has_context();
-  void clear_has_context();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgString)
+private:
+    void set_has_context();
+    void clear_has_context();
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::internal::ArenaStringPtr context_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr context_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgPoint2 : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPoint2) */ {
- public:
-  MsgPoint2();
-  virtual ~MsgPoint2();
+class MsgPoint2 : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPoint2) */
+public:
+    MsgPoint2();
+    virtual ~MsgPoint2();
 
-  MsgPoint2(const MsgPoint2& from);
+    MsgPoint2(const MsgPoint2& from);
 
-  inline MsgPoint2& operator=(const MsgPoint2& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgPoint2& operator=(const MsgPoint2& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgPoint2& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgPoint2& default_instance();
 
-  static inline const MsgPoint2* internal_default_instance() {
-    return reinterpret_cast<const MsgPoint2*>(
-               &_MsgPoint2_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    1;
+    static inline const MsgPoint2* internal_default_instance() {
+        return reinterpret_cast<const MsgPoint2*>(
+                   &_MsgPoint2_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        1;
 
-  void Swap(MsgPoint2* other);
+    void Swap(MsgPoint2* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgPoint2* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgPoint2* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgPoint2* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgPoint2& from);
-  void MergeFrom(const MsgPoint2& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgPoint2* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgPoint2& from);
+    void MergeFrom(const MsgPoint2& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgPoint2* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgPoint2* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required float x = 1;
-  bool has_x() const;
-  void clear_x();
-  static const int kXFieldNumber = 1;
-  float x() const;
-  void set_x(float value);
+    // required float x = 1;
+    bool has_x() const;
+    void clear_x();
+    static const int kXFieldNumber = 1;
+    float x() const;
+    void set_x(float value);
 
-  // required float y = 2;
-  bool has_y() const;
-  void clear_y();
-  static const int kYFieldNumber = 2;
-  float y() const;
-  void set_y(float value);
+    // required float y = 2;
+    bool has_y() const;
+    void clear_y();
+    static const int kYFieldNumber = 2;
+    float y() const;
+    void set_y(float value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgPoint2)
- private:
-  void set_has_x();
-  void clear_has_x();
-  void set_has_y();
-  void clear_has_y();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgPoint2)
+private:
+    void set_has_x();
+    void clear_has_x();
+    void set_has_y();
+    void clear_has_y();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  float x_;
-  float y_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    float x_;
+    float y_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgPoint2Array : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPoint2Array) */ {
- public:
-  MsgPoint2Array();
-  virtual ~MsgPoint2Array();
+class MsgPoint2Array : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPoint2Array) */
+public:
+    MsgPoint2Array();
+    virtual ~MsgPoint2Array();
 
-  MsgPoint2Array(const MsgPoint2Array& from);
+    MsgPoint2Array(const MsgPoint2Array& from);
 
-  inline MsgPoint2Array& operator=(const MsgPoint2Array& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgPoint2Array& operator=(const MsgPoint2Array& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgPoint2Array& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgPoint2Array& default_instance();
 
-  static inline const MsgPoint2Array* internal_default_instance() {
-    return reinterpret_cast<const MsgPoint2Array*>(
-               &_MsgPoint2Array_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    2;
+    static inline const MsgPoint2Array* internal_default_instance() {
+        return reinterpret_cast<const MsgPoint2Array*>(
+                   &_MsgPoint2Array_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        2;
 
-  void Swap(MsgPoint2Array* other);
+    void Swap(MsgPoint2Array* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgPoint2Array* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgPoint2Array* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgPoint2Array* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgPoint2Array& from);
-  void MergeFrom(const MsgPoint2Array& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgPoint2Array* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgPoint2Array& from);
+    void MergeFrom(const MsgPoint2Array& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgPoint2Array* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgPoint2Array* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required float x = 1;
-  bool has_x() const;
-  void clear_x();
-  static const int kXFieldNumber = 1;
-  float x() const;
-  void set_x(float value);
+    // required float x = 1;
+    bool has_x() const;
+    void clear_x();
+    static const int kXFieldNumber = 1;
+    float x() const;
+    void set_x(float value);
 
-  // required float y = 2;
-  bool has_y() const;
-  void clear_y();
-  static const int kYFieldNumber = 2;
-  float y() const;
-  void set_y(float value);
+    // required float y = 2;
+    bool has_y() const;
+    void clear_y();
+    static const int kYFieldNumber = 2;
+    float y() const;
+    void set_y(float value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgPoint2Array)
- private:
-  void set_has_x();
-  void clear_has_x();
-  void set_has_y();
-  void clear_has_y();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgPoint2Array)
+private:
+    void set_has_x();
+    void clear_has_x();
+    void set_has_y();
+    void clear_has_y();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  float x_;
-  float y_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    float x_;
+    float y_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgPaging : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPaging) */ {
- public:
-  MsgPaging();
-  virtual ~MsgPaging();
+class MsgPaging : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgPaging) */
+public:
+    MsgPaging();
+    virtual ~MsgPaging();
 
-  MsgPaging(const MsgPaging& from);
+    MsgPaging(const MsgPaging& from);
 
-  inline MsgPaging& operator=(const MsgPaging& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgPaging& operator=(const MsgPaging& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgPaging& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgPaging& default_instance();
 
-  static inline const MsgPaging* internal_default_instance() {
-    return reinterpret_cast<const MsgPaging*>(
-               &_MsgPaging_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    3;
+    static inline const MsgPaging* internal_default_instance() {
+        return reinterpret_cast<const MsgPaging*>(
+                   &_MsgPaging_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        3;
 
-  void Swap(MsgPaging* other);
+    void Swap(MsgPaging* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgPaging* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgPaging* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgPaging* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgPaging& from);
-  void MergeFrom(const MsgPaging& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgPaging* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgPaging& from);
+    void MergeFrom(const MsgPaging& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgPaging* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgPaging* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required int32 page = 1;
-  bool has_page() const;
-  void clear_page();
-  static const int kPageFieldNumber = 1;
-  ::google::protobuf::int32 page() const;
-  void set_page(::google::protobuf::int32 value);
+    // required int32 page = 1;
+    bool has_page() const;
+    void clear_page();
+    static const int kPageFieldNumber = 1;
+    ::google::protobuf::int32 page() const;
+    void set_page(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgPaging)
- private:
-  void set_has_page();
-  void clear_has_page();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgPaging)
+private:
+    void set_has_page();
+    void clear_has_page();
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::int32 page_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::int32 page_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgMouse : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgMouse) */ {
- public:
-  MsgMouse();
-  virtual ~MsgMouse();
+class MsgMouse : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgMouse) */
+public:
+    MsgMouse();
+    virtual ~MsgMouse();
 
-  MsgMouse(const MsgMouse& from);
+    MsgMouse(const MsgMouse& from);
 
-  inline MsgMouse& operator=(const MsgMouse& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgMouse& operator=(const MsgMouse& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgMouse& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgMouse& default_instance();
 
-  static inline const MsgMouse* internal_default_instance() {
-    return reinterpret_cast<const MsgMouse*>(
-               &_MsgMouse_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    4;
+    static inline const MsgMouse* internal_default_instance() {
+        return reinterpret_cast<const MsgMouse*>(
+                   &_MsgMouse_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        4;
 
-  void Swap(MsgMouse* other);
+    void Swap(MsgMouse* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgMouse* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgMouse* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgMouse* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgMouse& from);
-  void MergeFrom(const MsgMouse& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgMouse* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgMouse& from);
+    void MergeFrom(const MsgMouse& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgMouse* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgMouse* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required .medical_imaging.MsgPoint2 pre = 1;
-  bool has_pre() const;
-  void clear_pre();
-  static const int kPreFieldNumber = 1;
-  const ::medical_imaging::MsgPoint2& pre() const;
-  ::medical_imaging::MsgPoint2* mutable_pre();
-  ::medical_imaging::MsgPoint2* release_pre();
-  void set_allocated_pre(::medical_imaging::MsgPoint2* pre);
+    // required .medical_imaging.MsgPoint2 pre = 1;
+    bool has_pre() const;
+    void clear_pre();
+    static const int kPreFieldNumber = 1;
+    const ::medical_imaging::MsgPoint2& pre() const;
+    ::medical_imaging::MsgPoint2* mutable_pre();
+    ::medical_imaging::MsgPoint2* release_pre();
+    void set_allocated_pre(::medical_imaging::MsgPoint2* pre);
 
-  // required .medical_imaging.MsgPoint2 cur = 2;
-  bool has_cur() const;
-  void clear_cur();
-  static const int kCurFieldNumber = 2;
-  const ::medical_imaging::MsgPoint2& cur() const;
-  ::medical_imaging::MsgPoint2* mutable_cur();
-  ::medical_imaging::MsgPoint2* release_cur();
-  void set_allocated_cur(::medical_imaging::MsgPoint2* cur);
+    // required .medical_imaging.MsgPoint2 cur = 2;
+    bool has_cur() const;
+    void clear_cur();
+    static const int kCurFieldNumber = 2;
+    const ::medical_imaging::MsgPoint2& cur() const;
+    ::medical_imaging::MsgPoint2* mutable_cur();
+    ::medical_imaging::MsgPoint2* release_cur();
+    void set_allocated_cur(::medical_imaging::MsgPoint2* cur);
 
-  // required int32 tag = 3;
-  bool has_tag() const;
-  void clear_tag();
-  static const int kTagFieldNumber = 3;
-  ::google::protobuf::int32 tag() const;
-  void set_tag(::google::protobuf::int32 value);
+    // required int32 tag = 3;
+    bool has_tag() const;
+    void clear_tag();
+    static const int kTagFieldNumber = 3;
+    ::google::protobuf::int32 tag() const;
+    void set_tag(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgMouse)
- private:
-  void set_has_pre();
-  void clear_has_pre();
-  void set_has_cur();
-  void clear_has_cur();
-  void set_has_tag();
-  void clear_has_tag();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgMouse)
+private:
+    void set_has_pre();
+    void clear_has_pre();
+    void set_has_cur();
+    void clear_has_cur();
+    void set_has_tag();
+    void clear_has_tag();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::medical_imaging::MsgPoint2* pre_;
-  ::medical_imaging::MsgPoint2* cur_;
-  ::google::protobuf::int32 tag_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::medical_imaging::MsgPoint2* pre_;
+    ::medical_imaging::MsgPoint2* cur_;
+    ::google::protobuf::int32 tag_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgCellInfo : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgCellInfo) */ {
- public:
-  MsgCellInfo();
-  virtual ~MsgCellInfo();
+class MsgCellInfo : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgCellInfo) */
+public:
+    MsgCellInfo();
+    virtual ~MsgCellInfo();
 
-  MsgCellInfo(const MsgCellInfo& from);
+    MsgCellInfo(const MsgCellInfo& from);
 
-  inline MsgCellInfo& operator=(const MsgCellInfo& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgCellInfo& operator=(const MsgCellInfo& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgCellInfo& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgCellInfo& default_instance();
 
-  static inline const MsgCellInfo* internal_default_instance() {
-    return reinterpret_cast<const MsgCellInfo*>(
-               &_MsgCellInfo_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    5;
+    static inline const MsgCellInfo* internal_default_instance() {
+        return reinterpret_cast<const MsgCellInfo*>(
+                   &_MsgCellInfo_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        5;
 
-  void Swap(MsgCellInfo* other);
+    void Swap(MsgCellInfo* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgCellInfo* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgCellInfo* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgCellInfo* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgCellInfo& from);
-  void MergeFrom(const MsgCellInfo& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgCellInfo* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgCellInfo& from);
+    void MergeFrom(const MsgCellInfo& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgCellInfo* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgCellInfo* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required int32 id = 1;
-  bool has_id() const;
-  void clear_id();
-  static const int kIdFieldNumber = 1;
-  ::google::protobuf::int32 id() const;
-  void set_id(::google::protobuf::int32 value);
+    // required int32 id = 1;
+    bool has_id() const;
+    void clear_id();
+    static const int kIdFieldNumber = 1;
+    ::google::protobuf::int32 id() const;
+    void set_id(::google::protobuf::int32 value);
 
-  // required int32 type = 2;
-  bool has_type() const;
-  void clear_type();
-  static const int kTypeFieldNumber = 2;
-  ::google::protobuf::int32 type() const;
-  void set_type(::google::protobuf::int32 value);
+    // required int32 type = 2;
+    bool has_type() const;
+    void clear_type();
+    static const int kTypeFieldNumber = 2;
+    ::google::protobuf::int32 type() const;
+    void set_type(::google::protobuf::int32 value);
 
-  // required int32 direction = 3;
-  bool has_direction() const;
-  void clear_direction();
-  static const int kDirectionFieldNumber = 3;
-  ::google::protobuf::int32 direction() const;
-  void set_direction(::google::protobuf::int32 value);
+    // required int32 direction = 3;
+    bool has_direction() const;
+    void clear_direction();
+    static const int kDirectionFieldNumber = 3;
+    ::google::protobuf::int32 direction() const;
+    void set_direction(::google::protobuf::int32 value);
 
-  // required int32 width = 4;
-  bool has_width() const;
-  void clear_width();
-  static const int kWidthFieldNumber = 4;
-  ::google::protobuf::int32 width() const;
-  void set_width(::google::protobuf::int32 value);
+    // required int32 width = 4;
+    bool has_width() const;
+    void clear_width();
+    static const int kWidthFieldNumber = 4;
+    ::google::protobuf::int32 width() const;
+    void set_width(::google::protobuf::int32 value);
 
-  // required int32 height = 5;
-  bool has_height() const;
-  void clear_height();
-  static const int kHeightFieldNumber = 5;
-  ::google::protobuf::int32 height() const;
-  void set_height(::google::protobuf::int32 value);
+    // required int32 height = 5;
+    bool has_height() const;
+    void clear_height();
+    static const int kHeightFieldNumber = 5;
+    ::google::protobuf::int32 height() const;
+    void set_height(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgCellInfo)
- private:
-  void set_has_id();
-  void clear_has_id();
-  void set_has_type();
-  void clear_has_type();
-  void set_has_direction();
-  void clear_has_direction();
-  void set_has_width();
-  void clear_has_width();
-  void set_has_height();
-  void clear_has_height();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgCellInfo)
+private:
+    void set_has_id();
+    void clear_has_id();
+    void set_has_type();
+    void clear_has_type();
+    void set_has_direction();
+    void clear_has_direction();
+    void set_has_width();
+    void clear_has_width();
+    void set_has_height();
+    void clear_has_height();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::int32 id_;
-  ::google::protobuf::int32 type_;
-  ::google::protobuf::int32 direction_;
-  ::google::protobuf::int32 width_;
-  ::google::protobuf::int32 height_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::int32 id_;
+    ::google::protobuf::int32 type_;
+    ::google::protobuf::int32 direction_;
+    ::google::protobuf::int32 width_;
+    ::google::protobuf::int32 height_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgInit : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgInit) */ {
- public:
-  MsgInit();
-  virtual ~MsgInit();
+class MsgInit : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgInit) */
+public:
+    MsgInit();
+    virtual ~MsgInit();
 
-  MsgInit(const MsgInit& from);
+    MsgInit(const MsgInit& from);
 
-  inline MsgInit& operator=(const MsgInit& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgInit& operator=(const MsgInit& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgInit& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgInit& default_instance();
 
-  static inline const MsgInit* internal_default_instance() {
-    return reinterpret_cast<const MsgInit*>(
-               &_MsgInit_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    6;
+    static inline const MsgInit* internal_default_instance() {
+        return reinterpret_cast<const MsgInit*>(
+                   &_MsgInit_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        6;
 
-  void Swap(MsgInit* other);
+    void Swap(MsgInit* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgInit* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgInit* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgInit* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgInit& from);
-  void MergeFrom(const MsgInit& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgInit* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgInit& from);
+    void MergeFrom(const MsgInit& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgInit* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgInit* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // repeated .medical_imaging.MsgCellInfo cells = 3;
-  int cells_size() const;
-  void clear_cells();
-  static const int kCellsFieldNumber = 3;
-  const ::medical_imaging::MsgCellInfo& cells(int index) const;
-  ::medical_imaging::MsgCellInfo* mutable_cells(int index);
-  ::medical_imaging::MsgCellInfo* add_cells();
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
-      mutable_cells();
-  const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
-      cells() const;
+    // repeated .medical_imaging.MsgCellInfo cells = 3;
+    int cells_size() const;
+    void clear_cells();
+    static const int kCellsFieldNumber = 3;
+    const ::medical_imaging::MsgCellInfo& cells(int index) const;
+    ::medical_imaging::MsgCellInfo* mutable_cells(int index);
+    ::medical_imaging::MsgCellInfo* add_cells();
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
+    mutable_cells();
+    const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
+    cells() const;
 
-  // required string series_uid = 2;
-  bool has_series_uid() const;
-  void clear_series_uid();
-  static const int kSeriesUidFieldNumber = 2;
-  const ::std::string& series_uid() const;
-  void set_series_uid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_series_uid(::std::string&& value);
-  #endif
-  void set_series_uid(const char* value);
-  void set_series_uid(const char* value, size_t size);
-  ::std::string* mutable_series_uid();
-  ::std::string* release_series_uid();
-  void set_allocated_series_uid(::std::string* series_uid);
+    // required string series_uid = 2;
+    bool has_series_uid() const;
+    void clear_series_uid();
+    static const int kSeriesUidFieldNumber = 2;
+    const ::std::string& series_uid() const;
+    void set_series_uid(const ::std::string& value);
+#if LANG_CXX11
+    void set_series_uid(::std::string&& value);
+#endif
+    void set_series_uid(const char* value);
+    void set_series_uid(const char* value, size_t size);
+    ::std::string* mutable_series_uid();
+    ::std::string* release_series_uid();
+    void set_allocated_series_uid(::std::string* series_uid);
 
-  // required int32 pid = 1;
-  bool has_pid() const;
-  void clear_pid();
-  static const int kPidFieldNumber = 1;
-  ::google::protobuf::int32 pid() const;
-  void set_pid(::google::protobuf::int32 value);
+    // required int32 pid = 1;
+    bool has_pid() const;
+    void clear_pid();
+    static const int kPidFieldNumber = 1;
+    ::google::protobuf::int32 pid() const;
+    void set_pid(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgInit)
- private:
-  void set_has_pid();
-  void clear_has_pid();
-  void set_has_series_uid();
-  void clear_has_series_uid();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgInit)
+private:
+    void set_has_pid();
+    void clear_has_pid();
+    void set_has_series_uid();
+    void clear_has_series_uid();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo > cells_;
-  ::google::protobuf::internal::ArenaStringPtr series_uid_;
-  ::google::protobuf::int32 pid_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo > cells_;
+    ::google::protobuf::internal::ArenaStringPtr series_uid_;
+    ::google::protobuf::int32 pid_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgResize : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgResize) */ {
- public:
-  MsgResize();
-  virtual ~MsgResize();
+class MsgResize : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgResize) */
+public:
+    MsgResize();
+    virtual ~MsgResize();
 
-  MsgResize(const MsgResize& from);
+    MsgResize(const MsgResize& from);
 
-  inline MsgResize& operator=(const MsgResize& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgResize& operator=(const MsgResize& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgResize& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgResize& default_instance();
 
-  static inline const MsgResize* internal_default_instance() {
-    return reinterpret_cast<const MsgResize*>(
-               &_MsgResize_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    7;
+    static inline const MsgResize* internal_default_instance() {
+        return reinterpret_cast<const MsgResize*>(
+                   &_MsgResize_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        7;
 
-  void Swap(MsgResize* other);
+    void Swap(MsgResize* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgResize* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgResize* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgResize* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgResize& from);
-  void MergeFrom(const MsgResize& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgResize* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgResize& from);
+    void MergeFrom(const MsgResize& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgResize* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgResize* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // repeated .medical_imaging.MsgCellInfo cells = 1;
-  int cells_size() const;
-  void clear_cells();
-  static const int kCellsFieldNumber = 1;
-  const ::medical_imaging::MsgCellInfo& cells(int index) const;
-  ::medical_imaging::MsgCellInfo* mutable_cells(int index);
-  ::medical_imaging::MsgCellInfo* add_cells();
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
-      mutable_cells();
-  const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
-      cells() const;
+    // repeated .medical_imaging.MsgCellInfo cells = 1;
+    int cells_size() const;
+    void clear_cells();
+    static const int kCellsFieldNumber = 1;
+    const ::medical_imaging::MsgCellInfo& cells(int index) const;
+    ::medical_imaging::MsgCellInfo* mutable_cells(int index);
+    ::medical_imaging::MsgCellInfo* add_cells();
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
+    mutable_cells();
+    const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
+    cells() const;
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgResize)
- private:
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgResize)
+private:
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo > cells_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo > cells_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgWorklistItem : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgWorklistItem) */ {
- public:
-  MsgWorklistItem();
-  virtual ~MsgWorklistItem();
+class MsgWorklistItem : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgWorklistItem) */
+public:
+    MsgWorklistItem();
+    virtual ~MsgWorklistItem();
 
-  MsgWorklistItem(const MsgWorklistItem& from);
+    MsgWorklistItem(const MsgWorklistItem& from);
 
-  inline MsgWorklistItem& operator=(const MsgWorklistItem& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgWorklistItem& operator=(const MsgWorklistItem& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgWorklistItem& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgWorklistItem& default_instance();
 
-  static inline const MsgWorklistItem* internal_default_instance() {
-    return reinterpret_cast<const MsgWorklistItem*>(
-               &_MsgWorklistItem_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    8;
+    static inline const MsgWorklistItem* internal_default_instance() {
+        return reinterpret_cast<const MsgWorklistItem*>(
+                   &_MsgWorklistItem_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        8;
 
-  void Swap(MsgWorklistItem* other);
+    void Swap(MsgWorklistItem* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgWorklistItem* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgWorklistItem* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgWorklistItem* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgWorklistItem& from);
-  void MergeFrom(const MsgWorklistItem& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgWorklistItem* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgWorklistItem& from);
+    void MergeFrom(const MsgWorklistItem& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgWorklistItem* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgWorklistItem* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // required string patient_name = 1;
-  bool has_patient_name() const;
-  void clear_patient_name();
-  static const int kPatientNameFieldNumber = 1;
-  const ::std::string& patient_name() const;
-  void set_patient_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_patient_name(::std::string&& value);
-  #endif
-  void set_patient_name(const char* value);
-  void set_patient_name(const char* value, size_t size);
-  ::std::string* mutable_patient_name();
-  ::std::string* release_patient_name();
-  void set_allocated_patient_name(::std::string* patient_name);
+    // required string patient_name = 1;
+    bool has_patient_name() const;
+    void clear_patient_name();
+    static const int kPatientNameFieldNumber = 1;
+    const ::std::string& patient_name() const;
+    void set_patient_name(const ::std::string& value);
+#if LANG_CXX11
+    void set_patient_name(::std::string&& value);
+#endif
+    void set_patient_name(const char* value);
+    void set_patient_name(const char* value, size_t size);
+    ::std::string* mutable_patient_name();
+    ::std::string* release_patient_name();
+    void set_allocated_patient_name(::std::string* patient_name);
 
-  // required string patient_id = 2;
-  bool has_patient_id() const;
-  void clear_patient_id();
-  static const int kPatientIdFieldNumber = 2;
-  const ::std::string& patient_id() const;
-  void set_patient_id(const ::std::string& value);
-  #if LANG_CXX11
-  void set_patient_id(::std::string&& value);
-  #endif
-  void set_patient_id(const char* value);
-  void set_patient_id(const char* value, size_t size);
-  ::std::string* mutable_patient_id();
-  ::std::string* release_patient_id();
-  void set_allocated_patient_id(::std::string* patient_id);
+    // required string patient_id = 2;
+    bool has_patient_id() const;
+    void clear_patient_id();
+    static const int kPatientIdFieldNumber = 2;
+    const ::std::string& patient_id() const;
+    void set_patient_id(const ::std::string& value);
+#if LANG_CXX11
+    void set_patient_id(::std::string&& value);
+#endif
+    void set_patient_id(const char* value);
+    void set_patient_id(const char* value, size_t size);
+    ::std::string* mutable_patient_id();
+    ::std::string* release_patient_id();
+    void set_allocated_patient_id(::std::string* patient_id);
 
-  // required string series_uid = 3;
-  bool has_series_uid() const;
-  void clear_series_uid();
-  static const int kSeriesUidFieldNumber = 3;
-  const ::std::string& series_uid() const;
-  void set_series_uid(const ::std::string& value);
-  #if LANG_CXX11
-  void set_series_uid(::std::string&& value);
-  #endif
-  void set_series_uid(const char* value);
-  void set_series_uid(const char* value, size_t size);
-  ::std::string* mutable_series_uid();
-  ::std::string* release_series_uid();
-  void set_allocated_series_uid(::std::string* series_uid);
+    // required string series_uid = 3;
+    bool has_series_uid() const;
+    void clear_series_uid();
+    static const int kSeriesUidFieldNumber = 3;
+    const ::std::string& series_uid() const;
+    void set_series_uid(const ::std::string& value);
+#if LANG_CXX11
+    void set_series_uid(::std::string&& value);
+#endif
+    void set_series_uid(const char* value);
+    void set_series_uid(const char* value, size_t size);
+    ::std::string* mutable_series_uid();
+    ::std::string* release_series_uid();
+    void set_allocated_series_uid(::std::string* series_uid);
 
-  // required string imaging_modality = 4;
-  bool has_imaging_modality() const;
-  void clear_imaging_modality();
-  static const int kImagingModalityFieldNumber = 4;
-  const ::std::string& imaging_modality() const;
-  void set_imaging_modality(const ::std::string& value);
-  #if LANG_CXX11
-  void set_imaging_modality(::std::string&& value);
-  #endif
-  void set_imaging_modality(const char* value);
-  void set_imaging_modality(const char* value, size_t size);
-  ::std::string* mutable_imaging_modality();
-  ::std::string* release_imaging_modality();
-  void set_allocated_imaging_modality(::std::string* imaging_modality);
+    // required string imaging_modality = 4;
+    bool has_imaging_modality() const;
+    void clear_imaging_modality();
+    static const int kImagingModalityFieldNumber = 4;
+    const ::std::string& imaging_modality() const;
+    void set_imaging_modality(const ::std::string& value);
+#if LANG_CXX11
+    void set_imaging_modality(::std::string&& value);
+#endif
+    void set_imaging_modality(const char* value);
+    void set_imaging_modality(const char* value, size_t size);
+    ::std::string* mutable_imaging_modality();
+    ::std::string* release_imaging_modality();
+    void set_allocated_imaging_modality(::std::string* imaging_modality);
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgWorklistItem)
- private:
-  void set_has_patient_name();
-  void clear_has_patient_name();
-  void set_has_patient_id();
-  void clear_has_patient_id();
-  void set_has_series_uid();
-  void clear_has_series_uid();
-  void set_has_imaging_modality();
-  void clear_has_imaging_modality();
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgWorklistItem)
+private:
+    void set_has_patient_name();
+    void clear_has_patient_name();
+    void set_has_patient_id();
+    void clear_has_patient_id();
+    void set_has_series_uid();
+    void clear_has_series_uid();
+    void set_has_imaging_modality();
+    void clear_has_imaging_modality();
 
-  // helper for ByteSizeLong()
-  size_t RequiredFieldsByteSizeFallback() const;
+    // helper for ByteSizeLong()
+    size_t RequiredFieldsByteSizeFallback() const;
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::internal::ArenaStringPtr patient_name_;
-  ::google::protobuf::internal::ArenaStringPtr patient_id_;
-  ::google::protobuf::internal::ArenaStringPtr series_uid_;
-  ::google::protobuf::internal::ArenaStringPtr imaging_modality_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::internal::ArenaStringPtr patient_name_;
+    ::google::protobuf::internal::ArenaStringPtr patient_id_;
+    ::google::protobuf::internal::ArenaStringPtr series_uid_;
+    ::google::protobuf::internal::ArenaStringPtr imaging_modality_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // -------------------------------------------------------------------
 
-class MsgWorklist : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:medical_imaging.MsgWorklist) */ {
- public:
-  MsgWorklist();
-  virtual ~MsgWorklist();
+class MsgWorklist : public
+        ::google::protobuf::Message { /* @@protoc_insertion_point(class_definition:medical_imaging.MsgWorklist) */
+public:
+    MsgWorklist();
+    virtual ~MsgWorklist();
 
-  MsgWorklist(const MsgWorklist& from);
+    MsgWorklist(const MsgWorklist& from);
 
-  inline MsgWorklist& operator=(const MsgWorklist& from) {
-    CopyFrom(from);
-    return *this;
-  }
+    inline MsgWorklist& operator=(const MsgWorklist& from) {
+        CopyFrom(from);
+        return *this;
+    }
 
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields();
-  }
+    inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+        return _internal_metadata_.unknown_fields();
+    }
 
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields();
-  }
+    inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+        return _internal_metadata_.mutable_unknown_fields();
+    }
 
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const MsgWorklist& default_instance();
+    static const ::google::protobuf::Descriptor* descriptor();
+    static const MsgWorklist& default_instance();
 
-  static inline const MsgWorklist* internal_default_instance() {
-    return reinterpret_cast<const MsgWorklist*>(
-               &_MsgWorklist_default_instance_);
-  }
-  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    9;
+    static inline const MsgWorklist* internal_default_instance() {
+        return reinterpret_cast<const MsgWorklist*>(
+                   &_MsgWorklist_default_instance_);
+    }
+    static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+        9;
 
-  void Swap(MsgWorklist* other);
+    void Swap(MsgWorklist* other);
 
-  // implements Message ----------------------------------------------
+    // implements Message ----------------------------------------------
 
-  inline MsgWorklist* New() const PROTOBUF_FINAL { return New(NULL); }
+    inline MsgWorklist* New() const PROTOBUF_FINAL {
+        return New(NULL);
+    }
 
-  MsgWorklist* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
-  void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
-  void CopyFrom(const MsgWorklist& from);
-  void MergeFrom(const MsgWorklist& from);
-  void Clear() PROTOBUF_FINAL;
-  bool IsInitialized() const PROTOBUF_FINAL;
+    MsgWorklist* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+    void CopyFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void MergeFrom(const ::google::protobuf::Message& from) PROTOBUF_FINAL;
+    void CopyFrom(const MsgWorklist& from);
+    void MergeFrom(const MsgWorklist& from);
+    void Clear() PROTOBUF_FINAL;
+    bool IsInitialized() const PROTOBUF_FINAL;
 
-  size_t ByteSizeLong() const PROTOBUF_FINAL;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
-  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const PROTOBUF_FINAL;
-  void InternalSwap(MsgWorklist* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
-  }
-  inline void* MaybeArenaPtr() const {
-    return NULL;
-  }
-  public:
+    size_t ByteSizeLong() const PROTOBUF_FINAL;
+    bool MergePartialFromCodedStream(
+        ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+    void SerializeWithCachedSizes(
+        ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+    ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+        bool deterministic, ::google::protobuf::uint8* target) const PROTOBUF_FINAL;
+    int GetCachedSize() const PROTOBUF_FINAL {
+        return _cached_size_;
+    }
+private:
+    void SharedCtor();
+    void SharedDtor();
+    void SetCachedSize(int size) const PROTOBUF_FINAL;
+    void InternalSwap(MsgWorklist* other);
+private:
+    inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+        return NULL;
+    }
+    inline void* MaybeArenaPtr() const {
+        return NULL;
+    }
+public:
 
-  ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
+    ::google::protobuf::Metadata GetMetadata() const PROTOBUF_FINAL;
 
-  // nested types ----------------------------------------------------
+    // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
+    // accessors -------------------------------------------------------
 
-  // repeated .medical_imaging.MsgWorklistItem items = 1;
-  int items_size() const;
-  void clear_items();
-  static const int kItemsFieldNumber = 1;
-  const ::medical_imaging::MsgWorklistItem& items(int index) const;
-  ::medical_imaging::MsgWorklistItem* mutable_items(int index);
-  ::medical_imaging::MsgWorklistItem* add_items();
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >*
-      mutable_items();
-  const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >&
-      items() const;
+    // repeated .medical_imaging.MsgWorklistItem items = 1;
+    int items_size() const;
+    void clear_items();
+    static const int kItemsFieldNumber = 1;
+    const ::medical_imaging::MsgWorklistItem& items(int index) const;
+    ::medical_imaging::MsgWorklistItem* mutable_items(int index);
+    ::medical_imaging::MsgWorklistItem* add_items();
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >*
+    mutable_items();
+    const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >&
+    items() const;
 
-  // @@protoc_insertion_point(class_scope:medical_imaging.MsgWorklist)
- private:
+    // @@protoc_insertion_point(class_scope:medical_imaging.MsgWorklist)
+private:
 
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::HasBits<1> _has_bits_;
-  mutable int _cached_size_;
-  ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem > items_;
-  friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
+    ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+    ::google::protobuf::internal::HasBits<1> _has_bits_;
+    mutable int _cached_size_;
+    ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem > items_;
+    friend struct protobuf_mi_5fmessage_2eproto::TableStruct;
 };
 // ===================================================================
 
@@ -1218,65 +1268,67 @@ class MsgWorklist : public ::google::protobuf::Message /* @@protoc_insertion_poi
 
 // required string context = 1;
 inline bool MsgString::has_context() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgString::set_has_context() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgString::clear_has_context() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgString::clear_context() {
-  context_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_context();
+    context_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_context();
 }
 inline const ::std::string& MsgString::context() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgString.context)
-  return context_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgString.context)
+    return context_.GetNoArena();
 }
 inline void MsgString::set_context(const ::std::string& value) {
-  set_has_context();
-  context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgString.context)
+    set_has_context();
+    context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgString.context)
 }
 #if LANG_CXX11
 inline void MsgString::set_context(::std::string&& value) {
-  set_has_context();
-  context_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgString.context)
+    set_has_context();
+    context_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgString.context)
 }
 #endif
 inline void MsgString::set_context(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_context();
-  context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgString.context)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_context();
+    context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                        ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgString.context)
 }
 inline void MsgString::set_context(const char* value, size_t size) {
-  set_has_context();
-  context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgString.context)
+    set_has_context();
+    context_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                        ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgString.context)
 }
 inline ::std::string* MsgString::mutable_context() {
-  set_has_context();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgString.context)
-  return context_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_context();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgString.context)
+    return context_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgString::release_context() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgString.context)
-  clear_has_context();
-  return context_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgString.context)
+    clear_has_context();
+    return context_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgString::set_allocated_context(::std::string* context) {
-  if (context != NULL) {
-    set_has_context();
-  } else {
-    clear_has_context();
-  }
-  context_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), context);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgString.context)
+    if (context != NULL) {
+        set_has_context();
+    } else {
+        clear_has_context();
+    }
+
+    context_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), context);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgString.context)
 }
 
 // -------------------------------------------------------------------
@@ -1285,50 +1337,50 @@ inline void MsgString::set_allocated_context(::std::string* context) {
 
 // required float x = 1;
 inline bool MsgPoint2::has_x() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgPoint2::set_has_x() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgPoint2::clear_has_x() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgPoint2::clear_x() {
-  x_ = 0;
-  clear_has_x();
+    x_ = 0;
+    clear_has_x();
 }
 inline float MsgPoint2::x() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2.x)
-  return x_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2.x)
+    return x_;
 }
 inline void MsgPoint2::set_x(float value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2.x)
+    set_has_x();
+    x_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2.x)
 }
 
 // required float y = 2;
 inline bool MsgPoint2::has_y() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgPoint2::set_has_y() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgPoint2::clear_has_y() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgPoint2::clear_y() {
-  y_ = 0;
-  clear_has_y();
+    y_ = 0;
+    clear_has_y();
 }
 inline float MsgPoint2::y() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2.y)
-  return y_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2.y)
+    return y_;
 }
 inline void MsgPoint2::set_y(float value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2.y)
+    set_has_y();
+    y_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2.y)
 }
 
 // -------------------------------------------------------------------
@@ -1337,50 +1389,50 @@ inline void MsgPoint2::set_y(float value) {
 
 // required float x = 1;
 inline bool MsgPoint2Array::has_x() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgPoint2Array::set_has_x() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgPoint2Array::clear_has_x() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgPoint2Array::clear_x() {
-  x_ = 0;
-  clear_has_x();
+    x_ = 0;
+    clear_has_x();
 }
 inline float MsgPoint2Array::x() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.x)
-  return x_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.x)
+    return x_;
 }
 inline void MsgPoint2Array::set_x(float value) {
-  set_has_x();
-  x_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.x)
+    set_has_x();
+    x_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.x)
 }
 
 // required float y = 2;
 inline bool MsgPoint2Array::has_y() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgPoint2Array::set_has_y() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgPoint2Array::clear_has_y() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgPoint2Array::clear_y() {
-  y_ = 0;
-  clear_has_y();
+    y_ = 0;
+    clear_has_y();
 }
 inline float MsgPoint2Array::y() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.y)
-  return y_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgPoint2Array.y)
+    return y_;
 }
 inline void MsgPoint2Array::set_y(float value) {
-  set_has_y();
-  y_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.y)
+    set_has_y();
+    y_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgPoint2Array.y)
 }
 
 // -------------------------------------------------------------------
@@ -1389,26 +1441,26 @@ inline void MsgPoint2Array::set_y(float value) {
 
 // required int32 page = 1;
 inline bool MsgPaging::has_page() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgPaging::set_has_page() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgPaging::clear_has_page() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgPaging::clear_page() {
-  page_ = 0;
-  clear_has_page();
+    page_ = 0;
+    clear_has_page();
 }
 inline ::google::protobuf::int32 MsgPaging::page() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgPaging.page)
-  return page_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgPaging.page)
+    return page_;
 }
 inline void MsgPaging::set_page(::google::protobuf::int32 value) {
-  set_has_page();
-  page_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgPaging.page)
+    set_has_page();
+    page_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgPaging.page)
 }
 
 // -------------------------------------------------------------------
@@ -1417,116 +1469,130 @@ inline void MsgPaging::set_page(::google::protobuf::int32 value) {
 
 // required .medical_imaging.MsgPoint2 pre = 1;
 inline bool MsgMouse::has_pre() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgMouse::set_has_pre() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgMouse::clear_has_pre() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgMouse::clear_pre() {
-  if (pre_ != NULL) pre_->::medical_imaging::MsgPoint2::Clear();
-  clear_has_pre();
+    if (pre_ != NULL) {
+        pre_->::medical_imaging::MsgPoint2::Clear();
+    }
+
+    clear_has_pre();
 }
 inline const ::medical_imaging::MsgPoint2& MsgMouse::pre() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.pre)
-  return pre_ != NULL ? *pre_
-                         : *::medical_imaging::MsgPoint2::internal_default_instance();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.pre)
+    return pre_ != NULL ? *pre_
+           : *::medical_imaging::MsgPoint2::internal_default_instance();
 }
 inline ::medical_imaging::MsgPoint2* MsgMouse::mutable_pre() {
-  set_has_pre();
-  if (pre_ == NULL) {
-    pre_ = new ::medical_imaging::MsgPoint2;
-  }
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgMouse.pre)
-  return pre_;
+    set_has_pre();
+
+    if (pre_ == NULL) {
+        pre_ = new ::medical_imaging::MsgPoint2;
+    }
+
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgMouse.pre)
+    return pre_;
 }
 inline ::medical_imaging::MsgPoint2* MsgMouse::release_pre() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgMouse.pre)
-  clear_has_pre();
-  ::medical_imaging::MsgPoint2* temp = pre_;
-  pre_ = NULL;
-  return temp;
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgMouse.pre)
+    clear_has_pre();
+    ::medical_imaging::MsgPoint2* temp = pre_;
+    pre_ = NULL;
+    return temp;
 }
 inline void MsgMouse::set_allocated_pre(::medical_imaging::MsgPoint2* pre) {
-  delete pre_;
-  pre_ = pre;
-  if (pre) {
-    set_has_pre();
-  } else {
-    clear_has_pre();
-  }
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgMouse.pre)
+    delete pre_;
+    pre_ = pre;
+
+    if (pre) {
+        set_has_pre();
+    } else {
+        clear_has_pre();
+    }
+
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgMouse.pre)
 }
 
 // required .medical_imaging.MsgPoint2 cur = 2;
 inline bool MsgMouse::has_cur() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgMouse::set_has_cur() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgMouse::clear_has_cur() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgMouse::clear_cur() {
-  if (cur_ != NULL) cur_->::medical_imaging::MsgPoint2::Clear();
-  clear_has_cur();
+    if (cur_ != NULL) {
+        cur_->::medical_imaging::MsgPoint2::Clear();
+    }
+
+    clear_has_cur();
 }
 inline const ::medical_imaging::MsgPoint2& MsgMouse::cur() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.cur)
-  return cur_ != NULL ? *cur_
-                         : *::medical_imaging::MsgPoint2::internal_default_instance();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.cur)
+    return cur_ != NULL ? *cur_
+           : *::medical_imaging::MsgPoint2::internal_default_instance();
 }
 inline ::medical_imaging::MsgPoint2* MsgMouse::mutable_cur() {
-  set_has_cur();
-  if (cur_ == NULL) {
-    cur_ = new ::medical_imaging::MsgPoint2;
-  }
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgMouse.cur)
-  return cur_;
+    set_has_cur();
+
+    if (cur_ == NULL) {
+        cur_ = new ::medical_imaging::MsgPoint2;
+    }
+
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgMouse.cur)
+    return cur_;
 }
 inline ::medical_imaging::MsgPoint2* MsgMouse::release_cur() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgMouse.cur)
-  clear_has_cur();
-  ::medical_imaging::MsgPoint2* temp = cur_;
-  cur_ = NULL;
-  return temp;
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgMouse.cur)
+    clear_has_cur();
+    ::medical_imaging::MsgPoint2* temp = cur_;
+    cur_ = NULL;
+    return temp;
 }
 inline void MsgMouse::set_allocated_cur(::medical_imaging::MsgPoint2* cur) {
-  delete cur_;
-  cur_ = cur;
-  if (cur) {
-    set_has_cur();
-  } else {
-    clear_has_cur();
-  }
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgMouse.cur)
+    delete cur_;
+    cur_ = cur;
+
+    if (cur) {
+        set_has_cur();
+    } else {
+        clear_has_cur();
+    }
+
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgMouse.cur)
 }
 
 // required int32 tag = 3;
 inline bool MsgMouse::has_tag() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+    return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void MsgMouse::set_has_tag() {
-  _has_bits_[0] |= 0x00000004u;
+    _has_bits_[0] |= 0x00000004u;
 }
 inline void MsgMouse::clear_has_tag() {
-  _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00000004u;
 }
 inline void MsgMouse::clear_tag() {
-  tag_ = 0;
-  clear_has_tag();
+    tag_ = 0;
+    clear_has_tag();
 }
 inline ::google::protobuf::int32 MsgMouse::tag() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.tag)
-  return tag_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgMouse.tag)
+    return tag_;
 }
 inline void MsgMouse::set_tag(::google::protobuf::int32 value) {
-  set_has_tag();
-  tag_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgMouse.tag)
+    set_has_tag();
+    tag_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgMouse.tag)
 }
 
 // -------------------------------------------------------------------
@@ -1535,122 +1601,122 @@ inline void MsgMouse::set_tag(::google::protobuf::int32 value) {
 
 // required int32 id = 1;
 inline bool MsgCellInfo::has_id() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgCellInfo::set_has_id() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgCellInfo::clear_has_id() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgCellInfo::clear_id() {
-  id_ = 0;
-  clear_has_id();
+    id_ = 0;
+    clear_has_id();
 }
 inline ::google::protobuf::int32 MsgCellInfo::id() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.id)
-  return id_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.id)
+    return id_;
 }
 inline void MsgCellInfo::set_id(::google::protobuf::int32 value) {
-  set_has_id();
-  id_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.id)
+    set_has_id();
+    id_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.id)
 }
 
 // required int32 type = 2;
 inline bool MsgCellInfo::has_type() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgCellInfo::set_has_type() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgCellInfo::clear_has_type() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgCellInfo::clear_type() {
-  type_ = 0;
-  clear_has_type();
+    type_ = 0;
+    clear_has_type();
 }
 inline ::google::protobuf::int32 MsgCellInfo::type() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.type)
-  return type_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.type)
+    return type_;
 }
 inline void MsgCellInfo::set_type(::google::protobuf::int32 value) {
-  set_has_type();
-  type_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.type)
+    set_has_type();
+    type_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.type)
 }
 
 // required int32 direction = 3;
 inline bool MsgCellInfo::has_direction() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+    return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void MsgCellInfo::set_has_direction() {
-  _has_bits_[0] |= 0x00000004u;
+    _has_bits_[0] |= 0x00000004u;
 }
 inline void MsgCellInfo::clear_has_direction() {
-  _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00000004u;
 }
 inline void MsgCellInfo::clear_direction() {
-  direction_ = 0;
-  clear_has_direction();
+    direction_ = 0;
+    clear_has_direction();
 }
 inline ::google::protobuf::int32 MsgCellInfo::direction() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
-  return direction_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.direction)
+    return direction_;
 }
 inline void MsgCellInfo::set_direction(::google::protobuf::int32 value) {
-  set_has_direction();
-  direction_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
+    set_has_direction();
+    direction_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.direction)
 }
 
 // required int32 width = 4;
 inline bool MsgCellInfo::has_width() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+    return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void MsgCellInfo::set_has_width() {
-  _has_bits_[0] |= 0x00000008u;
+    _has_bits_[0] |= 0x00000008u;
 }
 inline void MsgCellInfo::clear_has_width() {
-  _has_bits_[0] &= ~0x00000008u;
+    _has_bits_[0] &= ~0x00000008u;
 }
 inline void MsgCellInfo::clear_width() {
-  width_ = 0;
-  clear_has_width();
+    width_ = 0;
+    clear_has_width();
 }
 inline ::google::protobuf::int32 MsgCellInfo::width() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.width)
-  return width_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.width)
+    return width_;
 }
 inline void MsgCellInfo::set_width(::google::protobuf::int32 value) {
-  set_has_width();
-  width_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.width)
+    set_has_width();
+    width_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.width)
 }
 
 // required int32 height = 5;
 inline bool MsgCellInfo::has_height() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+    return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void MsgCellInfo::set_has_height() {
-  _has_bits_[0] |= 0x00000010u;
+    _has_bits_[0] |= 0x00000010u;
 }
 inline void MsgCellInfo::clear_has_height() {
-  _has_bits_[0] &= ~0x00000010u;
+    _has_bits_[0] &= ~0x00000010u;
 }
 inline void MsgCellInfo::clear_height() {
-  height_ = 0;
-  clear_has_height();
+    height_ = 0;
+    clear_has_height();
 }
 inline ::google::protobuf::int32 MsgCellInfo::height() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.height)
-  return height_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgCellInfo.height)
+    return height_;
 }
 inline void MsgCellInfo::set_height(::google::protobuf::int32 value) {
-  set_has_height();
-  height_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.height)
+    set_has_height();
+    height_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgCellInfo.height)
 }
 
 // -------------------------------------------------------------------
@@ -1659,119 +1725,122 @@ inline void MsgCellInfo::set_height(::google::protobuf::int32 value) {
 
 // required int32 pid = 1;
 inline bool MsgInit::has_pid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgInit::set_has_pid() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgInit::clear_has_pid() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgInit::clear_pid() {
-  pid_ = 0;
-  clear_has_pid();
+    pid_ = 0;
+    clear_has_pid();
 }
 inline ::google::protobuf::int32 MsgInit::pid() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.pid)
-  return pid_;
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.pid)
+    return pid_;
 }
 inline void MsgInit::set_pid(::google::protobuf::int32 value) {
-  set_has_pid();
-  pid_ = value;
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgInit.pid)
+    set_has_pid();
+    pid_ = value;
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgInit.pid)
 }
 
 // required string series_uid = 2;
 inline bool MsgInit::has_series_uid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgInit::set_has_series_uid() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgInit::clear_has_series_uid() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgInit::clear_series_uid() {
-  series_uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_series_uid();
+    series_uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_series_uid();
 }
 inline const ::std::string& MsgInit::series_uid() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.series_uid)
-  return series_uid_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.series_uid)
+    return series_uid_.GetNoArena();
 }
 inline void MsgInit::set_series_uid(const ::std::string& value) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgInit.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgInit.series_uid)
 }
 #if LANG_CXX11
 inline void MsgInit::set_series_uid(::std::string&& value) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgInit.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgInit.series_uid)
 }
 #endif
 inline void MsgInit::set_series_uid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgInit.series_uid)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgInit.series_uid)
 }
 inline void MsgInit::set_series_uid(const char* value, size_t size) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgInit.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgInit.series_uid)
 }
 inline ::std::string* MsgInit::mutable_series_uid() {
-  set_has_series_uid();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgInit.series_uid)
-  return series_uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_series_uid();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgInit.series_uid)
+    return series_uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgInit::release_series_uid() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgInit.series_uid)
-  clear_has_series_uid();
-  return series_uid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgInit.series_uid)
+    clear_has_series_uid();
+    return series_uid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgInit::set_allocated_series_uid(::std::string* series_uid) {
-  if (series_uid != NULL) {
-    set_has_series_uid();
-  } else {
-    clear_has_series_uid();
-  }
-  series_uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), series_uid);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgInit.series_uid)
+    if (series_uid != NULL) {
+        set_has_series_uid();
+    } else {
+        clear_has_series_uid();
+    }
+
+    series_uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                    series_uid);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgInit.series_uid)
 }
 
 // repeated .medical_imaging.MsgCellInfo cells = 3;
 inline int MsgInit::cells_size() const {
-  return cells_.size();
+    return cells_.size();
 }
 inline void MsgInit::clear_cells() {
-  cells_.Clear();
+    cells_.Clear();
 }
 inline const ::medical_imaging::MsgCellInfo& MsgInit::cells(int index) const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.cells)
-  return cells_.Get(index);
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgInit.cells)
+    return cells_.Get(index);
 }
 inline ::medical_imaging::MsgCellInfo* MsgInit::mutable_cells(int index) {
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgInit.cells)
-  return cells_.Mutable(index);
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgInit.cells)
+    return cells_.Mutable(index);
 }
 inline ::medical_imaging::MsgCellInfo* MsgInit::add_cells() {
-  // @@protoc_insertion_point(field_add:medical_imaging.MsgInit.cells)
-  return cells_.Add();
+    // @@protoc_insertion_point(field_add:medical_imaging.MsgInit.cells)
+    return cells_.Add();
 }
 inline ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
 MsgInit::mutable_cells() {
-  // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgInit.cells)
-  return &cells_;
+    // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgInit.cells)
+    return &cells_;
 }
 inline const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
 MsgInit::cells() const {
-  // @@protoc_insertion_point(field_list:medical_imaging.MsgInit.cells)
-  return cells_;
+    // @@protoc_insertion_point(field_list:medical_imaging.MsgInit.cells)
+    return cells_;
 }
 
 // -------------------------------------------------------------------
@@ -1780,32 +1849,32 @@ MsgInit::cells() const {
 
 // repeated .medical_imaging.MsgCellInfo cells = 1;
 inline int MsgResize::cells_size() const {
-  return cells_.size();
+    return cells_.size();
 }
 inline void MsgResize::clear_cells() {
-  cells_.Clear();
+    cells_.Clear();
 }
 inline const ::medical_imaging::MsgCellInfo& MsgResize::cells(int index) const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgResize.cells)
-  return cells_.Get(index);
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgResize.cells)
+    return cells_.Get(index);
 }
 inline ::medical_imaging::MsgCellInfo* MsgResize::mutable_cells(int index) {
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgResize.cells)
-  return cells_.Mutable(index);
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgResize.cells)
+    return cells_.Mutable(index);
 }
 inline ::medical_imaging::MsgCellInfo* MsgResize::add_cells() {
-  // @@protoc_insertion_point(field_add:medical_imaging.MsgResize.cells)
-  return cells_.Add();
+    // @@protoc_insertion_point(field_add:medical_imaging.MsgResize.cells)
+    return cells_.Add();
 }
 inline ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >*
 MsgResize::mutable_cells() {
-  // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgResize.cells)
-  return &cells_;
+    // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgResize.cells)
+    return &cells_;
 }
 inline const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgCellInfo >&
 MsgResize::cells() const {
-  // @@protoc_insertion_point(field_list:medical_imaging.MsgResize.cells)
-  return cells_;
+    // @@protoc_insertion_point(field_list:medical_imaging.MsgResize.cells)
+    return cells_;
 }
 
 // -------------------------------------------------------------------
@@ -1814,254 +1883,268 @@ MsgResize::cells() const {
 
 // required string patient_name = 1;
 inline bool MsgWorklistItem::has_patient_name() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+    return (_has_bits_[0] & 0x00000001u) != 0;
 }
 inline void MsgWorklistItem::set_has_patient_name() {
-  _has_bits_[0] |= 0x00000001u;
+    _has_bits_[0] |= 0x00000001u;
 }
 inline void MsgWorklistItem::clear_has_patient_name() {
-  _has_bits_[0] &= ~0x00000001u;
+    _has_bits_[0] &= ~0x00000001u;
 }
 inline void MsgWorklistItem::clear_patient_name() {
-  patient_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_patient_name();
+    patient_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_patient_name();
 }
 inline const ::std::string& MsgWorklistItem::patient_name() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_name)
-  return patient_name_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_name)
+    return patient_name_.GetNoArena();
 }
 inline void MsgWorklistItem::set_patient_name(const ::std::string& value) {
-  set_has_patient_name();
-  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_name)
+    set_has_patient_name();
+    patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_name)
 }
 #if LANG_CXX11
 inline void MsgWorklistItem::set_patient_name(::std::string&& value) {
-  set_has_patient_name();
-  patient_name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_name)
+    set_has_patient_name();
+    patient_name_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_name)
 }
 #endif
 inline void MsgWorklistItem::set_patient_name(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_patient_name();
-  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_name)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_patient_name();
+    patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                             ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_name)
 }
 inline void MsgWorklistItem::set_patient_name(const char* value, size_t size) {
-  set_has_patient_name();
-  patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_name)
+    set_has_patient_name();
+    patient_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                             ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_name)
 }
 inline ::std::string* MsgWorklistItem::mutable_patient_name() {
-  set_has_patient_name();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_name)
-  return patient_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_patient_name();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_name)
+    return patient_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgWorklistItem::release_patient_name() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_name)
-  clear_has_patient_name();
-  return patient_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_name)
+    clear_has_patient_name();
+    return patient_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgWorklistItem::set_allocated_patient_name(::std::string* patient_name) {
-  if (patient_name != NULL) {
-    set_has_patient_name();
-  } else {
-    clear_has_patient_name();
-  }
-  patient_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), patient_name);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_name)
+    if (patient_name != NULL) {
+        set_has_patient_name();
+    } else {
+        clear_has_patient_name();
+    }
+
+    patient_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                      patient_name);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_name)
 }
 
 // required string patient_id = 2;
 inline bool MsgWorklistItem::has_patient_id() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+    return (_has_bits_[0] & 0x00000002u) != 0;
 }
 inline void MsgWorklistItem::set_has_patient_id() {
-  _has_bits_[0] |= 0x00000002u;
+    _has_bits_[0] |= 0x00000002u;
 }
 inline void MsgWorklistItem::clear_has_patient_id() {
-  _has_bits_[0] &= ~0x00000002u;
+    _has_bits_[0] &= ~0x00000002u;
 }
 inline void MsgWorklistItem::clear_patient_id() {
-  patient_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_patient_id();
+    patient_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_patient_id();
 }
 inline const ::std::string& MsgWorklistItem::patient_id() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_id)
-  return patient_id_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.patient_id)
+    return patient_id_.GetNoArena();
 }
 inline void MsgWorklistItem::set_patient_id(const ::std::string& value) {
-  set_has_patient_id();
-  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_id)
+    set_has_patient_id();
+    patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.patient_id)
 }
 #if LANG_CXX11
 inline void MsgWorklistItem::set_patient_id(::std::string&& value) {
-  set_has_patient_id();
-  patient_id_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_id)
+    set_has_patient_id();
+    patient_id_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.patient_id)
 }
 #endif
 inline void MsgWorklistItem::set_patient_id(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_patient_id();
-  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_id)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_patient_id();
+    patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.patient_id)
 }
 inline void MsgWorklistItem::set_patient_id(const char* value, size_t size) {
-  set_has_patient_id();
-  patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_id)
+    set_has_patient_id();
+    patient_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.patient_id)
 }
 inline ::std::string* MsgWorklistItem::mutable_patient_id() {
-  set_has_patient_id();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_id)
-  return patient_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_patient_id();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.patient_id)
+    return patient_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgWorklistItem::release_patient_id() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_id)
-  clear_has_patient_id();
-  return patient_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.patient_id)
+    clear_has_patient_id();
+    return patient_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgWorklistItem::set_allocated_patient_id(::std::string* patient_id) {
-  if (patient_id != NULL) {
-    set_has_patient_id();
-  } else {
-    clear_has_patient_id();
-  }
-  patient_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), patient_id);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_id)
+    if (patient_id != NULL) {
+        set_has_patient_id();
+    } else {
+        clear_has_patient_id();
+    }
+
+    patient_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                    patient_id);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.patient_id)
 }
 
 // required string series_uid = 3;
 inline bool MsgWorklistItem::has_series_uid() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+    return (_has_bits_[0] & 0x00000004u) != 0;
 }
 inline void MsgWorklistItem::set_has_series_uid() {
-  _has_bits_[0] |= 0x00000004u;
+    _has_bits_[0] |= 0x00000004u;
 }
 inline void MsgWorklistItem::clear_has_series_uid() {
-  _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00000004u;
 }
 inline void MsgWorklistItem::clear_series_uid() {
-  series_uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_series_uid();
+    series_uid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_series_uid();
 }
 inline const ::std::string& MsgWorklistItem::series_uid() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.series_uid)
-  return series_uid_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.series_uid)
+    return series_uid_.GetNoArena();
 }
 inline void MsgWorklistItem::set_series_uid(const ::std::string& value) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.series_uid)
 }
 #if LANG_CXX11
 inline void MsgWorklistItem::set_series_uid(::std::string&& value) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.series_uid)
 }
 #endif
 inline void MsgWorklistItem::set_series_uid(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.series_uid)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.series_uid)
 }
 inline void MsgWorklistItem::set_series_uid(const char* value, size_t size) {
-  set_has_series_uid();
-  series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.series_uid)
+    set_has_series_uid();
+    series_uid_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                           ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.series_uid)
 }
 inline ::std::string* MsgWorklistItem::mutable_series_uid() {
-  set_has_series_uid();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.series_uid)
-  return series_uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_series_uid();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.series_uid)
+    return series_uid_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgWorklistItem::release_series_uid() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.series_uid)
-  clear_has_series_uid();
-  return series_uid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.series_uid)
+    clear_has_series_uid();
+    return series_uid_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgWorklistItem::set_allocated_series_uid(::std::string* series_uid) {
-  if (series_uid != NULL) {
-    set_has_series_uid();
-  } else {
-    clear_has_series_uid();
-  }
-  series_uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), series_uid);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.series_uid)
+    if (series_uid != NULL) {
+        set_has_series_uid();
+    } else {
+        clear_has_series_uid();
+    }
+
+    series_uid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                    series_uid);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.series_uid)
 }
 
 // required string imaging_modality = 4;
 inline bool MsgWorklistItem::has_imaging_modality() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
+    return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void MsgWorklistItem::set_has_imaging_modality() {
-  _has_bits_[0] |= 0x00000008u;
+    _has_bits_[0] |= 0x00000008u;
 }
 inline void MsgWorklistItem::clear_has_imaging_modality() {
-  _has_bits_[0] &= ~0x00000008u;
+    _has_bits_[0] &= ~0x00000008u;
 }
 inline void MsgWorklistItem::clear_imaging_modality() {
-  imaging_modality_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  clear_has_imaging_modality();
+    imaging_modality_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_imaging_modality();
 }
 inline const ::std::string& MsgWorklistItem::imaging_modality() const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.imaging_modality)
-  return imaging_modality_.GetNoArena();
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklistItem.imaging_modality)
+    return imaging_modality_.GetNoArena();
 }
 inline void MsgWorklistItem::set_imaging_modality(const ::std::string& value) {
-  set_has_imaging_modality();
-  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.imaging_modality)
+    set_has_imaging_modality();
+    imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+    // @@protoc_insertion_point(field_set:medical_imaging.MsgWorklistItem.imaging_modality)
 }
 #if LANG_CXX11
 inline void MsgWorklistItem::set_imaging_modality(::std::string&& value) {
-  set_has_imaging_modality();
-  imaging_modality_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.imaging_modality)
+    set_has_imaging_modality();
+    imaging_modality_.SetNoArena(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+    // @@protoc_insertion_point(field_set_rvalue:medical_imaging.MsgWorklistItem.imaging_modality)
 }
 #endif
 inline void MsgWorklistItem::set_imaging_modality(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  set_has_imaging_modality();
-  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.imaging_modality)
+    GOOGLE_DCHECK(value != NULL);
+    set_has_imaging_modality();
+    imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                 ::std::string(value));
+    // @@protoc_insertion_point(field_set_char:medical_imaging.MsgWorklistItem.imaging_modality)
 }
 inline void MsgWorklistItem::set_imaging_modality(const char* value, size_t size) {
-  set_has_imaging_modality();
-  imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.imaging_modality)
+    set_has_imaging_modality();
+    imaging_modality_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                 ::std::string(reinterpret_cast<const char*>(value), size));
+    // @@protoc_insertion_point(field_set_pointer:medical_imaging.MsgWorklistItem.imaging_modality)
 }
 inline ::std::string* MsgWorklistItem::mutable_imaging_modality() {
-  set_has_imaging_modality();
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.imaging_modality)
-  return imaging_modality_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    set_has_imaging_modality();
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklistItem.imaging_modality)
+    return imaging_modality_.MutableNoArena(
+               &::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* MsgWorklistItem::release_imaging_modality() {
-  // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.imaging_modality)
-  clear_has_imaging_modality();
-  return imaging_modality_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    // @@protoc_insertion_point(field_release:medical_imaging.MsgWorklistItem.imaging_modality)
+    clear_has_imaging_modality();
+    return imaging_modality_.ReleaseNoArena(
+               &::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline void MsgWorklistItem::set_allocated_imaging_modality(::std::string* imaging_modality) {
-  if (imaging_modality != NULL) {
-    set_has_imaging_modality();
-  } else {
-    clear_has_imaging_modality();
-  }
-  imaging_modality_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), imaging_modality);
-  // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.imaging_modality)
+    if (imaging_modality != NULL) {
+        set_has_imaging_modality();
+    } else {
+        clear_has_imaging_modality();
+    }
+
+    imaging_modality_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+                                          imaging_modality);
+    // @@protoc_insertion_point(field_set_allocated:medical_imaging.MsgWorklistItem.imaging_modality)
 }
 
 // -------------------------------------------------------------------
@@ -2070,32 +2153,32 @@ inline void MsgWorklistItem::set_allocated_imaging_modality(::std::string* imagi
 
 // repeated .medical_imaging.MsgWorklistItem items = 1;
 inline int MsgWorklist::items_size() const {
-  return items_.size();
+    return items_.size();
 }
 inline void MsgWorklist::clear_items() {
-  items_.Clear();
+    items_.Clear();
 }
 inline const ::medical_imaging::MsgWorklistItem& MsgWorklist::items(int index) const {
-  // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklist.items)
-  return items_.Get(index);
+    // @@protoc_insertion_point(field_get:medical_imaging.MsgWorklist.items)
+    return items_.Get(index);
 }
 inline ::medical_imaging::MsgWorklistItem* MsgWorklist::mutable_items(int index) {
-  // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklist.items)
-  return items_.Mutable(index);
+    // @@protoc_insertion_point(field_mutable:medical_imaging.MsgWorklist.items)
+    return items_.Mutable(index);
 }
 inline ::medical_imaging::MsgWorklistItem* MsgWorklist::add_items() {
-  // @@protoc_insertion_point(field_add:medical_imaging.MsgWorklist.items)
-  return items_.Add();
+    // @@protoc_insertion_point(field_add:medical_imaging.MsgWorklist.items)
+    return items_.Add();
 }
 inline ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >*
 MsgWorklist::mutable_items() {
-  // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgWorklist.items)
-  return &items_;
+    // @@protoc_insertion_point(field_mutable_list:medical_imaging.MsgWorklist.items)
+    return &items_;
 }
 inline const ::google::protobuf::RepeatedPtrField< ::medical_imaging::MsgWorklistItem >&
 MsgWorklist::items() const {
-  // @@protoc_insertion_point(field_list:medical_imaging.MsgWorklist.items)
-  return items_;
+    // @@protoc_insertion_point(field_list:medical_imaging.MsgWorklist.items)
+    return items_;
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS

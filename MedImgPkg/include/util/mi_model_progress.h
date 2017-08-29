@@ -3,7 +3,7 @@
 
 #include "util/mi_model_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class ProgressModel : public IModel {
 public:

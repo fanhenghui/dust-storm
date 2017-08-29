@@ -7,31 +7,31 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RCStepMaskOverlayEnable : public RCStepBase {
 public:
-  RCStepMaskOverlayEnable(std::shared_ptr<RayCaster> ray_caster,
-                          std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program), _loc_visible_label_count(-1){};
+    RCStepMaskOverlayEnable(std::shared_ptr<RayCaster> ray_caster,
+                            std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program), _loc_visible_label_count(-1) {};
 
-  virtual ~RCStepMaskOverlayEnable(){};
+    virtual ~RCStepMaskOverlayEnable() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
-  virtual void get_uniform_location();
+    virtual void get_uniform_location();
 
-  virtual void set_gpu_parameter();
+    virtual void set_gpu_parameter();
 
 private:
-  int _loc_visible_label_count;
+    int _loc_visible_label_count;
 };
 
 class RCStepMaskOverlayDisable : public RCStepBase {
 public:
-  RCStepMaskOverlayDisable(std::shared_ptr<RayCaster> ray_caster,
-                           std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepMaskOverlayDisable(std::shared_ptr<RayCaster> ray_caster,
+                             std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepMaskOverlayDisable(){};
+    virtual ~RCStepMaskOverlayDisable() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };

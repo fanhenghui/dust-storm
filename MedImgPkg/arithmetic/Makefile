@@ -17,7 +17,7 @@ OBJS = mi_point2.o mi_point3.o mi_vector2.o mi_vector3.o mi_matrix4.o \
 mi_camera_base.o mi_ortho_camera.o mi_perspective_camera.o mi_track_ball.o \
 mi_vector2f.o mi_vector3f.o mi_vector4f.o mi_matrix4f.o \
 mi_arithmetic_utils.o \
-mi_aabb.o mi_ellipsoid.o mi_line_segment.o mi_line.o mi_plane.o mi_rectangle.o mi_sphere.o mi_triangle.o mi_intersection_test.o \
+mi_aabb.o mi_ellipsoid.o mi_line_segment.o mi_line.o mi_plane.o mi_triangle.o mi_intersection_test.o \
 mi_rsa_utils.o mi_volume_statistician.o
 
 TARGET = $(BIN_DIR)/libmedimg_arithmetic.so
@@ -37,13 +37,13 @@ mi_rsa_utils.o: $(EXPORT_HEADER) mi_rsa_utils.h mi_rsa_utils.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_rsa_utils.cpp $(ADDITINAL_INCLUDE_DIR) 
 
 mi_intersection_test.o: $(EXPORT_HEADER) mi_intersection_test.h mi_intersection_test.cpp \
-mi_aabb.o mi_ellipsoid.o mi_line_segment.o mi_line.o mi_plane.o mi_rectangle.o
+mi_aabb.o mi_ellipsoid.o mi_line_segment.o mi_line.o mi_plane.o 
 	$(CC) -c -fPIC $(CFLAGS) mi_intersection_test.cpp $(ADDITINAL_INCLUDE_DIR) 
 
 mi_arithmetic_utils.o: $(EXPORT_HEADER) mi_arithmetic_utils.h mi_arithmetic_utils.cpp \
 mi_point3.o mi_point2.o mi_vector3.o mi_vector2.o mi_matrix4.o \
 mi_vector2f.o mi_vector3f.o mi_vector4f.o  mi_matrix4f.o \
-mi_sphere.o mi_ellipsoid.o
+mi_ellipsoid.o
 	$(CC) -c -fPIC $(CFLAGS) mi_arithmetic_utils.cpp $(ADDITINAL_INCLUDE_DIR)
 	
 mi_aabb.o: $(EXPORT_HEADER) mi_aabb.h mi_aabb.cpp mi_shape_interface.h mi_point3.o
@@ -65,17 +65,9 @@ mi_plane.o: $(EXPORT_HEADER) mi_plane.h mi_plane.cpp mi_shape_interface.h \
 mi_point3.o mi_point2.o
 	$(CC) -c -fPIC $(CFLAGS) mi_plane.cpp $(ADDITINAL_INCLUDE_DIR)	
 
-mi_sphere.o: $(EXPORT_HEADER) mi_sphere.h mi_sphere.cpp mi_shape_interface.h \
-mi_point3.o mi_point2.o
-	$(CC) -c -fPIC $(CFLAGS) mi_sphere.cpp $(ADDITINAL_INCLUDE_DIR)	
-
 mi_triangle.o: $(EXPORT_HEADER) mi_triangle.h mi_triangle.cpp mi_shape_interface.h \
 mi_point3.o mi_point2.o
-	$(CC) -c -fPIC $(CFLAGS) mi_triangle.cpp $(ADDITINAL_INCLUDE_DIR)	
-
-mi_rectangle.o: $(EXPORT_HEADER) mi_rectangle.h mi_rectangle.cpp mi_shape_interface.h \
-mi_point3.o mi_point2.o
-	$(CC) -c -fPIC $(CFLAGS) mi_rectangle.cpp $(ADDITINAL_INCLUDE_DIR)		
+	$(CC) -c -fPIC $(CFLAGS) mi_triangle.cpp $(ADDITINAL_INCLUDE_DIR)		
 
 mi_matrix4f.o: $(EXPORT_HEADER) mi_matrix4f.h mi_matrix4f.cpp mi_simd.h mi_vector3f.o mi_vector4f.o
 	$(CC) -c -fPIC $(CFLAGS) mi_matrix4f.cpp $(ADDITINAL_INCLUDE_DIR)

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class Util_Export FileUtil {
 public:

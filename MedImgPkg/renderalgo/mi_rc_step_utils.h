@@ -7,13 +7,13 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RCStepUtils : public RCStepBase {
 public:
-  RCStepUtils(std::shared_ptr<RayCaster> ray_caster,
-              std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepUtils(std::shared_ptr<RayCaster> ray_caster,
+                std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepUtils(){};
+    virtual ~RCStepUtils() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };

@@ -7,11 +7,10 @@
 
 class QGraphicsLineItem;
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class CrosshairModel;
-class QtPackage_Export GraphicItemCrosshair : public GraphicItemBase
-{
+class QtPackage_Export GraphicItemCrosshair : public GraphicItemBase {
 public:
     GraphicItemCrosshair();
     virtual ~GraphicItemCrosshair();
@@ -20,7 +19,8 @@ public:
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
+                        std::vector<QGraphicsItem*>& to_be_remove);
 
 protected:
 private:
@@ -29,7 +29,7 @@ private:
 
     Line2D _pre_lines[2];
     RGBUnit _pre_colors[2];
-    
+
 };
 
 MED_IMG_END_NAMESPACE

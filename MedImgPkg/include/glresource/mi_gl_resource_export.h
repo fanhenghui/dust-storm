@@ -14,16 +14,16 @@
 #include <algorithm>
 #include <cmath>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
-    #ifdef MEDIMGGLRESOURCE_EXPORTS
-    #define GLResource_Export __declspec(dllexport)
-    #else
-    #define GLResource_Export __declspec(dllimport)
-    #endif
+#ifdef MEDIMGGLRESOURCE_EXPORTS
+#define GLResource_Export __declspec(dllexport)
 #else
-    #define GLResource_Export
+#define GLResource_Export __declspec(dllimport)
+#endif
+#else
+#define GLResource_Export
 #endif
 
 #ifndef GLRESOURCE_THROW_EXCEPTION

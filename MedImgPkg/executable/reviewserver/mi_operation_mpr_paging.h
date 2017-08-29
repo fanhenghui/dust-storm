@@ -4,10 +4,9 @@
 #include "mi_review_common.h"
 #include "appcommon/mi_operation_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class OpMPRPaging : public IOperation
-{
+class OpMPRPaging : public IOperation {
 public:
     OpMPRPaging();
     virtual ~OpMPRPaging();

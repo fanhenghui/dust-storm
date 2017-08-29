@@ -6,10 +6,9 @@
 
 class SceneContainer;
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export FocusModel : public IModel
-{
+class QtPackage_Export FocusModel : public IModel {
 public:
     FocusModel();
     virtual ~FocusModel();

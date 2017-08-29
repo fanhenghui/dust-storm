@@ -4,7 +4,7 @@
 #include "util/mi_util_export.h"
 #include "boost/thread/mutex.hpp"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 enum ProcessingUnitType {
     CPU = 0,

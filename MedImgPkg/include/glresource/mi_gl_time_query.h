@@ -3,30 +3,30 @@
 
 #include "mi_gl_object.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTimeQuery : public GLObject {
 public:
-  GLTimeQuery(UIDType uid);
+    GLTimeQuery(UIDType uid);
 
-  ~GLTimeQuery();
+    ~GLTimeQuery();
 
-  virtual void initialize();
+    virtual void initialize();
 
-  virtual void finalize();
+    virtual void finalize();
 
-  void get_id(unsigned int (&query_id)[2]) const;
+    void get_id(unsigned int (&query_id)[2]) const;
 
-  void begin();
+    void begin();
 
-  double end();
+    double end();
 
-  double get_time_elapsed();
+    double get_time_elapsed();
 
 private:
-  unsigned int _query[2];
-  double _time_elapsed;
-  bool _is_first_query;
+    unsigned int _query[2];
+    double _time_elapsed;
+    bool _is_first_query;
 };
 
 MED_IMG_END_NAMESPACE

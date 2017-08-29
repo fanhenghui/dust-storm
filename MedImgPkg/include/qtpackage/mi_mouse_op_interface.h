@@ -4,21 +4,18 @@
 #include "qtpackage/mi_qt_package_export.h"
 #include "Qt/qpoint.h"
 
-namespace medical_imaging
-{
-    class SceneBase;
+namespace medical_imaging {
+class SceneBase;
 }
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export IMouseOp
-{
+class QtPackage_Export IMouseOp {
 public:
     IMouseOp() {};
     virtual ~IMouseOp() {};
 
-    void set_scene(std::shared_ptr<SceneBase> scene) 
-    {
+    void set_scene(std::shared_ptr<SceneBase> scene) {
         QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
         _scene = scene;
     };

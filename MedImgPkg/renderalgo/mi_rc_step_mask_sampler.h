@@ -7,28 +7,28 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RCStepMaskNoneSampler : public RCStepBase {
 public:
-  RCStepMaskNoneSampler(std::shared_ptr<RayCaster> ray_caster,
-                        std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepMaskNoneSampler(std::shared_ptr<RayCaster> ray_caster,
+                          std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepMaskNoneSampler(){};
+    virtual ~RCStepMaskNoneSampler() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
 private:
 };
 
 class RCStepMaskNearstSampler : public RCStepBase {
 public:
-  RCStepMaskNearstSampler(std::shared_ptr<RayCaster> ray_caster,
-                          std::shared_ptr<GLProgram> program)
-      : RCStepBase(ray_caster, program){};
+    RCStepMaskNearstSampler(std::shared_ptr<RayCaster> ray_caster,
+                            std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program) {};
 
-  virtual ~RCStepMaskNearstSampler(){};
+    virtual ~RCStepMaskNearstSampler() {};
 
-  virtual GLShaderInfo get_shader_info();
+    virtual GLShaderInfo get_shader_info();
 
-  virtual void set_gpu_parameter();
+    virtual void set_gpu_parameter();
 
 private:
 };

@@ -5,22 +5,21 @@
 
 #include <arpa/inet.h>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-ShutDownCommandHandler::ShutDownCommandHandler(std::shared_ptr<AppController> controller):_controller(controller)
-{
-
-}
-
-ShutDownCommandHandler::~ShutDownCommandHandler()
-{
+ShutDownCommandHandler::ShutDownCommandHandler(std::shared_ptr<AppController> controller):
+    _controller(controller) {
 
 }
 
-int ShutDownCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
-{
+ShutDownCommandHandler::~ShutDownCommandHandler() {
+
+}
+
+int ShutDownCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
     std::shared_ptr<AppController> controller = _controller.lock();
-    if(nullptr == controller){
+
+    if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
     }
 
@@ -28,7 +27,7 @@ int ShutDownCommandHandler::handle_command(const IPCDataHeader& ipcheader , char
     const unsigned int big_end = ipcheader._big_end;
     const unsigned int data_len = ipcheader._data_len;
 
-    
+
     //TODO return shutdown ID
     const int quit_id = CLIENT_QUIT_ID;
     return quit_id;

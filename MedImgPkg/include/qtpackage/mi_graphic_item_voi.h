@@ -14,15 +14,13 @@
 #include <QObject>
 
 
-namespace medical_imaging
-{
-    class VOIModel;
-    class SceneBase;
+namespace medical_imaging {
+class VOIModel;
+class SceneBase;
 }
 
 
-class GraphicsLineItem : public QObject , public QGraphicsLineItem
-{
+class GraphicsLineItem : public QObject , public QGraphicsLineItem {
     Q_OBJECT
 public:
     GraphicsLineItem();
@@ -34,25 +32,32 @@ protected slots:
 private:
 };
 
-class GraphicsTextItem : public QGraphicsTextItem
-{
+class GraphicsTextItem : public QGraphicsTextItem {
     Q_OBJECT
 public:
     GraphicsTextItem(GraphicsLineItem* line_item);
     virtual ~GraphicsTextItem();
 
-    void set_id(int id) {_id = id;};
-    int get_id() const {return _id;};
+    void set_id(int id) {
+        _id = id;
+    };
+    int get_id() const {
+        return _id;
+    };
 
-    bool is_grabbed() {return _is_grabbed;};
-    void grab(bool flag) {_is_grabbed = flag;};
+    bool is_grabbed() {
+        return _is_grabbed;
+    };
+    void grab(bool flag) {
+        _is_grabbed = flag;
+    };
 
 signals:
     void position_changed(QPointF info_pos);
 
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
 private:
     int _id;
     bool _is_grabbed;
@@ -60,14 +65,17 @@ private:
 
 
 //Mouse left change position , and right change size
-class GraphicsSphereItem : public QGraphicsEllipseItem
-{
+class GraphicsSphereItem : public QGraphicsEllipseItem {
 public:
-    GraphicsSphereItem(QGraphicsItem *parent = 0 , QGraphicsScene *scene = 0);
+    GraphicsSphereItem(QGraphicsItem* parent = 0 , QGraphicsScene* scene = 0);
     virtual ~GraphicsSphereItem();
 
-    void set_id(int id) {_id = id;};
-    int get_id() const {return _id;};
+    void set_id(int id) {
+        _id = id;
+    };
+    int get_id() const {
+        return _id;
+    };
 
     void set_sphere(QPointF center , float radius);
 
@@ -80,9 +88,9 @@ public:
 
 
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 private:
     void update_circle_center_i();
@@ -96,10 +104,9 @@ private:
 };
 
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export GraphicItemVOI : public GraphicItemBase
-{
+class QtPackage_Export GraphicItemVOI : public GraphicItemBase {
 public:
     GraphicItemVOI();
     virtual ~GraphicItemVOI();
@@ -108,7 +115,8 @@ public:
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
+                        std::vector<QGraphicsItem*>& to_be_remove);
 
     virtual void post_update();
 

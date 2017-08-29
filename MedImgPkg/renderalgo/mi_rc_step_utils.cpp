@@ -4,7 +4,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 GLShaderInfo RCStepUtils::get_shader_info() {
-  return GLShaderInfo(GL_FRAGMENT_SHADER, ksRCUtilsFrag, "RCStepUtils");
+    return GLShaderInfo(GL_FRAGMENT_SHADER, ksRCUtilsFrag, "RCStepUtils");
 }
 
 MED_IMG_END_NAMESPACE

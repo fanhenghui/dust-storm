@@ -1,5 +1,5 @@
-#ifndef MEDIMGARITHMETIC_INTERSECTION_TEST_H_
-#define MEDIMGARITHMETIC_INTERSECTION_TEST_H_
+#ifndef MEDIMGARITHMETIC_MI_INTERSECTION_TEST_H
+#define MEDIMGARITHMETIC_MI_INTERSECTION_TEST_H
 
 #include "arithmetic/mi_aabb.h"
 #include "arithmetic/mi_line.h"
@@ -13,8 +13,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class Arithmetic_Export IntersectionTest {
 public:
-  static bool plane_to_plane(const Plane &plane1, const Plane &plane2,
-                             Line3D &intersected_line);
+    static bool plane_to_plane(const Plane &plane1, const Plane &plane2,
+                               Line3D &intersected_line);
 
 protected:
 private:

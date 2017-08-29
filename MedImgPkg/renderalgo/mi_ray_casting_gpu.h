@@ -12,37 +12,37 @@ class RCStepBase;
 class GLActiveTextureCounter;
 class RayCastingGPU {
 public:
-  RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
-  ~RayCastingGPU();
+    RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
+    ~RayCastingGPU();
 
-  void render();
-
-private:
-  void update_i();
+    void render();
 
 private:
-  std::weak_ptr<RayCaster> _ray_caster;
-  std::shared_ptr<GLActiveTextureCounter> _gl_act_tex_counter;
+    void update_i();
 
-  // render steps
-  std::vector<std::shared_ptr<RCStepBase>> _ray_casting_steps;
+private:
+    std::weak_ptr<RayCaster> _ray_caster;
+    std::shared_ptr<GLActiveTextureCounter> _gl_act_tex_counter;
 
-  // Ray casting mode cache
-  MaskMode _mask_mode;
-  CompositeMode _composite_mode;
-  InterpolationMode _interpolation_mode;
-  ShadingMode _shading_mode;
-  ColorInverseMode _color_inverse_mode;
-  MaskOverlayMode _mask_overlay_mode;
+    // render steps
+    std::vector<std::shared_ptr<RCStepBase>> _ray_casting_steps;
 
-  // Resource
-  GLVAOPtr _gl_vao;
-  GLBufferPtr _gl_buffer_vertex;
-  GLProgramPtr _gl_program;
-  GLResourceShield _res_shield;
+    // Ray casting mode cache
+    MaskMode _mask_mode;
+    CompositeMode _composite_mode;
+    InterpolationMode _interpolation_mode;
+    ShadingMode _shading_mode;
+    ColorInverseMode _color_inverse_mode;
+    MaskOverlayMode _mask_overlay_mode;
 
-  // For Testing
-  int _last_test_code;
+    // Resource
+    GLVAOPtr _gl_vao;
+    GLBufferPtr _gl_buffer_vertex;
+    GLProgramPtr _gl_program;
+    GLResourceShield _res_shield;
+
+    // For Testing
+    int _last_test_code;
 };
 
 MED_IMG_END_NAMESPACE

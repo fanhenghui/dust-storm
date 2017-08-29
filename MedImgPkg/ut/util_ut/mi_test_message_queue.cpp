@@ -15,47 +15,52 @@ using namespace medical_imaging;
 
 class Message {
 public:
-  Message() {}
-  ~Message() {}
-  void set(const std::string &msg) { _msg = msg; }
-  std::string get() const { return _msg; }
+    Message() {}
+    ~Message() {}
+    void set(const std::string& msg) {
+        _msg = msg;
+    }
+    std::string get() const {
+        return _msg;
+    }
 
 protected:
 private:
-  std::string _msg;
+    std::string _msg;
 };
 
 MessageQueue<Message> _message_queue;
 
 void run() {
-  std::string s;
-  while (std::cin >> s) {
-    // Sleep(100);
-    // std::cout << s << std::endl;
-    Message msg;
-    msg.set(s);
-    _message_queue.push(msg);
-  }
+    std::string s;
+
+    while (std::cin >> s) {
+        // Sleep(100);
+        // std::cout << s << std::endl;
+        Message msg;
+        msg.set(s);
+        _message_queue.push(msg);
+    }
 }
 
 void mainloop() {
-  while (true) {
-    Message msg;
-    _message_queue.pop(&msg);
+    while (true) {
+        Message msg;
+        _message_queue.pop(&msg);
 
-    std::cout << "main loop : " << msg.get() << std::endl;
-  }
+        std::cout << "main loop : " << msg.get() << std::endl;
+    }
 }
 
-int TestMessageQueue(int argc, char *argv[]) {
-  _message_queue.activate();
+int TestMessageQueue(int argc, char* argv[]) {
+    _message_queue.activate();
 
-  boost::thread th(run);
+    boost::thread th(run);
 
-  boost::thread th2(mainloop);
+    boost::thread th2(mainloop);
 
-  th.join();
-  th2.join();
+    th.join();
+    th2.join();
 
-  return 0;
+    return 0;
 }

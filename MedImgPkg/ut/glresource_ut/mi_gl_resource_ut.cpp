@@ -91,35 +91,36 @@ using namespace medical_imaging;
 #include "GL/freeglut.h"
 
 static void display() {
-  glViewport(0, 0, 800, 600);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, 800, 600);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glPushAttrib(GL_ALL_ATTRIB_BITS);
-  glBegin(GL_TRIANGLES);
-  glVertex2f(-0.5, -0.5);
-  glVertex2f(0.5, -0.5);
-  glVertex2f(0.5, 0.5);
-  glEnd();
-  glPopAttrib();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glBegin(GL_TRIANGLES);
+    glVertex2f(-0.5, -0.5);
+    glVertex2f(0.5, -0.5);
+    glVertex2f(0.5, 0.5);
+    glEnd();
+    glPopAttrib();
 
-  glutSwapBuffers();
+    glutSwapBuffers();
 }
 
-int main(int argc, char *argv[]) {
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
-  glutInitWindowSize(800, 600);
-  glutCreateWindow("test gl resource");
+int main(int argc, char* argv[]) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL);
+    glutInitWindowSize(800, 600);
+    glutCreateWindow("test gl resource");
 
-  GLenum err = glewInit();
-  if (GLEW_OK != err) {
-    /* Problem: glewInit failed, something is seriously wrong. */
-    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    return 1;
-  }
+    GLenum err = glewInit();
 
-  glutDisplayFunc(display);
-  glutMainLoop();
+    if (GLEW_OK != err) {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        return 1;
+    }
 
-  return 0;
+    glutDisplayFunc(display);
+    glutMainLoop();
+
+    return 0;
 }

@@ -4,12 +4,11 @@
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_observer_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class VOIModel;
 class VolumeInfos;
-class QtPackage_Export VOIStatisticObserver : public IObserver
-{
+class QtPackage_Export VOIStatisticObserver : public IObserver {
 public:
     VOIStatisticObserver();
     virtual ~VOIStatisticObserver();

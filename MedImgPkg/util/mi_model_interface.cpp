@@ -1,7 +1,7 @@
 #include "mi_model_interface.h"
 #include "mi_observer_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 IModel::IModel(): _is_changed(false) {
 

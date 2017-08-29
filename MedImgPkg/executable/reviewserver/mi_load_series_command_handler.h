@@ -5,12 +5,11 @@
 #include "util/mi_ipc_common.h"
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class ReviewController;
 class PACSCommunicator;
-class LoadSeriesCommandHandler : public ICommandHandler
-{
+class LoadSeriesCommandHandler : public ICommandHandler {
 public:
     LoadSeriesCommandHandler(std::shared_ptr<ReviewController> controller);
 

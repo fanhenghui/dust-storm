@@ -5,10 +5,9 @@
 
 class QGraphicsTextItem;
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export GraphicItemCornersInfo : public GraphicItemBase
-{
+class QtPackage_Export GraphicItemCornersInfo : public GraphicItemBase {
 public:
     GraphicItemCornersInfo();
     virtual ~GraphicItemCornersInfo();
@@ -17,7 +16,8 @@ public:
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
+                        std::vector<QGraphicsItem*>& to_be_remove);
 
 private:
     void refresh_text_i();

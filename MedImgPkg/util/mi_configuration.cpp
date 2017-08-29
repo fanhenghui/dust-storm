@@ -1,6 +1,6 @@
 #include "mi_configuration.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 boost::mutex Configuration::_s_mutex;
 

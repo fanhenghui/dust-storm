@@ -5,7 +5,7 @@
 
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 struct IPCDataHeader { //32 byte
     unsigned int _sender;//sender pid

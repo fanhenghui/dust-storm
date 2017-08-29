@@ -7,7 +7,7 @@
 #include "glresource/mi_gl_resource_export.h"
 #include "glresource/mi_gl_resource_define.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTextureCache {
 public:
@@ -16,17 +16,17 @@ public:
     ~GLTextureCache();
 
     //upload
-    void cache_load(GLenum target , GLTextureBasePtr texture , 
-        GLint wrap_type , GLint filter_type , 
-        GLint internalformat , 
-        GLsizei width, GLsizei height , GLsizei depth , 
-        GLenum format , GLenum type , char* data , GLint level = 0);
+    void cache_load(GLenum target , GLTextureBasePtr texture ,
+                    GLint wrap_type , GLint filter_type ,
+                    GLint internalformat ,
+                    GLsizei width, GLsizei height , GLsizei depth ,
+                    GLenum format , GLenum type , char* data , GLint level = 0);
 
     //update
-    void cache_update(GLenum target , GLTextureBasePtr texture , 
-        GLint xoffset , GLint yoffset , GLint zoffset ,
-        GLsizei width , GLsizei height , GLsizei depth , 
-        GLenum format , GLenum type , char* data , GLint level = 0);
+    void cache_update(GLenum target , GLTextureBasePtr texture ,
+                      GLint xoffset , GLint yoffset , GLint zoffset ,
+                      GLsizei width , GLsizei height , GLsizei depth ,
+                      GLenum format , GLenum type , char* data , GLint level = 0);
 
     //process in gpu
     void process_cache();

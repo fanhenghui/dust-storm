@@ -1,5 +1,5 @@
-#ifndef MEDIMGARITHMETIC_ARITHMETIC_H
-#define MEDIMGARITHMETIC_ARITHMETIC_H
+#ifndef MEDIMGARITHMETIC_MI_ARITHMETIC_EXPORT_H
+#define MEDIMGARITHMETIC_MI_ARITHMETIC_EXPORT_H
 
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
@@ -17,7 +17,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
-#ifdef MEDIMGARITHMETIC_EXPORTS
+#ifdef MEDIMGARITHMETIC_MI_EXPORTS
 #define Arithmetic_Export __declspec(dllexport)
 #else
 #define Arithmetic_Export __declspec(dllimport)

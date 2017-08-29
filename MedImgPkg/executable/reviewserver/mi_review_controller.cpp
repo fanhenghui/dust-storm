@@ -22,70 +22,71 @@
 #include "mi_operation_windowing.h"
 #include "mi_operation_zoom.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 ReviewController::ReviewController() {}
 
 ReviewController::~ReviewController() {}
 
 void ReviewController::initialize() {
-  AppController::initialize();
+    AppController::initialize();
 
-  // Configure
-  Configuration::instance()->set_processing_unit_type(GPU);
+    // Configure
+    Configuration::instance()->set_processing_unit_type(GPU);
 
-  // Register command handler
-  std::shared_ptr<AppController> app_controller = shared_from_this();
-  std::shared_ptr<ReadyCommandHandler> handler_ready(
-      new ReadyCommandHandler(app_controller));
-  _proxy->register_command_handler(COMMAND_ID_FE_READY, handler_ready);
+    // Register command handler
+    std::shared_ptr<AppController> app_controller = shared_from_this();
+    std::shared_ptr<ReadyCommandHandler> handler_ready(
+        new ReadyCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_READY, handler_ready);
 
-  std::shared_ptr<ShutDownCommandHandler> handler_shutdown(
-      new ShutDownCommandHandler(app_controller));
-  _proxy->register_command_handler(COMMAND_ID_FE_SHUT_DOWN, handler_shutdown);
+    std::shared_ptr<ShutDownCommandHandler> handler_shutdown(
+        new ShutDownCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_SHUT_DOWN, handler_shutdown);
 
-  std::shared_ptr<OperationCommandHandler> handler_operation(
-      new OperationCommandHandler(app_controller));
-  _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, handler_operation);
+    std::shared_ptr<OperationCommandHandler> handler_operation(
+        new OperationCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, handler_operation);
 
-  std::shared_ptr<MPRPlayCommandHandler> handler_mpr_play(
-      new MPRPlayCommandHandler(app_controller));
-  _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
+    std::shared_ptr<MPRPlayCommandHandler> handler_mpr_play(
+        new MPRPlayCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
 
-  std::shared_ptr<SearchWorklistCommandHandler> handler_search_worklist( new SearchWorklistCommandHandler(app_controller));
-  _proxy->register_command_handler(COMMAND_ID_WORKLIST, handler_search_worklist);
+    std::shared_ptr<SearchWorklistCommandHandler> handler_search_worklist(
+        new SearchWorklistCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_WORKLIST, handler_search_worklist);
 
-  //   std::shared_ptr<ReviewController> review_controller =
-  //       std::dynamic_pointer_cast<ReviewController>(app_controller);
-  //   std::shared_ptr<LoadSeriesCommandHandler> handler_loadseries(
-  //       new LoadSeriesCommandHandler(review_controller));
-  //   _proxy->register_command_handler(COMMAND_ID_FE_LOAD_SERIES,
-  //                                    handler_loadseries);
+    //   std::shared_ptr<ReviewController> review_controller =
+    //       std::dynamic_pointer_cast<ReviewController>(app_controller);
+    //   std::shared_ptr<LoadSeriesCommandHandler> handler_loadseries(
+    //       new LoadSeriesCommandHandler(review_controller));
+    //   _proxy->register_command_handler(COMMAND_ID_FE_LOAD_SERIES,
+    //                                    handler_loadseries);
 
-  // Register operation
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_INIT, std::shared_ptr<OpInit>(new OpInit()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_PAN, std::shared_ptr<OpPan>(new OpPan()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
-  OperationFactory::instance()->register_operation(
-      OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
+    // Register operation
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_INIT, std::shared_ptr<OpInit>(new OpInit()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_PAN, std::shared_ptr<OpPan>(new OpPan()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
 }
 
 void ReviewController::set_volume_infos(
     std::shared_ptr<VolumeInfos> volumeinfos) {
-  _volumeinfos = volumeinfos;
+    _volumeinfos = volumeinfos;
 }
 
 std::shared_ptr<VolumeInfos> ReviewController::get_volume_infos() {
-  return _volumeinfos;
+    return _volumeinfos;
 }
 
 MED_IMG_END_NAMESPACE

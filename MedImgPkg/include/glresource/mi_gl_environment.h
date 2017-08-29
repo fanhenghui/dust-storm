@@ -3,19 +3,19 @@
 
 #include "glresource/mi_gl_resource_export.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLEnvironment {
 public:
-  GLEnvironment();
+    GLEnvironment();
 
-  ~GLEnvironment();
+    ~GLEnvironment();
 
-  void get_gl_version(int &major, int &minor);
+    void get_gl_version(int& major, int& minor);
 
-  std::string get_gl_vendor();
+    std::string get_gl_vendor();
 
-  std::string get_gl_renderer();
+    std::string get_gl_renderer();
 
 protected:
 private:

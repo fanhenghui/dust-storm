@@ -5,7 +5,7 @@
 #include "glresource/mi_gl_resource_export.h"
 #include "io/mi_io_define.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 #define CHECK_GL_ERROR                                                         \
   if (GLUtils::get_check_gl_flag()) {                                          \
@@ -51,85 +51,85 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLUtils {
 public:
-  static bool check_framebuffer_state();
+    static bool check_framebuffer_state();
 
-  static void get_gray_texture_format(DataType data_type,
-                                      GLenum &internal_format, GLenum &format,
-                                      GLenum &type);
+    static void get_gray_texture_format(DataType data_type,
+                                        GLenum& internal_format, GLenum& format,
+                                        GLenum& type);
 
-  static unsigned int get_byte_by_data_type(DataType data_type);
+    static unsigned int get_byte_by_data_type(DataType data_type);
 
-  static std::string get_gl_enum_description(GLenum e);
+    static std::string get_gl_enum_description(GLenum e);
 
-  static void set_check_gl_flag(bool flag);
+    static void set_check_gl_flag(bool flag);
 
-  static bool get_check_gl_flag();
+    static bool get_check_gl_flag();
 
-  static void set_pixel_pack_alignment(int i);
+    static void set_pixel_pack_alignment(int i);
 
 private:
-  static bool _s_check_gl_flag;
+    static bool _s_check_gl_flag;
 };
 
 class GLResource_Export DrawFBOStack {
 public:
-  DrawFBOStack();
-  ~DrawFBOStack();
+    DrawFBOStack();
+    ~DrawFBOStack();
 
 private:
-  GLint _current_draw_fbo;
-  GLint _current_draw_buffer_count;
-  GLint _current_draw_buffer_array[8];
+    GLint _current_draw_fbo;
+    GLint _current_draw_buffer_count;
+    GLint _current_draw_buffer_array[8];
 };
 
 class GLResource_Export ReadFBOStack {
 public:
-  ReadFBOStack();
-  ~ReadFBOStack();
+    ReadFBOStack();
+    ~ReadFBOStack();
 
 private:
-  GLint _current_read_fbo;
-  GLint _current_read_buffer;
+    GLint _current_read_fbo;
+    GLint _current_read_buffer;
 };
 
 class GLResource_Export FBOStack {
 public:
-  FBOStack();
-  ~FBOStack();
+    FBOStack();
+    ~FBOStack();
 
 private:
-  GLint _current_draw_fbo;
-  GLint _current_draw_buffer_count;
-  GLint _current_draw_buffer_array[8];
-  GLint _current_read_fbo;
-  GLint _current_read_buffer;
+    GLint _current_draw_fbo;
+    GLint _current_draw_buffer_count;
+    GLint _current_draw_buffer_array[8];
+    GLint _current_read_fbo;
+    GLint _current_read_buffer;
 };
 
 class GLResource_Export GLActiveTextureCounter {
 public:
-  GLActiveTextureCounter();
-  ~GLActiveTextureCounter();
+    GLActiveTextureCounter();
+    ~GLActiveTextureCounter();
 
-  int tick();
+    int tick();
 
-  void reset();
+    void reset();
 
 private:
-  int _current_active_texture_id;
+    int _current_active_texture_id;
 };
 
 class GLResource_Export GLContextHelper {
 public:
-  static bool has_gl_context();
+    static bool has_gl_context();
 };
 
 class GLResource_Export GLTextureUtils {
 public:
-  static void set_1d_wrap_s(GLint wrap_type);
-  static void set_1d_array_wrap_s(GLint wrap_type);
-  static void set_2d_wrap_s_t(GLint wrap_type);
-  static void set_3d_wrap_s_t_r(GLint wrap_type);
-  static void set_filter(GLenum texture_target, GLint filter_type);
+    static void set_1d_wrap_s(GLint wrap_type);
+    static void set_1d_array_wrap_s(GLint wrap_type);
+    static void set_2d_wrap_s_t(GLint wrap_type);
+    static void set_3d_wrap_s_t_r(GLint wrap_type);
+    static void set_filter(GLenum texture_target, GLint filter_type);
 };
 
 MED_IMG_END_NAMESPACE

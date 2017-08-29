@@ -4,14 +4,14 @@
 #include "appcommon/mi_operation_interface.h"
 #include "mi_review_common.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class OpWindowing : public IOperation {
 public:
-  OpWindowing();
-  virtual ~OpWindowing();
+    OpWindowing();
+    virtual ~OpWindowing();
 
-  virtual int execute();
+    virtual int execute();
 
 protected:
 private:

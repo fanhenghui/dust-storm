@@ -7,18 +7,16 @@
 #include "io/mi_voi.h"
 #include "arithmetic/mi_volume_statistician.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 //Notify code ID:
-//0 �޸Ľ��� 
+//0 �޸Ľ���
 //1 �޸Ĺ�����
 //2 ���voi
 //3 ɾ��voi
-class QtPackage_Export VOIModel : public IModel
-{
+class QtPackage_Export VOIModel : public IModel {
 public:
-    enum CodeID
-    {
+    enum CodeID {
         MODIFY_COMPLETED = 0,
         MODIFYING = 1,
         ADD_VOI = 2,

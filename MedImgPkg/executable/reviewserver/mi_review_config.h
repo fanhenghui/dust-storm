@@ -5,10 +5,9 @@
 #include <string>
 #include "boost/thread/mutex.hpp"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class ReviewConfig
-{
+class ReviewConfig {
 public:
     static ReviewConfig* instance();
     ~ReviewConfig();

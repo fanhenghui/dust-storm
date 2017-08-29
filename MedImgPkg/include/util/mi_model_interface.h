@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class IObserver;
 typedef std::shared_ptr<IObserver> ObserverPtr;

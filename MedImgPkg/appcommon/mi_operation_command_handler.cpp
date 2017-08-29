@@ -4,22 +4,21 @@
 #include "mi_app_thread_model.h"
 #include "mi_operation_factory.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-OperationCommandHandler::OperationCommandHandler(std::shared_ptr<AppController> controller):_controller(controller)
-{
-
-}
-
-OperationCommandHandler::~OperationCommandHandler()
-{
+OperationCommandHandler::OperationCommandHandler(std::shared_ptr<AppController> controller):
+    _controller(controller) {
 
 }
 
-int OperationCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer)
-{
+OperationCommandHandler::~OperationCommandHandler() {
+
+}
+
+int OperationCommandHandler::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
     std::shared_ptr<AppController> controller = _controller.lock();
-    if(nullptr == controller){
+
+    if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
     }
 
@@ -31,16 +30,14 @@ int OperationCommandHandler::handle_command(const IPCDataHeader& ipcheader , cha
     op_header._data_type = ipcheader._data_type;
     op_header._big_end = ipcheader._big_end;
     op_header._data_len = ipcheader._data_len;
-    
+
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
-    if(op)
-    {
+
+    if (op) {
         op->set_data(op_header , buffer);
         op->set_controller(controller);
         controller->get_thread_model()->push_operation(op);
-    }
-    else
-    {
+    } else {
         //TODO
         APPCOMMON_THROW_EXCEPTION("cant find operation!");
     }

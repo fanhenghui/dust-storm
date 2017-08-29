@@ -4,20 +4,19 @@
 #include <QtGui/QMainWindow>
 #include "ui_mi_main_window.h"
 
-namespace medical_imaging
-{
-    class SceneBase;
-    class MPRScene;
-    class VolumeInfos;
-    class ImageData;
-    class ImageDataHeader;
-    class VOIModel;
-    class CrosshairModel;
-    class SceneContainerObserver;
-    class ProgressModel;
-    class VOIStatisticObserver;
-    class FocusModel;
-    class VOISegmentObserver;
+namespace medical_imaging {
+class SceneBase;
+class MPRScene;
+class VolumeInfos;
+class ImageData;
+class ImageDataHeader;
+class VOIModel;
+class CrosshairModel;
+class SceneContainerObserver;
+class ProgressModel;
+class VOIStatisticObserver;
+class FocusModel;
+class VOISegmentObserver;
 }
 typedef std::shared_ptr<medical_imaging::MPRScene> MPRScenePtr;
 
@@ -31,16 +30,15 @@ class QSignalMapper;
 class QNoduleObject;
 class QMinMaxHintObject;
 
-class NoduleAnnotation : public QMainWindow
-{
+class NoduleAnnotation : public QMainWindow {
     Q_OBJECT
 
 public:
-    NoduleAnnotation(QWidget *parent = 0, Qt::WFlags flags = 0);
+    NoduleAnnotation(QWidget* parent = 0, Qt::WFlags flags = 0);
     ~NoduleAnnotation();
 
 private slots:
-    //Layout 
+    //Layout
     void slot_change_layout2x2_i();
 
     //File
@@ -61,14 +59,14 @@ private slots:
     void slot_press_btn_windowing_i();
     void slot_press_btn_fit_window_i();
 
-    //MPR scroll bar 
+    //MPR scroll bar
     void slot_sliding_bar_mpr00_i(int value);
     void slot_sliding_bar_mpr01_i(int value);
     void slot_sliding_bar_mpr10_i(int value);
 
     //VOI list
     void slot_voi_table_widget_cell_select_i(int row , int column);
-    void slot_voi_table_widget_item_changed_i(QTableWidgetItem *item);
+    void slot_voi_table_widget_item_changed_i(QTableWidgetItem* item);
     void slot_voi_table_widget_nodule_type_changed_i(int id);
     void slot_add_nodule_i();
     void slot_delete_nodule_i();
@@ -84,9 +82,10 @@ private slots:
     //void slot_focus_out_scene_i(QString name);
 
     //Crosshair visible
-    void slot_crosshair_visibility_i(int );
+    void slot_crosshair_visibility_i(int);
 
-    void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
+    void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,
+                     std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
 
 private:
     void connect_signal_slot_i();
@@ -107,9 +106,9 @@ private:
     SceneContainer* _mpr_10;
     SceneContainer* _vr_11;
 
-    QScrollBar * _mpr_00_scroll_bar;
-    QScrollBar * _mpr_01_scroll_bar;
-    QScrollBar * _mpr_10_scroll_bar;
+    QScrollBar* _mpr_00_scroll_bar;
+    QScrollBar* _mpr_01_scroll_bar;
+    QScrollBar* _mpr_10_scroll_bar;
 
     std::shared_ptr<medical_imaging::VolumeInfos> _volume_infos;
     MPRScenePtr _mpr_scene_00;

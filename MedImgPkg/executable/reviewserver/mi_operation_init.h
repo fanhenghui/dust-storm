@@ -4,14 +4,14 @@
 #include "appcommon/mi_operation_interface.h"
 #include "mi_review_common.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class OpInit : public IOperation {
 public:
-  OpInit();
-  virtual ~OpInit();
+    OpInit();
+    virtual ~OpInit();
 
-  virtual int execute();
+    virtual int execute();
 
 protected:
 private:

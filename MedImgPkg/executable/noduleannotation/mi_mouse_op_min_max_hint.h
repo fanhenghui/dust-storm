@@ -5,8 +5,7 @@
 #include "arithmetic/mi_point3.h"
 #include <QObject>
 
-class QMinMaxHintObject : public QObject
-{
+class QMinMaxHintObject : public QObject {
     Q_OBJECT
 public:
     QMinMaxHintObject(QObject* parent = 0);
@@ -20,11 +19,10 @@ protected:
 private:
 };
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 
-class MouseOpMinMaxHint : public IMouseOp
-{
+class MouseOpMinMaxHint : public IMouseOp {
 public:
     MouseOpMinMaxHint();
     virtual ~MouseOpMinMaxHint();

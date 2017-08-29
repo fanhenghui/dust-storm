@@ -14,25 +14,25 @@ class OrthoCamera;
 class CameraCalculator;
 class RenderAlgo_Export OrthoCameraInteractor {
 public:
-  OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera);
-  ~OrthoCameraInteractor();
+    OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera);
+    ~OrthoCameraInteractor();
 
-  void reset_camera();
-  void set_initial_status(std::shared_ptr<OrthoCamera> camera);
+    void reset_camera();
+    void set_initial_status(std::shared_ptr<OrthoCamera> camera);
 
-  void resize(int width, int height);
-  void zoom(double scale);
-  void pan(const Vector2 &pan);
-  void rotate(const Matrix4 &mat);
-  void zoom(const Point2 &pre_pt, const Point2 &cur_pt, int width, int height);
-  void pan(const Point2 &pre_pt, const Point2 &cur_pt, int width, int height);
-  void rotate(const Point2 &pre_pt, const Point2 &cur_pt, int width,
-              int height);
+    void resize(int width, int height);
+    void zoom(double scale);
+    void pan(const Vector2& pan);
+    void rotate(const Matrix4& mat);
+    void zoom(const Point2& pre_pt, const Point2& cur_pt, int width, int height);
+    void pan(const Point2& pre_pt, const Point2& cur_pt, int width, int height);
+    void rotate(const Point2& pre_pt, const Point2& cur_pt, int width,
+                int height);
 
 protected:
 private:
-  OrthoCamera _camera_init;
-  std::shared_ptr<OrthoCamera> _camera;
+    OrthoCamera _camera_init;
+    std::shared_ptr<OrthoCamera> _camera;
 };
 
 MED_IMG_END_NAMESPACE

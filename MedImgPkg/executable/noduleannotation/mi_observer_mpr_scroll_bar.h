@@ -5,15 +5,13 @@
 #include <vector>
 #include "util/mi_observer_interface.h"
 
-namespace medical_imaging
-{
-    class MPRScene;
-    class CrosshairModel;
+namespace medical_imaging {
+class MPRScene;
+class CrosshairModel;
 }
 
 class QScrollBar;
-class MPRScrollBarObserver : public medical_imaging::IObserver
-{
+class MPRScrollBarObserver : public medical_imaging::IObserver {
 public:
     MPRScrollBarObserver();
     virtual ~MPRScrollBarObserver();

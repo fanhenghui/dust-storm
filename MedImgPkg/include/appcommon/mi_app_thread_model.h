@@ -8,14 +8,13 @@
 
 #include "boost/thread/mutex.hpp"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class IPCClientProxy;
 class IOperation;
 class GLContext;
 class AppController;
-class AppCommon_Export AppThreadModel
-{
+class AppCommon_Export AppThreadModel {
 public:
     AppThreadModel();
     ~AppThreadModel();
@@ -26,7 +25,7 @@ public:
     void push_operation(const std::shared_ptr<IOperation>& op);
 
     std::shared_ptr<GLContext> get_gl_context();
-    
+
     void start();
     void stop();
 

@@ -3,10 +3,9 @@
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export MouseOpTest : public IMouseOp
-{
+class QtPackage_Export MouseOpTest : public IMouseOp {
 public:
     MouseOpTest();
     virtual ~MouseOpTest();

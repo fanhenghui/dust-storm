@@ -4,10 +4,9 @@
 #include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 class CrosshairModel;
-class QtPackage_Export MouseOpLocate : public IMouseOp
-{
+class QtPackage_Export MouseOpLocate : public IMouseOp {
 public:
     MouseOpLocate();
     virtual ~MouseOpLocate();

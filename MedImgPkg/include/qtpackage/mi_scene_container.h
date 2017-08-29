@@ -9,19 +9,17 @@
 
 #include "boost/thread/mutex.hpp"
 
-namespace medical_imaging
-{
-    class SceneBase;
-    class IMouseOp;
-    class GraphicItemBase;
+namespace medical_imaging {
+class SceneBase;
+class IMouseOp;
+class GraphicItemBase;
 }
 
 typedef std::shared_ptr<medical_imaging::IMouseOp> IMouseOpPtr;
 typedef std::vector<IMouseOpPtr> IMouseOpPtrCollection;
 typedef std::shared_ptr<medical_imaging::GraphicItemBase> GraphicItemPtr;
 
-class Graphics2DScene : public QGraphicsScene
-{
+class Graphics2DScene : public QGraphicsScene {
     Q_OBJECT
 public:
     Graphics2DScene(QObject* parent = 0);
@@ -32,8 +30,7 @@ public:
 //���Զ�λͼԪ�������߼�Ϊ��Qt�ı��ͼԪ -> ����ͼԪ�޸ĵ��߼���ҵ���߼���
 //ע����ǣ�Qtֻ����ײ���϶��߼���������Ƹı�ͼԪ��״�������߼�����Ҫ�Լ���չ
 //ĿǰQt����ײ�����ǰ��������ڵ�������Բ������Բ�ڶ��ǽ�����ԲȦ
-class QtPackage_Export SceneContainer : public QGraphicsView
-{
+class QtPackage_Export SceneContainer : public QGraphicsView {
     Q_OBJECT
 public:
     SceneContainer(QWidget* parent = 0);
@@ -49,33 +46,36 @@ public:
     void add_item(GraphicItemPtr item);
     void clear();
 
-    void register_mouse_operation(IMouseOpPtr mouse_op , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
-    void register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
+    void register_mouse_operation(IMouseOpPtr mouse_op , Qt::MouseButtons buttons ,
+                                  Qt::KeyboardModifier keyboard_modifier);
+    void register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons buttons ,
+                                  Qt::KeyboardModifier keyboard_modifier);
     void register_mouse_wheel_operation(IMouseOpPtr mouse_op);
     void register_mouse_wheel_operation(IMouseOpPtrCollection mouse_ops);
-    IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier);
+    IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons button ,
+            Qt::KeyboardModifier keyboard_modifier);
 
 signals:
     void focus_in_scene();
     void focus_out_scene();
 
 protected:
-    void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent* event);
+    void resizeEvent(QResizeEvent* event);
 
-    virtual void drawBackground(QPainter *painter, const QRectF &rect);
-    virtual void drawForeground(QPainter *painter, const QRectF &rect);
+    virtual void drawBackground(QPainter* painter, const QRectF& rect);
+    virtual void drawForeground(QPainter* painter, const QRectF& rect);
 
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseReleaseEvent( QMouseEvent *event );
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void wheelEvent(QWheelEvent *);
-    virtual void keyPressEvent(QKeyEvent *key);
-    virtual void keyReleaseEvent(QKeyEvent *key);
+    virtual void mousePressEvent(QMouseEvent* event);
+    virtual void mouseReleaseEvent(QMouseEvent* event);
+    virtual void mouseMoveEvent(QMouseEvent* event);
+    virtual void mouseDoubleClickEvent(QMouseEvent* event);
+    virtual void wheelEvent(QWheelEvent*);
+    virtual void keyPressEvent(QKeyEvent* key);
+    virtual void keyReleaseEvent(QKeyEvent* key);
 
-    virtual void focusInEvent(QFocusEvent *event);
-    virtual void focusOutEvent(QFocusEvent *event);
+    virtual void focusInEvent(QFocusEvent* event);
+    virtual void focusOutEvent(QFocusEvent* event);
 
 private slots:
     void slot_mouse_click();

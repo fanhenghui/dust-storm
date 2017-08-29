@@ -1,4 +1,4 @@
-mysql -u root -p$1 -e"
+mysql - u root - p$1 - e"
 drop database if exists med_img_cache_db;;
 create database med_img_cache_db;
 show databases;

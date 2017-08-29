@@ -6,7 +6,7 @@
 
 #include "appcommon/mi_app_common_define.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 #ifndef REVIEW_THROW_EXCEPTION
 #define REVIEW_THROW_EXCEPTION(desc) THROW_EXCEPTION("Review", desc);

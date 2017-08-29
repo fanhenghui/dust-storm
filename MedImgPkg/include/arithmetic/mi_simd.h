@@ -1,5 +1,5 @@
-#ifndef MEDIMGARITHMETIC_ARITHMETIC_COMMON_H
-#define MEDIMGARITHMETIC_ARITHMETIC_COMMON_H
+#ifndef MEDIMGARITHMETIC_MI_SIMD_H
+#define MEDIMGARITHMETIC_MI_SIMD_H
 
 #include "arithmetic/mi_arithmetic_export.h"
 
@@ -77,246 +77,254 @@ typedef __m128i vec_ushort8;
 #define _vmathVfGetElement(vec, slot) ((float *)(&vec))[slot]
 
 static __m128 vec_sel(__m128 a, __m128 b, __m128 mask) {
-  return _mm_or_ps(_mm_and_ps(mask, b), _mm_andnot_ps(mask, a));
+    return _mm_or_ps(_mm_and_ps(mask, b), _mm_andnot_ps(mask, a));
 }
 static __m128 vec_sel(__m128 a, __m128 b, const unsigned int *_mask) {
-  return vec_sel(a, b, _mm_load_ps((float *)_mask));
+    return vec_sel(a, b, _mm_load_ps((float *)_mask));
 }
 static __m128 vec_sel(__m128 a, __m128 b, unsigned int _mask) {
-  return vec_sel(a, b, _mm_set1_ps(*(float *)&_mask));
+    return vec_sel(a, b, _mm_set1_ps(*(float *)&_mask));
 }
 
-static __m128 toM128(unsigned int x) { return _mm_set1_ps(*(float *)&x); }
+static __m128 toM128(unsigned int x) {
+    return _mm_set1_ps(*(float *)&x);
+}
 
-static __m128 fabsf4(__m128 x) { return _mm_and_ps(x, toM128(0x7fffffff)); }
+static __m128 fabsf4(__m128 x) {
+    return _mm_and_ps(x, toM128(0x7fffffff));
+}
 
 static __m128 vec_cts(__m128 x) {
-  __m128i result = _mm_cvtps_epi32(x);
-  return (__m128 &)result;
+    __m128i result = _mm_cvtps_epi32(x);
+    return (__m128 &)result;
 }
 
-static __m128 vec_ctf(__m128 x) { return _mm_cvtepi32_ps((__m128i &)x); }
+static __m128 vec_ctf(__m128 x) {
+    return _mm_cvtepi32_ps((__m128i &)x);
+}
 
 static __m128 vec_round_to_int(__m128 x) {
-  __m128i result = _mm_cvtps_epi32(x);
-  return (__m128 &)result;
+    __m128i result = _mm_cvtps_epi32(x);
+    return (__m128 &)result;
 }
 
 static __m128 vec_truncate_to_int(__m128 x) {
-  __m128i result = _mm_cvttps_epi32(x);
-  return (__m128 &)result;
+    __m128i result = _mm_cvttps_epi32(x);
+    return (__m128 &)result;
 }
 
 static __m128 newtonrapson_rsqrt4(const __m128 v) {
 #define _half4 _mm_setr_ps(.5f, .5f, .5f, .5f)
 #define _three _mm_setr_ps(3.f, 3.f, 3.f, 3.f)
-  const __m128 approx = _mm_rsqrt_ps(v);
-  const __m128 muls = _mm_mul_ps(_mm_mul_ps(v, approx), approx);
-  return _mm_mul_ps(_mm_mul_ps(_half4, approx), _mm_sub_ps(_three, muls));
+    const __m128 approx = _mm_rsqrt_ps(v);
+    const __m128 muls = _mm_mul_ps(_mm_mul_ps(v, approx), approx);
+    return _mm_mul_ps(_mm_mul_ps(_half4, approx), _mm_sub_ps(_three, muls));
 }
 
 static __m128 acosf4(__m128 x) {
-  __m128 xabs = fabsf4(x);
-  __m128 select = _mm_cmplt_ps(x, _mm_setzero_ps());
-  __m128 t1 = sqrtf4(vec_sub(_mm_set1_ps(1.0f), xabs));
+    __m128 xabs = fabsf4(x);
+    __m128 select = _mm_cmplt_ps(x, _mm_setzero_ps());
+    __m128 t1 = sqrtf4(vec_sub(_mm_set1_ps(1.0f), xabs));
 
-  /* Instruction counts can be reduced if the polynomial was
-  * computed entirely from nested (dependent) fma's. However,
-  * to reduce the number of pipeline stalls, the polygon is evaluated
-  * in two halves (hi amd lo).
-  */
-  __m128 xabs2 = _mm_mul_ps(xabs, xabs);
-  __m128 xabs4 = _mm_mul_ps(xabs2, xabs2);
-  __m128 hi = vec_madd(vec_madd(vec_madd(_mm_set1_ps(-0.0012624911f), xabs,
-                                         _mm_set1_ps(0.0066700901f)),
-                                xabs, _mm_set1_ps(-0.0170881256f)),
-                       xabs, _mm_set1_ps(0.0308918810f));
-  __m128 lo = vec_madd(vec_madd(vec_madd(_mm_set1_ps(-0.0501743046f), xabs,
-                                         _mm_set1_ps(0.0889789874f)),
-                                xabs, _mm_set1_ps(-0.2145988016f)),
-                       xabs, _mm_set1_ps(1.5707963050f));
+    /* Instruction counts can be reduced if the polynomial was
+    * computed entirely from nested (dependent) fma's. However,
+    * to reduce the number of pipeline stalls, the polygon is evaluated
+    * in two halves (hi amd lo).
+    */
+    __m128 xabs2 = _mm_mul_ps(xabs, xabs);
+    __m128 xabs4 = _mm_mul_ps(xabs2, xabs2);
+    __m128 hi = vec_madd(vec_madd(vec_madd(_mm_set1_ps(-0.0012624911f), xabs,
+                                           _mm_set1_ps(0.0066700901f)),
+                                  xabs, _mm_set1_ps(-0.0170881256f)),
+                         xabs, _mm_set1_ps(0.0308918810f));
+    __m128 lo = vec_madd(vec_madd(vec_madd(_mm_set1_ps(-0.0501743046f), xabs,
+                                           _mm_set1_ps(0.0889789874f)),
+                                  xabs, _mm_set1_ps(-0.2145988016f)),
+                         xabs, _mm_set1_ps(1.5707963050f));
 
-  __m128 result = vec_madd(hi, xabs4, lo);
+    __m128 result = vec_madd(hi, xabs4, lo);
 
-  // Adjust the result if x is negactive.
-  return vec_sel(
-      vec_mul(t1, result),                                  // Positive
-      vec_nmsub(t1, result, _mm_set1_ps(3.1415926535898f)), // Negative
-      select);
+    // Adjust the result if x is negactive.
+    return vec_sel(
+               vec_mul(t1, result),                                  // Positive
+               vec_nmsub(t1, result, _mm_set1_ps(3.1415926535898f)), // Negative
+               select);
 }
+
+static const float SINCOS_CC0 = -0.0013602249f;
+static const float SINCOS_CC1 = 0.0416566950f;
+static const float SINCOS_CC2 = -0.4999990225f;
+static const float SINCOS_SC0 = -0.0001950727f;
+static const float SINCOS_SC1 = 0.0083320758f;
+static const float SINCOS_SC2 = -0.1666665247f;
+
+static const float SINCOS_KC1 = 1.57079625129f;
+static const float SINCOS_KC2 = 7.54978995489e-8f;
 
 static __m128 sinf4(vec_float4 x) {
 
 //
 // Common constants used to evaluate sinf4/cosf4/tanf4
 //
-#define _SINCOS_CC0 -0.0013602249f
-#define _SINCOS_CC1 0.0416566950f
-#define _SINCOS_CC2 -0.4999990225f
-#define _SINCOS_SC0 -0.0001950727f
-#define _SINCOS_SC1 0.0083320758f
-#define _SINCOS_SC2 -0.1666665247f
+    vec_float4 xl, xl2, xl3, res;
 
-#define _SINCOS_KC1 1.57079625129f
-#define _SINCOS_KC2 7.54978995489e-8f
+    // Range reduction using : xl = angle * TwoOverPi;
+    //
+    xl = vec_mul(x, _mm_set1_ps(0.63661977236f));
 
-  vec_float4 xl, xl2, xl3, res;
+    // Find the quadrant the angle falls in
+    // using:  q = (int) (ceil(abs(xl))*sign(xl))
+    //
+    vec_int4 q = vec_cts(xl);
 
-  // Range reduction using : xl = angle * TwoOverPi;
-  //
-  xl = vec_mul(x, _mm_set1_ps(0.63661977236f));
+    // Compute an offset based on the quadrant that the angle falls in
+    //
+    vec_int4 offset = _mm_and_ps(q, toM128(0x3));
 
-  // Find the quadrant the angle falls in
-  // using:  q = (int) (ceil(abs(xl))*sign(xl))
-  //
-  vec_int4 q = vec_cts(xl);
+    // Remainder in range [-pi/4..pi/4]
+    //
+    vec_float4 qf = vec_ctf(q);
+    xl = vec_nmsub(qf, _mm_set1_ps(SINCOS_KC2),
+                   vec_nmsub(qf, _mm_set1_ps(SINCOS_KC1), x));
 
-  // Compute an offset based on the quadrant that the angle falls in
-  //
-  vec_int4 offset = _mm_and_ps(q, toM128(0x3));
+    // Compute x^2 and x^3
+    //
+    xl2 = vec_mul(xl, xl);
+    xl3 = vec_mul(xl2, xl);
 
-  // Remainder in range [-pi/4..pi/4]
-  //
-  vec_float4 qf = vec_ctf(q);
-  xl = vec_nmsub(qf, _mm_set1_ps(_SINCOS_KC2),
-                 vec_nmsub(qf, _mm_set1_ps(_SINCOS_KC1), x));
+    // Compute both the sin and cos of the angles
+    // using a polynomial expression:
+    //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
+    //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
+    //
+    vec_float4 cx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(SINCOS_CC0), xl2,
+                                      _mm_set1_ps(SINCOS_CC1)),
+                                      xl2, _mm_set1_ps(SINCOS_CC2)),
+                             xl2, _mm_set1_ps(1.0f));
+    vec_float4 sx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(SINCOS_SC0), xl2,
+                                      _mm_set1_ps(SINCOS_SC1)),
+                                      xl2, _mm_set1_ps(SINCOS_SC2)),
+                             xl3, xl);
 
-  // Compute x^2 and x^3
-  //
-  xl2 = vec_mul(xl, xl);
-  xl3 = vec_mul(xl2, xl);
+    // Use the cosine when the offset is odd and the sin
+    // when the offset is even
+    //
+    res = vec_sel(cx, sx,
+                  vec_cmpeq(vec_and(offset, toM128(0x1)), _mm_setzero_ps()));
 
-  // Compute both the sin and cos of the angles
-  // using a polynomial expression:
-  //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
-  //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
-  //
-  vec_float4 cx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(_SINCOS_CC0), xl2,
-                                             _mm_set1_ps(_SINCOS_CC1)),
-                                    xl2, _mm_set1_ps(_SINCOS_CC2)),
-                           xl2, _mm_set1_ps(1.0f));
-  vec_float4 sx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(_SINCOS_SC0), xl2,
-                                             _mm_set1_ps(_SINCOS_SC1)),
-                                    xl2, _mm_set1_ps(_SINCOS_SC2)),
-                           xl3, xl);
-
-  // Use the cosine when the offset is odd and the sin
-  // when the offset is even
-  //
-  res = vec_sel(cx, sx,
-                vec_cmpeq(vec_and(offset, toM128(0x1)), _mm_setzero_ps()));
-
-  // Flip the sign of the result when (offset mod 4) = 1 or 2
-  //
-  return vec_sel(vec_xor(toM128(0x80000000U), res), // Negative
-                 res,                               // Positive
-                 vec_cmpeq(vec_and(offset, toM128(0x2)), _mm_setzero_ps()));
+    // Flip the sign of the result when (offset mod 4) = 1 or 2
+    //
+    return vec_sel(vec_xor(toM128(0x80000000U), res), // Negative
+                   res,                               // Positive
+                   vec_cmpeq(vec_and(offset, toM128(0x2)), _mm_setzero_ps()));
 }
 
 static void sincosf4(vec_float4 x, vec_float4 *s, vec_float4 *c) {
-  vec_float4 xl, xl2, xl3;
-  vec_int4 offsetSin, offsetCos;
+    vec_float4 xl, xl2, xl3;
+    vec_int4 offsetSin, offsetCos;
 
-  // Range reduction using : xl = angle * TwoOverPi;
-  //
-  xl = vec_mul(x, _mm_set1_ps(0.63661977236f));
+    // Range reduction using : xl = angle * TwoOverPi;
+    //
+    xl = vec_mul(x, _mm_set1_ps(0.63661977236f));
 
-  // Find the quadrant the angle falls in
-  // using:  q = (int) (ceil(abs(xl))*sign(xl))
-  //
-  // vec_int4 q =
-  // vec_cts(vec_add(xl,vec_sel(_mm_set1_ps(0.5f),xl,(0x80000000))));
-  vec_int4 q = vec_cts(xl);
+    // Find the quadrant the angle falls in
+    // using:  q = (int) (ceil(abs(xl))*sign(xl))
+    //
+    // vec_int4 q =
+    // vec_cts(vec_add(xl,vec_sel(_mm_set1_ps(0.5f),xl,(0x80000000))));
+    vec_int4 q = vec_cts(xl);
 
-  // Compute the offset based on the quadrant that the angle falls in.
-  // Add 1 to the offset for the cosine.
-  //
-  offsetSin = vec_and(q, toM128((int)0x3));
-  __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i &)offsetSin);
-  offsetCos = (__m128 &)temp;
+    // Compute the offset based on the quadrant that the angle falls in.
+    // Add 1 to the offset for the cosine.
+    //
+    offsetSin = vec_and(q, toM128((int)0x3));
+    __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i &)offsetSin);
+    offsetCos = (__m128 &)temp;
 
-  // Remainder in range [-pi/4..pi/4]
-  //
-  vec_float4 qf = vec_ctf(q);
-  xl = vec_nmsub(qf, _mm_set1_ps(_SINCOS_KC2),
-                 vec_nmsub(qf, _mm_set1_ps(_SINCOS_KC1), x));
+    // Remainder in range [-pi/4..pi/4]
+    //
+    vec_float4 qf = vec_ctf(q);
+    xl = vec_nmsub(qf, _mm_set1_ps(SINCOS_KC2),
+                   vec_nmsub(qf, _mm_set1_ps(SINCOS_KC1), x));
 
-  // Compute x^2 and x^3
-  //
-  xl2 = vec_mul(xl, xl);
-  xl3 = vec_mul(xl2, xl);
+    // Compute x^2 and x^3
+    //
+    xl2 = vec_mul(xl, xl);
+    xl3 = vec_mul(xl2, xl);
 
-  // Compute both the sin and cos of the angles
-  // using a polynomial expression:
-  //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
-  //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
-  //
-  vec_float4 cx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(_SINCOS_CC0), xl2,
-                                             _mm_set1_ps(_SINCOS_CC1)),
-                                    xl2, _mm_set1_ps(_SINCOS_CC2)),
-                           xl2, _mm_set1_ps(1.0f));
-  vec_float4 sx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(_SINCOS_SC0), xl2,
-                                             _mm_set1_ps(_SINCOS_SC1)),
-                                    xl2, _mm_set1_ps(_SINCOS_SC2)),
-                           xl3, xl);
+    // Compute both the sin and cos of the angles
+    // using a polynomial expression:
+    //   cx = 1.0f + xl2 * ((C0 * xl2 + C1) * xl2 + C2), and
+    //   sx = xl + xl3 * ((S0 * xl2 + S1) * xl2 + S2)
+    //
+    vec_float4 cx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(SINCOS_CC0), xl2,
+                                      _mm_set1_ps(SINCOS_CC1)),
+                                      xl2, _mm_set1_ps(SINCOS_CC2)),
+                             xl2, _mm_set1_ps(1.0f));
+    vec_float4 sx = vec_madd(vec_madd(vec_madd(_mm_set1_ps(SINCOS_SC0), xl2,
+                                      _mm_set1_ps(SINCOS_SC1)),
+                                      xl2, _mm_set1_ps(SINCOS_SC2)),
+                             xl3, xl);
 
-  // Use the cosine when the offset is odd and the sin
-  // when the offset is even
-  //
-  vec_uint4 sinMask =
-      (vec_uint4)vec_cmpeq(vec_and(offsetSin, toM128(0x1)), _mm_setzero_ps());
-  vec_uint4 cosMask =
-      (vec_uint4)vec_cmpeq(vec_and(offsetCos, toM128(0x1)), _mm_setzero_ps());
-  *s = vec_sel(cx, sx, sinMask);
-  *c = vec_sel(cx, sx, cosMask);
+    // Use the cosine when the offset is odd and the sin
+    // when the offset is even
+    //
+    vec_uint4 sinMask =
+        (vec_uint4)vec_cmpeq(vec_and(offsetSin, toM128(0x1)), _mm_setzero_ps());
+    vec_uint4 cosMask =
+        (vec_uint4)vec_cmpeq(vec_and(offsetCos, toM128(0x1)), _mm_setzero_ps());
+    *s = vec_sel(cx, sx, sinMask);
+    *c = vec_sel(cx, sx, cosMask);
 
-  // Flip the sign of the result when (offset mod 4) = 1 or 2
-  //
-  sinMask = vec_cmpeq(vec_and(offsetSin, toM128(0x2)), _mm_setzero_ps());
-  cosMask = vec_cmpeq(vec_and(offsetCos, toM128(0x2)), _mm_setzero_ps());
+    // Flip the sign of the result when (offset mod 4) = 1 or 2
+    //
+    sinMask = vec_cmpeq(vec_and(offsetSin, toM128(0x2)), _mm_setzero_ps());
+    cosMask = vec_cmpeq(vec_and(offsetCos, toM128(0x2)), _mm_setzero_ps());
 
-  *s = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*s), *s,
-               sinMask);
-  *c = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*c), *c,
-               cosMask);
+    *s = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*s), *s,
+                 sinMask);
+    *c = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*c), *c,
+                 cosMask);
 }
 
 #define _vmath_shufps(a, b, immx, immy, immz, immw)                            \
   _mm_shuffle_ps(a, b, _MM_SHUFFLE(immw, immz, immy, immx))
 
 static __m128 _vmathVfDot2(__m128 vec0, __m128 vec1) {
-  __m128 result = _mm_mul_ps(vec0, vec1);
-  return _mm_add_ps(vec_splat(result, 0), vec_splat(result, 1));
+    __m128 result = _mm_mul_ps(vec0, vec1);
+    return _mm_add_ps(vec_splat(result, 0), vec_splat(result, 1));
 }
 
 static __m128 _vmathVfDot3(__m128 vec0, __m128 vec1) {
-  __m128 result = _mm_mul_ps(vec0, vec1);
-  return _mm_add_ps(vec_splat(result, 0),
-                    _mm_add_ps(vec_splat(result, 1), vec_splat(result, 2)));
+    __m128 result = _mm_mul_ps(vec0, vec1);
+    return _mm_add_ps(vec_splat(result, 0),
+                      _mm_add_ps(vec_splat(result, 1), vec_splat(result, 2)));
 }
 
 static __m128 _vmathVfDot4(__m128 vec0, __m128 vec1) {
-  __m128 result = _mm_mul_ps(vec0, vec1);
-  return _mm_add_ps(
-      _mm_shuffle_ps(result, result, _MM_SHUFFLE(0, 0, 0, 0)),
-      _mm_add_ps(
-          _mm_shuffle_ps(result, result, _MM_SHUFFLE(1, 1, 1, 1)),
-          _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)),
-                     _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
+    __m128 result = _mm_mul_ps(vec0, vec1);
+    return _mm_add_ps(
+               _mm_shuffle_ps(result, result, _MM_SHUFFLE(0, 0, 0, 0)),
+               _mm_add_ps(
+                   _mm_shuffle_ps(result, result, _MM_SHUFFLE(1, 1, 1, 1)),
+                   _mm_add_ps(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2)),
+                              _mm_shuffle_ps(result, result, _MM_SHUFFLE(3, 3, 3, 3)))));
 }
 
 static __m128 _vmathVfCross(__m128 vec0, __m128 vec1) {
-  __m128 tmp0, tmp1, tmp2, tmp3, result;
-  tmp0 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 0, 2, 1));
-  tmp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 1, 0, 2));
-  tmp2 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 1, 0, 2));
-  tmp3 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 0, 2, 1));
-  result = vec_mul(tmp0, tmp1);
-  result = vec_nmsub(tmp2, tmp3, result);
-  return result;
+    __m128 tmp0, tmp1, tmp2, tmp3, result;
+    tmp0 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 0, 2, 1));
+    tmp1 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 1, 0, 2));
+    tmp2 = _mm_shuffle_ps(vec0, vec0, _MM_SHUFFLE(3, 1, 0, 2));
+    tmp3 = _mm_shuffle_ps(vec1, vec1, _MM_SHUFFLE(3, 0, 2, 1));
+    result = vec_mul(tmp0, tmp1);
+    result = vec_nmsub(tmp2, tmp3, result);
+    return result;
 }
 
-static bool _isAlignedForSSE(const void *p) { return (((size_t)p) & 15) == 0; }
+static bool _isAlignedForSSE(const void *p) {
+    return (((size_t)p) & 15) == 0;
+}
 
 MED_IMG_END_NAMESPACE
 

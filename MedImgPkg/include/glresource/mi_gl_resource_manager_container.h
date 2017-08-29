@@ -4,7 +4,7 @@
 #include "glresource/mi_gl_resource_manager.h"
 #include <list>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class GLProgram;
 class GLBuffer;
@@ -41,116 +41,118 @@ typedef std::shared_ptr<GLTimeQueryManager> GLTimeQueryManagerPtr;
 
 class GLResource_Export GLResourceManagerContainer {
 public:
-  static GLResourceManagerContainer *instance();
+    static GLResourceManagerContainer* instance();
 
-  ~GLResourceManagerContainer();
+    ~GLResourceManagerContainer();
 
-  template <class ResourceType>
-  std::shared_ptr<GLResourceManager<ResourceType>> get_resource_manager() {
-    GLRESOURCE_THROW_EXCEPTION("get resource mananger failed!");
-  }
+    template <class ResourceType>
+    std::shared_ptr<GLResourceManager<ResourceType>> get_resource_manager() {
+        GLRESOURCE_THROW_EXCEPTION("get resource mananger failed!");
+    }
 
-  GLProgramManagerPtr get_program_manager() const;
+    GLProgramManagerPtr get_program_manager() const;
 
-  GLBufferManagerPtr get_buffer_manager() const;
+    GLBufferManagerPtr get_buffer_manager() const;
 
-  GLTexture1DManagerPtr get_texture_1d_manager() const;
+    GLTexture1DManagerPtr get_texture_1d_manager() const;
 
-  GLTexture2DManagerPtr get_texture_2d_manager() const;
+    GLTexture2DManagerPtr get_texture_2d_manager() const;
 
-  GLTexture3DManagerPtr get_texture_3d_manager() const;
+    GLTexture3DManagerPtr get_texture_3d_manager() const;
 
-  GLTexture1DArrayManagerPtr get_texture_1d_array_manager() const;
+    GLTexture1DArrayManagerPtr get_texture_1d_array_manager() const;
 
-  GLVAOManagerPtr get_vao_manager() const;
+    GLVAOManagerPtr get_vao_manager() const;
 
-  GLFBOManagerPtr get_fbo_manager() const;
+    GLFBOManagerPtr get_fbo_manager() const;
 
-  GLContextManagerPtr get_context_manager() const;
+    GLContextManagerPtr get_context_manager() const;
 
-  GLTimeQueryManagerPtr get_time_query_manager() const;
+    GLTimeQueryManagerPtr get_time_query_manager() const;
 
-  void update_all();
-
-private:
-  GLResourceManagerContainer();
+    void update_all();
 
 private:
-  static GLResourceManagerContainer *_s_instance;
-  static boost::mutex _mutex;
+    GLResourceManagerContainer();
 
 private:
-  GLProgramManagerPtr _program_manager;
-  GLBufferManagerPtr _buffer_manager;
-  GLTexture1DManagerPtr _texture_1d_manager;
-  GLTexture2DManagerPtr _texture_2d_manager;
-  GLTexture3DManagerPtr _texture_3d_manager;
-  GLTexture1DArrayManagerPtr _texture_1d_array_manager;
-  GLVAOManagerPtr _vao_manager;
-  GLFBOManagerPtr _fbo_manager;
-  GLContextManagerPtr _context_manager;
-  GLTimeQueryManagerPtr _time_query_manager;
+    static GLResourceManagerContainer* _s_instance;
+    static boost::mutex _mutex;
+
+private:
+    GLProgramManagerPtr _program_manager;
+    GLBufferManagerPtr _buffer_manager;
+    GLTexture1DManagerPtr _texture_1d_manager;
+    GLTexture2DManagerPtr _texture_2d_manager;
+    GLTexture3DManagerPtr _texture_3d_manager;
+    GLTexture1DArrayManagerPtr _texture_1d_array_manager;
+    GLVAOManagerPtr _vao_manager;
+    GLFBOManagerPtr _fbo_manager;
+    GLContextManagerPtr _context_manager;
+    GLTimeQueryManagerPtr _time_query_manager;
 };
 
 class GLObjectShieldBase {
 public:
-  GLObjectShieldBase(){};
-  virtual ~GLObjectShieldBase(){};
+    GLObjectShieldBase() {};
+    virtual ~GLObjectShieldBase() {};
 
-  virtual bool shield(std::shared_ptr<GLObject> obj) = 0;
+    virtual bool shield(std::shared_ptr<GLObject> obj) = 0;
 };
 
 template <class ResourceType> class GLObjectShield : public GLObjectShieldBase {
 public:
-  GLObjectShield(std::shared_ptr<ResourceType> obj) : _obj(obj){};
+    GLObjectShield(std::shared_ptr<ResourceType> obj) : _obj(obj) {};
 
-  virtual ~GLObjectShield() {
-    if (_obj) {
-      GLResourceManagerContainer::instance()
-          ->get_resource_manager<ResourceType>()
-          ->remove_object(_obj->get_uid());
-    }
-  };
+    virtual ~GLObjectShield() {
+        if (_obj) {
+            GLResourceManagerContainer::instance()
+            ->get_resource_manager<ResourceType>()
+            ->remove_object(_obj->get_uid());
+        }
+    };
 
-  virtual bool shield(std::shared_ptr<GLObject> obj) {
-    if (!_obj) {
-      return false;
+    virtual bool shield(std::shared_ptr<GLObject> obj) {
+        if (!_obj) {
+            return false;
+        }
+
+        return obj == _obj;
     }
-    return obj == _obj;
-  }
 
 private:
-  std::shared_ptr<ResourceType> _obj;
+    std::shared_ptr<ResourceType> _obj;
 };
 
 class GLResourceShield {
 public:
-  GLResourceShield(){};
+    GLResourceShield() {};
 
-  ~GLResourceShield() {
-    for (auto it = _shields.begin(); it != _shields.end(); ++it) {
-      delete *it;
+    ~GLResourceShield() {
+        for (auto it = _shields.begin(); it != _shields.end(); ++it) {
+            delete *it;
+        }
+
+        _shields.clear();
     }
-    _shields.clear();
-  }
 
-  template <class ResourceType>
-  void add_shield(std::shared_ptr<ResourceType> obj) {
-    _shields.push_back(new GLObjectShield<ResourceType>(obj));
-  }
-
-  template <class ResourceType>
-  void remove_shield(std::shared_ptr<ResourceType> obj) {
-    for (auto it = _shields.begin(); it != _shields.end(); ++it) {
-      if ((*it)->shield(obj)) {
-        _shields.erase(it);
-        break;
-      }
+    template <class ResourceType>
+    void add_shield(std::shared_ptr<ResourceType> obj) {
+        _shields.push_back(new GLObjectShield<ResourceType>(obj));
     }
-  }
+
+    template <class ResourceType>
+    void remove_shield(std::shared_ptr<ResourceType> obj) {
+        for (auto it = _shields.begin(); it != _shields.end(); ++it) {
+            if ((*it)->shield(obj)) {
+                _shields.erase(it);
+                break;
+            }
+        }
+    }
 
 private:
-  std::list<GLObjectShieldBase *> _shields;
+    std::list<GLObjectShieldBase*> _shields;
 };
 
 MED_IMG_END_NAMESPACE

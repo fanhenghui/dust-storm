@@ -14,14 +14,14 @@ class OpacityTransFunc;
 
 class RenderAlgo_Export TransferFuncLoader {
 public:
-  static IOStatus load_pseudo_color(const std::string &xml,
-                                    std::shared_ptr<ColorTransFunc> &color);
+    static IOStatus load_pseudo_color(const std::string& xml,
+                                      std::shared_ptr<ColorTransFunc>& color);
 
-  static IOStatus load_color_opacity(const std::string &xml,
-                                     std::shared_ptr<ColorTransFunc> &color,
-                                     std::shared_ptr<OpacityTransFunc> &opacity,
-                                     float &ww, float &wl, RGBAUnit &background,
-                                     Material &material);
+    static IOStatus load_color_opacity(const std::string& xml,
+                                       std::shared_ptr<ColorTransFunc>& color,
+                                       std::shared_ptr<OpacityTransFunc>& opacity,
+                                       float& ww, float& wl, RGBAUnit& background,
+                                       Material& material);
 
 protected:
 private:

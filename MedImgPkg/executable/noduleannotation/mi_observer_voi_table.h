@@ -4,16 +4,14 @@
 #include "util/mi_observer_interface.h"
 #include <QObject>
 
-namespace medical_imaging
-{
-    class VOIModel;
+namespace medical_imaging {
+class VOIModel;
 }
 
-class QNoduleObject : public QObject
-{
+class QNoduleObject : public QObject {
     Q_OBJECT
 public:
-    QNoduleObject(QObject* parent =0);
+    QNoduleObject(QObject* parent = 0);
 
     void add_nodule();
     void delete_nodule(int id);
@@ -26,8 +24,7 @@ protected:
 private:
 };
 
-class VOITableObserver : public medical_imaging::IObserver 
-{
+class VOITableObserver : public medical_imaging::IObserver {
 public:
     VOITableObserver();
     virtual ~VOITableObserver();

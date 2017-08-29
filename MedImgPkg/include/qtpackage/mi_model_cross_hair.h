@@ -9,14 +9,13 @@
 #include "arithmetic/mi_line.h"
 #include "renderalgo/mi_camera_calculator.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class MPRScene;
 class SceneBase;
 class CameraCalculator;
 
-class QtPackage_Export CrosshairModel : public medical_imaging::IModel
-{
+class QtPackage_Export CrosshairModel : public medical_imaging::IModel {
 public:
     typedef std::shared_ptr<MPRScene> MPRScenePtr;
 
@@ -24,12 +23,13 @@ public:
 
     virtual ~CrosshairModel();
 
-    void set_mpr_scene(const ScanSliceType (&scan_type)[3] , const MPRScenePtr (&scenes)[3] , const RGBUnit (colors)[3]);
+    void set_mpr_scene(const ScanSliceType(&scan_type)[3] , const MPRScenePtr(&scenes)[3] ,
+                       const RGBUnit(colors)[3]);
 
     void get_cross_line(
-        const MPRScenePtr& target_mpr_scene, 
-        Line2D (&lines)[2],
-        RGBUnit (&color)[2]);
+        const MPRScenePtr& target_mpr_scene,
+        Line2D(&lines)[2],
+        RGBUnit(&color)[2]);
 
     RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 
@@ -42,7 +42,7 @@ public:
 
     bool page(const std::shared_ptr<MPRScene>& target_mpr_scene , int step);
 
-    int get_page(const std::shared_ptr<MPRScene>& target_mpr_scene );
+    int get_page(const std::shared_ptr<MPRScene>& target_mpr_scene);
 
     //locate in one MPR will paging others 2
     bool locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc);

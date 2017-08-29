@@ -7,7 +7,7 @@
 #include <sstream>
 #include <iomanip>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 
 template<class T>

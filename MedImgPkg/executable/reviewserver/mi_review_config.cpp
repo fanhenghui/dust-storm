@@ -2,15 +2,15 @@
 #include <fstream>
 #include <sstream>
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 ReviewConfig* ReviewConfig::_instance = nullptr;
 boost::mutex ReviewConfig::_mutex;
 
-ReviewConfig::ReviewConfig()
-{
+ReviewConfig::ReviewConfig() {
     std::ifstream in("../config/configure.txt");
-    if(!in.is_open()){
+
+    if (!in.is_open()) {
         //TODO ERROR LOG
         return;
     }
@@ -19,10 +19,12 @@ ReviewConfig::ReviewConfig()
     std::string tag;
     std::string equal;
     std::string context;
-    while(std::getline(in , line)){
+
+    while (std::getline(in , line)) {
         std::stringstream ss(line);
         ss >> tag >> equal >> context;
-        if(tag == "TestDataRoot"){
+
+        if (tag == "TestDataRoot") {
             _test_data_root = context;
             break;
         }
@@ -31,16 +33,15 @@ ReviewConfig::ReviewConfig()
     //TODO CHECK path valid
 }
 
-ReviewConfig::~ReviewConfig()
-{
-    
+ReviewConfig::~ReviewConfig() {
+
 }
 
-ReviewConfig* ReviewConfig::instance()
-{
-    if(nullptr == _instance){
+ReviewConfig* ReviewConfig::instance() {
+    if (nullptr == _instance) {
         boost::mutex::scoped_lock locker(_mutex);
-        if(nullptr == _instance){
+
+        if (nullptr == _instance) {
             _instance = new ReviewConfig();
         }
     }
@@ -48,8 +49,7 @@ ReviewConfig* ReviewConfig::instance()
     return _instance;
 }
 
-std::string ReviewConfig::get_test_data_root() const
-{
+std::string ReviewConfig::get_test_data_root() const {
     return _test_data_root;
 }
 

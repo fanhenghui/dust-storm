@@ -3,10 +3,9 @@
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export MouseOpZoom : public IMouseOp
-{
+class QtPackage_Export MouseOpZoom : public IMouseOp {
 public:
     MouseOpZoom();
     virtual ~MouseOpZoom();

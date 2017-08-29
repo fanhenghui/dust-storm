@@ -8,22 +8,22 @@
 
 #include "appcommon/mi_app_controller.h"
 
-MED_IMG_BEGIN_NAMESPACE 
+MED_IMG_BEGIN_NAMESPACE
 
 class VolumeInfos;
 class ReviewController : public AppController {
 public:
-  ReviewController();
-  virtual ~ReviewController();
+    ReviewController();
+    virtual ~ReviewController();
 
-  virtual void initialize();
+    virtual void initialize();
 
-  void set_volume_infos(std::shared_ptr<VolumeInfos> volumeinfos);
-  std::shared_ptr<VolumeInfos> get_volume_infos();
+    void set_volume_infos(std::shared_ptr<VolumeInfos> volumeinfos);
+    std::shared_ptr<VolumeInfos> get_volume_infos();
 
 protected:
 private:
-  std::shared_ptr<VolumeInfos> _volumeinfos;
+    std::shared_ptr<VolumeInfos> _volumeinfos;
 };
 
 MED_IMG_END_NAMESPACE
