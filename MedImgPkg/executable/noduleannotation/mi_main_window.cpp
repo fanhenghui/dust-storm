@@ -6,19 +6,22 @@
 
 #include "util/mi_configuration.h"
 #include "util/mi_string_number_converter.h"
+#include "util/mi_model_progress.h"
 
 #include "arithmetic/mi_rsa_utils.h"
 #include "arithmetic/mi_ortho_camera.h"
+#include "arithmetic/mi_run_length_operator.h"
 
-#include "util/mi_dicom_loader.h"
-#include "util/mi_image_data.h"
-#include "util/mi_image_data_header.h"
-#include "util/mi_meta_object_loader.h"
-#include "util/mi_nodule_set.h"
-#include "util/mi_nodule_set_parser.h"
-#include "util/mi_model_progress.h"
+#include "io/mi_dicom_loader.h"
+#include "io/mi_image_data.h"
+#include "io/mi_image_data_header.h"
+#include "io/mi_meta_object_loader.h"
+#include "io/mi_nodule_set.h"
+#include "io/mi_nodule_set_parser.h"
+#include "io/mi_mask_voi_converter.h"
 
 #include "glresource/mi_gl_utils.h"
+#include "glresource/mi_gl_texture_cache.h"
 
 #include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_mpr_entry_exit_points.h"
@@ -42,6 +45,7 @@
 #include "qtpackage/mi_mouse_op_windowing.h"
 #include "qtpackage/mi_mouse_op_probe.h"
 #include "qtpackage/mi_mouse_op_annotate.h"
+#include "qtpackage/mi_mouse_op_annotate_fine_tuning.h"
 #include "qtpackage/mi_mouse_op_locate.h"
 #include "qtpackage/mi_mouse_op_test.h"
 #include "qtpackage/mi_model_voi.h"
@@ -51,7 +55,7 @@
 #include "qtpackage/mi_observer_progress.h"
 #include "qtpackage/mi_observer_voi_statistic.h"
 #include "qtpackage/mi_observer_voi_segment.h"
-
+#include "qtpackage/mi_graphic_item_voi.h"
 
 #include "mi_observer_voi_table.h"
 #include "mi_observer_mpr_scroll_bar.h"
@@ -72,7 +76,8 @@ using namespace medical_imaging;
 
 //Nodule type
 #define NODULE_TYPE_NUM 6
-static const std::string S_NODULE_TYPES[NODULE_TYPE_NUM] = {
+static const std::string S_NODULE_TYPES[NODULE_TYPE_NUM] = 
+{
     "W",
     "V",
     "P",
@@ -80,21 +85,14 @@ static const std::string S_NODULE_TYPES[NODULE_TYPE_NUM] = {
     "G",
     "N"
 };
-static const std::string S_NODULE_TYPE_DESCRIPTION[NODULE_TYPE_NUM] = {
+static const std::string S_NODULE_TYPE_DESCRIPTION[NODULE_TYPE_NUM] = 
+{
     "Well-Circumscribed",
     "Vascualarized ",
     "Pleural-Tail",
     "Juxta-Pleural",
     "GGO",
     "Non-nodule"
-};
-static const std::string S_NODULE_TYPE_DESCRIPTION_CHINESE[NODULE_TYPE_NUM] = {
-    "�߽������Ľ��",
-    "ճ��Ѫ�ܵĽ��",
-    "�α�����Ľ��",
-    "ճ���αڵĽ��",
-    "ë�����ͽ��",
-    "�ǽ��"
 };
 
 //Preset WL
@@ -116,13 +114,14 @@ const float PRESET_CT_BONE_WL = 300;
 const float PRESET_CT_CHEST_WW = 400;
 const float PRESET_CT_CHEST_WL = 40;
 
-NoduleAnnotation::NoduleAnnotation(QWidget* parent, Qt::WFlags flags)
+NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags),
-      _layout_tag(0),
-      _is_ready(false),
-      _object_nodule(nullptr),
-      _single_manager_nodule_type(nullptr),
-      _select_vio_id(-1) {
+    _layout_tag(0),
+    _is_ready(false),
+    _object_nodule(nullptr),
+    _single_manager_nodule_type(nullptr),
+    _select_voi_id(-1)
+{
     _ui.setupUi(this);
 
     _ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -133,10 +132,10 @@ NoduleAnnotation::NoduleAnnotation(QWidget* parent, Qt::WFlags flags)
     _mpr_10 = new SceneContainer(SharedWidget::instance());
     _vr_11 = new SceneContainer(SharedWidget::instance());
 
-    _mpr_10->setMinimumSize(100, 100);
-    _mpr_01->setMinimumSize(100, 100);
-    _mpr_00->setMinimumSize(100, 100);
-    _vr_11->setMinimumSize(100, 100);
+    _mpr_10->setMinimumSize(100,100);
+    _mpr_01->setMinimumSize(100,100);
+    _mpr_00->setMinimumSize(100,100);
+    _vr_11->setMinimumSize(100,100);
 
     //_mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//����Ӧ����
     //_mpr_01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
@@ -157,67 +156,92 @@ NoduleAnnotation::NoduleAnnotation(QWidget* parent, Qt::WFlags flags)
     _mpr_10_scroll_bar->setOrientation(Qt::Vertical);
 
 
-    _ui.gridLayout_6->addWidget(_mpr_00 , 0 , 0);
-    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 , 1, 1, 1);
-    _ui.gridLayout_6->addWidget(_mpr_01 , 0 , 2);
-    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 , 3, 1, 1);
-    _ui.gridLayout_6->addWidget(_mpr_10 , 1 , 0);
-    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 , 1, 1, 1);
-    _ui.gridLayout_6->addWidget(_vr_11 , 1 , 2);
+    _ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
     _object_nodule = new QNoduleObject(this);
     _object_min_max_hint = new QMinMaxHintObject(this);
 
     //progress model
-    _model_progress.reset(new ProgressModel());
+    _model_progress.reset( new ProgressModel());
 
     configure_i();
 
     connect_signal_slot_i();
 }
 
-NoduleAnnotation::~NoduleAnnotation() {
+NoduleAnnotation::~NoduleAnnotation()
+{
 
 }
 
-void NoduleAnnotation::configure_i() {
+void NoduleAnnotation::configure_i()
+{
+    //default
+    Configuration::instance()->set_processing_unit_type(GPU);
+    Configuration::instance()->set_nodule_file_rsa(true);
+
     //1 TODO Check process unit
     //Open config file
-    std::fstream in("../../../config/configure.txt" , std::ios::in);
-
-    if (!in.is_open()) {
-        in.open("./config/configure.txt" , std::ios::in);//second chance
+    std::fstream input_file("../../../config/configure.txt" , std::ios::in);
+    if (!input_file.is_open())
+    {
+        input_file.open("./config/configure.txt" , std::ios::in);//second chance
     }
 
-    if (!in.is_open()) {
-        Configuration::instance()->set_processing_unit_type(GPU);
-    } else {
+    if (input_file.is_open())
+    {
         std::string line;
         std::string tag;
         std::string equal;
         std::string context;
-
-        while (std::getline(in, line)) {
+        while(std::getline(input_file,line))
+        {
             std::stringstream ss(line);
             ss >> tag >> equal >> context;
-
-            if (tag == std::string("ProcessingUnit")) {
-                if (context == "GPU") {
+            if (tag == std::string("ProcessingUnit"))
+            {
+                if (context == "GPU")
+                {
                     Configuration::instance()->set_processing_unit_type(GPU);
-                } else {
+                }
+                else
+                {
                     Configuration::instance()->set_processing_unit_type(CPU);
                 }
             }
-        }
 
-        in.close();
+            if (tag == "NoduleOutput")
+            {
+                if(context == "TEXT")
+                {
+                    Configuration::instance()->set_nodule_file_rsa(false);
+                }
+                else
+                {
+                    Configuration::instance()->set_nodule_file_rsa(true);
+                }
+            }
+
+            if (tag == "LastOpenDirection")
+            {
+                _last_open_direction = context;
+            }
+        }
+        input_file.close();
     }
 
-    Configuration::instance()->set_nodule_file_rsa(true);
+
     GLUtils::set_check_gl_flag(false);
 }
 
-void NoduleAnnotation::create_scene_i() {
+void NoduleAnnotation::create_scene_i()
+{
     _mpr_scene_00.reset(new MPRScene(_mpr_00->width() , _mpr_00->height()));
     _mpr_scene_01.reset(new MPRScene(_mpr_01->width() , _mpr_01->height()));
     _mpr_scene_10.reset(new MPRScene(_mpr_10->width() , _mpr_10->height()));
@@ -235,14 +259,16 @@ void NoduleAnnotation::create_scene_i() {
     //Set scenes
     _ob_voi_segment->set_scenes(mpr_scenes);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         //1 Set Scene
         mpr_containers[i]->set_scene(mpr_scenes[i]);
 
         //2 Set scene parameter
+        mpr_scenes[i]->set_mask_label_level(LabelLevel::L_64);
         mpr_scenes[i]->set_volume_infos(_volume_infos);
         mpr_scenes[i]->set_sample_rate(1.0);
-        mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW, PRESET_CT_LUNGS_WL);
+        mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
         mpr_scenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
         mpr_scenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         mpr_scenes[i]->set_mask_mode(MASK_NONE);
@@ -257,6 +283,7 @@ void NoduleAnnotation::create_scene_i() {
         graphic_item_voi->set_scene(mpr_scenes[i]);
         graphic_item_voi->set_voi_model(_model_voi);
         mpr_containers[i]->add_item(graphic_item_voi);
+        this->_voi_collections.push_back(graphic_item_voi);
 
         std::shared_ptr<GraphicItemCrosshair> graphic_item_crosshair(new GraphicItemCrosshair());
         graphic_item_crosshair->set_scene(mpr_scenes[i]);
@@ -269,7 +296,7 @@ void NoduleAnnotation::create_scene_i() {
         graphic_item_mpr_border->set_focus_model(_model_focus);
         mpr_containers[i]->add_item(graphic_item_mpr_border);
 
-        //4 Add operation
+        //4 Add operation 
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
         op_mpr_locate->set_crosshair_model(_model_crosshair);
@@ -300,8 +327,7 @@ void NoduleAnnotation::create_scene_i() {
 
         std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
         op_pan->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton | Qt::RightButton ,
-                Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton | Qt::RightButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpMPRPage> op_page(new MouseOpMPRPage());
         op_page->set_scene(mpr_scenes[i]);
@@ -313,10 +339,10 @@ void NoduleAnnotation::create_scene_i() {
     //////////////////////////////////////////////////////////////////////////
     //Placement orthogonal MPR
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
-    ScanSliceType scan_types[3] = {SAGITTAL , CORONAL , TRANSVERSE};
-    const std::string scan_types_string[3] = {"Sagittal_MPR_scene_00" , "Coronal_MPR_scene_01" , "Transverse_MPR_scene_10"};
+    ScanSliceType scan_types[3] = {SAGITTAL ,CORONAL , TRANSVERSE};
+    const std::string scan_types_string[3] = {"Sagittal_MPR_scene_00" ,"Coronal_MPR_scene_01" , "Transverse_MPR_scene_10"};
     MPRScenePtr scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
-    RGBUnit colors[3] = {kColorSagittal, kColorCoronal , kColorTransverse};
+    RGBUnit colors[3] ={kColorSagittal, kColorCoronal , kColorTransverse};
     QScrollBar* scroll_bars[3] = {_mpr_00_scroll_bar , _mpr_01_scroll_bar , _mpr_10_scroll_bar};
 
     //Model set scenes
@@ -326,12 +352,13 @@ void NoduleAnnotation::create_scene_i() {
     _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_01 , _mpr_01_scroll_bar);
     _ob_mpr_scroll_bar->add_scroll_bar(_mpr_scene_10 , _mpr_10_scroll_bar);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i<3 ; ++i)
+    {
         scenes[i]->place_mpr(scan_types[i]);
         scenes[i]->set_name(scan_types_string[i]);
 
         //Init page
-        scroll_bars[i]->setMaximum(camera_cal->get_page_maximum(scan_types[i]) - 1);
+        scroll_bars[i]->setMaximum(camera_cal->get_page_maximum(scan_types[i])-1);
         scroll_bars[i]->setMinimum(0);
         scroll_bars[i]->setPageStep(1);
         scroll_bars[i]->setValue(camera_cal->get_default_page(scan_types[i]));
@@ -349,8 +376,7 @@ void NoduleAnnotation::create_scene_i() {
     connect(_mpr_10 , SIGNAL(focus_in_scene()) , focus_in_singal_mapper , SLOT(map()));
     focus_in_singal_mapper->setMapping(_mpr_10 , QString(_mpr_10->get_name().c_str()));
 
-    connect(focus_in_singal_mapper , SIGNAL(mapped(QString)) , this ,
-            SLOT(slot_focus_in_scene_i(QString)));
+    connect(focus_in_singal_mapper , SIGNAL(mapped(QString)) , this , SLOT(slot_focus_in_scene_i(QString)));
 
     /*QSignalMapper* focus_out_singal_mapper = new QSignalMapper();
 
@@ -366,29 +392,28 @@ void NoduleAnnotation::create_scene_i() {
 
 }
 
-void NoduleAnnotation::connect_signal_slot_i() {
+void NoduleAnnotation::connect_signal_slot_i()
+{
     //Layout
     //connect(ui.action1x1 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout1x1_i()));
     connect(_ui.action2x2 , SIGNAL(triggered()) , this , SLOT(slot_change_layout2x2_i()));
 
     //File
-    connect(_ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this ,
-            SLOT(slot_open_dicom_folder_i()));
+    connect(_ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
     connect(_ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
     connect(_ui.actionOpen_Raw , SIGNAL(triggered()) , this , SLOT(slot_open_raw_i()));
     connect(_ui.actionSave_Nodule , SIGNAL(triggered()) , this , SLOT(slot_save_nodule_file_i()));
     connect(_ui.actionLoad_Nodule , SIGNAL(triggered()) , this , SLOT(slot_open_nodule_file_i()));
-    connect(_ui.actionAnonymization_DICOM , SIGNAL(triggered()) , this ,
-            SLOT(slot_dicom_anonymization_i()));
+    connect(_ui.actionAnonymization_DICOM , SIGNAL(triggered()) , this , SLOT(slot_dicom_anonymization_i()));
     connect(_ui.actionQuit , SIGNAL(triggered()) , this , SLOT(slot_quit_i()));
 
+    connect(_ui.actionSave_Label, SIGNAL(triggered()) , this , SLOT(slot_save_label_file()));
+    connect(_ui.actionLoad_Label, SIGNAL(triggered()) , this , SLOT(slot_load_label_file()));
+
     //MPR scroll bar
-    connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this ,
-            SLOT(slot_sliding_bar_mpr00_i(int)));
-    connect(_mpr_01_scroll_bar , SIGNAL(valueChanged(int)) , this ,
-            SLOT(slot_sliding_bar_mpr01_i(int)));
-    connect(_mpr_10_scroll_bar , SIGNAL(valueChanged(int)) , this ,
-            SLOT(slot_sliding_bar_mpr10_i(int)));
+    connect(_mpr_00_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr00_i(int)));
+    connect(_mpr_01_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr01_i(int)));
+    connect(_mpr_10_scroll_bar , SIGNAL(valueChanged(int)) , this , SLOT(slot_sliding_bar_mpr10_i(int)));
 
     //Common tools
     connect(_ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
@@ -399,28 +424,30 @@ void NoduleAnnotation::connect_signal_slot_i() {
     connect(_ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
     connect(_ui.pushButtonFitWindow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fit_window_i()));
 
+    connect(_ui.pushButtonFineTune , SIGNAL(pressed()) , this , SLOT(slot_press_btn_fine_tune_i()));
+    connect(_ui.spinBoxTuneRadius , SIGNAL(valueChanged(int)) , this , SLOT(slot_spn_box_tune_radius(int)));
+
     //VOI list
-    connect(_ui.tableWidgetNoduleList , SIGNAL(cellPressed(int, int)) , this ,
-            SLOT(slot_voi_table_widget_cell_select_i(int , int)));
-    connect(_ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem*)) , this ,
-            SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem*)));
+    connect(_ui.tableWidgetNoduleList , SIGNAL(cellPressed(int,int)) , this , SLOT(slot_voi_table_widget_cell_select_i(int ,int)));
+    connect(_ui.tableWidgetNoduleList , SIGNAL(itemChanged(QTableWidgetItem *)) , this , SLOT(slot_voi_table_widget_item_changed_i(QTableWidgetItem *)));
     connect(_object_nodule , SIGNAL(nodule_added()) , this , SLOT(slot_add_nodule_i()));
     connect(_ui.pushButtonDeleteNodule , SIGNAL(pressed()) , this , SLOT(slot_delete_nodule_i()));
 
     //Preset WL
-    connect(_ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this ,
-            SLOT(slot_preset_wl_changed_i(QString)));
+    connect(_ui.comboBoxPresetWL , SIGNAL(currentIndexChanged(QString)) , this , SLOT(slot_preset_wl_changed_i(QString)));
 
     //Scene Min Max hint
-    connect(_object_min_max_hint , SIGNAL(triggered(const std::string&)) , this ,
-            SLOT(slot_scene_min_max_hint_i(const std::string&)));
+    connect(_object_min_max_hint , SIGNAL(triggered(const std::string&)) , this , SLOT(slot_scene_min_max_hint_i(const std::string&)));
 
     //Crosshair visibility
-    connect(_ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this ,
-            SLOT(slot_crosshair_visibility_i(int)));
+    connect(_ui.checkBoxCrossHair , SIGNAL(stateChanged(int)) , this , SLOT(slot_crosshair_visibility_i(int)));
+
+    //Nodule overlay visibility
+    connect(_ui.checkBoxNoduleOverlay , SIGNAL(stateChanged(int)) , this , SLOT(slot_nodule_overlay_visibility_i(int)));
 }
 
-void NoduleAnnotation::create_model_observer_i() {
+void NoduleAnnotation::create_model_observer_i()
+{
     //VOI
     _model_voi.reset(new VOIModel());
 
@@ -455,11 +482,11 @@ void NoduleAnnotation::create_model_observer_i() {
     _model_crosshair->add_observer(_ob_mpr_scroll_bar);
     _model_crosshair->add_observer(_ob_scene_container);
 
-    if (!_single_manager_nodule_type) {
+    if (!_single_manager_nodule_type)
+    {
         delete _single_manager_nodule_type;
         _single_manager_nodule_type = new QSignalMapper(this);
-        connect(_single_manager_nodule_type , SIGNAL(mapped(int)) , this ,
-                SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
+        connect(_single_manager_nodule_type , SIGNAL(mapped(int)) , this , SLOT(slot_voi_table_widget_nodule_type_changed_i(int)));
     }
 
     //Focus model
@@ -467,8 +494,10 @@ void NoduleAnnotation::create_model_observer_i() {
     _model_focus->set_focus_scene_container(_mpr_00);//Default focus MPR00
 }
 
-void NoduleAnnotation::slot_change_layout2x2_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_change_layout2x2_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
@@ -484,23 +513,23 @@ void NoduleAnnotation::slot_change_layout2x2_i() {
     _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
     _ui.gridLayout_6->removeWidget(_mpr_01);
     _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-    _ui.gridLayout_6->removeWidget(_mpr_10);
+    _ui.gridLayout_6->removeWidget(_mpr_10 );
     _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
     _ui.gridLayout_6->removeWidget(_vr_11);
 
-    _ui.gridLayout_6->addWidget(_mpr_00 , 0 , 0);
-    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 , 1, 1, 1);
-    _ui.gridLayout_6->addWidget(_mpr_01 , 0 , 2);
-    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 , 3, 1, 1);
-    _ui.gridLayout_6->addWidget(_mpr_10 , 1 , 0);
-    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 , 1, 1, 1);
-    _ui.gridLayout_6->addWidget(_vr_11 , 1 , 2);
+    _ui.gridLayout_6->addWidget(_mpr_00 , 0 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_00_scroll_bar , 0 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_01 , 0 ,2);
+    _ui.gridLayout_6->addWidget(_mpr_01_scroll_bar , 0 ,3,1,1);
+    _ui.gridLayout_6->addWidget(_mpr_10 , 1 ,0);
+    _ui.gridLayout_6->addWidget(_mpr_10_scroll_bar , 1 ,1,1,1);
+    _ui.gridLayout_6->addWidget(_vr_11 , 1 ,2);
 
     //Set min size to fix size bug
     _mpr_00->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _mpr_01->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
     _mpr_10->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
-    _vr_11->setMinimumSize(_pre_2x2_width , _pre_2x2_height);
+    _vr_11->setMinimumSize(_pre_2x2_width ,_pre_2x2_height);
 
 
     _mpr_00->show();
@@ -512,24 +541,28 @@ void NoduleAnnotation::slot_change_layout2x2_i() {
     _vr_11->show();
 
     //Recover min size to expanding
-    _mpr_10->setMinimumSize(100, 100);
-    _mpr_01->setMinimumSize(100, 100);
-    _mpr_00->setMinimumSize(100, 100);
-    _vr_11->setMinimumSize(100, 100);
+    _mpr_10->setMinimumSize(100,100);
+    _mpr_01->setMinimumSize(100,100);
+    _mpr_00->setMinimumSize(100,100);
+    _vr_11->setMinimumSize(100,100);
 
     _layout_tag = 0;
 }
 
-void NoduleAnnotation::slot_open_dicom_folder_i() {
+void NoduleAnnotation::slot_open_dicom_folder_i()
+{
     QStringList file_name_list = QFileDialog::getOpenFileNames(
-                                     this , tr("Loading DICOM Dialog"), "", tr("Dicom image(*dcm);;Other(*)"));
+        this ,tr("Loading DICOM Dialog"),_last_open_direction.c_str(),tr("Dicom image(*dcm);;Other(*)"));
 
-    if (!file_name_list.empty()) {
+    if (!file_name_list.empty())
+    {
+        update_last_open_direction_i(std::string(file_name_list[0].toLocal8Bit()));
+
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
         //Init progress dialog
         std::shared_ptr<ProgressObserver> progress_ob(new ProgressObserver());
-        QProgressDialog progress_dialog(tr("Loading DICOM series ......") , 0 , 0 , 100);
+        QProgressDialog progress_dialog(tr("Loading DICOM series ......") ,0 , 0 , 100 );
 
         _model_progress->clear_observer();
         _model_progress->add_observer(progress_ob);
@@ -544,8 +577,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i() {
 
         std::vector<std::string> file_names_std(file_name_list.size());
         int idx = 0;
-
-        for (auto it = file_name_list.begin() ; it != file_name_list.end() ; ++it) {
+        for (auto it = file_name_list.begin() ; it != file_name_list.end() ; ++it)
+        {
             std::string s((*it).toLocal8Bit());
             file_names_std[idx++] = s;
         }
@@ -555,8 +588,8 @@ void NoduleAnnotation::slot_open_dicom_folder_i() {
         DICOMLoader loader;
         loader.set_progress_model(_model_progress);
         IOStatus status = loader.load_series(file_names_std, img_data , data_header);
-
-        if (status != IO_SUCCESS) {
+        if (status != IO_SUCCESS)
+        {
             QApplication::restoreOverrideCursor();
             QMessageBox::warning(this , tr("Load DICOM folder") , tr("load DICOM folder failed!"));
             _model_progress->clear_observer();
@@ -571,19 +604,71 @@ void NoduleAnnotation::slot_open_dicom_folder_i() {
         load_data_i(img_data , data_header);
 
         QApplication::restoreOverrideCursor();
-    } else {
+    }
+    else
+    {
         return;
     }
 }
 
-void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,
-                                   std::shared_ptr<ImageDataHeader> data_header) {
-    //////////////////////////////////////////////////////////////////////////
-    //Initialize
-    if (_volume_infos) { //Delete last one
-        _volume_infos->finialize();
+void NoduleAnnotation::release_i()
+{
+    _volume_infos.reset();
+    //release scene
+    /* if (_mpr_00)
+    {
+    delete _mpr_00;
+    _mpr_00 = nullptr;
     }
 
+    if (_mpr_01)
+    {
+    delete _mpr_01;
+    _mpr_01 = nullptr;
+    }
+
+    if (_mpr_10)
+    {
+    delete _mpr_10;
+    _mpr_10 = nullptr;
+    }*/
+
+    _mpr_scene_00.reset();
+    _mpr_scene_01.reset();
+    _mpr_scene_10.reset();
+
+    if (_vr_11)
+    {
+        delete _vr_11;
+        _vr_11 = nullptr;
+    }
+
+    _model_voi.reset();
+    _model_crosshair.reset();
+    _model_progress.reset();
+    _model_focus.reset();
+
+    _ob_voi_table.reset();
+    _ob_voi_statistic.reset();
+    _ob_voi_segment.reset();
+    _ob_scene_container.reset();
+    _ob_mpr_scroll_bar.reset();
+
+    _voi_collections.clear();
+    _dicom_series_files.clear();
+
+    //GLTextureCache::instance()->process_cache();
+    //GLResourceManagerContainer::instance()->update_all();
+}
+
+void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,std::shared_ptr<ImageDataHeader> data_header)
+{
+    //////////////////////////////////////////////////////////////////////////
+    //Initialize
+    if (_volume_infos)//Delete last one
+    {
+        _volume_infos->finialize();
+    }
     _volume_infos.reset(new VolumeInfos());
     _volume_infos->set_data_header(data_header);
     //SharedWidget::instance()->makeCurrent();
@@ -615,14 +700,16 @@ void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,
 
     //reset nodule list
     refresh_nodule_list_i();
-    _select_vio_id = -1;
+    _select_voi_id = -1;
 
     _is_ready = true;
 }
 
-void NoduleAnnotation::slot_dicom_anonymization_i() {
-    if (!_dicom_series_files.empty()) {
-        DICOMAnonymizationDlg* dlg = new DICOMAnonymizationDlg();
+void NoduleAnnotation::slot_dicom_anonymization_i()
+{
+    if (!_dicom_series_files.empty())
+    {
+        DICOMAnonymizationDlg *dlg = new DICOMAnonymizationDlg();
         dlg->setWindowModality(Qt::WindowModal);
         dlg->set_dicom_series_files(_dicom_series_files);
         dlg->set_progress_model(_model_progress);
@@ -630,14 +717,18 @@ void NoduleAnnotation::slot_dicom_anonymization_i() {
     }
 }
 
-void NoduleAnnotation::slot_open_meta_image_i() {
+void NoduleAnnotation::slot_open_meta_image_i()
+{
 
     QString file_name = QFileDialog::getOpenFileName(
-                            this , tr("Loading meta data"), "", tr("Dicom image(*mhd)"));
+        this ,tr("Loading meta data"),_last_open_direction.c_str(),tr("Dicom image(*mhd)"));
 
-    if (file_name.isEmpty()) {
+    if (file_name.isEmpty())
+    {
         return;
     }
+
+    update_last_open_direction_i(std::string(file_name.toLocal8Bit()));
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -646,10 +737,9 @@ void NoduleAnnotation::slot_open_meta_image_i() {
     std::shared_ptr<ImageData> img_data;
     std::shared_ptr<ImageDataHeader> data_header;
 
-    IOStatus status = loader.load(std::string(file_name.toLocal8Bit()) , img_data , meta_tag,
-                                  data_header);
-
-    if (status != IO_SUCCESS) {
+    IOStatus status = loader.load(std::string(file_name.toLocal8Bit()) , img_data , meta_tag,data_header);
+    if (status != IO_SUCCESS)
+    {
         QApplication::restoreOverrideCursor();
         QMessageBox::warning(this , tr("Load meta data") , tr("load meta data failed!"));
         return;
@@ -663,24 +753,25 @@ void NoduleAnnotation::slot_open_meta_image_i() {
     QApplication::restoreOverrideCursor();
 }
 
-void NoduleAnnotation::slot_open_raw_i() {
-    RawDataImportDlg* dlg = new RawDataImportDlg();
+void NoduleAnnotation::slot_open_raw_i()
+{
+    RawDataImportDlg *dlg = new RawDataImportDlg();
     dlg->setWindowModality(Qt::WindowModal);
 
     connect(
-        dlg , SIGNAL(raw_data_imported(std::shared_ptr<medical_imaging::ImageData> ,
-                                       std::shared_ptr<medical_imaging::ImageDataHeader>)) ,
-        this , SLOT(load_data_i(std::shared_ptr<medical_imaging::ImageData> ,
-                                std::shared_ptr<medical_imaging::ImageDataHeader>)));
+        dlg , SIGNAL(raw_data_imported(std::shared_ptr<medical_imaging::ImageData> ,std::shared_ptr<medical_imaging::ImageDataHeader> )) , 
+        this , SLOT(load_data_i(std::shared_ptr<medical_imaging::ImageData> ,std::shared_ptr<medical_imaging::ImageDataHeader> )) );
 
     dlg->show();
 }
 
-void NoduleAnnotation::slot_press_btn_annotate_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_annotate_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
-
+    this->_current_operation = "Annotate";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -691,11 +782,12 @@ void NoduleAnnotation::slot_press_btn_annotate_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpAnnotate> op_annotate(new MouseOpAnnotate());
         op_annotate->set_scene(mpr_scenes[i]);
         op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools
-
+        
         std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
         op_min_max_hint->set_scene(mpr_scenes[i]);
         op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
@@ -703,16 +795,96 @@ void NoduleAnnotation::slot_press_btn_annotate_i() {
         IMouseOpPtrCollection left_btn_ops(2);
         left_btn_ops[0] = op_annotate;
         left_btn_ops[1] = op_min_max_hint;
-
+        
         mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+
+        this->_voi_collections[i]->enable_interaction();
+        this->_voi_collections[i]->set_item_to_be_tuned(-1);
+        
+        mpr_containers[i]->setMouseTracking(false);
     }
+
+    this->_model_voi->set_voi_to_tune(-1);
 }
 
-void NoduleAnnotation::slot_press_btn_arrow_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_fine_tune_i()
+{
+    if (!_is_ready || this->_model_voi->get_vois().size() < 1)
+    {
+        return;
+    }
+    this->_current_operation = "Finetune";
+    std::vector<MPRScenePtr> mpr_slices;
+    mpr_slices.push_back(this->_mpr_scene_00);
+    mpr_slices.push_back(this->_mpr_scene_01);
+    mpr_slices.push_back(this->_mpr_scene_10);
+
+    std::vector<SceneContainer*> render_windows;
+    render_windows.push_back(_mpr_00);
+    render_windows.push_back(_mpr_01);
+    render_windows.push_back(_mpr_10);
+
+    // can select the table entry but fail to highlight
+    int voi_to_be_tuned = this->_select_voi_id == -1 ? this->_ui.tableWidgetNoduleList->rowCount()-1 : this->_select_voi_id;
+    this->_ui.tableWidgetNoduleList->selectRow(voi_to_be_tuned);
+    
+    for (int i = 0 ; i < 3 ; ++i)
+    {
+        // take over left-button operation
+        std::shared_ptr<MouseOpAnnotateFineTuning> op_annotate_fine_tuning(new MouseOpAnnotateFineTuning());
+        op_annotate_fine_tuning->set_scene(mpr_slices[i]);
+        op_annotate_fine_tuning->set_voi_model(this->_model_voi);//Set Model to annotate tools
+        
+        IMouseOpPtrCollection left_btn_ops(1);
+        left_btn_ops[0] = op_annotate_fine_tuning;
+
+        render_windows[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        render_windows[i]->register_mouse_operation(left_btn_ops , Qt::NoButton , Qt::NoModifier);
+
+        // freeze all the vois
+        this->_voi_collections[i]->disable_interaction();
+
+        // highlight the circle
+        this->_voi_collections[i]->set_item_to_be_tuned(voi_to_be_tuned);
+
+        // make sure the circle updated
+        // render_windows[i]->update_scene(); // not working :(
+        
+        render_windows[i]->set_mouse_hovering(true);
+    }
+
+    this->_model_voi->set_voi_to_tune(voi_to_be_tuned);
+}
+
+void NoduleAnnotation::slot_spn_box_tune_radius(int new_value)
+{
+    if (!_is_ready || !_model_voi)
+    {
         return;
     }
 
+    this->_model_voi->set_tune_radius(new_value);
+}
+
+void NoduleAnnotation::shift_tune_object()
+{
+    int voi_to_be_tuned = this->_select_voi_id == -1 ? this->_ui.tableWidgetNoduleList->rowCount()-1 : this->_select_voi_id;
+    this->_ui.tableWidgetNoduleList->selectRow(voi_to_be_tuned);
+
+    for (int view_idx=0; view_idx<3; ++view_idx)
+    {
+        this->_voi_collections[view_idx]->set_item_to_be_tuned(voi_to_be_tuned);
+    }
+    this->_model_voi->set_voi_to_tune(voi_to_be_tuned);
+}
+
+void NoduleAnnotation::slot_press_btn_arrow_i()
+{
+    if (!_is_ready)
+    {
+        return;
+    }
+    this->_current_operation = "Arrow";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -723,7 +895,8 @@ void NoduleAnnotation::slot_press_btn_arrow_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
         op_mpr_locate->set_crosshair_model(_model_crosshair);
@@ -737,14 +910,17 @@ void NoduleAnnotation::slot_press_btn_arrow_i() {
         left_btn_ops[1] = op_min_max_hint;
 
         mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_rotate_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_rotate_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
-
+    this->_current_operation = "Rotate";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -755,7 +931,8 @@ void NoduleAnnotation::slot_press_btn_rotate_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpRotate> op_rotate(new MouseOpRotate());
         op_rotate->set_scene(mpr_scenes[i]);
 
@@ -767,12 +944,14 @@ void NoduleAnnotation::slot_press_btn_rotate_i() {
         left_btn_ops[0] = op_rotate;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_zoom_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_zoom_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
@@ -786,7 +965,8 @@ void NoduleAnnotation::slot_press_btn_zoom_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
         op_zoom->set_scene(mpr_scenes[i]);
 
@@ -798,12 +978,14 @@ void NoduleAnnotation::slot_press_btn_zoom_i() {
         left_btn_ops[0] = op_zoom;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_pan_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_pan_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
@@ -817,7 +999,8 @@ void NoduleAnnotation::slot_press_btn_pan_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
         op_pan->set_scene(mpr_scenes[i]);
 
@@ -829,12 +1012,14 @@ void NoduleAnnotation::slot_press_btn_pan_i() {
         left_btn_ops[0] = op_pan;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_windowing_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_press_btn_windowing_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
@@ -848,7 +1033,8 @@ void NoduleAnnotation::slot_press_btn_windowing_i() {
     mpr_containers.push_back(_mpr_01);
     mpr_containers.push_back(_mpr_10);
 
-    for (int i = 0 ; i < 3 ; ++i) {
+    for (int i = 0 ; i < 3 ; ++i)
+    {
         std::shared_ptr<MouseOpWindowing> op_windowing(new MouseOpWindowing());
         op_windowing->set_scene(mpr_scenes[i]);
 
@@ -860,25 +1046,32 @@ void NoduleAnnotation::slot_press_btn_windowing_i() {
         left_btn_ops[0] = op_windowing;
         left_btn_ops[1] = op_min_max_hint;
 
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_fit_window_i() {
+void NoduleAnnotation::slot_press_btn_fit_window_i()
+{
     //TODO
-    if (!_is_ready) {
+    if (!_is_ready)
+    {
         return;
     }
 
-    if (_model_focus->get_focus_scene_container() == _mpr_00) {
+    if (_model_focus->get_focus_scene_container() == _mpr_00)
+    {
         _mpr_scene_00->place_mpr(SAGITTAL);
         _model_crosshair->set_changed();
         _model_voi->set_changed();
-    } else if (_model_focus->get_focus_scene_container() == _mpr_01) {
+    }
+    else if (_model_focus->get_focus_scene_container() == _mpr_01)
+    {
         _mpr_scene_01->place_mpr(CORONAL);
         _model_crosshair->set_changed();
         _model_voi->set_changed();
-    } else if (_model_focus->get_focus_scene_container() == _mpr_10) {
+    }
+    else if (_model_focus->get_focus_scene_container() == _mpr_10)
+    {
         _mpr_scene_10->place_mpr(TRANSVERSE);
         _model_crosshair->set_changed();
         _model_voi->set_changed();
@@ -888,23 +1081,28 @@ void NoduleAnnotation::slot_press_btn_fit_window_i() {
     _model_voi->notify();
 }
 
-void NoduleAnnotation::slot_save_nodule_file_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_save_nodule_file_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
-    if (_model_voi->get_vois().empty()) {
-        if (QMessageBox::No == QMessageBox::warning(
-                    this , tr("Save Nodule") , tr("Nodule count is zero. If you still want to save to file?"),
-                    QMessageBox::Yes | QMessageBox::No)) {
+    if (_model_voi->get_vois().empty())
+    {
+        if(QMessageBox::No == QMessageBox::warning(
+            this , tr("Save Nodule") , tr("Nodule count is zero. If you still want to save to file?"),QMessageBox::Yes |QMessageBox::No))
+        {
             return;
         }
     }
 
-    QString file_name = QFileDialog::getSaveFileName(this, tr("Save Nodule") ,
-                        QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
+    QString file_name = Configuration::instance()->get_nodule_file_rsa() ?
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw)")) :
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
 
-    if (!file_name.isEmpty()) {
+    if (!file_name.isEmpty())
+    {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
         const std::vector<VOISphere>& vois = _model_voi->get_vois();
         nodule_set->set_nodule(vois);
@@ -914,186 +1112,236 @@ void NoduleAnnotation::slot_save_nodule_file_i() {
         std::string file_name_std(file_name.toLocal8Bit());
 
         IOStatus status;
-
-        if (Configuration::instance()->get_nodule_file_rsa()) {
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
+        {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
-
-            if (rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0) {
+            if(rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0)
+            {
                 status = IO_ENCRYPT_FAILED;
-            } else {
+            }
+            else
+            {
                 status = parser.save_as_rsa_binary(file_name_std , rsa , nodule_set);
             }
-        } else {
+        }
+        else
+        {
             status = parser.save_as_csv(file_name_std , nodule_set);
         }
 
 
-        if (status == IO_SUCCESS) {
-            QMessageBox::information(this , tr("Save Nodule") , tr("Save nodule file success."),
-                                     QMessageBox::Ok);
-        } else {
-            QMessageBox::warning(this , tr("Save Nodule") , tr("Save nodule file failed."), QMessageBox::Ok);
+        if (status == IO_SUCCESS)
+        {
+            QMessageBox::information(this , tr("Save Nodule") , tr("Save nodule file success."),QMessageBox::Ok);
         }
-
+        else
+        {
+            QMessageBox::warning(this , tr("Save Nodule") , tr("Save nodule file failed."),QMessageBox::Ok);
+        }
         //TODO check status
     }
 }
 
-void NoduleAnnotation::slot_open_nodule_file_i() {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_open_nodule_file_i()
+{
+    if (!_is_ready)
+    {
         return;
     }
 
-    if (!_model_voi->get_vois().empty()) {
+    if (!_model_voi->get_vois().empty())
+    {
         if (QMessageBox::No == QMessageBox::warning(
-                    this , tr("Load Nodule") ,
-                    tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
-                    QMessageBox::Yes | QMessageBox::No)) {
+            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new nodule file"),
+            QMessageBox::Yes | QMessageBox::No))
+        {
             return;
         }
     }
 
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") ,
-                        QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv)"));
-
-    if (!file_name.isEmpty()) {
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv);;NoduleSet(*.nraw)"));
+    if (!file_name.isEmpty())
+    {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
         NoduleSetParser parser;
         parser.set_series_id(_volume_infos->get_data_header()->series_uid);
         std::string file_name_std(file_name.toLocal8Bit());
 
-        IOStatus status ;
-
-        if (Configuration::instance()->get_nodule_file_rsa()) {
+        IOStatus status;
+        const bool is_csv = file_name_std.substr(file_name_std.size() - 3 , 3) == std::string("csv");
+        if (!is_csv)
+        {
             RSAUtils rsa_utils;
             mbedtls_rsa_context rsa;
-
-            if (rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0) {
+            if(rsa_utils.to_rsa_context(S_N , S_E , S_D , S_P , S_Q , S_DP , S_DQ , S_QP , rsa) != 0)
+            {
                 status = IO_ENCRYPT_FAILED;
-            } else {
+            }
+            else
+            {
                 status = parser.load_as_rsa_binary(file_name_std , rsa , nodule_set);
             }
-        } else {
+        }
+        else
+        {
             status = parser.load_as_csv(file_name_std , nodule_set);
         }
 
-        if (status == IO_SUCCESS) {
+        if (status == IO_SUCCESS)
+        {
             _model_voi->remove_all();
             _model_voi->notify(VOIModel::DELETE_VOI);
 
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             int idx = 0;
-
-            for (auto it = vois.begin() ; it != vois.end() ; ++it) {
+            for (auto it = vois.begin() ; it != vois.end() ; ++it)
+            {
                 _model_voi->add_voi(*it , MaskLabelStore::instance()->acquire_label());
                 _model_voi->notify(VOIModel::ADD_VOI);
             }
 
-            QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),
-                                     QMessageBox::Ok);
-        } else {
-            QMessageBox::warning(this , tr("Load Nodule") , tr("Load nodule file failed."), QMessageBox::Ok);
+            QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);
         }
-
+        else
+        {
+            QMessageBox::warning(this , tr("Load Nodule") , tr("Load nodule file failed."),QMessageBox::Ok);
+        }
         //TODO check status
     }
 
 
 }
 
-void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value) {
-    if (_model_crosshair->page_to(_mpr_scene_00 , value)) {
+void NoduleAnnotation::slot_sliding_bar_mpr00_i(int value)
+{
+    if(_model_crosshair->page_to(_mpr_scene_00 , value))
+    {
         _model_crosshair->notify();
     }
 }
 
-void NoduleAnnotation::slot_sliding_bar_mpr01_i(int value) {
-    if (_model_crosshair->page_to(_mpr_scene_01 , value)) {
+void NoduleAnnotation::slot_sliding_bar_mpr01_i(int value)
+{
+    if(_model_crosshair->page_to(_mpr_scene_01 , value))
+    {
         _model_crosshair->notify();
     }
 }
 
-void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value) {
-    if (_model_crosshair->page_to(_mpr_scene_10 , value)) {
+void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
+{
+    if(_model_crosshair->page_to(_mpr_scene_10 , value))
+    {
         _model_crosshair->notify();
     }
 }
 
-void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column) {
-    //std::cout << "CellSelect "<< row << " " << column<< std::endl;
+void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
+{
+    //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
     VOISphere voi = _model_voi->get_voi(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
-    _model_crosshair->locate(mat_p2w.transform(voi.center));
+    _model_crosshair->locate(mat_p2w.transform(voi.center),  false);
     _model_crosshair->notify();
-    _select_vio_id = row;
+    _select_voi_id = row;
+    
+    if (this->_current_operation.compare("Finetune") == 0)
+    {
+        this->shift_tune_object();
+    }
 }
 
-void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem* item) {
+void NoduleAnnotation::slot_voi_table_widget_item_changed_i(QTableWidgetItem *item)
+{
     const int row = item->row();
     const int column = item->column();
-
-    if (1 == column) {
-        std::string sDiameter = (item->text()).toLocal8Bit();
+    if (1 == column)
+    {
+        std::string sDiameter =  (item->text()).toLocal8Bit();
         StrNumConverter<double> con;
         _model_voi->modify_diameter(row , con.to_num(sDiameter));
         _ob_scene_container->update();
     }
 }
 
-void NoduleAnnotation::slot_add_nodule_i() {
+void NoduleAnnotation::slot_add_nodule_i()
+{
     refresh_nodule_list_i();
 }
 
-void NoduleAnnotation::slot_delete_nodule_i() {
-    if (_select_vio_id >= 0 && _select_vio_id < _model_voi->get_vois().size()) {
-        _model_voi->remove_voi(_select_vio_id);
+void NoduleAnnotation::slot_delete_nodule_i()
+{
+    if (_select_voi_id >= 0 && _select_voi_id < _model_voi->get_vois().size())
+    {
+        _model_voi->remove_voi(_select_voi_id);
         _model_voi->notify(VOIModel::DELETE_VOI);
-        _select_vio_id = -1;
+        _select_voi_id = -1;
         _ob_scene_container->update();
+    }
+
+    if (this->_current_operation.compare("Finetune") == 0)
+    {
+        this->shift_tune_object();
     }
 }
 
-void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id) {
+void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
+{
     QWidget* widget = _ui.tableWidgetNoduleList->cellWidget(id , 2);
 
-    QComboBox* pBox = dynamic_cast<QComboBox*>(widget);
-
-    if (pBox) {
+    QComboBox* pBox= dynamic_cast<QComboBox*>(widget);
+    if (pBox)
+    {
         std::string type = pBox->currentText().toStdString();
-        std::cout << id << '\t' << type << std::endl;
+        std::cout << id <<'\t' << type << std::endl;
 
         _model_voi->modify_name(id , type);
     }
 }
 
-void NoduleAnnotation::slot_preset_wl_changed_i(QString s) {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
+{
+    if (!_is_ready)
+    {
         return;
     }
 
     std::string wl_preset = std::string(s.toLocal8Bit());
     float ww(1) , wl(0);
-
-    if (wl_preset == std::string("CT_Lungs")) {
+    if (wl_preset == std::string("CT_Lungs"))
+    {
         ww = PRESET_CT_LUNGS_WW;
         wl   = PRESET_CT_LUNGS_WL;
-    } else if (wl_preset == std::string("CT_Chest")) {
+    }
+    else if (wl_preset == std::string("CT_Chest"))
+    {
         ww = PRESET_CT_CHEST_WW;
         wl   = PRESET_CT_CHEST_WL;
-    } else if (wl_preset == std::string("CT_Bone")) {
+    }
+    else if (wl_preset == std::string("CT_Bone"))
+    {
         ww = PRESET_CT_BONE_WW;
         wl   = PRESET_CT_BONE_WL;
-    } else if (wl_preset == std::string("CT_Angio")) {
+    }
+    else if (wl_preset == std::string("CT_Angio"))
+    {
         ww = PRESET_CT_ANGIO_WW;
         wl   = PRESET_CT_ANGIO_WL;
-    } else if (wl_preset == std::string("CT_Abdomen")) {
+    }
+    else if (wl_preset == std::string("CT_Abdomen"))
+    {
         ww = PRESET_CT_ABDOMEN_WW;
         wl   = PRESET_CT_ABDOMEN_WL;
-    } else if (wl_preset == std::string("CT_Brain")) {
+    }
+    else if (wl_preset == std::string("CT_Brain"))
+    {
         ww = PRESET_CT_BRAIN_WW;
         wl   = PRESET_CT_BRAIN_WL;
-    } else {
+    }
+    else 
+    {
         return;
     }
 
@@ -1103,27 +1351,36 @@ void NoduleAnnotation::slot_preset_wl_changed_i(QString s) {
     _ob_scene_container->update();
 }
 
-void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name) {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
+{
+    if (!_is_ready)
+    {
         return;
     }
 
     SceneContainer* target_container = nullptr;
     QScrollBar* target_scroll_bar = nullptr;
-
-    if (0 == _layout_tag) {
+    if (0 == _layout_tag)
+    {
         save_layout2x2_parameter_i();
 
-        if (name == _mpr_scene_00->get_name()) {
+        if (name == _mpr_scene_00->get_name())
+        {
             target_container = _mpr_00;
             target_scroll_bar = _mpr_00_scroll_bar;
-        } else if (name == _mpr_scene_01->get_name()) {
+        }
+        else if (name == _mpr_scene_01->get_name())
+        {
             target_container = _mpr_01;
             target_scroll_bar = _mpr_01_scroll_bar;
-        } else if (name == _mpr_scene_10->get_name()) {
+        }
+        else if (name == _mpr_scene_10->get_name())
+        {
             target_container = _mpr_10;
             target_scroll_bar = _mpr_10_scroll_bar;
-        } else {
+        }
+        else
+        {
             return;
         }
 
@@ -1139,12 +1396,12 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name) {
         _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
         _ui.gridLayout_6->removeWidget(_mpr_01);
         _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-        _ui.gridLayout_6->removeWidget(_mpr_10);
+        _ui.gridLayout_6->removeWidget(_mpr_10 );
         _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
         _ui.gridLayout_6->removeWidget(_vr_11);
 
-        _ui.gridLayout_6->addWidget(target_container , 0 , 0);
-        _ui.gridLayout_6->addWidget(target_scroll_bar , 0 , 1, 1, 1);
+        _ui.gridLayout_6->addWidget(target_container , 0 ,0);
+        _ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
 
         target_container->show();
         target_scroll_bar->show();
@@ -1152,25 +1409,36 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name) {
 
         _layout_tag = 1;
 
-    } else {
+    }
+    else
+    {
         slot_change_layout2x2_i();
     }
 }
 
-void NoduleAnnotation::slot_focus_in_scene_i(QString s) {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_focus_in_scene_i(QString s)
+{
+    if (!_is_ready)
+    {
         return;
     }
 
     const std::string name(s.toLocal8Bit());
 
-    if (name == _mpr_scene_00->get_name()) {
+    if (name == _mpr_scene_00->get_name())
+    {
         _model_focus->set_focus_scene_container(_mpr_00);
-    } else if (name == _mpr_scene_01->get_name()) {
+    }
+    else if (name == _mpr_scene_01->get_name())
+    {
         _model_focus->set_focus_scene_container(_mpr_01);
-    } else if (name == _mpr_scene_10->get_name()) {
+    }
+    else if (name == _mpr_scene_10->get_name())
+    {
         _model_focus->set_focus_scene_container(_mpr_10);
-    } else {
+    }
+    else
+    {
 
     }
 }
@@ -1183,8 +1451,10 @@ void NoduleAnnotation::slot_focus_in_scene_i(QString s) {
 //    }
 //}
 
-void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag) {
-    if (!_is_ready) {
+void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag)
+{
+    if (!_is_ready)
+    {
         return;
     }
 
@@ -1192,35 +1462,41 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag) {
 
     SceneContainer* containers[3] = {_mpr_00 , _mpr_01 , _mpr_10};
     std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
-
-    if (0 == iFlag) { //Hide
-        if (_ui.pushButtonArrow->isChecked()) {
+    if (0 == iFlag)//Hide
+    {
+        if (_ui.pushButtonArrow->isChecked())
+        {
             //Unregister mouse locate operation
-            for (int i = 0 ; i < 3 ; ++i) {
+            for (int i = 0 ;i<3 ; ++i)
+            {
                 IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
                 IMouseOpPtrCollection ops_new;
-
-                for (auto it = ops.begin() ; it != ops.end() ; ++it) {
-                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it)) {
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
+                {
+                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it) )
+                    {
                         ops_new.push_back(*it);
                     }
                 }
-
                 containers[i]->register_mouse_operation(ops_new , Qt::LeftButton , Qt::NoModifier);
             }
         }
-    } else { //Show
-        if (_ui.pushButtonArrow->isChecked()) {
-            for (int i = 0 ; i < 3 ; ++i) {
+    }
+    else//Show
+    {
+        if (_ui.pushButtonArrow->isChecked())
+        {
+            for (int i = 0 ;i<3 ; ++i)
+            {
                 IMouseOpPtrCollection ops = containers[i]->get_mouse_operation(Qt::LeftButton ,  Qt::NoModifier);
                 IMouseOpPtrCollection ops_new;
-
-                for (auto it = ops.begin() ; it != ops.end() ; ++it) {
-                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it)) {
+                for (auto it = ops.begin() ; it != ops.end() ; ++it)
+                {
+                    if (!std::dynamic_pointer_cast<MouseOpLocate>(*it) )
+                    {
                         ops_new.push_back(*it);
                     }
                 }
-
                 std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
                 op_locate->set_scene(scenes[i]);
                 op_locate->set_crosshair_model(_model_crosshair);
@@ -1229,62 +1505,75 @@ void NoduleAnnotation::slot_crosshair_visibility_i(int iFlag) {
             }
         }
     }
-
     _ob_scene_container->update();
 }
 
-void NoduleAnnotation::refresh_nodule_list_i() {
+void NoduleAnnotation::slot_nodule_overlay_visibility_i(int flag)
+{
+    if (!_is_ready)
+    {
+        return;
+    }
+
+    std::shared_ptr<MPRScene> scenes[3] = {_mpr_scene_00 , _mpr_scene_01 , _mpr_scene_10};
+    MaskOverlayMode mode = flag != 0 ? MASK_OVERLAY_ENABLE : MASK_OVERLAY_DISABLE;
+    for(int i= 0 ; i < 3 ; ++i)
+    {
+        scenes[i]->set_mask_overlay_mode(mode);
+        scenes[i]->set_dirty(true);
+    }
+    _ob_scene_container->update();
+}
+
+void NoduleAnnotation::refresh_nodule_list_i()
+{
     //reset nodule list
     _ui.tableWidgetNoduleList->clear();
     _ui.tableWidgetNoduleList->setRowCount(0);
 
     //set column header
-    QTableWidgetItem* qtablewidgetitem = new QTableWidgetItem();
-    QTableWidgetItem* qtablewidgetitem1 = new QTableWidgetItem();
-    QTableWidgetItem* qtablewidgetitem2 = new QTableWidgetItem();
+    QTableWidgetItem *qtablewidgetitem = new QTableWidgetItem();
+    QTableWidgetItem *qtablewidgetitem1 = new QTableWidgetItem();
+    QTableWidgetItem *qtablewidgetitem2 = new QTableWidgetItem();
 
-    qtablewidgetitem->setText(QApplication::translate("NoduleAnnotationClass", "Position", 0,
-                              QApplication::UnicodeUTF8));
-    qtablewidgetitem1->setText(QApplication::translate("NoduleAnnotationClass", "Diameter", 0,
-                               QApplication::UnicodeUTF8));
-    qtablewidgetitem2->setText(QApplication::translate("NoduleAnnotationClass", "Type", 0,
-                               QApplication::UnicodeUTF8));
+    qtablewidgetitem->setText(QApplication::translate("NoduleAnnotationClass", "Position", 0, QApplication::UnicodeUTF8));
+    qtablewidgetitem1->setText(QApplication::translate("NoduleAnnotationClass", "Diameter", 0, QApplication::UnicodeUTF8));
+    qtablewidgetitem2->setText(QApplication::translate("NoduleAnnotationClass", "Type", 0, QApplication::UnicodeUTF8));
 
     _ui.tableWidgetNoduleList->setHorizontalHeaderItem(0, qtablewidgetitem);
     _ui.tableWidgetNoduleList->setHorizontalHeaderItem(1, qtablewidgetitem1);
     _ui.tableWidgetNoduleList->setHorizontalHeaderItem(2, qtablewidgetitem2);
 
     //reset selected voi id
-    _select_vio_id = -1;
+    _select_voi_id = -1;
     const std::vector<VOISphere>& vois = _model_voi->get_vois();
-
-    if (!vois.empty()) {
+    if (!vois.empty())
+    {
         _ui.tableWidgetNoduleList->setRowCount(vois.size());//Set row count , otherwise set item useless
         StrNumConverter<double> converter;
         const int iPrecision = 1;
         int iRow = 0;
-
-        for (auto it = vois.begin() ; it != vois.end() ; ++it) {
+        for (auto it = vois.begin() ; it != vois.end() ; ++it)
+        {
             const VOISphere& voi = *it;
             std::string sPos = converter.to_string_decimal(voi.center.x , iPrecision) + "," +
-                               converter.to_string_decimal(voi.center.y , iPrecision) + "," +
-                               converter.to_string_decimal(voi.center.z , iPrecision);
+                converter.to_string_decimal(voi.center.y , iPrecision) + "," +
+                converter.to_string_decimal(voi.center.z , iPrecision);
             std::string sRadius = converter.to_string_decimal(voi.diameter , iPrecision);
 
-            QTableWidgetItem* pPos = new QTableWidgetItem(sPos.c_str());
+            QTableWidgetItem* pPos= new QTableWidgetItem(sPos.c_str());
             pPos->setFlags(pPos->flags() & ~Qt::ItemIsEnabled);
-            _ui.tableWidgetNoduleList->setItem(iRow, 0, pPos);
-            _ui.tableWidgetNoduleList->setItem(iRow, 1, new QTableWidgetItem(sRadius.c_str()));
+            _ui.tableWidgetNoduleList->setItem(iRow,0, pPos);
+            _ui.tableWidgetNoduleList->setItem(iRow,1, new QTableWidgetItem(sRadius.c_str()));
 
-            QComboBox* pNoduleType = new QComboBox(_ui.tableWidgetNoduleList);
+            QComboBox * pNoduleType = new QComboBox(_ui.tableWidgetNoduleList);
             pNoduleType->clear();
-
-            for (int i = 0 ; i < NODULE_TYPE_NUM ; ++i) {
+            for (int i = 0 ; i<NODULE_TYPE_NUM ; ++i)
+            {
                 pNoduleType->insertItem(i , S_NODULE_TYPES[i].c_str());
                 pNoduleType->setItemData(i , S_NODULE_TYPE_DESCRIPTION[i].c_str(), Qt::ToolTipRole);
             }
-
-            _ui.tableWidgetNoduleList->setCellWidget(iRow, 2, pNoduleType);
+            _ui.tableWidgetNoduleList->setCellWidget(iRow,2, pNoduleType);
 
             connect(pNoduleType , SIGNAL(currentIndexChanged(int)) , _single_manager_nodule_type , SLOT(map()));
             _single_manager_nodule_type->setMapping(pNoduleType , iRow);
@@ -1294,16 +1583,332 @@ void NoduleAnnotation::refresh_nodule_list_i() {
     }
 }
 
-void NoduleAnnotation::save_layout2x2_parameter_i() {
+void NoduleAnnotation::save_layout2x2_parameter_i()
+{
     _pre_2x2_width = _mpr_00->width();
     _pre_2x2_height = _mpr_00->height();
 }
 
+void NoduleAnnotation::closeEvent(QCloseEvent * event)
+{
+    release_i();
 
-void NoduleAnnotation::slot_quit_i() {
-    this->close();
+    GLTextureCache::instance()->process_cache();
+    GLResourceManagerContainer::instance()->update_all();
+
+    std::cout << GLContextHelper::has_gl_context() << std::endl;
+    //Save config file
+    int tag = 0;
+    std::ifstream input_file("../../../config/configure.txt" , std::ios::in);
+    if (!input_file.is_open())
+    {
+        tag = 1;
+        input_file.open("./config/configure.txt");//second chance
+    }
+
+    if (input_file.is_open())
+    {
+        input_file.close();
+    }
+
+    std::ofstream output_file;
+    if (tag == 0)
+    {
+        output_file.open("../../../config/configure.txt" , std::ios::out);
+    }
+    else
+    {
+        output_file.open("./config/configure.txt" , std::ios::out);
+    }
+
+    if (output_file.is_open())
+    {
+
+        output_file << "ProcessingUnit = ";
+        if (Configuration::instance()->get_processing_unit_type() == CPU)
+        {
+            output_file << "CPU\n";
+        }
+        else
+        {
+            output_file << "GPU\n";
+        }
+
+        if (Configuration::instance()->get_nodule_file_rsa())
+        {
+            //output_file << "NoduleOutput = ";
+            //output_file << "RSA\n";
+        }
+        else
+        {
+            output_file << "NoduleOutput = ";
+            output_file << "TEXT\n";
+        }
+
+        output_file<< "LastOpenDirection = " << _last_open_direction; 
+        output_file.close();
+    }
+
+    QMainWindow::closeEvent(event);
 }
 
+void NoduleAnnotation::slot_quit_i()
+{
+    this->close();
+
+}
+
+void NoduleAnnotation::slot_save_label_file()
+{
+    //TODO: check whether data are ready
+
+    // label remapping
+    const auto & labels = this->_model_voi->get_labels(); // get the labels which are ordered
+
+    // build a map to 'correct' the labels to be sequential, starting from 1
+    std::map<unsigned char, unsigned char> label_correction;
+
+    unsigned char label_index = 1;
+    for (auto it = labels.begin(); it != labels.end(); ++it, ++label_index)
+    {
+        label_correction[(*it)] = label_index;
+        //std::cout << static_cast<int>(*it) << " mapped to " << static_cast<int>(cnt) << '\n';
+    }
+
+    // create a new data as the final output
+    ImageData * output_label_volume = new ImageData();
+    std::shared_ptr<ImageData> mask_data = this->_volume_infos->get_mask(); //get the associated mask
+    mask_data->deep_copy(output_label_volume);
+
+    // iterate/correct the mask data as 1D array
+    unsigned char* array_pointer = static_cast<unsigned char*>(output_label_volume->get_pixel_pointer());
+    if (array_pointer == nullptr)
+    {
+        std::cout << "We get a null pointer for the label :( \n";
+        return;
+    }
+
+    unsigned int total_number_of_voxels = mask_data->_dim[0] * mask_data->_dim[1] * mask_data->_dim[2];
+    for (int voxel=0; voxel < total_number_of_voxels; ++voxel)
+    {
+        if (array_pointer[voxel] != 0) // skip empty voxels
+        {
+            auto it = label_correction.find(array_pointer[voxel]);
+            if (it != label_correction.end())
+            {
+                array_pointer[voxel] = it->second;
+            }
+        }
+    }
 
 
+    // encode the original labels
+    std::vector<unsigned int> run_length_encoded_output = RunLengthOperator::encode(array_pointer, total_number_of_voxels);
+    delete output_label_volume;
 
+    // write to disk
+    QString output_file_name = QFileDialog::getSaveFileName(
+        this,
+        tr("Save Label"), 
+        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
+
+    if (!output_file_name.isEmpty())
+    {
+        std::string output_file_name_std(output_file_name.toLocal8Bit());
+
+        std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+        if (output_file.is_open())
+        {
+            unsigned int * raw_ptr = run_length_encoded_output.data();
+            output_file.write(
+                reinterpret_cast<char *>(raw_ptr),
+                sizeof(unsigned int) * run_length_encoded_output.size());
+            output_file.flush();
+            output_file.close();
+        }
+    }
+}
+
+void NoduleAnnotation::update_last_open_direction_i(const std::string& file_path)
+{
+    int sub_file_path = -1;
+    for(int i = file_path.size() - 1 ; i >= 0 ;--i)
+    {
+        if(file_path[i] == '/' || file_path[i] == '\\')
+        {
+            sub_file_path = i;
+            _last_open_direction = file_path.substr(0 , sub_file_path);
+            break;
+        }
+    }
+}
+
+//
+//void NoduleAnnotation::write_encoded_labels(std::string& file_name, std::vector<unsigned int> &run_length_encoded_output)
+//{
+//    QString output_file_name = QFileDialog::getSaveFileName(
+//        this,
+//        tr("Save Label"), 
+//        QString(this->_volume_infos->get_data_header()->series_uid.c_str()), tr("LabelSet(*.rle)") );
+//
+//    if (!output_file_name.isEmpty())
+//    {
+//        std::string output_file_name_std(output_file_name.toLocal8Bit());
+//
+//        bool binary_output = true;
+//        if (binary_output)
+//        {
+//            std::ofstream output_file(output_file_name_std, std::ios::out | std::ios::binary);
+//            if (output_file.is_open())
+//            {
+//                int * raw_ptr = run_length_encoded_output.data();
+//                output_file.write(
+//                    reinterpret_cast<char *>(raw_ptr),
+//                    sizeof(int) * run_length_encoded_output.size());
+//                output_file.flush();
+//                output_file.close();
+//            }
+//        }
+//        else /*for debug*/
+//        {
+//            std::ofstream output_file;
+//            output_file.open(output_file_name_std, std::ios::out);
+//            if (output_file.is_open())
+//            {
+//                std::ostream_iterator<int> out_it (output_file, ", ");
+//                std::copy ( run_length_encoded_output.begin(), run_length_encoded_output.end(), out_it );
+//                output_file.flush();
+//                output_file.close();
+//            }
+//        }
+//    }
+//}
+
+void NoduleAnnotation::slot_load_label_file()
+{
+    if (!_is_ready || !this->_volume_infos)
+    {
+        std::cout << "No volume loaded yet!\n";
+        return;
+    }
+
+    if (!_model_voi->get_vois().empty())
+    {
+        if (QMessageBox::No == QMessageBox::warning(
+            this , tr("Load Nodule") , tr("You had annotated some of nodule . Will you discard them and load a new label file"),
+            QMessageBox::Yes | QMessageBox::No))
+        {
+            return;
+        }
+    }
+
+    // read file, interpret as pairs of integers, (repeated times, value)
+    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , "home/" /*QString(_volume_infos->get_data_header()->series_uid.c_str())*/, tr("LabelSet(*.rle)"));
+    if (label_file_name_str.isEmpty())
+    {
+        return;
+    }
+    std::string file_name_std(label_file_name_str.toLocal8Bit());
+    std::ifstream input_file(file_name_std, std::ios::in | std::ios::binary | std::ios::ate);
+    if (!input_file.is_open())
+    {
+        return;
+    }
+
+    // get size in bytes
+    input_file.seekg (0, input_file.end);
+    int file_size = input_file.tellg();
+    input_file.seekg (0, input_file.beg);
+
+    // prepare the buffer and copy into it
+    int number_of_entries = file_size/sizeof(int);
+    std::vector<unsigned int> labels(number_of_entries);
+    char * buffer = reinterpret_cast<char*>(labels.data());
+    input_file.read (buffer, file_size);
+
+    //if (input_file)
+    //    std::cout << "all characters read successfully.";
+    //else
+    //    std::cout << "error: only " << input_file.gcount() << " could be read";
+
+    input_file.close();
+
+    // count the voxels, check w.r.t _volume_infos.dim[0]*dim[1]*dim[2]
+    unsigned int sum_voxels = 0;
+    for (auto it = labels.begin(); it != labels.end(); it += 2)
+    {
+        sum_voxels += (*it);
+    }
+    std::cout << sum_voxels << " labels are loaded\n";
+
+    std::shared_ptr<ImageData> mask_in_use = this->_volume_infos->get_mask();
+    unsigned int total_number_of_voxels = mask_in_use->_dim[0] * mask_in_use->_dim[1] * mask_in_use->_dim[2];
+    if (sum_voxels != total_number_of_voxels)
+    {
+        std::cout << "Fail since label data not match the volume in use \n";
+        return;
+    }
+
+    // delete previous files
+    this->_model_voi->remove_all();
+    this->_model_voi->notify(VOIModel::DELETE_VOI);
+
+    // TODO: directly update the mask_data? but if in the presence of existing vois (i.e., spheres), how to combine them?
+    //clock_t _start = clock();
+    std::vector<unsigned char> actual_labels = RunLengthOperator::decode(labels);
+    /*clock_t _end = clock();
+    std::cout << "decode cost : " << double(_end - _start) << " ms\n";*/
+
+    std::shared_ptr<ImageData> volume = _volume_infos->get_volume(); 
+    double origin[3] = {volume->_image_position.x, volume->_image_position.y, volume->_image_position.z}; // TODO here we ignore rotation
+    std::vector<VOISphere> voi_spheres = MaskVOIConverter::convert_label_2_sphere(actual_labels, volume->_dim, volume->_spacing, origin);
+    const Matrix4 matv2patient = _volume_infos->get_camera_calculator()->get_world_to_patient_matrix()*_volume_infos->get_camera_calculator()->get_volume_to_world_matrix();
+    for (auto it = voi_spheres.begin() ; it != voi_spheres.end() ; ++it)
+    {
+        (*it).center = matv2patient.transform((*it).center);
+        if ((*it).diameter <DOUBLE_EPSILON)
+        {
+            (*it).diameter = (std::min)((std::min)(volume->_spacing[0] , volume->_spacing[1]) , volume->_spacing[2]);
+        }
+    }
+
+    //clock_t _end2 = clock();
+    //std::cout << "convert label cost : " << double(_end2 - _end) << " ms\n";
+
+    // update underlying mask
+    bool directly_update_mask = true;
+    if (directly_update_mask)
+    {
+        unsigned char * dest_value_ptr = static_cast<unsigned char *>(mask_in_use->get_pixel_pointer());
+        unsigned char * src_value = new unsigned char [total_number_of_voxels];
+
+        for (int voxel=0; voxel<total_number_of_voxels;++voxel)
+        {
+            unsigned int current_label = actual_labels.at(voxel);
+
+            // populate the temporary information container
+            src_value[voxel] = current_label;
+
+            // update current volume with loaded labels
+            dest_value_ptr[voxel] = current_label;
+        }
+
+        // Notify that mask volume has changed, renderer should refresh GPU memory [lower_bound, upper_bound) // half-open interval
+        unsigned int lower_bound[3] = {0,0,0};
+        unsigned int upper_bound[3] = {mask_in_use->_dim[0], mask_in_use->_dim[1], mask_in_use->_dim[2]};
+
+        if (Configuration::instance()->get_processing_unit_type() == GPU)
+        {
+            this->_volume_infos->update_mask(lower_bound, upper_bound, src_value, true); // "src_value": temporary data container; "true" : already update loaded
+        }
+    }
+
+    // update the underlying model & visual representation
+    for (int sphere_idx=0; sphere_idx<voi_spheres.size(); ++sphere_idx)
+    {
+        this->_model_voi->add_voi(voi_spheres.at(sphere_idx), sphere_idx+1);
+    }
+    this->_model_voi->notify(VOIModel::LOAD_VOI);
+    
+    QMessageBox::information(this , tr("Load Label") , tr("Load label file success."),QMessageBox::Ok);
+} 

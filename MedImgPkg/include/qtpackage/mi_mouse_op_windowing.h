@@ -1,11 +1,12 @@
-#ifndef MED_IMG_MOUSE_OP_WINDOWING_H
-#define MED_IMG_MOUSE_OP_WINDOWING_H
+#ifndef MED_IMAGING_MOUSE_OP_WINDOWING_H
+#define MED_IMAGING_MOUSE_OP_WINDOWING_H
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export MouseOpWindowing : public IMouseOp {
+class QtWidgets_Export MouseOpWindowing : public IMouseOp
+{
 public:
     MouseOpWindowing();
     virtual ~MouseOpWindowing();

@@ -140,7 +140,7 @@
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_observer_voi_table.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Executable\NoduleAnnotation\mi_nodule_annotation.cpp">
+    <ClCompile Include="..\..\MedImaging\NoduleAnnotation\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

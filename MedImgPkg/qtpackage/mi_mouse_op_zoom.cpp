@@ -4,48 +4,59 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-MouseOpZoom::MouseOpZoom() {
+MouseOpZoom::MouseOpZoom()
+{
 
 }
 
-MouseOpZoom::~MouseOpZoom() {
+MouseOpZoom::~MouseOpZoom()
+{
 
 }
 
-void MouseOpZoom::press(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpZoom::press(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpZoom::move(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpZoom::move(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
-    _scene->zoom(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
+    scene_base->zoom(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
     _pre_point = pt;
 }
 
-void MouseOpZoom::release(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpZoom::release(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpZoom::double_click(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpZoom::double_click(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpZoom::wheel_slide(int) {
+void MouseOpZoom::wheel_slide(int)
+{
 
 }
 

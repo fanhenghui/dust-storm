@@ -1,5 +1,5 @@
-#ifndef MED_IMG_MOUSE_OP_ANAOTATE_H_
-#define MED_IMG_MOUSE_OP_ANAOTATE_H_
+#ifndef MED_IMAGING_MOUSE_OP_ANAOTATE_H_
+#define MED_IMAGING_MOUSE_OP_ANAOTATE_H_
 
 #include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
@@ -8,7 +8,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class VOIModel;
 
-class QtPackage_Export MouseOpAnnotate : public IMouseOp {
+class QtWidgets_Export MouseOpAnnotate : public IMouseOp
+{
 public:
     MouseOpAnnotate();
     virtual ~MouseOpAnnotate();
@@ -18,7 +19,7 @@ public:
     virtual void double_click(const QPointF& pt);
     virtual void wheel_slide(int value);
 
-    void set_type();//TODO type
+    void set_type();//TODO type 
     void set_voi_model(std::shared_ptr<VOIModel> model);
 protected:
 private:

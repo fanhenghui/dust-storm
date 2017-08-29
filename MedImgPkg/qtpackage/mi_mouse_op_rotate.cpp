@@ -4,48 +4,60 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-MouseOpRotate::MouseOpRotate() {
+MouseOpRotate::MouseOpRotate()
+{
 
 }
 
-MouseOpRotate::~MouseOpRotate() {
+MouseOpRotate::~MouseOpRotate()
+{
 
 }
 
-void MouseOpRotate::press(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpRotate::press(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpRotate::move(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpRotate::move(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
 
-    _scene->rotate(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
+    scene_base->rotate(Point2(_pre_point.x() , _pre_point.y()) , Point2(pt.x() , pt.y()));
     _pre_point = pt;
 }
 
-void MouseOpRotate::release(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpRotate::release(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpRotate::double_click(const QPointF& pt) {
-    if (!_scene) {
+void MouseOpRotate::double_click(const QPointF& pt)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
+    if (!scene_base)
+    {
         return;
     }
-
     _pre_point = pt;
 }
 
-void MouseOpRotate::wheel_slide(int) {
+void MouseOpRotate::wheel_slide(int)
+{
 
 }
 

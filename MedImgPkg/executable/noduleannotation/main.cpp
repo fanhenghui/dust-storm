@@ -2,7 +2,7 @@
 #include <cassert>
 #include "mi_main_window.h"
 #include <QtGui/QApplication>
-#include "util/mi_exception.h"
+#include "util/mi_common_exception.h"
 
 //TODO this will be configured by config file
 #ifdef _DEBUG
@@ -10,18 +10,22 @@
 #endif
 
 
-int main(int argc, char* argv[]) {
-    try {
+int main(int argc, char *argv[])
+{
+    try
+    {
         QApplication a(argc, argv);
-        //a.doubleClickInterval(150);
+        //std::cout << a.doubleClickInterval() << std::endl;
 
         NoduleAnnotation w;
         w.show();
         return a.exec();
-    } catch (const medical_imaging::Exception& e) {
+    }
+    catch (const medical_imaging::Exception& e)
+    {
         std::cout << e.what();
         assert(false);
         return 0;
     }
-
+    
 }

@@ -15,119 +15,119 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_buffer.h">
+    <ClInclude Include="..\include\glresource\mi_gl_buffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_environment.h">
+    <ClInclude Include="..\include\glresource\mi_gl_buffer_cache.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_fbo.h">
+    <ClInclude Include="..\include\glresource\mi_gl_context.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_object.h">
+    <ClInclude Include="..\include\glresource\mi_gl_environment.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_program.h">
+    <ClInclude Include="..\include\glresource\mi_gl_fbo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_resource_define.h">
+    <ClInclude Include="..\include\glresource\mi_gl_object.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_resource_manager.h">
+    <ClInclude Include="..\include\glresource\mi_gl_program.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_resource_manager_container.h">
+    <ClInclude Include="..\include\glresource\mi_gl_resource_define.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_1d.h">
+    <ClInclude Include="..\include\glresource\mi_gl_resource_export.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_1d_array.h">
+    <ClInclude Include="..\include\glresource\mi_gl_resource_manager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_2d.h">
+    <ClInclude Include="..\include\glresource\mi_gl_resource_manager_container.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_3d.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_1d.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_base.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_1d_array.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_utils.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_2d.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_vao.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_3d.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_resource_export.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_base.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_context.h">
+    <ClInclude Include="..\include\glresource\mi_gl_texture_cache.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_time_query.h">
+    <ClInclude Include="..\include\glresource\mi_gl_time_query.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_texture_cache.h">
+    <ClInclude Include="..\include\glresource\mi_gl_utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgGLResource\mi_gl_buffer_cache.h">
+    <ClInclude Include="..\include\glresource\mi_gl_vao.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Include\MedImgGLResource\mi_gl_resource_manager.inl">
+    <None Include="..\include\glresource\mi_gl_resource_manager.inl">
       <Filter>头文件</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_buffer.cpp">
+    <ClCompile Include="..\glresource\mi_gl_vao.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_environment.cpp">
+    <ClCompile Include="..\glresource\mi_gl_buffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_fbo.cpp">
+    <ClCompile Include="..\glresource\mi_gl_context.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_program.cpp">
+    <ClCompile Include="..\glresource\mi_gl_environment.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_resource_manager.cpp">
+    <ClCompile Include="..\glresource\mi_gl_fbo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_resource_manager_container.cpp">
+    <ClCompile Include="..\glresource\mi_gl_program.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_1d.cpp">
+    <ClCompile Include="..\glresource\mi_gl_resource_manager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_1d_array.cpp">
+    <ClCompile Include="..\glresource\mi_gl_resource_manager_container.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_2d.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_1d.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_3d.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_1d_array.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_base.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_2d.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_utils.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_3d.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_vao.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_base.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_context.cpp">
+    <ClCompile Include="..\glresource\mi_gl_texture_cache.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_time_query.cpp">
+    <ClCompile Include="..\glresource\mi_gl_time_query.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgGLResource\mi_gl_texture_cache.cpp">
+    <ClCompile Include="..\glresource\mi_gl_utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,12 +1,13 @@
-#ifndef MED_IMG_MOUSE_OP_LOCATE_H_
-#define MED_IMG_MOUSE_OP_LOCATE_H_
+#ifndef MED_IMAGING_MOUSE_OP_LOCATE_H_
+#define MED_IMAGING_MOUSE_OP_LOCATE_H_
 
 #include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
 
 MED_IMG_BEGIN_NAMESPACE
 class CrosshairModel;
-class QtPackage_Export MouseOpLocate : public IMouseOp {
+class QtWidgets_Export MouseOpLocate : public IMouseOp
+{
 public:
     MouseOpLocate();
     virtual ~MouseOpLocate();

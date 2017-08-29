@@ -1,5 +1,5 @@
-#ifndef MED_IMG_PATIENT_MPR_BORDER_H_
-#define MED_IMG_PATIENT_MPR_BORDER_H_
+#ifndef MED_IMAGING_PATIENT_MPR_BORDER_H_
+#define MED_IMAGING_PATIENT_MPR_BORDER_H_
 
 #include "qtpackage/mi_graphic_item_base.h"
 
@@ -9,7 +9,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class CrosshairModel;
 class FocusModel;
-class QtPackage_Export GraphicItemMPRBorder : public GraphicItemBase {
+class QtWidgets_Export GraphicItemMPRBorder : public GraphicItemBase
+{
 public:
     GraphicItemMPRBorder();
     virtual ~GraphicItemMPRBorder();
@@ -20,8 +21,7 @@ public:
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
-                        std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 protected:
 private:
     std::shared_ptr<CrosshairModel> _model_corsshair;

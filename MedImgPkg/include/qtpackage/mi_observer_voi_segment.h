@@ -1,5 +1,5 @@
-#ifndef MED_IMG_OBSERVER_VOI_SEGMENT_H
-#define MED_IMG_OBSERVER_VOI_SEGMENT_H
+#ifndef MED_IMAGING_OBSERVER_VOI_SEGMENT_H
+#define MED_IMAGING_OBSERVER_VOI_SEGMENT_H
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_observer_interface.h"
@@ -14,7 +14,8 @@ class VOIModel;
 class VolumeInfos;
 class MPRScene;
 
-class QtPackage_Export VOISegmentObserver : public IObserver {
+class QtWidgets_Export VOISegmentObserver : public IObserver
+{
 public:
     VOISegmentObserver();
     virtual ~VOISegmentObserver();
@@ -23,7 +24,7 @@ public:
 
     void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
 
-    void set_scenes(std::vector<std::shared_ptr<MPRScene>> scenes);
+    void set_scenes(std::vector<std::shared_ptr<MPRScene>> scenes );
 
     virtual void update(int code_id = 0);
 

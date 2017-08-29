@@ -5,14 +5,16 @@
 #include <QDialog>
 #include "ui_mi_anonymization_dialog.h"
 
-namespace medical_imaging {
-class ProgressModel;
+namespace medical_imaging
+{
+    class ProgressModel;
 }
 
-class DICOMAnonymizationDlg : public QDialog {
+class DICOMAnonymizationDlg : public QDialog
+{
     Q_OBJECT
 public:
-    DICOMAnonymizationDlg(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    DICOMAnonymizationDlg(QWidget *parent = 0, Qt::WindowFlags f = 0);
     virtual ~DICOMAnonymizationDlg();
 
     void set_dicom_series_files(std::vector<std::string>& files);

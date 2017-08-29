@@ -2,19 +2,23 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-FocusModel::FocusModel(): _container(nullptr) {
+FocusModel::FocusModel():_container(nullptr)
+{
 
 }
 
-FocusModel::~FocusModel() {
+FocusModel::~FocusModel()
+{
 
 }
 
-void FocusModel::set_focus_scene_container(SceneContainer* container) {
+void FocusModel::set_focus_scene_container(SceneContainer* container )
+{
     _container = container;
 }
 
-SceneContainer*  FocusModel::get_focus_scene_container() const {
+SceneContainer*  FocusModel::get_focus_scene_container() const
+{
     return _container;
 }
 

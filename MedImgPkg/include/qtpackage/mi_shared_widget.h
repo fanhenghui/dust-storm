@@ -1,6 +1,5 @@
-#ifndef MED_IMG_SHARED_WIDGET_H_
-#define MED_IMG_SHARED_WIDGET_H_
-
+#ifndef MED_IMAGING_SHARED_WIDGET_H_
+#define MED_IMAGING_SHARED_WIDGET_H_
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "gl/glew.h"
@@ -9,7 +8,8 @@
 
 //MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export SharedWidget : public QGLWidget {
+class QtWidgets_Export SharedWidget : public QGLWidget
+{
     Q_OBJECT
 public:
     static SharedWidget* instance();

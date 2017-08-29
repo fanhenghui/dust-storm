@@ -1,227 +1,209 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Float">
-      <UniqueIdentifier>{020c184b-9d2a-413f-84e2-3f715a17792a}</UniqueIdentifier>
+    <Filter Include="Include">
+      <UniqueIdentifier>{93f1e980-4926-459a-b61f-b7fd3b7974b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RSA">
-      <UniqueIdentifier>{d6090d22-1ebb-4920-9da5-cee4f36b83ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sampler">
-      <UniqueIdentifier>{9f1decbd-862b-4917-b4ba-b440e8b98e77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Segmentation">
-      <UniqueIdentifier>{69c8642d-e60e-4c17-b500-f3f2d3f14184}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Color Related">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Double">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Export Define">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Shape">
-      <UniqueIdentifier>{68ea7cae-904a-420d-ae8d-1d58d90c7692}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Statistic">
-      <UniqueIdentifier>{02beee0b-d7c7-4742-a74b-fe949edebd63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{6e05b2a1-e6c1-4414-8ef7-a3c026bb64bb}</UniqueIdentifier>
+    <Filter Include="Source">
+      <UniqueIdentifier>{e37c565e-a6a3-4e49-9809-c34c0888f509}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_color_unit.h">
-      <Filter>Color Related</Filter>
+    <ClCompile Include="..\arithmetic\mi_volume_statistician.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_aabb.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_arithmetic_utils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_camera_base.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_connected_domain_analysis.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_ellipsoid.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_intersection_test.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_line.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_line_segment.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_matrix4.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_matrix4f.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_ortho_camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_perspective_camera.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_plane.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_point2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_point3.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_rsa_utils.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_run_length_operator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_track_ball.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_triangle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector2f.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector3.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector3f.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector4f.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\arithmetic\mi_aabb.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_volume_statistician.h">
-      <Filter>Statistic</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_export.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector4f.h">
-      <Filter>Float</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_utils.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector3f.h">
-      <Filter>Float</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_camera_base.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector2f.h">
-      <Filter>Float</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_color_unit.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector3.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_connected_domain_analysis.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_vector2.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_ellipsoid.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_track_ball.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_intersection_test.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_triangle.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_line.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_sphere.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_line_segment.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_shape_interface.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_matrix4.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_interface.h">
-      <Filter>Segmentation</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_matrix4f.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_segment_threshold.h">
-      <Filter>Segmentation</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_ortho_camera.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_sampler.h">
-      <Filter>Sampler</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_perspective_camera.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_rsa_utils.h">
-      <Filter>RSA</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_plane.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_rectangle.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_point2.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_quat4.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_point3.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_point2.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_quat4.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_point3.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_rectangle.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_plane.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_rsa_utils.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_matrix4.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_run_length_operator.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_matrix4f.h">
-      <Filter>Float</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_sampler.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_perspective_camera.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_scan_line_analysis.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_ortho_camera.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_segment_interface.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_line_segment.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_segment_threshold.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_intersection_test.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_shape_interface.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_line.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_simd.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_ellipsoid.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_sphere.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_camera_base.h">
-      <Filter>Double</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_track_ball.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_utils.h">
-      <Filter>Utils</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_triangle.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_arithmetic_export.h">
-      <Filter>Export Define</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_vector2.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_aabb.h">
-      <Filter>Shape</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_vector2f.h">
+      <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgArithmetic\mi_simd.h">
-      <Filter>Float</Filter>
+    <ClInclude Include="..\include\arithmetic\mi_vector3.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector3f.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector4f.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_volume_statistician.h">
+      <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Include\MedImgArithmetic\mi_volume_statistician.inl">
-      <Filter>Statistic</Filter>
+    <None Include="..\include\arithmetic\mi_sampler.inl">
+      <Filter>Include</Filter>
     </None>
-    <None Include="..\Include\MedImgArithmetic\mi_segment_threshold.inl">
-      <Filter>Segmentation</Filter>
+    <None Include="..\include\arithmetic\mi_segment_threshold.inl">
+      <Filter>Include</Filter>
     </None>
-    <None Include="..\Include\MedImgArithmetic\mi_sampler.inl">
-      <Filter>Sampler</Filter>
+    <None Include="..\include\arithmetic\mi_volume_statistician.inl">
+      <Filter>Include</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\MedImgArithmetic\mi_volume_statistician.cpp">
-      <Filter>Statistic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_vector3f.cpp">
-      <Filter>Float</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_vector4f.cpp">
-      <Filter>Float</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_vector2f.cpp">
-      <Filter>Float</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_vector2.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_vector3.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_track_ball.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_triangle.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_sphere.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_rsa_utils.cpp">
-      <Filter>RSA</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_rectangle.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_point2.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_point3.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_plane.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_matrix4.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_matrix4f.cpp">
-      <Filter>Float</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_perspective_camera.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_ortho_camera.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_intersection_test.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_line.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_line_segment.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_ellipsoid.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_camera_base.cpp">
-      <Filter>Double</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_arithmetic_utils.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgArithmetic\mi_aabb.cpp">
-      <Filter>Shape</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

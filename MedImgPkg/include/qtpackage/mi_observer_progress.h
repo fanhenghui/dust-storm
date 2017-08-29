@@ -1,5 +1,5 @@
-#ifndef MED_IMG_OBSERVER_PROGRESS_H_
-#define MED_IMG_OBSERVER_PROGRESS_H_
+#ifndef MED_IMAGING_OBSERVER_PROGRESS_H_
+#define MED_IMAGING_OBSERVER_PROGRESS_H_
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_observer_interface.h"
@@ -9,7 +9,8 @@ class QProgressDialog;
 MED_IMG_BEGIN_NAMESPACE
 
 class ProgressModel;
-class QtPackage_Export ProgressObserver : public IObserver {
+class QtWidgets_Export ProgressObserver : public IObserver
+{
 public:
     ProgressObserver();
     virtual ~ProgressObserver();

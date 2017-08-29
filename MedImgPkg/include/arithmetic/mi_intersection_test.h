@@ -16,6 +16,9 @@ public:
     static bool plane_to_plane(const Plane& plane1, const Plane& plane2,
                                Line3D& intersected_line);
 
+    static bool aabb_to_aabb(const AABBI& l , const AABBI& r , AABBI& result);
+    static bool aabb_to_aabb(const AABBUI& l , const AABBUI& r , AABBUI& result);
+
 protected:
 private:
 };

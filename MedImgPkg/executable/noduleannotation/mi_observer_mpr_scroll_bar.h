@@ -1,17 +1,19 @@
-#ifndef MED_IMG_VOBSERVER_MPR_SCROLL_BAR_H_
-#define MED_IMG_VOBSERVER_MPR_SCROLL_BAR_H_
+#ifndef MED_IMAGING_VOBSERVER_MPR_SCROLL_BAR_H_
+#define MED_IMAGING_VOBSERVER_MPR_SCROLL_BAR_H_
 
 #include <memory>
 #include <vector>
 #include "util/mi_observer_interface.h"
 
-namespace medical_imaging {
-class MPRScene;
-class CrosshairModel;
+namespace medical_imaging
+{
+    class MPRScene;
+    class CrosshairModel;
 }
 
 class QScrollBar;
-class MPRScrollBarObserver : public medical_imaging::IObserver {
+class MPRScrollBarObserver : public medical_imaging::IObserver
+{
 public:
     MPRScrollBarObserver();
     virtual ~MPRScrollBarObserver();

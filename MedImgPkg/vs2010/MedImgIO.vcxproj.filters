@@ -11,72 +11,108 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgIO\mi_dicom_exporter.h">
+    <ClInclude Include="..\include\io\mi_image_data.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_dicom_loader.h">
+    <ClInclude Include="..\include\io\mi_image_data_header.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_dicom_rt_struct.h">
+    <ClInclude Include="..\include\io\mi_io_define.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_dicom_rt_struct_loader.h">
+    <ClInclude Include="..\include\io\mi_io_export.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_image_data.h">
+    <ClInclude Include="..\include\io\mi_jpeg_parser.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_image_data_header.h">
+    <ClInclude Include="..\include\io\mi_meta_object_loader.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_meta_object_loader.h">
+    <ClInclude Include="..\include\io\mi_nodule_set.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_nodule_set.h">
+    <ClInclude Include="..\include\io\mi_nodule_set_parser.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_nodule_set_parser.h">
+    <ClInclude Include="..\include\io\mi_pacs_communicator.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_voi.h">
+    <ClInclude Include="..\include\io\mi_voi.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_zlib_utils.h">
+    <ClInclude Include="..\include\io\mi_worklist_info.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_io_define.h">
+    <ClInclude Include="..\include\io\mi_zlib_utils.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgIO\mi_io_export.h">
+    <ClInclude Include="..\include\io\mi_dcm_scp.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dcm_scu.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_exporter.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_loader.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct_loader.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_mask_voi_converter.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgIO\mi_dicom_exporter.cpp">
+    <ClCompile Include="..\io\mi_zlib_utils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_dicom_loader.cpp">
+    <ClCompile Include="..\io\mi_dcm_scp.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_dicom_rt_struct.cpp">
+    <ClCompile Include="..\io\mi_dcm_scu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_dicom_rt_struct_loader.cpp">
+    <ClCompile Include="..\io\mi_dicom_exporter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_image_data.cpp">
+    <ClCompile Include="..\io\mi_dicom_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_meta_object_loader.cpp">
+    <ClCompile Include="..\io\mi_dicom_rt_struct.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_nodule_set.cpp">
+    <ClCompile Include="..\io\mi_dicom_rt_struct_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_nodule_set_parser.cpp">
+    <ClCompile Include="..\io\mi_image_data.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgIO\mi_zlib_utils.cpp">
+    <ClCompile Include="..\io\mi_jpeg_parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_meta_object_loader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_nodule_set.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_nodule_set_parser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_pacs_communicator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_worklist_info.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_mask_voi_converter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

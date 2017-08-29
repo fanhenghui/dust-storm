@@ -1,5 +1,5 @@
-#ifndef MED_IMG_PATIENT_CORNERS_INFO_H_
-#define MED_IMG_PATIENT_CORNERS_INFO_H_
+#ifndef MED_IMAGING_PATIENT_CORNERS_INFO_H_
+#define MED_IMAGING_PATIENT_CORNERS_INFO_H_
 
 #include "qtpackage/mi_graphic_item_base.h"
 
@@ -7,7 +7,8 @@ class QGraphicsTextItem;
 
 MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export GraphicItemCornersInfo : public GraphicItemBase {
+class QtWidgets_Export GraphicItemCornersInfo : public GraphicItemBase
+{
 public:
     GraphicItemCornersInfo();
     virtual ~GraphicItemCornersInfo();
@@ -16,8 +17,7 @@ public:
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
-                        std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 
 private:
     void refresh_text_i();

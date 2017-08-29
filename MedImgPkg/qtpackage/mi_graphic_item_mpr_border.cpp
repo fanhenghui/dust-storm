@@ -10,27 +10,31 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-GraphicItemMPRBorder::GraphicItemMPRBorder(): _pre_color(0, 0, 0), _pre_pen_width(0),
-    _pre_window_width(-1), _pre_window_height(-1) {
+GraphicItemMPRBorder::GraphicItemMPRBorder():_pre_color(0,0,0),_pre_pen_width(0),_pre_window_width(-1),_pre_window_height(-1)
+{
     _lines[0] = new QGraphicsLineItem();
     _lines[1] = new QGraphicsLineItem();
     _lines[2] = new QGraphicsLineItem();
     _lines[3] = new QGraphicsLineItem();
 }
 
-GraphicItemMPRBorder::~GraphicItemMPRBorder() {
+GraphicItemMPRBorder::~GraphicItemMPRBorder()
+{
 
 }
 
-void GraphicItemMPRBorder::set_crosshair_model(std::shared_ptr<CrosshairModel> model) {
+void GraphicItemMPRBorder::set_crosshair_model(std::shared_ptr<CrosshairModel> model)
+{
     _model_corsshair = model;
 }
 
-void GraphicItemMPRBorder::set_focus_model(std::shared_ptr<FocusModel> model) {
+void GraphicItemMPRBorder::set_focus_model( std::shared_ptr<FocusModel> model )
+{
     _model_focus = model;
 }
 
-std::vector<QGraphicsItem*> GraphicItemMPRBorder::get_init_items() {
+std::vector<QGraphicsItem*> GraphicItemMPRBorder::get_init_items()
+{
     std::vector<QGraphicsItem*> items(4);
     items[0] = _lines[0];
     items[1] = _lines[1];
@@ -39,13 +43,14 @@ std::vector<QGraphicsItem*> GraphicItemMPRBorder::get_init_items() {
     return std::move(items);
 }
 
-void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add ,
-                                  std::vector<QGraphicsItem*>& to_be_remove) {
+void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove)
+{
+    std::shared_ptr<SceneBase> scene_base = _scene.lock();
     QTWIDGETS_CHECK_NULL_EXCEPTION(_model_corsshair);
     QTWIDGETS_CHECK_NULL_EXCEPTION(_model_focus);
-    QTWIDGETS_CHECK_NULL_EXCEPTION(_scene);
+    QTWIDGETS_CHECK_NULL_EXCEPTION(scene_base);
 
-    std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    std::shared_ptr<MPRScene> scene = std::dynamic_pointer_cast<MPRScene>(scene_base);
     QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
 
     int width(1) , height(1);
@@ -59,40 +64,44 @@ void GraphicItemMPRBorder::update(std::vector<QGraphicsItem*>& to_be_add ,
     QColor color_qt;
 
     if (_model_focus->get_focus_scene_container() &&
-            _model_focus->get_focus_scene_container()->get_scene() == _scene) {
+        _model_focus->get_focus_scene_container()->get_scene() == scene )
+    {
         pen_width = 4;
         border = 2.0f;
-        color_qt = QColor(0, 255, 255);
-    } else {
+        color_qt = QColor(0,255,255);
+    }
+    else
+    {
         pen_width = 3;
         border = 1.5f;
-        color_qt = QColor(color.r , color.g , color.b);
+        color_qt = QColor(color.r ,color.g , color.b);
     }
-
     pen.setWidth(pen_width);
     pen.setColor(color_qt);
 
     if (_pre_color == color_qt && _pre_pen_width == pen_width &&
-            _pre_window_width == width && _pre_window_height == height) {
+        _pre_window_width == width && _pre_window_height== height)
+    {
         return;
-    } else {
+    }
+    else
+    {
         _pre_color = color_qt;
-        _pre_pen_width = pen_width;
+        _pre_pen_width= pen_width;
         _pre_window_width = width;
         _pre_window_height = height;
     }
 
 
-    for (int i = 0; i < 4 ; ++i) {
+    for (int i = 0; i<4 ; ++i)
+    {
         _lines[i]->setPen(pen);
     }
 
-    _lines[0]->setLine(QLineF(QPointF(border, border) , QPointF(border , height - border))); //left
-    _lines[1]->setLine(QLineF(QPointF(width - border, border) , QPointF(width - border ,
-                              height - border)));//right
-    _lines[2]->setLine(QLineF(QPointF(border, border) , QPointF(width - border , border))); //top
-    _lines[3]->setLine(QLineF(QPointF(border, height - border) , QPointF(width - border ,
-                              height - border)));//bottom
+    _lines[0]->setLine(QLineF(QPointF(border,border) , QPointF(border ,height-border)));//left
+    _lines[1]->setLine(QLineF(QPointF(width - border,border) , QPointF(width -border ,height-border)));//right
+    _lines[2]->setLine(QLineF(QPointF(border,border) , QPointF(width - border ,border)));//top
+    _lines[3]->setLine(QLineF(QPointF(border,height - border) , QPointF(width - border ,height - border)));//bottom
 }
 
 MED_IMG_END_NAMESPACE

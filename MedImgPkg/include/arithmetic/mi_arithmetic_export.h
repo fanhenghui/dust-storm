@@ -17,7 +17,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
-#ifdef MEDIMGARITHMETIC_MI_EXPORTS
+#ifdef MEDIMGARITHMETIC_EXPORTS
 #define Arithmetic_Export __declspec(dllexport)
 #else
 #define Arithmetic_Export __declspec(dllimport)

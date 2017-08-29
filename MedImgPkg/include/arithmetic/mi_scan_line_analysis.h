@@ -1,9 +1,9 @@
 #ifndef MED_IMG_SCAN_LINE_ANALYSIS_H
 #define MED_IMG_SCAN_LINE_ANALYSIS_H
 
-#include "MedImgArithmetic/mi_arithmetic_stdafx.h"
+#include "arithmetic/mi_arithmetic_export.h"
 
-MED_IMAGING_BEGIN_NAMESPACE
+MED_IMG_BEGIN_NAMESPACE
 
 template<class T>
 class FillStrategy {
@@ -367,7 +367,7 @@ public:
 
 };
 
-MED_IMAGING_END_NAMESPACE
+MED_IMG_END_NAMESPACE
 
 
 

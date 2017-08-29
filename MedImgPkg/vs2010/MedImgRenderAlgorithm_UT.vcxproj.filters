@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_mpr_scene.cpp">
+    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_vr_scene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_main.cpp">
+    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\UT\MedImgRenderAlgorithm_UT\mi_render_algo_vr_scene.cpp">
+    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_mpr_scene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

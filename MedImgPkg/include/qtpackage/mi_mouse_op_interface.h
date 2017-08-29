@@ -1,21 +1,24 @@
-#ifndef MED_IMG_MOUSE_OPERATION_INTERFACE_H
-#define MED_IMG_MOUSE_OPERATION_INTERFACE_H
+#ifndef MED_IMAGING_MOUSE_OPERATION_INTERFACE_H
+#define MED_IMAGING_MOUSE_OPERATION_INTERFACE_H
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "Qt/qpoint.h"
 
-namespace medical_imaging {
-class SceneBase;
+namespace medical_imaging
+{
+    class SceneBase;
 }
 
 MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export IMouseOp {
+class QtWidgets_Export IMouseOp
+{
 public:
     IMouseOp() {};
     virtual ~IMouseOp() {};
 
-    void set_scene(std::shared_ptr<SceneBase> scene) {
+    void set_scene(std::shared_ptr<SceneBase> scene) 
+    {
         QTWIDGETS_CHECK_NULL_EXCEPTION(scene);
         _scene = scene;
     };
@@ -28,7 +31,7 @@ public:
 
 protected:
     QPointF _pre_point;
-    std::shared_ptr<medical_imaging::SceneBase> _scene;
+    std::weak_ptr<medical_imaging::SceneBase> _scene;
 };
 
 MED_IMG_END_NAMESPACE

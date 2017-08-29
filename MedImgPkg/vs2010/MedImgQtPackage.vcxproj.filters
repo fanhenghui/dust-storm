@@ -24,92 +24,95 @@
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{1ddbb51b-1aa1-40bb-80ff-e0da0e366d8d}</UniqueIdentifier>
+      <UniqueIdentifier>{a7cb8f85-4ac7-4812-8549-7e500fe5758c}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{6f995936-6e68-4895-910e-495eaabf9efe}</UniqueIdentifier>
+      <UniqueIdentifier>{7bab8e11-e284-4c9e-b445-527b93d72e2b}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_graphic_item_base.h">
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_graphic_item_corners_info.h">
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_corners_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_graphic_item_cross_hair.h">
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_cross_hair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_graphic_item_mpr_border.h">
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_mpr_border.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_model_cross_hair.h">
+    <ClInclude Include="..\include\qtpackage\mi_model_cross_hair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_model_focus.h">
+    <ClInclude Include="..\include\qtpackage\mi_model_focus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_model_voi.h">
+    <ClInclude Include="..\include\qtpackage\mi_model_voi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_annotate.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_annotate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_interface.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_annotate_fine_tuning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_locate.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_mpr_page.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_locate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_pan.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_mpr_page.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_probe.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_pan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_rotate.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_probe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_test.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_rotate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_windowing.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_mouse_op_zoom.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_windowing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_observer_progress.h">
+    <ClInclude Include="..\include\qtpackage\mi_mouse_op_zoom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_observer_scene_container.h">
+    <ClInclude Include="..\include\qtpackage\mi_observer_progress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_observer_voi_segment.h">
+    <ClInclude Include="..\include\qtpackage\mi_observer_scene_container.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_observer_voi_statistic.h">
+    <ClInclude Include="..\include\qtpackage\mi_observer_voi_segment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgQtPackage\mi_qt_package_export.h">
+    <ClInclude Include="..\include\qtpackage\mi_observer_voi_statistic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\qtpackage\mi_qt_package_export.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\Include\MedImgQtPackage\mi_graphic_item_voi.h">
+    <CustomBuild Include="..\include\qtpackage\mi_graphic_item_voi.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\Include\MedImgQtPackage\mi_scene_container.h">
+    <CustomBuild Include="..\include\qtpackage\mi_scene_container.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\Include\MedImgQtPackage\mi_shared_widget.h">
+    <CustomBuild Include="..\include\qtpackage\mi_shared_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -132,73 +135,73 @@
     <ClCompile Include="GeneratedFiles\Release\moc_mi_shared_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_graphic_item_corners_info.cpp">
+    <ClCompile Include="..\qtpackage\mi_graphic_item_corners_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_graphic_item_cross_hair.cpp">
+    <ClCompile Include="..\qtpackage\mi_graphic_item_cross_hair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_graphic_item_mpr_border.cpp">
+    <ClCompile Include="..\qtpackage\mi_graphic_item_mpr_border.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_graphic_item_voi.cpp">
+    <ClCompile Include="..\qtpackage\mi_graphic_item_voi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_model_cross_hair.cpp">
+    <ClCompile Include="..\qtpackage\mi_model_cross_hair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_model_focus.cpp">
+    <ClCompile Include="..\qtpackage\mi_model_focus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_model_voi.cpp">
+    <ClCompile Include="..\qtpackage\mi_model_voi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_annotate.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_annotate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_locate.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_annotate_fine_tuning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_mpr_page.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_locate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_pan.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_mpr_page.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_probe.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_pan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_rotate.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_probe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_test.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_rotate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_windowing.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_mouse_op_zoom.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_windowing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_observer_progress.cpp">
+    <ClCompile Include="..\qtpackage\mi_mouse_op_zoom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_observer_scene_container.cpp">
+    <ClCompile Include="..\qtpackage\mi_observer_progress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_observer_voi_segment.cpp">
+    <ClCompile Include="..\qtpackage\mi_observer_scene_container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_observer_voi_statistic.cpp">
+    <ClCompile Include="..\qtpackage\mi_observer_voi_segment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_scene_container.cpp">
+    <ClCompile Include="..\qtpackage\mi_observer_voi_statistic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_shared_widget.cpp">
+    <ClCompile Include="..\qtpackage\mi_scene_container.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\MedImgQtPackage\mi_qt_package_export.cpp">
+    <ClCompile Include="..\qtpackage\mi_shared_widget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

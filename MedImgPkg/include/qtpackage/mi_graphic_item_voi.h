@@ -1,5 +1,5 @@
-#ifndef MED_IMG_VOI_PAINTER_H_
-#define MED_IMG_VOI_PAINTER_H_
+#ifndef MED_IMAGING_VOI_PAINTER_H_
+#define MED_IMAGING_VOI_PAINTER_H_
 
 #include <vector>
 
@@ -14,13 +14,15 @@
 #include <QObject>
 
 
-namespace medical_imaging {
-class VOIModel;
-class SceneBase;
+namespace medical_imaging
+{
+    class VOIModel;
+    class SceneBase;
 }
 
 
-class GraphicsLineItem : public QObject , public QGraphicsLineItem {
+class GraphicsLineItem : public QObject , public QGraphicsLineItem
+{
     Q_OBJECT
 public:
     GraphicsLineItem();
@@ -32,32 +34,25 @@ protected slots:
 private:
 };
 
-class GraphicsTextItem : public QGraphicsTextItem {
+class GraphicsTextItem : public QGraphicsTextItem
+{
     Q_OBJECT
 public:
     GraphicsTextItem(GraphicsLineItem* line_item);
     virtual ~GraphicsTextItem();
 
-    void set_id(int id) {
-        _id = id;
-    };
-    int get_id() const {
-        return _id;
-    };
+    void set_id(int id) {_id = id;};
+    int get_id() const {return _id;};
 
-    bool is_grabbed() {
-        return _is_grabbed;
-    };
-    void grab(bool flag) {
-        _is_grabbed = flag;
-    };
+    bool is_grabbed() {return _is_grabbed;};
+    void grab(bool flag) {_is_grabbed = flag;};
 
 signals:
     void position_changed(QPointF info_pos);
 
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 private:
     int _id;
     bool _is_grabbed;
@@ -65,17 +60,14 @@ private:
 
 
 //Mouse left change position , and right change size
-class GraphicsSphereItem : public QGraphicsEllipseItem {
+class GraphicsSphereItem : public QGraphicsEllipseItem
+{
 public:
-    GraphicsSphereItem(QGraphicsItem* parent = 0 , QGraphicsScene* scene = 0);
+    GraphicsSphereItem(QGraphicsItem *parent = 0 , QGraphicsScene *scene = 0);
     virtual ~GraphicsSphereItem();
 
-    void set_id(int id) {
-        _id = id;
-    };
-    int get_id() const {
-        return _id;
-    };
+    void set_id(int id) {_id = id;};
+    int get_id() const {return _id;};
 
     void set_sphere(QPointF center , float radius);
 
@@ -88,9 +80,10 @@ public:
 
 
 protected:
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event);
-    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    std::shared_ptr<medical_imaging::VOIModel>& get_voi_model();
 
 private:
     void update_circle_center_i();
@@ -103,22 +96,42 @@ private:
     bool _is_frezze;
 };
 
+// left-button changes circle size
+class GraphicsCircleItem : public GraphicsSphereItem
+{
+public:
+    GraphicsCircleItem(QGraphicsItem *parent = 0 , QGraphicsScene *scene = 0);
+    virtual ~GraphicsCircleItem();
+
+protected:
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+};
+
 
 MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export GraphicItemVOI : public GraphicItemBase {
+class QtWidgets_Export GraphicItemVOI : public GraphicItemBase
+{
 public:
     GraphicItemVOI();
+
     virtual ~GraphicItemVOI();
 
     void set_voi_model(std::shared_ptr<VOIModel> model);
 
     virtual std::vector<QGraphicsItem*> get_init_items();
 
-    virtual void update(std::vector<QGraphicsItem*>& to_be_add ,
-                        std::vector<QGraphicsItem*>& to_be_remove);
+    virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 
     virtual void post_update();
+
+    void enable_interaction();
+
+    void disable_interaction();
+
+    void set_item_to_be_tuned(const int idx);
 
 private:
     std::shared_ptr<VOIModel> _model;
@@ -127,6 +140,10 @@ private:
     std::vector<GraphicsLineItem*> _items_lines;//Circle to info line
     int _pre_item_num;
     std::vector<QGraphicsItem*> _items_to_be_delete;
+
+    // three circles on three slices
+    std::unique_ptr<GraphicsSphereItem> _tune_graphic_item;
+    int _item_to_be_tuned;
 
     //cache
     std::vector<VOISphere> _pre_vois;

@@ -49,4 +49,31 @@ bool IntersectionTest::plane_to_plane(const Plane& plane1, const Plane& plane2,
     }
 }
 
+namespace{
+
+template<class AABBType>
+bool aabb_to_aabb_t(const AABBType& l , const AABBType& r , AABBType& result) {
+    if ( (l._min[0] > r._max[0] || l._min[1] > r._max[1] || l._min[2] > r._max[2]) ||
+        (r._min[0] > l._max[0] || r._min[1] > l._max[1] || r._min[2] > l._max[2]) ) {
+        return false;
+    }
+
+    for (int i = 0 ; i< 3 ; ++i) {
+        result._max[i] = (std::min)(l._max[i] , r._max[i]);//get minum max as max
+        result._min[i] = (std::max)(l._min[i] , r._min[i]);//get maxum min as min
+    }
+    return true;
+}
+
+}
+
+bool IntersectionTest::aabb_to_aabb(const AABBI& l , const AABBI& r , AABBI& result) {
+    return aabb_to_aabb_t(l , r , result);
+}
+
+bool IntersectionTest::aabb_to_aabb(const AABBUI& l , const AABBUI& r , AABBUI& result) {
+    return aabb_to_aabb_t(l , r , result);
+}
+
+
 MED_IMG_END_NAMESPACE

@@ -1,11 +1,12 @@
-#ifndef MED_IMG_MOUSE_OP_MPR_PAGING_H
-#define MED_IMG_MOUSE_OP_MPR_PAGING_H
+#ifndef MED_IMAGING_MOUSE_OP_MPR_PAGING_H
+#define MED_IMAGING_MOUSE_OP_MPR_PAGING_H
 
 #include "qtpackage/mi_mouse_op_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 class CrosshairModel;
-class QtPackage_Export MouseOpMPRPage : public IMouseOp {
+class QtWidgets_Export MouseOpMPRPage : public IMouseOp
+{
 public:
     MouseOpMPRPage();
     virtual ~MouseOpMPRPage();

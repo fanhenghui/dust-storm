@@ -1,5 +1,5 @@
-#ifndef MED_IMG_OBSERVER_VOI_STATISTIC_H
-#define MED_IMG_OBSERVER_VOI_STATISTIC_H
+#ifndef MED_IMAGING_OBSERVER_VOI_STATISTIC_H
+#define MED_IMAGING_OBSERVER_VOI_STATISTIC_H
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_observer_interface.h"
@@ -8,7 +8,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class VOIModel;
 class VolumeInfos;
-class QtPackage_Export VOIStatisticObserver : public IObserver {
+class QtWidgets_Export VOIStatisticObserver : public IObserver
+{
 public:
     VOIStatisticObserver();
     virtual ~VOIStatisticObserver();

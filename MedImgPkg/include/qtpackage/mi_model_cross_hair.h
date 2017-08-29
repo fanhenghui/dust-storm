@@ -1,5 +1,5 @@
-#ifndef MED_IMG_CROSS_HAIR_H_
-#define MED_IMG_CROSS_HAIR_H_
+#ifndef MED_IMAGING_CROSS_HAIR_H_
+#define MED_IMAGING_CROSS_HAIR_H_
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_model_interface.h"
@@ -15,7 +15,8 @@ class MPRScene;
 class SceneBase;
 class CameraCalculator;
 
-class QtPackage_Export CrosshairModel : public medical_imaging::IModel {
+class QtWidgets_Export CrosshairModel : public medical_imaging::IModel
+{
 public:
     typedef std::shared_ptr<MPRScene> MPRScenePtr;
 
@@ -23,13 +24,12 @@ public:
 
     virtual ~CrosshairModel();
 
-    void set_mpr_scene(const ScanSliceType(&scan_type)[3] , const MPRScenePtr(&scenes)[3] ,
-                       const RGBUnit(colors)[3]);
+    void set_mpr_scene(const ScanSliceType (&scan_type)[3] , const MPRScenePtr (&scenes)[3] , const RGBUnit (colors)[3]);
 
     void get_cross_line(
-        const MPRScenePtr& target_mpr_scene,
-        Line2D(&lines)[2],
-        RGBUnit(&color)[2]);
+        const MPRScenePtr& target_mpr_scene, 
+        Line2D (&lines)[2],
+        RGBUnit (&color)[2]);
 
     RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 
@@ -42,12 +42,12 @@ public:
 
     bool page(const std::shared_ptr<MPRScene>& target_mpr_scene , int step);
 
-    int get_page(const std::shared_ptr<MPRScene>& target_mpr_scene);
+    int get_page(const std::shared_ptr<MPRScene>& target_mpr_scene );
 
     //locate in one MPR will paging others 2
     bool locate(const std::shared_ptr<MPRScene>& target_mpr_scene , const Point2& pt_dc);
 
-    bool locate(const Point3& center_w);
+    bool locate(const Point3& center_w, bool ignore_pan = true);
 
     //bool locate_focus(const Point3& center_w);
 

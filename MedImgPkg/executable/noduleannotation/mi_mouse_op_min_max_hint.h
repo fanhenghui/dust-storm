@@ -1,11 +1,12 @@
-#ifndef MED_IMG_MOUSE_OP_MIN_MAX_HINT_H_
-#define MED_IMG_MOUSE_OP_MIN_MAX_HINT_H_
+#ifndef MED_IMAGING_MOUSE_OP_MIN_MAX_HINT_H_
+#define MED_IMAGING_MOUSE_OP_MIN_MAX_HINT_H_
 
 #include "qtpackage/mi_mouse_op_interface.h"
 #include "arithmetic/mi_point3.h"
 #include <QObject>
 
-class QMinMaxHintObject : public QObject {
+class QMinMaxHintObject : public QObject
+{
     Q_OBJECT
 public:
     QMinMaxHintObject(QObject* parent = 0);
@@ -22,7 +23,8 @@ private:
 MED_IMG_BEGIN_NAMESPACE
 
 
-class MouseOpMinMaxHint : public IMouseOp {
+class MouseOpMinMaxHint : public IMouseOp
+{
 public:
     MouseOpMinMaxHint();
     virtual ~MouseOpMinMaxHint();

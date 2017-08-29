@@ -11,66 +11,78 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgUtil\mi_configuration.h">
+    <ClInclude Include="..\include\util\mi_configuration.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_model_interface.h">
+    <ClInclude Include="..\include\util\mi_exception.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_observer_interface.h">
+    <ClInclude Include="..\include\util\mi_file_util.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_string_number_converter.h">
+    <ClInclude Include="..\include\util\mi_ipc_client_proxy.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_util_export.h">
+    <ClInclude Include="..\include\util\mi_ipc_common.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_exception.h">
+    <ClInclude Include="..\include\util\mi_ipc_server_proxy.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_message_queue.h">
+    <ClInclude Include="..\include\util\mi_message_queue.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_socket_client.h">
+    <ClInclude Include="..\include\util\mi_model_interface.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_file_util.h">
+    <ClInclude Include="..\include\util\mi_model_progress.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_client_proxy.h">
+    <ClInclude Include="..\include\util\mi_observer_interface.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_ipc_common.h">
+    <ClInclude Include="..\include\util\mi_socket_client.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\Include\MedImgUtil\mi_model_progress.h">
+    <ClInclude Include="..\include\util\mi_socket_server.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_string_number_converter.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_util_export.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\MedImgUtil\mi_configuration.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgUtil\mi_model_interface.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgUtil\mi_exception.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgUtil\mi_socket_client.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgUtil\mi_file_util.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\MedImgUtil\mi_ipc_client_proxy.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Include\MedImgUtil\mi_message_queue.inl">
+    <None Include="..\include\util\mi_message_queue.inl">
       <Filter>Include</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\util\mi_socket_server.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_configuration.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_exception.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_file_util.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_ipc_client_proxy.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_ipc_server_proxy.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_model_interface.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_socket_client.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

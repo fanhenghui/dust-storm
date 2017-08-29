@@ -1,5 +1,5 @@
-#ifndef MED_IMG_MODEL_FOCUS_H_
-#define MED_IMG_MODEL_FOCUS_H_
+#ifndef MED_IMAGING_MODEL_FOCUS_H_
+#define MED_IMAGING_MODEL_FOCUS_H_
 
 #include "qtpackage/mi_qt_package_export.h"
 #include "util/mi_model_interface.h"
@@ -8,7 +8,8 @@ class SceneContainer;
 
 MED_IMG_BEGIN_NAMESPACE
 
-class QtPackage_Export FocusModel : public IModel {
+class QtWidgets_Export FocusModel : public IModel
+{
 public:
     FocusModel();
     virtual ~FocusModel();
