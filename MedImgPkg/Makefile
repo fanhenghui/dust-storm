@@ -17,6 +17,7 @@ subsystem:
 	$(MAKE) -C ./ut/protocol_ut
 	$(MAKE) -C ./executable/reviewserver
 	$(MAKE) -C ./executable/dcmdbimporter
+	$(MAKE) -C ./executable/extractmask
 
 PHONY.:clean
 clean:
@@ -34,4 +35,5 @@ clean:
 	$(MAKE) clean -C ./ut/protocol_ut
 	$(MAKE) clean -C ./executable/reviewserver
 	$(MAKE) clean -C ./executable/dcmdbimporter
+	$(MAKE) clean -C ./executable/extractmask
 	-rm -r bin

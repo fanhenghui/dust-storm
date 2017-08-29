@@ -47,32 +47,35 @@ public:
         m[3][3] = m33;
     };
 
-    Matrix4(const Matrix4 &mat) {
+    Matrix4(const Matrix4& mat) {
         memcpy(this->_m, mat._m, sizeof(mat._m));
     };
 
-    inline double *operator[](size_t iRow) {
-        if (iRow > 4)
+    inline double* operator[](size_t iRow) {
+        if (iRow > 4) {
             return nullptr;
-        else
+        } else {
             return m[iRow];
+        }
     };
 
-    inline const double *operator[](size_t iRow) const {
-        if (iRow > 4)
+    inline const double* operator[](size_t iRow) const {
+        if (iRow > 4) {
             return nullptr;
-        else
+        } else {
             return m[iRow];
+        }
     };
 
-    inline Matrix4 &operator=(const Matrix4 &mat) {
+    inline Matrix4& operator=(const Matrix4& mat) {
         for (int i = 0; i < 16; ++i) {
             _m[i] = mat._m[i];
         }
+
         return *this;
     };
 
-    inline Matrix4 operator*(const Matrix4 &m2) const {
+    inline Matrix4 operator*(const Matrix4& m2) const {
         return Matrix4(_m[0] * m2._m[0] + _m[4] * m2._m[1] + _m[8] * m2._m[2] +
                        _m[12] * m2._m[3],
                        _m[1] * m2._m[0] + _m[5] * m2._m[1] + _m[9] * m2._m[2] +
@@ -107,18 +110,18 @@ public:
                        _m[15] * m2._m[15]);
     };
 
-    inline Matrix4 operator*=(const Matrix4 &m2) {
+    inline Matrix4 operator*=(const Matrix4& m2) {
         (*this) = (*this) * m2;
         return *this;
     };
 
-    inline Vector3 operator*(const Vector3 &v) const {
+    inline Vector3 operator*(const Vector3& v) const {
         return Vector3(_m[0] * v.x + _m[4] * v.y + _m[8] * v.z,
                        _m[1] * v.x + _m[5] * v.y + _m[9] * v.z,
                        _m[2] * v.x + _m[6] * v.y + _m[10] * v.z);
     };
 
-    inline Point3 operator*(const Point3 &pt) const {
+    inline Point3 operator*(const Point3& pt) const {
         double dw = _m[3] * pt.x + _m[7] * pt.y + _m[11] * pt.z + _m[15];
         dw = fabs(dw) > DOUBLE_EPSILON ? dw : DOUBLE_EPSILON;
         dw = 1.0 / dw;
@@ -139,10 +142,11 @@ public:
         for (int i = 0; i < 16; ++i) {
             _m[i] *= scale;
         }
+
         return *this;
     };
 
-    inline bool operator==(const Matrix4 &mat) const {
+    inline bool operator==(const Matrix4& mat) const {
         return (std::fabs(_m[0] - mat._m[0]) < DOUBLE_EPSILON &&
                 std::fabs(_m[1] - mat._m[1]) < DOUBLE_EPSILON &&
                 std::fabs(_m[2] - mat._m[2]) < DOUBLE_EPSILON &&
@@ -161,7 +165,7 @@ public:
                 std::fabs(_m[15] - mat._m[15]) < DOUBLE_EPSILON);
     };
 
-    inline bool operator!=(const Matrix4 &mat) const {
+    inline bool operator!=(const Matrix4& mat) const {
         return (std::fabs(_m[0] - mat._m[0]) > DOUBLE_EPSILON ||
                 std::fabs(_m[1] - mat._m[1]) > DOUBLE_EPSILON ||
                 std::fabs(_m[2] - mat._m[2]) > DOUBLE_EPSILON ||
@@ -199,11 +203,11 @@ public:
         m[3][3] = 1.0;
     };
 
-    inline void prepend(const Matrix4 &mat) {
+    inline void prepend(const Matrix4& mat) {
         *this = mat * (*this);
     };
 
-    inline void append(const Matrix4 &mat) {
+    inline void append(const Matrix4& mat) {
         *this = (*this) * mat;
     };
 
@@ -265,10 +269,12 @@ public:
         double t30 = -(v3 * m10 - v1 * m11 + v0 * m12);
 
         double det = t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03;
+
         if (std::fabs(det) < DOUBLE_EPSILON) {
             ARITHMETIC_THROW_EXCEPTION(
                 "Matrix's determinant is zero! Get inverse failed!");
         }
+
         double invDet = 1 / det;
 
         double d00 = t00 * invDet;
@@ -314,24 +320,24 @@ public:
         return *this;
     };
 
-    inline Point3 transform(const Point3 &pt) const {
+    inline Point3 transform(const Point3& pt) const {
         return (*this) * pt;
     };
 
-    inline Vector3 transform(const Vector3 &v) const {
+    inline Vector3 transform(const Vector3& v) const {
         return (*this) * v;
     };
 
-    inline void to_float16(float (&fMat)[16]) const {
+    inline void to_float16(float(&fMat)[16]) const {
         for (int i = 0; i < 16; ++i) {
             fMat[i] = (float)_m[i];
         }
     };
 };
 
-Matrix4 Arithmetic_Export make_scale(const Vector3 &v);
+Matrix4 Arithmetic_Export make_scale(const Vector3& v);
 
-Matrix4 Arithmetic_Export make_translate(const Vector3 &v);
+Matrix4 Arithmetic_Export make_translate(const Vector3& v);
 
 MED_IMG_END_NAMESPACE
 

@@ -20,11 +20,11 @@ public:
         memcpy(_dim, dim, 3 * sizeof(unsigned int));
     }
 
-    void set_data_ref(T *data_array) {
+    void set_data_ref(T* data_array) {
         _data_ref = data_array;
     }
 
-    void set_mask_ref(unsigned char *mask_array) {
+    void set_mask_ref(unsigned char* mask_array) {
         _mask_ref = mask_array;
     }
 
@@ -42,8 +42,8 @@ public:
 
 protected:
     unsigned int _dim[3]; // dim[2] could be 0
-    T *_data_ref;
-    unsigned char *_mask_ref;
+    T* _data_ref;
+    unsigned char* _mask_ref;
     unsigned char _target_label;
     float _min_scalar;
     float _max_scalar;

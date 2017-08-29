@@ -16,8 +16,9 @@ public:
     Ellipsoid();
     virtual ~Ellipsoid();
 
-    inline bool in_ellipsoid(const Point3 &pt) {
+    inline bool in_ellipsoid(const Point3& pt) {
         Vector3 tmp = pt - _center;
+
         if (!(tmp.x * tmp.x / _a * _a + tmp.y * tmp.y / _b * _b +
                 tmp.z * tmp.z / _c * _c >
                 1.0)) {

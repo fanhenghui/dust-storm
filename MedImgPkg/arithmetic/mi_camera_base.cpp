@@ -9,17 +9,17 @@ CameraBase::CameraBase()
 
 CameraBase::~CameraBase() {}
 
-void CameraBase::set_eye(const Point3 &eye) {
+void CameraBase::set_eye(const Point3& eye) {
     _eye = eye;
     _is_view_mat_cal = false;
 }
 
-void CameraBase::set_look_at(const Point3 &center) {
+void CameraBase::set_look_at(const Point3& center) {
     _at = center;
     _is_view_mat_cal = false;
 }
 
-void CameraBase::set_up_direction(const Vector3 &up) {
+void CameraBase::set_up_direction(const Vector3& up) {
     _up = up;
     _is_view_mat_cal = false;
 }
@@ -70,12 +70,13 @@ void CameraBase::calculate_view_matrix_i() {
     }
 }
 
-void CameraBase::rotate(const Quat4 &quat) {
+void CameraBase::rotate(const Quat4& quat) {
     rotate(quat.to_matrix());
 }
 
-void CameraBase::rotate(const Matrix4 &mat) {
+void CameraBase::rotate(const Matrix4& mat) {
     Matrix4 mat_pre_view = get_view_matrix();
+
     if (!mat_pre_view.has_inverse()) {
         return;
     } else {
@@ -89,11 +90,13 @@ void CameraBase::rotate(const Matrix4 &mat) {
     }
 }
 
-void CameraBase::pan(const Vector2 &pan) {
+void CameraBase::pan(const Vector2& pan) {
     Matrix4 viewmat = get_view_matrix();
+
     if (!viewmat.has_inverse()) {
         return;
     }
+
     Matrix4 mat = viewmat;
     mat.prepend(make_translate(Point3::S_ZERO_POINT - Point3(pan.x, pan.y, 0.0)));
     mat.prepend(viewmat.get_inverse());
@@ -103,7 +106,7 @@ void CameraBase::pan(const Vector2 &pan) {
     _is_view_mat_cal = false;
 }
 
-CameraBase &CameraBase::operator=(const CameraBase &camera) {
+CameraBase& CameraBase::operator=(const CameraBase& camera) {
 #define COPY_PARAMETER(p) this->p = camera.p
     COPY_PARAMETER(_eye);
     COPY_PARAMETER(_at);
@@ -118,7 +121,7 @@ Vector3 CameraBase::get_view_direction() const {
     return (_at - _eye).get_normalize();
 }
 
-bool CameraBase::operator==(const CameraBase &camera) const {
+bool CameraBase::operator==(const CameraBase& camera) const {
     if (_is_view_mat_cal && camera._is_view_mat_cal) {
         return _mat_view == camera._mat_view;
     } else {

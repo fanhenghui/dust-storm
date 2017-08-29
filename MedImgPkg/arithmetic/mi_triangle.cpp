@@ -2,7 +2,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-void Triangle::to_lines(std::vector<LineSegment3D> &lines) const {
+void Triangle::to_lines(std::vector<LineSegment3D>& lines) const {
     lines.clear();
     lines.resize(3);
     lines[0] = LineSegment3D(_pt[0], _pt[1]);
@@ -17,7 +17,7 @@ Vector3 Triangle::get_normal() const {
     return norm.get_normalize();
 }
 
-bool Triangle::in_triangle(const Point3 &pt0) {
+bool Triangle::in_triangle(const Point3& pt0) {
     // P点在ABC内的方法可以用PAB PBC PCA呈现顺时针排列或者逆时针排列
     // ，计算差乘结果判断方向一致性
     const Vector3 a = _pt[0] - pt0;
@@ -31,6 +31,7 @@ bool Triangle::in_triangle(const Point3 &pt0) {
         return false;
     } else {
         Vector3 w = a.cross_product(b);
+
         if (u.dot_product(w) < 0.0) {
             return false;
         } else {

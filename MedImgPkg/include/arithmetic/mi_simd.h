@@ -79,15 +79,15 @@ typedef __m128i vec_ushort8;
 static __m128 vec_sel(__m128 a, __m128 b, __m128 mask) {
     return _mm_or_ps(_mm_and_ps(mask, b), _mm_andnot_ps(mask, a));
 }
-static __m128 vec_sel(__m128 a, __m128 b, const unsigned int *_mask) {
-    return vec_sel(a, b, _mm_load_ps((float *)_mask));
+static __m128 vec_sel(__m128 a, __m128 b, const unsigned int* _mask) {
+    return vec_sel(a, b, _mm_load_ps((float*)_mask));
 }
 static __m128 vec_sel(__m128 a, __m128 b, unsigned int _mask) {
-    return vec_sel(a, b, _mm_set1_ps(*(float *)&_mask));
+    return vec_sel(a, b, _mm_set1_ps(*(float*)&_mask));
 }
 
 static __m128 toM128(unsigned int x) {
-    return _mm_set1_ps(*(float *)&x);
+    return _mm_set1_ps(*(float*)&x);
 }
 
 static __m128 fabsf4(__m128 x) {
@@ -96,21 +96,21 @@ static __m128 fabsf4(__m128 x) {
 
 static __m128 vec_cts(__m128 x) {
     __m128i result = _mm_cvtps_epi32(x);
-    return (__m128 &)result;
+    return (__m128&)result;
 }
 
 static __m128 vec_ctf(__m128 x) {
-    return _mm_cvtepi32_ps((__m128i &)x);
+    return _mm_cvtepi32_ps((__m128i&)x);
 }
 
 static __m128 vec_round_to_int(__m128 x) {
     __m128i result = _mm_cvtps_epi32(x);
-    return (__m128 &)result;
+    return (__m128&)result;
 }
 
 static __m128 vec_truncate_to_int(__m128 x) {
     __m128i result = _mm_cvttps_epi32(x);
-    return (__m128 &)result;
+    return (__m128&)result;
 }
 
 static __m128 newtonrapson_rsqrt4(const __m128 v) {
@@ -163,9 +163,9 @@ static const float SINCOS_KC2 = 7.54978995489e-8f;
 
 static __m128 sinf4(vec_float4 x) {
 
-//
-// Common constants used to evaluate sinf4/cosf4/tanf4
-//
+    //
+    // Common constants used to evaluate sinf4/cosf4/tanf4
+    //
     vec_float4 xl, xl2, xl3, res;
 
     // Range reduction using : xl = angle * TwoOverPi;
@@ -219,7 +219,7 @@ static __m128 sinf4(vec_float4 x) {
                    vec_cmpeq(vec_and(offset, toM128(0x2)), _mm_setzero_ps()));
 }
 
-static void sincosf4(vec_float4 x, vec_float4 *s, vec_float4 *c) {
+static void sincosf4(vec_float4 x, vec_float4* s, vec_float4* c) {
     vec_float4 xl, xl2, xl3;
     vec_int4 offsetSin, offsetCos;
 
@@ -238,8 +238,8 @@ static void sincosf4(vec_float4 x, vec_float4 *s, vec_float4 *c) {
     // Add 1 to the offset for the cosine.
     //
     offsetSin = vec_and(q, toM128((int)0x3));
-    __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i &)offsetSin);
-    offsetCos = (__m128 &)temp;
+    __m128i temp = _mm_add_epi32(_mm_set1_epi32(1), (__m128i&)offsetSin);
+    offsetCos = (__m128&)temp;
 
     // Remainder in range [-pi/4..pi/4]
     //
@@ -281,9 +281,9 @@ static void sincosf4(vec_float4 x, vec_float4 *s, vec_float4 *c) {
     sinMask = vec_cmpeq(vec_and(offsetSin, toM128(0x2)), _mm_setzero_ps());
     cosMask = vec_cmpeq(vec_and(offsetCos, toM128(0x2)), _mm_setzero_ps());
 
-    *s = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*s), *s,
+    *s = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4) * s), *s,
                  sinMask);
-    *c = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4)*c), *c,
+    *c = vec_sel((vec_float4)vec_xor(toM128(0x80000000), (vec_uint4) * c), *c,
                  cosMask);
 }
 
@@ -322,7 +322,7 @@ static __m128 _vmathVfCross(__m128 vec0, __m128 vec1) {
     return result;
 }
 
-static bool _isAlignedForSSE(const void *p) {
+static bool _isAlignedForSSE(const void* p) {
     return (((size_t)p) & 15) == 0;
 }
 

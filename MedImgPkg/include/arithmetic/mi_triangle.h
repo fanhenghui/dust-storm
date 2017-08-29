@@ -25,11 +25,11 @@ public:
         _pt[2] = pt2;
     }
 
-    void to_lines(std::vector<LineSegment3D> &lines) const;
+    void to_lines(std::vector<LineSegment3D>& lines) const;
 
     Vector3 get_normal() const;
 
-    bool in_triangle(const Point3 &pt0);
+    bool in_triangle(const Point3& pt0);
 };
 
 MED_IMG_END_NAMESPACE

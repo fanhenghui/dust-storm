@@ -22,7 +22,7 @@ public:
 
 public:
     LineSegment3D();
-    LineSegment3D(const Point3 &pt0, const Point3 &pt1);
+    LineSegment3D(const Point3& pt0, const Point3& pt1);
     virtual ~LineSegment3D();
 };
 

@@ -18,7 +18,7 @@ mi_camera_base.o mi_ortho_camera.o mi_perspective_camera.o mi_track_ball.o \
 mi_vector2f.o mi_vector3f.o mi_vector4f.o mi_matrix4f.o \
 mi_arithmetic_utils.o \
 mi_aabb.o mi_ellipsoid.o mi_line_segment.o mi_line.o mi_plane.o mi_triangle.o mi_intersection_test.o \
-mi_rsa_utils.o mi_volume_statistician.o
+mi_rsa_utils.o mi_volume_statistician.o mi_run_length_operator.o mi_connected_domain_analysis.o
 
 TARGET = $(BIN_DIR)/libmedimg_arithmetic.so
 
@@ -108,7 +108,13 @@ mi_vector3.o: $(EXPORT_HEADER) mi_vector3.h mi_vector3.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_vector3.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_vector2.o: $(EXPORT_HEADER) mi_vector2.h mi_vector2.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_vector2.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) mi_vector2.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_run_length_operator.o: $(EXPORT_HEADER) mi_run_length_operator.h mi_run_length_operator.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_run_length_operator.cpp $(ADDITINAL_INCLUDE_DIR)	
+
+mi_connected_domain_analysis.o: $(EXPORT_HEADER) mi_connected_domain_analysis.h mi_connected_domain_analysis.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_connected_domain_analysis.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

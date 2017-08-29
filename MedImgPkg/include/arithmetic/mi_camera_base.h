@@ -15,11 +15,11 @@ public:
 
     virtual ~CameraBase();
 
-    void set_eye(const Point3 &ptEye);
+    void set_eye(const Point3& ptEye);
 
-    void set_look_at(const Point3 &ptCenter);
+    void set_look_at(const Point3& ptCenter);
 
-    void set_up_direction(const Vector3 &vecUp);
+    void set_up_direction(const Vector3& vecUp);
 
     Point3 get_eye() const;
 
@@ -39,17 +39,17 @@ public:
 
     virtual double get_far_clip_distance() const = 0;
 
-    void rotate(const Quat4 &quat);
+    void rotate(const Quat4& quat);
 
-    void rotate(const Matrix4 &mat);
+    void rotate(const Matrix4& mat);
 
     virtual void zoom(double rate) = 0;
 
-    virtual void pan(const Vector2 &pan);
+    virtual void pan(const Vector2& pan);
 
-    CameraBase &operator=(const CameraBase &camera);
+    CameraBase& operator=(const CameraBase& camera);
 
-    bool operator==(const CameraBase &camera) const;
+    bool operator==(const CameraBase& camera) const;
 
 protected:
     void calculate_view_matrix_i();

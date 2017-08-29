@@ -17,15 +17,15 @@ public:
     SegmentThreshold() {};
     virtual ~SegmentThreshold() {};
 
-    void segment(const Ellipsoid &region_ellipsoid, T threshold);
+    void segment(const Ellipsoid& region_ellipsoid, T threshold);
 
-    void segment_auto_threshold(const Ellipsoid &region_ellipsoid,
+    void segment_auto_threshold(const Ellipsoid& region_ellipsoid,
                                 ThresholdType type = Otsu);
 
 private:
-    T get_threshold_otsu_i(const Ellipsoid &region_ellipsoid);
+    T get_threshold_otsu_i(const Ellipsoid& region_ellipsoid);
 
-    T get_threshold_center_i(const Ellipsoid &region_ellipsoid);
+    T get_threshold_center_i(const Ellipsoid& region_ellipsoid);
 };
 
 #include "arithmetic/mi_segment_threshold.inl"

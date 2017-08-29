@@ -5,9 +5,9 @@
 MED_IMG_BEGIN_NAMESPACE
 
 Point3
-TrackBall::convert_screen_point_to_sphere_i(const Point2 &ptPos, double width,
+TrackBall::convert_screen_point_to_sphere_i(const Point2& ptPos, double width,
         double height,
-        const Point2 &ptBottomLeftCorner) {
+        const Point2& ptBottomLeftCorner) {
     double x = (ptPos.x - ptBottomLeftCorner.x) / (width / 2) - 1;
     double y = 1 - (ptPos.y - ptBottomLeftCorner.y) / (height / 2);
 
@@ -17,10 +17,10 @@ TrackBall::convert_screen_point_to_sphere_i(const Point2 &ptPos, double width,
     return Point3(x, y, z);
 }
 
-Quat4 TrackBall::mouse_motion_to_rotation(const Point2 &ptMouseFrom,
-        const Point2 &ptMouseTo, double width,
+Quat4 TrackBall::mouse_motion_to_rotation(const Point2& ptMouseFrom,
+        const Point2& ptMouseTo, double width,
         double height,
-        const Point2 &ptBottomLeftCorner) {
+        const Point2& ptBottomLeftCorner) {
     if ((ptMouseFrom.x > ptBottomLeftCorner.x) &&
             (ptMouseFrom.x < ptBottomLeftCorner.x + width) &&
             (ptMouseFrom.y > ptBottomLeftCorner.y) &&
@@ -38,9 +38,9 @@ Quat4 TrackBall::mouse_motion_to_rotation(const Point2 &ptMouseFrom,
     }
 }
 
-Quat4 TrackBall::calculate_track_ball_rotation(const Point3 &ptPrevious,
-        const Point3 &ptCurrent,
-        const Point3 &ptCenter) {
+Quat4 TrackBall::calculate_track_ball_rotation(const Point3& ptPrevious,
+        const Point3& ptCurrent,
+        const Point3& ptCenter) {
     const Vector3 v0 = ptCurrent - ptCenter;
     const Vector3 v1 = ptPrevious - ptCenter;
     const Vector3 vAxis = cross(v0, v1);

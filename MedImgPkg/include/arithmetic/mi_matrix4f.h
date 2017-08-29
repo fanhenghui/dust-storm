@@ -23,15 +23,15 @@ public:
         m_Col3 = Vector4f(0.0f);
     }
 
-    Matrix4f(const Matrix4f &mat) {
+    Matrix4f(const Matrix4f& mat) {
         m_Col0 = mat.m_Col0;
         m_Col1 = mat.m_Col1;
         m_Col2 = mat.m_Col2;
         m_Col3 = mat.m_Col3;
     }
 
-    Matrix4f(const Vector4f &col0, const Vector4f &col1, const Vector4f &col2,
-             const Vector4f &col3) {
+    Matrix4f(const Vector4f& col0, const Vector4f& col1, const Vector4f& col2,
+             const Vector4f& col3) {
         m_Col0 = col0;
         m_Col1 = col1;
         m_Col2 = col2;
@@ -45,7 +45,7 @@ public:
         m_Col3 = Vector4f(scalar);
     }
 
-    inline Matrix4f &operator=(const Matrix4f &mat) {
+    inline Matrix4f& operator=(const Matrix4f& mat) {
         m_Col0 = mat.m_Col0;
         m_Col1 = mat.m_Col1;
         m_Col2 = mat.m_Col2;
@@ -53,7 +53,7 @@ public:
         return *this;
     }
 
-    inline Matrix4f &set_translation(const Vector3f &translateVec) {
+    inline Matrix4f& set_translation(const Vector3f& translateVec) {
         m_Col3.set_xyz(translateVec);
         return *this;
     }
@@ -62,22 +62,22 @@ public:
         return m_Col3.get_xyz();
     }
 
-    inline Matrix4f &set_col0(const Vector4f &col0) {
+    inline Matrix4f& set_col0(const Vector4f& col0) {
         m_Col0 = col0;
         return *this;
     }
 
-    inline Matrix4f &set_col1(const Vector4f &col1) {
+    inline Matrix4f& set_col1(const Vector4f& col1) {
         m_Col1 = col1;
         return *this;
     }
 
-    inline Matrix4f &set_col2(const Vector4f &col2) {
+    inline Matrix4f& set_col2(const Vector4f& col2) {
         m_Col2 = col2;
         return *this;
     }
 
-    inline Matrix4f &set_col3(const Vector4f &col3) {
+    inline Matrix4f& set_col3(const Vector4f& col3) {
         m_Col3 = col3;
         return *this;
     }
@@ -98,7 +98,7 @@ public:
         return m_Col3;
     }
 
-    inline Matrix4f &set_col(const int col, const Vector4f &vec) {
+    inline Matrix4f& set_col(const int col, const Vector4f& vec) {
         *(&m_Col0 + col) = vec;
         return *this;
     }
@@ -107,7 +107,7 @@ public:
         return *(&m_Col0 + col);
     }
 
-    inline Matrix4f &set_row(const int row, const Vector4f &vec) {
+    inline Matrix4f& set_row(const int row, const Vector4f& vec) {
         m_Col0.set_elem(row, vec.get_elem(0));
         m_Col1.set_elem(row, vec.get_elem(1));
         m_Col2.set_elem(row, vec.get_elem(2));
@@ -120,7 +120,7 @@ public:
                         m_Col2.get_elem(row), m_Col3.get_elem(row));
     }
 
-    inline Vector4f &operator[](const int col) {
+    inline Vector4f& operator[](const int col) {
         return *(&m_Col0 + col);
     }
 
@@ -128,7 +128,7 @@ public:
         return *(&m_Col0 + col);
     }
 
-    inline Matrix4f &set_elem(const int col, const int row, const float val) {
+    inline Matrix4f& set_elem(const int col, const int row, const float val) {
         Vector4f tmpV3_0;
         tmpV3_0 = this->get_col(col);
         tmpV3_0.set_elem(row, val);
@@ -140,12 +140,12 @@ public:
         return this->get_col(col).get_elem(row);
     }
 
-    inline const Matrix4f operator+(const Matrix4f &mat) const {
+    inline const Matrix4f operator+(const Matrix4f& mat) const {
         return Matrix4f((m_Col0 + mat.m_Col0), (m_Col1 + mat.m_Col1),
                         (m_Col2 + mat.m_Col2), (m_Col3 + mat.m_Col3));
     }
 
-    inline const Matrix4f operator-(const Matrix4f &mat) const {
+    inline const Matrix4f operator-(const Matrix4f& mat) const {
         return Matrix4f((m_Col0 - mat.m_Col0), (m_Col1 - mat.m_Col1),
                         (m_Col2 - mat.m_Col2), (m_Col3 - mat.m_Col3));
     }
@@ -159,7 +159,7 @@ public:
                         (m_Col3 * scalar));
     }
 
-    inline const Vector4f operator*(const Vector4f &vec) const {
+    inline const Vector4f operator*(const Vector4f& vec) const {
         return Vector4f(_mm_add_ps(
                             _mm_add_ps(
                                 _mm_mul_ps(m_Col0._m128, _mm_shuffle_ps(vec._m128, vec._m128,
@@ -174,27 +174,27 @@ public:
                                                    _MM_SHUFFLE(3, 3, 3, 3))))));
     }
 
-    inline const Matrix4f operator*(const Matrix4f &mat) const {
+    inline const Matrix4f operator*(const Matrix4f& mat) const {
         return Matrix4f((*this * mat.m_Col0), (*this * mat.m_Col1),
                         (*this * mat.m_Col2), (*this * mat.m_Col3));
     }
 
-    inline Matrix4f &operator+=(const Matrix4f &mat) {
+    inline Matrix4f& operator+=(const Matrix4f& mat) {
         *this = *this + mat;
         return *this;
     }
 
-    inline Matrix4f &operator-=(const Matrix4f &mat) {
+    inline Matrix4f& operator-=(const Matrix4f& mat) {
         *this = *this - mat;
         return *this;
     }
 
-    inline Matrix4f &operator*=(const float scalar) {
+    inline Matrix4f& operator*=(const float scalar) {
         *this = *this * scalar;
         return *this;
     }
 
-    inline Matrix4f &operator*=(const Matrix4f &mat) {
+    inline Matrix4f& operator*=(const Matrix4f& mat) {
         *this = *this * mat;
         return *this;
     }
@@ -254,7 +254,7 @@ public:
                         Vector4f(_mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
-    inline const Matrix4f rotate(const float radians, const Vector3f &unitVec) {
+    inline const Matrix4f rotate(const float radians, const Vector3f& unitVec) {
         __m128 axis, s, c, oneMinusC, axisS, negAxisS, xxxx, yyyy, zzzz, tmp0, tmp1,
                tmp2;
         axis = unitVec._m128;
@@ -282,17 +282,17 @@ public:
         ALIGN16 unsigned int select_xyz[4] = {0xffffffff, 0xffffffff, 0xffffffff,
                                               0
                                              };
-        axis = vec_and(axis, _mm_load_ps((float *)select_xyz));
-        tmp0 = vec_and(tmp0, _mm_load_ps((float *)select_xyz));
-        tmp1 = vec_and(tmp1, _mm_load_ps((float *)select_xyz));
-        tmp2 = vec_and(tmp2, _mm_load_ps((float *)select_xyz));
+        axis = vec_and(axis, _mm_load_ps((float*)select_xyz));
+        tmp0 = vec_and(tmp0, _mm_load_ps((float*)select_xyz));
+        tmp1 = vec_and(tmp1, _mm_load_ps((float*)select_xyz));
+        tmp2 = vec_and(tmp2, _mm_load_ps((float*)select_xyz));
         return Matrix4f(Vector4f(vec_madd(vec_mul(axis, xxxx), oneMinusC, tmp0)),
                         Vector4f(vec_madd(vec_mul(axis, yyyy), oneMinusC, tmp1)),
                         Vector4f(vec_madd(vec_mul(axis, zzzz), oneMinusC, tmp2)),
                         Vector4f(_mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
-    inline const Matrix4f scale(const Vector3f &scaleVec) {
+    inline const Matrix4f scale(const Vector3f& scaleVec) {
         __m128 zero = _mm_setzero_ps();
         ALIGN16 unsigned int select_x[4] = {0xffffffff, 0, 0, 0};
         ALIGN16 unsigned int select_y[4] = {0, 0xffffffff, 0, 0};
@@ -303,7 +303,7 @@ public:
                         Vector4f(_mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
-    inline const Matrix4f translation(const Vector3f &translateVec) {
+    inline const Matrix4f translation(const Vector3f& translateVec) {
         return Matrix4f(Vector4f(_mm_setr_ps(1.0f, 0.0f, 0.0f, 0.0f)),
                         Vector4f(_mm_setr_ps(0.0f, 1.0f, 0.0f, 0.0f)),
                         Vector4f(_mm_setr_ps(0.0f, 0.0f, 1.0f, 0.0f)),
@@ -317,11 +317,11 @@ public:
                          Vector4f(_mm_setr_ps(0.0f, 0.0f, 0.0f, 1.0f)));
     }
 
-    inline void prepend(const Matrix4f &myMatrix) {
+    inline void prepend(const Matrix4f& myMatrix) {
         *this = myMatrix * (*this);
     }
 
-    inline void append(const Matrix4f &myMatrix) {
+    inline void append(const Matrix4f& myMatrix) {
         *this = (*this) * myMatrix;
     }
 
@@ -387,8 +387,8 @@ public:
         ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000,
                                                     0x80000000, 0x00000000
                                                    };
-        const __m128 Sign_PNPN = _mm_load_ps((float *)_vmathPNPN);
-        const __m128 Sign_NPNP = _mm_load_ps((float *)_vmathNPNP);
+        const __m128 Sign_PNPN = _mm_load_ps((float*)_vmathPNPN);
+        const __m128 Sign_NPNP = _mm_load_ps((float*)_vmathNPNP);
 
         __m128 mtL1 = _mm_xor_ps(sum, Sign_PNPN);
 
@@ -428,7 +428,7 @@ public:
         // Dividing is FASTER than rcp_nr! (Because rcp_nr causes many
         // register-memory RWs).
         ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-        RDet = _mm_div_ss(_mm_load_ss((float *)&_vmathZERONE),
+        RDet = _mm_div_ss(_mm_load_ss((float*)&_vmathZERONE),
                           Det); // TODO: just 1.0f?
         RDet = _mm_shuffle_ps(RDet, RDet, 0x00);
 
@@ -460,7 +460,7 @@ public:
         return Matrix4f(Vector4f(_L1), Vector4f(_L2), Vector4f(_L3), Vector4f(_L4));
     }
 
-    inline Vector3f transform_point(const Vector3f &mypoint) const {
+    inline Vector3f transform_point(const Vector3f& mypoint) const {
         Vector4f spoint = Vector4f(mypoint);
         spoint._m[3] = 1.0f;
         Vector4f temp = *this * spoint;
@@ -471,7 +471,7 @@ public:
         return Vector3f(temp._m128);
     }
 
-    inline Vector3f transform_vector(const Vector3f &vec) const {
+    inline Vector3f transform_vector(const Vector3f& vec) const {
         __m128 res;
         __m128 xxxx, yyyy, zzzz;
         xxxx = vec_splat(vec._m128, 0);
@@ -483,7 +483,7 @@ public:
         return Vector3f(res);
     }
 
-    inline void extract_translate(Vector3f &myVector) const {
+    inline void extract_translate(Vector3f& myVector) const {
         myVector = Vector3f(m_Col3._m128);
     }
 
@@ -543,12 +543,12 @@ public:
         return tmp;
     }
 
-    inline bool operator==(const Matrix4f &myMatrix) const {
+    inline bool operator==(const Matrix4f& myMatrix) const {
         return (m_Col0 == myMatrix.get_col0() && m_Col1 == myMatrix.get_col1() &&
                 m_Col2 == myMatrix.get_col2() && m_Col3 == myMatrix.get_col3());
     }
 
-    inline bool operator!=(const Matrix4f &myMatrix) const {
+    inline bool operator!=(const Matrix4f& myMatrix) const {
         return (m_Col0 != myMatrix.get_col0() || m_Col1 != myMatrix.get_col1() ||
                 m_Col2 != myMatrix.get_col2() || m_Col3 != myMatrix.get_col3());
     }
@@ -559,7 +559,7 @@ public:
                                 FLOAT_EPSILON + 1.0f));
     }
 
-    inline Matrix4f make_scale(const Vector3f &myScale) {
+    inline Matrix4f make_scale(const Vector3f& myScale) {
         set_identity();
         m_Col0 *= myScale.get_x();
         m_Col1 *= myScale.get_y();
@@ -567,7 +567,7 @@ public:
         return *this;
     }
 
-    inline Matrix4f make_translate(const Vector3f &myTranslate) {
+    inline Matrix4f make_translate(const Vector3f& myTranslate) {
         set_identity();
         m_Col3 += Vector4f(myTranslate, 0.0f);
         return *this;
@@ -580,52 +580,52 @@ public:
 
 // append (post-multiply) a scale transformation to a 4x4 matrix
 // Faster than creating and multiplying a scale transformation matrix.
-Arithmetic_Export inline const Matrix4f append_scale(const Matrix4f &mat,
-        const Vector3f &scaleVec);
+Arithmetic_Export inline const Matrix4f append_scale(const Matrix4f& mat,
+        const Vector3f& scaleVec);
 
 // prepend (pre-multiply) a scale transformation to a 4x4 matrix
 // Faster than creating and multiplying a scale transformation matrix.
-Arithmetic_Export inline const Matrix4f prepend_scale(const Vector3f &scaleVec,
-        const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f prepend_scale(const Vector3f& scaleVec,
+        const Matrix4f& mat);
 
 // Multiply two 4x4 matrices per element
-Arithmetic_Export inline const Matrix4f mul_per_elem(const Matrix4f &mat0,
-        const Matrix4f &mat1);
+Arithmetic_Export inline const Matrix4f mul_per_elem(const Matrix4f& mat0,
+        const Matrix4f& mat1);
 
 // Compute the absolute value of a 4x4 matrix per element
-Arithmetic_Export inline const Matrix4f abs_per_elem(const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f abs_per_elem(const Matrix4f& mat);
 
 // transpose of a 4x4 matrix
-Arithmetic_Export inline const Matrix4f transpose(const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f transpose(const Matrix4f& mat);
 
 // Compute the inverse of a 4x4 matrix
 // Result is unpredictable when the determinant of mat is equal to or near 0.
-Arithmetic_Export inline const Matrix4f inverse(const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f inverse(const Matrix4f& mat);
 
 // Compute the inverse of a 4x4 matrix, which is expected to be an affine matrix
 // This can be used to achieve better performance than a general inverse when
 // the specified 4x4 matrix meets the given restrictions.  The result is
 // unpredictable when the determinant of mat is equal to or near 0.
-Arithmetic_Export inline const Matrix4f affine_inverse(const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f affine_inverse(const Matrix4f& mat);
 
 // Compute the inverse of a 4x4 matrix, which is expected to be an affine matrix
 // with an orthogonal upper-left 3x3 submatrix
 // This can be used to achieve better performance than a general inverse when
 // the specified 4x4 matrix meets the given restrictions.
-Arithmetic_Export inline const Matrix4f ortho_inverse(const Matrix4f &mat);
+Arithmetic_Export inline const Matrix4f ortho_inverse(const Matrix4f& mat);
 
 // determinant of a 4x4 matrix
-Arithmetic_Export inline const float determinant(const Matrix4f &mat);
+Arithmetic_Export inline const float determinant(const Matrix4f& mat);
 
 #ifdef _DEBUG
 
 // print a 4x4 matrix
 // Function is only defined when _DEBUG is defined.
-Arithmetic_Export inline void print(const Matrix4f &mat);
+Arithmetic_Export inline void print(const Matrix4f& mat);
 
 // print a 4x4 matrix and an associated string identifier
 // Function is only defined when _DEBUG is defined.
-Arithmetic_Export inline void print(const Matrix4f &mat, const char *name);
+Arithmetic_Export inline void print(const Matrix4f& mat, const char* name);
 
 #endif
 

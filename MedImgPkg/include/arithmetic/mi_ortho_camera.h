@@ -19,8 +19,8 @@ public:
     void set_ortho(double left, double right, double bottom, double top,
                    double near, double far0);
 
-    void get_ortho(double &left, double &right, double &bottom, double &top,
-                   double &near, double &far0) const;
+    void get_ortho(double& left, double& right, double& bottom, double& top,
+                   double& near, double& far0) const;
 
     virtual Matrix4 get_projection_matrix();
 
@@ -32,9 +32,9 @@ public:
 
     double get_far_clip_distance() const;
 
-    OrthoCamera &operator=(const OrthoCamera &camera);
+    OrthoCamera& operator=(const OrthoCamera& camera);
 
-    bool operator==(const OrthoCamera &camera) const;
+    bool operator==(const OrthoCamera& camera) const;
 
 protected:
     virtual void calculate_projection_matrix_i();

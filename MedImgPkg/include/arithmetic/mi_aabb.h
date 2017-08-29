@@ -15,8 +15,8 @@ public:
     AABB();
     virtual ~AABB();
 
-    bool operator==(const AABB &aabb) const;
-    bool operator!=(const AABB &aabb) const;
+    bool operator==(const AABB& aabb) const;
+    bool operator!=(const AABB& aabb) const;
 };
 
 class Arithmetic_Export AABBUI : public IShape {
@@ -29,8 +29,8 @@ public:
     AABBUI(const unsigned int (&min0)[3], const unsigned int (&max0)[3]);
     virtual ~AABBUI();
 
-    bool operator==(const AABBUI &aabb) const;
-    bool operator!=(const AABBUI &aabb) const;
+    bool operator==(const AABBUI& aabb) const;
+    bool operator!=(const AABBUI& aabb) const;
 
     void Print();
 };
@@ -45,8 +45,8 @@ public:
     AABBI(const int (&min0)[3], const int (&max0)[3]);
     virtual ~AABBI();
 
-    bool operator==(const AABBI &aabb) const;
-    bool operator!=(const AABBI &aabb) const;
+    bool operator==(const AABBI& aabb) const;
+    bool operator!=(const AABBI& aabb) const;
 
     void Print();
 };

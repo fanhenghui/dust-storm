@@ -16,9 +16,10 @@ public:
 
     Quat4() : w(0), x(1), y(0), z(0) {}
 
-    Quat4(double angle, const Vector3 &axis)
+    Quat4(double angle, const Vector3& axis)
         : w(std::cos(angle / 2)), m_bNorm(true) {
         double mag = axis.magnitude();
+
         if (mag < DOUBLE_EPSILON) {
             x = 0;
             y = 0;
@@ -31,7 +32,7 @@ public:
         }
     }
 
-    Quat4(const Quat4 &quat)
+    Quat4(const Quat4& quat)
         : w(quat.w), x(quat.x), y(quat.y), z(quat.z), m_bNorm(quat.m_bNorm) {}
 
     inline Quat4 operator-() const {
@@ -43,7 +44,7 @@ public:
         return quat;
     }
 
-    inline Quat4 operator*(const Quat4 &quat) const {
+    inline Quat4 operator*(const Quat4& quat) const {
         Quat4 quatOut;
         quatOut.w = w * quat.w - x * quat.x - y * quat.y - z * quat.z;
         quatOut.x = w * quat.x + x * quat.w + y * quat.z - z * quat.y;
@@ -53,7 +54,7 @@ public:
         return quatOut;
     }
 
-    inline Quat4 &operator*=(const Quat4 &quat) {
+    inline Quat4& operator*=(const Quat4& quat) {
         *this = *this * quat;
         return *this;
     }
@@ -83,6 +84,7 @@ public:
             return true;
         } else {
             double norm = std::sqrt(w * w + x * x + y * y + z * z);
+
             if (DOUBLE_EPSILON > norm) {
                 return false;
             } else {
@@ -96,21 +98,21 @@ public:
         }
     }
 
-    inline bool operator==(const Quat4 &quat) const {
+    inline bool operator==(const Quat4& quat) const {
         return (std::abs(w - quat.w) < DOUBLE_EPSILON &&
                 std::abs(x - quat.x) < DOUBLE_EPSILON &&
                 std::abs(y - quat.y) < DOUBLE_EPSILON &&
                 std::abs(z - quat.z) < DOUBLE_EPSILON);
     }
 
-    inline bool operator!=(const Quat4 &quat) const {
+    inline bool operator!=(const Quat4& quat) const {
         return (std::abs(w - quat.w) > DOUBLE_EPSILON ||
                 std::abs(x - quat.x) > DOUBLE_EPSILON ||
                 std::abs(y - quat.y) > DOUBLE_EPSILON ||
                 std::abs(z - quat.z) > DOUBLE_EPSILON);
     }
 
-    inline Quat4 &operator=(const Quat4 &quat) {
+    inline Quat4& operator=(const Quat4& quat) {
         w = quat.w;
         x = quat.x;
         y = quat.y;

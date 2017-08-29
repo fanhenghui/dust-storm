@@ -22,7 +22,7 @@ public:
 
     virtual ~Plane();
 
-    double distance_to_point(const Point3 &pt) const;
+    double distance_to_point(const Point3& pt) const;
 };
 
 MED_IMG_END_NAMESPACE

@@ -2,7 +2,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-Matrix4f ArithmeticUtils::convert_matrix(const Matrix4 &mat) {
+Matrix4f ArithmeticUtils::convert_matrix(const Matrix4& mat) {
     Vector4f col0((float)mat.m[0][0], (float)mat.m[0][1], (float)mat.m[0][2],
                   (float)mat.m[0][3]);
     Vector4f col1((float)mat.m[1][0], (float)mat.m[1][1], (float)mat.m[1][2],
@@ -15,15 +15,15 @@ Matrix4f ArithmeticUtils::convert_matrix(const Matrix4 &mat) {
     return Matrix4f(col0, col1, col2, col3);
 }
 
-Vector3f ArithmeticUtils::convert_vector(const Vector3 &v) {
+Vector3f ArithmeticUtils::convert_vector(const Vector3& v) {
     return Vector3f((float)v.x, (float)v.y, (float)v.z);
 }
 
-Vector3f ArithmeticUtils::convert_point(const Point3 &v) {
+Vector3f ArithmeticUtils::convert_point(const Point3& v) {
     return Vector3f((float)v.x, (float)v.y, (float)v.z);
 }
 
-Point2 ArithmeticUtils::dc_to_ndc(const Point2 &pt_dc, int width, int height) {
+Point2 ArithmeticUtils::dc_to_ndc(const Point2& pt_dc, int width, int height) {
     double x = (pt_dc.x + 0.5) / (double)width;
     double y = (pt_dc.y + 0.5) / (double)height;
     return Point2(x * 2.0 - 1.0, -(y * 2.0 - 1.0));
@@ -32,6 +32,7 @@ Point2 ArithmeticUtils::dc_to_ndc(const Point2 &pt_dc, int width, int height) {
 Point2 ArithmeticUtils::ndc_to_dc(Point2 pt_ndc, int width, int height,
                                   int spill_tag) {
     spill_tag = 0;
+
     if (pt_ndc.x < -1.0) {
         pt_ndc.x = -1.0;
         spill_tag = 1;
@@ -75,7 +76,7 @@ Point2 ArithmeticUtils::ndc_to_dc_decimal(Point2 pt_ndc, int width,
     return Point2(x, y);
 }
 
-bool ArithmeticUtils::check_in_bound(const Point3 &pt, const Point3 &bound) {
+bool ArithmeticUtils::check_in_bound(const Point3& pt, const Point3& bound) {
     if (pt.x < 0 || pt.x > bound.x || pt.y < 0 || pt.y > bound.y || pt.z < 0 ||
             pt.z > bound.z) {
         return false;
@@ -85,7 +86,7 @@ bool ArithmeticUtils::check_in_bound(const Point3 &pt, const Point3 &bound) {
 }
 
 void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
-                                       const Sphere &sphere,
+                                       const Sphere& sphere,
                                        unsigned int (&begin)[3],
                                        unsigned int (&end)[3]) {
     const Point3 min =
@@ -124,7 +125,7 @@ void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
 }
 
 void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
-                                       const Ellipsoid &ellipsoid,
+                                       const Ellipsoid& ellipsoid,
                                        unsigned int (&begin)[3],
                                        unsigned int (&end)[3]) {
     const double radius =

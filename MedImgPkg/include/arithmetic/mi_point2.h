@@ -18,24 +18,24 @@ public:
 
     Point2(double x1, double y1) : x(x1), y(y1) {}
 
-    Point2(const Point2 &pt) {
+    Point2(const Point2& pt) {
         x = pt.x;
         y = pt.y;
     }
 
-    inline Point2 &operator+=(const Vector2 &v) {
+    inline Point2& operator+=(const Vector2& v) {
         this->x = this->x + v.x;
         this->y = this->y + v.y;
         return *this;
     }
 
-    inline Point2 &operator-=(const Vector2 &v) {
+    inline Point2& operator-=(const Vector2& v) {
         this->x = this->x - v.x;
         this->y = this->y - v.y;
         return *this;
     }
 
-    inline Point2 &operator*=(double scale) {
+    inline Point2& operator*=(double scale) {
         x *= scale;
         y *= scale;
         return *this;
@@ -45,18 +45,18 @@ public:
         return Point2(x * scale, y * scale);
     }
 
-    inline Point2 &operator=(const Point2 &pt) {
+    inline Point2& operator=(const Point2& pt) {
         this->x = pt.x;
         this->y = pt.y;
         return *this;
     }
 
-    inline bool operator!=(const Point2 &pt) const {
+    inline bool operator!=(const Point2& pt) const {
         return (std::fabs(x - pt.x) > DOUBLE_EPSILON ||
                 std::fabs(y - pt.y) > DOUBLE_EPSILON);
     }
 
-    inline bool operator==(const Point2 &pt) const {
+    inline bool operator==(const Point2& pt) const {
         return (std::fabs(x - pt.x) < DOUBLE_EPSILON &&
                 std::fabs(y - pt.y) < DOUBLE_EPSILON);
     }
@@ -66,13 +66,13 @@ public:
     }
 };
 
-Point2 Arithmetic_Export operator*(double scale, const Point2 &v);
+Point2 Arithmetic_Export operator*(double scale, const Point2& v);
 
-Vector2 Arithmetic_Export operator-(const Point2 &pt1, const Point2 &pt2);
+Vector2 Arithmetic_Export operator-(const Point2& pt1, const Point2& pt2);
 
-Point2 Arithmetic_Export operator+(const Point2 &pt, const Vector2 &v);
+Point2 Arithmetic_Export operator+(const Point2& pt, const Vector2& v);
 
-Point2 Arithmetic_Export operator-(const Point2 &pt, const Vector2 &v);
+Point2 Arithmetic_Export operator-(const Point2& pt, const Vector2& v);
 
 MED_IMG_END_NAMESPACE
 

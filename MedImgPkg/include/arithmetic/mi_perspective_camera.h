@@ -35,9 +35,9 @@ public:
 
     virtual void zoom(double rate);
 
-    virtual void pan(const Vector2 &pan);
+    virtual void pan(const Vector2& pan);
 
-    PerspectiveCamera &operator=(const PerspectiveCamera &camera);
+    PerspectiveCamera& operator=(const PerspectiveCamera& camera);
 
 protected:
     virtual void calculate_projection_matrix_i();

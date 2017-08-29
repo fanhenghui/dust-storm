@@ -20,18 +20,19 @@ RSAUtils::RSAUtils() {}
 
 RSAUtils::~RSAUtils() {}
 
-int RSAUtils::gen_key(mbedtls_rsa_context &rsa, int key_size /*= 2048*/,
+int RSAUtils::gen_key(mbedtls_rsa_context& rsa, int key_size /*= 2048*/,
                       int exponent /*= 65537*/) {
     int ret = 0;
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
-    const char *pers = "rsa_genkey";
+    const char* pers = "rsa_genkey";
 
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
     mbedtls_entropy_init(&entropy);
+
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                                     (const unsigned char *)pers,
+                                     (const unsigned char*)pers,
                                      strlen(pers))) != 0) {
         // mbedtls_printf( " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret
         // );
@@ -50,10 +51,11 @@ int RSAUtils::gen_key(mbedtls_rsa_context &rsa, int key_size /*= 2048*/,
     return 0;
 }
 
-int RSAUtils::key_to_file(const mbedtls_rsa_context &rsa,
-                          const std::string &file_public,
-                          const std::string &file_private) {
-    FILE *fpub = nullptr;
+int RSAUtils::key_to_file(const mbedtls_rsa_context& rsa,
+                          const std::string& file_public,
+                          const std::string& file_private) {
+    FILE* fpub = nullptr;
+
     if ((fpub = fopen(file_public.c_str(), "wb+")) == nullptr) {
         // mbedtls_printf( " failed\n  ! could not open rsa_pub.txt for writing\n\n"
         // );
@@ -67,9 +69,11 @@ int RSAUtils::key_to_file(const mbedtls_rsa_context &rsa,
         fclose(fpub);
         return -1;
     }
+
     fclose(fpub);
 
-    FILE *fpriv = nullptr;
+    FILE* fpriv = nullptr;
+
     if ((fpriv = fopen(file_private.c_str(), "wb+")) == nullptr) {
         // mbedtls_printf( " failed\n  ! could not open rsa_priv.txt for writing\n"
         // );
@@ -95,10 +99,10 @@ int RSAUtils::key_to_file(const mbedtls_rsa_context &rsa,
     return 0;
 }
 
-int RSAUtils::entrypt(const mbedtls_rsa_context &rsa, size_t len_context,
-                      unsigned char *context, unsigned char (&output)[512]) {
+int RSAUtils::entrypt(const mbedtls_rsa_context& rsa, size_t len_context,
+                      unsigned char* context, unsigned char(&output)[512]) {
     int return_val = 0;
-    const char *pers = "rsa_encrypt";
+    const char* pers = "rsa_encrypt";
 
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
@@ -107,15 +111,16 @@ int RSAUtils::entrypt(const mbedtls_rsa_context &rsa, size_t len_context,
     mbedtls_entropy_init(&entropy);
 
     return_val = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                                       (const unsigned char *)pers, strlen(pers));
+                                       (const unsigned char*)pers, strlen(pers));
 
     if (return_val != 0) {
         return -1;
     }
 
     return_val = mbedtls_rsa_pkcs1_encrypt(
-                     const_cast<mbedtls_rsa_context *>(&rsa), mbedtls_ctr_drbg_random,
+                     const_cast<mbedtls_rsa_context*>(&rsa), mbedtls_ctr_drbg_random,
                      &ctr_drbg, MBEDTLS_RSA_PUBLIC, len_context, context, output);
+
     if (return_val != 0) {
         return -1;
     }
@@ -123,10 +128,10 @@ int RSAUtils::entrypt(const mbedtls_rsa_context &rsa, size_t len_context,
     return 0;
 }
 
-int RSAUtils::detrypt(const mbedtls_rsa_context &rsa, size_t len_context,
-                      unsigned char *context, unsigned char (&output)[1024]) {
+int RSAUtils::detrypt(const mbedtls_rsa_context& rsa, size_t len_context,
+                      unsigned char* context, unsigned char(&output)[1024]) {
     int return_val = 0;
-    const char *pers = "rsa_decrypt";
+    const char* pers = "rsa_decrypt";
 
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
@@ -135,15 +140,16 @@ int RSAUtils::detrypt(const mbedtls_rsa_context &rsa, size_t len_context,
     mbedtls_entropy_init(&entropy);
 
     return_val = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                                       (const unsigned char *)pers, strlen(pers));
+                                       (const unsigned char*)pers, strlen(pers));
 
     if (return_val != 0) {
         return -1;
     }
 
     return_val = mbedtls_rsa_pkcs1_decrypt(
-                     const_cast<mbedtls_rsa_context *>(&rsa), mbedtls_ctr_drbg_random,
+                     const_cast<mbedtls_rsa_context*>(&rsa), mbedtls_ctr_drbg_random,
                      &ctr_drbg, MBEDTLS_RSA_PRIVATE, &len_context, context, output, 1024);
+
     if (return_val != 0) {
         return -1;
     }
@@ -151,8 +157,8 @@ int RSAUtils::detrypt(const mbedtls_rsa_context &rsa, size_t len_context,
     return 0;
 }
 
-int RSAUtils::file_to_private_key(const std::string &file_private,
-                                  mbedtls_rsa_context &rsa) {
+int RSAUtils::file_to_private_key(const std::string& file_private,
+                                  mbedtls_rsa_context& rsa) {
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
 
@@ -160,15 +166,17 @@ int RSAUtils::file_to_private_key(const std::string &file_private,
     mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
 
-    const char *pers = "rsa_decrypt";
+    const char* pers = "rsa_decrypt";
     int return_val =
         mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                              (const unsigned char *)pers, strlen(pers));
+                              (const unsigned char*)pers, strlen(pers));
+
     if (return_val != 0) {
         return -1;
     }
 
-    FILE *fpriv = nullptr;
+    FILE* fpriv = nullptr;
+
     if ((fpriv = fopen("rsa_priv.txt", "rb")) == NULL) {
         return -1;
     }
@@ -192,8 +200,8 @@ int RSAUtils::file_to_private_key(const std::string &file_private,
     return 0;
 }
 
-int RSAUtils::file_to_pubilc_key(const std::string &file_public,
-                                 mbedtls_rsa_context &rsa) {
+int RSAUtils::file_to_pubilc_key(const std::string& file_public,
+                                 mbedtls_rsa_context& rsa) {
     mbedtls_entropy_context entropy;
     mbedtls_ctr_drbg_context ctr_drbg;
 
@@ -201,15 +209,17 @@ int RSAUtils::file_to_pubilc_key(const std::string &file_public,
     mbedtls_ctr_drbg_init(&ctr_drbg);
     mbedtls_entropy_init(&entropy);
 
-    const char *pers = "rsa_encrypt";
+    const char* pers = "rsa_encrypt";
     int return_val =
         mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
-                              (const unsigned char *)pers, strlen(pers));
+                              (const unsigned char*)pers, strlen(pers));
+
     if (return_val != 0) {
         return -1;
     }
 
-    FILE *fpub = nullptr;
+    FILE* fpub = nullptr;
+
     if ((fpub = fopen(file_public.c_str(), "rb")) == NULL) {
         return -1;
     }
@@ -227,13 +237,14 @@ int RSAUtils::file_to_pubilc_key(const std::string &file_public,
     return 0;
 }
 
-int RSAUtils::to_rsa_context(const char *n, const char *e, const char *d,
-                             const char *p, const char *q, const char *dp,
-                             const char *dq, const char *qp,
-                             mbedtls_rsa_context &rsa) {
+int RSAUtils::to_rsa_context(const char* n, const char* e, const char* d,
+                             const char* p, const char* q, const char* dp,
+                             const char* dq, const char* qp,
+                             mbedtls_rsa_context& rsa) {
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, 0);
 
     int status = -1;
+
     if ((status = mbedtls_mpi_read_string(&rsa.N, 16, n)) != 0 ||
             (status = mbedtls_mpi_read_string(&rsa.E, 16, e)) != 0 ||
             (status = mbedtls_mpi_read_string(&rsa.D, 16, d)) != 0 ||

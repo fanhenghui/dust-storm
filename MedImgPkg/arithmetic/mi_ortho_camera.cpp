@@ -28,8 +28,8 @@ void OrthoCamera::set_ortho(double left, double right, double bottom,
     _is_proj_mat_cal = false;
 }
 
-void OrthoCamera::get_ortho(double &left, double &right, double &bottom,
-                            double &top, double &near, double &far0) const {
+void OrthoCamera::get_ortho(double& left, double& right, double& bottom,
+                            double& top, double& near, double& far0) const {
     left = _left;
     right = _right;
     bottom = _bottom;
@@ -81,7 +81,7 @@ double OrthoCamera::get_far_clip_distance() const {
     return _far;
 }
 
-OrthoCamera &OrthoCamera::operator=(const OrthoCamera &camera) {
+OrthoCamera& OrthoCamera::operator=(const OrthoCamera& camera) {
     CameraBase::operator=(camera);
 
 #define COPY_PARAMETER(p) this->p = camera.p
@@ -98,7 +98,7 @@ OrthoCamera &OrthoCamera::operator=(const OrthoCamera &camera) {
     return *this;
 }
 
-bool OrthoCamera::operator==(const OrthoCamera &camera) const {
+bool OrthoCamera::operator==(const OrthoCamera& camera) const {
     if (_is_proj_mat_cal && _is_view_mat_cal && camera._is_proj_mat_cal &&
             camera._is_view_mat_cal) {
         return _mat_view == camera._mat_view &&

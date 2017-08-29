@@ -3,10 +3,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-bool IntersectionTest::plane_to_plane(const Plane &plane1, const Plane &plane2,
-                                      Line3D &intersected_line) {
+bool IntersectionTest::plane_to_plane(const Plane& plane1, const Plane& plane2,
+                                      Line3D& intersected_line) {
     const Vector3 norm1 = plane1._norm; // Here should be normalized
     const Vector3 norm2 = plane2._norm;
+
     if (norm1 == norm2) {
         return false;
     } else {
@@ -26,6 +27,7 @@ bool IntersectionTest::plane_to_plane(const Plane &plane1, const Plane &plane2,
         double x = 0;
         double y = 0;
         double z = 0;
+
         if (std::abs(a0 * b1 - a1 * b0) > DOUBLE_EPSILON) {
             x = (b1 * d0 - b0 * d1) / (a0 * b1 - a1 * b0);
             y = (a1 * d0 - a0 * d1) / (a1 * b0 - a0 * b1);

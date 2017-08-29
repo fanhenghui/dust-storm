@@ -2,13 +2,13 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-const Matrix4f append_scale(const Matrix4f &mat, const Vector3f &scaleVec) {
+const Matrix4f append_scale(const Matrix4f& mat, const Vector3f& scaleVec) {
     return Matrix4f((mat.get_col0() * scaleVec.get_x()),
                     (mat.get_col1() * scaleVec.get_y()),
                     (mat.get_col2() * scaleVec.get_z()), mat.get_col3());
 }
 
-const Matrix4f prepend_scale(const Vector3f &scaleVec, const Matrix4f &mat) {
+const Matrix4f prepend_scale(const Vector3f& scaleVec, const Matrix4f& mat) {
     Vector4f scale4 = Vector4f(scaleVec, 1.0f);
     return Matrix4f(mul_per_elem(mat.get_col0(), scale4),
                     mul_per_elem(mat.get_col1(), scale4),
@@ -16,19 +16,19 @@ const Matrix4f prepend_scale(const Vector3f &scaleVec, const Matrix4f &mat) {
                     mul_per_elem(mat.get_col3(), scale4));
 }
 
-const Matrix4f mul_per_elem(const Matrix4f &mat0, const Matrix4f &mat1) {
+const Matrix4f mul_per_elem(const Matrix4f& mat0, const Matrix4f& mat1) {
     return Matrix4f(mul_per_elem(mat0.get_col0(), mat1.get_col0()),
                     mul_per_elem(mat0.get_col1(), mat1.get_col1()),
                     mul_per_elem(mat0.get_col2(), mat1.get_col2()),
                     mul_per_elem(mat0.get_col3(), mat1.get_col3()));
 }
 
-const Matrix4f abs_per_elem(const Matrix4f &mat) {
+const Matrix4f abs_per_elem(const Matrix4f& mat) {
     return Matrix4f(abs_per_elem(mat.get_col0()), abs_per_elem(mat.get_col1()),
                     abs_per_elem(mat.get_col2()), abs_per_elem(mat.get_col3()));
 }
 
-const Matrix4f transpose(const Matrix4f &mat) {
+const Matrix4f transpose(const Matrix4f& mat) {
     __m128 tmp0 = vec_mergeh(mat.get_col0()._m128, mat.get_col2()._m128);
     __m128 tmp1 = vec_mergeh(mat.get_col1()._m128, mat.get_col3()._m128);
     __m128 tmp2 = vec_mergel(mat.get_col0()._m128, mat.get_col2()._m128);
@@ -41,7 +41,7 @@ const Matrix4f transpose(const Matrix4f &mat) {
                     Vector4f(res3));
 }
 
-const Matrix4f inverse(const Matrix4f &mat) {
+const Matrix4f inverse(const Matrix4f& mat) {
     __m128 _L1 = mat.get_col0()._m128;
     __m128 _L2 = mat.get_col1()._m128;
     __m128 _L3 = mat.get_col2()._m128;
@@ -80,8 +80,8 @@ const Matrix4f inverse(const Matrix4f &mat) {
     ALIGN16 const unsigned int _vmathNPNP[4] = {0x80000000, 0x00000000,
                                                 0x80000000, 0x00000000
                                                };
-    const __m128 Sign_PNPN = _mm_load_ps((float *)_vmathPNPN);
-    const __m128 Sign_NPNP = _mm_load_ps((float *)_vmathNPNP);
+    const __m128 Sign_PNPN = _mm_load_ps((float*)_vmathPNPN);
+    const __m128 Sign_NPNP = _mm_load_ps((float*)_vmathNPNP);
 
     __m128 mtL1 = _mm_xor_ps(sum, Sign_PNPN);
 
@@ -122,7 +122,7 @@ const Matrix4f inverse(const Matrix4f &mat) {
     // RWs).
     ALIGN16 const float _vmathZERONE[4] = {1.0f, 0.0f, 0.0f, 1.0f};
     __m128 RDet =
-        _mm_div_ss(_mm_load_ss((float *)&_vmathZERONE), Det); // TODO: just 1.0f?
+        _mm_div_ss(_mm_load_ss((float*)&_vmathZERONE), Det);  // TODO: just 1.0f?
     RDet = _mm_shuffle_ps(RDet, RDet, 0x00);
 
     // Devide the first 12 minterms with the determinant.
@@ -153,7 +153,7 @@ const Matrix4f inverse(const Matrix4f &mat) {
     return Matrix4f(Vector4f(_L1), Vector4f(_L2), Vector4f(_L3), Vector4f(_L4));
 }
 
-const Matrix4f affine_inverse(const Matrix4f &mat) {
+const Matrix4f affine_inverse(const Matrix4f& mat) {
     Vector3f col0 = mat.get_col0().get_xyz();
     Vector3f col1 = mat.get_col1().get_xyz();
     Vector3f col2 = mat.get_col2().get_xyz();
@@ -178,7 +178,7 @@ const Matrix4f affine_inverse(const Matrix4f &mat) {
                     Vector4f(inv2, 0.0f), Vector4f(temp, 1.0));
 }
 
-const Matrix4f ortho_inverse(const Matrix4f &mat) {
+const Matrix4f ortho_inverse(const Matrix4f& mat) {
     Vector3f inv0 = mat.get_row(0).get_xyz();
     Vector3f inv1 = mat.get_row(1).get_xyz();
     Vector3f inv2 = mat.get_row(2).get_xyz();
@@ -189,7 +189,7 @@ const Matrix4f ortho_inverse(const Matrix4f &mat) {
                     Vector4f(inv2, 0.0f), Vector4f(temp, 1.0));
 }
 
-const float determinant(const Matrix4f &mat) {
+const float determinant(const Matrix4f& mat) {
     __m128 _L1 = mat.get_col0()._m128;
     __m128 _L2 = mat.get_col1()._m128;
     __m128 _L3 = mat.get_col2()._m128;
@@ -237,14 +237,14 @@ const float determinant(const Matrix4f &mat) {
 
 #ifdef _DEBUG
 
-void print(const Matrix4f &mat) {
+void print(const Matrix4f& mat) {
     print(mat.get_row(0));
     print(mat.get_row(1));
     print(mat.get_row(2));
     print(mat.get_row(3));
 }
 
-void print(const Matrix4f &mat, const char *name) {
+void print(const Matrix4f& mat, const char* name) {
     printf("%s:\n", name);
     print(mat);
 }
