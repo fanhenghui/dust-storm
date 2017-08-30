@@ -27,7 +27,7 @@ sampler3D volume_sampler , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub
     float wl_min_gray;
     float gray;
 
-    vec3 actual_sample_pos = (sample_pos + sub_data_offset )/sub_data_dim;//Actual SamplePos in sampler
+    vec3 actual_sample_pos = (sample_pos + sub_data_offset + vec3(0.5,0.5,0.5) )/sub_data_dim;//Actual SamplePos in sampler
     if(access_mask(mask_sampler , actual_sample_pos , label))
     {
         wl_min_gray = windowing[label].y - 0.5 * windowing[label].x;

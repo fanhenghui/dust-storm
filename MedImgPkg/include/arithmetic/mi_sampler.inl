@@ -69,6 +69,25 @@ template <class T>
 float Sampler<T>::sample_3d_nearst(float x, float y, float z,
                                    unsigned int uiWidth, unsigned int uiHeight,
                                    unsigned int uiDepth, T* data) const {
+    if (x < 0 ) { x = 0;}
+    if (y < 0 ) { y = 0;}
+    if (z < 0 ) { z = 0;}
+
+    if (x >= (float)(uiWidth - 1) - FLOAT_EPSILON) {
+        x = (float)(uiWidth - 1);
+    }
+
+    unsigned int uiYAdjust = uiWidth;
+
+    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
+        uiYAdjust = 0;
+    }
+
+    unsigned int uiZAdjust = uiWidth * uiHeight;
+
+    if (z >= (float)(uiDepth - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������z����Ϊ������ʱ������ȥ��֧
+        uiZAdjust = 0;
+    }
     const unsigned int uX = (unsigned int)x;
     const unsigned int uY = (unsigned int)y;
     const unsigned int uZ = (unsigned int)z;
@@ -82,6 +101,10 @@ float Sampler<T>::sample_3d_linear(float x, float y, float z,
                                    unsigned int uiDepth, T* data) const {
     unsigned int uiXAdjust = 1;
 
+    if (x < 0 ) { x = 0;}
+    if (y < 0 ) { y = 0;}
+    if (z < 0 ) { z = 0;}
+
     if (x >= (float)(uiWidth - 1) - FLOAT_EPSILON) {
         x = (float)(uiWidth - 1);
         uiXAdjust = 0;
@@ -89,18 +112,14 @@ float Sampler<T>::sample_3d_linear(float x, float y, float z,
 
     unsigned int uiYAdjust = uiWidth;
 
-    if (y >=
-            (float)(uiHeight - 1) -
-            FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
+    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
         y = (float)(uiHeight - 1);
         uiYAdjust = 0;
     }
 
     unsigned int uiZAdjust = uiWidth * uiHeight;
 
-    if (z >=
-            (float)(uiDepth - 1) -
-            FLOAT_EPSILON) { // TODO ��������==�� ����������z����Ϊ������ʱ������ȥ��֧
+    if (z >= (float)(uiDepth - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������z����Ϊ������ʱ������ȥ��֧
         z = (float)(uiDepth - 1);
         uiZAdjust = 0;
     }

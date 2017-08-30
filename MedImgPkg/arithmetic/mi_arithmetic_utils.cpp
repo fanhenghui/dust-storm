@@ -77,8 +77,9 @@ Point2 ArithmeticUtils::ndc_to_dc_decimal(Point2 pt_ndc, int width,
 }
 
 bool ArithmeticUtils::check_in_bound(const Point3& pt, const Point3& bound) {
-    if (pt.x < 0 || pt.x > bound.x || pt.y < 0 || pt.y > bound.y || pt.z < 0 ||
-            pt.z > bound.z) {
+    if (pt.x < -FLOAT_EPSILON || pt.x > bound.x + FLOAT_EPSILON || 
+        pt.y < -FLOAT_EPSILON || pt.y > bound.y + FLOAT_EPSILON|| 
+        pt.z < -FLOAT_EPSILON || pt.z > bound.z + FLOAT_EPSILON) {
         return false;
     } else {
         return true;

@@ -106,7 +106,8 @@ bool MPRScene::get_world_position(const Point2& pt_dc, Point3& pos_w) {
 
 void MPRScene::page(int step) {
     // TODO should consider oblique MPR
-    _camera_calculator->page_orthognal_mpr(_ray_cast_camera, step);
+    int cur_page = 0;
+    _camera_calculator->page_orthognal_mpr(_ray_cast_camera, step , cur_page);
     set_dirty(true);
 }
 

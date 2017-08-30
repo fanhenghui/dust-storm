@@ -127,13 +127,15 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& target_mpr_scene , in
 {
     //1 page target MPR
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(target_mpr_scene->get_camera());
-    if( !_camera_calculator->page_orthognal_mpr(camera , step))
+    int cur_page = 0;
+    if( !_camera_calculator->page_orthognal_mpr(camera , step , cur_page))
     {
         return false;
     }
 
     target_mpr_scene->set_dirty(true);
-    set_page_i(target_mpr_scene , _camera_calculator->get_orthognal_mpr_page(camera));
+    printf("cur page : %i \n" , cur_page);
+    set_page_i(target_mpr_scene , cur_page);
 
     //2 Change cross location
     const Point3 sphere_center = target_mpr_scene->get_camera()->get_look_at();

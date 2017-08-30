@@ -124,8 +124,7 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
         if (!_mask_textures.empty()) {
             for (auto it = _mask_textures.begin(); it != _mask_textures.end(); ++it) {
                 GLResourceManagerContainer::instance()
-                ->get_texture_3d_manager()
-                ->remove_object(*it);
+                ->get_texture_3d_manager()->remove_object(*it);
             }
 
             _mask_textures.clear();
@@ -184,20 +183,18 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3],
                               unsigned char* data_updated,
                               bool has_data_array_changed /*= true*/) {
     // update mask CPU
-    const unsigned int dim_brick[3] = {end[0] - begin[0], end[1] - begin[1],
-                                       end[2] - begin[2]
-                                      };
+    const unsigned int dim_brick[3] = { end[0] - begin[0], 
+                                        end[1] - begin[1],
+                                        end[2] - begin[2]};
 
     if (!has_data_array_changed) {
-        unsigned char* mask_array =
-            (unsigned char*)_mask_data->get_pixel_pointer();
+        unsigned char* mask_array = (unsigned char*)_mask_data->get_pixel_pointer();
         const unsigned int layer_whole = _mask_data->_dim[0] * _mask_data->_dim[1];
         const unsigned int layer_brick = dim_brick[0] * dim_brick[1];
 
         for (unsigned int z = begin[2]; z < end[2]; ++z) {
             for (unsigned int y = begin[1]; y < end[1]; ++y) {
-                memcpy(mask_array + z * layer_whole + y * _mask_data->_dim[0] +
-                       begin[0],
+                memcpy(mask_array + z * layer_whole + y * _mask_data->_dim[0] + begin[0],
                        data_updated + (z - begin[2]) * layer_brick +
                        (y - begin[1]) * dim_brick[0],
                        dim_brick[0]);

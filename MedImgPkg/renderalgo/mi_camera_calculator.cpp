@@ -312,6 +312,12 @@ PatientAxisInfo CameraCalculator::get_posterior_patient_axis_info() const {
 
 ScanSliceType
 CameraCalculator::check_scan_type(std::shared_ptr<OrthoCamera> camera) const {
+    double spacing = 0;
+    return check_scan_type(camera , spacing);
+}
+
+ScanSliceType CameraCalculator::check_scan_type(std::shared_ptr<OrthoCamera> camera , 
+    double& spacing) const {
     Point3 eye = camera->get_eye();
     Point3 look_at = camera->get_look_at();
     Vector3 dir = look_at - eye;
@@ -323,46 +329,45 @@ CameraCalculator::check_scan_type(std::shared_ptr<OrthoCamera> camera) const {
         fabs(_posteriorInfo.patient_orientation.dot_product(dir));
 
     ScanSliceType scan_type = OBLIQUE;
-
+    spacing = 0;
     if (dot_head > dot_left && dot_head > dot_posterior) { // Transverse
         scan_type = fabs(dot_head - 1.0) > DOUBLE_EPSILON ? OBLIQUE : TRANSVERSE;
+        spacing = _volume_data->_spacing[_headInfo.volume_coord/2];
     } else if (dot_left > dot_head && dot_left > dot_posterior) { // Sagittal
         scan_type = fabs(dot_left - 1.0) > DOUBLE_EPSILON ? OBLIQUE : SAGITTAL;
+        spacing = _volume_data->_spacing[_leftInfo.volume_coord/2];
     } else { // Coronal
         scan_type = fabs(dot_posterior - 1.0) > DOUBLE_EPSILON ? OBLIQUE : CORONAL;
+        spacing = _volume_data->_spacing[_posteriorInfo.volume_coord/2];
     }
 
     return scan_type;
 }
 
-bool CameraCalculator::page_orthognal_mpr(std::shared_ptr<OrthoCamera> camera,
-        int iPageStep) const {
+bool CameraCalculator::page_orthognal_mpr(
+    std::shared_ptr<OrthoCamera> camera, int page_step , int& cur_page) const {
+    double spacing_step = 0;
+    ScanSliceType scan_type = check_scan_type(camera , spacing_step);
+    if(scan_type == OBLIQUE){
+        RENDERALGO_THROW_EXCEPTION("MPR is oblique!");
+    }
     Point3 eye = camera->get_eye();
     Point3 look_at = camera->get_look_at();
-    const Vector3 dir = camera->get_view_direction();
+    Vector3 dir = camera->get_view_direction();
 
-    const double dot_head = fabs(_headInfo.patient_orientation.dot_product(dir));
-    const double dot_left = fabs(_leftInfo.patient_orientation.dot_product(dir));
-    const double dot_posterior =
-        fabs(_posteriorInfo.patient_orientation.dot_product(dir));
+    eye += dir * spacing_step * page_step;
+    look_at += dir * spacing_step * page_step;
 
-    double spacing_step = 0;
+    const double distance =
+        dir.dot_product(look_at - _othogonal_mpr_camera[scan_type].get_look_at());
+    const double delta = distance / spacing_step;
+    const int delta_i = int(delta);
+    cur_page = get_default_page(scan_type) + delta_i;
 
-    if (dot_head > dot_left && dot_head > dot_posterior) { // Transverse
-        spacing_step = _volume_data->_spacing[_headInfo.volume_coord / 2];
-    } else if (dot_left > dot_head && dot_left > dot_posterior) { // Sagittal
-        spacing_step = _volume_data->_spacing[_leftInfo.volume_coord / 2];
-    } else { // Coronal
-        spacing_step = _volume_data->_spacing[_posteriorInfo.volume_coord / 2];
-    }
-
-    eye += dir * spacing_step * iPageStep;
-    look_at += dir * spacing_step * iPageStep;
-    Point3 pt_v = _mat_world_to_volume.transform(look_at);
-
-    if (ArithmeticUtils::check_in_bound(
-                pt_v, Point3(_volume_data->_dim[0] - 1, _volume_data->_dim[1] - 1,
-                             _volume_data->_dim[2] - 1))) {
+    Point3 pt_test = _mat_world_to_volume.transform(look_at);
+    printf("mpr center volume : ");pt_test.print();
+    printf("\n");
+    if (cur_page >= 0 && cur_page < get_page_maximum(scan_type)) {
         camera->set_eye(eye);
         camera->set_look_at(look_at);
         return true;
@@ -373,33 +378,14 @@ bool CameraCalculator::page_orthognal_mpr(std::shared_ptr<OrthoCamera> camera,
 
 bool CameraCalculator::page_orthognal_mpr_to(
     std::shared_ptr<OrthoCamera> camera, int page) const {
-    // 1 Check orthogonal
-    const Point3 eye = camera->get_eye();
-    const Point3 look_at = camera->get_look_at();
-    const Vector3 dir = camera->get_view_direction();
-
-    const double dot_head = fabs(_headInfo.patient_orientation.dot_product(dir));
-    const double dot_left = fabs(_leftInfo.patient_orientation.dot_product(dir));
-    const double dot_posterior =
-        fabs(_posteriorInfo.patient_orientation.dot_product(dir));
-
-    ScanSliceType scan_type = OBLIQUE;
     double spacing_step = 0;
-
-    if (dot_head > dot_left && dot_head > dot_posterior) { // Transverse
-        scan_type = fabs(dot_head - 1.0) > DOUBLE_EPSILON ? OBLIQUE : TRANSVERSE;
-        spacing_step = _volume_data->_spacing[_headInfo.volume_coord / 2];
-    } else if (dot_left > dot_head && dot_left > dot_posterior) { // Sagittal
-        scan_type = fabs(dot_left - 1.0) > DOUBLE_EPSILON ? OBLIQUE : SAGITTAL;
-        spacing_step = _volume_data->_spacing[_leftInfo.volume_coord / 2];
-    } else { // Coronal
-        scan_type = fabs(dot_posterior - 1.0) > DOUBLE_EPSILON ? OBLIQUE : CORONAL;
-        spacing_step = _volume_data->_spacing[_posteriorInfo.volume_coord / 2];
+    ScanSliceType scan_type = check_scan_type(camera , spacing_step);
+    if(scan_type == OBLIQUE){
+        RENDERALGO_THROW_EXCEPTION("MPR is oblique!");
     }
-
-    if (scan_type == OBLIQUE) {
-        return false;
-    }
+    Point3 eye = camera->get_eye();
+    Point3 look_at = camera->get_look_at();
+    Vector3 dir = camera->get_view_direction();
 
     // 2 page
     // 2.1 Back to default
@@ -413,11 +399,14 @@ bool CameraCalculator::page_orthognal_mpr_to(
     changed_look_at += dir * (step) * spacing_step;
     changed_eye += dir * (step) * spacing_step;
 
-    Point3 ptV = _mat_world_to_volume.transform(changed_look_at);
+    const double distance =
+        dir.dot_product(changed_look_at - _othogonal_mpr_camera[scan_type].get_look_at());
+    const double delta = distance / spacing_step;
+    const int delta_i = int(delta);
 
-    if (ArithmeticUtils::check_in_bound(ptV, Point3(_volume_data->_dim[0] - 1,
-                                        _volume_data->_dim[1] - 1,
-                                        _volume_data->_dim[2] - 1))) {
+    //TODO
+    int cur_page = get_default_page(scan_type) + delta_i;
+    if (page >= 0 && page < get_page_maximum(scan_type)) {
         camera->set_eye(changed_eye);
         camera->set_look_at(changed_look_at);
         return true;
@@ -428,38 +417,19 @@ bool CameraCalculator::page_orthognal_mpr_to(
 
 int CameraCalculator::get_orthognal_mpr_page(
     std::shared_ptr<OrthoCamera> camera) const {
-    // 1 Check orthogonal
-    const Point3 eye = camera->get_eye();
+    double spacing_step = 0;
+    ScanSliceType scan_type = check_scan_type(camera , spacing_step);
+    if(scan_type == OBLIQUE){
+        RENDERALGO_THROW_EXCEPTION("MPR is oblique!");
+    }
     const Point3 look_at = camera->get_look_at();
     const Vector3 dir = camera->get_view_direction();
 
-    const double dot_head = fabs(_headInfo.patient_orientation.dot_product(dir));
-    const double dot_left = fabs(_leftInfo.patient_orientation.dot_product(dir));
-    const double dot_posterior =
-        fabs(_posteriorInfo.patient_orientation.dot_product(dir));
-
-    ScanSliceType scan_type = OBLIQUE;
-    double spacing_step = 0;
-
-    if (dot_head > dot_left && dot_head > dot_posterior) { // Transverse
-        scan_type = fabs(dot_head - 1.0) > DOUBLE_EPSILON ? OBLIQUE : TRANSVERSE;
-        spacing_step = _volume_data->_spacing[_headInfo.volume_coord / 2];
-    } else if (dot_left > dot_head && dot_left > dot_posterior) { // Sagittal
-        scan_type = fabs(dot_left - 1.0) > DOUBLE_EPSILON ? OBLIQUE : SAGITTAL;
-        spacing_step = _volume_data->_spacing[_leftInfo.volume_coord / 2];
-    } else { // Coronal
-        scan_type = fabs(dot_posterior - 1.0) > DOUBLE_EPSILON ? OBLIQUE : CORONAL;
-        spacing_step = _volume_data->_spacing[_posteriorInfo.volume_coord / 2];
-    }
-
-    if (scan_type == OBLIQUE) {
-        RENDERALGO_THROW_EXCEPTION("Calculate MPR page failed!");
-    }
-
     const double distance =
         dir.dot_product(look_at - _othogonal_mpr_camera[scan_type].get_look_at());
-    int iDelta = int(distance / spacing_step);
-    int page = get_default_page(scan_type) + iDelta;
+    const double delta = distance / spacing_step;
+    const int delta_i = int(delta);
+    const int page = get_default_page(scan_type) + delta_i;
 
     if (page >= 0 && page < get_page_maximum(scan_type)) {
         return page;
@@ -512,15 +482,39 @@ int CameraCalculator::get_page_maximum(ScanSliceType type) const {
 int CameraCalculator::get_default_page(ScanSliceType type) const {
     switch (type) {
     case TRANSVERSE: {
-        return _volume_data->_dim[_headInfo.volume_coord / 2] / 2;
+        const int idx = _headInfo.volume_coord / 2;
+        Vector3 vl = _volume_data->_image_orientation[idx] - Vector3(0.0,0.0,1.0);
+        Vector3 vr = _volume_data->_image_orientation[idx] - Vector3(0.0,0.0,-1.0);
+        if (vl.magnitude() < vr.magnitude()) {
+            return _volume_data->_dim[idx] / 2;
+        } else {
+            //paging direction is inverse with volume direction
+            return _volume_data->_dim[idx] / 2 - 1;
+        }
     }
 
-    case SAGITTAL: {
-        return _volume_data->_dim[_leftInfo.volume_coord / 2] / 2;
+    case SAGITTAL: {//This paging direction is not the postive direction of patient coordinate
+        const int idx = _leftInfo.volume_coord / 2;
+        Vector3 vl = _volume_data->_image_orientation[idx] - Vector3(1.0,0.0,0.0);
+        Vector3 vr = _volume_data->_image_orientation[idx] - Vector3(-1.0,0.0,0.0);
+        if (vl.magnitude() < vr.magnitude()) {
+            //paging direction is inverse with volume direction
+            return _volume_data->_dim[idx] / 2 - 1;
+        } else {
+            return _volume_data->_dim[idx] / 2;
+        }
     }
 
     case CORONAL: {
-        return _volume_data->_dim[_posteriorInfo.volume_coord / 2] / 2;
+        const int idx = _posteriorInfo.volume_coord / 2;
+        Vector3 vl = _volume_data->_image_orientation[idx] - Vector3(0.0,1.0,0.0);
+        Vector3 vr = _volume_data->_image_orientation[idx] - Vector3(0.0,-1.0,0.0);
+        if (vl.magnitude() < vr.magnitude()) {
+            return _volume_data->_dim[idx] / 2;
+        } else {
+            //paging direction is inverse with volume direction
+            return _volume_data->_dim[idx] / 2 - 1;
+        }
     }
 
     default: {
@@ -616,7 +610,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
     const unsigned int uiSagittalDimension =
         _volume_data->_dim[_leftInfo.volume_coord / 2];
 
-    if (uiSagittalDimension % 2 == 0) {
+    if (uiSagittalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
                    _volume_data->_spacing[_leftInfo.volume_coord / 2]; //ȡ����
     }
@@ -627,7 +621,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
     const unsigned int uiTransversalDimension =
         _volume_data->_dim[_headInfo.volume_coord / 2];
 
-    if (0 == uiTransversalDimension % 2) {
+    if (uiTransversalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
                    _volume_data->_spacing[_headInfo.volume_coord / 2]; //ȡ����
     }
@@ -638,12 +632,16 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
     const unsigned int uiCoronalDimension =
         _volume_data->_dim[_posteriorInfo.volume_coord / 2];
 
-    if (0 == uiCoronalDimension % 2) {
+    if (uiCoronalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
                    _volume_data->_spacing[_posteriorInfo.volume_coord / 2]; //ȡ����
     }
 
     _default_mpr_center = look_at;
+    Point3 pt_test = _mat_volume_to_wolrd.get_inverse().transform(_default_mpr_center);
+    printf("mpr center volume : ");pt_test.print();
+    printf("\n");
+
 }
 
 const Matrix4& CameraCalculator::get_patient_to_world_matrix() const {

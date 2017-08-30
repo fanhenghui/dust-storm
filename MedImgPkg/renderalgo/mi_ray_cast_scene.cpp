@@ -157,13 +157,13 @@ void RayCastScene::init_default_color_texture_i() {
 }
 
 void RayCastScene::render() {
-    std::cout << "in rendering\n";
     pre_render_i();
 
     // Skip render scene
     if (!get_dirty()) {
         return;
     }
+    //std::cout << "in rendering\n";
 
     CHECK_GL_ERROR;
 
@@ -196,15 +196,6 @@ void RayCastScene::render() {
     _canvas->get_color_attach_texture()->bind();
 
     glBegin(GL_QUADS);
-    // glTexCoord2f(0.0, 0.0);
-    // glVertex2f(-1.0, -1.0);
-    // glTexCoord2f(1.0, 0.0);
-    // glVertex2f(1.0, -1.0);
-    // glTexCoord2f(1.0, 1.0);
-    // glVertex2f(1.0, 1.0);
-    // glTexCoord2f(0.0, 1.0);
-    // glVertex2f(-1.0, 1.0);
-
     glTexCoord2f(0.0, 1.0);
     glVertex2f(-1.0, -1.0);
     glTexCoord2f(1.0, 1.0);
@@ -213,7 +204,6 @@ void RayCastScene::render() {
     glVertex2f(1.0, 1.0);
     glTexCoord2f(0.0, 0.0);
     glVertex2f(-1.0, 1.0);
-
     glEnd();
 
     // CHECK_GL_ERROR;
@@ -253,8 +243,7 @@ void RayCastScene::render() {
     }
 
     set_dirty(false);
-
-    std::cout << "out rendering\n";
+    //std::cout << "out rendering\n";
 }
 
 void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {

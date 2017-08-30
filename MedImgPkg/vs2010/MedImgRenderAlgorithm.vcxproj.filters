@@ -113,6 +113,9 @@
     <ClInclude Include="..\include\renderalgo\mi_camera_calculator.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_shader_collection.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

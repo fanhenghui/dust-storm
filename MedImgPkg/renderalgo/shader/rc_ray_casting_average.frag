@@ -32,7 +32,7 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
     vec3 sample_pos;
     vec4 current_integral_color =  integral_color;
 
-    for (float i = start_step ; i <= end_step ; ++i)
+    for (float i = start_step ; i < end_step ; ++i)
     {
         sample_pos = ray_start + ray_dir * i;
         composite(sample_pos , ray_dir, current_integral_color , volume_sampler , mask_sampler , sub_data_dim ,sub_data_offset ,sample_shift );

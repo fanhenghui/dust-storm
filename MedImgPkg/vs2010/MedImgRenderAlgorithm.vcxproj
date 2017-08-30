@@ -131,6 +131,7 @@
     <ClInclude Include="..\renderalgo\mi_rc_step_shading.h" />
     <ClInclude Include="..\renderalgo\mi_rc_step_utils.h" />
     <ClInclude Include="..\renderalgo\mi_rc_step_volume_sampler.h" />
+    <ClInclude Include="..\renderalgo\mi_shader_collection.h" />
     <ClInclude Include="..\renderalgo\mi_vr_entry_exit_points_culling.h" />
   </ItemGroup>
   <ItemGroup>

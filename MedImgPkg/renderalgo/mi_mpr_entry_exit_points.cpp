@@ -77,11 +77,11 @@ void MPREntryExitPoints::calculate_entry_exit_points() {
     _standard_steps = float(int(_thickness / _sample_rate + 0.5f));
 
     // clock_t t0 = clock();
-    if (CPU_BASE == _strategy) {
+    //if (CPU_BASE == _strategy) {
         cal_entry_exit_points_cpu_i();
-    } else if (GPU_BASE == _strategy) {
-        cal_entry_exit_points_gpu_i();
-    }
+    //} else if (GPU_BASE == _strategy) {
+    //    cal_entry_exit_points_gpu_i();
+    //}
 
     // clock_t t1 = clock();
     // std::cout << "Calculate entry exit points cost : " << double(t1 - t0) <<
@@ -166,6 +166,10 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
             int iY = idx / _width;
             int iX = idx - iY * _width;
 
+            if(idx == pixel_sum/2){
+                printf(".");
+            }
+
             ptCurF = pt00F + x_delta_float * (float)iX + y_delta_float * (float)iY;
 
             if (fThicknessHalf <= 1.0) {
@@ -208,6 +212,9 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
                 }
 
                 ptExitIntersection = ptEntryF + ray_dir * exit_step;
+                if (fThicknessHalf <= 1.0) {
+                    ptExitIntersection = ptEntryF + ray_dir * fThicknessHalf*2.0f;
+                }
             }
 
             //////////////////////////////////////////////////////////////////////////
@@ -234,16 +241,16 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
             //////////////////////////////////////////////////////////////////////////
         }
 
-        /*initialize();
+        initialize();
         _entry_points_texture->bind();
         _entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-        GL_FLOAT , _entry_points_buffer.get());
+            GL_FLOAT , _entry_points_buffer.get());
 
         _exit_points_texture->bind();
         _exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-        GL_FLOAT , _exit_points_buffer.get());
+            GL_FLOAT , _exit_points_buffer.get());
 
-        _entry_points_texture->bind();
+        /*_entry_points_texture->bind();
         _entry_points_texture->download(GL_RGBA , GL_FLOAT ,
         _entry_points_buffer.get());
 
