@@ -103,7 +103,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             //Update visible labels
             for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
             {
-                (*it)->set_mask_overlay_color(RGBAUnit(1.0f,0.0f,0.0f) , label_added);
+                (*it)->set_mask_overlay_color(RGBAUnit(255.0f,0.0f,0.0f) , label_added);
                 if (model->is_voi_mask_visible())
                 {
                     (*it)->set_visible_labels(labels);
@@ -130,7 +130,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
                 // codes copy from above
                 for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
                 {
-                    (*it)->set_mask_overlay_color(RGBAUnit(1.0f,0.0f,0.0f) , label_loaded);
+                    (*it)->set_mask_overlay_color(RGBAUnit(255.0f,0.0f,0.0f) , label_loaded);
                     if (model->is_voi_mask_visible())
                     {
                         (*it)->set_visible_labels(labels);

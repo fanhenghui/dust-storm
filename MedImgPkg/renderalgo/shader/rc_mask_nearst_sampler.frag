@@ -1,6 +1,6 @@
 #version 430
 
-#define BUFFER_BINDING_VISIBLE_LABEL_BUCKET 6
+#define BUFFER_BINDING_VISIBLE_LABEL_BUCKET 1
 
 layout (std430 , binding = BUFFER_BINDING_VISIBLE_LABEL_BUCKET) buffer VisibleLabelBucket
 {

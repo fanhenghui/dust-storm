@@ -365,8 +365,8 @@ bool CameraCalculator::page_orthognal_mpr(
     cur_page = get_default_page(scan_type) + delta_i;
 
     Point3 pt_test = _mat_world_to_volume.transform(look_at);
-    printf("mpr center volume : ");pt_test.print();
-    printf("\n");
+    //printf("mpr center volume : ");pt_test.print();
+    //printf("\n");
     if (cur_page >= 0 && cur_page < get_page_maximum(scan_type)) {
         camera->set_eye(eye);
         camera->set_look_at(look_at);

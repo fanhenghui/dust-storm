@@ -91,6 +91,12 @@ void Init() {
     mask_data->_channel_num = 1;
     mask_data->_data_type = medical_imaging::UCHAR;
     mask_data->mem_allocate();
+    char* mask_raw = (char*)mask_data->get_pixel_pointer();
+    memset(mask_raw , 1 , mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2]);
+    /*for (size_t i = 0 ; i< mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2] ; ++i)
+    {
+        mask_raw[i] = 1;
+    }*/
     _volumeinfos->set_mask(mask_data);
 
     _scene.reset(new VRScene(_width, _height));
@@ -103,14 +109,19 @@ void Init() {
     _scene->set_sample_rate(0.5);
     _scene->set_global_window_level(_ww, _wl);
     _scene->set_window_level(_ww, _wl, 0);
+    _scene->set_window_level(_ww, _wl, 1);
     _scene->set_composite_mode(COMPOSITE_MIP);
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
-    _scene->set_mask_mode(MASK_NONE);
+    _scene->set_mask_mode(MASK_MULTI_LABEL);
+    std::vector<unsigned char> vis_labels;
+    vis_labels.push_back(1);
+    _scene->set_visible_labels(vis_labels);
+
     _scene->set_interpolation_mode(LINEAR);
     _scene->set_shading_mode(SHADING_NONE);
 
     //_scene->set_proxy_geometry(PG_CUBE);
-    _scene->set_proxy_geometry(PG_BRICKS);
+    _scene->set_proxy_geometry(PG_CUBE);
     _scene->set_test_code(_iTestCode);
     //_scene->initialize();
 
@@ -162,6 +173,11 @@ void Init() {
     _scene->set_ambient_color(1.0f, 1.0f, 1.0f, 0.28f);
     _scene->set_material(material, 0);
     _scene->set_window_level(ww, wl, 0);
+
+    _scene->set_color_opacity(color, opacity, 1);
+    _scene->set_material(material, 1);
+    _scene->set_window_level(ww, wl, 1);
+
     _ww = ww;
     _wl = wl;
 
@@ -171,15 +187,21 @@ void Init() {
 
 void Display() {
     try {
+        CHECK_GL_ERROR;
+
         GLUtils::set_pixel_pack_alignment(1);
+
+        CHECK_GL_ERROR;
 
         glViewport(0, 0, _width, _height);
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        std::shared_ptr<CameraBase> camera = _scene->get_camera();
-        Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
-        camera->rotate(q);
+        //std::shared_ptr<CameraBase> camera = _scene->get_camera();
+        //Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
+        //camera->rotate(q);
+
+        CHECK_GL_ERROR;
 
         _time_query->initialize();
         _time_query->begin();
@@ -312,7 +334,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
@@ -354,6 +376,7 @@ void MouseMotion(int x, int y) {
         _ww = _ww < 0 ? 1 : _ww;
         _scene->set_global_window_level(_ww, _wl);
         _scene->set_window_level(_ww, _wl, 0);
+        _scene->set_window_level(_ww, _wl, 1);
         std::cout << "wl : " << _ww << " " << _wl << std::endl;
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {

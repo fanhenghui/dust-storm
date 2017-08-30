@@ -47,11 +47,11 @@ vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step
 
     vec3 sample_pos;
     int label = 0;
-    for (float i = start_step ; i <= end_step ; ++i)
+    for (float i = start_step ; i < end_step ; ++i)
     {
         sample_pos = ray_start + ray_dir * i;
 
-        vec3 actual_sample_pos = (sample_pos + sub_data_offset)/sub_data_dim;
+        vec3 actual_sample_pos = (sample_pos + sub_data_offset + vec3(0.5,0.5,0.5))/sub_data_dim;
         label = int(texture(mask_sampler, actual_sample_pos).r*255);//Using default nearest interpolation
         if(label != 0)
         {

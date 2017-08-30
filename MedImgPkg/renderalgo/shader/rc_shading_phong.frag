@@ -14,6 +14,9 @@ struct Material
     vec4 diffuse_color;
     vec4 specular_color;
     float shininess;
+    float _reserve0;
+    float _reserve1;
+    float _reserve2;
 };
 
 layout(std430 , binding = BUFFER_BINDING_MATERIAL_BUCKET) buffer MaterialBucket

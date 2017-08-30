@@ -87,6 +87,9 @@ struct Material {
     float diffuse[4];
     float specular[4];
     float specular_shiness;
+    float reserve0;
+    float reserve1;
+    float reserve2;
 
     bool operator==(const Material& m) const {
         return (fabs(diffuse[0] - m.diffuse[0]) < FLOAT_EPSILON &&

@@ -134,7 +134,7 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& target_mpr_scene , in
     }
 
     target_mpr_scene->set_dirty(true);
-    printf("cur page : %i \n" , cur_page);
+    //printf("cur page : %i \n" , cur_page);
     set_page_i(target_mpr_scene , cur_page);
 
     //2 Change cross location
