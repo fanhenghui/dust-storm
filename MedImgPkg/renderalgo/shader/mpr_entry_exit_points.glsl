@@ -35,8 +35,7 @@ float ray_intersect_brick(vec3 initialPt, vec3 brick_min, vec3 brick_dim, vec3 r
     float tnear = max(max(tmin.x,tmin.y),tmin.z);
     float tfar = min(min(tmax.x,tmax.y),tmax.z);
 
-    start_step = tnear;   
-    start_step = max(start_step, 0.0);
+    start_step = tnear;
     end_step = tfar;
 
     return tnear - start_step;
@@ -44,8 +43,8 @@ float ray_intersect_brick(vec3 initialPt, vec3 brick_min, vec3 brick_dim, vec3 r
 
 bool check_outside(vec3 point, vec3 boundary)
 {
-    bvec3 compare_min = lessThan(point, vec3(0.0, 0.0, 0.0));
-    bvec3 compare_max = greaterThan(point, boundary);
+    bvec3 compare_min = lessThan(point, vec3(-1e-6, -1e-6, -1e-6));
+    bvec3 compare_max = greaterThan(point, boundary+vec3(-1e-6));
     return any(compare_min) || any(compare_max);
 }
 
@@ -72,18 +71,13 @@ void main()
     if(thickness <= 1.0)
     {
         entry_point = central ;
-        exit_point  = central + ray_dir * thickness*0.5;
+        exit_point  = central + ray_dir * thickness;
     }
     else
     {
         entry_point = central - ray_dir * thickness *0.5 ;
         exit_point  = central + ray_dir * thickness * 0.5 ;
     }
-    
-
-    //imageStore(image_entry_points , img_coord , vec4(entry_point, 1.0f));
-    //imageStore(image_exit_points , img_coord , vec4(exit_point, 1.0f));
-    //return;
 
     float entry_step = 0.0;
     float exit_step = 0.0;
@@ -94,7 +88,7 @@ void main()
     ray_intersect_brick(entry_point, vec3(0,0,0),volume_dim, ray_dir, entry_step, exit_step);
 
     //Entry point outside
-    if( check_outside(entry_point, volume_dim) )
+    if( check_outside(entry_point, volume_dim - vec3(1,1,1)) )
     {
         if(entry_step >= exit_step || entry_step < 0 || entry_step > thickness)// check entry points in range of thickness and volume
         {
@@ -107,7 +101,7 @@ void main()
     }
 
     //Exit point outside
-    if( check_outside(exit_point, volume_dim) )
+    if( check_outside(exit_point, volume_dim - vec3(1,1,1)) )
     {
         if(entry_step >= exit_step)
         {
@@ -116,13 +110,13 @@ void main()
             imageStore(image_exit_points , img_coord , vec4(0,0,0, -1.0f));
             return;
         }
-        exit_intersection= entry_point + exit_step * ray_dir;
+        exit_intersection = entry_point + exit_step * ray_dir;
+        if (thickness <= 1.0)//forbid border exit_step=0 : entry == exit (ray direction is Nan)
+        {
+            exit_intersection = entry_point + thickness * ray_dir;
+        }
     }
 
     imageStore(image_entry_points , img_coord , vec4(entry_intersection, 1.0f));
     imageStore(image_exit_points , img_coord , vec4(exit_intersection, 1.0f));
-
-    //imageStore(image_entry_points , img_coord , vec4(255,0,0, 1.0f));
-    //imageStore(image_exit_points , img_coord , vec4(exit_intersection, 1.0f));
-
 }

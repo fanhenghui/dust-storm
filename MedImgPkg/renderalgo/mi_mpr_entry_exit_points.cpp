@@ -77,11 +77,11 @@ void MPREntryExitPoints::calculate_entry_exit_points() {
     _standard_steps = float(int(_thickness / _sample_rate + 0.5f));
 
     // clock_t t0 = clock();
-    //if (CPU_BASE == _strategy) {
+    if (CPU_BASE == _strategy) {
         cal_entry_exit_points_cpu_i();
-    //} else if (GPU_BASE == _strategy) {
-    //    cal_entry_exit_points_gpu_i();
-    //}
+    } else if (GPU_BASE == _strategy) {
+        cal_entry_exit_points_gpu_i();
+    }
 
     // clock_t t1 = clock();
     // std::cout << "Calculate entry exit points cost : " << double(t1 - t0) <<
@@ -133,9 +133,9 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
                                      (float)y_delta.z);
 
         const float thickness = _thickness;
-        const float fThicknessHalf = thickness * 0.5f;
-        Vector4f* pEntryPoints = _entry_points_buffer.get();
-        Vector4f* pExitPoints = _exit_points_buffer.get();
+        const float thickness_half = thickness * 0.5f;
+        Vector4f* entry_points_array = _entry_points_buffer.get();
+        Vector4f* exit_points_array = _exit_points_buffer.get();
 
         //////////////////////////////////////////////////////////////////////////
         // Adjust ray direction
@@ -157,73 +157,70 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
 #endif
 
         for (int idx = 0; idx < pixel_sum; ++idx) {
-            Vector3f ptCurF;
-            Vector3f ptEntryF;
-            Vector3f ptExitF;
-            Vector3f ptEntryIntersection;
-            Vector3f ptExitIntersection;
+            Vector3f cur_f;
+            Vector3f entry_f;
+            Vector3f exit_f;
+            Vector3f entry_intersection;
+            Vector3f exit_intersection;
 
             int iY = idx / _width;
             int iX = idx - iY * _width;
 
-            if(idx == pixel_sum/2){
+            if (idx == pixel_sum/2)
+            {
                 printf(".");
             }
 
-            ptCurF = pt00F + x_delta_float * (float)iX + y_delta_float * (float)iY;
+            cur_f = pt00F + x_delta_float * (float)iX + y_delta_float * (float)iY;
 
-            if (fThicknessHalf <= 1.0) {
-                ptEntryF = ptCurF;
-                ptExitF = ptCurF + ray_dir * fThicknessHalf * 2;
+            if (thickness <= 1.0) {
+                entry_f = cur_f;
+                exit_f = cur_f + ray_dir * thickness_half * 2;
             } else {
-                ptEntryF = ptCurF - ray_dir * fThicknessHalf;
-                ptExitF = ptCurF + ray_dir * fThicknessHalf;
+                entry_f = cur_f - ray_dir * thickness_half;
+                exit_f = cur_f + ray_dir * thickness_half;
             }
 
-            ptEntryIntersection = ptEntryF;
-            ptExitIntersection = ptExitF;
+            entry_intersection = entry_f;
+            exit_intersection = exit_f;
 
             // Intersect volume AABB to get intersected entry&exit points
             float entry_step(0), exit_step(0);
             const bool bIntersection = ray_intersect_aabb_acc(
-                                           ptEntryF, Vector3f(0, 0, 0), dim_vector, vRayBrick, vRayBrickAdjust,
+                                           entry_f, Vector3f(0, 0, 0), dim_vector, vRayBrick, vRayBrickAdjust,
                                            entry_step, exit_step);
 
             // Entry point outside
-            if (check_outside(ptEntryF, dim_vector)) {
+            if (check_outside(entry_f, dim_vector)) {
                 if (!bIntersection || entry_step < 0 ||
                         entry_step > thickness) // check entry points in range of thickness
                     // and volume
                 {
-                    pEntryPoints[idx] = Vector4f(0, 0, 0, -1.0f);
-                    pExitPoints[idx] = Vector4f(0, 0, 0, -1.0f);
+                    entry_points_array[idx] = Vector4f(0, 0, 0, -1.0f);
+                    exit_points_array[idx] = Vector4f(0, 0, 0, -1.0f);
                     continue;
                 }
 
-                ptEntryIntersection = ptEntryF + ray_dir * entry_step;
+                entry_intersection = entry_f + ray_dir * entry_step;
             }
 
             // Exit point outside
-            if (check_outside(ptExitF, dim_vector)) {
+            if (check_outside(exit_f, dim_vector)) {
                 if (!bIntersection) {
-                    pEntryPoints[idx] = Vector4f(0, 0, 0, -1.0f);
-                    pExitPoints[idx] = Vector4f(0, 0, 0, -1.0f);
+                    entry_points_array[idx] = Vector4f(0, 0, 0, -1.0f);
+                    exit_points_array[idx] = Vector4f(0, 0, 0, -1.0f);
                     continue;
                 }
 
-                ptExitIntersection = ptEntryF + ray_dir * exit_step;
-                if (fThicknessHalf <= 1.0) {
-                    ptExitIntersection = ptEntryF + ray_dir * fThicknessHalf*2.0f;
+                exit_intersection = entry_f + ray_dir * exit_step;
+                if (thickness <= 1.0) {
+                    exit_intersection = entry_f + ray_dir * thickness;
                 }
             }
 
             //////////////////////////////////////////////////////////////////////////
             // alpha value : ray step
-            float fStep =
-                (float)(int)((ptExitIntersection - ptEntryIntersection).magnitude() /
-                             _sample_rate +
-                             0.5f);
-
+            float fStep = (float)(int)((exit_intersection - entry_intersection).magnitude() / _sample_rate + 0.5f);
             if (fStep > _standard_steps) // Adjust step to prevent  fStep = standard
                 // step + epsilon which it's ceil equals (
                 // standard cell + 1)
@@ -231,24 +228,22 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
                 fStep = _standard_steps;
             }
 
-            pEntryPoints[idx] = Vector4f(ptEntryIntersection,
-                                         0.0f); // Entry step is 0 , the first sample
+            entry_points_array[idx] = Vector4f(entry_intersection, 0.0f); // Entry step is 0 , the first sample
             // position is on entry plane
-            pExitPoints[idx] = Vector4f(ptExitIntersection,
-                                        fStep); // Exit step is integer step which
+            exit_points_array[idx] = Vector4f(exit_intersection, fStep); // Exit step is integer step which
             // represent the integeration path
 
             //////////////////////////////////////////////////////////////////////////
         }
 
-        initialize();
-        _entry_points_texture->bind();
-        _entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-            GL_FLOAT , _entry_points_buffer.get());
+        //initialize();
+        //_entry_points_texture->bind();
+        //_entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
+        //    GL_FLOAT , _entry_points_buffer.get());
 
-        _exit_points_texture->bind();
-        _exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-            GL_FLOAT , _exit_points_buffer.get());
+        //_exit_points_texture->bind();
+        //_exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
+        //    GL_FLOAT , _exit_points_buffer.get());
 
         /*_entry_points_texture->bind();
         _entry_points_texture->download(GL_RGBA , GL_FLOAT ,
@@ -350,18 +345,20 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i() {
         CHECK_GL_ERROR;
 
         //////////////////////////////////////////////////////////////////////////
-        // For testing
-        // std::cout << "Size : " << _width << " " << _height << std::endl;
-        //_entry_points_texture->bind();
-        //_entry_points_texture->download(GL_RGBA , GL_FLOAT ,
-        //_entry_points_buffer.get());
+        // TODO For testing
+        /*std::cout << "Size : " << _width << " " << _height << std::endl;
+        _entry_points_texture->bind();
+        _entry_points_texture->download(GL_RGBA , GL_FLOAT ,
+            _entry_points_buffer.get());
 
-        // _entry_points_texture->unbind();
-        // _exit_points_texture->bind();
-        // _exit_points_texture->download(GL_RGBA , GL_FLOAT ,
-        // _exit_points_buffer.get());
+        _entry_points_texture->unbind();
+        _exit_points_texture->bind();
+        _exit_points_texture->download(GL_RGBA , GL_FLOAT ,
+            _exit_points_buffer.get());
 
-        // this->debug_output_entry_points("/home/wr/data/entry_points.raw");
+        this->debug_output_entry_points("d:/temp/entry_points.raw");
+        this->debug_output_exit_points("d:/temp/exit_points.raw");*/
+        //////////////////////////////////////////////////////////////////////////
 
 #undef IMAGE_ENTRY_POINT
 #undef IMAGE_EXIT_POINT

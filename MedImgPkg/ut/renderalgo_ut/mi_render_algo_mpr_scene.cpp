@@ -95,7 +95,8 @@ void Init() {
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     _scene->set_mask_mode(MASK_NONE);
     _scene->set_interpolation_mode(LINEAR);
-    _scene->place_mpr(TRANSVERSE);
+    _scene->place_mpr(SAGITTAL);
+    //_scene->page_to(511);
     //_scene->initialize();
 
     // Time query
