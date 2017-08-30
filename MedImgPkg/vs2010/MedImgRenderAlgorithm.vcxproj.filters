@@ -121,6 +121,9 @@
     <Filter Include="Source">
       <UniqueIdentifier>{e9210a01-390b-4f20-8d45-bbaacf1cd593}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{a8c4c448-4c38-424b-93e6-fceb96f45375}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\renderalgo\mi_rc_step_color_inverse.cpp">
@@ -222,5 +225,97 @@
     <ClCompile Include="..\renderalgo\mi_ray_casting_gpu.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\renderalgo\shader\rc_mask_linear_sampler.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_nearst_sampler.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_none_sampler.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_overlay_disable.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_overlay_enable.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_average.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_dvr.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_mip_minip.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_shading_none.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_shading_phong.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_utils.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_volume_linear_samper.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_volume_nearst_samper.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\shader_config">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points_culling.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_mask.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_utils.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_volume.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\mpr_entry_exit_points.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_color_inverse_disable.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_color_inverse_enable.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_average.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_dvr.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_minip.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_mip.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main_test.frag">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

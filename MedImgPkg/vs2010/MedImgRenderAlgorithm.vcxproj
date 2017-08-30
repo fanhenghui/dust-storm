@@ -168,6 +168,38 @@
     <ClCompile Include="..\renderalgo\mi_vr_proxy_geometry_cube.cpp" />
     <ClCompile Include="..\renderalgo\mi_vr_scene.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\renderalgo\shader\brick_info_cal_mask.glsl" />
+    <None Include="..\renderalgo\shader\brick_info_cal_utils.glsl" />
+    <None Include="..\renderalgo\shader\brick_info_cal_volume.glsl" />
+    <None Include="..\renderalgo\shader\mpr_entry_exit_points.glsl" />
+    <None Include="..\renderalgo\shader\rc_color_inverse_disable.frag" />
+    <None Include="..\renderalgo\shader\rc_color_inverse_enable.frag" />
+    <None Include="..\renderalgo\shader\rc_composite_average.frag" />
+    <None Include="..\renderalgo\shader\rc_composite_dvr.frag" />
+    <None Include="..\renderalgo\shader\rc_composite_minip.frag" />
+    <None Include="..\renderalgo\shader\rc_composite_mip.frag" />
+    <None Include="..\renderalgo\shader\rc_main.frag" />
+    <None Include="..\renderalgo\shader\rc_main.vert" />
+    <None Include="..\renderalgo\shader\rc_main_test.frag" />
+    <None Include="..\renderalgo\shader\rc_mask_linear_sampler.frag" />
+    <None Include="..\renderalgo\shader\rc_mask_nearst_sampler.frag" />
+    <None Include="..\renderalgo\shader\rc_mask_none_sampler.frag" />
+    <None Include="..\renderalgo\shader\rc_mask_overlay_disable.frag" />
+    <None Include="..\renderalgo\shader\rc_mask_overlay_enable.frag" />
+    <None Include="..\renderalgo\shader\rc_ray_casting_average.frag" />
+    <None Include="..\renderalgo\shader\rc_ray_casting_dvr.frag" />
+    <None Include="..\renderalgo\shader\rc_ray_casting_mip_minip.frag" />
+    <None Include="..\renderalgo\shader\rc_shading_none.frag" />
+    <None Include="..\renderalgo\shader\rc_shading_phong.frag" />
+    <None Include="..\renderalgo\shader\rc_utils.frag" />
+    <None Include="..\renderalgo\shader\rc_volume_linear_samper.frag" />
+    <None Include="..\renderalgo\shader\rc_volume_nearst_samper.frag" />
+    <None Include="..\renderalgo\shader\shader_config" />
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.frag" />
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.vert" />
+    <None Include="..\renderalgo\shader\vr_entry_exit_points_culling.glsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
