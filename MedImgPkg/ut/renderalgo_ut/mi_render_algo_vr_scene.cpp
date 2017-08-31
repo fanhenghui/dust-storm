@@ -62,6 +62,9 @@ int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
 
+int _act_label_idx = 0;
+std::vector<unsigned char> _vis_labels;
+
 std::vector<std::string> GetFiles() {
 #ifdef WIN32
     const std::string root = "E:/data/MyData/demo/lung/LIDC-IDRI-1002";
@@ -98,12 +101,12 @@ void Init() {
     mask_data->mem_allocate();
     char* mask_raw = (char*)mask_data->get_pixel_pointer();
     std::ifstream in("E:/data/MyData/demo/lung/mask.raw" , std::ios::in);
-    if(in.is_open()) {
-        in.read(mask_raw, data_len);
-        in.close();
-    } else {
+    //if(in.is_open()) {
+    //    in.read(mask_raw, data_len);
+    //    in.close();
+    //} else {
         memset(mask_raw , 1 , data_len);
-    }
+    //}
 
     std::set<unsigned char> target_label_set;
     RunLengthOperator run_length_op;
@@ -239,6 +242,7 @@ void Init() {
     }
     printf("\n");
     _scene->set_visible_labels(vis_labels);
+    _vis_labels = vis_labels;
 }
 
 void Display() {
@@ -339,6 +343,19 @@ void Keyboard(unsigned char key, int x, int y) {
         _scene->set_display_size(_width, _height);
         break;
     }
+    case 'a' : {
+            _act_label_idx += 1;
+            if (_act_label_idx > _vis_labels.size() - 1) {
+                _act_label_idx = 0;
+            }
+            unsigned char act_label = _vis_labels[_act_label_idx];
+            printf("act labels is : n%i\n" , (int)act_label);
+            float ww , wl;
+            _scene->get_window_level(ww , wl, act_label);
+            _ww = (int)ww;
+            _wl = (int)wl;
+            break;
+        }
     default:
         break;
     }
@@ -398,9 +415,9 @@ void MouseMotion(int x, int y) {
         _ww += (x - (int)_ptPre.x);
         _wl += ((int)_ptPre.y - y);
         _ww = _ww < 0 ? 1 : _ww;
-        _scene->set_global_window_level(_ww, _wl);
-        _scene->set_window_level(_ww, _wl, 0);
-        _scene->set_window_level(_ww, _wl, 1);
+        //_scene->set_global_window_level(_ww, _wl);
+        //_scene->set_window_level(_ww, _wl, 0);
+        _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
         std::cout << "wl : " << _ww << " " << _wl << std::endl;
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {

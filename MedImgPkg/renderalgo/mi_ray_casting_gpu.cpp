@@ -159,6 +159,8 @@ void RayCastingGPU::update_i() {
                 STEP_PUSH_BACK(RCStepMaskNoneSampler);
             } else if (_mask_mode == MASK_MULTI_LABEL) {
                 STEP_PUSH_BACK(RCStepMaskNearstSampler);
+            } else if (_mask_mode == MASK_MULTI_LINEAR_LABEL) {
+                STEP_PUSH_BACK(RCStepMaskLinearSampler);
             }
 
             // Volume
