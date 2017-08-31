@@ -8,6 +8,7 @@
 #include "io/mi_image_data_header.h"
 
 #include "arithmetic/mi_ortho_camera.h"
+#include "arithmetic/mi_run_length_operator.h"
 
 #include "glresource/mi_gl_environment.h"
 #include "glresource/mi_gl_fbo.h"
@@ -63,13 +64,15 @@ int _iTestCode = 0;
 
 std::vector<std::string> GetFiles() {
 #ifdef WIN32
-    const std::string root = "E:/data/MyData/AB_CTA_01/";
+    const std::string root = "E:/data/MyData/demo/lung/LIDC-IDRI-1002";
 #else
     const std::string root = "/home/wr/data/AB_CTA_01/";
 #endif
 
     std::vector<std::string> files;
-    FileUtil::get_all_file_recursion(root, std::vector<std::string>(), files);
+    std::set<std::string> dcm_postfix;
+    dcm_postfix.insert(".dcm");
+    FileUtil::get_all_file_recursion(root, dcm_postfix, files);
     return files;
 }
 
@@ -80,6 +83,8 @@ void Init() {
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
     IOStatus status = loader.load_series(files, _volume_data, _data_header);
+    const unsigned int data_len = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
+    printf("spacing : %lf %lf %lf \n" , _volume_data->_spacing[0] , _volume_data->_spacing[1] , _volume_data->_spacing[2]);
 
     _volumeinfos.reset(new VolumeInfos());
     _volumeinfos->set_data_header(_data_header);
@@ -92,11 +97,41 @@ void Init() {
     mask_data->_data_type = medical_imaging::UCHAR;
     mask_data->mem_allocate();
     char* mask_raw = (char*)mask_data->get_pixel_pointer();
-    memset(mask_raw , 1 , mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2]);
-    /*for (size_t i = 0 ; i< mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2] ; ++i)
-    {
-        mask_raw[i] = 1;
-    }*/
+    std::ifstream in("E:/data/MyData/demo/lung/mask.raw" , std::ios::in);
+    if(in.is_open()) {
+        in.read(mask_raw, data_len);
+        in.close();
+    } else {
+        memset(mask_raw , 1 , data_len);
+    }
+
+    std::set<unsigned char> target_label_set;
+    RunLengthOperator run_length_op;
+    std::ifstream in2("E:/data/MyData/demo/lung/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle" , std::ios::binary | std::ios::in);
+    if (in2.is_open()) {
+        in2.seekg (0, in2.end);
+        const int code_len = in2.tellg();
+        in2.seekg (0, in2.beg);
+        unsigned int *code_buffer = new unsigned int[code_len];
+        in2.read((char*)code_buffer ,code_len);
+        in2.close();
+        unsigned char* mask_target = new unsigned char[data_len];
+        
+        if(0 == run_length_op.decode(code_buffer , code_len/sizeof(unsigned int) , mask_target , data_len) ) {
+            FileUtil::write_raw("D:/temp/nodule.raw" , mask_target , data_len);
+            printf("load target mask done.\n");
+            for (unsigned int i = 0 ; i < data_len ; ++i) {
+                if (mask_target[i] != 0) {
+                    mask_raw[i] = mask_target[i] + 1;
+                    target_label_set.insert(mask_target[i] + 1);
+                }
+            }
+        }
+        delete [] mask_target;
+    }
+
+    FileUtil::write_raw("D:/temp/target_mask.raw" , mask_raw, data_len);
+
     _volumeinfos->set_mask(mask_data);
 
     _scene.reset(new VRScene(_width, _height));
@@ -113,9 +148,6 @@ void Init() {
     _scene->set_composite_mode(COMPOSITE_MIP);
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     _scene->set_mask_mode(MASK_MULTI_LABEL);
-    std::vector<unsigned char> vis_labels;
-    vis_labels.push_back(1);
-    _scene->set_visible_labels(vis_labels);
 
     _scene->set_interpolation_mode(LINEAR);
     _scene->set_shading_mode(SHADING_NONE);
@@ -158,15 +190,15 @@ void Init() {
     RGBAUnit background;
     Material material;
 #ifdef WIN32
-    const std::string color_opacity_xml = "../../../config/lut/3d/ct_cta.xml";
+    std::string color_opacity_xml = "../../../config/lut/3d/ct_lung_glass.xml";
 #else
-    const std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
+    std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
 #endif
 
     if (IO_SUCCESS !=
             TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity,
                     ww, wl, background, material)) {
-        std::cout << "load color opacity failed!\n";
+        printf("load lut : %s failed.\n" , color_opacity_xml.c_str());
     }
 
     _scene->set_color_opacity(color, opacity, 0);
@@ -183,6 +215,30 @@ void Init() {
 
     _scene->set_composite_mode(COMPOSITE_DVR);
     _scene->set_shading_mode(SHADING_PHONG);
+
+#ifdef WIN32
+    color_opacity_xml = "../../../config/lut/3d/ct_lung_nodule.xml";
+#else
+    color_opacity_xml = "../config/lut/3d/ct_lung_nodule.xml";
+#endif
+    if (IO_SUCCESS !=
+        TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity,
+        ww, wl, background, material)) {
+        printf("load lut : %s failed.\n" , color_opacity_xml.c_str());
+    }
+    std::vector<unsigned char> vis_labels;
+    vis_labels.push_back(1);
+    printf("target label : ");
+    for (auto it = target_label_set.begin(); it != target_label_set.end() ; ++it)
+    {
+        printf("%i " , int(*it));
+        vis_labels.push_back(*it);
+        _scene->set_color_opacity(color, opacity, *it);
+        _scene->set_material(material, *it);
+        _scene->set_window_level(ww, wl, *it);
+    }
+    printf("\n");
+    _scene->set_visible_labels(vis_labels);
 }
 
 void Display() {
@@ -283,38 +339,6 @@ void Keyboard(unsigned char key, int x, int y) {
         _scene->set_display_size(_width, _height);
         break;
     }
-
-    case 'l': {
-        std::shared_ptr<ColorTransFunc> color;
-        std::shared_ptr<OpacityTransFunc> opacity;
-        float ww, wl;
-        RGBAUnit background;
-        Material material;
-#ifdef WIN32
-        const std::string color_opacity_xml = "../../../config/lut/3d/ct_cta.xml";
-#else
-        const std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
-#endif
-
-        if (IO_SUCCESS !=
-                TransferFuncLoader::load_color_opacity(
-                    color_opacity_xml, color, opacity, ww, wl, background, material)) {
-            std::cout << "load color opacity failed!\n";
-        }
-
-        _scene->set_color_opacity(color, opacity, 0);
-        _scene->set_ambient_color(1.0f, 1.0f, 1.0f, 0.28f);
-        _scene->set_material(material, 0);
-        _scene->set_window_level(ww, wl, 0);
-        _ww = ww;
-        _wl = wl;
-
-        _scene->set_composite_mode(COMPOSITE_DVR);
-        _scene->set_shading_mode(SHADING_PHONG);
-
-        break;
-    }
-
     default:
         break;
     }

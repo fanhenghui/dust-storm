@@ -194,6 +194,9 @@
     <ClInclude Include="..\include\arithmetic\mi_volume_statistician.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_morphology.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\arithmetic\mi_sampler.inl">

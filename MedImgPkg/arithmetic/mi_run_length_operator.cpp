@@ -75,6 +75,39 @@ std::vector<unsigned char> RunLengthOperator::decode(const std::vector<unsigned 
     return result; // std::move(result)
 }
 
+int RunLengthOperator::decode(
+    unsigned int* code_buffer , 
+    unsigned int code_buffer_len , 
+    unsigned char* target_mask , 
+    unsigned int mask_buffer_len) {
+    unsigned int voxel_num = 0;
+    for (unsigned int i = 0; i < code_buffer_len; i += 2) {
+        voxel_num += code_buffer[i];
+    }
+
+    if (voxel_num != mask_buffer_len) {
+        return -1;
+    }
+
+    unsigned int cur_idx = 0;
+    unsigned int voxel_bound = code_buffer[cur_idx];
+    unsigned char cur_label = static_cast<unsigned char>(code_buffer[cur_idx + 1]);
+
+    for (unsigned int voxel = 0; voxel < voxel_num; ++voxel) {
+        if (voxel == voxel_bound) {
+            cur_idx += 2;
+            voxel_bound += code_buffer[cur_idx];
+            cur_label = static_cast<unsigned char>(code_buffer[cur_idx + 1]);
+        }
+        // populate the temporary information container
+        target_mask[voxel] = cur_label;
+    }
+
+    return 0;
+
+}
+
 MED_IMG_END_NAMESPACE
 
+    
 
