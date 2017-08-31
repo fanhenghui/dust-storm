@@ -4,16 +4,22 @@
 #include "util/mi_util_export.h"
 #include <string>
 #include <vector>
+#include <set>
+#include <map>
 
 MED_IMG_BEGIN_NAMESPACE
 
 class Util_Export FileUtil {
 public:
     static void get_all_file_recursion(
-        const std::string& root , const std::vector<std::string>& postfix ,
+        const std::string& root , const std::set<std::string>& postfix ,
         std::vector<std::string>& files);
+    
+    static void get_all_file_recursion(
+        const std::string& root , const std::set<std::string>& postfix ,
+        std::map<std::string , std::vector<std::string>>& files);
 
-    static void write_raw(const std::string& path , void* buffer , unsigned int length);
+    static int write_raw(const std::string& path , void* buffer , unsigned int length);
 
 protected:
 private:

@@ -1,13 +1,19 @@
-#include "GL/glew.h"
-#include "GL/glxew.h"
 
+#ifdef WIN32
+#include "GL/glew.h"
+#include "GL/freeglut.h"
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_utils.h"
-
-#include "GL/glew.h"
-#include <unistd.h>
-
 #include "boost/thread.hpp"
+
+#else
+#include "GL/glxew.h"
+#include <unistd.h>
+#include "glresource/mi_gl_context.h"
+#include "glresource/mi_gl_utils.h"
+#include "boost/thread.hpp"
+#include "GL/freeglut.h"
+#endif
 
 using namespace medical_imaging;
 
@@ -87,8 +93,6 @@ using namespace medical_imaging;
 
 //     return 0;
 // }
-
-#include "GL/freeglut.h"
 
 static void display() {
     glViewport(0, 0, 800, 600);

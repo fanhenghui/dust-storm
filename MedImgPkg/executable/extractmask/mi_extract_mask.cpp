@@ -1,6 +1,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <set>
 
 #include "util/mi_file_util.h"
 #include "util/mi_string_number_converter.h"
@@ -8,10 +9,10 @@
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_aabb.h"
 #include "arithmetic/mi_intersection_test.h"
+#include "arithmetic/mi_run_length_operator.h"
 #include "io/mi_image_data_header.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
-#include "io/mi_run_length_operator.h"
 #include "io/mi_jpeg_parser.h"
 #include "pugixml/pugixml.hpp"
 #include "pugixml/pugiconfig.hpp"
@@ -797,7 +798,7 @@ void produce_one_test_jpeg(std::shared_ptr<ImageData> img , std::shared_ptr<Imag
                 unsigned char rgb = static_cast<unsigned char>(v0 * 255.0f);
 
                 if (mask_data[idx] != 0) {
-                    float rrr = (float)rgb  + 125;
+                    float rrr = (float)rgb*0.5  + 125;
                     rrr = rrr > 255.0f ? 255.0f : rrr;
                     buffer.get()[(y * w + x) * 3] = static_cast<unsigned char>(rrr);
                     buffer.get()[(y * w + x) * 3 + 1] = rgb;

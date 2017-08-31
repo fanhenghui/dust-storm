@@ -10,6 +10,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\executable\anonymization\mi_dicom_anonymization.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\executable\anonymization\ph-list-icon-anonymous.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\executable\anonymization\MedImgAnonymization.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\executable\anonymization\resource.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6C33E0D2-BF8F-458C-BFA2-1236F9FE88C8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -83,18 +95,6 @@
       <AdditionalDependencies>advapi32.lib;oflog.lib;netapi32.lib;wsock32.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;MedImgIO.lib;zlib_o.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ResourceCompile Include="..\Executable\MedImgAnonymization\res.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\Executable\MedImgAnonymization\mi_dicom_anonymization.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Executable\MedImgAnonymization\resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Executable\MedImgAnonymization\ph-list-icon-anonymous.ico" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
