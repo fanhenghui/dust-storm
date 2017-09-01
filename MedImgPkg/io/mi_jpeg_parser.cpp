@@ -27,9 +27,9 @@ void JpegParser::write_to_jpeg(std::string& file, char* img_buf , int width , in
 
     jpeg_set_defaults(&cinfo);
     /*set the quality [0..100]  */
-    jpeg_set_quality(&cinfo, 75, true);
+    jpeg_set_quality(&cinfo, 75, static_cast<boolean>(true));
 
-    jpeg_start_compress(&cinfo, true);
+    jpeg_start_compress(&cinfo, static_cast<boolean>(true));
 
     JSAMPROW row_pointer;          /* pointer to a single row */
 
