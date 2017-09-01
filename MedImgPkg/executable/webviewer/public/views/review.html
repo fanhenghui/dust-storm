@@ -30,7 +30,7 @@
 
 </head>
 
-<body onresize="FE.resize()">
+<body>    
     <!-- <div id="container" style="width:1240px">
         <div id="header" style="background-color:darkgray;float:none">
             <h1>Medcial Review</h1>
@@ -61,7 +61,7 @@
         </div>
 
     </div> -->
-    <div class="container-fluid">
+    <div class="container-fluid" id="worklist-div">
         <div style="display:none">
             <p id="username"><%=username%></p>
         </div>
@@ -110,7 +110,7 @@
         </div>
     </div>
     <hr>
-    <div class="container-fluid">
+    <div class="container-fluid" hidden="true" id="review-div">
         <div class="row clearfix">
             <div class="col-md-12 column">
                 <nav class="navbar navbar-default" role="navigation">
