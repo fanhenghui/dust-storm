@@ -30,10 +30,15 @@ int OpMPRPaging::execute() {
 
     if (_buffer != nullptr) {
         MsgPaging msg;
-
         if (msg.ParseFromArray(_buffer , _header._data_len)) {
             page_num = msg.page();
             std::cout << "paging num : " << page_num << std::endl;
+        } else {
+            MsgMouse msg;
+            if (msg.ParseFromArray(_buffer , _header._data_len)) {
+                page_num = static_cast<int>(msg.cur().y() - msg.pre().y());
+                std::cout << "paging num : " << page_num << std::endl;
+            }
         }
     }
 
@@ -50,40 +55,14 @@ int OpMPRPaging::execute() {
     std::shared_ptr<SceneBase> scene = cell->get_scene();
     REVIEW_CHECK_NULL_EXCEPTION(scene);
 
-#ifdef MPR
-
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(scene);
     REVIEW_CHECK_NULL_EXCEPTION(mpr_scene);
 
-    // mpr_scene->page(1);
-    // mpr_scene->set_dirty(true);
-
-    //////////////////////////////////////////////////
-    //For testing
     std::shared_ptr<VolumeInfos> volumeinfos = review_controller->get_volume_infos();
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>
                                           (mpr_scene->get_camera());
     int cur_page = mpr_scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
-    std::cout << "current page : " << cur_page << std::endl;
-
-    if (cur_page >= volumeinfos->get_volume()->_dim[2] - 2) {
-        mpr_scene->page_to(1);
-    } else {
-        mpr_scene->page(page_num);
-    }
-
-#else
-    std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(scene);
-    REVIEW_CHECK_NULL_EXCEPTION(vr_scene);
-
-    std::shared_ptr<VolumeInfos> volumeinfos = review_controller->get_volume_infos();
-    std::shared_ptr<CameraBase> camera = vr_scene->get_camera();
-
-    Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926 , Vector3(0, 1, 0));
-    camera->rotate(q);
-    vr_scene->set_dirty(true);
-
-#endif
+    mpr_scene->page(page_num);
     return 0;
 }
 
