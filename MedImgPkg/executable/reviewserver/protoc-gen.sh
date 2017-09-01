@@ -1,1 +1,1 @@
-protoc --proto_path = .. //public/data/ --cpp_out=./ ..//public/data/mi_message.proto
+protoc --proto_path=../webviewer/public/data/ --cpp_out=./ ../webviewer/public/data/mi_message.proto

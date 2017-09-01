@@ -20,6 +20,13 @@ message MsgPaging {
     required int32 page = 1;
 };
 
+message MsgRotation {
+    required float angle = 1;
+    required float axis_x = 2;
+    required float axis_y = 3;
+    required float axis_z = 4;
+};
+
 message MsgMouse {
     required MsgPoint2 pre = 1;
     required MsgPoint2 cur = 2;

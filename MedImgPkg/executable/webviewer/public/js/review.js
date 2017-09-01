@@ -391,7 +391,7 @@
       var username = document.getElementById('username').innerHTML;
       this.init(username);
     },
-
+    
     switchCommonTool: function(btnID) {
       switch (btnID) {
         case 'common-tool-arrow':
@@ -740,6 +740,24 @@
          });
         }
       );
+    },
+
+    playVR : function() {
+      var header_buffer = new ArrayBuffer(32);
+      var header = new Uint32Array(header_buffer);
+      header[0] = 0;
+      header[1] = 0;
+      header[2] = COMMAND_ID_FE_VR_PLAY;
+      header[3] = 3;//VR cell id
+      header[4] = 0;
+      header[5] = 0;
+      header[6] = 0;
+      header[7] = 0;
+      this.socket.emit('data', {
+        userid: this.userid,
+        username: this.username,
+        content: header_buffer
+      });
     }
     // changeLayout1x1: function() {
     //     document.getElementById("cell1").style.visibility = "hidden";

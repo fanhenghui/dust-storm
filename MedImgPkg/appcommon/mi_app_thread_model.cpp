@@ -125,10 +125,12 @@ void AppThreadModel::process_operating() {
         }
 
     } catch (const Exception& e) {
-        throw e;
+        //DO nothing to keep running
+        printf("operation has catch exception : %s\n" , e.what());
+        //throw e;
         // TODO ERROR
     } catch (boost::thread_interrupted& e) {
-        throw e;
+        //throw e;
         // TODO thread interrupted
     } catch (...) {
     }
@@ -207,9 +209,12 @@ void AppThreadModel::process_rendering() {
         }
 
     } catch (const Exception& e) {
-        throw e;
+        //DO nothing to keep running
+        printf("operation has catch exception : %s\n" , e.what());
+        //throw e;
     } catch (boost::thread_interrupted& e) {
-        throw e;
+        //DO nothing to keep running
+        //throw e;
         // TODO
     } catch (...) {
     }
@@ -287,9 +292,11 @@ void AppThreadModel::process_sending() {
             _sending = false;
         }
     } catch (const Exception& e) {
-        throw e;
+        //DO nothing to keep running
+        printf("operation has catch exception : %s\n" , e.what());
+        //throw e;
     } catch (boost::thread_interrupted& e) {
-        throw e;
+        //throw e;
         // TODO
     } catch (...) {
     }
