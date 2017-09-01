@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1477</width>
-    <height>1020</height>
+    <width>1167</width>
+    <height>927</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,89 +24,177 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <layout class="QGridLayout" name="gridLayout_5">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
       <item row="0" column="0">
        <widget class="QGroupBox" name="groupBoxView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>View</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Preset WL</string>
-             </property>
-            </widget>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Preset WL</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBoxPresetWL">
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <item>
+            <property name="text">
+             <string>CT_Lungs</string>
+            </property>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="comboBoxPresetWL">
-             <item>
-              <property name="text">
-               <string>CT_Lungs</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CT_Chest</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CT_Bone</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CT_Abdomen</string>
-              </property>
-             </item>
-            </widget>
+           <item>
+            <property name="text">
+             <string>CT_Chest</string>
+            </property>
            </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBoxColorInverse">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>inverse</string>
-             </property>
-            </widget>
+           <item>
+            <property name="text">
+             <string>CT_Bone</string>
+            </property>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="checkBoxCrossHair">
-             <property name="text">
-              <string>CrossHair</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
-            </widget>
+           <item>
+            <property name="text">
+             <string>CT_Abdomen</string>
+            </property>
            </item>
-          </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="checkBoxColorInverse">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>inverse</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="checkBoxCrossHair">
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>CrossHair</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QGroupBox" name="groupBoxAnnotation">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>220</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="title">
          <string>Annotation</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="1" column="0" colspan="5">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="text">
+              <string>Mark VOI</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxMarkType">
+             <item>
+              <property name="text">
+               <string>Sphere</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QCheckBox" name="checkBoxVOIAutoSegment">
+             <property name="text">
+              <string>VOI AutoSeg</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxNoduleOverlay">
+             <property name="text">
+              <string>Nodule Overlay</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
           <widget class="QTableWidget" name="tableWidgetNoduleList">
-           <property name="minimumSize">
+           <property name="maximumSize">
             <size>
-             <width>300</width>
-             <height>200</height>
+             <width>210</width>
+             <height>16777215</height>
             </size>
            </property>
            <attribute name="horizontalHeaderCascadingSectionResizes">
             <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderDefaultSectionSize">
+            <number>70</number>
            </attribute>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
@@ -128,153 +216,107 @@
            </column>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Mark VOI</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="comboBoxMarkType">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <property name="text">
-             <string>Sphere</string>
-            </property>
+            <widget class="QPushButton" name="pushButtonAnnotate">
+             <property name="text">
+              <string>Annotate</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup</string>
+             </attribute>
+            </widget>
            </item>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QCheckBox" name="checkBoxVOIAutoSegment">
-           <property name="text">
-            <string>VOI Auto Segment</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="4">
-          <widget class="QCheckBox" name="checkBoxNoduleOverlay">
-           <property name="text">
-            <string>Nodule overlay</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="pushButtonAnnotate">
-           <property name="text">
-            <string>Annotate</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButtonDeleteNodule">
-           <property name="text">
-            <string>Delete</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QPushButton" name="pushButtonFineTune">
-           <property name="text">
-            <string>Fine Tune</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item row="2" column="3">
-          <widget class="QComboBox" name="comboBoxTuneType">
            <item>
-            <property name="text">
-             <string>Substract</string>
-            </property>
+            <widget class="QPushButton" name="pushButtonDeleteNodule">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
            </item>
-          </widget>
+          </layout>
          </item>
-         <item row="2" column="4">
-          <widget class="QSpinBox" name="spinBoxTuneRadius">
-           <property name="minimum">
-            <number>2</number>
-           </property>
-           <property name="maximum">
-            <number>64</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>5</number>
-           </property>
-          </widget>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="pushButtonFineTune">
+             <property name="text">
+              <string>Fine Tune</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <attribute name="buttonGroup">
+              <string notr="true">buttonGroup</string>
+             </attribute>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxTuneType">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <item>
+              <property name="text">
+               <string>Substract</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBoxTuneRadius">
+             <property name="minimum">
+              <number>2</number>
+             </property>
+             <property name="maximum">
+              <number>64</number>
+             </property>
+             <property name="singleStep">
+              <number>1</number>
+             </property>
+             <property name="value">
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QGroupBox" name="groupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>128</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="title">
          <string>Common Tools</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButtonWindowing">
-           <property name="text">
-            <string>Windowing</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QPushButton" name="pushButtonRotate">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Rotate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="pushButtonZoom">
-           <property name="text">
-            <string>Zoom</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string notr="true">buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
+        <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
           <widget class="QPushButton" name="pushButtonArrow">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>Arrow</string>
            </property>
@@ -289,18 +331,49 @@
            </attribute>
           </widget>
          </item>
-         <item row="2" column="3">
-          <widget class="QPushButton" name="pushButtonFitWindow">
-           <property name="enabled">
-            <bool>true</bool>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButtonZoom">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
            </property>
            <property name="text">
-            <string>FitWindow</string>
+            <string>Zoom</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="pushButtonRotate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Rotate</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="1" column="0">
           <widget class="QPushButton" name="pushButtonPan">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text">
             <string>Pan</string>
            </property>
@@ -310,6 +383,41 @@
            <attribute name="buttonGroup">
             <string notr="true">buttonGroup</string>
            </attribute>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="pushButtonWindowing">
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Windowing</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="pushButtonFitWindow">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>64</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>FitWindow</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -327,7 +435,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1477</width>
+     <width>1167</width>
      <height>23</height>
     </rect>
    </property>

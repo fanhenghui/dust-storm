@@ -35,6 +35,7 @@
 #include "qtpackage/mi_shared_widget.h"
 #include "qtpackage/mi_scene_container.h"
 #include "qtpackage/mi_graphic_item_corners_info.h"
+#include "qtpackage/mi_graphic_item_direction_info.h"
 #include "qtpackage/mi_graphic_item_voi.h"
 #include "qtpackage/mi_graphic_item_cross_hair.h"
 #include "qtpackage/mi_graphic_item_mpr_border.h"
@@ -278,6 +279,10 @@ void NoduleAnnotation::create_scene_i()
         std::shared_ptr<GraphicItemCornersInfo> graphic_item_corner_info(new GraphicItemCornersInfo());
         graphic_item_corner_info->set_scene(mpr_scenes[i]);
         mpr_containers[i]->add_item(graphic_item_corner_info);
+
+        std::shared_ptr<GraphicItemDirectionInfo> graphic_item_direction_info(new GraphicItemDirectionInfo());
+        graphic_item_direction_info->set_scene(mpr_scenes[i]);
+        mpr_containers[i]->add_item(graphic_item_direction_info);
 
         std::shared_ptr<GraphicItemVOI> graphic_item_voi(new GraphicItemVOI());
         graphic_item_voi->set_scene(mpr_scenes[i]);

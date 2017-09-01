@@ -12,6 +12,8 @@
 #include <QTextDocument>
 #include <QTextOption>
 
+#include <string>
+
 MED_IMG_BEGIN_NAMESPACE
 
 namespace
@@ -155,6 +157,7 @@ void GraphicItemCornersInfo::refresh_text_i()
     //Manufacturer model name
     //Modality
     //Image date
+    //KVP
     std::string modality = "UnSupported";
     switch(data_header->modality)
     {
@@ -178,8 +181,13 @@ void GraphicItemCornersInfo::refresh_text_i()
     std::string context = data_header->manufacturer + CRLF +
         data_header->manufacturer_model_name + CRLF +
         modality + CRLF +
-        data_header->image_date;
-
+        data_header->image_date + CRLF;
+    {
+        std::stringstream ss;
+        ss << "kvp:" << data_header->kvp;
+        context += ss.str();
+    }
+ 
     //Set alignment
     QTextDocument* dcm = _text_item_lt->document();
     dcm->setPlainText(context.c_str());

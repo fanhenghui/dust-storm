@@ -22,6 +22,7 @@
     <ClInclude Include="..\include\qtpackage\mi_graphic_item_base.h" />
     <ClInclude Include="..\include\qtpackage\mi_graphic_item_corners_info.h" />
     <ClInclude Include="..\include\qtpackage\mi_graphic_item_cross_hair.h" />
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_direction_info.h" />
     <ClInclude Include="..\include\qtpackage\mi_graphic_item_mpr_border.h" />
     <ClInclude Include="..\include\qtpackage\mi_model_cross_hair.h" />
     <ClInclude Include="..\include\qtpackage\mi_model_focus.h" />
@@ -88,6 +89,7 @@
   <ItemGroup>
     <ClCompile Include="..\qtpackage\mi_graphic_item_corners_info.cpp" />
     <ClCompile Include="..\qtpackage\mi_graphic_item_cross_hair.cpp" />
+    <ClCompile Include="..\qtpackage\mi_graphic_item_direction_info.cpp" />
     <ClCompile Include="..\qtpackage\mi_graphic_item_mpr_border.cpp" />
     <ClCompile Include="..\qtpackage\mi_graphic_item_voi.cpp" />
     <ClCompile Include="..\qtpackage\mi_model_cross_hair.cpp" />
