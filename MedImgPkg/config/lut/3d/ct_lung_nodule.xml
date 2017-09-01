@@ -9,10 +9,10 @@
 <point><index>-500</index><A>200</A></point>
 <point><index>350</index><A>255</A></point>
 </Opacity>
-<Windowing>
-<windowwidth>1900</windowwidth>
-<level>-300</level>
-</Windowing>
+<WindowLevel>
+<width>1759</width>
+<level>488</level>
+</WindowLevel>
 <Material>
     <DiffuseColor>
 		<R>255</R>
