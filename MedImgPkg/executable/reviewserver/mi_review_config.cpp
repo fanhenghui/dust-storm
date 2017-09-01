@@ -26,7 +26,8 @@ ReviewConfig::ReviewConfig() {
 
         if (tag == "TestDataRoot") {
             _test_data_root = context;
-            break;
+        } else if (tag == "DBPWD") {
+            _db_wpd = context;
         }
     }
 
@@ -51,6 +52,10 @@ ReviewConfig* ReviewConfig::instance() {
 
 std::string ReviewConfig::get_test_data_root() const {
     return _test_data_root;
+}
+
+std::string ReviewConfig::get_db_pwd() const {
+    return _db_wpd;
 }
 
 

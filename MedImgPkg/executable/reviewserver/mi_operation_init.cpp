@@ -61,8 +61,8 @@ int OpInit::execute() {
     // load series
     const std::string series_uid = msg_init.series_uid();
     AppDataBase db;
-
-    if (0 != db.connect("root", "127.0.0.1:3306", "6ckj1sWR", "med_img_cache_db")) {
+    const std::string db_wpd = ReviewConfig::instance()->get_db_pwd();
+    if (0 != db.connect("root", "127.0.0.1:3306", db_wpd.c_str(), "med_img_cache_db")) {
         //TODO LOG
         return -1;
     }

@@ -9,6 +9,8 @@
 #include "appcommon/mi_app_data_base.h"
 #include "util/mi_ipc_client_proxy.h"
 
+#include "mi_review_config.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 SearchWorklistCommandHandler::SearchWorklistCommandHandler(std::shared_ptr<AppController>
@@ -54,7 +56,8 @@ int SearchWorklistCommandHandler::handle_command(const IPCDataHeader& datahaeder
 MsgWorklist* SearchWorklistCommandHandler::createWorklist() {
     AppDataBase db;
 
-    if (0 != db.connect("root", "127.0.0.1:3306", "6ckj1sWR", "med_img_cache_db")) {
+    const std::string db_wpd = ReviewConfig::instance()->get_db_pwd();
+    if (0 != db.connect("root", "127.0.0.1:3306", db_wpd.c_str(), "med_img_cache_db")) {
         //TODO LOG
         return nullptr;
     }

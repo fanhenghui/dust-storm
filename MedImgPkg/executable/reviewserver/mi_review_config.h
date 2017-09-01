@@ -13,6 +13,7 @@ public:
     ~ReviewConfig();
 
     std::string get_test_data_root() const;
+    std::string get_db_pwd() const;
 
 private:
     ReviewConfig();
@@ -21,6 +22,7 @@ private:
 
 private:
     std::string _test_data_root;
+    std::string _db_wpd;
 };
 
 
