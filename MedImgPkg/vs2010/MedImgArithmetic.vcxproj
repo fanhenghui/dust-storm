@@ -50,6 +50,7 @@
     <ClInclude Include="..\include\arithmetic\mi_line_segment.h" />
     <ClInclude Include="..\include\arithmetic\mi_matrix4.h" />
     <ClInclude Include="..\include\arithmetic\mi_matrix4f.h" />
+    <ClInclude Include="..\include\arithmetic\mi_morphology.h" />
     <ClInclude Include="..\include\arithmetic\mi_ortho_camera.h" />
     <ClInclude Include="..\include\arithmetic\mi_perspective_camera.h" />
     <ClInclude Include="..\include\arithmetic\mi_plane.h" />

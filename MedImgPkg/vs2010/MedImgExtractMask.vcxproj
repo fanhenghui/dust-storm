@@ -10,15 +10,10 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\ut\util_ut\mi_test_ipc_proxy.cpp" />
-    <ClCompile Include="..\ut\util_ut\mi_test_message_queue.cpp" />
-    <ClCompile Include="..\ut\util_ut\mi_util_ut.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{16DCB576-8840-41CE-A30C-E5C1FE6461A4}</ProjectGuid>
+    <ProjectGuid>{DC7764FE-1B04-4784-8613-96206355307D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>MedImgUtil_UT</RootNamespace>
+    <RootNamespace>MedImgExtractMask</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -57,14 +52,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4819;</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgUtil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MedImgUtil.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -76,18 +70,32 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Include\;..\Include\MedImgUtil;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4819;</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
-      <AdditionalDependencies>MedImgUtil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>MedImgUtil.lib;MedImgArithmetic.lib;MedImgIO.lib;pugixml.lib;opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\executable\extractmask\mi_extract_mask.cpp" />
+    <ClCompile Include="..\executable\extractmask\mi_extract_mask_vis.cpp" />
+    <ClCompile Include="..\executable\extractmask\mi_main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\executable\extractmask\mi_extract_mask_common.h" />
+    <ClInclude Include="..\executable\extractmask\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\executable\extractmask\extract_mask.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\executable\extractmask\MedImgExtractMask.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

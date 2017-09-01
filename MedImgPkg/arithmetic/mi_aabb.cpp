@@ -44,6 +44,10 @@ bool AABBUI::operator!=(const AABBUI& aabb) const {
             _max[1] != aabb._max[1] || _max[2] != aabb._max[2]);
 }
 
+int AABBUI::volume() const {
+    return (_max[0] - _min[0])*(_max[1] - _min[1])*(_max[2] - _min[2]);
+}
+
 void AABBUI::Print() {
     std::cout << "AABBUI : [ " << _min[0] << " " << _min[1] << " " << _min[2]
               << " ] , [" << _max[0] << " " << _max[1] << " " << _max[2]
@@ -72,6 +76,10 @@ bool AABBI::operator!=(const AABBI& aabb) const {
     return (_min[0] != aabb._min[0] || _min[1] != aabb._min[1] ||
             _min[2] != aabb._min[2] || _max[0] != aabb._max[0] ||
             _max[1] != aabb._max[1] || _max[2] != aabb._max[2]);
+}
+
+int AABBI::volume() const {
+    return (_max[0] - _min[0])*(_max[1] - _min[1])*(_max[2] - _min[2]);
 }
 
 void AABBI::Print() {

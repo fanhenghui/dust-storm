@@ -43,6 +43,37 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid, T threshold) {
 }
 
 template <class T>
+void SegmentThreshold<T>::segment(T threshold) {
+    const unsigned int layer = _dim[0] * _dim[1];
+
+#ifndef _DEBUG
+#pragma omp parallel for
+#endif
+
+    for (int z = 0; z < _dim[2]; ++z) {
+#ifndef _DEBUG
+#pragma omp parallel for
+#endif
+
+        for (int y = 0; y < _dim[1]; ++y) {
+#ifndef _DEBUG
+#pragma omp parallel for
+#endif
+
+            for (int x = 0; x < _dim[0]; ++x) {
+                unsigned int idx = z * layer + y * _dim[0] + x;
+                T tmp = _data_ref[idx];
+
+                if (tmp > threshold) {
+                    _mask_ref[idx] = _target_label;
+                }
+            }
+        }
+    }
+}
+
+
+template <class T>
 void SegmentThreshold<T>::segment_auto_threshold(const Ellipsoid& ellipsoid,
         ThresholdType type) {
     T threshold = 0;
@@ -165,6 +196,94 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
         // ICV
         float icv = pa * (mean_a - mean) * (mean_a - mean) +
                     pb * (mean_b - mean) * (mean_b - mean);
+
+        if (icv > max_icv) {
+            max_icv = icv;
+            max_gray_scalar = i;
+        }
+    }
+
+    float gray_norm = (float)max_gray_scalar / (float)gray_level;
+    return T(gray_norm * ww + _min_scalar);
+}
+
+template <class T>
+T SegmentThreshold<T>::get_threshold_otsu_i() {
+
+    const unsigned int layer = _dim[0] * _dim[1];
+
+    // 1 Calculate histogram
+    const int gray_level = 256;
+    // boost::atomic_uint32_t gray_hist[gray_level];
+    unsigned int gray_hist[gray_level];
+    memset(gray_hist, 0, sizeof(gray_hist));
+    unsigned int pixel_num = 0;
+    float sum = 0;
+
+    const float ww = _max_scalar - _min_scalar;
+    const float ww_r = 1.0f / ww;
+
+    //#ifndef _DEBUG
+    //#pragma omp parallel for
+    //#endif
+    for (unsigned int z = 0; z < _dim[2]; ++z) {
+        //#ifndef _DEBUG
+        //#pragma omp parallel for
+        //#endif
+        for (unsigned int y = 0; y < _dim[1]; ++y) {
+            //#ifndef _DEBUG
+            //#pragma omp parallel for
+            //#endif
+            for (unsigned int x = 0; x < _dim[0]; ++x) {
+                unsigned int idx = z * layer + y * _dim[0] + x;
+                T tmp = _data_ref[idx];
+                float temp_norm = (tmp - _min_scalar) * ww_r;
+                temp_norm = temp_norm > 1.0f ? 1.0f : temp_norm;
+                temp_norm = temp_norm < 0.0f ? 0.0f : temp_norm;
+                int gray_scalar = int(temp_norm * (gray_level - 1));
+                gray_hist[gray_scalar] = gray_hist[gray_scalar] + 1;
+                sum += gray_scalar * 0.001f;
+                ++pixel_num;
+            }
+        }
+    }
+
+    // 2 Loop to find ICA
+    // Nobuyuki Otsu define : ICA = PA*(MA-M)^2 + PB*(MB-M)^2
+    // Part A less than threshold t , and part B large than threshold t
+    // M : all pixel mean
+    // MA : part A mean
+    // MB : part B mean
+    // PA =  part A pixel / all pixel
+    // PB = part B pixel / all pixel
+
+    // calculate mean
+    const float pixel_num_f = (float)pixel_num;
+    const float mean = sum / (float)pixel_num * 1000.0f;
+    float max_icv = std::numeric_limits<float>::min();
+    int max_gray_scalar = -1;
+
+    for (int i = 1; i < gray_level - 1; ++i) {
+        // PA MA
+        unsigned int pixel_a = 0;
+        float sum_a = 0.0f;
+
+        for (int j = 0; j <= i; ++j) {
+            pixel_a += gray_hist[j];
+            sum_a += (float)j * gray_hist[j] * 0.001f;
+        }
+
+        float pa = (float)pixel_a / pixel_num_f;
+        float mean_a = sum_a / (float)pixel_a * 1000.0f;
+
+        // PB MB
+        float pixel_b_f = (float)(pixel_num - pixel_a);
+        float pb = pixel_b_f / pixel_num_f;
+        float mean_b = (sum - sum_a) / pixel_b_f * 1000.0f;
+
+        // ICV
+        float icv = pa * (mean_a - mean) * (mean_a - mean) +
+            pb * (mean_b - mean) * (mean_b - mean);
 
         if (icv > max_icv) {
             max_icv = icv;

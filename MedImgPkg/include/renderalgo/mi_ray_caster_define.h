@@ -48,6 +48,7 @@ enum CompositeMode {
 enum MaskMode {
     MASK_NONE = 0,
     MASK_MULTI_LABEL,
+    MASK_MULTI_LINEAR_LABEL,
 };
 
 enum ShadingMode {

@@ -1,3 +1,0 @@
-ProcessingUnit = GPU
-NoduleOutput = TEXT
-LastOpenDirection = E:/data/LUNA/test1

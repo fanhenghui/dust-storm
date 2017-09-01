@@ -19,13 +19,17 @@ public:
 
     void segment(const Ellipsoid& region_ellipsoid, T threshold);
 
+    void segment(T threshold);
+
     void segment_auto_threshold(const Ellipsoid& region_ellipsoid,
                                 ThresholdType type = Otsu);
 
-private:
+public:
     T get_threshold_otsu_i(const Ellipsoid& region_ellipsoid);
 
     T get_threshold_center_i(const Ellipsoid& region_ellipsoid);
+
+    T get_threshold_otsu_i();
 };
 
 #include "arithmetic/mi_segment_threshold.inl"

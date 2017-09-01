@@ -60,7 +60,9 @@ std::vector<std::string> GetFiles() {
 #endif
 
     std::vector<std::string> files;
-    FileUtil::get_all_file_recursion(root, std::vector<std::string>(), files);
+    std::set<std::string> dcm_postfix;
+    dcm_postfix.insert(".dcm");
+    FileUtil::get_all_file_recursion(root, dcm_postfix, files);
     return files;
 }
 

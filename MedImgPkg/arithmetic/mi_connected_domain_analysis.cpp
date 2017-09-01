@@ -17,7 +17,7 @@ void ConnectedDomainAnalysis::seed_filling(std::stack<POS>& s , unsigned char la
         if (s.empty() && cd_num == 0) {
             _roi_cache.get()[pos.z * _roi_dim[0]*_roi_dim[1] + pos.y * _roi_dim[0] + pos.x] =
                 0; //isolated point
-            std::cout << "isolated point\n";
+            //std::cout << "isolated point\n";
             break;
         }
 

@@ -32,6 +32,8 @@ public:
     bool operator==(const AABBUI& aabb) const;
     bool operator!=(const AABBUI& aabb) const;
 
+    int volume() const;
+
     void Print();
 };
 
@@ -47,6 +49,8 @@ public:
 
     bool operator==(const AABBI& aabb) const;
     bool operator!=(const AABBI& aabb) const;
+
+    int volume() const;
 
     void Print();
 };

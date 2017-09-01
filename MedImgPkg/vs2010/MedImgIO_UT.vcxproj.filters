@@ -15,13 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_vr_scene.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_mpr_scene.cpp">
+    <ClCompile Include="..\ut\io_ut\mi_io_ut.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
