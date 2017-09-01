@@ -68,8 +68,9 @@ int parse_root(
     std::map<std::string, ImgItem>& series_info_map,
     std::map<std::string, std::vector<std::string>>& series_col) {
     std::vector<std::string> files;
-    FileUtil::get_all_file_recursion(root, std::vector<std::string>(1, ".dcm"),
-                                     files);
+    std::set<std::string> postfix;
+    postfix.insert(".dcm");
+    FileUtil::get_all_file_recursion(root, postfix, files);
 
     if (files.empty()) {
         LOG_OUT("ERROR : has no .dcm files.");

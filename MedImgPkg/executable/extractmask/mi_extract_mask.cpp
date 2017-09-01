@@ -14,10 +14,16 @@
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_jpeg_parser.h"
-#include "pugixml/pugixml.hpp"
-#include "pugixml/pugiconfig.hpp"
 
 #include "mi_extract_mask_common.h"
+
+#ifdef WIN32
+#include "pugixml/pugixml.hpp"
+#include "pugixml/pugiconfig.hpp"
+#else
+#include "pugixml.hpp"
+#include "pugiconfig.hpp"
+#endif
 
 using namespace medical_imaging;
 
@@ -834,7 +840,8 @@ void produce_test_jpeg(std::shared_ptr<ImageData> img , std::shared_ptr<ImageDat
         if (got_it) {
             std::stringstream ss;
             ss << base_name << "_slice_" << i << ".jpeg";
-            produce_one_test_jpeg(img , mask , i , ss.str());
+            std::string jpeg_out_path = ss.str();
+            produce_one_test_jpeg(img , mask , i , jpeg_out_path);
         }
     }
 }

@@ -1,6 +1,6 @@
-#include "gl/glew.h"
-#include "gl/freeglut.h"
-#include "gl/GLU.h"
+#include "GL/glew.h"
+#include "GL/freeglut.h"
+#include "GL/glu.h"
 
 #include <string>
 #include <fstream>
@@ -17,8 +17,14 @@
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_jpeg_parser.h"
+
+#ifdef WIN32
 #include "pugixml/pugixml.hpp"
 #include "pugixml/pugiconfig.hpp"
+#else
+#include "pugixml.hpp"
+#include "pugiconfig.hpp"
+#endif
 
 #include "mi_extract_mask_common.h"
 

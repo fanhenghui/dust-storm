@@ -65,17 +65,17 @@ int _iTestCode = 0;
 int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
 
-std::vector<std::string> GetFiles() {
 #ifdef WIN32
-    const std::string root = "E:/data/MyData/demo/lung/LIDC-IDRI-1002";
+const std::string root = "E:/data/MyData/demo/lung/";
 #else
-    const std::string root = "/home/wr/data/AB_CTA_01/";
+const std::string root = "/home/zhangchanggong/data/demo/lung/";
 #endif
 
+std::vector<std::string> GetFiles() {
     std::vector<std::string> files;
     std::set<std::string> dcm_postfix;
     dcm_postfix.insert(".dcm");
-    FileUtil::get_all_file_recursion(root, dcm_postfix, files);
+    FileUtil::get_all_file_recursion(root+"/LIDC-IDRI-1002", dcm_postfix, files);
     return files;
 }
 
@@ -100,17 +100,17 @@ void Init() {
     mask_data->_data_type = medical_imaging::UCHAR;
     mask_data->mem_allocate();
     char* mask_raw = (char*)mask_data->get_pixel_pointer();
-    std::ifstream in("E:/data/MyData/demo/lung/mask.raw" , std::ios::in);
-    //if(in.is_open()) {
-    //    in.read(mask_raw, data_len);
-    //    in.close();
-    //} else {
+    std::ifstream in(root+"/mask.raw" , std::ios::in);
+    if(in.is_open()) {
+        in.read(mask_raw, data_len);
+        in.close();
+    } else {
         memset(mask_raw , 1 , data_len);
-    //}
+    }
 
     std::set<unsigned char> target_label_set;
     RunLengthOperator run_length_op;
-    std::ifstream in2("E:/data/MyData/demo/lung/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle" , std::ios::binary | std::ios::in);
+    std::ifstream in2(root+"/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle" , std::ios::binary | std::ios::in);
     if (in2.is_open()) {
         in2.seekg (0, in2.end);
         const int code_len = in2.tellg();
@@ -121,7 +121,7 @@ void Init() {
         unsigned char* mask_target = new unsigned char[data_len];
         
         if(0 == run_length_op.decode(code_buffer , code_len/sizeof(unsigned int) , mask_target , data_len) ) {
-            FileUtil::write_raw("D:/temp/nodule.raw" , mask_target , data_len);
+            FileUtil::write_raw(root+"./nodule.raw" , mask_target , data_len);
             printf("load target mask done.\n");
             for (unsigned int i = 0 ; i < data_len ; ++i) {
                 if (mask_target[i] != 0) {
@@ -133,7 +133,7 @@ void Init() {
         delete [] mask_target;
     }
 
-    FileUtil::write_raw("D:/temp/target_mask.raw" , mask_raw, data_len);
+    FileUtil::write_raw(root+"/target_mask.raw" , mask_raw, data_len);
 
     _volumeinfos->set_mask(mask_data);
 

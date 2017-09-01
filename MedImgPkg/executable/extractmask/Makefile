@@ -17,7 +17,7 @@ TARGET = $(BIN_DIR)/extract_mask
 
 COMMON_HEADER = mi_extract_mask_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) 
-ADDITIANL_DEPENDENCIES = -lboost_system -lboost_filesystem -lboost_thread -lpugixml
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lboost_filesystem -lboost_thread -lpugixml -lGL -lGLEW -lGLU -lglut -lmedimg_util -lmedimg_arithmetic -lmedimg_io 
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
