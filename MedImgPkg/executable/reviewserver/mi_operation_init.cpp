@@ -83,8 +83,9 @@ int OpInit::execute() {
     ////////////////////////////////////////////////////////////////////////
 
     std::vector<std::string> dcm_files;
-    FileUtil::get_all_file_recursion(series_path, std::vector<std::string>(),
-                                     dcm_files);
+    std::set<std::string> postfix;
+    postfix.insert(".dcm");
+    FileUtil::get_all_file_recursion(series_path, postfix, dcm_files);
 
     if (dcm_files.empty()) {
         REVIEW_THROW_EXCEPTION("Empty series files!");
