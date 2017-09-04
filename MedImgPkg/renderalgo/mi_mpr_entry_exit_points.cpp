@@ -23,8 +23,9 @@ MED_IMG_BEGIN_NAMESPACE
 namespace {
 // Return true if out
 bool check_outside(Vector3f pt, Vector3f bound) {
-    if (pt._m[0] < 0 || pt._m[1] < 0 || pt._m[2] < 0 || pt._m[0] > bound._m[0] ||
-            pt._m[1] > bound._m[1] || pt._m[2] > bound._m[2]) {
+    const float BB_EPSILON = 1e-4f;
+    if (pt._m[0] < -BB_EPSILON || pt._m[1] < -BB_EPSILON || pt._m[2] < -BB_EPSILON || 
+        pt._m[0] > bound._m[0] + BB_EPSILON || pt._m[1] > bound._m[1] + BB_EPSILON || pt._m[2] > bound._m[2] + BB_EPSILON) {
         return true;
     } else {
         return false;
@@ -33,19 +34,35 @@ bool check_outside(Vector3f pt, Vector3f bound) {
 
 // If ray[i] < FLOAT_EPSLION then set ray[i] = 1 adjust[i] =
 // std::numeric_limits<float>::max()*0.5f
-bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound,
-                            Vector3f ray_norm, Vector3f adjust,
-                            float& entry_step, float& exit_step) {
-    Vector3f bottom_step = (min - ray_start) / ray_norm;
-    Vector3f top_step = (min + bound - ray_start) / ray_norm;
-    Vector3f bottom_step2(bottom_step);
-    Vector3f top_step2(top_step);
-    bottom_step -= adjust;
-    top_step -= adjust;
-    bottom_step2 += adjust;
-    top_step2 += adjust;
+bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound, Vector3f ray_norm, float& entry_step, float& exit_step) {
+    
+    Vector3f ray_r = Vector3f(1.0f,1.0f,1.0f) / ray_norm;
+    Vector3f bottom_step = (min - ray_start);
+    Vector3f top_step = (min + bound - ray_start);
+    Vector3f bottom_step2 = bottom_step * ray_r;
+    Vector3f top_step2  = top_step * ray_r;
 
-    entry_step = bottom_step.min_per_elem(top_step).max_elem();
+    if(fabs(bottom_step.get_x()) < FLOAT_EPSILON){
+        bottom_step2.set_x(0);
+    }
+    if(fabs(bottom_step.get_y()) < FLOAT_EPSILON){
+        bottom_step2.set_y(0);
+    }
+    if(fabs(bottom_step.get_z()) < FLOAT_EPSILON){
+        bottom_step2.set_z(0);
+    }
+
+    if(fabs(top_step.get_x()) < FLOAT_EPSILON){
+        top_step2.set_x(0);
+    }
+    if(fabs(top_step.get_y()) < FLOAT_EPSILON){
+        top_step2.set_y(0);
+    }
+    if(fabs(top_step.get_z()) < FLOAT_EPSILON){
+        top_step2.set_z(0);
+    }
+
+    entry_step = bottom_step2.min_per_elem(top_step2).max_elem();
     exit_step = bottom_step2.max_per_elem(top_step2).min_elem();
 
     //////////////////////////////////////////////////////////////////////////
@@ -140,12 +157,9 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
         //////////////////////////////////////////////////////////////////////////
         // Adjust ray direction
         Vector3f vRayBrick(ray_dir);
-        Vector3f vRayBrickAdjust(0, 0, 0);
-
         for (int i = 0; i < 3; ++i) {
             if (fabs(vRayBrick._m[i]) <= FLOAT_EPSILON) {
-                vRayBrick._m[i] = 1; // be divided
-                vRayBrickAdjust._m[i] = std::numeric_limits<float>::max() * 0.5f;
+                vRayBrick._m[i] = FLOAT_EPSILON; // be divided
             }
         }
 
@@ -166,10 +180,10 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
             int iY = idx / _width;
             int iX = idx - iY * _width;
 
-            if (idx == pixel_sum/2)
-            {
-                printf(".");
-            }
+            //if (idx == pixel_sum/2)
+            //{
+            //    printf(".");
+            //}
 
             cur_f = pt00F + x_delta_float * (float)iX + y_delta_float * (float)iY;
 
@@ -187,7 +201,7 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
             // Intersect volume AABB to get intersected entry&exit points
             float entry_step(0), exit_step(0);
             const bool bIntersection = ray_intersect_aabb_acc(
-                                           entry_f, Vector3f(0, 0, 0), dim_vector, vRayBrick, vRayBrickAdjust,
+                                           entry_f, Vector3f(0, 0, 0), dim_vector, vRayBrick,
                                            entry_step, exit_step);
 
             // Entry point outside

@@ -270,11 +270,11 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
 
         for (auto it = file_format_set.begin(); it != file_format_set.end();
                 ++idx_delete, ++it_file, ++it) {
-            if (idx_delete != *it_delete) {
+            if(it_delete != to_be_delete.end() && idx_delete == *it_delete) {
+                ++it_delete;
+            } else {
                 file_format_set_major.push_back(*it);
                 file_major.push_back(*it_file);
-            } else {
-                ++it_delete;
             }
         }
 
