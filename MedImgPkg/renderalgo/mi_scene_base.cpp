@@ -120,6 +120,7 @@ void SceneBase::initialize() {
 
         gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
         gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
+        //_gpujpeg_param.quality = 98;
 
         gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
         _gpujpeg_image_param.width = _width;

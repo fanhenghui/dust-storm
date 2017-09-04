@@ -178,16 +178,22 @@ io.on(
           console.log('app path : ' + review_server_path);
 
           // TODO Test 自己起C++ BE
-          // const out_log = fs.openSync(
-          //     './out_' + util.inspect(obj.username) + '.log', 'a');
-          // const err_log = fs.openSync(
-          //     './err_' + util.inspect(obj.username) + '.log', 'a');
-          // var worker = childProcess.spawn(
-          //     review_server_path.toString(), ['/tmp/app.' +
-          //     obj.username],
-          //     {detached: true, stdio: ['ignore', out_log, err_log]});
-          // onlineLogicProcessID[obj.userid] = worker;
-          // console.log('<><><><><><> login in success <><><><><><>');
+          //  const out_log = fs.openSync(
+          //      './out_' + util.inspect(obj.username) + '.log', 'a');
+          //  const err_log = fs.openSync(
+          //      './err_' + util.inspect(obj.username) + '.log', 'a');
+          //  var worker = childProcess.spawn(
+          //      review_server_path.toString(), ['/tmp/app.' +
+          //      obj.username],
+          //      {detached: true, stdio: ['ignore', out_log, err_log]});
+          //  onlineLogicProcessID[obj.userid] = worker;
+          //  console.log('<><><><><><> login in success <><><><><><>');
+        var worker = childProcess.spawn(
+            review_server_path.toString(), ['/tmp/app.' +
+            obj.username],
+            {detached: true});
+        onlineLogicProcessID[obj.userid] = worker;
+        console.log('<><><><><><> login in success <><><><><><>');
           });
       });
 

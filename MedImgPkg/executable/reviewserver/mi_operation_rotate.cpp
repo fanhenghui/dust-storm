@@ -1,5 +1,9 @@
 #include "mi_operation_rotate.h"
 
+#include "arithmetic/mi_matrix4.h"
+#include "arithmetic/mi_camera_base.h"
+#include "arithmetic/mi_quat4.h"
+
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_controller.h"
 
@@ -20,19 +24,9 @@ OpRotate::OpRotate() {}
 OpRotate::~OpRotate() {}
 
 int OpRotate::execute() {
+    try {
     const unsigned int cell_id = _header._cell_id;
     REVIEW_CHECK_NULL_EXCEPTION(_buffer);
-
-    MsgMouse msg;
-
-    if (!msg.ParseFromArray(_buffer, _header._data_len)) {
-        REVIEW_THROW_EXCEPTION("parse mouse message failed!");
-    }
-
-    const float pre_x = msg.pre().x();
-    const float pre_y = msg.pre().y();
-    const float cur_x = msg.cur().x();
-    const float cur_y = msg.cur().y();
 
     std::shared_ptr<AppController> controller = _controller.lock();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
@@ -43,10 +37,35 @@ int OpRotate::execute() {
     std::shared_ptr<SceneBase> scene = cell->get_scene();
     REVIEW_CHECK_NULL_EXCEPTION(scene);
 
-    scene->rotate(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
-    std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
-    std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
+    MsgMouse msg;
+    if (msg.ParseFromArray(_buffer, _header._data_len)) {
+        const float pre_x = msg.pre().x();
+        const float pre_y = msg.pre().y();
+        const float cur_x = msg.cur().x();
+        const float cur_y = msg.cur().y();
+    
+        scene->rotate(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
+        std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
+        std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
+    } else {
+        //second change to parse to rotation message
+        MsgRotation msg;    
+        if(msg.ParseFromArray(_buffer , _header._data_len)) {
+            const double angle = static_cast<double>(msg.angle());
+            const double axis_x = static_cast<double>(msg.axis_x());
+            const double axis_y = static_cast<double>(msg.axis_y());
+            const double axis_z = static_cast<double>(msg.axis_z());
+            Quat4 quat(angle,Vector3(axis_x,axis_y,axis_z));
+            scene->get_camera()->rotate(quat);
+            scene->set_dirty(true);   
+        } else {
+            REVIEW_THROW_EXCEPTION("parser rotation message failed!");
+        }
+    }
     return 0;
+}catch(...){
+    return -1;
+}
 }
 
 MED_IMG_END_NAMESPACE

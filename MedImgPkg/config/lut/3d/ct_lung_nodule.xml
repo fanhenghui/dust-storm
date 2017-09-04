@@ -1,18 +1,18 @@
 <Lut name='CT_LUNG_NODULE'>
 <Color Interpolation="RGB">
-<point><index>-1550</index><R>205</R><G>255</G><B>25</B></point>
-<point><index>-500</index><R>205</R><G>255</G><B>25</B></point>
-<point><index>350</index><R>255</R><G>255</G><B>25</B></point>
+<point><index>-1550</index><R>205</R><G>25</G><B>25</B></point>
+<point><index>-500</index><R>205</R><G>25</G><B>25</B></point>
+<point><index>350</index><R>255</R><G>25</G><B>25</B></point>
 </Color>
 <Opacity>
 <point><index>-1550</index><A>200</A></point>
 <point><index>-500</index><A>200</A></point>
 <point><index>350</index><A>255</A></point>
 </Opacity>
-<Windowing>
-<windowwidth>1900</windowwidth>
-<level>-300</level>
-</Windowing>
+<WindowLevel>
+<width>1759</width>
+<level>488</level>
+</WindowLevel>
 <Material>
     <DiffuseColor>
 		<R>255</R>

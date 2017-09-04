@@ -17,7 +17,8 @@ PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-OBJS = mi_review_controller.o mi_load_series_command_handler.o mi_operation_mpr_paging.o mi_review_main.o mi_mpr_play_command_handler.o \
+OBJS = mi_review_controller.o mi_load_series_command_handler.o mi_operation_mpr_paging.o mi_review_main.o \
+mi_mpr_play_command_handler.o mi_vr_play_command_handler.o \
 mi_review_config.o mi_message.pb.o mi_operation_init.o \
 mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o mi_operation_windowing.o mi_operation_resize.o mi_search_worklist_command_handler.o
 TARGET = $(BIN_DIR)/review_server
@@ -46,6 +47,10 @@ mi_review_controller.o mi_review_config.o mi_message.pb.o
 mi_mpr_play_command_handler.o: $(EXPORT_HEADER) mi_mpr_play_command_handler.h mi_mpr_play_command_handler.cpp \
 mi_review_controller.o mi_message.pb.o
 	$(CC) -c -fPIC $(CFLAGS) mi_mpr_play_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_vr_play_command_handler.o: $(EXPORT_HEADER) mi_vr_play_command_handler.h mi_vr_play_command_handler.cpp \
+mi_review_controller.o mi_message.pb.o
+	$(CC) -c -fPIC $(CFLAGS) mi_vr_play_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_operation_init.o: $(EXPORT_HEADER) mi_operation_init.h mi_operation_init.cpp \
 mi_review_controller.o mi_message.pb.o

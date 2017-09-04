@@ -34,6 +34,7 @@ int OperationCommandHandler::handle_command(const IPCDataHeader& ipcheader , cha
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
 
     if (op) {
+        op->reset();
         op->set_data(op_header , buffer);
         op->set_controller(controller);
         controller->get_thread_model()->push_operation(op);

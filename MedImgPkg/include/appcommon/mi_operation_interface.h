@@ -26,6 +26,7 @@ public:
     virtual ~IOperation() {
         if (nullptr != _buffer) {
             delete[] _buffer;
+            _buffer = nullptr;
         }
     };
 
@@ -40,6 +41,13 @@ public:
 
     virtual int execute() {
         return 0;
+    }
+
+    void reset() {
+        if (nullptr != _buffer) {
+            delete[] _buffer;
+            _buffer = nullptr;
+        }
     }
 
 protected:

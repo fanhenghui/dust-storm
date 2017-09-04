@@ -14,6 +14,7 @@
 #include "mi_load_series_command_handler.h"
 #include "mi_search_worklist_command_handler.h"
 #include "mi_mpr_play_command_handler.h"
+#include "mi_vr_play_command_handler.h"
 #include "mi_operation_init.h"
 #include "mi_operation_mpr_paging.h"
 #include "mi_operation_pan.h"
@@ -51,6 +52,10 @@ void ReviewController::initialize() {
     std::shared_ptr<MPRPlayCommandHandler> handler_mpr_play(
         new MPRPlayCommandHandler(app_controller));
     _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
+
+    std::shared_ptr<VRPlayCommandHandler> handler_vr_play(
+        new VRPlayCommandHandler(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_VR_PLAY, handler_vr_play);
 
     std::shared_ptr<SearchWorklistCommandHandler> handler_search_worklist(
         new SearchWorklistCommandHandler(app_controller));

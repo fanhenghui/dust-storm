@@ -55,6 +55,14 @@ int OpWindowing::execute() {
             ww += (cur_x - pre_x);
             wl += (pre_y - cur_y);
             scene_ext->set_window_level(ww, wl, 0);
+
+            //TODO harding coding
+            if(scene_ext->get_mask_mode() != MASK_NONE) {
+                scene_ext->get_window_level(ww, wl, 1);
+                ww += (cur_x - pre_x);
+                wl += (pre_y - cur_y);
+                scene_ext->set_window_level(ww, wl, 1);
+            }
         } else {
             scene_ext->get_global_window_level(ww, wl);
             ww += (cur_x - pre_x);
