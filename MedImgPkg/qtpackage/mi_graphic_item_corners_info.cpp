@@ -2,15 +2,19 @@
 
 //Medical imaging
 #include "io/mi_image_data_header.h"
+#include "io/mi_image_data.h"
 #include "util/mi_string_number_converter.h"
 #include "renderalgo/mi_ray_cast_scene.h"
 #include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_mpr_scene.h"
 
 #include <QGraphicsTextItem>
 #include <QFont>
 #include <QTextDocument>
 #include <QTextOption>
+
+#include <string>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -110,6 +114,7 @@ void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std
         //Set position
         _text_item_lb->setPos(BORDER , height - (BORDER+MARGIN*2));
     }
+
 }
 
 void GraphicItemCornersInfo::refresh_text_i()
@@ -178,7 +183,7 @@ void GraphicItemCornersInfo::refresh_text_i()
     std::string context = data_header->manufacturer + CRLF +
         data_header->manufacturer_model_name + CRLF +
         modality + CRLF +
-        data_header->image_date;
+        data_header->image_date + CRLF;
 
     //Set alignment
     QTextDocument* dcm = _text_item_lt->document();
@@ -223,6 +228,52 @@ void GraphicItemCornersInfo::refresh_text_i()
 
     //Set position
     _text_item_rt->setPos(width - (BORDER+_text_item_rt->textWidth()),BORDER);
+
+    //////////////////////////////////////////////////////////////////////////
+    //3.4 Right bottom
+    //KVP
+    //Thickness
+    std::string().swap(context);
+    {
+        std::stringstream ss;
+        ss << "kvp:" << data_header->kvp << CRLF;
+        context = ss.str();
+    }
+
+    double thickness = 0.0;
+    //if (scene_base->get_camera()->get_eye() != Point3(0.0, 0.0, 0.0) )
+    //{
+        Vector3 view_to = scene_base->get_camera()->get_view_direction();
+        std::shared_ptr<CameraCalculator> camera_cal = ray_cast_scene->get_camera_calculator();
+        if (  (1.0 - abs(view_to.dot_product(Vector3(1.0, 0.0, 0.0)))) < 1e-6 )
+        {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_left_patient_axis_info().volume_coord / 2]; 
+        }
+        else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 1.0, 0.0)))) < 1e-6)
+        {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_posterior_patient_axis_info().volume_coord / 2]; 
+        }
+        else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 0.0, 1.0)))) < 1e-6 )
+        {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_head_patient_axis_info().volume_coord / 2];
+        }
+    //}
+    {
+        std::stringstream ss;
+        ss << "thickness:" << thickness;
+        context += ss.str();
+    }
+
+    dcm = _text_item_rb->document();
+    dcm->setPlainText(context.c_str());
+    QTextOption option4 = dcm->defaultTextOption();
+    option4.setAlignment(Qt::AlignRight);
+    dcm->setDefaultTextOption(option4);
+    dcm->adjustSize();
+    _text_item_rb->setTextWidth(dcm->idealWidth());
+    std::cout << _text_item_rb->textWidth() << std::endl;
+    //Set position
+    _text_item_rb->setPos(width - (BORDER+_text_item_rb->textWidth()), height - (BORDER+MARGIN*4));
 
     //////////////////////////////////////////////////////////////////////////
     //3.3 Left Bottom

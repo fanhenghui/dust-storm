@@ -104,6 +104,9 @@
     <ClInclude Include="..\include\qtpackage\mi_qt_package_export.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\qtpackage\mi_graphic_item_direction_info.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\include\qtpackage\mi_graphic_item_voi.h">
@@ -202,6 +205,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\qtpackage\mi_shared_widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\qtpackage\mi_graphic_item_direction_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

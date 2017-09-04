@@ -21,12 +21,13 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _name = "Scene";
     _front_buffer_id = 0;
 
+#ifndef WIN32
     // init gpujepg parameter
     _gpujpeg_encoder = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
-
     //_gpujpeg_encoding_duration = 0;
+#endif
 }
 
 SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
@@ -39,12 +40,13 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
     _name = "Scene";
     _front_buffer_id = 0;
 
+#ifndef WIN32
     // init gpujepg parameter
     _gpujpeg_encoder = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
-
     //_gpujpeg_encoding_duration = 0;
+#endif
 }
 
 SceneBase::~SceneBase() {}
@@ -111,6 +113,7 @@ void SceneBase::initialize() {
 
         CHECK_GL_ERROR;
 
+#ifndef WIN32
         // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in
         // multi-scene)
         gpujpeg_init_device(0, 0);
@@ -140,6 +143,7 @@ void SceneBase::initialize() {
 
         // cudaEventCreate(&_gpujpeg_encoding_start);
         // cudaEventCreate(&_gpujpeg_encoding_stop);
+#endif
 
         _res_shield.add_shield<GLFBO>(_scene_fbo);
         _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
@@ -162,10 +166,6 @@ void SceneBase::set_display_size(int width, int height) {
     _image_buffer_size[1] = _width * _height * 3;
     _front_buffer_id = 0;
 
-    _gpujpeg_image_param.width = _width;
-    _gpujpeg_image_param.height = _height;
-    _gpujpeg_encoder_dirty = true;
-
     GLTextureCache::instance()->cache_load(
         GL_TEXTURE_2D, _scene_color_attach_0, GL_CLAMP_TO_EDGE, GL_LINEAR,
         GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
@@ -175,14 +175,11 @@ void SceneBase::set_display_size(int width, int height) {
         GL_DEPTH_COMPONENT16, _width, _height, 0, GL_DEPTH_COMPONENT,
         GL_UNSIGNED_SHORT, nullptr);
 
-    // _scene_color_attach_0->bind();
-    // _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGBA,
-    //                             GL_UNSIGNED_BYTE, nullptr);
-
-    // _scene_depth_attach->bind();
-    // _scene_depth_attach->load(GL_DEPTH_COMPONENT16, _width, _height,
-    //                           GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
-
+#ifndef WIN32
+    _gpujpeg_image_param.width = _width;
+    _gpujpeg_image_param.height = _height;
+    _gpujpeg_encoder_dirty = true;
+#endif
     set_dirty(true);
 }
 
@@ -208,6 +205,7 @@ bool SceneBase::get_dirty() const {
 }
 
 void SceneBase::pre_render_i() {
+#ifndef WIN32
     if (_gpujpeg_encoder && _gpujpeg_encoder_dirty) {
         gpujpeg_encoder_destroy(_gpujpeg_encoder);
         _gpujpeg_encoder = nullptr;
@@ -233,6 +231,7 @@ void SceneBase::pre_render_i() {
 
         _gpujpeg_encoder_dirty = false;
     }
+#endif
 }
 
 void SceneBase::set_name(const std::string& name) {
@@ -245,8 +244,9 @@ const std::string& SceneBase::get_name() const {
 
 void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
     boost::mutex::scoped_lock locker(_write_mutex);
-
-    if (jpeg) {
+#ifndef WIN32
+    if (jpeg) 
+    {
         uint8_t* image_compressed = nullptr;
         int image_compressed_size = 0;
 
@@ -299,7 +299,10 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
 
         // FileUtil::write_raw("/home/wr/data/output_download.jpeg",_image_buffer[1
         // - _front_buffer_id].get() , image_compressed_size);
-    } else {
+    }
+    else 
+#endif
+    {
         // download FBO to back buffer directly
         CHECK_GL_ERROR;
 
