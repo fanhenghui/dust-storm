@@ -160,6 +160,7 @@ void GraphicItemCornersInfo::refresh_text_i()
     //Manufacturer model name
     //Modality
     //Image date
+    //KVP
     std::string modality = "UnSupported";
     switch(data_header->modality)
     {
@@ -184,7 +185,16 @@ void GraphicItemCornersInfo::refresh_text_i()
         data_header->manufacturer_model_name + CRLF +
         modality + CRLF +
         data_header->image_date + CRLF;
+<<<<<<< HEAD
 
+=======
+    {
+        std::stringstream ss;
+        ss << "kvp:" << data_header->kvp;
+        context += ss.str();
+    }
+ 
+>>>>>>> 447137aece4abfd5efcd7ff796c6329f729e157a
     //Set alignment
     QTextDocument* dcm = _text_item_lt->document();
     dcm->setPlainText(context.c_str());

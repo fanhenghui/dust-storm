@@ -20,15 +20,37 @@ layout (location = THICKNESS) uniform float thickness;
 layout (location = RAY_DIRECTION) uniform vec3 ray_dir;
 
 /// Get exaclty point
-float ray_intersect_brick(vec3 initialPt, vec3 brick_min, vec3 brick_dim, vec3 ray_dir, 
+float ray_intersect_brick(vec3 init_pt, vec3 brick_min, vec3 brick_dim, vec3 ray_dir, 
     out float start_step, out float end_step)
 {
-    vec3 invR = 1.0 / (ray_dir); 
+    vec3 ray_r = 1.0 / (ray_dir); 
 
-    vec3 bottom =  (brick_min - initialPt);
-    vec3 top =  (brick_min + brick_dim - initialPt);
-    vec3 tbot = invR * bottom;
-    vec3 ttop = invR * top; 
+    vec3 bottom =  (brick_min - init_pt);
+    vec3 top =  (brick_min + brick_dim - init_pt);
+    vec3 tbot = ray_r * bottom;
+    vec3 ttop = ray_r * top; 
+
+    //Adjust
+    bvec3 bottom_zero = equal(bottom ,vec3(0.0));
+    bvec3 top_zero = equal(top ,vec3(0.0));
+    if(any(bottom_zero))
+    {
+        if(bottom_zero.x)
+            tbot.x = 0.0;
+        if(bottom_zero.y)
+            tbot.y = 0.0;
+        if(bottom_zero.z)
+            tbot.z = 0.0;
+    }
+    if(any(top_zero))
+    {
+        if(top_zero.x)
+            ttop.x = 0.0;
+        if(top_zero.y)
+            ttop.y = 0.0;
+        if(top_zero.z)
+            ttop.z = 0.0;
+    }
 
     vec3 tmin = min(tbot, ttop);
     vec3 tmax = max(tbot, ttop);
@@ -43,8 +65,9 @@ float ray_intersect_brick(vec3 initialPt, vec3 brick_min, vec3 brick_dim, vec3 r
 
 bool check_outside(vec3 point, vec3 boundary)
 {
-    bvec3 compare_min = lessThan(point, vec3(-1e-6, -1e-6, -1e-6));
-    bvec3 compare_max = greaterThan(point, boundary+vec3(-1e-6));
+    const float BB_EPSILON = 1e-4;
+    bvec3 compare_min = lessThan(point, vec3(-BB_EPSILON, -BB_EPSILON, -BB_EPSILON));
+    bvec3 compare_max = greaterThan(point, boundary+vec3(BB_EPSILON));
     return any(compare_min) || any(compare_max);
 }
 
