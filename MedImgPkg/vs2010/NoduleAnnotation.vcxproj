@@ -170,7 +170,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\MedImaging\NoduleAnnotation\main.cpp" />
+    <ClCompile Include="..\executable\noduleannotation\main.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_dicom_anonymization_dialog.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_main_window.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_mouse_op_min_max_hint.cpp" />

@@ -2,7 +2,7 @@
 #include <cassert>
 #include "mi_main_window.h"
 #include <QtGui/QApplication>
-#include "util/mi_common_exception.h"
+#include "util/mi_exception.h"
 
 //TODO this will be configured by config file
 #ifdef _DEBUG
