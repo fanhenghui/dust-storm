@@ -9,8 +9,10 @@
 
 #include "boost/thread/mutex.hpp"
 
+#ifndef WIN32
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
+#endif
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -68,6 +70,7 @@ protected:
     boost::mutex _read_mutex;
     boost::mutex _write_mutex;
 
+#ifndef WIN32
     // GPU JPEG
     gpujpeg_parameters _gpujpeg_param;             // gpujpeg parameter
     gpujpeg_image_parameters _gpujpeg_image_param; // image parameter
@@ -81,6 +84,7 @@ protected:
     // cudaEvent_t _gpujpeg_encoding_start;
     // cudaEvent_t _gpujpeg_encoding_stop;
     bool _gpujpeg_encoder_dirty;
+#endif
 
 private:
     DISALLOW_COPY_AND_ASSIGN(SceneBase);

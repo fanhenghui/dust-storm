@@ -61,7 +61,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\renderalgo\Shader\shader_config</Command>
