@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Executable\NoduleAnnotation\mi_my_rsa.h" />
+    <ClInclude Include="..\executable\noduleannotation\mi_nodule_anno_config.h" />
     <ClInclude Include="..\Executable\NoduleAnnotation\mi_observer_mpr_scroll_bar.h" />
     <ClInclude Include="GeneratedFiles\ui_mi_raw_data_dialog.h" />
     <CustomBuild Include="..\Executable\NoduleAnnotation\mi_raw_data_import_dialog.h">
@@ -174,6 +175,7 @@
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_dicom_anonymization_dialog.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_main_window.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_mouse_op_min_max_hint.cpp" />
+    <ClCompile Include="..\executable\noduleannotation\mi_nodule_anno_config.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_observer_mpr_scroll_bar.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_observer_voi_table.cpp" />
     <ClCompile Include="..\Executable\NoduleAnnotation\mi_raw_data_import_dialog.cpp" />

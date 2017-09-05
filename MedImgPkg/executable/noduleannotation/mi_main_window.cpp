@@ -64,6 +64,7 @@
 #include "mi_my_rsa.h"
 #include "mi_dicom_anonymization_dialog.h"
 #include "mi_raw_data_import_dialog.h"
+#include "mi_nodule_anno_config.h"
 
 #include <QEvent>
 #include <QSizePolicy>
@@ -96,24 +97,7 @@ static const std::string S_NODULE_TYPE_DESCRIPTION[NODULE_TYPE_NUM] =
     "Non-nodule"
 };
 
-//Preset WL
-const float PRESET_CT_ABDOMEN_WW = 400;
-const float PRESET_CT_ABDOMEN_WL = 60;
-
-const float PRESET_CT_LUNGS_WW = 1500;
-const float PRESET_CT_LUNGS_WL = -400;
-
-const float PRESET_CT_BRAIN_WW = 80;
-const float PRESET_CT_BRAIN_WL = 40;
-
-const float PRESET_CT_ANGIO_WW = 600;
-const float PRESET_CT_ANGIO_WL = 300;
-
-const float PRESET_CT_BONE_WW = 1500;
-const float PRESET_CT_BONE_WL = 300;
-
-const float PRESET_CT_CHEST_WW = 400;
-const float PRESET_CT_CHEST_WL = 40;
+const std::string CONFIG_FILE = "./config/configure.txt";
 
 NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags),
@@ -183,61 +167,8 @@ NoduleAnnotation::~NoduleAnnotation()
 
 void NoduleAnnotation::configure_i()
 {
-    //default
-    Configuration::instance()->set_processing_unit_type(GPU);
-    Configuration::instance()->set_nodule_file_rsa(true);
-
-    //1 TODO Check process unit
-    //Open config file
-    std::fstream input_file("../../../config/configure.txt" , std::ios::in);
-    if (!input_file.is_open())
-    {
-        input_file.open("./config/configure.txt" , std::ios::in);//second chance
-    }
-
-    if (input_file.is_open())
-    {
-        std::string line;
-        std::string tag;
-        std::string equal;
-        std::string context;
-        while(std::getline(input_file,line))
-        {
-            std::stringstream ss(line);
-            ss >> tag >> equal >> context;
-            if (tag == std::string("ProcessingUnit"))
-            {
-                if (context == "GPU")
-                {
-                    Configuration::instance()->set_processing_unit_type(GPU);
-                }
-                else
-                {
-                    Configuration::instance()->set_processing_unit_type(CPU);
-                }
-            }
-
-            if (tag == "NoduleOutput")
-            {
-                if(context == "TEXT")
-                {
-                    Configuration::instance()->set_nodule_file_rsa(false);
-                }
-                else
-                {
-                    Configuration::instance()->set_nodule_file_rsa(true);
-                }
-            }
-
-            if (tag == "LastOpenDirection")
-            {
-                _last_open_direction = context;
-            }
-        }
-        input_file.close();
-    }
-
-
+    NoduleAnnoConfig::instance()->bind_config_file(CONFIG_FILE);
+    NoduleAnnoConfig::instance()->initialize();
     GLUtils::set_check_gl_flag(false);
 }
 
@@ -266,10 +197,12 @@ void NoduleAnnotation::create_scene_i()
         mpr_containers[i]->set_scene(mpr_scenes[i]);
 
         //2 Set scene parameter
-        mpr_scenes[i]->set_mask_label_level(LabelLevel::L_64);
+        mpr_scenes[i]->set_mask_label_level(L_64);
         mpr_scenes[i]->set_volume_infos(_volume_infos);
         mpr_scenes[i]->set_sample_rate(1.0);
-        mpr_scenes[i]->set_global_window_level(PRESET_CT_LUNGS_WW,PRESET_CT_LUNGS_WL);
+        float ww(0.0f), wl(0.0f);
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_LUNGS, ww, wl);
+        mpr_scenes[i]->set_global_window_level(ww,wl);
         mpr_scenes[i]->set_composite_mode(COMPOSITE_AVERAGE);
         mpr_scenes[i]->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
         mpr_scenes[i]->set_mask_mode(MASK_NONE);
@@ -611,7 +544,8 @@ void NoduleAnnotation::slot_change_layout1x1_i()
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList file_name_list = QFileDialog::getOpenFileNames(
-        this ,tr("Loading DICOM Dialog"),_last_open_direction.c_str(),tr("Dicom image(*dcm);;Other(*)"));
+        this ,tr("Loading DICOM Dialog"),NoduleAnnoConfig::instance()->get_last_open_direction().c_str(),
+        tr("Dicom image(*dcm);;Other(*)"));
 
     if (!file_name_list.empty())
     {
@@ -780,7 +714,8 @@ void NoduleAnnotation::slot_open_meta_image_i()
 {
 
     QString file_name = QFileDialog::getOpenFileName(
-        this ,tr("Loading meta data"),_last_open_direction.c_str(),tr("Dicom image(*mhd)"));
+        this ,tr("Loading meta data"),NoduleAnnoConfig::instance()->get_last_open_direction().c_str(),
+        tr("Dicom image(*mhd)"));
 
     if (file_name.isEmpty())
     {
@@ -1156,7 +1091,7 @@ void NoduleAnnotation::slot_save_nodule_file_i()
         }
     }
 
-    QString file_name = Configuration::instance()->get_nodule_file_rsa() ?
+    QString file_name = NoduleAnnoConfig::instance()->get_nodule_file_rsa() ?
         QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw)")) :
         QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
 
@@ -1371,33 +1306,27 @@ void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
     float ww(1) , wl(0);
     if (wl_preset == std::string("CT_Lungs"))
     {
-        ww = PRESET_CT_LUNGS_WW;
-        wl   = PRESET_CT_LUNGS_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_LUNGS , ww , wl);
     }
     else if (wl_preset == std::string("CT_Chest"))
     {
-        ww = PRESET_CT_CHEST_WW;
-        wl   = PRESET_CT_CHEST_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_CHEST , ww , wl);
     }
     else if (wl_preset == std::string("CT_Bone"))
     {
-        ww = PRESET_CT_BONE_WW;
-        wl   = PRESET_CT_BONE_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_BONE , ww , wl);
     }
     else if (wl_preset == std::string("CT_Angio"))
     {
-        ww = PRESET_CT_ANGIO_WW;
-        wl   = PRESET_CT_ANGIO_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_ANGIO , ww , wl);
     }
     else if (wl_preset == std::string("CT_Abdomen"))
     {
-        ww = PRESET_CT_ABDOMEN_WW;
-        wl   = PRESET_CT_ABDOMEN_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_ABDOMEN , ww , wl);
     }
     else if (wl_preset == std::string("CT_Brain"))
     {
-        ww = PRESET_CT_BRAIN_WW;
-        wl   = PRESET_CT_BRAIN_WL;
+        NoduleAnnoConfig::instance()->get_preset_wl(CT_BRAIN , ww , wl);
     }
     else 
     {
@@ -1654,59 +1583,9 @@ void NoduleAnnotation::closeEvent(QCloseEvent * event)
 
     GLTextureCache::instance()->process_cache();
     GLResourceManagerContainer::instance()->update_all();
-
     std::cout << GLContextHelper::has_gl_context() << std::endl;
-    //Save config file
-    int tag = 0;
-    std::ifstream input_file("../../../config/configure.txt" , std::ios::in);
-    if (!input_file.is_open())
-    {
-        tag = 1;
-        input_file.open("./config/configure.txt");//second chance
-    }
 
-    if (input_file.is_open())
-    {
-        input_file.close();
-    }
-
-    std::ofstream output_file;
-    if (tag == 0)
-    {
-        output_file.open("../../../config/configure.txt" , std::ios::out);
-    }
-    else
-    {
-        output_file.open("./config/configure.txt" , std::ios::out);
-    }
-
-    if (output_file.is_open())
-    {
-
-        output_file << "ProcessingUnit = ";
-        if (Configuration::instance()->get_processing_unit_type() == CPU)
-        {
-            output_file << "CPU\n";
-        }
-        else
-        {
-            output_file << "GPU\n";
-        }
-
-        if (Configuration::instance()->get_nodule_file_rsa())
-        {
-            //output_file << "NoduleOutput = ";
-            //output_file << "RSA\n";
-        }
-        else
-        {
-            output_file << "NoduleOutput = ";
-            output_file << "TEXT\n";
-        }
-
-        output_file<< "LastOpenDirection = " << _last_open_direction; 
-        output_file.close();
-    }
+    NoduleAnnoConfig::instance()->finalize();
 
     QMainWindow::closeEvent(event);
 }
@@ -1796,7 +1675,8 @@ void NoduleAnnotation::update_last_open_direction_i(const std::string& file_path
         if(file_path[i] == '/' || file_path[i] == '\\')
         {
             sub_file_path = i;
-            _last_open_direction = file_path.substr(0 , sub_file_path);
+            const std::string last_open_direction = file_path.substr(0 , sub_file_path);
+            NoduleAnnoConfig::instance()->set_last_open_direction(last_open_direction);
             break;
         }
     }

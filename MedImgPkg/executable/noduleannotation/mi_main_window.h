@@ -171,9 +171,6 @@ private:
     //DICOM files cache
     std::vector<std::string> _dicom_series_files;
     std::string _current_operation; // remember current operation
-
-    //Last open direction cache
-    std::string _last_open_direction;
 };
 
 #endif
