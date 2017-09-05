@@ -33,6 +33,8 @@ private:
 
     int _pre_window_width;
     int _pre_window_height;
+
+    int _pre_slice;
 };
 
 MED_IMG_END_NAMESPACE
