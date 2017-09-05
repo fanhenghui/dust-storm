@@ -493,7 +493,7 @@ int CameraCalculator::get_default_page(ScanSliceType type) const {
         }
     }
 
-    case SAGITTAL: {//This paging direction is not the postive direction of patient coordinate
+    case SAGITTAL: {//This paging direction is not the positive direction of patient coordinate
         const int idx = _leftInfo.volume_coord / 2;
         Vector3 vl = _volume_data->_image_orientation[idx] - Vector3(1.0,0.0,0.0);
         Vector3 vr = _volume_data->_image_orientation[idx] - Vector3(-1.0,0.0,0.0);

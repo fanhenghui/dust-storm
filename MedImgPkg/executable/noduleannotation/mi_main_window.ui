@@ -474,7 +474,9 @@
       <string>Layout</string>
      </property>
      <addaction name="action2x2"/>
-     <addaction name="action1x1"/>
+     <addaction name="action2D_Sagittal"/>
+     <addaction name="action2D_Coronal"/>
+     <addaction name="action2D_Tranverse"/>
     </widget>
     <addaction name="menuLayout"/>
     <addaction name="actionPython_Interactor"/>
@@ -571,12 +573,9 @@
     <string>About</string>
    </property>
   </action>
-  <action name="action1x1">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <action name="action2D_Sagittal">
    <property name="text">
-    <string>2D 1x1</string>
+    <string>2D 1x1 Sagittal</string>
    </property>
   </action>
   <action name="actionAnonymization_DICOM">
@@ -592,6 +591,16 @@
   <action name="actionLoad_Label">
    <property name="text">
     <string>Load Label</string>
+   </property>
+  </action>
+  <action name="action2D_Coronal">
+   <property name="text">
+    <string>2D 1x1 Coronal</string>
+   </property>
+  </action>
+  <action name="action2D_Tranverse">
+   <property name="text">
+    <string>2D 1x1 Transverse</string>
    </property>
   </action>
  </widget>

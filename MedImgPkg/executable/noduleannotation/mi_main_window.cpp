@@ -403,6 +403,11 @@ void NoduleAnnotation::connect_signal_slot_i()
     //connect(ui.action1x1 , SIGNAL(triggered()) , this , SLOT(SlotChangeLayout1x1_i()));
     connect(_ui.action2x2 , SIGNAL(triggered()) , this , SLOT(slot_change_layout2x2_i()));
 
+    // Layout three 2D views
+    connect(_ui.action2D_Sagittal , SIGNAL(triggered()) , this , SLOT(slot_change_layout1x1_i()));
+    connect(_ui.action2D_Coronal , SIGNAL(triggered()) , this , SLOT(slot_change_layout1x1_i()));
+    connect(_ui.action2D_Tranverse , SIGNAL(triggered()) , this , SLOT(slot_change_layout1x1_i()));
+
     //File
     connect(_ui.actionOpen_DICOM_Folder , SIGNAL(triggered()) , this , SLOT(slot_open_dicom_folder_i()));
     connect(_ui.actionOpen_Meta_Image , SIGNAL(triggered()) , this , SLOT(slot_open_meta_image_i()));
@@ -554,6 +559,55 @@ void NoduleAnnotation::slot_change_layout2x2_i()
     _layout_tag = 0;
 }
 
+void NoduleAnnotation::slot_change_layout1x1_i()
+{
+    if (!_is_ready)
+    {
+        return;
+    }
+
+
+    _mpr_00->hide();
+    _mpr_00_scroll_bar->hide();
+    _mpr_01->hide();
+    _mpr_01_scroll_bar->hide();
+    _mpr_10->hide();
+    _mpr_10_scroll_bar->hide();
+    _vr_11->hide();
+
+    _ui.gridLayout_6->removeWidget(_mpr_00);
+    _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_01);
+    _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_10 );
+    _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_vr_11);
+
+    SceneContainer* scene = nullptr;
+    QScrollBar* bar = nullptr;
+
+    if (this->sender() == this->_ui.action2D_Sagittal)
+    {
+        scene = _mpr_00;
+        bar = _mpr_00_scroll_bar;
+    }
+    else if (this->sender() == this->_ui.action2D_Coronal)
+    {
+        scene = _mpr_01;
+        bar = _mpr_01_scroll_bar;
+    }
+    else /*if (this->sender() == this->_ui.action2D_Transverse)*/
+    {
+        scene = _mpr_10;
+        bar = _mpr_10_scroll_bar;
+    }
+    
+    _ui.gridLayout_6->addWidget(scene , 0 ,0);
+    _ui.gridLayout_6->addWidget(bar , 0 ,1,1,1);
+
+    scene->show();
+    bar->show();
+}
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList file_name_list = QFileDialog::getOpenFileNames(

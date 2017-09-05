@@ -47,6 +47,7 @@ protected:
 private slots:
     //Layout 
     void slot_change_layout2x2_i();
+    void slot_change_layout1x1_i();
 
     //File
     void slot_open_dicom_folder_i();

@@ -154,8 +154,6 @@ public:
     // 0 unsigned
     // 1 2s complement (signed)
     unsigned int pixel_representation;
-    
-    bool reverse_z; // when loading the slices, whether z is reversed or not
 
     ImageDataHeader() {
         data_source_uid = 0;
@@ -177,7 +175,6 @@ public:
         photometric_interpretation = PI_MONOCHROME2;
         bits_allocated = 0;
         pixel_representation = 0;
-        reverse_z = false;
     }
 };
 
