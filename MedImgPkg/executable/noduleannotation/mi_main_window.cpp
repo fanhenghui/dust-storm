@@ -64,6 +64,7 @@
 #include "mi_my_rsa.h"
 #include "mi_dicom_anonymization_dialog.h"
 #include "mi_raw_data_import_dialog.h"
+#include "mi_setting_dialog.h"
 #include "mi_nodule_anno_config.h"
 
 #include <QEvent>
@@ -174,8 +175,14 @@ void NoduleAnnotation::configure_i()
 
 void NoduleAnnotation::create_scene_i()
 {
+    int interval = NoduleAnnoConfig::instance()->get_double_click_interval();
+    _mpr_00->set_double_click_interval(interval);
     _mpr_scene_00.reset(new MPRScene(_mpr_00->width() , _mpr_00->height()));
+    
+    _mpr_01->set_double_click_interval(interval);
     _mpr_scene_01.reset(new MPRScene(_mpr_01->width() , _mpr_01->height()));
+
+    _mpr_10->set_double_click_interval(interval);
     _mpr_scene_10.reset(new MPRScene(_mpr_10->width() , _mpr_10->height()));
 
     std::vector<MPRScenePtr> mpr_scenes;
@@ -240,10 +247,10 @@ void NoduleAnnotation::create_scene_i()
         op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
         mpr_containers[i]->register_mouse_double_click_operation(op_min_max_hint);
 
-        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
-        op_mpr_locate->set_scene(mpr_scenes[i]);
-        op_mpr_locate->set_crosshair_model(_model_crosshair);
-        mpr_containers[i]->register_mouse_operation(op_mpr_locate, Qt::LeftButton , Qt::NoModifier);
+        //std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
+        //op_mpr_locate->set_scene(mpr_scenes[i]);
+        //op_mpr_locate->set_crosshair_model(_model_crosshair);
+        //mpr_containers[i]->register_mouse_operation(op_mpr_locate, Qt::LeftButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
         op_zoom->set_scene(mpr_scenes[i]);
@@ -358,7 +365,7 @@ void NoduleAnnotation::connect_signal_slot_i()
     //Common tools
     connect(_ui.pushButtonArrow , SIGNAL(pressed()) , this , SLOT(slot_press_btn_arrow_i()));
     connect(_ui.pushButtonAnnotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_annotate_i()));
-    connect(_ui.pushButtonRotate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_rotate_i()));
+    connect(_ui.pushButtonLocate , SIGNAL(pressed()) , this , SLOT(slot_press_btn_locate_i()));
     connect(_ui.pushButtonZoom , SIGNAL(pressed()) , this , SLOT(slot_press_btn_zoom_i()));
     connect(_ui.pushButtonPan , SIGNAL(pressed()) , this , SLOT(slot_press_btn_pan_i()));
     connect(_ui.pushButtonWindowing , SIGNAL(pressed()) , this , SLOT(slot_press_btn_windowing_i()));
@@ -384,6 +391,9 @@ void NoduleAnnotation::connect_signal_slot_i()
 
     //Nodule overlay visibility
     connect(_ui.checkBoxNoduleOverlay , SIGNAL(stateChanged(int)) , this , SLOT(slot_nodule_overlay_visibility_i(int)));
+
+    //Setting
+    connect(_ui.actionSetting, SIGNAL(triggered()), this, SLOT(open_preset_wl_setting_dlg()) );
 }
 
 void NoduleAnnotation::create_model_observer_i()
@@ -695,6 +705,32 @@ void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,std::sha
     _is_ready = true;
 }
 
+void NoduleAnnotation::open_preset_wl_setting_dlg()
+{
+    SettingDlg *dlg = new SettingDlg();
+    dlg->setWindowModality(Qt::WindowModal);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    float ww = 0.0f, wl = 0.0f;
+    for (int i=0; i<CT_Preset_ALL; ++i)
+    {
+        NoduleAnnoConfig::instance()->get_preset_wl(PreSetWLType(i), ww, wl);
+        dlg->set_preset_wl(PreSetWLType(i), ww, wl);
+    }
+    connect(dlg, SIGNAL(save_setting(std::vector<float>)), this, SLOT(save_preset_wl_setting(std::vector<float>)));
+    dlg->show();
+}
+
+void NoduleAnnotation::save_preset_wl_setting(std::vector<float> ww_wl)
+{
+    for (int i=0; i<CT_Preset_ALL; ++i)
+    {
+        float ww = ww_wl.at(2*i+0);
+        float wl = ww_wl.at(2*i+1);
+        NoduleAnnoConfig::instance()->set_preset_wl(PreSetWLType(i), ww, wl);
+    }
+    NoduleAnnoConfig::instance()->finalize();
+}
+
 void NoduleAnnotation::slot_dicom_anonymization_i()
 {
     if (!_dicom_series_files.empty())
@@ -866,6 +902,11 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
     {
         return;
     }
+    if (this->_current_operation.compare("Arrow") == 0)
+    {
+        return;
+    }
+
     this->_current_operation = "Arrow";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
@@ -879,21 +920,27 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
-        op_mpr_locate->set_scene(mpr_scenes[i]);
-        op_mpr_locate->set_crosshair_model(_model_crosshair);
-        mpr_containers[i]->register_mouse_operation(op_mpr_locate , Qt::LeftButton , Qt::NoModifier);
+        //std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
+        //op_mpr_locate->set_scene(mpr_scenes[i]);
+        //op_mpr_locate->set_crosshair_model(_model_crosshair);
+        mpr_containers[i]->register_mouse_operation(nullptr , Qt::LeftButton , Qt::NoModifier);
         mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
-void NoduleAnnotation::slot_press_btn_rotate_i()
+void NoduleAnnotation::slot_press_btn_locate_i()
 {
     if (!_is_ready)
     {
         return;
     }
-    this->_current_operation = "Rotate";
+
+    if (this->_current_operation.compare("Locate")==0)
+    {
+        return;
+    }
+
+    this->_current_operation = "Locate";
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -906,9 +953,11 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
 
     for (int i = 0 ; i < 3 ; ++i)
     {
-        std::shared_ptr<MouseOpRotate> op_rotate(new MouseOpRotate());
-        op_rotate->set_scene(mpr_scenes[i]);
-        mpr_containers[i]->register_mouse_operation(op_rotate , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
+        std::shared_ptr<MouseOpLocate> op_locate(new MouseOpLocate());
+        op_locate->set_scene(mpr_scenes[i]);
+        op_locate->set_crosshair_model(_model_crosshair);
+        mpr_containers[i]->register_mouse_operation(op_locate , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -944,6 +993,12 @@ void NoduleAnnotation::slot_press_btn_pan_i()
         return;
     }
 
+    if (this->_current_operation.compare("Zoom") == 0)
+    {
+        return;
+    }
+    this->_current_operation = "Zoom";
+
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
     mpr_scenes.push_back(_mpr_scene_01);
@@ -968,6 +1023,12 @@ void NoduleAnnotation::slot_press_btn_windowing_i()
     {
         return;
     }
+
+    if (this->_current_operation.compare("Windowing") == 0)
+    {
+        return;
+    }
+    this->_current_operation = "Windowing";
 
     std::vector<MPRScenePtr> mpr_scenes;
     mpr_scenes.push_back(_mpr_scene_00);
@@ -1528,7 +1589,7 @@ void NoduleAnnotation::closeEvent(QCloseEvent * event)
     GLResourceManagerContainer::instance()->update_all();
     std::cout << GLContextHelper::has_gl_context() << std::endl;
 
-    NoduleAnnoConfig::instance()->finalize();
+    //NoduleAnnoConfig::instance()->finalize(); // shall we call it when closing the window?
 
     QMainWindow::closeEvent(event);
 }

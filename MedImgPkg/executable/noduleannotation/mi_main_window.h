@@ -67,7 +67,7 @@ private slots:
     void slot_press_btn_annotate_i();
     void slot_press_btn_fine_tune_i();
     void slot_spn_box_tune_radius(int);
-    void slot_press_btn_rotate_i();
+    void slot_press_btn_locate_i();
     void slot_press_btn_zoom_i();
     void slot_press_btn_pan_i();
     void slot_press_btn_windowing_i();
@@ -101,6 +101,10 @@ private slots:
     void slot_nodule_overlay_visibility_i(int );
 
     void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
+
+    //Setting Dialog
+    void open_preset_wl_setting_dlg();
+    void save_preset_wl_setting(std::vector<float>);
 
 private:
     void connect_signal_slot_i();

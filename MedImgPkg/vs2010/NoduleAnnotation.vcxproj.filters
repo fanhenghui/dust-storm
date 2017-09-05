@@ -62,6 +62,12 @@
     <CustomBuild Include="..\Executable\NoduleAnnotation\mi_raw_data_dialog.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\executable\noduleannotation\mi_setting_dialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\executable\noduleannotation\mi_setting.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_mi_anonymization_dialog.h">
@@ -84,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="..\executable\noduleannotation\mi_nodule_anno_config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mi_setting.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +157,15 @@
     </ClCompile>
     <ClCompile Include="..\executable\noduleannotation\mi_nodule_anno_config.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\executable\noduleannotation\mi_setting_dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mi_setting_dialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mi_setting_dialog.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,7 @@ enum PreSetWLType {
     CT_ANGIO,
     CT_BONE,
     CT_CHEST,
+    CT_Preset_ALL,
 };
 
 class NoduleAnnoConfig {
@@ -33,6 +34,8 @@ public:
     void set_last_open_direction(const std::string& path);
     std::string get_last_open_direction() const;
 
+    int get_double_click_interval() const;
+
 protected:
 private:
     NoduleAnnoConfig();
@@ -46,6 +49,7 @@ private:
     bool _is_nodule_file_rsa;
     std::map<PreSetWLType , std::pair<float , float>> _preset_windowing;
     std::string _last_open_direction;
+    int _double_click_interval; 
 };
 
 #endif

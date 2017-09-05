@@ -65,6 +65,13 @@ public:
         return _mouse_hovering;
     };
 
+    void set_double_click_interval(int interval)
+    {
+        if (interval >0 && interval < 1000)
+        {
+            _double_click_interval = interval;
+        }
+    }
 signals:
     void focus_in_scene();
     void focus_out_scene();
@@ -117,6 +124,8 @@ private:
     bool _mouse_hovering;
 
     std::vector<GraphicItemPtr> _graphic_items;
+
+    int _double_click_interval;
 };
 
 #endif

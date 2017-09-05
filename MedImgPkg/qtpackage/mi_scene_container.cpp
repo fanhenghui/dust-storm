@@ -35,7 +35,8 @@ SceneContainer::SceneContainer(QWidget* parent /*= 0*/):
         _mouse_press_time(0),
         _mouse_release_time(0),
         _pre_point(0,0),
-        _buttons_pre_press(Qt::NoButton)
+        _buttons_pre_press(Qt::NoButton),
+        _double_click_interval(QApplication::doubleClickInterval())
 {
     _inner_graphic_scene = new Graphics2DScene();
     this->setScene(_inner_graphic_scene);
@@ -200,9 +201,9 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
         {
             //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
-            const int interval = QApplication::doubleClickInterval();
+            //const int interval = _double_click_interval == 0 ? QApplication::doubleClickInterval() : _double_click_interval;
             //const int interval = 300;
-            QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
+            QTimer::singleShot( _double_click_interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
         }
 
         //do single click directly
@@ -339,7 +340,14 @@ void SceneContainer::keyReleaseEvent(QKeyEvent *key)
 
 void SceneContainer::register_mouse_operation(std::shared_ptr<IMouseOp> mouse_op , Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier)
 {
-    _mouse_ops[button|keyboard_modifier] = IMouseOpPtrCollection(1 , mouse_op);
+    if (mouse_op == nullptr)
+    {
+        _mouse_ops[button|keyboard_modifier] = IMouseOpPtrCollection(0);
+    }
+    else
+    {
+        _mouse_ops[button|keyboard_modifier] = IMouseOpPtrCollection(1 , mouse_op);
+    }
 }
 
 void SceneContainer::register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier)

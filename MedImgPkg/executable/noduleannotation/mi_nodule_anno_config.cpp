@@ -88,7 +88,9 @@ void NoduleAnnoConfig::initialize()
             } else if (tag == "PresetCTChestWL") {
                 _preset_windowing[CT_CHEST].second = converter.to_num(context);
             }  
-            
+            else if (tag == "DoubleClickInterval") {
+                _double_click_interval = converter.to_num(context);
+            } 
         }
         input_file.close();
     }
@@ -133,6 +135,8 @@ void NoduleAnnoConfig::finalize()
         output_file << "PresetCTChestWW = " << _preset_windowing[CT_CHEST].first << std::endl;
         output_file << "PresetCTChestWL = " << _preset_windowing[CT_CHEST].second << std::endl;
 
+        output_file << "DoubleClickInterval = " << _double_click_interval << std::endl;
+
         output_file.close();
     }
 }
@@ -167,7 +171,9 @@ void NoduleAnnoConfig::init_i() {
     _preset_windowing[CT_BONE] = std::make_pair(PRESET_CT_BONE_WW , PRESET_CT_BONE_WL);
     _preset_windowing[CT_CHEST] = std::make_pair(PRESET_CT_CHEST_WW , PRESET_CT_CHEST_WL);
 
-    _last_open_direction.clear();   
+    _last_open_direction.clear();
+
+    _double_click_interval = 0;
 }
 
 void NoduleAnnoConfig::set_nodule_file_rsa(bool b) {
@@ -197,4 +203,9 @@ void NoduleAnnoConfig::set_last_open_direction(const std::string& path)
 std::string NoduleAnnoConfig::get_last_open_direction() const
 {
     return _last_open_direction;
+}
+
+int NoduleAnnoConfig::get_double_click_interval() const
+{
+    return _double_click_interval;
 }
