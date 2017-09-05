@@ -235,18 +235,15 @@ void NoduleAnnotation::create_scene_i()
         mpr_containers[i]->add_item(graphic_item_mpr_border);
 
         //4 Add operation 
-        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
-        op_mpr_locate->set_scene(mpr_scenes[i]);
-        op_mpr_locate->set_crosshair_model(_model_crosshair);
-
         std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
         op_min_max_hint->set_scene(mpr_scenes[i]);
         op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
+        mpr_containers[i]->register_mouse_double_click_operation(op_min_max_hint);
 
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_mpr_locate;
-        left_btn_ops[1] = op_min_max_hint;
-        mpr_containers[i]->register_mouse_operation(left_btn_ops, Qt::LeftButton , Qt::NoModifier);
+        std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
+        op_mpr_locate->set_scene(mpr_scenes[i]);
+        op_mpr_locate->set_crosshair_model(_model_crosshair);
+        mpr_containers[i]->register_mouse_operation(op_mpr_locate, Qt::LeftButton , Qt::NoModifier);
 
         std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
         op_zoom->set_scene(mpr_scenes[i]);
@@ -780,17 +777,8 @@ void NoduleAnnotation::slot_press_btn_annotate_i()
     {
         std::shared_ptr<MouseOpAnnotate> op_annotate(new MouseOpAnnotate());
         op_annotate->set_scene(mpr_scenes[i]);
-        op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools
-        
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_annotate;
-        left_btn_ops[1] = op_min_max_hint;
-        
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        op_annotate->set_voi_model(_model_voi);//Set Model to annotate tools       
+        mpr_containers[i]->register_mouse_operation(op_annotate , Qt::LeftButton , Qt::NoModifier);
 
         this->_voi_collections[i]->enable_interaction();
         this->_voi_collections[i]->set_item_to_be_tuned(-1);
@@ -894,16 +882,7 @@ void NoduleAnnotation::slot_press_btn_arrow_i()
         std::shared_ptr<MouseOpLocate> op_mpr_locate(new MouseOpLocate());
         op_mpr_locate->set_scene(mpr_scenes[i]);
         op_mpr_locate->set_crosshair_model(_model_crosshair);
-
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_mpr_locate;
-        left_btn_ops[1] = op_min_max_hint;
-
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);
+        mpr_containers[i]->register_mouse_operation(op_mpr_locate , Qt::LeftButton , Qt::NoModifier);
         mpr_containers[i]->set_mouse_hovering(false);
     }
 }
@@ -929,16 +908,7 @@ void NoduleAnnotation::slot_press_btn_rotate_i()
     {
         std::shared_ptr<MouseOpRotate> op_rotate(new MouseOpRotate());
         op_rotate->set_scene(mpr_scenes[i]);
-
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_rotate;
-        left_btn_ops[1] = op_min_max_hint;
-
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
+        mpr_containers[i]->register_mouse_operation(op_rotate , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -963,16 +933,7 @@ void NoduleAnnotation::slot_press_btn_zoom_i()
     {
         std::shared_ptr<MouseOpZoom> op_zoom(new MouseOpZoom());
         op_zoom->set_scene(mpr_scenes[i]);
-
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_zoom;
-        left_btn_ops[1] = op_min_max_hint;
-
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
+        mpr_containers[i]->register_mouse_operation(op_zoom , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -997,16 +958,7 @@ void NoduleAnnotation::slot_press_btn_pan_i()
     {
         std::shared_ptr<MouseOpPan> op_pan(new MouseOpPan());
         op_pan->set_scene(mpr_scenes[i]);
-
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_pan;
-        left_btn_ops[1] = op_min_max_hint;
-
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
+        mpr_containers[i]->register_mouse_operation(op_pan , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 
@@ -1031,16 +983,7 @@ void NoduleAnnotation::slot_press_btn_windowing_i()
     {
         std::shared_ptr<MouseOpWindowing> op_windowing(new MouseOpWindowing());
         op_windowing->set_scene(mpr_scenes[i]);
-
-        std::shared_ptr<MouseOpMinMaxHint> op_min_max_hint(new MouseOpMinMaxHint());
-        op_min_max_hint->set_scene(mpr_scenes[i]);
-        op_min_max_hint->set_min_max_hint_object(_object_min_max_hint);
-
-        IMouseOpPtrCollection left_btn_ops(2);
-        left_btn_ops[0] = op_windowing;
-        left_btn_ops[1] = op_min_max_hint;
-
-        mpr_containers[i]->register_mouse_operation(left_btn_ops , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
+        mpr_containers[i]->register_mouse_operation(op_windowing , Qt::LeftButton , Qt::NoModifier);mpr_containers[i]->set_mouse_hovering(false);
     }
 }
 

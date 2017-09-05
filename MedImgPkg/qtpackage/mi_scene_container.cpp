@@ -163,49 +163,11 @@ void SceneContainer::update_scene()
 void SceneContainer::slot_mouse_click()
 {
     //std::cout << "Slot click in >>\n";
-    bool double_click_status = (_mouse_press_time>1) && (_buttons_pre_press == _buttons);
+    bool double_click_status = (_mouse_press_time>1);
     _mouse_press_time = 0;//Make mouse click decision
-    if (!double_click_status)
+    if (double_click_status && _mouse_double_click_op)
     {
-        //std::cout << "Run single click in slot \n";
-        IMouseOpPtrCollection ops;
-        if(get_mouse_operation_i(ops))
-        {
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
-            {
-                (*it)->press(_pre_point);
-            }
-        }
-    }
-    else
-    {
-        //std::cout << "Run double click in slot \n";
-        IMouseOpPtrCollection ops;
-        if(get_mouse_operation_i( ops))
-        {
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
-            {
-                (*it)->double_click(_pre_point);
-            }
-        }
-    }
-
-    //Do previous release logic when decide the click type
-    if (1 == _mouse_release_time)
-    {
-        //std::cout << "Mouse release \n";
-        IMouseOpPtrCollection ops;
-        if(get_mouse_operation_i(ops))
-        {
-            for (auto it = ops.begin() ; it != ops.end() ; ++it)
-            {
-                (*it)->release(_pre_point);
-            }
-        }
-
-        _buttons = Qt::NoButton;
-        _mouse_release_time = 0;
-        //std::cout << "release in slot\n";
+        _mouse_double_click_op->double_click(_pre_point);
     }
 
     update_scene();
@@ -238,9 +200,19 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
         {
             //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
-            //const int interval = QApplication::doubleClickInterval();
-            const int interval = 150;
+            const int interval = QApplication::doubleClickInterval();
+            //const int interval = 300;
             QTimer::singleShot( interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
+        }
+
+        //do single click directly
+        IMouseOpPtrCollection ops;
+        if(get_mouse_operation_i(ops))
+        {
+            for (auto it = ops.begin() ; it != ops.end() ; ++it)
+            {
+                (*it)->press(_pre_point);
+            }
         }
     }
     //std::cout << "Press out >>\n";
@@ -263,20 +235,17 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
             return;
         }
 
-        if (0 == _mouse_press_time)//mouse after press 
+        IMouseOpPtrCollection ops;
+        _modifiers = event->modifiers();
+        if(get_mouse_operation_i( ops))
         {
-            IMouseOpPtrCollection ops;
-            _modifiers = event->modifiers();
-            if(get_mouse_operation_i( ops))
+            for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
-                for (auto it = ops.begin() ; it != ops.end() ; ++it)
-                {
-                    (*it)->move(event->pos());
-                }
+                (*it)->move(event->pos());
             }
-
-            update_scene();
         }
+
+        update_scene();
     }
 }
 
@@ -291,31 +260,19 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
-        //std::cout << "No graphics grab \n";
-
-        if (0 == _mouse_press_time)
+        IMouseOpPtrCollection ops;
+        _modifiers = event->modifiers();
+        if(get_mouse_operation_i(ops))
         {
-            _mouse_release_time = 0;
-
-            IMouseOpPtrCollection ops;
-            _modifiers = event->modifiers();
-            if(get_mouse_operation_i(ops))
+            for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
-                for (auto it = ops.begin() ; it != ops.end() ; ++it)
-                {
-                    (*it)->release(event->pos());
-                }
+                (*it)->release(event->pos());
             }
+        }
 
-            _buttons = Qt::NoButton;
-            update_scene();
-        }
-        else
-        {
-            _mouse_release_time = 1;
-        }
+        _buttons = Qt::NoButton;
+        update_scene();
     }
-    //std::cout << "Release out <<\n";
 }
 
 void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
@@ -333,7 +290,7 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
         if (1 == _mouse_press_time)// In timer slot to wait to run
         {
             ++_mouse_press_time;
-            _buttons = event->buttons();
+            //_buttons = event->buttons();
         }
         else
         {
@@ -359,9 +316,9 @@ void SceneContainer::wheelEvent(QWheelEvent *event)
             return;
         }
 
-        //���������Ǹ���������������
-        const int degree = event->delta() / 8;//�����ĽǶȣ�*8�����������ľ���
-        const int step = degree/ 15;//�����Ĳ�����*15�����������ĽǶ�
+        //up->positive ; down->negative
+        const int degree = event->delta() / 8;//rolling angle , *8 is rolling distance
+        const int step = degree/ 15;//rolling step , *15 is rolling angle
 
         for (auto it = _mouse_wheel_ops.begin() ; it != _mouse_wheel_ops.end() ; ++it)
         {
@@ -437,6 +394,11 @@ void SceneContainer::register_mouse_wheel_operation(IMouseOpPtrCollection mouse_
 void SceneContainer::register_mouse_wheel_operation(IMouseOpPtr mouse_op)
 {
     IMouseOpPtrCollection(1 ,mouse_op).swap(_mouse_wheel_ops);
+}
+
+void SceneContainer::register_mouse_double_click_operation(IMouseOpPtr mouse_op)
+{
+    _mouse_double_click_op = mouse_op;
 }
 
 bool SceneContainer::no_graphics_item_grab_i()

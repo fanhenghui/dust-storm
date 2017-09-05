@@ -28,10 +28,10 @@ public:
     virtual ~Graphics2DScene();
 };
 
-//�����Ҳ�����Qt��QGraphicItem + QGraphicScene + QGraphicView ���������ԭ����Qt�Դ���һ��ͼԪ����꽻�����߼��������ѡ���϶�Բ ������ ���ֵȣ�
-//���Զ�λͼԪ�������߼�Ϊ��Qt�ı��ͼԪ -> ����ͼԪ�޸ĵ��߼���ҵ���߼���
-//ע����ǣ�Qtֻ����ײ���϶��߼���������Ƹı�ͼԪ��״�������߼�����Ҫ�Լ���չ
-//ĿǰQt����ײ�����ǰ��������ڵ�������Բ������Բ�ڶ��ǽ�����ԲȦ
+//这里我采用了Qt的QGraphicItem + QGraphicScene + QGraphicView 框架来做，原因是Qt自带了一套图元和鼠标交互的逻辑（如鼠标选择拖动圆 长方形 文字等）
+//所以二位图元交互的逻辑为：Qt改变该图元 -> 触发图元修改的逻辑（业务逻辑）
+//注意的是：Qt只有碰撞和拖动逻辑，因此类似改变图元形状这样的逻辑就需要自己扩展
+//目前Qt的碰撞热区是包含轮廓内的区域，如圆，则是圆内而非仅仅是圆圈
 class QtWidgets_Export SceneContainer : public QGraphicsView
 {
     Q_OBJECT
@@ -53,6 +53,7 @@ public:
     void register_mouse_operation(IMouseOpPtrCollection mouse_ops , Qt::MouseButtons buttons , Qt::KeyboardModifier keyboard_modifier);
     void register_mouse_wheel_operation(IMouseOpPtr mouse_op);
     void register_mouse_wheel_operation(IMouseOpPtrCollection mouse_ops);
+    void register_mouse_double_click_operation(IMouseOpPtr mouse_op);
     IMouseOpPtrCollection get_mouse_operation(Qt::MouseButtons button , Qt::KeyboardModifier keyboard_modifier);
 
     void set_mouse_hovering(bool new_state)
@@ -104,6 +105,7 @@ private:
     //Mouse interaction
     std::map<int , IMouseOpPtrCollection> _mouse_ops;
     IMouseOpPtrCollection _mouse_wheel_ops;
+    IMouseOpPtr _mouse_double_click_op;
     Qt::MouseButtons _buttons;
     Qt::KeyboardModifiers _modifiers;
     QPointF _pre_point;
