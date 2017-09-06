@@ -74,6 +74,7 @@
 #include <QMessagebox>
 #include <QSignalMapper>
 #include <QProgressDialog>
+#include <QKeyEvent>
 
 using namespace medical_imaging;
 
@@ -110,8 +111,13 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
 {
     _ui.setupUi(this);
 
+    _ui.pushButtonFineTune->setVisible(false);
+    _ui.comboBoxTuneType->setVisible(false);
+    _ui.spinBoxTuneRadius->setVisible(false);
+
     _ui.tableWidgetNoduleList->setSelectionBehavior(QAbstractItemView::SelectRows);
     _ui.tableWidgetNoduleList->setSelectionMode(QAbstractItemView::SingleSelection);
+    _ui.tableWidgetNoduleList->installEventFilter(this);
 
     _mpr_00 = new SceneContainer(SharedWidget::instance());
     _mpr_01 = new SceneContainer(SharedWidget::instance());
@@ -729,6 +735,21 @@ void NoduleAnnotation::save_preset_wl_setting(std::vector<float> ww_wl)
         NoduleAnnoConfig::instance()->set_preset_wl(PreSetWLType(i), ww, wl);
     }
     NoduleAnnoConfig::instance()->finalize();
+    slot_preset_wl_changed_i(this->_ui.comboBoxPresetWL->currentText());
+}
+
+bool NoduleAnnotation::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == this->_ui.tableWidgetNoduleList && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Delete) {
+            // Special tab handling
+            this->slot_delete_nodule_i();
+            return true;
+        } else
+            return false;
+    }
+    return QMainWindow::eventFilter(object, event);
 }
 
 void NoduleAnnotation::slot_dicom_anonymization_i()
@@ -1589,7 +1610,7 @@ void NoduleAnnotation::closeEvent(QCloseEvent * event)
     GLResourceManagerContainer::instance()->update_all();
     std::cout << GLContextHelper::has_gl_context() << std::endl;
 
-    //NoduleAnnoConfig::instance()->finalize(); // shall we call it when closing the window?
+    NoduleAnnoConfig::instance()->finalize();
 
     QMainWindow::closeEvent(event);
 }

@@ -603,7 +603,7 @@
   </action>
   <action name="action2D_Tranverse">
    <property name="text">
-    <string>2D 1x1 Transverse</string>
+    <string>2D 1x1 Axial </string>
    </property>
   </action>
  </widget>

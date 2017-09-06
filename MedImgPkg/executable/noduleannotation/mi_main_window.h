@@ -41,6 +41,8 @@ public:
     NoduleAnnotation(QWidget *parent = 0, Qt::WFlags flags = 0);
     ~NoduleAnnotation();
 
+    virtual bool eventFilter(QObject *object, QEvent *event);
+
 protected:
     virtual void closeEvent(QCloseEvent * event);
 
@@ -105,7 +107,7 @@ private slots:
     //Setting Dialog
     void open_preset_wl_setting_dlg();
     void save_preset_wl_setting(std::vector<float>);
-
+    
 private:
     void connect_signal_slot_i();
     void configure_i();
