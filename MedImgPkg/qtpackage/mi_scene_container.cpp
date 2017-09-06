@@ -5,6 +5,8 @@
 #include <QPainter>
 #include <QTimer>
 #include <QApplication>
+//#include <QDebug>
+#include <QMouseEvent>
 
 #include "renderalgo/mi_scene_base.h"
 
@@ -192,12 +194,13 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     {
         //std::cout << "No graphics grab \n";
         _buttons = event->buttons();
+        // qDebug() << _buttons;
         _pre_point = event->pos();
         _modifiers = event->modifiers();
 
         //std::cout << "Previous mouse press time : " << _mouse_press_time << std::endl;
         ++_mouse_press_time;
-        if (1 == _mouse_press_time)
+        if (1 == _mouse_press_time && _buttons == 0x00000001) // only when left button is pressed
         {
             //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
@@ -205,7 +208,10 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
             //const int interval = 300;
             QTimer::singleShot( _double_click_interval , this , SLOT(slot_mouse_click()));//Use timer to decide single click and double click
         }
-
+        else
+        {
+            _mouse_press_time = 0; // reset if both right and left button are pressed
+        }
         //do single click directly
         IMouseOpPtrCollection ops;
         if(get_mouse_operation_i(ops))
