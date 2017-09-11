@@ -299,5 +299,11 @@ mi_shader_collection.h
 *.so
 *.a
 .vscode/
+
+#User Config File
 configure.txt
 run_time.config
+
+#ProtocolBuffer Auto-gen
+*.pb.cc
+*.pb.h
