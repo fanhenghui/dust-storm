@@ -28,6 +28,13 @@ ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(GOOGLE_INCLUDE_DIR) -I$(PROTOC
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(PROTOCO_LIB_DIR) -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_appcommon -lmedimg_renderalgo \
 -lboost_system -lboost_filesystem -lboost_thread -lGL -lGLEW -lprotobuf
 
+all: pre-build main-build
+
+pre-build:
+	sh protoc-gen.sh
+
+main-build: $(TARGET)
+
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so $(BIN_DIR)/libmedimg_io.so $(BIN_DIR)/libmedimg_appcommon.so $(BIN_DIR)/libmedimg_renderalgo.so
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES) $(ADDITINAL_INCLUDE_DIR)
 
@@ -92,4 +99,5 @@ mi_message.pb.o: mi_message.pb.h mi_message.pb.cc
 .PHONY : clean
 clean:
 	-rm $(OBJS) $(TARGET)
+	-rm *.pb.cc *.pb.h
 
