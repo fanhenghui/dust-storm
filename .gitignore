@@ -307,3 +307,6 @@ run_time.config
 #ProtocolBuffer Auto-gen
 *.pb.cc
 *.pb.h
+
+#npm package version file
+package-lock.json
