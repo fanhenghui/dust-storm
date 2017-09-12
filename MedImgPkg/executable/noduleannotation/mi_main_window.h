@@ -105,8 +105,8 @@ private slots:
     void load_data_i(std::shared_ptr<medical_imaging::ImageData> img_data ,std::shared_ptr<medical_imaging::ImageDataHeader> data_header);
 
     //Setting Dialog
-    void open_preset_wl_setting_dlg();
-    void save_preset_wl_setting(std::vector<float>);
+    void slot_open_setting_dlg();
+    void slot_save_setting(std::vector<float>);
     
 private:
     void connect_signal_slot_i();

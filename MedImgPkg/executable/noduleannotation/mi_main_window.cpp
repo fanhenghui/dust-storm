@@ -399,7 +399,7 @@ void NoduleAnnotation::connect_signal_slot_i()
     connect(_ui.checkBoxNoduleOverlay , SIGNAL(stateChanged(int)) , this , SLOT(slot_nodule_overlay_visibility_i(int)));
 
     //Setting
-    connect(_ui.actionSetting, SIGNAL(triggered()), this, SLOT(open_preset_wl_setting_dlg()) );
+    connect(_ui.actionSetting, SIGNAL(triggered()), this, SLOT(slot_open_setting_dlg()) );
 }
 
 void NoduleAnnotation::create_model_observer_i()
@@ -711,7 +711,7 @@ void NoduleAnnotation::load_data_i(std::shared_ptr<ImageData> img_data ,std::sha
     _is_ready = true;
 }
 
-void NoduleAnnotation::open_preset_wl_setting_dlg()
+void NoduleAnnotation::slot_open_setting_dlg()
 {
     SettingDlg *dlg = new SettingDlg();
     dlg->setWindowModality(Qt::WindowModal);
@@ -722,11 +722,11 @@ void NoduleAnnotation::open_preset_wl_setting_dlg()
         NoduleAnnoConfig::instance()->get_preset_wl(PreSetWLType(i), ww, wl);
         dlg->set_preset_wl(PreSetWLType(i), ww, wl);
     }
-    connect(dlg, SIGNAL(save_setting(std::vector<float>)), this, SLOT(save_preset_wl_setting(std::vector<float>)));
+    connect(dlg, SIGNAL(save_setting(std::vector<float>)), this, SLOT(slot_save_setting(std::vector<float>)));
     dlg->show();
 }
 
-void NoduleAnnotation::save_preset_wl_setting(std::vector<float> ww_wl)
+void NoduleAnnotation::slot_save_setting(std::vector<float> ww_wl)
 {
     for (int i=0; i<CT_Preset_ALL; ++i)
     {
