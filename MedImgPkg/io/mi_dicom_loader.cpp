@@ -203,28 +203,46 @@ DICOMLoader::load_series(std::vector<std::string>& files,
 
 IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
                                    DcmFileFormatSet& file_format_set) {
+    IOStatus status = data_check_series_unique_i(files, file_format_set);
+    if (status != IO_SUCCESS) {
+        return status;
+    }
+
+    DcmFileFormatSet sequece_series_set;
+    status = data_check_spacing_unique_i(file_format_set , sequece_series_set);
+    if (status != IO_SUCCESS) {
+        return status;
+    }
+    file_format_set = sequece_series_set;
+
+    return status;
+}
+
+IOStatus DICOMLoader::data_check_series_unique_i(
+    std::vector<std::string>& files, DcmFileFormatSet& file_format_set)
+{
     std::map<std::string, std::vector<int>> series_separate;
     std::string series_id;
     int idx = 0;
 
     for (auto it = file_format_set.begin(); it != file_format_set.end();
-            ++it, ++idx) {
-        OFString context;
-        OFCondition status =
-            (*it)->getDataset()->findAndGetOFString(DCM_SeriesInstanceUID, context);
+        ++it, ++idx) {
+            OFString context;
+            OFCondition status =
+                (*it)->getDataset()->findAndGetOFString(DCM_SeriesInstanceUID, context);
 
-        if (status.bad()) {
-            return IO_DATA_CHECK_FAILED;
-        }
+            if (status.bad()) {
+                return IO_DATA_CHECK_FAILED;
+            }
 
-        series_id = std::string(context.c_str());
-        auto it_sep = series_separate.find(series_id);
+            series_id = std::string(context.c_str());
+            auto it_sep = series_separate.find(series_id);
 
-        if (it_sep != series_separate.end()) {
-            it_sep->second.push_back(idx);
-        } else {
-            series_separate[series_id] = std::vector<int>(1, idx);
-        }
+            if (it_sep != series_separate.end()) {
+                it_sep->second.push_back(idx);
+            } else {
+                series_separate[series_id] = std::vector<int>(1, idx);
+            }
     }
 
     if (series_separate.size() != 1) {
@@ -245,11 +263,11 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
         std::vector<int> to_be_delete;
 
         for (auto it_sep = series_separate.begin(); it_sep != series_separate.end();
-                ++it_sep) {
-            if (it_sep->first != max_num_series_id) {
-                to_be_delete.insert(to_be_delete.end(), it_sep->second.begin(),
-                                    it_sep->second.end());
-            }
+            ++it_sep) {
+                if (it_sep->first != max_num_series_id) {
+                    to_be_delete.insert(to_be_delete.end(), it_sep->second.begin(),
+                        it_sep->second.end());
+                }
         }
 
         std::sort(to_be_delete.begin(), to_be_delete.end(), std::less<int>());
@@ -269,13 +287,13 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
         auto it_file = files.begin();
 
         for (auto it = file_format_set.begin(); it != file_format_set.end();
-                ++idx_delete, ++it_file, ++it) {
-            if(it_delete != to_be_delete.end() && idx_delete == *it_delete) {
-                ++it_delete;
-            } else {
-                file_format_set_major.push_back(*it);
-                file_major.push_back(*it_file);
-            }
+            ++idx_delete, ++it_file, ++it) {
+                if(it_delete != to_be_delete.end() && idx_delete == *it_delete) {
+                    ++it_delete;
+                } else {
+                    file_format_set_major.push_back(*it);
+                    file_major.push_back(*it_file);
+                }
         }
 
         files = file_major;
@@ -284,6 +302,102 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
 
     return IO_SUCCESS;
 }
+
+IOStatus DICOMLoader::data_check_spacing_unique_i(
+    DcmFileFormatSet& set_in, DcmFileFormatSet& set_out) {
+    std::vector<Point2> spacing(set_in.size());
+    for (size_t i = 0; i < spacing.size(); ++i) {
+        get_pixel_spacing_i(set_in[i]->getDataset(), spacing[i]);
+    }
+    
+    std::vector<std::vector<size_t>> same_spacing_begin_end;
+    std::vector<size_t> cur_set;
+    cur_set.push_back(0);
+    same_spacing_begin_end.push_back(cur_set);
+    Point2 cur_spacing = spacing[0];
+    size_t cur_id = 0;
+    size_t major_seq_id = 0;
+    for (size_t i = 1 ; i < spacing.size(); ++i) {
+        if (spacing[i] != cur_spacing) {
+            std::vector<size_t> cur_set;
+            cur_set.push_back(i);
+            same_spacing_begin_end.push_back(cur_set);
+            ++cur_id;
+            cur_spacing = spacing[i];
+        } else {
+            same_spacing_begin_end[cur_id].push_back(i);
+        }
+    }
+
+    if (cur_id == 0) {
+        set_out = set_in;
+        return IO_SUCCESS;
+    } else {
+        //choose major spacing slice to next pipe
+        size_t major_slice = same_spacing_begin_end[0].size();
+        size_t major_id = 0;
+        for (size_t i = 1; i < same_spacing_begin_end.size() ; ++i) {
+            if (major_slice < same_spacing_begin_end[i].size()) {
+                major_slice = same_spacing_begin_end[i].size();
+                major_id = i;
+            }
+        }
+
+        set_out.resize(major_slice);
+        for (size_t i = 0; i < major_slice; ++i) {
+            set_out[i] = set_in[same_spacing_begin_end[major_id][i]];
+        }
+        return IO_SUCCESS;
+    }
+}
+
+//IOStatus DICOMLoader::data_check_series_image_sequece_i(
+//    DcmFileFormatSet& set_in , DcmFileFormatSet& set_out) {
+//    sort_series_i(set_in);
+//
+//    std::vector<Point3> z_pos(set_in.size());
+//    for (size_t i = 0; i < z_pos.size(); ++i) {
+//        get_image_position_i(set_in[i]->getDataset(), z_pos[i]);
+//    }
+//
+//    std::vector<Vector3> z_dir(set_in.size()-1);
+//    for (size_t i = 1; i < z_pos.size(); ++i) {
+//        z_dir[i-1] = z_pos[i] - z_pos[i-1];
+//    }
+//    std::vector<std::pair<size_t , size_t>> same_seq_begin_end;
+//    same_seq_begin_end.push_back(std::make_pair(0,0));
+//    Vector3 cur_dir = z_dir[0];
+//    size_t cur_id = 0;
+//    size_t major_seq_id = 0;
+//    size_t major_seq_slice = 0;
+//    for (size_t i = 1 ; i < z_dir.size(); ++i) {
+//        if (z_dir[i] != cur_dir) {
+//            same_seq_begin_end[cur_id].second = i;
+//            size_t cur_slice = i - same_seq_begin_end[cur_id].first + 1;
+//            if (cur_slice > major_seq_slice) {
+//                major_seq_slice = cur_slice;
+//                major_seq_id = cur_id;
+//            }
+//            same_seq_begin_end.push_back(std::make_pair(i+1,i+1));
+//            ++cur_id;
+//        }
+//    }
+//    if (same_seq_begin_end[cur_id].second == same_seq_begin_end[cur_id].first) {
+//        same_seq_begin_end[cur_id].second = z_dir.size();
+//    }
+//
+//    if(cur_id == 0) {
+//        set_out = set_in;
+//        return IO_SUCCESS;
+//    } else {
+//        set_out.resize(major_seq_slice);
+//        int idx = 0;
+//        for (size_t i = same_seq_begin_end[major_seq_id].first; i <= same_seq_begin_end[major_seq_id].second; ++i) {
+//            set_out[idx++] = set_in[i];
+//        }
+//        return IO_SUCCESS;
+//    }
+//}
 
 IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
     // sort based on slice lotation
@@ -947,6 +1061,23 @@ bool DICOMLoader::get_pixel_spacing_i(
     img_data_header->pixel_spacing[0] = atof(row_spacing.c_str());
     img_data_header->pixel_spacing[1] = atof(col_spacing.c_str());
 
+    return true;
+}
+
+bool DICOMLoader::get_pixel_spacing_i(
+    DcmDataset* data_set, Point2& spacing) {
+    OFString row_spacing, col_spacing;
+    OFCondition status1 =
+        data_set->findAndGetOFString(DCM_PixelSpacing, row_spacing, 0);
+    OFCondition status2 =
+        data_set->findAndGetOFString(DCM_PixelSpacing, col_spacing, 1);
+
+    if (status1.bad() || status2.bad()) {
+        return false;
+    }
+
+    spacing.x = atof(row_spacing.c_str());
+    spacing.y = atof(col_spacing.c_str());
     return true;
 }
 

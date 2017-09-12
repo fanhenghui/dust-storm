@@ -3,6 +3,7 @@
 
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3.h"
+#include "arithmetic/mi_point2.h"
 #include "io/mi_io_define.h"
 #include "io/mi_io_export.h"
 
@@ -47,6 +48,12 @@ public:
 private:
     IOStatus data_check_i(std::vector<std::string>& files,
                           DcmFileFormatSet& file_format_set);
+    IOStatus data_check_series_unique_i(std::vector<std::string>& files,
+                                        DcmFileFormatSet& file_format_set);
+    IOStatus data_check_spacing_unique_i(DcmFileFormatSet& set_in, 
+                                         DcmFileFormatSet& set_out);
+    /*IOStatus data_check_series_image_sequece_i(DcmFileFormatSet& set_in, 
+                                               DcmFileFormatSet& set_out);*/
 
     IOStatus sort_series_i(DcmFileFormatSet& file_format_set);
 
@@ -113,6 +120,7 @@ private:
 
     bool get_pixel_spacing_i(DcmDataset* data_set,
                              std::shared_ptr<ImageDataHeader>& img_data_header);
+    bool get_pixel_spacing_i(DcmDataset* data_set, Point2& spacing);
 
     bool get_bits_allocated_i(DcmDataset* data_set,
                               std::shared_ptr<ImageDataHeader>& img_data_header);
