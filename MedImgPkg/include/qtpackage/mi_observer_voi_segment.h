@@ -31,7 +31,7 @@ public:
 private:
     Ellipsoid voi_patient_to_volume(const VOISphere& voi);
 
-    AABBUI get_aabb_i(const Ellipsoid& ellipsoid);
+    int get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb);
 
     void segment_i(const Ellipsoid& ellipsoid, const AABBUI& aabb , unsigned char label);
 

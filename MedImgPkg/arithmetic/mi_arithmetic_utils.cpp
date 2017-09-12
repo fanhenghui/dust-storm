@@ -86,82 +86,122 @@ bool ArithmeticUtils::check_in_bound(const Point3& pt, const Point3& bound) {
     }
 }
 
-void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
+int ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
                                        const Sphere& sphere,
-                                       unsigned int (&begin)[3],
-                                       unsigned int (&end)[3]) {
+                                       unsigned int (&ubegin)[3],
+                                       unsigned int (&uend)[3]) {
     const Point3 min =
         sphere._center - Vector3(sphere._radius, sphere._radius, sphere._radius);
     const Point3 max =
         sphere._center + Vector3(sphere._radius, sphere._radius, sphere._radius);
 
-    int tmp = static_cast<int>(min.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[0] = static_cast<unsigned int>(tmp);
-
+    int begin[3] = {0,0,0};
+    int end[3] = {0,0,0};
+    int tmp = 0;
+    
+    tmp = static_cast<int>(min.x + 0.5);
+    begin[0] = static_cast<int>(tmp);
     tmp = static_cast<int>(min.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[1] = static_cast<unsigned int>(tmp);
-
+    begin[1] = static_cast<int>(tmp);
     tmp = static_cast<int>(min.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[2] = static_cast<unsigned int>(tmp);
+    begin[2] = static_cast<int>(tmp);
 
     tmp = static_cast<int>(max.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[0] = static_cast<unsigned int>(tmp);
-
+    end[0] = static_cast<int>(tmp);
     tmp = static_cast<int>(max.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[1] = static_cast<unsigned int>(tmp);
-
+    end[1] = static_cast<int>(tmp);
     tmp = static_cast<int>(max.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[2] = static_cast<unsigned int>(tmp);
+    end[2] = static_cast<int>(tmp);
+
+    int bound_status = 0;
+    if (begin[0] >= (int)dim[0] - 1 || begin[1] >= (int)dim[1] - 1 || begin[2] >= (int)dim[2] - 1 ) {
+        bound_status = -1;
+    }
+    if (end[0] <= 0 || end[1] <= 0 || end[2] <= 0) {
+        bound_status = -1;
+    }
 
     for (int i = 0; i < 3; ++i) {
-        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
-        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
+        if (begin[i] > (int)dim[i] - 1) {
+            begin[i] = (int)dim[i] - 1;
+        }
+        if (begin[i] < 0) {
+            begin[i] = 0;
+        }
+
+        if (end[i] > (int)dim[i] - 1) {
+            end[i] = (int)dim[i] - 1;
+        }
+        if (end[i] < 0) {
+            end[i] = 0;
+        }
     }
+
+    for (int i = 0; i < 3; ++i) {
+        ubegin[i] = (unsigned int)begin[i];
+        uend[i] = (unsigned int)end[i];
+    }
+
+    return bound_status;
 }
 
-void ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
+int ArithmeticUtils::get_valid_region(const unsigned int (&dim)[3],
                                        const Ellipsoid& ellipsoid,
-                                       unsigned int (&begin)[3],
-                                       unsigned int (&end)[3]) {
+                                       unsigned int (&ubegin)[3],
+                                       unsigned int (&uend)[3]) {
     const double radius =
         std::max(std::max(ellipsoid._a, ellipsoid._b), ellipsoid._c);
     const Point3 min = ellipsoid._center - Vector3(radius, radius, radius);
     const Point3 max = ellipsoid._center + Vector3(radius, radius, radius);
 
-    int tmp = static_cast<int>(min.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[0] = static_cast<unsigned int>(tmp);
+    int begin[3] = {0,0,0};
+    int end[3] = {0,0,0};
+    int tmp = 0;
 
+    tmp = static_cast<int>(min.x + 0.5);
+    begin[0] = static_cast<int>(tmp);
     tmp = static_cast<int>(min.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[1] = static_cast<unsigned int>(tmp);
-
+    begin[1] = static_cast<int>(tmp);
     tmp = static_cast<int>(min.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    begin[2] = static_cast<unsigned int>(tmp);
+    begin[2] = static_cast<int>(tmp);
 
     tmp = static_cast<int>(max.x + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[0] = static_cast<unsigned int>(tmp);
-
+    end[0] = static_cast<int>(tmp);
     tmp = static_cast<int>(max.y + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[1] = static_cast<unsigned int>(tmp);
-
+    end[1] = static_cast<int>(tmp);
     tmp = static_cast<int>(max.z + 0.5);
-    tmp = tmp < 0 ? 0 : tmp;
-    end[2] = static_cast<unsigned int>(tmp);
+    end[2] = static_cast<int>(tmp);
+
+    int bound_status = 0;
+    if (begin[0] >= (int)dim[0] - 1 || begin[1] >= (int)dim[1] - 1 || begin[2] >= (int)dim[2] - 1 ) {
+        bound_status = -1;
+    }
+    if (end[0] <= 0 || end[1] <= 0 || end[2] <= 0) {
+        bound_status = -1;
+    }
 
     for (int i = 0; i < 3; ++i) {
-        begin[i] = begin[i] > dim[i] - 1 ? dim[i] - 1 : begin[i];
-        end[i] = end[i] > dim[i] - 1 ? dim[i] - 1 : end[i];
+        if (begin[i] > (int)dim[i] - 1) {
+            begin[i] = (int)dim[i] - 1;
+        }
+        if (begin[i] < 0) {
+            begin[i] = 0;
+        }
+
+        if (end[i] > (int)dim[i] - 1) {
+            end[i] = (int)dim[i] - 1;
+        }
+        if (end[i] < 0) {
+            end[i] = 0;
+        }
     }
+
+    for (int i = 0; i < 3; ++i) {
+        ubegin[i] = (unsigned int)begin[i];
+        uend[i] = (unsigned int)end[i];
+    }
+
+    return bound_status;
 }
 
 MED_IMG_END_NAMESPACE

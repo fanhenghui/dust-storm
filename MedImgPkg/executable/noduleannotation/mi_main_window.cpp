@@ -11,6 +11,7 @@
 #include "arithmetic/mi_rsa_utils.h"
 #include "arithmetic/mi_ortho_camera.h"
 #include "arithmetic/mi_run_length_operator.h"
+#include "arithmetic/mi_arithmetic_utils.h"
 
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
@@ -1135,6 +1136,39 @@ void NoduleAnnotation::slot_save_nodule_file_i()
     }
 }
 
+namespace 
+{
+    int _check_nodule_valid(std::shared_ptr<ImageData> volume_data,
+        std::shared_ptr<CameraCalculator> camera_cal,
+        const VOISphere& voi)
+    {
+        const Matrix4& mat_p2w = camera_cal->get_patient_to_world_matrix();
+        const Matrix4& mat_w2v = camera_cal->get_world_to_volume_matrix();
+        Matrix4 mat_p2v = mat_w2v*mat_p2w;
+
+        PatientAxisInfo head_info = camera_cal->get_head_patient_axis_info();
+        PatientAxisInfo posterior_info = camera_cal->get_posterior_patient_axis_info();
+        PatientAxisInfo left_info = camera_cal->get_left_patient_axis_info();
+        double basic_abc[3];
+        basic_abc[head_info.volume_coord/2] = volume_data->_spacing[head_info.volume_coord/2];
+        basic_abc[posterior_info.volume_coord/2] = volume_data->_spacing[posterior_info.volume_coord/2];
+        basic_abc[left_info.volume_coord/2] = volume_data->_spacing[left_info.volume_coord/2];
+
+        Ellipsoid ellipsoid;
+        ellipsoid._center = mat_p2v.transform(voi.center);
+        double voi_abc[3] = {0,0,0};
+        voi_abc[head_info.volume_coord/2] = voi.diameter*0.5/basic_abc[head_info.volume_coord/2] ;
+        voi_abc[left_info.volume_coord/2] = voi.diameter*0.5/basic_abc[left_info.volume_coord/2] ;
+        voi_abc[posterior_info.volume_coord/2] = voi.diameter*0.5/basic_abc[posterior_info.volume_coord/2] ;
+        ellipsoid._a = voi_abc[0];
+        ellipsoid._b = voi_abc[1];
+        ellipsoid._c = voi_abc[2];
+
+        unsigned int begin[3] , end[3];
+        return ArithmeticUtils::get_valid_region(volume_data->_dim , ellipsoid , begin , end);
+    }
+}
+
 void NoduleAnnotation::slot_open_nodule_file_i()
 {
     if (!_is_ready)
@@ -1152,7 +1186,9 @@ void NoduleAnnotation::slot_open_nodule_file_i()
         }
     }
 
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.csv);;NoduleSet(*.nraw)"));
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Load Nodule") , 
+        (NoduleAnnoConfig::instance()->get_last_open_direction() + "/" +_volume_infos->get_data_header()->series_uid).c_str(), 
+        tr("NoduleSet(*.csv);;NoduleSet(*.nraw)"));
     if (!file_name.isEmpty())
     {
         std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
@@ -1189,8 +1225,19 @@ void NoduleAnnotation::slot_open_nodule_file_i()
             int idx = 0;
             for (auto it = vois.begin() ; it != vois.end() ; ++it)
             {
-                _model_voi->add_voi(*it , MaskLabelStore::instance()->acquire_label());
-                _model_voi->notify(VOIModel::ADD_VOI);
+                if (0 != _check_nodule_valid(_volume_infos->get_volume() , _volume_infos->get_camera_calculator() , *it))
+                {
+                    //TODO warning
+                    std::stringstream ss;
+                    ss << "The nodule item : center " << (*it).center.x << " " << (*it).center.y << " " <<
+                        (*it).center.z << " , diameter " << (*it).diameter << " bounding overflow. So skip it.";
+                    QMessageBox::warning(this ,tr("Load Nodule"), tr(ss.str().c_str()), QMessageBox::Yes);
+                }
+                else
+                {
+                    _model_voi->add_voi(*it , MaskLabelStore::instance()->acquire_label());
+                    _model_voi->notify(VOIModel::ADD_VOI);
+                }
             }
 
             QMessageBox::information(this , tr("Load Nodule") , tr("Load nodule file success."),QMessageBox::Ok);
@@ -1762,7 +1809,9 @@ void NoduleAnnotation::slot_load_label_file()
     }
 
     // read file, interpret as pairs of integers, (repeated times, value)
-    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , "home/" /*QString(_volume_infos->get_data_header()->series_uid.c_str())*/, tr("LabelSet(*.rle)"));
+    QString label_file_name_str = QFileDialog::getOpenFileName(this, tr("Load Label") , 
+        (NoduleAnnoConfig::instance()->get_last_open_direction() + "/" +_volume_infos->get_data_header()->series_uid).c_str(),
+        tr("LabelSet(*.rle)"));
     if (label_file_name_str.isEmpty())
     {
         return;

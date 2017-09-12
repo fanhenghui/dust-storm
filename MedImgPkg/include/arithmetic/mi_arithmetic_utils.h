@@ -29,10 +29,12 @@ public:
     check_in_bound(const Point3& pt,
                    const Point3& bound); // Check pt in [ (0,0,0) , bound ]
 
-    static void get_valid_region(const unsigned int (&dim)[3],
+    //0 inside bounding
+    //-1 outside bounding
+    static int get_valid_region(const unsigned int (&dim)[3],
                                  const Sphere& sphere, unsigned int (&begin)[3],
                                  unsigned int (&end)[3]);
-    static void get_valid_region(const unsigned int (&dim)[3],
+    static int get_valid_region(const unsigned int (&dim)[3],
                                  const Ellipsoid& ellipsoid,
                                  unsigned int (&begin)[3],
                                  unsigned int (&end)[3]);

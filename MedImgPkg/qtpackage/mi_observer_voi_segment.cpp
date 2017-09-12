@@ -92,8 +92,8 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
                 assert(_pre_voi_aabbs.find(label_added) == _pre_voi_aabbs.end());
 
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi_added);
-                AABBUI aabb = get_aabb_i(ellipsoid);
-
+                AABBUI aabb;
+                get_aabb_i(ellipsoid, aabb);
                 segment_i(ellipsoid , aabb , label_added);
 
                 _pre_voi_aabbs[label_added] = aabb;
@@ -124,7 +124,8 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
                 const unsigned char label_loaded = model->get_label(voi_idx);
                 
                 Ellipsoid ellipsoid = voi_patient_to_volume(vois[voi_idx]);
-                AABBUI aabb = get_aabb_i(ellipsoid);
+                AABBUI aabb;
+                get_aabb_i(ellipsoid, aabb);
                 _pre_voi_aabbs[label_loaded] = aabb;
 
                 // codes copy from above
@@ -230,7 +231,8 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
 
             //2 Segment
             Ellipsoid ellipsoid = voi_patient_to_volume(model->get_voi(idx));
-            AABBUI aabb = get_aabb_i(ellipsoid);
+            AABBUI aabb;
+            get_aabb_i(ellipsoid, aabb);
 
             segment_i(ellipsoid , aabb , label_modify);
 
@@ -329,14 +331,15 @@ Ellipsoid VOISegmentObserver::voi_patient_to_volume(const VOISphere& voi)
     return ellipsoid;
 }
 
-AABBUI VOISegmentObserver::get_aabb_i(const Ellipsoid& ellipsoid)
+int VOISegmentObserver::get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb)
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
 
     unsigned int begin[3] , end[3];
-    ArithmeticUtils::get_valid_region(volume_data->_dim , ellipsoid , begin , end);
+    int inter_status = ArithmeticUtils::get_valid_region(volume_data->_dim , ellipsoid , begin , end);
+    aabb = AABBUI(begin , end);
 
-    return AABBUI(begin , end);
+    return inter_status;
 }
 void VOISegmentObserver::recover_i(const AABBUI& aabb , unsigned char label)
 {
@@ -384,6 +387,10 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
     const DataType data_type = volume_data->_data_type;
 
+    unsigned int begin[3] = {0,0,0};
+    unsigned int end[3] = {0,0,0};
+    ArithmeticUtils::get_valid_region(volume_data->_dim, ellipsoid, begin, end);
+
     switch(data_type)
     {
     case SHORT:
@@ -397,7 +404,6 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
             segment.set_min_scalar(volume_data->get_min_scalar());
             segment.set_max_scalar(volume_data->get_max_scalar());
             segment.segment_auto_threshold(ellipsoid , SegmentThreshold<short>::Otsu);
-
 
             ConnectedDomainAnalysis cd_analy;
             cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
