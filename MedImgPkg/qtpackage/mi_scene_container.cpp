@@ -200,7 +200,7 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
 
         //std::cout << "Previous mouse press time : " << _mouse_press_time << std::endl;
         ++_mouse_press_time;
-        if (1 == _mouse_press_time && _buttons == 0x00000001) // only when left button is pressed
+        if (1 == _mouse_press_time && _buttons == Qt::LeftButton) // only when left button is pressed
         {
             //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
