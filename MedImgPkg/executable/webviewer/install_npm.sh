@@ -16,4 +16,4 @@ npm install multer@0 --save
 npm install ejs --save
 npm install ipaddr.js --save
 
-sudo apt - get install mongodb mongodb - clients mongodb - server
+sudo apt-get install mongodb mongodb-clients mongodb-server
