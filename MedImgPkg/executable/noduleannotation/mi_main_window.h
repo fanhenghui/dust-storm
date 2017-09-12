@@ -117,7 +117,7 @@ private:
     void save_layout2x2_parameter_i();
     void shift_tune_object();
     void update_last_open_direction_i(const std::string& cur_file);
-
+    void change_layout1x1_i(int scan_type );
     void release_i();
 
 

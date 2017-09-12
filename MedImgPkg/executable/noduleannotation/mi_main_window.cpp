@@ -512,48 +512,20 @@ void NoduleAnnotation::slot_change_layout1x1_i()
         return;
     }
 
-
-    _mpr_00->hide();
-    _mpr_00_scroll_bar->hide();
-    _mpr_01->hide();
-    _mpr_01_scroll_bar->hide();
-    _mpr_10->hide();
-    _mpr_10_scroll_bar->hide();
-    _vr_11->hide();
-
-    _ui.gridLayout_6->removeWidget(_mpr_00);
-    _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
-    _ui.gridLayout_6->removeWidget(_mpr_01);
-    _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-    _ui.gridLayout_6->removeWidget(_mpr_10 );
-    _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
-    _ui.gridLayout_6->removeWidget(_vr_11);
-
-    SceneContainer* scene = nullptr;
-    QScrollBar* bar = nullptr;
-
     if (this->sender() == this->_ui.action2D_Sagittal)
     {
-        scene = _mpr_00;
-        bar = _mpr_00_scroll_bar;
+        change_layout1x1_i(SAGITTAL);
     }
     else if (this->sender() == this->_ui.action2D_Coronal)
     {
-        scene = _mpr_01;
-        bar = _mpr_01_scroll_bar;
+        change_layout1x1_i(CORONAL);
     }
     else /*if (this->sender() == this->_ui.action2D_Transverse)*/
     {
-        scene = _mpr_10;
-        bar = _mpr_10_scroll_bar;
+        change_layout1x1_i(TRANSVERSE);
     }
-    
-    _ui.gridLayout_6->addWidget(scene , 0 ,0);
-    _ui.gridLayout_6->addWidget(bar , 0 ,1,1,1);
-
-    scene->show();
-    bar->show();
 }
+
 void NoduleAnnotation::slot_open_dicom_folder_i()
 {
     QStringList file_name_list = QFileDialog::getOpenFileNames(
@@ -1364,6 +1336,62 @@ void NoduleAnnotation::slot_preset_wl_changed_i(QString s)
     _ob_scene_container->update();
 }
 
+void NoduleAnnotation::change_layout1x1_i(int scan_type)
+{
+    SceneContainer* target_container = nullptr;
+    QScrollBar* target_scroll_bar = nullptr;
+
+    if (scan_type == static_cast<int>(SAGITTAL))
+    {
+        target_container = _mpr_00;
+        target_scroll_bar = _mpr_00_scroll_bar;
+    }
+    else if (scan_type == static_cast<int>(CORONAL))
+    {
+        target_container = _mpr_01;
+        target_scroll_bar = _mpr_01_scroll_bar;
+    }
+    else if (scan_type == static_cast<int>(TRANSVERSE))
+    {
+        target_container = _mpr_10;
+        target_scroll_bar = _mpr_10_scroll_bar;
+    }
+    else
+    {
+        return;
+    }
+
+    if (0 == _layout_tag)
+    {
+        save_layout2x2_parameter_i();
+    }
+
+    _mpr_00->hide();
+    _mpr_00_scroll_bar->hide();
+    _mpr_01->hide();
+    _mpr_01_scroll_bar->hide();
+    _mpr_10->hide();
+    _mpr_10_scroll_bar->hide();
+    _vr_11->hide();
+
+    _ui.gridLayout_6->removeWidget(_mpr_00);
+    _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_01);
+    _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_mpr_10 );
+    _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
+    _ui.gridLayout_6->removeWidget(_vr_11);
+
+    _ui.gridLayout_6->addWidget(target_container , 0 ,0);
+    _ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
+
+    target_container->show();
+    target_scroll_bar->show();
+    target_container->update_scene();
+
+    _layout_tag = 1;
+}
+
 void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
 {
     if (!_is_ready)
@@ -1371,57 +1399,24 @@ void NoduleAnnotation::slot_scene_min_max_hint_i(const std::string& name)
         return;
     }
 
-    SceneContainer* target_container = nullptr;
-    QScrollBar* target_scroll_bar = nullptr;
     if (0 == _layout_tag)
     {
-        save_layout2x2_parameter_i();
-
         if (name == _mpr_scene_00->get_name())
         {
-            target_container = _mpr_00;
-            target_scroll_bar = _mpr_00_scroll_bar;
+            change_layout1x1_i(SAGITTAL);
         }
         else if (name == _mpr_scene_01->get_name())
         {
-            target_container = _mpr_01;
-            target_scroll_bar = _mpr_01_scroll_bar;
+            change_layout1x1_i(CORONAL);
         }
         else if (name == _mpr_scene_10->get_name())
         {
-            target_container = _mpr_10;
-            target_scroll_bar = _mpr_10_scroll_bar;
+            change_layout1x1_i(TRANSVERSE);
         }
         else
         {
             return;
         }
-
-        _mpr_00->hide();
-        _mpr_00_scroll_bar->hide();
-        _mpr_01->hide();
-        _mpr_01_scroll_bar->hide();
-        _mpr_10->hide();
-        _mpr_10_scroll_bar->hide();
-        _vr_11->hide();
-
-        _ui.gridLayout_6->removeWidget(_mpr_00);
-        _ui.gridLayout_6->removeWidget(_mpr_00_scroll_bar);
-        _ui.gridLayout_6->removeWidget(_mpr_01);
-        _ui.gridLayout_6->removeWidget(_mpr_01_scroll_bar);
-        _ui.gridLayout_6->removeWidget(_mpr_10 );
-        _ui.gridLayout_6->removeWidget(_mpr_10_scroll_bar);
-        _ui.gridLayout_6->removeWidget(_vr_11);
-
-        _ui.gridLayout_6->addWidget(target_container , 0 ,0);
-        _ui.gridLayout_6->addWidget(target_scroll_bar , 0 ,1,1,1);
-
-        target_container->show();
-        target_scroll_bar->show();
-        target_container->update_scene();
-
-        _layout_tag = 1;
-
     }
     else
     {
