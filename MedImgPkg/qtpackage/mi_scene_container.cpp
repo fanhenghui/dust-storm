@@ -58,9 +58,6 @@ SceneContainer::~SceneContainer()
 
 void SceneContainer::drawBackground(QPainter *painter, const QRectF &rect)
 {
-    //static int idx = 0;
-    //std::cout << "draw background " << idx++ << std::endl;
-
     //Render scene
     std::shared_ptr<medical_imaging::SceneBase> scene = _scene.lock();
     if (!scene)
@@ -74,7 +71,6 @@ void SceneContainer::drawBackground(QPainter *painter, const QRectF &rect)
         scene->initialize();
         scene->render();
         scene->render_to_back();
-
         //_gl_widget->doneCurrent();
     }
 }
@@ -160,27 +156,21 @@ std::string SceneContainer::get_name() const
 void SceneContainer::update_scene()
 {
     _inner_graphic_scene->update();
-    //std::cout << "update scene" << std::endl;
 }
 
 void SceneContainer::slot_mouse_click()
 {
-    //std::cout << "Slot click in >>\n";
     bool double_click_status = (_mouse_press_time>1);
     _mouse_press_time = 0;//Make mouse click decision
     if (double_click_status && _mouse_double_click_op)
     {
         _mouse_double_click_op->double_click(_pre_point);
     }
-
     update_scene();
-
-    //std::cout << "Slot click out <<\n";
 }
 
 void SceneContainer::mousePressEvent(QMouseEvent *event)
 {
-    //std::cout << "\nPress in >>\n";
     //focus
     this->setFocus();
 
@@ -192,17 +182,13 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
-        //std::cout << "No graphics grab \n";
         _buttons = event->buttons();
-        // qDebug() << _buttons;
         _pre_point = event->pos();
         _modifiers = event->modifiers();
 
-        //std::cout << "Previous mouse press time : " << _mouse_press_time << std::endl;
         ++_mouse_press_time;
         if (1 == _mouse_press_time && _buttons == Qt::LeftButton) // only when left button is pressed
         {
-            //std::cout << "Trigger timer\n";
             _buttons_pre_press = _buttons;
             //const int interval = _double_click_interval == 0 ? QApplication::doubleClickInterval() : _double_click_interval;
             //const int interval = 300;
@@ -229,8 +215,6 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 {
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseMoveEvent(event);
-    //bool flag = this->hasMouseTracking();
-    //std::cout << flag << std::endl; // flag = 0 ? if so, why we enter here��
 
     //2 TODO Graphic primitive(3D) interaction
 
@@ -276,7 +260,6 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
                 (*it)->release(event->pos());
             }
         }
-
         _buttons = Qt::NoButton;
         update_scene();
     }
@@ -284,7 +267,6 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
 
 void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //std::cout << "Double click in >>\n";
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseDoubleClickEvent(event);
 
@@ -293,19 +275,11 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
     //3 Mouse operation
     if (no_graphics_item_grab_i())
     {
-        //std::cout << "No graphics grab \n";
         if (1 == _mouse_press_time)// In timer slot to wait to run
         {
             ++_mouse_press_time;
-            //_buttons = event->buttons();
-        }
-        else
-        {
-            //std::cout << "Double click to be late......\n";
         }
     }
-
-    //std::cout << "Double click out <<\n";
 }
 
 void SceneContainer::wheelEvent(QWheelEvent *event)
@@ -437,5 +411,3 @@ void SceneContainer::clear()
     _graphic_items.clear();
     _scene.reset();
 }
-
-//////////////////////////////////////////////////////////////////////////
