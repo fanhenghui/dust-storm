@@ -53,6 +53,9 @@
     <ClInclude Include="..\include\util\mi_util_export.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\util\mi_logger.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\util\mi_message_queue.inl">
@@ -82,6 +85,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_socket_client.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_logger.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

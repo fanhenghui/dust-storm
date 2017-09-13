@@ -90,6 +90,7 @@
     <ClInclude Include="..\include\util\mi_ipc_client_proxy.h" />
     <ClInclude Include="..\include\util\mi_ipc_common.h" />
     <ClInclude Include="..\include\util\mi_ipc_server_proxy.h" />
+    <ClInclude Include="..\include\util\mi_logger.h" />
     <ClInclude Include="..\include\util\mi_message_queue.h" />
     <ClInclude Include="..\include\util\mi_model_interface.h" />
     <ClInclude Include="..\include\util\mi_model_progress.h" />
@@ -108,6 +109,7 @@
     <ClCompile Include="..\util\mi_file_util.cpp" />
     <ClCompile Include="..\util\mi_ipc_client_proxy.cpp" />
     <ClCompile Include="..\util\mi_ipc_server_proxy.cpp" />
+    <ClCompile Include="..\util\mi_logger.cpp" />
     <ClCompile Include="..\util\mi_model_interface.cpp" />
     <ClCompile Include="..\util\mi_socket_client.cpp" />
     <ClCompile Include="..\util\mi_socket_server.cpp" />
