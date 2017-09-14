@@ -64,15 +64,15 @@
     <None Include="..\include\util\mi_logger.inl">
       <Filter>Include</Filter>
     </None>
+    <None Include="..\include\util\mi_exception.inl">
+      <Filter>Include</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\util\mi_socket_server.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_configuration.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\mi_exception.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_file_util.cpp">
@@ -88,9 +88,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_socket_client.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\mi_logger.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

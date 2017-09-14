@@ -1,9 +1,3 @@
-#ifndef MED_IMG_UTIL_EXCEPTION_H
-#define MED_IMG_UTIL_EXCEPTION_H
-
-#include "mi_exception.h"
-
-MED_IMG_BEGIN_NAMESPACE
 
 Exception::Exception(const std::string& module, const std::string& file, long line,
                      const std::string& function, const std::string& description) : std::exception()
@@ -74,7 +68,3 @@ const std::string& Exception::get_full_description() const {
 
     return _full_description;
 }
-
-
-MED_IMG_END_NAMESPACE
-#endif

@@ -3,6 +3,7 @@
 
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
+#include "util/mi_logger.h"
 
 #include <exception>
 #include <iostream>
@@ -37,6 +38,9 @@ MED_IMG_BEGIN_NAMESPACE
     GLRESOURCE_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
 }
 #endif
+
+src::severity_logger<SeverityLevel> G_GL_RESOURCE_LG;
+#define MI_GL_RESOUECE_LOG(sev) BOOST_LOG_SEV(G_GL_RESOURCE_LG, sev)
 
 MED_IMG_END_NAMESPACE
 

@@ -1,3 +1,5 @@
+boost::mutex Logger::_s_mutex;
+Logger* Logger::_s_instance = nullptr;
 
 typedef sinks::synchronous_sink< sinks::text_file_backend > file_sink_t;
 typedef sinks::synchronous_sink< sinks::text_ostream_backend > stream_sink_t;
@@ -22,11 +24,35 @@ std::ostream& operator<< (std::ostream& strm, SeverityLevel lvl)
     return strm;
 }
 
-struct Logger::InnerSink
-{
+struct Logger::InnerSink {
     boost::weak_ptr<file_sink_t> file_sink;
     boost::weak_ptr<stream_sink_t> stream_sink;
 };
+
+Logger::Logger() : _inner_sink(new InnerSink)
+    , _stream_filer_level(DEBUG)
+    , _file_filer_level(DEBUG)
+    , _target_dir("log")
+    , _file_name_format("sign-%Y-%m-%d_%H-%M-%S.%N.log")
+    , _rotation_size(10*1024)
+    , _min_free_space(3*1024*1024)
+    , _time_based_rotation(TimeHMS(0,0,0))
+{
+}
+
+Logger::~Logger() {
+
+}
+
+Logger* Logger::instance() {
+    if (!_s_instance) {
+        boost::unique_lock<boost::mutex> locker(_s_mutex);
+        if (!_s_instance) {
+            _s_instance = new Logger();
+        }
+    }
+    return _s_instance;
+}
 
 void Logger::init() {
     boost::shared_ptr< sinks::text_file_backend > file_sink_backend =
@@ -50,17 +76,18 @@ void Logger::init() {
         (
         expr::stream
         << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
-        << ": <" << severity << ">\t"
-        << "(" << scope << ") "
-        << expr::if_(expr::has_attr(tag_attr))
+        << ": <" << severity << "> "
+        << expr::if_(expr::has_attr(module))
         [
-            expr::stream << "[" << tag_attr << "] "
+            expr::stream << "[" << module << "] "
         ]
-    << expr::if_(expr::has_attr(timeline))
+        //<< "(" << scope << ") "
+        << expr::if_(expr::has_attr(timeline))
         [
             expr::stream << "[" << timeline << "] "
         ]
-    << expr::smessage
+        << "{" << thread_id << "} "
+        << expr::smessage
         );
 
 
@@ -77,16 +104,17 @@ void Logger::init() {
         expr::stream
         << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
         << ": <" << severity << "> "
-        << "(" << scope << ") "
-        << expr::if_(expr::has_attr(tag_attr))
+        << expr::if_(expr::has_attr(module))
         [
-            expr::stream << "[" << tag_attr << "] "
+            expr::stream << "[" << module << "] "
         ]
-    << expr::if_(expr::has_attr(timeline))
+        //<< "(" << scope << ") "
+        << expr::if_(expr::has_attr(timeline))
         [
             expr::stream << "[" << timeline << "] "
         ]
-    << expr::smessage
+        << "{" << thread_id << "} "
+        << expr::smessage
         );
 
 
@@ -101,6 +129,10 @@ void Logger::init() {
     logging::core::get()->add_global_attribute("ThreadID" , attrs::current_thread_id());
     logging::core::get()->add_global_attribute("Module" , attrs::current_thread_id());
 
-    mi_logger::get().add_attribute("Module", attrs::constant< std::string >("Global"));
+    this->register_logger_module(G_UTIL_LG , "Util");
 } 
+
+void Logger::register_logger_module(src::severity_logger<SeverityLevel>& lg, const std::string& module_name) {
+    lg.add_attribute("Module" , attrs::constant<std::string>(module_name));
+}
 

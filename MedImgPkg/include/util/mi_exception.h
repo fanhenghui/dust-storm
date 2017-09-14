@@ -10,7 +10,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class Util_Export Exception : public std::exception {
+class Exception : public std::exception {
 public:
     Exception(const std::string& module, const std::string& file, long line, const std::string& func,
               const std::string& des);
@@ -42,6 +42,8 @@ private:
     std::string _description;
     mutable std::string _full_description;
 };
+
+#include "mi_exception.inl"
 
 
 #ifndef THROW_EXCEPTION

@@ -3,6 +3,7 @@
 
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"
+#include "util/mi_logger.h"
 
 #include <algorithm>
 #include <cmath>
@@ -38,6 +39,9 @@ MED_IMG_BEGIN_NAMESPACE
                                " is null.");                                   \
   }
 #endif
+
+src::severity_logger<SeverityLevel> G_ARITHMETIC_LG;
+#define MI_ARITHMETIC_LOG(sev) BOOST_LOG_SEV(G_ARITHMETIC_LG, sev)
 
 MED_IMG_END_NAMESPACE
 

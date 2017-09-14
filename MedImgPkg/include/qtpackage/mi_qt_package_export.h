@@ -18,6 +18,7 @@
 #include <cassert>
 
 #include "util/mi_exception.h"
+#include "util/mi_logger.h"
 
 
 #ifdef MEDIMGQTPACKAGE_LIB
@@ -39,5 +40,8 @@
     QTWIDGETS_THROW_EXCEPTION(std::string(typeid(pointer).name()) + std::string(" ") + std::string(#pointer) + " is null.");                \
 }
 #endif
+
+src::severity_logger<medical_imaging::SeverityLevel> G_QT_PACKAGE_LG;
+#define MI_QT_PACKAGE_LOG(sev) BOOST_LOG_SEV(G_QT_PACKAGE_LG, sev)
 
 #endif

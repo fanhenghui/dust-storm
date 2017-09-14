@@ -17,6 +17,7 @@ int TestLogger(int argc, char* argv[]) {
         MI_LOG(FATAL) << "test rotation.";
     }
     MI_LOG(WARNING) << "ENDENDNED";
+    MI_UTIL_LOG(FATAL) <<"util module testing";
 
     return 1;
 }

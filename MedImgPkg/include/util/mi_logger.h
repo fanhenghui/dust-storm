@@ -1,14 +1,12 @@
-#ifndef MEDIMGUTIL_MI_FILE_UTIL_H
-#define MEDIMGUTIL_MI_FILE_UTIL_H
+#ifndef MEDIMGUTIL_MI_LOGGER_H
+#define MEDIMGUTIL_MI_LOGGER_H
 
 #include "util/mi_util_export.h"
 
 #include "boost/thread/mutex.hpp"
 
-#include <cstddef>
 #include <string>
 #include <ostream>
-#include <fstream>
 #include <iomanip>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -53,15 +51,19 @@ BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger< medical_i
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", medical_imaging::SeverityLevel)
-BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Module", std::string)
+BOOST_LOG_ATTRIBUTE_KEYWORD(module, "Module", std::string)
 BOOST_LOG_ATTRIBUTE_KEYWORD(scope, "Scope", attrs::named_scope::value_type)
 BOOST_LOG_ATTRIBUTE_KEYWORD(timeline, "Timeline", attrs::timer::value_type)
+BOOST_LOG_ATTRIBUTE_KEYWORD(thread_id, "ThreadID", boost::log::aux::thread::id)
 
 #define MI_LOG(sev) BOOST_LOG_SEV(mi_logger::get() , sev)
 
+src::severity_logger<medical_imaging::SeverityLevel> G_UTIL_LG;
+#define MI_UTIL_LOG(sev) BOOST_LOG_SEV(G_UTIL_LG, sev)
+
 MED_IMG_BEGIN_NAMESPACE
 
-class Util_Export Logger {
+class Logger {
 public:
     static Logger* instance();
     ~Logger();
@@ -80,7 +82,7 @@ public:
     void filter_level_stream(SeverityLevel level);
     void filter_level_file(SeverityLevel level);
     //custom module attribute register
-    int register_logger_module(src::severity_logger<SeverityLevel>& lg, const std::string& module_name);
+    void register_logger_module(src::severity_logger<SeverityLevel>& lg, const std::string& module_name);
 
 private:
     Logger();
