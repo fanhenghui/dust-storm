@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ut\util_ut\mi_test_ipc_proxy.cpp" />
+    <ClCompile Include="..\ut\util_ut\mi_test_logger.cpp" />
     <ClCompile Include="..\ut\util_ut\mi_test_message_queue.cpp" />
     <ClCompile Include="..\ut\util_ut\mi_util_ut.cpp" />
   </ItemGroup>

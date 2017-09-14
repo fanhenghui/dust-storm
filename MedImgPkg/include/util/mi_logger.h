@@ -3,71 +3,60 @@
 
 #include "util/mi_util_export.h"
 
-#include "boost/shared_ptr.hpp"
 #include "boost/thread/mutex.hpp"
 
-#include "boost/log/sources/logger.hpp"
-#include "boost/log/sources/global_logger_storage.hpp"
-#include "boost/log/sources/severity_logger.hpp"
-//#include "boost/log/utility/setup/console.hpp"
-//#include "boost/log/utility/setup/file.hpp"
-#include "boost/log/sinks/text_ostream_backend.hpp"
-#include "boost/log/sinks/text_file_backend.hpp"
-//#include "boost/log/sinks/basic_sink_frontend.hpp"
-//#include "boost/log/sinks/basic_sink_backend.hpp"
-#include "boost/log/sinks/sync_frontend.hpp"
+#include <cstddef>
+#include <string>
+#include <ostream>
+#include <fstream>
+#include <iomanip>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/make_shared_object.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/sources/basic_logger.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_ostream_backend.hpp>
+#include <boost/log/attributes/scoped_attribute.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+
+#include <boost/log/sources/global_logger_storage.hpp>
+#include <boost/log/utility/setup/file.hpp>
+
+#include <boost/core/null_deleter.hpp>
 
 namespace logging = boost::log;
 namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
 namespace sinks = boost::log::sinks;
-namespace expr = boost::log::expressions;  
-namespace keywords = boost::log::keywords;
 namespace attrs = boost::log::attributes;
+namespace keywords = boost::log::keywords;
 
-namespace medical_imaging {
+namespace medical_imaging{
 enum SeverityLevel {
     TRACE = 0,
     DEBUG,
     INFO,
     WARNING,
     ERROR,
-    FATAL,
+    FATAL
 };
 }
 
-template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT >& operator<< (
-    std::basic_ostream< CharT, TraitsT >& strm, medical_imaging::SeverityLevel lvl)
-{
-    static const int lvlnum = 6; 
-    static const char* const lvlstr[lvlnum] = {
-        "Trace",
-        "Debug",
-        "Info",
-        "Warning",
-        "Error",
-        "Fatal",
-    };
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger< medical_imaging::SeverityLevel >)
 
-    if (static_cast<int>(lvl) < lvlnum ) {
-        strm << lvlstr[lvl];
-    } else {
-        strm << "Invalid severity";
-    }
-    return strm;
-}
+BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", medical_imaging::SeverityLevel)
+BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Module", std::string)
+BOOST_LOG_ATTRIBUTE_KEYWORD(scope, "Scope", attrs::named_scope::value_type)
+BOOST_LOG_ATTRIBUTE_KEYWORD(timeline, "Timeline", attrs::timer::value_type)
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger_mt<medical_imaging::SeverityLevel>)
-
-#ifndef BOOST_LOG_NO_THREADS
-    typedef sinks::synchronous_sink<sinks::text_file_backend> FileSinkType;
-    typedef sinks::synchronous_sink<sinks::basic_text_ostream_backend<char>> ConsoleSinkType;
-#else
-    typedef sinks::unlocked_sink<sinks::text_file_backend> FileSinkType;
-    typedef sinks::unlocked_sink<sinks::basic_text_ostream_backend<char>> ConsoleSinkType;
-#endif
-
-#define MI_LOG(sev) BOOST_LOG_SEV(mi_logger , sev)
+#define MI_LOG(sev) BOOST_LOG_SEV(mi_logger::get() , sev)
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -76,23 +65,50 @@ public:
     static Logger* instance();
     ~Logger();
 
-    void filter_level_console(SeverityLevel level);
+    void bind_config_file(const std::string& file_name);
+
+    void init();
+
+    //text file log sink
+    void set_target(const std::string& tag_dir);
+    void set_file_name_format(const std::string& name_format = std::string("sign-%Y-%m-%d_%H-%M-%S.%N.log"));
+    void set_rotation_size(unsigned int size);
+    void set_time_based_rotation(unsigned char hour , unsigned char min , unsigned char sec);
+    void set_free_space(unsigned int free_space);
+    //sink filter
+    void filter_level_stream(SeverityLevel level);
     void filter_level_file(SeverityLevel level);
+    //custom module attribute register
+    int register_logger_module(src::severity_logger<SeverityLevel>& lg, const std::string& module_name);
 
 private:
     Logger();
-    void init_i();
 
 private:
     static Logger* _s_instance;
     static boost::mutex _s_mutex;
 
-    SeverityLevel _console_filer_level;
+    struct InnerSink;
+    std::unique_ptr<InnerSink> _inner_sink;
+
+    SeverityLevel _stream_filer_level;
     SeverityLevel _file_filer_level;
-    boost::shared_ptr<FileSinkType> _file_sink;
-    boost::shared_ptr<ConsoleSinkType> _console_sink;
-    
+    std::string _target_dir;
+    std::string _file_name_format;
+    unsigned int _rotation_size;
+    unsigned int _min_free_space;
+
+    struct TimeHMS {
+        unsigned char hour;
+        unsigned char min;
+        unsigned char sec;
+        TimeHMS(unsigned char h , unsigned char m , unsigned char s ) : hour(h), min(m), sec(s) {}
+        TimeHMS() : hour(0), min(0), sec(0) {}
+    };
+    TimeHMS _time_based_rotation;
 };
+
+#include "util/mi_logger.inl"
 
 MED_IMG_END_NAMESPACE
 

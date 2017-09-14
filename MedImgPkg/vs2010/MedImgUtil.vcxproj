@@ -101,6 +101,7 @@
     <ClInclude Include="..\include\util\mi_util_export.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\include\util\mi_logger.inl" />
     <None Include="..\include\util\mi_message_queue.inl" />
   </ItemGroup>
   <ItemGroup>

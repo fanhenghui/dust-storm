@@ -15,5 +15,8 @@
     <ClCompile Include="..\ut\util_ut\mi_util_ut.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\ut\util_ut\mi_test_logger.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
