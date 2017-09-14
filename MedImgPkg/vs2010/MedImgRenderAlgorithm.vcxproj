@@ -111,6 +111,7 @@
     <ClInclude Include="..\include\renderalgo\mi_ray_caster_define.h" />
     <ClInclude Include="..\include\renderalgo\mi_ray_cast_scene.h" />
     <ClInclude Include="..\include\renderalgo\mi_render_algo_export.h" />
+    <ClInclude Include="..\include\renderalgo\mi_render_algo_logger.h" />
     <ClInclude Include="..\include\renderalgo\mi_scene_base.h" />
     <ClInclude Include="..\include\renderalgo\mi_transfer_function_loader.h" />
     <ClInclude Include="..\include\renderalgo\mi_volume_infos.h" />

@@ -95,6 +95,7 @@
     <ClInclude Include="..\include\glresource\mi_gl_program.h" />
     <ClInclude Include="..\include\glresource\mi_gl_resource_define.h" />
     <ClInclude Include="..\include\glresource\mi_gl_resource_export.h" />
+    <ClInclude Include="..\include\glresource\mi_gl_resource_logger.h" />
     <ClInclude Include="..\include\glresource\mi_gl_resource_manager.h" />
     <ClInclude Include="..\include\glresource\mi_gl_resource_manager_container.h" />
     <ClInclude Include="..\include\glresource\mi_gl_texture_1d.h" />

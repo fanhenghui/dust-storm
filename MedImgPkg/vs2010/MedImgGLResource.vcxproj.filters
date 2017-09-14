@@ -75,6 +75,9 @@
     <ClInclude Include="..\include\glresource\mi_gl_vao.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_logger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\glresource\mi_gl_resource_manager.inl">

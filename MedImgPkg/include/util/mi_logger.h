@@ -57,9 +57,7 @@ BOOST_LOG_ATTRIBUTE_KEYWORD(timeline, "Timeline", attrs::timer::value_type)
 BOOST_LOG_ATTRIBUTE_KEYWORD(thread_id, "ThreadID", boost::log::aux::thread::id)
 
 #define MI_LOG(sev) BOOST_LOG_SEV(mi_logger::get() , sev)
-
-src::severity_logger<medical_imaging::SeverityLevel> G_UTIL_LG;
-#define MI_UTIL_LOG(sev) BOOST_LOG_SEV(G_UTIL_LG, sev)
+#define MI_UTIL_LOG(sev) MI_LOG(sev) << "[Util] "
 
 MED_IMG_BEGIN_NAMESPACE
 

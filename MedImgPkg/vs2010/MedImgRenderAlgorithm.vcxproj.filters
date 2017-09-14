@@ -116,6 +116,9 @@
     <ClInclude Include="..\renderalgo\mi_shader_collection.h">
       <Filter>Shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_render_algo_logger.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">

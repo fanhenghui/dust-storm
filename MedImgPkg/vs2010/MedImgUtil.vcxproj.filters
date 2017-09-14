@@ -64,9 +64,6 @@
     <None Include="..\include\util\mi_logger.inl">
       <Filter>Include</Filter>
     </None>
-    <None Include="..\include\util\mi_exception.inl">
-      <Filter>Include</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\util\mi_socket_server.cpp">

@@ -39,9 +39,6 @@ MED_IMG_BEGIN_NAMESPACE
   }
 #endif
 
-//src::severity_logger<SeverityLevel> G_ARITHMETIC_LG;
-//#define MI_ARITHMETIC_LOG(sev) BOOST_LOG_SEV(G_ARITHMETIC_LG, sev)
-
 MED_IMG_END_NAMESPACE
 
 #endif

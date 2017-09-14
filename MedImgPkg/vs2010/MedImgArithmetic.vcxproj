@@ -40,6 +40,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\arithmetic\mi_aabb.h" />
     <ClInclude Include="..\include\arithmetic\mi_arithmetic_export.h" />
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_logger.h" />
     <ClInclude Include="..\include\arithmetic\mi_arithmetic_utils.h" />
     <ClInclude Include="..\include\arithmetic\mi_camera_base.h" />
     <ClInclude Include="..\include\arithmetic\mi_color_unit.h" />

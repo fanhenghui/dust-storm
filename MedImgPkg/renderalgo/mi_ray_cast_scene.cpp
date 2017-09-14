@@ -120,7 +120,7 @@ void RayCastScene::init_default_color_texture_i() {
             unsigned char* gray_array = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
 
             for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
-                gray_array[i * 3] = (255 - 0) * (float)i / (float)S_TRANSFER_FUNC_WIDTH;
+                gray_array[i * 3] = static_cast<unsigned char>(255.0f * (float)i / (float)S_TRANSFER_FUNC_WIDTH);
                 gray_array[i * 3 + 1] = gray_array[i * 3];
                 gray_array[i * 3 + 2] = gray_array[i * 3];
             }

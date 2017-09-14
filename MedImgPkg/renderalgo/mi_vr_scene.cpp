@@ -18,7 +18,7 @@ MED_IMG_BEGIN_NAMESPACE
 VRScene::VRScene() : RayCastScene() {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
         new VREntryExitPoints());
-    vr_entry_exit_points->set_brick_filter_item(BrickFilterItem::BF_WL);
+    vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
 
     if (CPU == Configuration::instance()->get_processing_unit_type()) {
@@ -31,7 +31,7 @@ VRScene::VRScene() : RayCastScene() {
 VRScene::VRScene(int width, int height) : RayCastScene(width, height) {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
         new VREntryExitPoints());
-    vr_entry_exit_points->set_brick_filter_item(BrickFilterItem::BF_WL);
+    vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
 
     if (CPU == Configuration::instance()->get_processing_unit_type()) {
@@ -134,13 +134,13 @@ void VRScene::pre_render_i() {
 
     if (_ray_caster->get_composite_mode() == COMPOSITE_DVR) {
         if (_ray_caster->get_mask_mode() == MASK_MULTI_LABEL) {
-            vr_entry_exit_points->set_brick_filter_item(BrickFilterItem::BF_MASK |
-                    BrickFilterItem::BF_WL);
+            vr_entry_exit_points->set_brick_filter_item(BF_MASK |
+                    BF_WL);
         } else {
-            vr_entry_exit_points->set_brick_filter_item(BrickFilterItem::BF_WL);
+            vr_entry_exit_points->set_brick_filter_item(BF_WL);
         }
     } else {
-        vr_entry_exit_points->set_brick_filter_item(BrickFilterItem::BF_WL);
+        vr_entry_exit_points->set_brick_filter_item(BF_WL);
     }
 }
 

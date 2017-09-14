@@ -21,6 +21,7 @@
     <ClInclude Include="..\include\io\mi_image_data_header.h" />
     <ClInclude Include="..\include\io\mi_io_define.h" />
     <ClInclude Include="..\include\io\mi_io_export.h" />
+    <ClInclude Include="..\include\io\mi_io_logger.h" />
     <ClInclude Include="..\include\io\mi_jpeg_parser.h" />
     <ClInclude Include="..\include\io\mi_mask_voi_converter.h" />
     <ClInclude Include="..\include\io\mi_meta_object_loader.h" />

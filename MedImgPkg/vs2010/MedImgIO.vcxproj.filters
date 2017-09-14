@@ -68,6 +68,9 @@
     <ClInclude Include="..\include\io\mi_mask_voi_converter.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\io\mi_io_logger.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\io\mi_zlib_utils.cpp">
