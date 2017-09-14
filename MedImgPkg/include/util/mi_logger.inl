@@ -25,8 +25,8 @@ std::ostream& operator<< (std::ostream& strm, SeverityLevel lvl)
 }
 
 struct Logger::InnerSink {
-    boost::weak_ptr<file_sink_t> file_sink;
-    boost::weak_ptr<stream_sink_t> stream_sink;
+    //boost::weak_ptr<file_sink_t> file_sink;
+    //boost::weak_ptr<stream_sink_t> stream_sink;
 };
 
 Logger::Logger() : _inner_sink(new InnerSink)
@@ -54,11 +54,11 @@ Logger* Logger::instance() {
     return _s_instance;
 }
 
-void Logger::init() {
+void Logger::initialize() {
     boost::shared_ptr< sinks::text_file_backend > file_sink_backend =
         boost::make_shared< sinks::text_file_backend >(
         keywords::file_name = "mi-%Y-%m-%d_%H-%M-%S.%5N.log", 
-        keywords::enable_final_rotation = true,
+        //keywords::enable_final_rotation = true,
         keywords::rotation_size = 1 * 1024 * 1024,
         keywords::time_based_rotation = sinks::file::rotation_at_time_point(0,0,0)
         );
@@ -66,12 +66,12 @@ void Logger::init() {
     file_sink_backend->set_file_collector(sinks::file::make_collector(
         keywords::target = "logs",
         keywords::max_size = 16 * 1024 * 1024,
-        keywords::min_free_space = 100 * 1024 * 1024,
-        keywords::max_files = 512
+        keywords::min_free_space = 100 * 1024 * 1024
+        //keywords::max_files = 512
         ));
 
     boost::shared_ptr< file_sink_t > file_sink(new file_sink_t(file_sink_backend));
-    _inner_sink->file_sink = file_sink;
+    //_inner_sink->file_sink = file_sink;
     file_sink->set_formatter
         (
         expr::stream
@@ -98,7 +98,7 @@ void Logger::init() {
         boost::shared_ptr< std::ostream >(&std::clog, boost::null_deleter()));
     stream_sink_backend->auto_flush(true);
     boost::shared_ptr< stream_sink_t > stream_sink(new stream_sink_t(stream_sink_backend));
-    _inner_sink->stream_sink= stream_sink;
+    //_inner_sink->stream_sink= stream_sink;
     stream_sink->set_formatter
         (
         expr::stream
@@ -134,5 +134,13 @@ void Logger::init() {
 
 void Logger::register_logger_module(src::severity_logger<SeverityLevel>& lg, const std::string& module_name) {
     lg.add_attribute("Module" , attrs::constant<std::string>(module_name));
+}
+
+void Logger::finalize() {
+    if (_s_instance) {
+        boost::unique_lock<boost::mutex> locker(_s_mutex);
+        delete _s_instance;
+        _s_instance = nullptr;
+    }
 }
 

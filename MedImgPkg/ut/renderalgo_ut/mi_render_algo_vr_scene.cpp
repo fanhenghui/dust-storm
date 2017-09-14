@@ -2,6 +2,7 @@
 
 #include "util/mi_configuration.h"
 #include "util/mi_file_util.h"
+#include "util/mi_logger.h"
 
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
@@ -68,7 +69,7 @@ std::vector<unsigned char> _vis_labels;
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
 #else
-const std::string root = "/home/zhangchanggong/data/demo/lung/";
+const std::string root = "/home/wangrui22/data/demo/lung/";
 #endif
 
 std::vector<std::string> GetFiles() {
@@ -82,6 +83,7 @@ std::vector<std::string> GetFiles() {
 void Init() {
     Configuration::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
+    Logger::instance()->initialize();
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
@@ -296,7 +298,7 @@ void Display() {
 #ifdef WIN32
         FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
-        FileUtil::write_raw("/home/wr/data/output_ut.jpeg", buffer, buffer_size);
+        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
         // std::cout << "compressing time : " << _scene->get_compressing_time() <<
         // std::endl;
@@ -464,6 +466,11 @@ int TE_VRScene(int argc, char* argv[]) {
         // Init();
 
         glutMainLoop();
+
+        Logger::instance()->finalize();
+
+        std::cout << "finalize log.\n";
+
         return 0;
     } catch (const Exception& e) {
         std::cout << e.what();

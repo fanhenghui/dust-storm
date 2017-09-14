@@ -4,7 +4,6 @@
 #include "med_img_pkg_config.h"
 
 #include "util/mi_exception.h"
-#include "util/mi_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -31,10 +30,6 @@ MED_IMG_BEGIN_NAMESPACE
                                " is null.");                                   \
   }
 #endif
-
-
-src::severity_logger<SeverityLevel> G_RENDER_ALGO_LG;
-#define MI_RENDER_ALGO_LOG(sev) BOOST_LOG_SEV(G_RENDER_ALGO_LG, sev)
 
 MED_IMG_END_NAMESPACE
 

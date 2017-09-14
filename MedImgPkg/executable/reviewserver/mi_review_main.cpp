@@ -3,6 +3,7 @@
 #include <iostream>
 #include "mi_review_controller.h"
 #include "util/mi_exception.h"
+#include "util/mi_logger.h"
 
 #ifdef WIN32
 #else
@@ -19,6 +20,8 @@ int main(int argc , char* argv[]) {
 
         std::cout << "hello review\n";
 
+        Logger::instance()->initialize();
+
         if (argc != 2) {
             std::cout << "invalid input\n";
             return -1;
@@ -33,6 +36,8 @@ int main(int argc , char* argv[]) {
     } catch (Exception& e) {
         std::cout << "Review server error exit : " << e.what() << std::endl;
     }
+
+    Logger::instance()->finalize();
 
     std::cout << "Review server exit.\n";
     return 0;

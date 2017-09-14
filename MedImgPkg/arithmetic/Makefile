@@ -3,8 +3,11 @@ CC  = g++ -std=c++11 -Wall
 
 ifeq ($(ver) , release)
 else
-CFLAGS += -g
+CFLAGS += -g 
 endif
+
+DEFS = -DBOOST_LOG_DYN_LINK
+CFLAGS += $(DEFS)
 
 ROOT = ..
 INCLUDE_ROOT_DIR = $(ROOT)/include
@@ -24,7 +27,7 @@ TARGET = $(BIN_DIR)/libmedimg_arithmetic.so
 
 EXPORT_HEADER = mi_arithmetic_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lmbedcrypto -lmbedtls -lmbedx509 
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log_setup -lboost_log -lmbedcrypto -lmbedtls -lmbedx509 
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

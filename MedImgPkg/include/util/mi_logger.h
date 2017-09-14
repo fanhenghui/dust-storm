@@ -70,7 +70,9 @@ public:
 
     void bind_config_file(const std::string& file_name);
 
-    void init();
+    void initialize();
+
+    void finalize();
 
     //text file log sink
     void set_target(const std::string& tag_dir);

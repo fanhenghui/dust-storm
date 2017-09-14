@@ -13,7 +13,7 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_exception.o mi_configuration.o mi_model_interface.o mi_socket_client.o mi_ipc_client_proxy.o \
+OBJS = mi_configuration.o mi_model_interface.o mi_socket_client.o mi_ipc_client_proxy.o \
 mi_file_util.o
 TARGET = $(BIN_DIR)/libmedimg_util.so
 

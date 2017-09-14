@@ -16,7 +16,6 @@
 #include <vector>
 
 #include "util/mi_exception.h"
-#include "util/mi_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -44,9 +43,6 @@ MED_IMG_BEGIN_NAMESPACE
                        " is null.");                                           \
   }
 #endif
-
-src::severity_logger<SeverityLevel> G_IO_LG;
-#define MI_IO_LOG(sev) BOOST_LOG_SEV(G_IO_LG, sev)
 
 MED_IMG_END_NAMESPACE
 
