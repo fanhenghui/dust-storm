@@ -24,19 +24,26 @@ std::ostream& operator<< (std::ostream& strm, SeverityLevel lvl)
 
 struct Logger::InnerSink
 {
-    boost::shared_ptr<file_sink_t> file_sink;
-    boost::shared_ptr<stream_sink_t> stream_sink;
+    boost::weak_ptr<file_sink_t> file_sink;
+    boost::weak_ptr<stream_sink_t> stream_sink;
 };
 
 void Logger::init() {
     boost::shared_ptr< sinks::text_file_backend > file_sink_backend =
         boost::make_shared< sinks::text_file_backend >(
-        keywords::target = "log",
-        keywords::file_name = "sign-%Y-%m-%d_%H-%M-%S.%N.log", 
-        keywords::rotation_size = 10*1024,
-        keywords::time_based_rotation = sinks::file::rotation_at_time_point(0,0,0),
-        keywords::min_free_space = 3*1024*1024 
+        keywords::file_name = "mi-%Y-%m-%d_%H-%M-%S.%5N.log", 
+        keywords::enable_final_rotation = true,
+        keywords::rotation_size = 1 * 1024 * 1024,
+        keywords::time_based_rotation = sinks::file::rotation_at_time_point(0,0,0)
         );
+
+    file_sink_backend->set_file_collector(sinks::file::make_collector(
+        keywords::target = "logs",
+        keywords::max_size = 16 * 1024 * 1024,
+        keywords::min_free_space = 100 * 1024 * 1024,
+        keywords::max_files = 512
+        ));
+
     boost::shared_ptr< file_sink_t > file_sink(new file_sink_t(file_sink_backend));
     _inner_sink->file_sink = file_sink;
     file_sink->set_formatter

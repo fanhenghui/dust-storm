@@ -11,5 +11,12 @@ int TestLogger(int argc, char* argv[]) {
     MI_LOG(INFO) << "hello world INFO";
     MI_LOG(WARNING) << "hello world WARNING";
     MI_LOG(FATAL) << "hello world FATAL";
+
+    for (int i= 0 ; i< 2000 ; ++i)
+    {
+        MI_LOG(FATAL) << "test rotation.";
+    }
+    MI_LOG(WARNING) << "ENDENDNED";
+
     return 1;
 }
