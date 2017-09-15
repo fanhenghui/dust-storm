@@ -3,6 +3,7 @@
 
 #include "arithmetic/mi_arithmetic_export.h"
 #include "arithmetic/mi_arithmetic_utils.h"
+#include "arithmetic/mi_arithmetic_logger.h"
 #include <set>
 #include <stack>
 #include <vector>
@@ -51,6 +52,9 @@ public:
     void set_roi(const unsigned int (&min)[3] , const unsigned int (&max)[3]) {
         for (int i = 0 ; i < 3 ; ++i) {
             if (min[i] >= max[i]) {
+                MI_ARITHMETIC_LOG(MI_FATAL) << "invalid roi dimension in connected domain analysis." <<
+                    "min : (" << min[0] << "," << min[1] << "," << min[2] << ")" <<
+                    "max : (" << max[0] << "," << max[1] << "," << max[2] << ")";
                 ARITHMETIC_THROW_EXCEPTION("invalid roi dimension");
             }
 

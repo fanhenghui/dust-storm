@@ -3,6 +3,7 @@
 
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3.h"
+//#include "arithmetic/mi_arithmetic_logger.h"
 
 #ifdef WIN32
 
@@ -271,8 +272,8 @@ public:
         double det = t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03;
 
         if (std::fabs(det) < DOUBLE_EPSILON) {
-            ARITHMETIC_THROW_EXCEPTION(
-                "Matrix's determinant is zero! Get inverse failed!");
+            //MI_ARITHMETIC_LOG(MI_WARNING) << "matrix4's determinant is zero when calculate inverse. Just return identity";
+            return S_IDENTITY_MATRIX;
         }
 
         double invDet = 1 / det;

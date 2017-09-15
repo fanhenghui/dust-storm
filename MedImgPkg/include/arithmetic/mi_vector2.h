@@ -2,6 +2,7 @@
 #define MEDIMGARITHMETIC_MI_VECTOR2_H
 
 #include "arithmetic/mi_arithmetic_export.h"
+//#include "arithmetic/mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -95,8 +96,8 @@ public:
         double len = std::sqrt(x * x + y * y);
 
         if (len < DOUBLE_EPSILON) {
-            ARITHMETIC_THROW_EXCEPTION(
-                "Vector's magnitude is 0 ! Get normalize failed!");
+            //MI_ARITHMETIC_LOG(MI_WARNING) << "vector2's magnitude is 0 ! Get normalize failed.";
+            return;
         }
 
         double leninv = 1.0 / len;
@@ -108,8 +109,8 @@ public:
         double len = std::sqrt(x * x + y * y);
 
         if (len < DOUBLE_EPSILON) {
-            ARITHMETIC_THROW_EXCEPTION(
-                "Vector's magnitude is 0 ! Get normalize failed!");
+            //MI_ARITHMETIC_LOG(MI_WARNING) << "vector2's magnitude is 0 ! Get normalize failed.";
+            return *this;
         }
 
         double leninv = 1.0 / len;

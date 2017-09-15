@@ -22,6 +22,15 @@ struct IPCDataHeader { //32 byte
         _msg_info1(0), _data_type(0), _big_end(0), _data_len(0) {
     }
 };
+#define STREAM_IPCHEADER_INFO(header) "sender: " << header._sender << \
+    "; receiver: " << header._receiver << \
+    "; cmd id: " << header._msg_id << \
+    "; cell id: " << header._msg_info0 << \
+    "; op id: " << header._msg_info1 << \
+    "; data type: " << header._data_type << \
+    "; big end: " << header._big_end << \
+    "; data len: " << header._data_len
+
 
 class IPCDataRecvHandler {
 public:

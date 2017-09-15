@@ -51,17 +51,18 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;_DEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\renderalgo;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\renderalgo\Shader\shader_config</Command>
@@ -75,10 +76,11 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;NDEBUG;_WINDOWS;_USRDLL;MEDIMGRENDERALGORITHM_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\renderalgo;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
       <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -87,14 +89,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;libgpujpeg.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgGLResource.lib;MedImgIO.lib;pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>..\bin\$(Configuration)\$(Platform)\MedImgShaderEncoder.exe  ..\renderalgo\Shader\shader_config</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Include\MedImgRenderAlgorithm\mi_render_algo_export.h" />
     <ClInclude Include="..\include\renderalgo\mi_brick_define.h" />
     <ClInclude Include="..\include\renderalgo\mi_brick_info_calculator.h" />
     <ClInclude Include="..\include\renderalgo\mi_brick_pool.h" />

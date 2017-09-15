@@ -28,6 +28,7 @@ void ConnectedDomainAnalysis::seed_filling(std::stack<POS>& s , unsigned char la
 }
 
 void ConnectedDomainAnalysis::keep_major() {
+    MI_ARITHMETIC_LOG(MI_TRACE) << "IN connected domain anaysis keep major. begining >>>";
     unsigned char* roi = _roi_cache.get();
     ARITHMETIC_CHECK_NULL_EXCEPTION(roi);
 
@@ -120,12 +121,14 @@ void ConnectedDomainAnalysis::keep_major() {
         }
     }
 
-    std::cout << "connect doman : \n";
-
-    for (auto it = tmp_cd.begin() ; it != tmp_cd.end() ; ++it) {
-        std::cout << "label : " << int(it->first)  << "  voxel number : " << it->second << std::endl;
+    {
+        std::stringstream ss ;
+        for (auto it = tmp_cd.begin() ; it != tmp_cd.end() ; ++it) {
+            ss << "[label " << int(it->first)  << ", voxel number  " << it->second << "] ";
+        }
+        MI_ARITHMETIC_LOG(MI_TRACE) << "IN connected domain anaysis keep major. connect doman : " << ss.str();
     }
-
+    
     unsigned char major_label = tmp_cd.begin()->first;
     unsigned int max_num = tmp_cd.begin()->second;
 
@@ -161,9 +164,6 @@ void ConnectedDomainAnalysis::keep_major() {
     }
 
     assert(curidx == max_num);
-    std::cout << "major connected domain : " << major_label << "   voxel number :" << max_num <<
-              std::endl;
-
 
     //////////////////////////////////////////////////////////////////////////
     //Test
@@ -175,6 +175,7 @@ void ConnectedDomainAnalysis::keep_major() {
     //    out.close();
     //}
     //////////////////////////////////////////////////////////////////////////
+    MI_ARITHMETIC_LOG(MI_TRACE) << "OUT connected domain anaysis keep major. Major voxel number is " << max_num;
 }
 
 MED_IMG_END_NAMESPACE

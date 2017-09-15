@@ -3,6 +3,7 @@
 
 #include "util/mi_util_export.h"
 #include "util/mi_exception.h"
+#include "util/mi_util_logger.h"
 
 #include <vector>
 #include <deque>
@@ -73,7 +74,8 @@ public:
 
         while (is_full()) {
             if (!_condition_write.timed_wait(locker , time)) {
-                UTIL_THROW_EXCEPTION("message time out.");
+                MI_UTIL_LOG(MI_FATAL) << "message queue time out to push.";
+                UTIL_THROW_EXCEPTION("message queue time out to push.");
             }
         }
     }
@@ -84,7 +86,8 @@ public:
 
         while (is_empty()) {
             if (!_condition_read.timed_wait(locker , time)) {
-                UTIL_THROW_EXCEPTION("message time out.");
+                MI_UTIL_LOG(MI_FATAL) << "message queue time out to pop.";
+                UTIL_THROW_EXCEPTION("message time out to pop.");
             }
         }
 
@@ -130,7 +133,8 @@ public:
         wait_to_push(locker , _DEFAULT_TIME_WAIT_LIMIT);
 
         if (!is_activated()) {
-            UTIL_THROW_EXCEPTION("message queue is not activated!");
+            MI_UTIL_LOG(MI_FATAL) << "message queue is not activated.";
+            UTIL_THROW_EXCEPTION("message queue is not activated.");
         }
 
         _container.push(msg);
@@ -144,7 +148,8 @@ public:
         wait_to_pop(locker , _DEFAULT_TIME_WAIT_LIMIT);
 
         if (!is_activated()) {
-            UTIL_THROW_EXCEPTION("message queue is not activated!");
+            MI_UTIL_LOG(MI_FATAL) << "message queue is not activated.";
+            UTIL_THROW_EXCEPTION("message queue is not activated.");
         }
 
         _container.pop(msg);

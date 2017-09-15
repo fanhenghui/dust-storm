@@ -107,6 +107,9 @@
     <ClInclude Include="..\include\qtpackage\mi_graphic_item_direction_info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\qtpackage\mi_qt_package_logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\include\qtpackage\mi_graphic_item_voi.h">

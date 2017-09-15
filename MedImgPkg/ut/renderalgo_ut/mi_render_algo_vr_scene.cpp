@@ -2,7 +2,7 @@
 
 #include "util/mi_configuration.h"
 #include "util/mi_file_util.h"
-#include "util/mi_logger.h"
+#include "log/mi_logger.h"
 
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"

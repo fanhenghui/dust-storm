@@ -102,9 +102,7 @@ int RunLengthOperator::decode(
         // populate the temporary information container
         target_mask[voxel] = cur_label;
     }
-
     return 0;
-
 }
 
 MED_IMG_END_NAMESPACE

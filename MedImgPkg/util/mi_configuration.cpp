@@ -27,7 +27,7 @@ ProcessingUnitType Configuration::get_processing_unit_type() {
 }
 
 Configuration::Configuration(): _processing_unit_type(CPU) {
-    //Check hardware processing unit . Check if has GPU
+    //TODO Check hardware processing unit . Check if has GPU
 }
 
 void Configuration::set_processing_unit_type(ProcessingUnitType type) {

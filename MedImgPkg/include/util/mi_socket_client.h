@@ -13,7 +13,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class SocketClient : public boost::noncopyable {
+class SocketClient {
 public:
     SocketClient();
     ~SocketClient();
@@ -36,6 +36,9 @@ private:
 
     pid_t _local_pid;
     pid_t _server_pid;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(SocketClient);
 };
 
 MED_IMG_END_NAMESPACE

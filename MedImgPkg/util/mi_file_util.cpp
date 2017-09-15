@@ -1,4 +1,5 @@
 #include "mi_file_util.h"
+#include "mi_util_logger.h"
 
 #include <fstream>
 #include "boost/filesystem.hpp"
@@ -99,20 +100,25 @@ void FileUtil::get_all_file_recursion(
 }
 
 int FileUtil::write_raw(const std::string& path , void* buffer , unsigned int length) {
-    if (nullptr == buffer || path.empty()) {
+    if (nullptr == buffer) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::write_raw input buffer is null.";
         return -1;
+    }
+
+    if (path.empty()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::write_raw input path is empty.";
     }
 
     std::ofstream out(path.c_str() , std::ios::out | std::ios::binary);
 
     if (!out.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::write_raw open file " << path << " failed.";
         return -1;
     }
 
-
     out.write((char*)buffer , length);
     out.close();
-
+    MI_UTIL_LOG(MI_TRACE) << "FileUtil::write_raw in file " << path << " success.";
     return 0;
 }
 

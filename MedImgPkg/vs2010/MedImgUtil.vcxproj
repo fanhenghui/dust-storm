@@ -51,15 +51,17 @@
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;_DEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\util;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>MedImgLog.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -70,9 +72,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;NDEBUG;_WINDOWS;_USRDLL;MEDIMGUTIL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\util;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4819;</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -81,6 +84,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>MedImgLog.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -90,7 +94,6 @@
     <ClInclude Include="..\include\util\mi_ipc_client_proxy.h" />
     <ClInclude Include="..\include\util\mi_ipc_common.h" />
     <ClInclude Include="..\include\util\mi_ipc_server_proxy.h" />
-    <ClInclude Include="..\include\util\mi_logger.h" />
     <ClInclude Include="..\include\util\mi_message_queue.h" />
     <ClInclude Include="..\include\util\mi_model_interface.h" />
     <ClInclude Include="..\include\util\mi_model_progress.h" />
@@ -99,9 +102,9 @@
     <ClInclude Include="..\include\util\mi_socket_server.h" />
     <ClInclude Include="..\include\util\mi_string_number_converter.h" />
     <ClInclude Include="..\include\util\mi_util_export.h" />
+    <ClInclude Include="..\include\util\mi_util_logger.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\include\util\mi_logger.inl" />
     <None Include="..\include\util\mi_message_queue.inl" />
   </ItemGroup>
   <ItemGroup>

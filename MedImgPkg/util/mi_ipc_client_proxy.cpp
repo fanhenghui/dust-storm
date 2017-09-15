@@ -1,6 +1,7 @@
 #ifndef WIN32
 #include "mi_ipc_client_proxy.h"
 #include "mi_socket_client.h"
+#include "mi_util_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -16,7 +17,7 @@ public:
         if (_proxy) {
             return _proxy->handle_command(header , buffer);
         } else {
-            //TODO return what number
+            MI_UTIL_LOG(MI_ERROR) << "IPC client proxy is null when handle IPC data received.";
             return 0;
         }
     }
@@ -71,6 +72,7 @@ int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {
     if (it != _handlers.end() && it->second) {
         return it->second->handle_command(header , buffer);
     } else {
+        MI_UTIL_LOG(MI_WARNING) << "cant find handler to process ipc data. header detail : " << STREAM_IPCHEADER_INFO(header);
         return -1;
     }
 }

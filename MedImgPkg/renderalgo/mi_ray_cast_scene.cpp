@@ -26,6 +26,8 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_volume_infos.h"
 
+#include "mi_render_algo_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
@@ -163,6 +165,8 @@ void RayCastScene::render() {
     if (!get_dirty()) {
         return;
     }
+
+    MI_RENDERALGO_LOG(MI_TRACE) << "IN ray cast scene render.";
     //std::cout << "in rendering\n";
 
     CHECK_GL_ERROR;
@@ -244,6 +248,7 @@ void RayCastScene::render() {
 
     set_dirty(false);
     //std::cout << "out rendering\n";
+    MI_RENDERALGO_LOG(MI_TRACE) << "OUT ray cast scene render.";
 }
 
 void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {

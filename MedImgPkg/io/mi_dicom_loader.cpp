@@ -11,6 +11,7 @@
 #include "dcmtk/dcmjpeg/djdecode.h"
 
 #include "util/mi_model_progress.h"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -116,7 +117,9 @@ IOStatus DICOMLoader::check_series_uid(
 IOStatus
 DICOMLoader::load_series(std::vector<std::string>& files,
                          std::shared_ptr<ImageData>& image_data,
-                         std::shared_ptr<ImageDataHeader>& img_data_header) {
+                         std::shared_ptr<ImageDataHeader>& img_data_header) 
+{
+    MI_IO_LOG(MI_TRACE) << "IN load_series.";
     if (files.empty()) {
         set_progress_i(100);
         return IO_EMPTY_INPUT;
@@ -198,6 +201,7 @@ DICOMLoader::load_series(std::vector<std::string>& files,
     }
 
     set_progress_i(100);
+    MI_IO_LOG(MI_TRACE) << "OUT load_series.";
     return IO_SUCCESS;
 }
 
