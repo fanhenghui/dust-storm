@@ -1,11 +1,13 @@
 ver = debug
 CC  = g++ -std=c++11 -Wall 
-DEFS = -D VR -D LOAD_LOCAL -DBOOST_LOG_DYN_LINK
 
 ifeq ($(ver) , release)
 else
-CFLAGS += -g $(DEFS)
+CFLAGS += -g
 endif
+
+DEFS = -DVR -DLOAD_LOCAL -DBOOST_LOG_DYN_LINK
+CFLAGS += $(DEFS)
 
 ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
@@ -25,7 +27,7 @@ TARGET = $(BIN_DIR)/review_server
 
 COMMON_HEADER = mi_review_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(GOOGLE_INCLUDE_DIR) -I$(PROTOCO_INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(PROTOCO_LIB_DIR) -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_appcommon -lmedimg_renderalgo \
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(PROTOCO_LIB_DIR) -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_appcommon -lmedimg_renderalgo \
 -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lboost_log_setup -lGL -lGLEW -lprotobuf
 
 all: pre-build main-build

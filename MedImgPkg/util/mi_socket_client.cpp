@@ -72,7 +72,7 @@ void SocketClient::run() {
     }
 
     if (connect_status == -1) {
-        MI_UTIL_LOG(MI_FATAL) << "connect server failed."
+        MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
         UTIL_THROW_EXCEPTION("connect server failed.");
     }
 
@@ -84,16 +84,16 @@ void SocketClient::run() {
         char* buffer = nullptr;
 
         if (-1 == recv(_fd_server, &header, sizeof(header) , 0)) {
-            MI_UTIL_LOG(MI_WARNING) << "client receive data header failed."
+            MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
             continue;
         }
 
         if (header._data_len <= 0) {
-            MI_UTIL_LOG(MI_INFO) << "client received data buffer length less than 0."
+            MI_UTIL_LOG(MI_INFO) << "client received data buffer length less than 0.";
         } else {
             buffer = new char[header._data_len];
             if (-1 == recv(_fd_server, buffer, header._data_len, 0)) {
-                MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed."
+                MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
                 continue;
             }
         }
@@ -105,7 +105,7 @@ void SocketClient::run() {
                     break;
                 }
             } else {
-                MI_UTIL_LOG(MI_WARNING) << "client handler to process received data is null."
+                MI_UTIL_LOG(MI_WARNING) << "client handler to process received data is null.";
             }
 
         } catch (const Exception& e) {

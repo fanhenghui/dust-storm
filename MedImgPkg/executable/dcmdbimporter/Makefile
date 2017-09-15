@@ -7,6 +7,9 @@ else
 CFLAGS += -g
 endif
 
+DEFS = -DBOOST_LOG_DYN_LINK
+CFLAGS += $(DEFS)
+
 ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 BIN_DIR = $(ROOT)/bin

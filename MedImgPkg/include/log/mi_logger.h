@@ -76,7 +76,6 @@ public:
     Log_Export ~Logger();
 
     Log_Export void initialize();
-    Log_Export void finalize();
 
     Log_Export void bind_config_file(const std::string& file_name);
     //text file log sink

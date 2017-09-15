@@ -113,11 +113,4 @@ Logger* Logger::instance() {
     return _s_instance;
 }
 
-void Logger::finalize() {
-    if (_s_instance) {
-        boost::unique_lock<boost::mutex> locker(_s_mutex);
-        delete _s_instance;
-        _s_instance = nullptr;
-    }
-}
 }

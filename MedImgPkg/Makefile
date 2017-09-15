@@ -3,6 +3,7 @@ ver = debug
 
 subsystem:
 	-mkdir bin
+	$(MAKE) -C ./log
 	$(MAKE) -C ./util
 	$(MAKE) -C ./glresource
 	$(MAKE) -C ./arithmetic
@@ -21,6 +22,7 @@ subsystem:
 
 PHONY.:clean
 clean:
+	$(MAKE) clean -C ./log
 	$(MAKE) clean -C ./util
 	$(MAKE) clean -C ./glresource
 	$(MAKE) clean -C ./arithmetic

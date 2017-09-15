@@ -467,9 +467,7 @@ int TE_VRScene(int argc, char* argv[]) {
 
         glutMainLoop();
 
-        Logger::instance()->finalize();
-
-        std::cout << "finalize log.\n";
+        //Logger::instance()->finalize();
 
         return 0;
     } catch (const Exception& e) {

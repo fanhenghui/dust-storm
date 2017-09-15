@@ -6,6 +6,9 @@ else
 CFLAGS += -g
 endif
 
+DEF = -DBOOST_LOG_DYN_LINK
+CFLAGS += $(DEF)
+
 ROOT = ..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/glresource
@@ -20,7 +23,7 @@ TARGET = $(BIN_DIR)/libmedimg_glresource.so
 
 EXPORT_HEADER = mi_gl_resource_export.h mi_gl_object.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_util -lGL -lGLEW
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_log -lmedimg_util -lGL -lGLEW
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

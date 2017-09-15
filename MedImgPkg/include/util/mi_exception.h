@@ -94,7 +94,7 @@ private:
 #endif
 
 #ifndef UTIL_THROW_EXCEPTION
-#define UTIL_THROW_EXCEPTION(desc) THROW_EXCEPTION("Common" , desc);
+#define UTIL_THROW_EXCEPTION(desc) THROW_EXCEPTION("Util" , desc);
 #endif
 
 #ifndef  UTIL_CHECK_NULL_EXCEPTION
