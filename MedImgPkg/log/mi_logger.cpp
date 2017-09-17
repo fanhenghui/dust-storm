@@ -1,5 +1,9 @@
 #include "log/mi_logger.h"
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 #include "boost/smart_ptr/shared_ptr.hpp"
 #include "boost/smart_ptr/weak_ptr.hpp"
 #include "boost/smart_ptr/make_shared_object.hpp"
@@ -15,6 +19,50 @@
 
 typedef sinks::synchronous_sink< sinks::text_file_backend > file_sink_t;
 typedef sinks::synchronous_sink< sinks::text_ostream_backend > stream_sink_t;
+
+namespace {
+void my_formatter(logging::record_view const& rec, logging::formatting_ostream& strm)
+{
+    using namespace medical_imaging;
+    auto lvl = logging::extract< SeverityLevel >("Severity", rec);
+
+#ifdef WIN32
+    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    switch(lvl.get()) {
+    case MI_TRACE :
+        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY);
+        break;
+    case MI_DEBUG :
+        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        break;
+    case MI_INFO :
+        SetConsoleTextAttribute(handle , FOREGROUND_GREEN | FOREGROUND_BLUE);
+        break;
+    case MI_WARNING :
+        SetConsoleTextAttribute(handle , FOREGROUND_RED | FOREGROUND_BLUE);
+        break;
+    case MI_ERROR :
+        SetConsoleTextAttribute(handle , FOREGROUND_RED);
+        break;
+    case MI_FATAL :
+        SetConsoleTextAttribute(handle , FOREGROUND_GREEN);
+        break;
+    default:
+        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY);
+    }
+#endif
+
+    strm << std::hex << std::setw(8) << std::setfill('0') << 
+        logging::extract< unsigned int >("LineID", rec) << std::dec << std::setfill(' ')
+        << ": <" << lvl << "> "
+        << "{" << logging::extract< boost::log::aux::thread::id >("ThreadID", rec) << "} "
+        << rec[expr::smessage];
+
+//#ifdef WIN32
+//    SetConsoleTextAttribute(handle , FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+//#endif
+}
+}
 
 namespace medical_imaging {
 Logger* Logger::_s_instance = nullptr;
@@ -77,20 +125,20 @@ void Logger::initialize()
     stream_sink_backend->auto_flush(true);
     boost::shared_ptr< stream_sink_t > stream_sink(new stream_sink_t(stream_sink_backend));
     //_inner_sink->stream_sink= stream_sink;
-    stream_sink->set_formatter
-        (
-        expr::stream
-        << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
-        << ": <" << severity << "> "
-        //<< "(" << scope << ") "
-        << expr::if_(expr::has_attr(timeline))
-        [
-            expr::stream << "[" << timeline << "] "
-        ]
-    << "{" << thread_id << "} "
-        << expr::smessage
-        );
-
+    //stream_sink->set_formatter
+    //    (
+    //    expr::stream
+    //    << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
+    //    << ": <" << severity << "> "
+    //    //<< "(" << scope << ") "
+    //    << expr::if_(expr::has_attr(timeline))
+    //    [
+    //        expr::stream << "[" << timeline << "] "
+    //    ]
+    //<< "{" << thread_id << "} "
+    //    << expr::smessage
+    //    );
+    stream_sink->set_formatter(&my_formatter);
 
     boost::shared_ptr< logging::core > core = logging::core::get();
     core->add_sink(file_sink);

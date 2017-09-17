@@ -46,7 +46,6 @@ inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< Ch
         "Error",
         "Fatal",
     };
-
     if (static_cast<int>(lvl) < lvlnum ) {
         strm << lvlstr[lvl];
     } else {
