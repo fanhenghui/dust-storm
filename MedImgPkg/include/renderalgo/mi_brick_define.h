@@ -87,7 +87,7 @@ struct LabelKey {
         if (key == "Empty") {
             return std::vector<unsigned char>();
         } else {
-            StrNumConverter<unsigned char> conv;
+            StrNumConverter<unsigned int> conv;
             std::vector<unsigned char> labels;
             std::string tmp;
             tmp.reserve(3);
@@ -96,7 +96,7 @@ struct LabelKey {
                 if (key[i] != '|') {
                     tmp.push_back(key[i]);
                 } else if (!tmp.empty()) {
-                    labels.push_back(conv.to_num(tmp));
+                    labels.push_back(static_cast<unsigned char>(conv.to_num(tmp)));
                     tmp.clear();
                 }
             }

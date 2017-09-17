@@ -7,6 +7,7 @@
 #include "glresource/mi_gl_buffer.h"
 
 #include "mi_brick_info_calculator.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -110,14 +111,32 @@ void BrickPool::write_volume_brick_info(const std::string& path) {
     }
 }
 
+void BrickPool::add_visible_labels_cache(const std::vector<unsigned char>& vis_labels) {
+    _vis_labels_cache[LabelKey(vis_labels)] = (vis_labels);
+}
+
+void BrickPool::get_visible_labels_cache(std::vector<std::vector<unsigned char>>& vis_labels)
+{
+    vis_labels.clear();
+    for (auto it = _vis_labels_cache.begin(); it != _vis_labels_cache.end(); ++it) {
+        vis_labels.push_back(it->second);
+    }
+}
+
+void BrickPool::clear_visible_labels_cache()
+{
+    _vis_labels_cache.clear();
+}
+
 void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels) {
+    MI_RENDERALGO_LOG(MI_TRACE) << "IN brick pool calculate mask brick info";
     LabelKey key(vis_labels);
     MaskBrickInfo* brick_info = this->get_mask_brick_info(vis_labels);
 
     if (nullptr == brick_info) {
         std::unique_ptr<MaskBrickInfo[]> info_array(new MaskBrickInfo[this->get_brick_count()]);
-        _mask_brick_info_array_set.insert(std::make_pair(key, std::move(info_array)));
         brick_info = info_array.get();
+        _mask_brick_info_array_set.insert(std::make_pair(key, std::move(info_array)));
 
         UIDType uid;
         GLBufferPtr info_buffer =
@@ -143,6 +162,7 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
     _mask_brick_info_cal->set_brick_dim(_brick_dim);
     _mask_brick_info_cal->set_visible_labels(vis_labels);
     _mask_brick_info_cal->calculate();
+    MI_RENDERALGO_LOG(MI_TRACE) << "OUT brick pool calculate mask brick info";
 }
 
 void BrickPool::update_mask_brick_info(const AABBUI& aabb) {
@@ -454,6 +474,35 @@ void BrickPool::get_clipping_brick_geometry(const AABB& bounding, float* brick_v
             brick_color[idx_min * 4 + 2] = bounding_min[2];
             brick_color[idx_max * 4 + 2] = bounding_max[2];
         }
+    }
+}
+
+void BrickPool::debug_save_mask_info(const std::string& path)
+{
+    for (auto it = _mask_brick_info_array_set.begin(); it != _mask_brick_info_array_set.end(); 
+        ++it) {
+        std::vector<unsigned char> labels = LabelKey::extract_labels(it->first);
+        std::stringstream ss;
+        ss << "mask";
+        for (auto l = labels.begin(); l != labels.end(); ++l) {
+            ss << "_" << static_cast<unsigned int>(*l);
+        }
+        ss << ".txt";
+        const std::string file_name = path + "/" + ss.str();
+        std::ofstream out(file_name.c_str(), std::ios::out);
+        if(!out.is_open()) {
+            MI_RENDERALGO_LOG(MI_WARNING) << "open file " << file_name << " to debug save mask info failed.";
+            continue;
+        }
+
+        MaskBrickInfo* info = it->second.get();
+        out << "volume dim "  << _volume->_dim[0] << " " << _volume->_dim[1] << " " << _volume->_dim[2] << std::endl;
+        out << "brick dim " << _brick_dim[0] << " " << _brick_dim[1] << " " << " " << _brick_dim[2] << std::endl;
+        for (unsigned int i = 0; i < _brick_count; ++i ) {
+            out << i << " _" << info[i].label << std::endl;
+        }
+        out.close();
+        MI_RENDERALGO_LOG(MI_WARNING) << "save file " << file_name << " to debug save mask info done.";
     }
 }
 

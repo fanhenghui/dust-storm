@@ -46,6 +46,7 @@ private:
     void refresh_upload_volume_i();
     void refresh_upload_mask_i();
     void refresh_update_mask_i();
+    void refresh_mask_brick_info_i();
 
 private:
     std::shared_ptr<ImageData> _volume_data;

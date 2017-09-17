@@ -16,6 +16,7 @@
 #include "mi_camera_calculator.h"
 #include "mi_shader_collection.h"
 #include "mi_vr_entry_exit_points.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -256,6 +257,7 @@ void ProxyGeometryBrick::update_vertex_color_i() {
 }
 
 void ProxyGeometryBrick::brick_filtering_non_mask_i() {
+    MI_RENDERALGO_LOG(MI_TRACE) << "IN proxy geometry brick filtering.";
     std::shared_ptr<VREntryExitPoints> entry_exit_points =
         _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
@@ -283,7 +285,7 @@ void ProxyGeometryBrick::brick_filtering_non_mask_i() {
 
     float ww = it_wl->second[0] / volume->_slope;
     float wl = (it_wl->second[1] - volume->_intercept) / volume->_slope;
-    const float fFilterMin = wl - ww * 0.5f;
+    const float filter_min = wl - ww * 0.5f;
 
     const int brick_count_layer_jump = brick_dim[0] * brick_dim[1];
     int z_jump(0), zy_jump(0);
@@ -303,7 +305,7 @@ void ProxyGeometryBrick::brick_filtering_non_mask_i() {
             for (int x = brick_range._min[0]; x <= brick_range._max[0]; ++x) {
                 brick_idx = zy_jump + x;
 
-                if (volume_brick_info[brick_idx].max < fFilterMin) {
+                if (volume_brick_info[brick_idx].max < filter_min) {
                     continue;
                 }
 
@@ -320,10 +322,95 @@ void ProxyGeometryBrick::brick_filtering_non_mask_i() {
     _gl_element_buffer->bind();
     _gl_element_buffer->load(sizeof(unsigned int) * _draw_element_count,
                              ele_idx_array, GL_DYNAMIC_DRAW);
+    MI_RENDERALGO_LOG(MI_TRACE) << "OUT proxy geometry brick filtering.";
 }
 
 void ProxyGeometryBrick::brick_flitering_mask_i() {
-    // TOOD
+    MI_RENDERALGO_LOG(MI_TRACE) << "IN proxy geometry brick filtering with mask.";
+
+    std::shared_ptr<VREntryExitPoints> entry_exit_points =
+        _vr_entry_exit_points.lock();
+    RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
+
+    std::shared_ptr<ImageData> volume = entry_exit_points->_volume_data;
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume);
+
+    const std::shared_ptr<BrickPool>& brick_pool = entry_exit_points->_brick_pool;
+    const BrickGeometry& brick_geometry = brick_pool->get_brick_geometry();
+    VolumeBrickInfo* volume_brick_info = brick_pool->get_volume_brick_info();
+    RENDERALGO_CHECK_NULL_EXCEPTION(volume_brick_info);
+    MaskBrickInfo* mask_brick_info = brick_pool->get_mask_brick_info(_last_vis_labels);
+    RENDERALGO_CHECK_NULL_EXCEPTION(mask_brick_info);
+
+    unsigned int brick_dim[3] = {0, 0, 0};
+    brick_pool->get_brick_dim(brick_dim);
+
+    std::unique_ptr<unsigned int[]> u_ele_idx_array(
+        new unsigned int[brick_pool->get_brick_count() * 36]);
+    unsigned int* ele_idx_array = u_ele_idx_array.get();
+
+    float filter_min[256];
+    memset(filter_min , 0 , sizeof(float)*256);
+    for (auto it = _last_window_levels.begin(); it != _last_window_levels.end(); ++it)
+    {
+        unsigned int label = it->first;
+        float ww = it->second.get_x() / volume->_slope;
+        float wl =  (it->second.get_y() - volume->_intercept) / volume->_slope;
+        filter_min[label] = wl - ww*0.5f;
+    }
+
+    const int brick_count_layer_jump = brick_dim[0] * brick_dim[1];
+    int z_jump(0), zy_jump(0);
+    int brick_idx(0);
+
+    AABBI brick_range;
+    brick_pool->calculate_intercect_brick_range(_last_aabb, brick_range);
+
+    int reset_brick_count = 0;
+    unsigned char brick_label = 0;
+    const unsigned char EMPTY_SPACE = 0;
+    const unsigned char CHASO_SPACE = 255;
+    for (int z = brick_range._min[2]; z <= brick_range._max[2]; ++z) {
+        z_jump = z * brick_count_layer_jump;
+
+        for (int y = brick_range._min[1]; y <= brick_range._max[1]; ++y) {
+            zy_jump = z_jump + y * brick_dim[0];
+
+            for (int x = brick_range._min[0]; x <= brick_range._max[0]; ++x) {
+                brick_idx = zy_jump + x;
+
+                brick_label = static_cast<unsigned char>(mask_brick_info[brick_idx].label);
+                if (brick_label == EMPTY_SPACE) {
+                    continue;
+                } else if(brick_label != CHASO_SPACE) {
+                    if (brick_label !=1 ) {
+                        int yyy = 1;
+                        yyy+=1;
+                        printf("get label%i\n",(int)brick_label);
+                    }
+                    const float brick_max = volume_brick_info[brick_idx].max;
+                    if (brick_max < filter_min[brick_label]) {
+                        continue;
+                    }
+                } else if (brick_label == CHASO_SPACE) {
+                    int xxx = 0;
+                    xxx+=1;
+                }
+
+                memcpy(ele_idx_array + reset_brick_count * 36,
+                    brick_geometry.brick_idx_units[brick_idx].idx,
+                    sizeof(unsigned int) * 36);
+                ++reset_brick_count;
+            }
+        }
+    }
+
+    _draw_element_count = reset_brick_count * 36;
+
+    _gl_element_buffer->bind();
+    _gl_element_buffer->load(sizeof(unsigned int) * _draw_element_count,
+        ele_idx_array, GL_DYNAMIC_DRAW);
+    MI_RENDERALGO_LOG(MI_TRACE) << "OUT proxy geometry brick filtering with mask.";
 }
 
 MED_IMG_END_NAMESPACE

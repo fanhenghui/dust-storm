@@ -29,6 +29,7 @@
 #include "renderalgo/mi_transfer_function_loader.h"
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_vr_scene.h"
+#include "renderalgo/mi_brick_pool.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -158,7 +159,7 @@ void Init() {
     _scene->set_shading_mode(SHADING_NONE);
 
     //_scene->set_proxy_geometry(PG_CUBE);
-    _scene->set_proxy_geometry(PG_CUBE);
+    _scene->set_proxy_geometry(PG_BRICKS);
     _scene->set_test_code(_iTestCode);
     //_scene->initialize();
 
@@ -358,6 +359,14 @@ void Keyboard(unsigned char key, int x, int y) {
             _wl = (int)wl;
             break;
         }
+    case 'k' : {
+#ifdef WIN32
+        _volumeinfos->get_brick_pool()->debug_save_mask_info("D:/temp/");
+#else
+        _volumeinfos->get_brick_pool()->debug_save_mask_info("/home/wangrui22/data/");
+#endif
+        break;
+               }
     default:
         break;
     }

@@ -233,6 +233,17 @@ void VolumeInfos::refresh_update_mask_i() {
         _mask_textures[0]->unbind();
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
+
+        refresh_mask_brick_info_i();
+    }
+}
+
+void VolumeInfos::refresh_mask_brick_info_i()
+{
+    std::vector<std::vector<unsigned char>> vis_labels;
+    _brick_pool->get_visible_labels_cache(vis_labels);
+    for (auto it = vis_labels.begin(); it != vis_labels.end(); ++it) {
+        _brick_pool->calculate_mask_brick_info(*it);
     }
 }
 
@@ -252,6 +263,8 @@ void VolumeInfos::refresh_upload_mask_i() {
               _mask_data->get_pixel_pointer());
     tex->unbind();
     CHECK_GL_ERROR;
+
+    refresh_mask_brick_info_i();
 
     _mask_dirty = false;
 }
@@ -275,7 +288,7 @@ void VolumeInfos::refresh_upload_volume_i() {
         _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
     const double min_gray = _volume_data->get_min_scalar();
 
-    // signed interger should conter to unsigned
+    // signed integer should convert to unsigned
     if (_volume_data->_data_type == SHORT) {
         std::unique_ptr<unsigned short[]> dst_data =
             signed_to_unsigned<short, unsigned short>(

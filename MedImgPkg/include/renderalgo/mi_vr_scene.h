@@ -34,6 +34,8 @@ public:
 
     void set_proxy_geometry(ProxyGeometry pg_type);
 
+    virtual void set_visible_labels(std::vector<unsigned char> labels);
+
 protected:
     virtual void pre_render_i();
 

@@ -103,7 +103,7 @@ void VREntryExitPoints::set_clipping_plane(std::vector<Plane> planes) {
     // TODO vr cull logic
 }
 
-void VREntryExitPoints::set_visible_mask(std::vector<unsigned char>& labels) {
+void VREntryExitPoints::set_visible_labels(std::vector<unsigned char>& labels) {
     _vis_labels = labels;
 }
 
@@ -117,8 +117,8 @@ void VREntryExitPoints::set_window_level(float ww, float wl,
         if (_window_levels.find(0) !=
                 _window_levels.end()) { // clear global window level (label 0)
             _window_levels.clear();
-            _window_levels[label] = Vector2f(ww, wl);
         }
+        _window_levels[label] = Vector2f(ww, wl);
     }
 }
 

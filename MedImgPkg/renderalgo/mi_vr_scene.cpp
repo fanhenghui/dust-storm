@@ -107,6 +107,13 @@ void VRScene::set_global_window_level(float ww, float wl) {
     vr_entry_exit_points->set_window_level(ww, wl, 0, true);
 }
 
+void VRScene::set_visible_labels(std::vector<unsigned char> labels) {
+    RayCastScene::set_visible_labels(labels);
+    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
+        std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
+    vr_entry_exit_points->set_visible_labels(labels);
+}
+
 void VRScene::set_bounding_box(const AABB& aabb) {
     // TODO check aabb
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =

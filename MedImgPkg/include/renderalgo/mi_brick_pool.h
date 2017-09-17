@@ -41,6 +41,10 @@ public:
     VolumeBrickInfo* get_volume_brick_info() const;
     void write_volume_brick_info(const std::string& path);
 
+    void add_visible_labels_cache(const std::vector<unsigned char>& vis_labels);
+    void get_visible_labels_cache(std::vector<std::vector<unsigned char>>& vis_labels);
+    void clear_visible_labels_cache();
+
     void calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels);
     void update_mask_brick_info(const AABBUI& aabb);
     MaskBrickInfo*
@@ -56,6 +60,9 @@ public:
                                          AABBI& brick_range);
     void get_clipping_brick_geometry(const AABB& bounding, float* brick_vertex,
                                      float* brick_color);
+
+public:
+    void debug_save_mask_info(const std::string& path);
 
 private:
     std::shared_ptr<ImageData> _volume;
@@ -78,6 +85,8 @@ private:
     std::map<LabelKey, GLBufferPtr> _mask_brick_info_buffer_set;
 
     GLResourceShield _res_shield;
+
+    std::map<LabelKey , std::vector<unsigned char>> _vis_labels_cache;
 
 private:
     std::unique_ptr<VolumeBrickInfoCalculator> _volume_brick_info_cal;

@@ -102,10 +102,10 @@ void main()
     end += ivec3(brick_margin);
 
     begin = max(begin ,ivec3(0));
-    begin = min(begin ,volume_dim);
+    begin = min(begin ,mask_dim);
 
     end = max(end ,ivec3(0));
-    end = min(end ,volume_dim);
+    end = min(end ,mask_dim);
 
     int label_code = 0;
     statistic_mask_info_in_cube(begin , end, mask_sampler , label_code);

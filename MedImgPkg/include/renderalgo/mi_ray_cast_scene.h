@@ -46,7 +46,7 @@ public:
     void set_sample_rate(float sample_rate);
 
     // Label parameter
-    void set_visible_labels(std::vector<unsigned char> labels);
+    virtual void set_visible_labels(std::vector<unsigned char> labels);
 
     // Window level parameter ( unregulated)
     // EG: CT modality , the unit is HU

@@ -179,8 +179,8 @@ MaskBrickInfoCalculator::~MaskBrickInfoCalculator() {}
 
 void MaskBrickInfoCalculator::update(const AABBUI& aabb) {
     initialize_i();
-    calculate_i();
     update_i(aabb);
+    download_i();
 }
 
 void MaskBrickInfoCalculator::calculate() {
@@ -269,7 +269,7 @@ void MaskBrickInfoCalculator::update_i(const AABBUI& aabb) {
     }
 
     _gl_buffer_visible_labels->bind();
-    _gl_buffer_visible_labels->load(static_cast<GLsizei>(_visible_labels.size()),
+    _gl_buffer_visible_labels->load(static_cast<GLsizei>(_visible_labels.size())*sizeof(int),
                                     visible_label_array.get(), GL_STATIC_DRAW);
     _gl_buffer_visible_labels->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
             VISIBLE_LABEL_BUFFER);

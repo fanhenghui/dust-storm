@@ -46,7 +46,7 @@ public:
 
     void set_bounding_box(const AABB& aabb);
     void set_clipping_plane(std::vector<Plane> planes);
-    void set_visible_mask(std::vector<unsigned char>& labels);
+    void set_visible_labels(std::vector<unsigned char>& labels);
 
     void set_window_level(float ww, float wl, unsigned char label,
                           bool global = false);

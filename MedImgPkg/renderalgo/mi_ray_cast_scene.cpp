@@ -25,6 +25,7 @@
 #include "mi_ray_caster.h"
 #include "mi_ray_caster_canvas.h"
 #include "mi_volume_infos.h"
+#include "mi_brick_pool.h"
 
 #include "mi_render_algo_logger.h"
 
@@ -340,6 +341,10 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
         if (*it == 0) {
             RENDERALGO_THROW_EXCEPTION("visible labels contain zero");
         }
+    }
+
+    if (_volume_infos) {
+        _volume_infos->get_brick_pool()->add_visible_labels_cache(labels);
     }
 
     if (_ray_caster->get_visible_labels() != labels) {
