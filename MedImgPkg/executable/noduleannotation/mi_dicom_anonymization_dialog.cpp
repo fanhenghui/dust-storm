@@ -145,8 +145,6 @@ void DICOMAnonymizationDlg::slot_press_btn_export_i()
         
         std::string file_name = custom_export_path + std::string("\\") + custom_prefix + file_nake + custom_postfix;
         export_files[i] = file_name;
-
-        //std::cout << file_name << std::endl;
     }
 
     //3 If without private

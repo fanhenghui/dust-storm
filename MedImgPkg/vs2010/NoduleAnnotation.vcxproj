@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Executable\NoduleAnnotation\mi_my_rsa.h" />
+    <ClInclude Include="..\executable\noduleannotation\mi_nodule_anno_logger.h" />
     <ClInclude Include="..\executable\noduleannotation\mi_nodule_anno_config.h" />
     <ClInclude Include="..\Executable\NoduleAnnotation\mi_observer_mpr_scroll_bar.h" />
     <ClInclude Include="GeneratedFiles\ui_mi_setting.h" />

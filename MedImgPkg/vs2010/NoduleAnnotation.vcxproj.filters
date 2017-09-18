@@ -94,6 +94,9 @@
     <ClInclude Include="GeneratedFiles\ui_mi_setting.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\executable\noduleannotation\mi_nodule_anno_logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Executable\NoduleAnnotation\lung.png">

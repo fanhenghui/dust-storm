@@ -67,6 +67,7 @@
 #include "mi_raw_data_import_dialog.h"
 #include "mi_setting_dialog.h"
 #include "mi_nodule_anno_config.h"
+#include "mi_nodule_anno_logger.h"
 
 #include <QEvent>
 #include <QSizePolicy>
@@ -1278,7 +1279,7 @@ void NoduleAnnotation::slot_sliding_bar_mpr10_i(int value)
 
 void NoduleAnnotation::slot_voi_table_widget_cell_select_i(int row , int column)
 {
-    //std::cout << "CellSelect "<< row << " " << column<< std::endl; 
+    //MI_NODULEANNO_LOG(MI_DEBUG) << "CellSelect "<< row << " " << column;
     VOISphere voi = _model_voi->get_voi(row);
     const Matrix4 mat_p2w = _mpr_scene_00->get_camera_calculator()->get_patient_to_world_matrix();
     _model_crosshair->locate(mat_p2w.transform(voi.center),  false);
@@ -1333,8 +1334,6 @@ void NoduleAnnotation::slot_voi_table_widget_nodule_type_changed_i(int id)
     if (pBox)
     {
         std::string type = pBox->currentText().toStdString();
-        std::cout << id <<'\t' << type << std::endl;
-
         _model_voi->modify_name(id , type);
     }
 }
@@ -1650,7 +1649,7 @@ void NoduleAnnotation::closeEvent(QCloseEvent * event)
 
     GLTextureCache::instance()->process_cache();
     GLResourceManagerContainer::instance()->update_all();
-    std::cout << GLContextHelper::has_gl_context() << std::endl;
+    MI_NODULEANNO_LOG(MI_DEBUG) << "GL context status: " << GLContextHelper::has_gl_context();
 
     NoduleAnnoConfig::instance()->finalize();
 
@@ -1677,7 +1676,7 @@ void NoduleAnnotation::slot_save_label_file()
     for (auto it = labels.begin(); it != labels.end(); ++it, ++label_index)
     {
         label_correction[(*it)] = label_index;
-        //std::cout << static_cast<int>(*it) << " mapped to " << static_cast<int>(cnt) << '\n';
+        //MI_NODULEANNO_LOG(MI_DEBUG)<< static_cast<int>(*it) << " mapped to " << static_cast<int>(cnt);
     }
 
     // create a new data as the final output
@@ -1689,7 +1688,7 @@ void NoduleAnnotation::slot_save_label_file()
     unsigned char* array_pointer = static_cast<unsigned char*>(output_label_volume->get_pixel_pointer());
     if (array_pointer == nullptr)
     {
-        std::cout << "We get a null pointer for the label :( \n";
+        MI_NODULEANNO_LOG(MI_ERROR) << "out label volume memory is null.";
         return;
     }
 
@@ -1794,7 +1793,7 @@ void NoduleAnnotation::slot_load_label_file()
 {
     if (!_is_ready || !this->_volume_infos)
     {
-        std::cout << "No volume loaded yet!\n";
+        MI_NODULEANNO_LOG(MI_WARNING) << "No volume loaded yet.";
         return;
     }
 
@@ -1835,9 +1834,9 @@ void NoduleAnnotation::slot_load_label_file()
     input_file.read (buffer, file_size);
 
     //if (input_file)
-    //    std::cout << "all characters read successfully.";
+    //    MI_NODULEANNO_LOG(MI_DEBUG) << "all characters read successfully.";
     //else
-    //    std::cout << "error: only " << input_file.gcount() << " could be read";
+    //    MI_NODULEANNO_LOG(MI_DEBUG) << "error: only " << input_file.gcount() << " could be read";
 
     input_file.close();
 
@@ -1847,13 +1846,13 @@ void NoduleAnnotation::slot_load_label_file()
     {
         sum_voxels += (*it);
     }
-    std::cout << sum_voxels << " labels are loaded\n";
+    MI_NODULEANNO_LOG(MI_DEBUG) << sum_voxels << " labels are loaded.";
 
     std::shared_ptr<ImageData> mask_in_use = this->_volume_infos->get_mask();
     unsigned int total_number_of_voxels = mask_in_use->_dim[0] * mask_in_use->_dim[1] * mask_in_use->_dim[2];
     if (sum_voxels != total_number_of_voxels)
     {
-        std::cout << "Fail since label data not match the volume in use \n";
+        MI_NODULEANNO_LOG(MI_ERROR) << "Fail since label data not match the volume in use.";
         return;
     }
 
@@ -1865,7 +1864,7 @@ void NoduleAnnotation::slot_load_label_file()
     //clock_t _start = clock();
     std::vector<unsigned char> actual_labels = RunLengthOperator::decode(labels);
     /*clock_t _end = clock();
-    std::cout << "decode cost : " << double(_end - _start) << " ms\n";*/
+    MI_NODULEANNO_LOG(MI_DEBUG) << "decode cost : " << double(_end - _start) << " ms.";*/
 
     std::shared_ptr<ImageData> volume = _volume_infos->get_volume(); 
     double origin[3] = {volume->_image_position.x, volume->_image_position.y, volume->_image_position.z}; // TODO here we ignore rotation
@@ -1881,7 +1880,7 @@ void NoduleAnnotation::slot_load_label_file()
     }
 
     //clock_t _end2 = clock();
-    //std::cout << "convert label cost : " << double(_end2 - _end) << " ms\n";
+    //MI_NODULEANNO_LOG(MI_DEBUG) << "convert label cost : " << double(_end2 - _end) << " ms.";
 
     // update underlying mask
     bool directly_update_mask = true;

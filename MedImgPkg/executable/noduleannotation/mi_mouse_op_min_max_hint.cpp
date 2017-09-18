@@ -35,7 +35,6 @@ MouseOpMinMaxHint::~MouseOpMinMaxHint()
 
 void MouseOpMinMaxHint::press(const QPointF& pt)
 {
-    //std::cout << "single click \n";
 }
 
 void MouseOpMinMaxHint::move(const QPointF& pt)
@@ -55,7 +54,6 @@ void MouseOpMinMaxHint::double_click(const QPointF& pt)
     {
         return;
     }
-    //std::cout << "double click \n";
     if (_min_max_hint_object)
     {
         _min_max_hint_object->trigger(scene_base->get_name());

@@ -16,16 +16,11 @@ int main(int argc, char *argv[])
 {
     try
     {
+        MI_LOG(MI_TRACE) << "nodule annotation start.";
         medical_imaging::Logger::instance()->initialize();
 
-        MI_LOG(MI_TRACE) << "QT hello world TRACE";
-        MI_LOG(MI_DEBUG) << "QT hello world DEBUG";
-        MI_LOG(MI_INFO) << "QT hello world INFO";
-        MI_LOG(MI_WARNING) << "QT hello world WARNING";
-        MI_LOG(MI_FATAL) << "QT hello world FATAL";
-
         QApplication a(argc, argv);
-        //std::cout << a.doubleClickInterval() << std::endl;
+        //MI_LOG(MI_DEBUG) << a.doubleClickInterval() << std::endl;
 
         NoduleAnnotation w;
         w.show();
@@ -33,9 +28,8 @@ int main(int argc, char *argv[])
     }
     catch (const medical_imaging::Exception& e)
     {
-        std::cout << e.what();
+        MI_LOG(MI_ERROR) << "nodule annotation abort with exception: " << e.what();
         assert(false);
         return 0;
     }
-    
 }
