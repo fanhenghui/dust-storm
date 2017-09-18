@@ -1,3 +1,5 @@
+sudo apt-get install mongodb mongodb-clients mongodb-server
+
 npm install express --save
 npm install path --save
 npm install http --save
@@ -15,5 +17,3 @@ npm install node-ipc --save
 npm install multer@0 --save
 npm install ejs --save
 npm install ipaddr.js --save
-
-sudo apt-get install mongodb mongodb-clients mongodb-server
