@@ -82,18 +82,20 @@ std::vector<std::string> GetFiles() {
     return files;
 }
 
+void Finalize() {
+    _data_header.reset();
+    _volume_data.reset();
+    _volumeinfos.reset();
+    _scene.reset();
+    _time_query.reset();
+    _time_query2.reset();
+}
+
 void Init() {
     Configuration::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
     Logger::instance()->bind_config_file("./config/log_config");
     Logger::instance()->initialize();
-
-    MI_RENDERALGO_LOG(MI_TRACE) << "test debug log";
-    MI_RENDERALGO_LOG(MI_DEBUG) << "test debug log";
-    MI_RENDERALGO_LOG(MI_INFO) << "test debug log";
-    MI_RENDERALGO_LOG(MI_WARNING) << "test debug log";
-    MI_RENDERALGO_LOG(MI_ERROR) << "test debug log";
-    MI_RENDERALGO_LOG(MI_FATAL) << "test debug log";
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
@@ -316,8 +318,8 @@ void Display() {
         // MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() <<
         // std::endl;
 
-        MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << _time_query->end() << " " << buffer_size
-                  << std::endl;
+        const double render_time  = _time_query->end();
+        MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;
 
         glutSwapBuffers();
     } catch (Exception& e) {
@@ -456,10 +458,6 @@ int TE_VRScene(int argc, char* argv[]) {
 
         Init();
 
-        Point2 pt(12,23);
-        MI_LOG(MI_INFO) << "test point2" << pt;
-        std::cout << pt << std::endl;
-
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0, 0);
@@ -488,6 +486,8 @@ int TE_VRScene(int argc, char* argv[]) {
         glutMainLoop();
 
         //Logger::instance()->finalize();
+
+        Finalize();
 
         return 0;
     } catch (const Exception& e) {
