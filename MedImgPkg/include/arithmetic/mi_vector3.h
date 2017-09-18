@@ -3,7 +3,7 @@
 
 #include <ostream>
 #include "arithmetic/mi_arithmetic_export.h"
-//#include "arithmetic/mi_arithmetic_logger.h"
+#include "log/mi_logger_util.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -108,7 +108,7 @@ public:
         double len = std::sqrt(x * x + y * y + z * z);
 
         if (len < DOUBLE_EPSILON) {
-            //MI_ARITHMETIC_LOG(MI_WARNING) << "vector3's magnitude is 0 ! Get normalize failed.";
+            LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
             return;
         }
 
@@ -122,7 +122,7 @@ public:
         double len = std::sqrt(x * x + y * y + z * z);
 
         if (len < DOUBLE_EPSILON) {
-            //MI_ARITHMETIC_LOG(MI_WARNING) << "vector3's magnitude is 0 ! Get normalize failed.";
+            LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
             return *this;
         }
 
