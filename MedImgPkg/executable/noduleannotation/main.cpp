@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     }
     catch (const medical_imaging::Exception& e)
     {
-        MI_LOG(MI_ERROR) << "nodule annotation abort with exception: " << e.what();
+        MI_LOG(MI_FATAL) << "nodule annotation abort with exception: " << e.what();
         assert(false);
         return 0;
     }

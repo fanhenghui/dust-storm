@@ -333,7 +333,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
     }
     catch (const Exception& e)
     {
-        MI_QTPACKAGE_LOG(MI_ERROR) << "graphic item VOI update failed with exception: " << e.what();
+        MI_QTPACKAGE_LOG(MI_FATAL) << "graphic item VOI update failed with exception: " << e.what();
         assert(false);
         throw e;
     }

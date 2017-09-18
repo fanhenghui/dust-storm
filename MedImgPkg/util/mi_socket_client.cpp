@@ -110,7 +110,7 @@ void SocketClient::run() {
 
         } catch (const Exception& e) {
             //Ignore error to keep connecting
-            MI_UTIL_LOG(MI_WARNING) << "handle command error(skip and continue): " << e.what();
+            MI_UTIL_LOG(MI_FATAL) << "handle command error(skip and continue): " << e.what();
         }
     }
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running end.";

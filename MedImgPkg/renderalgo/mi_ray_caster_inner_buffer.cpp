@@ -249,7 +249,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type) {
         return buffer;
 
     } catch (Exception& e) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "get inner buffer failed with exceptionL: " << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << "get inner buffer failed with exceptionL: " << e.what();
         assert(false);
         throw e;
     }

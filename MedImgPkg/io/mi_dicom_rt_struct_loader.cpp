@@ -39,7 +39,7 @@ IOStatus DICOMRTLoader::load_rt_struct(const std::string& file_name,
         return io_status;
 
     } catch (const Exception& e) {
-        MI_LOG(MI_ERROR) << "load RT struct file: " << file_name << "failed with exception: " << e.what();
+        MI_LOG(MI_FATAL) << "load RT struct file: " << file_name << "failed with exception: " << e.what();
         return IO_FILE_OPEN_FAILED;
     }
 }

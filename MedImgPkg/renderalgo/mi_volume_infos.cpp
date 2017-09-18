@@ -110,7 +110,7 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
         _camera_calculator.reset(new CameraCalculator(_volume_data));
 
     } catch (const Exception& e) {
-        MI_RENDERALGO_LOG(MI_DEBUG) << "set volume failed with exception: " << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << "set volume failed with exception: " << e.what();
         assert(false);
     }
 }
@@ -152,8 +152,7 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
         _brick_pool->set_mask(_mask_data);
         _brick_pool->set_mask_texture(_mask_textures[0]);
     } catch (const Exception& e) {
-        // TODO LOG
-        MI_RENDERALGO_LOG(MI_DEBUG) << "set mask failed with exception: " << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << "set mask failed with exception: " << e.what();
         assert(false);
     }
 }

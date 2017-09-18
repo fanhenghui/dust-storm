@@ -94,11 +94,11 @@ void RayCastingCPU::render(int test_code) {
         CHECK_GL_ERROR;
 
     } catch (const Exception& e) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "CPU ray casting failed with exception: " << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << "CPU ray casting failed with exception: " << e.what();
         assert(false);
         throw e;
     } catch (const std::exception& e) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "CPU ray casting failed with exception: " << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << "CPU ray casting failed with exception: " << e.what();
         assert(false);
         throw e;
     }

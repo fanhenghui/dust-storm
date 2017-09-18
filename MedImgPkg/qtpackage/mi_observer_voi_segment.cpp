@@ -288,7 +288,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
     }
     catch (const Exception& e)
     {
-        MI_QTPACKAGE_LOG(MI_ERROR) << "VOI segment OB update failed with exception: " << e.what();
+        MI_QTPACKAGE_LOG(MI_FATAL) << "VOI segment OB update failed with exception: " << e.what();
         assert(false);
         throw e;
     }

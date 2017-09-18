@@ -294,8 +294,8 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
 
         set_dirty(true);
     } catch (const Exception& e) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "set volume infos failed with exception: " << e.what();
-        // assert(false);
+        MI_RENDERALGO_LOG(MI_FATAL) << "set volume infos failed with exception: " << e.what();
+        assert(false);
         throw e;
     }
 }

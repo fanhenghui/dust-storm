@@ -638,11 +638,11 @@ IOStatus DICOMLoader::construct_data_header_i(
         return IO_SUCCESS;
     } catch (const Exception& e) {
         // TODO LOG
-        MI_IO_LOG(MI_ERROR) << "construct header failed : " << e.what();
+        MI_IO_LOG(MI_FATAL) << "construct header failed : " << e.what();
         return io_status;
     } catch (const std::exception& e) {
         // TODO LOG
-        MI_IO_LOG(MI_ERROR) << "construct header failed : " << e.what();
+        MI_IO_LOG(MI_FATAL) << "construct header failed : " << e.what();
         return io_status;
     }
 }
