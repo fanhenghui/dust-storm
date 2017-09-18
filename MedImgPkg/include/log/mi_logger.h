@@ -55,7 +55,6 @@ inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< Ch
 }
 }
 
-
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger< medical_imaging::SeverityLevel >)
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
@@ -78,32 +77,37 @@ public:
 
     Log_Export void bind_config_file(const std::string& file_name);
     //text file log sink
-    Log_Export void set_target(const std::string& tag_dir);
-    Log_Export void set_file_name_format(const std::string& name_format = std::string("sign-%Y-%m-%d_%H-%M-%S.%N.log"));
-    Log_Export void set_rotation_size(unsigned int size);
-    Log_Export void set_time_based_rotation(unsigned char hour , unsigned char min , unsigned char sec);
-    Log_Export void set_free_space(unsigned int free_space);
+    Log_Export void set_file_direction(const std::string& tag_dir = std::string("logs"));
+    Log_Export void set_file_name_format(const std::string& name_format = std::string("mi-%Y-%m-%d_%H-%M-%S.%N.log"));
+    Log_Export void set_file_max_size(unsigned int size = 32*1024*1024);
+    Log_Export void set_file_rotation_size(unsigned int size);
+    Log_Export void set_file_rotation_time(unsigned char hour = 0, unsigned char min = 0, unsigned char sec = 0);
+    Log_Export void set_min_free_space(unsigned int free_space = 100*1024*1024);
     //sink filter
-    Log_Export void filter_level_stream(SeverityLevel level);
-    Log_Export void filter_level_file(SeverityLevel level);
+    Log_Export void filter_level_stream(SeverityLevel level = MI_TRACE);
+    Log_Export void filter_level_file(SeverityLevel level = MI_TRACE);
 
 private:
     Logger();
+    void read_config_file_i();
 
 private:
     static Logger* _s_instance;
     static boost::mutex _s_mutex;
+    bool _init;
 
     //struct InnerSink;
     //std::unique_ptr<InnerSink> _inner_sink;
 
     SeverityLevel _stream_filer_level;
     SeverityLevel _file_filer_level;
-    std::string _target_dir;
-    std::string _file_name_format;
-    unsigned int _rotation_size;
-    unsigned int _min_free_space;
 
+    std::string _file_target_dir;
+    std::string _file_name_format;
+    unsigned int _min_free_space;
+    unsigned int _max_file_size;
+
+    unsigned int _rotation_size;
     struct TimeHMS {
         unsigned char _hour;
         unsigned char _min;
@@ -111,9 +115,10 @@ private:
         TimeHMS(unsigned char h , unsigned char m , unsigned char s ) : _hour(h), _min(m), _sec(s) {}
         TimeHMS() : _hour(0), _min(0), _sec(0) {}
     };
-    TimeHMS _time_based_rotation;
-};
+    TimeHMS _rotation_time;
 
+    std::string _config_file;
+};
 
 MED_IMG_END_NAMESPACE
 

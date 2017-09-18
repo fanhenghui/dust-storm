@@ -1,0 +1,5 @@
+TargetDirection = logs
+Level = Trace
+MinFreeSpace = 1024
+MaxLogSize = 32
+RotationSize = 4
