@@ -33,7 +33,6 @@ RayCaster::~RayCaster() {}
 
 void RayCaster::render() {
     // clock_t t0 = clock();
-
     if (CPU_BASE == _strategy) {
         if (!_ray_casting_cpu) {
             _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));
@@ -67,11 +66,8 @@ void RayCaster::render() {
             _ray_casting_gpu->render();
         }
     }
-
     // clock_t t1 = clock();
-    // std::cout << "<<<>>><<<>>><<<>>><<<>>><<<>>>\n";
-    // std::cout << "Ray casting cost : " << double(t1-t0) << "ms\n";
-    // std::cout << "<<<>>><<<>>><<<>>><<<>>><<<>>>\n";
+    // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0) << "ms.";
 }
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {

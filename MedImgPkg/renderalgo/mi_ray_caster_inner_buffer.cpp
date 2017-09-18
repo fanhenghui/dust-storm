@@ -3,6 +3,8 @@
 #include "glresource/mi_gl_resource_manager_container.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "mi_render_algo_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 struct RayCasterInnerBuffer::GLResource {
     std::map<RayCasterInnerBuffer::BufferType, GLBufferPtr> buffer_ids;
@@ -247,9 +249,7 @@ GLBufferPtr RayCasterInnerBuffer::get_buffer(BufferType type) {
         return buffer;
 
     } catch (Exception& e) {
-#ifdef _DEBUG
-        std::cout << e.what();
-#endif
+        MI_RENDERALGO_LOG(MI_ERROR) << "get inner buffer failed with exceptionL: " << e.what();
         assert(false);
         throw e;
     }

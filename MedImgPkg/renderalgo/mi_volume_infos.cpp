@@ -13,6 +13,8 @@
 #include "mi_brick_pool.h"
 #include "mi_camera_calculator.h"
 
+#include "mi_render_algo_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 namespace {
@@ -79,8 +81,9 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
                 ->get_texture_3d_manager()
                 ->remove_object(*it);
             }
-
             _volume_textures.clear();
+
+            // TODO release volume brick info
         }
 
         // create texture
@@ -107,8 +110,7 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
         _camera_calculator.reset(new CameraCalculator(_volume_data));
 
     } catch (const Exception& e) {
-        // TODO LOG
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_DEBUG) << "set volume failed with exception: " << e.what();
         assert(false);
     }
 }
@@ -126,11 +128,10 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
                 GLResourceManagerContainer::instance()
                 ->get_texture_3d_manager()->remove_object(*it);
             }
-
             _mask_textures.clear();
-        }
 
-        // TODO release mask brick info
+            // TODO release mask brick info
+        }
 
         // create texture
         UIDType uid(0);
@@ -152,7 +153,7 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
         _brick_pool->set_mask_texture(_mask_textures[0]);
     } catch (const Exception& e) {
         // TODO LOG
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_DEBUG) << "set mask failed with exception: " << e.what();
         assert(false);
     }
 }

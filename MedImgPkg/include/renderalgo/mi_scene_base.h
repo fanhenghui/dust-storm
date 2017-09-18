@@ -39,8 +39,7 @@ public:
     virtual void render();
     void render_to_back();
 
-    void download_image_buffer(
-        bool jpeg = true); // TODO Temp change for scene FBO download error
+    void download_image_buffer(bool jpeg = true);
     void swap_image_buffer();
     void get_image_buffer(unsigned char*& buffer, int& size);
     // float get_compressing_time() const;

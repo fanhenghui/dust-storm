@@ -399,7 +399,6 @@ bool CameraCalculator::page_orthognal_mpr_to(
     const double delta = distance / spacing_step;
     const int delta_i = int(delta);
 
-    //TODO
     int cur_page = get_default_page(scan_type) + delta_i;
     if (page >= 0 && page < get_page_maximum(scan_type)) {
         camera->set_eye(changed_eye);

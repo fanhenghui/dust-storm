@@ -229,7 +229,7 @@ void BrickPool::remove_mask_brick_info(const std::vector<unsigned char>& vis_lab
     if (it_buffer != _mask_brick_info_buffer_set.end()) {
         _mask_brick_info_buffer_set.erase(it_buffer);
 
-        //release resouece immediately
+        //release resource immediately
         _res_shield.remove_shield<GLBuffer>(it_buffer->second);
         GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it_buffer->second);
     }
@@ -240,7 +240,7 @@ void BrickPool::remove_all_mask_brick_info() {
 
     for (auto it_buffer = _mask_brick_info_buffer_set.begin() ;
             it_buffer != _mask_brick_info_buffer_set.end() ; ++it_buffer) {
-        //release resouece immediately
+        //release resource immediately
         _res_shield.remove_shield<GLBuffer>(it_buffer->second);
         GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it_buffer->second);
     }

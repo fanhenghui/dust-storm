@@ -9,6 +9,7 @@
 #include "mi_entry_exit_points.h"
 #include "mi_ray_caster.h"
 #include "mi_ray_caster_canvas.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -93,17 +94,11 @@ void RayCastingCPU::render(int test_code) {
         CHECK_GL_ERROR;
 
     } catch (const Exception& e) {
-        //#ifdef _DEBUG
-        // TODO LOG
-        std::cout << e.what();
-        //#endif
+        MI_RENDERALGO_LOG(MI_ERROR) << "CPU ray casting failed with exception: " << e.what();
         assert(false);
         throw e;
     } catch (const std::exception& e) {
-#ifdef _DEBUG
-        // TODO LOG
-        std::cout << e.what();
-#endif
+        MI_RENDERALGO_LOG(MI_ERROR) << "CPU ray casting failed with exception: " << e.what();
         assert(false);
         throw e;
     }
@@ -165,7 +160,7 @@ void RayCastingCPU::ray_casting_average_i(
         const float step_float = length / ray_caster->_sample_rate;
         int step = (int)step_float;
 
-        if (step == 0) { //��֤���ٻ���һ��
+        if (step == 0) { //to make sure integrate at least once
             step = 1;
         }
 
@@ -232,7 +227,7 @@ void RayCastingCPU::ray_casting_mip_i(std::shared_ptr<RayCaster> ray_caster) {
         const float step_float = length / ray_caster->_sample_rate;
         int step = (int)step_float;
 
-        if (step == 0) { //��֤���ٻ���һ��
+        if (step == 0) { //to make sure integrate at least once
             step = 1;
         }
 
@@ -295,7 +290,7 @@ void RayCastingCPU::ray_casting_minip_i(std::shared_ptr<RayCaster> ray_caster) {
         const float step_float = length / ray_caster->_sample_rate;
         int step = (int)step_float;
 
-        if (step == 0) { //��֤���ٻ���һ��
+        if (step == 0) { //to make sure integrate at least once
             step = 1;
         }
 
@@ -416,7 +411,7 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
         const float step_float = length / ray_caster->_sample_rate;
         int step = (int)step_float;
 
-        if (step == 0) { //��֤���ٻ���һ��
+        if (step == 0) { //to make sure integrate at least once
             step = 1;
         }
 

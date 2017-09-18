@@ -168,7 +168,6 @@ void RayCastScene::render() {
     }
 
     MI_RENDERALGO_LOG(MI_TRACE) << "IN ray cast scene render.";
-    //std::cout << "in rendering\n";
 
     CHECK_GL_ERROR;
 
@@ -223,7 +222,7 @@ void RayCastScene::render() {
     //_canvas->debug_output_color("/home/wr/data/output.raw");
     // CHECK_GL_ERROR;
 
-    // TODO Test code
+    // Test code
     {
         //     FBOStack fbo_stack;
         //     _scene_color_attach_0->bind();
@@ -248,7 +247,6 @@ void RayCastScene::render() {
     }
 
     set_dirty(false);
-    //std::cout << "out rendering\n";
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT ray cast scene render.";
 }
 
@@ -296,8 +294,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
 
         set_dirty(true);
     } catch (const Exception& e) {
-        // TOOD LOG
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_ERROR) << "set volume infos failed with exception: " << e.what();
         // assert(false);
         throw e;
     }

@@ -18,6 +18,8 @@
 #include "mi_camera_calculator.h"
 #include "mi_shader_collection.h"
 
+#include "mi_render_algo_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 namespace {
@@ -91,6 +93,7 @@ void MPREntryExitPoints::set_thickness(float thickness) {
 }
 
 void MPREntryExitPoints::calculate_entry_exit_points() {
+    MI_RENDERALGO_LOG(MI_TRACE) << "IN calculate MPR entry exit points.";
     _standard_steps = float(int(_thickness / _sample_rate + 0.5f));
 
     // clock_t t0 = clock();
@@ -99,10 +102,9 @@ void MPREntryExitPoints::calculate_entry_exit_points() {
     } else if (GPU_BASE == _strategy) {
         cal_entry_exit_points_gpu_i();
     }
-
     // clock_t t1 = clock();
-    // std::cout << "Calculate entry exit points cost : " << double(t1 - t0) <<
-    // std::endl;
+    // MI_RENDERALGO_LOG(MI_DEBUG) << "Calculate entry exit points cost : " << double(t1 - t0);
+    MI_RENDERALGO_LOG(MI_TRACE) << "OUT calculate MPR entry exit points.";
 }
 
 void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
@@ -267,7 +269,7 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
         _exit_points_texture->download(GL_RGBA , GL_FLOAT ,
         _exit_points_buffer.get());*/
     } catch (const Exception& e) {
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_ERROR) << "calculate CPU MPR entry exit points failed with exception: " << e.what();
         assert(false);
         throw e;
     }
@@ -359,8 +361,8 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i() {
         CHECK_GL_ERROR;
 
         //////////////////////////////////////////////////////////////////////////
-        // TODO For testing
-        /*std::cout << "Size : " << _width << " " << _height << std::endl;
+        // Test code
+        /*MI_RENDERALGO_LOG(MI_DEBUG)  << "Size : " << _width << " " << _height << std::endl;
         _entry_points_texture->bind();
         _entry_points_texture->download(GL_RGBA , GL_FLOAT ,
             _entry_points_buffer.get());
@@ -383,7 +385,7 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu_i() {
 #undef RAY_DIRECTION
 
     } catch (const Exception& e) {
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_ERROR) << "calculate GPU MPR entry exit points failed with exception: " << e.what();
         assert(false);
         throw e;
     }

@@ -92,12 +92,9 @@ protected:
     std::shared_ptr<CameraCalculator> _camera_calculator;
     std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
 
-    //////////////////////////////////////////////////////////////////////////
-    // TODO Temp for test
     float _global_ww;
     float _global_wl;
     std::map<unsigned char, Vector2f> _window_levels;
-    //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
     // should design a wrap to contain global pseudo colors because its
