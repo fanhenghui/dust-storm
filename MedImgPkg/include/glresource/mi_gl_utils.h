@@ -18,31 +18,31 @@ MED_IMG_BEGIN_NAMESPACE
     }                                                                          \
     case GL_INVALID_ENUM: {                                                    \
       ss << "OpenGL Error: GL_INVALID_ENUM ! "                          \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+                << "In File: " << __FILE__  << "In File: " << __FILE__  << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
       GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_VALUE: {                                                   \
       ss << "OpenGL Error: GL_INVALID_VALUE ! "                         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+                << "In File: " << __FILE__  << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
       GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_OPERATION: {                                               \
       ss << "OpenGL Error: GL_INVALID_OPERATION ! "                     \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+                << "In File: " << __FILE__  << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
       GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_FRAMEBUFFER_OPERATION: {                                   \
       ss << "OpenGL Error: GL_INVALID_FRAMEBUFFER_OPERATION ! "         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+                << "In File: " << __FILE__  << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
       GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_OUT_OF_MEMORY: {                                                   \
       ss << "OpenGL Error: GL_OUT_OF_MEMORY ! "                         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+                << "In File: " << __FILE__  << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
       GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
