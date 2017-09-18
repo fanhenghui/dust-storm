@@ -28,37 +28,87 @@ void my_formatter(logging::record_view const& rec, logging::formatting_ostream& 
     using namespace medical_imaging;
     auto lvl = logging::extract< SeverityLevel >("Severity", rec);
 
+    static const int lvlnum = 6; 
+    static const std::string lvlstr[lvlnum] = {
+        std::string("Trace"),
+        std::string("Debug"),
+        std::string("Info"),
+        std::string("Warning"),
+        std::string("Error"),
+        std::string("Fatal"),
+    };
+    std::string sev = "";
+    
 #ifdef WIN32
-    HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    switch(lvl.get()) {
-    case MI_TRACE :
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-        break;
-    case MI_DEBUG :
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);
-        break;
-    case MI_INFO :
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
-        break;
-    case MI_WARNING :
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE);
-        break;
-    case MI_ERROR :
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED);
-        break;
-    case MI_FATAL :
-        SetConsoleTextAttribute(handle , FOREGROUND_RED);
-        break;
-    default:
-        SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY);
+    if(lvl) {
+        if (static_cast<int>(lvl.get()) < lvlnum ) {
+            sev = lvlstr[lvl.get()];
+        }
+        HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+        switch(lvl.get()) {
+            case MI_TRACE :
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                break;
+            case MI_DEBUG :
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN);
+                break;
+            case MI_INFO :
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                break;
+            case MI_WARNING :
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE);
+                break;
+            case MI_ERROR :
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED);
+                break;
+            case MI_FATAL :
+                SetConsoleTextAttribute(handle , FOREGROUND_RED);
+                break;
+            default:
+                SetConsoleTextAttribute(handle , FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        }
+    }
+#else
+    if(lvl) {
+        if (static_cast<int>(lvl.get()) < lvlnum ) {
+            sev = lvlstr[lvl.get()];
+        }
+        switch(lvl.get()) {
+            case MI_TRACE :
+                strm << "\033[37m";
+                break;
+            case MI_DEBUG :
+                strm << "\033[33m";
+                break;
+            case MI_INFO :
+                strm << "\033[36m";
+                break;
+            case MI_WARNING :
+                strm << "\033[35m";
+                break;
+            case MI_ERROR :
+                strm << "\033[31m";
+                break;
+            case MI_FATAL :
+                strm << "\033[31m";
+                break;
+            default:
+                strm << "\033[37m";
+        }
     }
 #endif
 
     strm << std::hex << std::setw(8) << std::setfill('0') << 
         logging::extract< unsigned int >("LineID", rec) << std::dec << std::setfill(' ')
-        << ": <" << lvl << "> "
+        << ": <" << sev << "> "
         << "{" << logging::extract< boost::log::aux::thread::id >("ThreadID", rec) << "} "
         << rec[expr::smessage];
+
+#ifndef WIN32
+    if(lvl) {
+        strm << "\033[0m";  
+    }
+#endif
 }
 }
 
@@ -249,6 +299,8 @@ void Logger::read_config_file_i() {
             _max_file_size = atoi(context.c_str())*1024*1024;
         } else if (tag == "RotationSize") {
             _rotation_size = atoi(context.c_str())*1024*1024;
+        } else if (tag == "TargetDirection") {
+            _file_target_dir = context;
         }
     }
     input_file.close();

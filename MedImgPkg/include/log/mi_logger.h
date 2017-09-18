@@ -26,6 +26,7 @@ namespace sinks = boost::log::sinks;
 namespace attrs = boost::log::attributes;
 namespace keywords = boost::log::keywords;
 
+#ifdef WIN32
 template< typename CharT, typename TraitsT >
 inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< CharT, TraitsT >& strm, medical_imaging::SeverityLevel lvl) {
     static const int lvlnum = 6; 
@@ -44,6 +45,8 @@ inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< Ch
     }
     return strm;
 }
+#endif
+
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger< medical_imaging::SeverityLevel >)
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
