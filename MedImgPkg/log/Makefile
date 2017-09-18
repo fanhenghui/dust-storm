@@ -16,7 +16,7 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_logger.o
+OBJS = mi_logger.o mi_logger_util.o
 TARGET = $(BIN_DIR)/libmedimg_log.so
 
 EXPORT_HEADER = mi_log_export.h
