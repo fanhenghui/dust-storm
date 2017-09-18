@@ -84,10 +84,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\log\mi_logger.h" />
+    <ClInclude Include="..\include\log\mi_logger_define.h" />
     <ClInclude Include="..\include\log\mi_logger_export.h" />
+    <ClInclude Include="..\include\log\mi_logger_util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\log\mi_logger.cpp" />
+    <ClCompile Include="..\log\mi_logger_util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

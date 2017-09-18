@@ -86,7 +86,7 @@ void SegmentThreshold<T>::segment_auto_threshold(const Ellipsoid& ellipsoid,
 
     case Otsu: {
         threshold = get_threshold_otsu_i(ellipsoid);
-        std::cout << "Auto Otsu threshold is : " << threshold << std::endl;
+        MI_ARITHMETIC_LOG(MI_DEBUG) << "Auto Otsu threshold is : " << threshold;
         break;
     }
 

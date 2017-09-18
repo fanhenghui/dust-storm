@@ -1,5 +1,6 @@
 #include "mi_gl_program.h"
 #include "mi_gl_utils.h"
+#include "mi_gl_resource_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -95,8 +96,8 @@ void GLProgram::compile() {
             std::string err_info = GetShaderTypeString((*it).type) +
                                    std::string(" \"") + (*it).shader_name +
                                    std::string("\" compiled failed : ") +
-                                   std::string(log_context.get()) + std::string("\n");
-            std::cout << err_info;
+                                   std::string(log_context.get());
+            MI_GLRESOURCE_LOG(MI_FATAL) << err_info;
             GLRESOURCE_THROW_EXCEPTION(err_info);
         }
 
@@ -126,8 +127,8 @@ void GLProgram::compile() {
         glDeleteProgram(_program_id);
 
         std::string err_info = std::string("Program link failed : ") +
-                               std::string(log_context.get()) + std::string("\n");
-        std::cout << err_info;
+                               std::string(log_context.get());
+        MI_GLRESOURCE_LOG(MI_FATAL) << err_info;
         GLRESOURCE_THROW_EXCEPTION(err_info.c_str());
     }
 

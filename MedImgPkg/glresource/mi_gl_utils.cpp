@@ -6,6 +6,8 @@
 #include <string.h>
 #endif
 
+#include "mi_gl_resource_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 bool GLUtils::check_framebuffer_state() {
@@ -19,37 +21,37 @@ bool GLUtils::check_framebuffer_state() {
     }
 
     case GL_FRAMEBUFFER_UNDEFINED: {
-        std::cout << "Framebuffer undefined!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer undefined!";
         break;
     }
 
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: {
-        std::cout << "Framebuffer incomplete attachment!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer incomplete attachment!";
         break;
     }
 
     case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: {
-        std::cout << "Framebuffer incomplete missing attachment!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer incomplete missing attachment!";
         break;
     }
 
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER: {
-        std::cout << "Framebuffer incomplete draw buffer!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer incomplete draw buffer!";
         break;
     }
 
     case GL_FRAMEBUFFER_UNSUPPORTED: {
-        std::cout << "Framebuffer unsupported!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer unsupported!";
         break;
     }
 
     case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE: {
-        std::cout << "Framebuffer incomplete mulitisample!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Framebuffer incomplete mulitisample!";
         break;
     }
 
     default: {
-        std::cout << "Undefined framebuffer status!\n";
+        MI_GLRESOURCE_LOG(MI_ERROR) << "Undefined framebuffer status!";
         break;
     }
     }
@@ -208,6 +210,11 @@ bool GLUtils::get_check_gl_flag() {
 
 void GLUtils::set_pixel_pack_alignment(int i) {
     glPixelStorei(GL_PACK_ALIGNMENT, i);
+}
+
+void GLUtils::log_gl_error(const std::string& err)
+{
+    MI_GLRESOURCE_LOG(MI_ERROR) << err;
 }
 
 DrawFBOStack::DrawFBOStack() {

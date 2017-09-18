@@ -1,6 +1,7 @@
 #ifndef MEDIMGRESOURCE_GL_UTILS_H_
 #define MEDIMGRESOURCE_GL_UTILS_H_
 
+#include <sstream>
 #include "GL/glew.h"
 #include "glresource/mi_gl_resource_export.h"
 #include "io/mi_io_define.h"
@@ -10,38 +11,39 @@ MED_IMG_BEGIN_NAMESPACE
 #define CHECK_GL_ERROR                                                         \
   if (GLUtils::get_check_gl_flag()) {                                          \
     GLenum err = glGetError();                                                 \
+    std::stringstream ss;                                                      \
     switch (err) {                                                             \
     case GL_NO_ERROR: {                                                        \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_ENUM: {                                                    \
-      std::cout << "OpenGL Error: GL_INVALID_ENUM ! "                          \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__   \
-                << " .\n";                                                     \
+      ss << "OpenGL Error: GL_INVALID_ENUM ! "                          \
+                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+      GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_VALUE: {                                                   \
-      std::cout << "OpenGL Error: GL_INVALID_VALUE ! "                         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__   \
-                << " .\n";                                                     \
+      ss << "OpenGL Error: GL_INVALID_VALUE ! "                         \
+                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+      GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_OPERATION: {                                               \
-      std::cout << "OpenGL Error: GL_INVALID_OPERATION ! "                     \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__   \
-                << " .\n";                                                     \
+      ss << "OpenGL Error: GL_INVALID_OPERATION ! "                     \
+                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+      GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_INVALID_FRAMEBUFFER_OPERATION: {                                   \
-      std::cout << "OpenGL Error: GL_INVALID_FRAMEBUFFER_OPERATION ! "         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__   \
-                << " .\n";                                                     \
+      ss << "OpenGL Error: GL_INVALID_FRAMEBUFFER_OPERATION ! "         \
+                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+      GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     case GL_OUT_OF_MEMORY: {                                                   \
-      std::cout << "OpenGL Error: GL_OUT_OF_MEMORY ! "                         \
-                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__   \
-                << " .\n";                                                     \
+      ss << "OpenGL Error: GL_OUT_OF_MEMORY ! "                         \
+                << " In Line : " << __LINE__ << ". In Func " << __FUNCTION__;  \
+      GLUtils::log_gl_error(ss.str());                                         \
       break;                                                                   \
     }                                                                          \
     default:                                                                   \
@@ -66,6 +68,8 @@ public:
     static bool get_check_gl_flag();
 
     static void set_pixel_pack_alignment(int i);
+
+    static void log_gl_error(const std::string& err);
 
 private:
     static bool _s_check_gl_flag;

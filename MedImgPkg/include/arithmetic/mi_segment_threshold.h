@@ -1,8 +1,10 @@
 #ifndef MEDIMGARITHMETIC_MI_SEGMENT_THRESHOLD_H
 #define MEDIMGARITHMETIC_MI_SEGMENT_THRESHOLD_H
 
+#include <ostream>
 #include "arithmetic/mi_sampler.h"
 #include "arithmetic/mi_segment_interface.h"
+#include "arithmetic/mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

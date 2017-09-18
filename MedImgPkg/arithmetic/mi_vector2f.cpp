@@ -98,25 +98,4 @@ void load_xy(Vector2f& vec, const float* fptr) {
     vec = Vector2f(fptr[0], fptr[1]);
 }
 
-#ifdef _DEBUG
-
-void print(const Vector2f& vec) {
-    union {
-        __m128 v;
-        float s[2];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("( %f %f )\n", tmp.s[0], tmp.s[1]);
-}
-
-void print(const Vector2f& vec, const char* name) {
-    union {
-        __m128 v;
-        float s[2];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("%s: ( %f %f )\n", name, tmp.s[0], tmp.s[1]);
-}
-#endif
-
 MED_IMG_END_NAMESPACE

@@ -84,7 +84,6 @@ public:
 
         //////////////////////////////////////////////////////////////////////////
         //Test
-        //std::cout << "roi dim : " << _roi_dim[0] << " " << _roi_dim[1] << " " << _roi_dim[2] << std::endl;
         //std::ofstream out("D:/temp/roi.raw" , std::ios::binary | std::ios::out);
         //if (out.is_open())
         //{

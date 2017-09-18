@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_VECTOR4F_H
 #define MEDIMGARITHMETIC_MI_VECTOR4F_H
 
+#include <ostream>
 #include "arithmetic/mi_simd.h"
 #include "arithmetic/mi_vector3f.h"
 
@@ -209,6 +210,11 @@ public:
         __m128 temp = _vmathVfDot4(_m128, _m128);
         return _vmathVfGetElement(temp, 0);
     }
+
+    friend std::ostream& operator<<(std::ostream &strm, const Vector4f& pt) {
+        strm << "(" << pt.get_x() << "," << pt.get_y() << "," << pt.get_z() << "," << pt.get_w() <<  ") ";
+        return strm;
+    }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -288,18 +294,6 @@ Arithmetic_Export void store_xyzw(const Vector4f& vec, float* fptr);
 
 // load x, y, z and w elements of 4-D vector in first four words of a float ptr
 Arithmetic_Export void load_xyzw(Vector4f& vec, const float* fptr);
-
-#ifdef _DEBUG
-
-// print a 4-D vector
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector4f& vec);
-
-// print a 4-D vector and an associated string identifier
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector4f& vec, const char* name);
-
-#endif
 
 MED_IMG_END_NAMESPACE
 

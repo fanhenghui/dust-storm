@@ -617,17 +617,6 @@ Arithmetic_Export inline const Matrix4f ortho_inverse(const Matrix4f& mat);
 // determinant of a 4x4 matrix
 Arithmetic_Export inline const float determinant(const Matrix4f& mat);
 
-#ifdef _DEBUG
-
-// print a 4x4 matrix
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export inline void print(const Matrix4f& mat);
-
-// print a 4x4 matrix and an associated string identifier
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export inline void print(const Matrix4f& mat, const char* name);
-
-#endif
 
 MED_IMG_END_NAMESPACE
 

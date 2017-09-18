@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_POINT3_H
 #define MEDIMGARITHMETIC_MI_POINT3_H
 
+#include <ostream>
 #include "arithmetic/mi_vector3.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -67,8 +68,9 @@ public:
                 std::fabs(z - pt.z) < DOUBLE_EPSILON);
     }
 
-    void print() {
-        std::cout << "( " << x << " , " << y << " , " << z << " ) ";
+    friend std::ostream& operator<<(std::ostream &strm, const Point3& pt) {
+        strm << "(" << pt.x << "," << pt.y << "," << pt.z << ") ";
+        return strm;
     }
 };
 

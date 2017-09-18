@@ -235,20 +235,4 @@ const float determinant(const Matrix4f& mat) {
     return _vmathVfGetElement(Det, 0);
 }
 
-#ifdef _DEBUG
-
-void print(const Matrix4f& mat) {
-    print(mat.get_row(0));
-    print(mat.get_row(1));
-    print(mat.get_row(2));
-    print(mat.get_row(3));
-}
-
-void print(const Matrix4f& mat, const char* name) {
-    printf("%s:\n", name);
-    print(mat);
-}
-
-#endif
-
 MED_IMG_END_NAMESPACE

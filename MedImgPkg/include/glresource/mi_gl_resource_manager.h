@@ -1,8 +1,10 @@
-#ifndef MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H_
-#define MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H_
+#ifndef MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H
+#define MEDIMGRESOURCE_GL_RESOURCE_MANAGER_H
 
+#include <sstream>
 #include "boost/thread/mutex.hpp"
 #include "glresource/mi_gl_object.h"
+#include "log/mi_logger_util.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

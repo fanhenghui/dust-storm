@@ -1,8 +1,8 @@
 #ifndef MEDIMGARITHMETIC_MI_VECTOR2_H
 #define MEDIMGARITHMETIC_MI_VECTOR2_H
 
+#include <ostream>
 #include "arithmetic/mi_arithmetic_export.h"
-//#include "arithmetic/mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -126,8 +126,9 @@ public:
         return std::fabs(this->dot_product(v)) < DOUBLE_EPSILON;
     }
 
-    void print() {
-        std::cout << "( " << x << " , " << y << " ) ";
+    friend std::ostream& operator<<(std::ostream &strm, const Vector2 &pt) {
+        strm << "(" << pt.x << "," << pt.y << ") ";
+        return strm;
     }
 };
 

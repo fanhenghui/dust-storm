@@ -8,8 +8,9 @@ template <class ResourceType> void GLResourceManager<ResourceType>::update() {
 
     for (auto it = _discard.begin(); it != _discard.end();) {
         if ((*it).use_count() > 1) {
-            // std::cout << "Cant discard useless " << GetObjectDescription() <<
-            // (*it)->get_uid() << std::endl;
+            std::stringstream ss;
+            ss << "Cant discard useless " << std::dynamic_pointer_cast<GLObject>(*it);
+            LoggerUtil::log(MI_ERROR, "GLResource", ss.str());
             ++it;
         } else {
             (*it)->finalize();
@@ -35,8 +36,9 @@ void GLResourceManager<ResourceType>::remove_object(UIDType uid) {
     auto it = _objects.find(uid);
 
     if (it != _objects.end()) {
-        std::cout << "remove useless " << it->second->get_description() << uid
-                  << std::endl;
+        std::stringstream ss;
+        ss << "remove useless " << std::dynamic_pointer_cast<GLObject>(it->second);
+        LoggerUtil::log(MI_INFO, "GLResource", ss.str());
         _discard.push_back(it->second);
         _objects.erase(it);
     }
@@ -71,10 +73,13 @@ GLResourceManager<ResourceType>::create_object(UIDType& uid) {
         GLRESOURCE_THROW_EXCEPTION("Generated UID invalid!");
     }
 
-    std::shared_ptr<ResourceType> pResource(new ResourceType(uid));
-    _objects[uid] = pResource;
+    std::shared_ptr<ResourceType> new_res(new ResourceType(uid));
+    _objects[uid] = new_res;
 
-    return pResource;
+    std::stringstream ss;
+    ss << "create " << std::dynamic_pointer_cast<GLObject>(new_res);
+    LoggerUtil::log(MI_INFO, "GLResource", ss.str());
+    return new_res;
 }
 
 template <class ResourceType>

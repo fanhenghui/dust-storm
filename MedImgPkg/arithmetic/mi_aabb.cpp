@@ -48,11 +48,6 @@ int AABBUI::volume() const {
     return (_max[0] - _min[0])*(_max[1] - _min[1])*(_max[2] - _min[2]);
 }
 
-void AABBUI::Print() {
-    std::cout << "AABBUI : [ " << _min[0] << " " << _min[1] << " " << _min[2]
-              << " ] , [" << _max[0] << " " << _max[1] << " " << _max[2]
-              << " ]\n";
-}
 
 AABBI::AABBI() {
     memset(_min, 0, sizeof(_min));
@@ -82,10 +77,5 @@ int AABBI::volume() const {
     return (_max[0] - _min[0])*(_max[1] - _min[1])*(_max[2] - _min[2]);
 }
 
-void AABBI::Print() {
-    std::cout << "AABBI : [ " << _min[0] << " " << _min[1] << " " << _min[2]
-              << " ] , [" << _max[0] << " " << _max[1] << " " << _max[2]
-              << " ]\n";
-}
 
 MED_IMG_END_NAMESPACE

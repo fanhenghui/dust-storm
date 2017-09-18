@@ -2,7 +2,7 @@
 #define MEDIMGARITHMETIC_MI_COLOR_UNIT_H
 
 #include "arithmetic/mi_arithmetic_export.h"
-#include <iostream>
+#include <ostream>
 #include "arithmetic/mi_vector4f.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -23,8 +23,9 @@ struct RGBUnit {
         return rgb.r != r || rgb.g != g || rgb.b != b;
     }
 
-    void print() {
-        std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " )";
+    friend std::ostream& operator << (std::ostream& strm , const RGBUnit& rgb) {
+        strm << "( " << (int)rgb.r << " , " << (int)rgb.g << " , " << (int)rgb.b << " )";
+        return strm;
     }
 };
 
@@ -83,8 +84,9 @@ struct RGBAUnit {
         return rgba.r != r || rgba.g != g || rgba.b != b || rgba.a != a;
     }
 
-    void print() {
-        std::cout << "( " << (int)r << " , " << (int)g << " , " << (int)b << " , " << (int)a << " )";
+    friend std::ostream& operator << (std::ostream& strm, RGBAUnit& rgba) {
+        strm << "( " << (int)rgba.r << " , " << (int)rgba.g << " , " << (int)rgba.b << " , " << (int)rgba.a << " )";
+        return strm;
     }
 };
 

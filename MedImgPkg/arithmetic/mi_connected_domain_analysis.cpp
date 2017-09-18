@@ -2,6 +2,8 @@
 #include <stack>
 #include <cassert>
 
+#include "mi_arithmetic_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 void ConnectedDomainAnalysis::seed_filling(std::stack<POS>& s , unsigned char label ,
@@ -17,7 +19,7 @@ void ConnectedDomainAnalysis::seed_filling(std::stack<POS>& s , unsigned char la
         if (s.empty() && cd_num == 0) {
             _roi_cache.get()[pos.z * _roi_dim[0]*_roi_dim[1] + pos.y * _roi_dim[0] + pos.x] =
                 0; //isolated point
-            //std::cout << "isolated point\n";
+            MI_ARITHMETIC_LOG(MI_DEBUG) << "isolated point.";
             break;
         }
 
@@ -82,7 +84,6 @@ void ConnectedDomainAnalysis::keep_major() {
     //                if (l0 == 1)
     //                {
     //                    err_0 ++;
-    //                    //std::cout << "ERROR 1 \n";
     //                }
     //                if (l0 == 0 && l1 != 0)
     //                {
@@ -91,12 +92,11 @@ void ConnectedDomainAnalysis::keep_major() {
     //                if(l0 != 0 && l1 == 0)
     //                {
     //                    err_2 ++;
-    //                    //std::cout << "ERROR 1\n";
     //                }
     //            }
     //        }
     //    }
-    //    std::cout << "err : " << err_0 << " " << err_1 << " " << err_2 << std::endl;
+    //    MI_ARITHMETIC_LOG(MI_ERROR) << "err : " << err_0 << " " << err_1 << " " << err_2;
     //}
     //////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +167,7 @@ void ConnectedDomainAnalysis::keep_major() {
 
     //////////////////////////////////////////////////////////////////////////
     //Test
-    //std::cout << "roi dim : " << _roi_dim[0] << " " << _roi_dim[1] << " " << _roi_dim[2] << std::endl;
+    //MI_ARITHMETIC_LOG(MI_DEBUG) << "roi dim : " << _roi_dim[0] << " " << _roi_dim[1] << " " << _roi_dim[2] << std::endl;
     //std::ofstream out("D:/temp/roi_cd.raw" , std::ios::binary | std::ios::out);
     //if (out.is_open())
     //{

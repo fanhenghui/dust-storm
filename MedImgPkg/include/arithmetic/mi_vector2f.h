@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_VECTOR2F_H
 #define MEDIMGARITHMETIC_MI_VECTOR2F_H
 
+#include <ostream>
 #include "arithmetic/mi_simd.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -170,6 +171,11 @@ public:
     inline void normalize() {
         _m128 = _mm_mul_ps(_m128, newtonrapson_rsqrt4(_vmathVfDot2(_m128, _m128)));
     }
+
+    friend std::ostream& operator<<(std::ostream &strm, const Vector2f& pt) {
+        strm << "(" << pt.get_x() << "," << pt.get_y() << ") ";
+        return strm;
+    }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -247,17 +253,6 @@ Arithmetic_Export void store_xy(const Vector2f& vec, float* fptr);
 
 // load x and y elements of 2-D vector in first three words of a float ptr
 Arithmetic_Export void load_xy(Vector2f& vec, const float* fptr);
-
-#ifdef _DEBUG
-// print a 2-D vector
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector2f& vec);
-
-// print a 2-D vector and an associated string identifier
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector2f& vec, const char* name);
-
-#endif
 
 MED_IMG_END_NAMESPACE
 

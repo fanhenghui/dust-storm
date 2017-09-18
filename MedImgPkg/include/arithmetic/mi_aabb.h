@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_AABB_H
 #define MEDIMGARITHMETIC_MI_AABB_H
 
+#include <ostream>
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_shape_interface.h"
 
@@ -17,6 +18,12 @@ public:
 
     bool operator==(const AABB& aabb) const;
     bool operator!=(const AABB& aabb) const;
+
+    friend std::ostream& operator << (std::ostream& strm , const AABB& aabb) {
+        strm << "AABB : [ " << aabb._min.x << " " << aabb._min.y << " " << aabb._min.z
+        << " ] , [" << aabb._max.x << " " << aabb._max.y << " " << aabb._max.z
+        << " ]";
+    }
 };
 
 class Arithmetic_Export AABBUI : public IShape {
@@ -34,7 +41,11 @@ public:
 
     int volume() const;
 
-    void Print();
+    friend std::ostream& operator << (std::ostream& strm , const AABBUI& aabb) {
+        strm << "AABBUI : [ " << aabb._min[0] << " " << aabb._min[1] << " " << aabb._min[2]
+        << " ] , [" << aabb._max[0] << " " << aabb._max[1] << " " << aabb._max[2]
+        << " ]";
+    }
 };
 
 class Arithmetic_Export AABBI : public IShape {
@@ -52,7 +63,11 @@ public:
 
     int volume() const;
 
-    void Print();
+    friend std::ostream& operator << (std::ostream& strm , const AABBI& aabb) {
+        strm << "AABBI : [ " << aabb._min[0] << " " << aabb._min[1] << " " << aabb._min[2]
+        << " ] , [" << aabb._max[0] << " " << aabb._max[1] << " " << aabb._max[2]
+        << " ]";
+    }
 };
 
 MED_IMG_END_NAMESPACE

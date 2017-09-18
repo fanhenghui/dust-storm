@@ -1,4 +1,5 @@
 #include "mi_run_length_operator.h"
+#include "mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -33,7 +34,7 @@ std::vector<unsigned int> RunLengthOperator::encode(const unsigned char* mask_ar
             sum_voxels += (*it);
         }
 
-        std::cout << sum_voxels << " voxels get counted\n";
+        MI_ARITHMETIC_LOG(MI_DEBUG) << sum_voxels << " voxels get counted.";
     }
 
     return result; // let's rely on return-value-optimization

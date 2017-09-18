@@ -17,9 +17,18 @@
     <ClInclude Include="..\include\log\mi_logger_export.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\log\mi_logger_util.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\log\mi_logger_define.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\log\mi_logger.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\log\mi_logger_util.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

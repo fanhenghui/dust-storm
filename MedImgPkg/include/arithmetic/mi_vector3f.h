@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_VECTOR3F_H
 #define MEDIMGARITHMETIC_MI_VECTOR3F_H
 
+#include <ostream>
 #include "arithmetic/mi_simd.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -243,6 +244,11 @@ public:
     inline void abs() {
         _m128 = _mm_and_ps(_m128, toM128(0x7fffffff));
     }
+
+    friend std::ostream& operator<<(std::ostream &strm, const Vector3f& pt) {
+        strm << "(" << pt.get_x() << "," << pt.get_y() << "," << pt.get_z() << ") ";
+        return strm;
+    }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -329,16 +335,6 @@ Arithmetic_Export void load_xyz(Vector3f& vec, const float* fptr);
 
 Arithmetic_Export const Vector3f operator/(const float scalar,
         const Vector3f& vec);
-
-#ifdef _DEBUG
-// print a 3-D vector
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector3f& vec);
-
-// print a 3-D vector and an associated string identifier
-// Function is only defined when _DEBUG is defined.
-Arithmetic_Export void print(const Vector3f& vec, const char* name);
-#endif
 
 MED_IMG_END_NAMESPACE
 #endif

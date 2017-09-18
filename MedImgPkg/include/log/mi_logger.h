@@ -6,6 +6,7 @@
 #include <iomanip>
 
 #include "log/mi_logger_export.h"
+#include "log/mi_logger_define.h"
 
 #include "boost/thread/mutex.hpp"
 
@@ -25,18 +26,8 @@ namespace sinks = boost::log::sinks;
 namespace attrs = boost::log::attributes;
 namespace keywords = boost::log::keywords;
 
-namespace medical_imaging{
-enum SeverityLevel {
-    MI_TRACE,
-    MI_DEBUG,
-    MI_INFO,
-    MI_WARNING,
-    MI_ERROR,
-    MI_FATAL,
-};
-
 template< typename CharT, typename TraitsT >
-inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< CharT, TraitsT >& strm, SeverityLevel lvl) {
+inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< CharT, TraitsT >& strm, medical_imaging::SeverityLevel lvl) {
     static const int lvlnum = 6; 
     static const char* const lvlstr[lvlnum] = {
         "Trace",
@@ -53,8 +44,6 @@ inline std::basic_ostream< CharT, TraitsT >& operator<< ( std::basic_ostream< Ch
     }
     return strm;
 }
-}
-
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(mi_logger,src::severity_logger< medical_imaging::SeverityLevel >)
 
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)

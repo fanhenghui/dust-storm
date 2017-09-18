@@ -51,8 +51,6 @@ class RenderAlgo_Export CameraCalculator {
 public:
     CameraCalculator(std::shared_ptr<ImageData> image_data);
 
-    // void UpdateImageData(std::shared_ptr<ImageData> image_data);
-
     //////////////////////////////////////////////////////////////////////////
     // Initializion
     //////////////////////////////////////////////////////////////////////////

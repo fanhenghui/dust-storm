@@ -30,6 +30,7 @@
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_brick_pool.h"
+#include "renderalgo/mi_render_algo_logger.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -84,7 +85,15 @@ std::vector<std::string> GetFiles() {
 void Init() {
     Configuration::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
+    Logger::instance()->bind_config_file("./config/log_config");
     Logger::instance()->initialize();
+
+    MI_RENDERALGO_LOG(MI_TRACE) << "test debug log";
+    MI_RENDERALGO_LOG(MI_DEBUG) << "test debug log";
+    MI_RENDERALGO_LOG(MI_INFO) << "test debug log";
+    MI_RENDERALGO_LOG(MI_WARNING) << "test debug log";
+    MI_RENDERALGO_LOG(MI_ERROR) << "test debug log";
+    MI_RENDERALGO_LOG(MI_FATAL) << "test debug log";
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
@@ -185,7 +194,7 @@ void Init() {
 
     if (IO_SUCCESS !=
             TransferFuncLoader::load_pseudo_color(pseudo_color_xml, pseudo_color)) {
-        std::cout << "load pseudo failed!\n";
+        MI_RENDERALGO_LOG(MI_ERROR) << "load pseudo failed!\n";
     }
 
     _scene->set_pseudo_color(pseudo_color);
@@ -301,18 +310,18 @@ void Display() {
 #else
         FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
-        // std::cout << "compressing time : " << _scene->get_compressing_time() <<
+        // MI_RENDERALGO_LOG(MI_TRACE) << "compressing time : " << _scene->get_compressing_time() <<
         // std::endl;
 
-        // std::cout << "gl compressing time : " << _time_query2->end() <<
+        // MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() <<
         // std::endl;
 
-        std::cout << "rendering time : " << _time_query->end() << " " << buffer_size
+        MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << _time_query->end() << " " << buffer_size
                   << std::endl;
 
         glutSwapBuffers();
     } catch (Exception& e) {
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_ERROR) << e.what();
         abort();
     }
 }
@@ -416,8 +425,6 @@ void MouseMotion(int x, int y) {
 
     Point2 cur_pt(x, y);
 
-    // std::cout << "Pre : " << m_ptPre.x << " " <<m_ptPre.y << std::endl;
-    // std::cout << "Cur : " << cur_pt.x << " " <<cur_pt.y << std::endl;
     if (_iButton == GLUT_LEFT_BUTTON) {
         _scene->rotate(_ptPre, cur_pt);
 
@@ -429,7 +436,7 @@ void MouseMotion(int x, int y) {
         //_scene->set_global_window_level(_ww, _wl);
         //_scene->set_window_level(_ww, _wl, 0);
         _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
-        std::cout << "wl : " << _ww << " " << _wl << std::endl;
+        MI_RENDERALGO_LOG(MI_DEBUG) << "wl : " << _ww << " " << _wl << std::endl;
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
         _scene->zoom(_ptPre, cur_pt);
@@ -449,6 +456,10 @@ int TE_VRScene(int argc, char* argv[]) {
 
         Init();
 
+        Point2 pt(12,23);
+        MI_LOG(MI_INFO) << "test point2" << pt;
+        std::cout << pt << std::endl;
+
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0, 0);
@@ -457,7 +468,7 @@ int TE_VRScene(int argc, char* argv[]) {
         glutCreateWindow("Test GL resource");
 
         if (GLEW_OK != glewInit()) {
-            std::cout << "Init glew failed!\n";
+            MI_RENDERALGO_LOG(MI_FATAL) << "Init glew failed!\n";
             return -1;
         }
 
@@ -480,7 +491,7 @@ int TE_VRScene(int argc, char* argv[]) {
 
         return 0;
     } catch (const Exception& e) {
-        std::cout << e.what();
+        MI_RENDERALGO_LOG(MI_FATAL) << e.what();
         return -1;
     }
 }

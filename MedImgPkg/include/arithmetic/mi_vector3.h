@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_VECTOR3_H
 #define MEDIMGARITHMETIC_MI_VECTOR3_H
 
+#include <ostream>
 #include "arithmetic/mi_arithmetic_export.h"
 //#include "arithmetic/mi_arithmetic_logger.h"
 
@@ -141,8 +142,9 @@ public:
         return std::fabs(this->dot_product(v)) < DOUBLE_EPSILON;
     }
 
-    void print() {
-        std::cout << "( " << x << " , " << y << " , " << z << " ) ";
+    friend std::ostream& operator<<(std::ostream &strm, const Vector3 &pt) {
+        strm << "(" << pt.x << "," << pt.y << "," << pt.z << ") ";
+        return strm;
     }
 };
 

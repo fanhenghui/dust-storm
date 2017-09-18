@@ -1,6 +1,7 @@
 #include "mi_camera_calculator.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 #include "io/mi_image_data.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -8,12 +9,6 @@ CameraCalculator::CameraCalculator(std::shared_ptr<ImageData> image_data)
     : _volume_data(image_data), _is_volume_orthogonal(true) {
     calculate_i();
 }
-
-// void CameraCalculator::UpdateImageData(std::shared_ptr<ImageData> image_data)
-//{
-//    _volume_data = image_data;
-//    Calculate_i();
-//}
 
 const Matrix4& CameraCalculator::get_volume_to_physical_matrix() const {
 
@@ -639,9 +634,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
 
     _default_mpr_center = look_at;
     Point3 pt_test = _mat_volume_to_wolrd.get_inverse().transform(_default_mpr_center);
-    printf("mpr center volume : ");pt_test.print();
-    printf("\n");
-
+    MI_RENDERALGO_LOG(MI_DEBUG) << "MPR volume center: " << pt_test;
 }
 
 const Matrix4& CameraCalculator::get_patient_to_world_matrix() const {

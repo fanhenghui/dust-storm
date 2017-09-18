@@ -56,6 +56,16 @@ public:
         _description = des;
     }
 
+    friend std::ostream& operator << (std::ostream& strm ,const GLObject& obj) {
+        strm << "GLOBJ type: " << obj.get_type() << ", uid: " << obj.get_uid() << ", des: " << obj.get_description();
+        return strm;
+    }
+
+    friend std::ostream& operator << (std::ostream& strm ,const std::shared_ptr<GLObject>& obj) {
+        strm << "GLOBJ type: " << obj->get_type() << ", uid: " << obj->get_uid() << ", des: " << obj->get_description();
+        return strm;
+    }
+
     virtual void initialize() = 0;
     virtual void finalize() = 0;
 

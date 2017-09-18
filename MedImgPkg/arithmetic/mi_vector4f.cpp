@@ -107,26 +107,4 @@ void load_xyzw(Vector4f& vec, const float* fptr) {
     vec = Vector4f(fptr[0], fptr[1], fptr[2], fptr[3]);
 }
 
-#ifdef _DEBUG
-
-void print(const Vector4f& vec) {
-    union {
-        __m128 v;
-        float s[4];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("( %f %f %f %f )\n", tmp.s[0], tmp.s[1], tmp.s[2], tmp.s[3]);
-}
-
-void print(const Vector4f& vec, const char* name) {
-    union {
-        __m128 v;
-        float s[4];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("%s: ( %f %f %f %f )\n", name, tmp.s[0], tmp.s[1], tmp.s[2], tmp.s[3]);
-}
-
-#endif
-
 MED_IMG_END_NAMESPACE

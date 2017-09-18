@@ -109,30 +109,8 @@ void load_xyz(Vector3f& vec, float* fptr) {
     vec = Vector3f(fptr[0], fptr[1], fptr[2]);
 }
 
-#ifdef _DEBUG
-
-void print(const Vector3f& vec) {
-    union {
-        __m128 v;
-        float s[4];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("( %f %f %f )\n", tmp.s[0], tmp.s[1], tmp.s[2]);
-}
-
-void print(const Vector3f& vec, const char* name) {
-    union {
-        __m128 v;
-        float s[4];
-    } tmp;
-    tmp.v = vec._m128;
-    printf("%s: ( %f %f %f )\n", name, tmp.s[0], tmp.s[1], tmp.s[2]);
-}
-
 const Vector3f operator/(const float scalar, const Vector3f& vec) {
     return Vector3f(_mm_div_ps(_mm_set1_ps(scalar), vec._m128));
 }
-
-#endif
 
 MED_IMG_END_NAMESPACE
