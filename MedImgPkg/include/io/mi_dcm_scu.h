@@ -10,28 +10,28 @@ MED_IMG_BEGIN_NAMESPACE
 
 class WorkListInfo;
 
-class IO_Export MIDcmSCU : public DcmSCU {
+class MIDcmSCU : public DcmSCU {
 public:
-    MIDcmSCU(const char* self_AE_title);
+    IO_Export MIDcmSCU(const char* self_AE_title);
 
-    ~MIDcmSCU() {};
+    IO_Export ~MIDcmSCU() {};
 
     // create association
-    bool createAssociation(const char* serive_ip_address,
+    IO_Export bool createAssociation(const char* serive_ip_address,
                            const unsigned short serive_port,
                            const char* service_AE_title);
 
     // search with user specified keys
-    bool search_all();
+    IO_Export bool search_all();
 
-    bool fetch(const char* dst_AE_title, const WorkListInfo& which_one);
+    IO_Export bool fetch(const char* dst_AE_title, const WorkListInfo& which_one);
 
     // finish the current association, without de-constructing, for next new
     // association
-    void endAssociation();
+    IO_Export void endAssociation();
 
     // output work list
-    void set_work_list(std::vector<WorkListInfo>* p_work_list);
+    IO_Export void set_work_list(std::vector<WorkListInfo>* p_work_list);
 
 private:
     bool search(DcmDataset& query_keys);

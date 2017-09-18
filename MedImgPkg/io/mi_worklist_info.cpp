@@ -1,6 +1,5 @@
 #include "mi_worklist_info.h"
-
-#include <iostream>
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -96,9 +95,8 @@ bool WorkListInfo::SetPatientName(const std::string& sPatientName) {
 bool WorkListInfo::SetPatientSex(const std::string& sPatientSex) {
     if (sPatientSex != "F" && sPatientSex != "M" && sPatientSex != "O" &&
             sPatientSex != "f" && sPatientSex != "m" && sPatientSex != "o") {
-        std::cout << "WorkListInfo::SetPatientSex() Parameter Check: PatientSex "
-                  "isn't 'F', 'f','M', 'm' or 'O', 'o'."
-                  << std::endl;
+        MI_IO_LOG(MI_ERROR) << "WorkListInfo::SetPatientSex() Parameter Check: PatientSex "
+                  "isn't 'F', 'f','M', 'm' or 'O', 'o'.";
         return false;
     }
 

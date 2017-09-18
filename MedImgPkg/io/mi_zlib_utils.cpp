@@ -107,7 +107,7 @@ IOStatus ZLibUtils::decompress(const std::string& src_path,
 
         // if (strm.avail_in != 16384)
         //{
-        //    std::cout << strm.avail_in << std::endl;
+        //    MI_IO_LOG(MI_ERROR) << strm.avail_in;
         //}
         if (strm.avail_in == 0) {
             break;
@@ -122,7 +122,7 @@ IOStatus ZLibUtils::decompress(const std::string& src_path,
             ret = inflate(&strm, Z_NO_FLUSH);
 
             if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR ||
-                    ret == Z_MEM_ERROR) { //��ѹ������ĩβ����Z_OK
+                    ret == Z_MEM_ERROR) {
                 src_file.close();
                 dst_file.close();
                 inflateEnd(&strm);
@@ -138,8 +138,6 @@ IOStatus ZLibUtils::decompress(const std::string& src_path,
 
     /* clean up and return */
     inflateEnd(&strm);
-
-    // std::cout << current_size << "\n";
 
     return IO_SUCCESS;
 }
@@ -191,7 +189,7 @@ IOStatus ZLibUtils::decompress(const std::string& src_path, char* dst_buffer,
             ret = inflate(&strm, Z_NO_FLUSH);
 
             if (ret == Z_NEED_DICT || ret == Z_DATA_ERROR ||
-                    ret == Z_MEM_ERROR) { //��ѹ������ĩβ����Z_OK
+                    ret == Z_MEM_ERROR) {
                 src_file.close();
                 inflateEnd(&strm);
                 return IO_DATA_DAMAGE;

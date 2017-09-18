@@ -13,6 +13,8 @@
 #include "dcmtk/dcmimgle/dcmimage.h"
 #include "dcmtk/dcmjpeg/djdecode.h"
 
+#include "mi_io_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 DICOMRTLoader::DICOMRTLoader() {}
@@ -22,19 +24,23 @@ DICOMRTLoader::~DICOMRTLoader() {}
 IOStatus DICOMRTLoader::load_rt_struct(const std::string& file_name,
                                        std::shared_ptr<RTStruct>& rt_struct) {
     try {
+        MI_IO_LOG(MI_TRACE) << "IN load RT struct: " << file_name;
         DcmFileFormatPtr file_format(new DcmFileFormat());
         OFCondition status = file_format->loadFile(file_name.c_str());
 
         if (status.bad()) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "load rt struct: " << file_name << "failed.";
+            return IO_FILE_OPEN_FAILED;
         }
 
-        return load_rt_struct(file_format, rt_struct);
+        IOStatus io_status = load_rt_struct(file_format, rt_struct);
+
+        MI_IO_LOG(MI_TRACE) << "OUT load RT struct: " << file_name;
+        return io_status;
 
     } catch (const Exception& e) {
-        std::cout << e.what();
-        throw e;
+        MI_LOG(MI_ERROR) << "load RT struct file: " << file_name << "failed with exception: " << e.what();
+        return IO_FILE_OPEN_FAILED;
     }
 }
 
@@ -50,41 +56,39 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
         OFCondition status = data_set->findAndGetOFString(DCM_Modality, modality);
 
         if (status.bad()) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "get modality failed.";
+            return IO_FILE_OPEN_FAILED;
         }
 
         if ("RTSTRUCT" != modality) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "modality is not RTSTRUCT.";
+            return IO_DATA_DAMAGE;
         }
 
-        std::cout << modality.c_str() << std::endl;
+        MI_LOG(MI_DEBUG) << "modality is : " << modality.c_str();
 
         DcmSequenceOfItems* roi_sequence = nullptr;
-        status =
-            data_set->findAndGetSequence(DCM_StructureSetROISequence, roi_sequence);
+        status = data_set->findAndGetSequence(DCM_StructureSetROISequence, roi_sequence);
 
         if (status.bad()) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "get ROI set sequence failed.";
+            return IO_DATA_DAMAGE;
         }
 
         DcmSequenceOfItems* contour_sequence = nullptr;
-        status =
-            data_set->findAndGetSequence(DCM_ROIContourSequence, contour_sequence);
+        status = data_set->findAndGetSequence(DCM_ROIContourSequence, contour_sequence);
 
         if (status.bad()) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "get ROI contour sequence failed.";
+            return IO_DATA_DAMAGE;
         }
 
         const unsigned long roi_num = roi_sequence->card();
         const unsigned long contour_num = contour_sequence->card();
 
         if (roi_num != contour_num) {
-            // TODO LOG
-            std::cout << "err\n";
+            MI_LOG(MI_ERROR) << "ROI num is not match with contour num.";
+            return IO_DATA_DAMAGE;
         }
 
         for (unsigned long i = 0; i < roi_num; ++i) {
@@ -95,8 +99,8 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
             status = roi_item->findAndGetOFString(DCM_ROIName, roi_name);
 
             if (status.bad()) {
-                // TODO LOG
-                std::cout << "err\n";
+                MI_LOG(MI_ERROR) << "get ROI name failed.";
+                return IO_DATA_DAMAGE;
             }
 
             DcmSequenceOfItems* contour_unit_sequence = nullptr;
@@ -104,8 +108,8 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
                      contour_unit_sequence);
 
             if (status.bad()) {
-                // TODO LOG
-                std::cout << "err\n";
+                MI_LOG(MI_ERROR) << "get contour sequence failed.";
+                return IO_DATA_DAMAGE;
             }
 
             unsigned long contour_unit_num = contour_unit_sequence->card();
@@ -117,15 +121,16 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
                          points_array);
 
                 if (status.bad()) {
-                    // TODO LOG
-                    std::cout << "err\n";
+                    MI_LOG(MI_ERROR) << "get contour data failed.";
+                    return IO_DATA_DAMAGE;
                 }
 
                 std::vector<std::string> points;
                 boost::split(points, points_array, boost::is_any_of("|/\\"));
 
                 if (0 != points.size() % 3) {
-                    // TODO LOG
+                    MI_LOG(MI_ERROR) << "contour point size invalid.";
+                    return IO_DATA_DAMAGE;
                 }
 
                 ContourData* contour_data = new ContourData();
@@ -142,17 +147,15 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
                 rt_struct->add_contour(roi_name.c_str(), contour_data);
             }
 
-            std::cout << roi_name << std::endl;
+            MI_LOG(MI_INFO) << "ROI name: " << roi_name;
         }
-
-        std::cout << "DONE\n";
 
         return IO_SUCCESS;
 
     } catch (const Exception& e) {
         rt_struct.reset();
-        std::cout << e.what();
-        return IO_SUCCESS;
+        throw e;
+        return IO_FILE_OPEN_FAILED;
     }
 }
 

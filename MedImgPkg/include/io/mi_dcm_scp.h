@@ -4,14 +4,13 @@
 #include "dcmtk/dcmnet/dstorscp.h"
 #include "io/mi_io_export.h"
 
-
 MED_IMG_BEGIN_NAMESPACE
 
-class IO_Export MIDcmSCP : public DcmStorageSCP {
+class MIDcmSCP : public DcmStorageSCP {
 public:
-    MIDcmSCP(const char* self_AE_title);
-    ~MIDcmSCP() {};
-    void initialize(const unsigned short port);
+    IO_Export MIDcmSCP(const char* self_AE_title);
+    IO_Export ~MIDcmSCP() {};
+    IO_Export void initialize(const unsigned short port);
 
 private:
     virtual OFCondition

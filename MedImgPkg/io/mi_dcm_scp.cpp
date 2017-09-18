@@ -1,6 +1,7 @@
 #include "mi_dcm_scp.h"
 
 #include "boost/thread.hpp"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -52,7 +53,6 @@ MIDcmSCP::handleIncomingCommand(T_DIMSE_Message* incomingMsg,
 // T_ASC_PresentationContextID presID, DcmDataset *&reqDataset)
 //{
 //    //write to the folder specified by _output_directory
-//    std::cout << "handle \n";
 //    return this->MIDcmSCP::handleSTORERequest(reqMessage, presID, reqDataset);
 //}
 

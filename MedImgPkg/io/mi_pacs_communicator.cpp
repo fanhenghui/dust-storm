@@ -3,7 +3,7 @@
 #include "mi_dcm_scp.h"
 #include "mi_dcm_scu.h"
 #include "mi_worklist_info.h"
-
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -28,7 +28,7 @@ bool PACSCommunicator::initialize(const char* self_AE_title,
 
         if (!this->_scu->createAssociation(serive_ip_address, serive_port,
                                            service_AE_title)) {
-            std::cout << "Fail to create association with PACS\n";
+            MI_IO_LOG(MI_ERROR) << "Fail to create association with PACS.";
             this->_scu.reset(nullptr);
             this->_scp.reset(nullptr);
             return this->_initialized;
@@ -45,8 +45,7 @@ bool PACSCommunicator::initialize(const char* configure_file_path) {
     std::fstream input_file(configure_file_path, std::ios::in);
 
     if (!input_file.is_open()) {
-        std::cout
-                << "Cannot open the specified file :(\n try another initializer \n";
+        MI_IO_LOG(MI_INFO) << "Cannot open the specified file. try another initializer.";
         return false;
     } else {
         std::string line;
@@ -141,11 +140,11 @@ const std::string PACSCommunicator::fetch_dicom(const WorkListInfo& item) {
         OFString root_name(_cache_path.c_str());
 
         if (OFStandard::createDirectory(directory, root_name).bad()) {
-            std::cout << "cannot create directory for downloading images :(\n";
+            MI_IO_LOG(MI_INFO) << "cannot create directory for downloading images :(";
         }
     } else {
         // should we clear this one?! following codes delete the whole folder
-        std::cout << "current files in the specified directory will be deleted!\n";
+        MI_IO_LOG(MI_INFO) << "current files in the specified directory will be deleted!";
 #ifdef WIN32
         std::string cmd = "del /Q \"" + std::string(directory.c_str()) + "\\*.* \"";
 #else
