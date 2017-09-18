@@ -208,7 +208,6 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
             }
         }
     }
-    //std::cout << "Press out >>\n";
 }
 
 void SceneContainer::mouseMoveEvent(QMouseEvent *event)
@@ -242,7 +241,6 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 
 void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
 {
-    //std::cout << "Release in >>\n";
     //1 Graphic item(Qt 2D) interaction
     QGraphicsView::mouseReleaseEvent(event);
 

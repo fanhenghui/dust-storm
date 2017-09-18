@@ -1,5 +1,5 @@
 #include "mi_shared_widget.h"
-
+#include "mi_qt_package_logger.h"
 
 //MED_IMG_BEGIN_NAMESPACE
 
@@ -49,8 +49,7 @@ void SharedWidget::initializeGL()
     }
     catch (const medical_imaging::Exception& e)
     {
-        //TODO LOG
-        std::cout << e.what();
+        MI_QTPACKAGE_LOG(medical_imaging::MI_FATAL) << "initialize GL failed with exception: " << e.what();
         assert(false);
         throw e;
     }

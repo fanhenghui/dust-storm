@@ -9,6 +9,7 @@
 #include "renderalgo/mi_camera_calculator.h"
 
 #include "mi_model_voi.h"
+#include "mi_qt_package_logger.h"
 
 //Qt
 #include <QPen>
@@ -332,7 +333,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
     }
     catch (const Exception& e)
     {
-        std::cout << e.what();
+        MI_QTPACKAGE_LOG(MI_ERROR) << "graphic item VOI update failed with exception: " << e.what();
         assert(false);
         throw e;
     }
@@ -479,7 +480,7 @@ std::shared_ptr<medical_imaging::VOIModel>& GraphicsSphereItem::get_voi_model()
 void GraphicsSphereItem::update_circle_center_i()
 {
     _pre_center = QPointF(this->pos().x() + this->rect().width()*0.5f , this->pos().y() + this->rect().height()*0.5f);
-    //std::cout  << "center : " << _pre_center.x()  << " , " << _pre_center.y() << std::endl;
+    //MI_QTPACKAGE_LOG(MI_DEBUG) << "center : " << _pre_center.x()  << " , " << _pre_center.y();
 }
 
 void GraphicsSphereItem::set_sphere(QPointF center , float radius)

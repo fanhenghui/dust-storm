@@ -12,9 +12,8 @@
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_mpr_scene.h"
 
-
 #include "mi_model_voi.h"
-
+#include "mi_qt_package_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -289,8 +288,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
     }
     catch (const Exception& e)
     {
-        //TODO LOG
-        std::cout << "VOI segment OB update failed! " << e.what();
+        MI_QTPACKAGE_LOG(MI_ERROR) << "VOI segment OB update failed with exception: " << e.what();
         assert(false);
         throw e;
     }

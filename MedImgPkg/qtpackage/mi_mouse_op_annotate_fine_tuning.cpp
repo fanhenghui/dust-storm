@@ -23,7 +23,6 @@ MouseOpAnnotateFineTuning::~MouseOpAnnotateFineTuning()
 void MouseOpAnnotateFineTuning::press(const QPointF& pt)
 {
     // display the default circle at specified location
-    // std::cout << "click voxel at x: " << pt.x() << ", y: " << pt.y() << std::endl;
     std::shared_ptr<SceneBase> scene_base = _scene.lock();
     if (!scene_base)
     {

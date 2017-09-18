@@ -52,7 +52,7 @@ void MouseOpProbe::move(const QPointF& pt)
                     double pixel_value(0);
                     pImg->get_pixel_value(pt_v , pixel_value);
                     pixel_value =pixel_value*pImg->_slope + pImg->_intercept;
-                    std::cout <<pixel_value << " " << pt_v.x << " " << pt_v.y << " " << pt_v.z << std::endl;
+                    //MI_QTPACKAGE_LOG(MI_DEBUG) <<pixel_value << " " << pt_v.x << " " << pt_v.y << " " << pt_v.z;
                 }
             }
             

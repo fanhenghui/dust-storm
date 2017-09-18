@@ -73,9 +73,6 @@ void GraphicItemCrosshair::update(std::vector<QGraphicsItem*>& to_be_add , std::
         _pre_colors[1] == colors[1];
     }
 
-    //std::cout << "<><><><><><><><>\n";
-    //std::cout << scene->get_description() << std::endl;
-
     int width(1) , height(1);
     scene->get_display_size(width , height);
 
@@ -126,11 +123,7 @@ void GraphicItemCrosshair::update(std::vector<QGraphicsItem*>& to_be_add , std::
         QPen pen(QColor(colors[i].r , colors[i].g , colors[i].b));
         _lines[i]->setPen(pen);
         _lines[i]->setLine(QLineF(pt_dc_0 , pt_dc_1));
-
-
     }
-    //std::cout << "<><><><><><><><>\n";
-
 }
 
 MED_IMG_END_NAMESPACE

@@ -1,4 +1,5 @@
 #include "mi_model_voi.h"
+#include "mi_qt_package_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -254,31 +255,29 @@ void VOIModel::print_code_id(int code_id)
     {
     case MODIFYING:
         {
-            std::cout << "modifying...\n";
+            MI_QTPACKAGE_LOG(MI_DEBUG) << "VOI model modifying.";
             break;
         }
     case MODIFY_COMPLETED:
         {
-            std::cout << "modify completed...\n";
+            MI_QTPACKAGE_LOG(MI_DEBUG) << "VOI model modify completed.";
             break;
         }
     case ADD_VOI:
         {
-            std::cout << "add voi...\n";
+            MI_QTPACKAGE_LOG(MI_DEBUG) << "VOI model add voi.";
             break;
         }
     case DELETE_VOI:
         {
-            std::cout << "delete voi...\n";
+            MI_QTPACKAGE_LOG(MI_DEBUG) << "VOI model delete voi.";
             break;
         }
     default:
         {
-            std::cout << "Unknown code id...\n";
+            MI_QTPACKAGE_LOG(MI_DEBUG) << "VOI model Unknown code id.";
         }
-        
     }
 }
-
 
 MED_IMG_END_NAMESPACE
