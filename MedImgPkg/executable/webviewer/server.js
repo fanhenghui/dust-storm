@@ -8,7 +8,6 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var multer = require('multer');
 
 var childProcess = require('child_process');
 var bodyParser = require('body-parser');
@@ -17,16 +16,18 @@ var routes = require('./public/routes/index');
 
 global.dbHandel = require('./public/database/dbHandel');
 global.db = mongoose.connect('mongodb://localhost:27017/nodedb');
-// use session for login
-app.use(session(
-    {secret: 'secret', cookie: {maxAge: 1000 * 60 * 30}}));  // 30 min timeout
+global.db.connection.on("error", function (error) {
+  console.log("connect user mongon DB failed：" + error);
+});
+global.db.connection.on("open", function () {
+  console.log("connect user mongon DB success.")
+});
 
-// simply copy here, figure out later
+// use session for login
+app.use(session( {secret: 'secret', cookie: {maxAge: 1000 * 60 * 30}}));  // 30 min timeout
 app.use(logger('dev'));
-// 解析 ajax 提交的 request 的 body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(multer());
 app.use(cookieParser());
 
 //添加静态目录
@@ -188,11 +189,11 @@ io.on(
           //      {detached: true, stdio: ['ignore', out_log, err_log]});
           //  onlineLogicProcessID[obj.userid] = worker;
           //  console.log('<><><><><><> login in success <><><><><><>');
-        var worker = childProcess.spawn(
-            review_server_path.toString(), ['/tmp/app.' +
-            obj.username],
-            {detached: true});
-        onlineLogicProcessID[obj.userid] = worker;
+        // var worker = childProcess.spawn(
+        //     review_server_path.toString(), ['/tmp/app.' +
+        //     obj.username],
+        //     {detached: true});
+        // onlineLogicProcessID[obj.userid] = worker;
         console.log('<><><><><><> login in success <><><><><><>');
           });
       });
