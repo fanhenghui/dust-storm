@@ -96,7 +96,7 @@ void stream_formatter(logging::record_view const& rec, logging::formatting_ostre
 
 #ifndef WIN32
     if(lvl) {
-        strm << "\033[0m";  
+        strm << "\033[1m";  
     }
 #endif
 }
