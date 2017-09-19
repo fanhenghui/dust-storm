@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 {
     try
     {
-        MI_LOG(MI_TRACE) << "nodule annotation start.";
         medical_imaging::Logger::instance()->initialize();
+        MI_LOG(MI_TRACE) << "nodule annotation start.";
 
         QApplication a(argc, argv);
         //MI_LOG(MI_DEBUG) << a.doubleClickInterval() << std::endl;

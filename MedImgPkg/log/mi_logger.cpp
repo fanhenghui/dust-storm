@@ -23,26 +23,16 @@ typedef sinks::synchronous_sink< sinks::text_file_backend > file_sink_t;
 typedef sinks::synchronous_sink< sinks::text_ostream_backend > stream_sink_t;
 
 namespace {
-void my_formatter(logging::record_view const& rec, logging::formatting_ostream& strm)
+void stream_formatter(logging::record_view const& rec, logging::formatting_ostream& strm)
 {
     using namespace medical_imaging;
     auto lvl = logging::extract< SeverityLevel >("Severity", rec);
-
-    static const int lvlnum = 6; 
-    static const std::string lvlstr[lvlnum] = {
-        std::string("Trace"),
-        std::string("Debug"),
-        std::string("Info"),
-        std::string("Warning"),
-        std::string("Error"),
-        std::string("Fatal"),
-    };
     std::string sev = "";
     
 #ifdef WIN32
     if(lvl) {
-        if (static_cast<int>(lvl.get()) < lvlnum ) {
-            sev = lvlstr[lvl.get()];
+        if (static_cast<int>(lvl.get()) < LEVEL_NUM ) {
+            sev = LEVEL_STR[lvl.get()];
         }
         HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
         switch(lvl.get()) {
@@ -70,8 +60,8 @@ void my_formatter(logging::record_view const& rec, logging::formatting_ostream& 
     }
 #else
     if(lvl) {
-        if (static_cast<int>(lvl.get()) < lvlnum ) {
-            sev = lvlstr[lvl.get()];
+        if (static_cast<int>(lvl.get()) < LEVEL_NUM ) {
+            sev = LEVEL_STR[lvl.get()];
         }
         switch(lvl.get()) {
             case MI_TRACE :
@@ -109,6 +99,24 @@ void my_formatter(logging::record_view const& rec, logging::formatting_ostream& 
         strm << "\033[0m";  
     }
 #endif
+}
+
+void file_formatter(logging::record_view const& rec, logging::formatting_ostream& strm)
+{
+    using namespace medical_imaging;
+    auto lvl = logging::extract< SeverityLevel >("Severity", rec);
+
+    std::string sev = "";
+    if(lvl) {
+        if (static_cast<int>(lvl.get()) < LEVEL_NUM ) {
+            sev = LEVEL_STR[lvl.get()];
+        }
+    }
+    strm << std::hex << std::setw(8) << std::setfill('0') << 
+        logging::extract< unsigned int >("LineID", rec) << std::dec << std::setfill(' ')
+        << ": <" << sev << "> "
+        << "{" << logging::extract< boost::log::aux::thread::id >("ThreadID", rec) << "} "
+        << rec[expr::smessage];
 }
 }
 
@@ -158,19 +166,22 @@ void Logger::initialize()
 
     boost::shared_ptr< file_sink_t > file_sink(new file_sink_t(file_sink_backend));
     //_inner_sink->file_sink = file_sink;
-    file_sink->set_formatter
-        (
-        expr::stream
-        << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
-        << ": <" << severity << "> "
-        //<< "(" << scope << ") "
-        << expr::if_(expr::has_attr(timeline))
-        [
-            expr::stream << "[" << timeline << "] "
-        ]
-    << "{" << thread_id << "} "
-        << expr::smessage
-        );
+    ////set format use expression
+    //file_sink->set_formatter
+    //    (
+    //    expr::stream
+    //    << std::hex << std::setw(8) << std::setfill('0') << line_id << std::dec << std::setfill(' ')
+    //    << ": <" << severity << "> "
+    //    //<< "(" << scope << ") "
+    //    << expr::if_(expr::has_attr(timeline))
+    //    [
+    //        expr::stream << "[" << timeline << "] "
+    //    ]
+    //<< "{" << thread_id << "} "
+    //    << expr::smessage
+    //    );
+    ////set format use function
+    file_sink->set_formatter(&file_formatter);
 
 
     //text stream sink
@@ -197,7 +208,7 @@ void Logger::initialize()
     //    << expr::smessage
     //    );
     ////set format use function
-    stream_sink->set_formatter(&my_formatter);
+    stream_sink->set_formatter(&stream_formatter);
 
     stream_sink->set_filter(severity >= _stream_filer_level);
     file_sink->set_filter(severity >= _file_filer_level );

@@ -14,6 +14,16 @@ enum SeverityLevel {
     MI_FATAL,
 };
 
+static const int LEVEL_NUM = 6; 
+static const std::string LEVEL_STR[LEVEL_NUM] = {
+    std::string("Trace"),
+    std::string("Debug"),
+    std::string("Info"),
+    std::string("Warning"),
+    std::string("Error"),
+    std::string("Fatal"),
+};
+
 MED_IMG_END_NAMESPACE
 
 #endif
