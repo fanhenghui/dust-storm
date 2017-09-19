@@ -274,12 +274,12 @@ void AppThreadModel::process_sending() {
                 std::cout << "send data length : "
                           << static_cast<unsigned int>(buffer_size) << std::endl;
 
-                // For testing write image to disk
-                {
-                    std::stringstream ss;
-                    ss << "/home/wr/data/img_buffer_cell_" << cell_id << ".jpeg";
-                    FileUtil::write_raw(ss.str(), buffer, buffer_size);
-                }
+                // Testing code write image to disk
+                //{
+                //    std::stringstream ss;
+                //    ss << "/home/wangrui22/data/img_buffer_cell_" << cell_id << ".jpeg";
+                //    FileUtil::write_raw(ss.str(), buffer, buffer_size);
+                //}
 
                 _proxy->async_send_message(header, (char*)buffer);
             }
