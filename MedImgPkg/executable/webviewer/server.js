@@ -29,8 +29,6 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-
-//添加静态目录
 app.use(require('express').static(__dirname + '/public'));
 
 // how to render template files
@@ -38,21 +36,8 @@ app.set('views', path.join(__dirname, '/public/views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.use('/', routes);
-//登录表单的提交
-// var uRLEncoderParser = bodyParser.urlencoded({extended: false});
-// app.post("/login_in" , uRLEncoderParser , function(req , res){
-//     //这里查数据库，匹配用户名和密码
-//     if(req.body.username == "wr" && req.body.password == "000000")
-//     {
-//         res.sendFile(__dirname + "/review.html");
-//     }
-//     console.log(req.body.username + " has login in.");
 
-//     //建立websocket长连接
-// });
-
-
-// Websocket 长连接用户
+// websocket user
 var onlineUsers = {};
 var onlineLocalSockets = {};
 var onlineLocalIPC = {};
@@ -97,7 +82,7 @@ io.on( 'connection', function(socket) {
     ipc.config.rawBuffer = true;
     ipc.config.encoding = 'hex';
     ipc.serve(function() {
-      ipc.server.on('connect', function(local_socket) {
+      ipc.server.on('connect', function(localSocket) {
         // when IPC is constructed between server and BE
         // server send a ready MSG to BE to make sure BE is ready
         console.log('IPC connect. Send FE ready to BE.');
@@ -114,20 +99,19 @@ io.on( 'connection', function(socket) {
 
         if (ipc != undefined) {
           // close IPC
-          ipc.server.emit(local_socket, msgFEReady);
+          ipc.server.emit(localSocket, msgFEReady);
           //ipc.server.stop(); // @r.wang why close it here? commented by c.zhang
         }
-        onlineLocalSockets[obj.userid] = local_socket;
+        onlineLocalSockets[obj.userid] = localSocket;
       });
 
-      // sever get logic process's tcp package and transfer to FE
-      // directly(not parse)
-      ipc.server.on('data', function(buffer, local_socket) {
+      // sever get logic process's tcp package and transfer to FE directly(not parse)
+      ipc.server.on('data', function(buffer, localSocket) {
         ipc.log('got a data : ' + buffer.length);
         socket.emit('data', buffer);
       });
 
-      ipc.server.on('socket.disconnected', function(local_socket, destroyedSocketID) {
+      ipc.server.on('socket.disconnected', function(localSocket, destroyedSocketID) {
         ipc.log('client ' + destroyedSocketID + ' has disconnected!');
       });
     });
@@ -166,88 +150,83 @@ io.on( 'connection', function(socket) {
       console.log('<><><><><><> login in success <><><><><><>');
     });
   });
-
-      //监听用户退出
-      socket.on('disconnect', function(obj) {
-        if (obj.username == '') {
-          console.log('invalid null username when disconnect!');
-          return;
-          }
-
-        var userid = socket.name;
-        if (!onlineUsers.hasOwnProperty(userid)) {
-          console.log(obj.username + ' disconnecting failed.');
-          return;
-        }
-
-        console.log(obj.username + ' has disconnecting.');
-        console.log('id : ' + userid);
-
-        // send last msg tp BE to notify it to shut down
-        var ipc = onlineLocalIPC[userid];
-        var localSocket = onlineLocalSockets[userid];
-        // ipc.config.encoding='hex';
-
-        const quitMsg = new Buffer(32);
-        quitMsg.writeUIntLE(1, 0, 4);
-        quitMsg.writeUIntLE(0, 4, 4);
-        quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
-        quitMsg.writeUIntLE(0, 12, 4);
-        quitMsg.writeUIntLE(0, 16, 4);
-        quitMsg.writeUIntLE(0, 20, 4);
-        quitMsg.writeUIntLE(0, 24, 4);
-        quitMsg.writeUIntLE(0, 28, 4);
-
-        if (ipc != undefined) {
-          ipc.server.emit(localSocket, quitMsg);
-          ipc.server.stop();
-        }
-
-        // purge user's infos
-        delete onlineUsers[userid];
-        delete onlineLocalSockets[userid];
-        // delete onlineLogicProcessID[userid];
-        delete onlineLocalIPC[userid];
-        onlineCount--;
-
-        console.log(obj.username + ' disconnecting success.');
-      });
-
-
-      // listen string message for test
-      socket.on('message', function(obj) {
-        console.log(obj.username + ' message : ' + obj.content);
-      });
-
-      socket.on('data', function(obj) {
-        // TODO FE 的　TCP 粘包问题是在BE端解?
-        userid = obj.userid;
-        console.log('socket on data , userid : ' + userid);
-        var ipc = onlineLocalIPC[userid];
-        if (ipc === undefined || ipc == null) {
-          console.log('socket on data , ERROR IPC');
-          return;
-          }
-
-        var localSocket = onlineLocalSockets[userid];
-        if (localSocket === undefined || localSocket == null) {
-          console.log('socket on data , ERROR SOCKET');
-          return;
-        }
-
-        console.log('web send to server : username ' + obj.username);
-        var buffer = obj.content;
-        var commandID = buffer.readUIntLE(8, 4);
-
-        console.log('buffer length : ' + buffer.byteLength);
-        console.log('command id :' + commandID);
-
-        ipc.server.emit(localSocket, buffer);
-      });
-    })
-
-    var server = http.listen(8000, function() {
-      var address = server.address();
-      console.log('address is ', util.inspect(address));
+  
+  //listen user disconnect(leave review page)
+  socket.on('disconnect', function(obj) {
+    if (obj.username == '') {
+      console.log('invalid null username when disconnect!');
+      return;
     }
-);
+    var userid = socket.name;
+    if (!onlineUsers.hasOwnProperty(userid)) {
+      console.log(obj.username + ' disconnecting failed.');
+      return;
+    }
+
+    console.log(obj.username + ' has disconnecting.');
+    console.log('id : ' + userid);
+
+    // send last msg tp BE to notify BE shut down
+    var ipc = onlineLocalIPC[userid];
+    var localSocket = onlineLocalSockets[userid];
+
+    const quitMsg = new Buffer(32);
+    quitMsg.writeUIntLE(1, 0, 4);
+    quitMsg.writeUIntLE(0, 4, 4);
+    quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
+    quitMsg.writeUIntLE(0, 12, 4);
+    quitMsg.writeUIntLE(0, 16, 4);
+    quitMsg.writeUIntLE(0, 20, 4);
+    quitMsg.writeUIntLE(0, 24, 4);
+    quitMsg.writeUIntLE(0, 28, 4);
+    
+    if (ipc != undefined) {
+      ipc.server.emit(localSocket, quitMsg);
+      ipc.server.stop();
+    }
+
+    // purge user's infos
+    delete onlineUsers[userid];
+    delete onlineLocalSockets[userid];
+    // delete onlineLogicProcessID[userid];
+    delete onlineLocalIPC[userid];
+    onlineCount--;
+    console.log(obj.username + ' disconnecting success.');
+  });
+
+  // listen string message for test
+  socket.on('message', function(obj) {
+    console.log(obj.username + ' message : ' + obj.content);
+  });
+
+  socket.on('data', function(obj) {
+    // TODO FE 的　TCP 粘包问题是在BE端解?
+    userid = obj.userid;
+    console.log('socket on data , userid : ' + userid);
+    var ipc = onlineLocalIPC[userid];
+    if (ipc === undefined || ipc == null) {
+      console.log('socket on data , ERROR IPC');
+      return;
+    }
+    
+    var localSocket = onlineLocalSockets[userid];
+    if (localSocket === undefined || localSocket == null) {
+      console.log('socket on data , ERROR SOCKET');
+      return;
+    }
+    
+    console.log('web send to server : username ' + obj.username);
+    var buffer = obj.content;
+    var commandID = buffer.readUIntLE(8, 4);
+
+    console.log('buffer length : ' + buffer.byteLength);
+    console.log('command id :' + commandID);
+
+    ipc.server.emit(localSocket, buffer);
+  });
+})
+
+var server = http.listen(8000, function() {
+  var address = server.address();
+  console.log('address is ', util.inspect(address));
+});
