@@ -1,4 +1,4 @@
-<Lut name='CT_LUNG_NODULE'>
+<Lut name="CT_LUNG_NODULE">
 <Color Interpolation="RGB">
 <point><index>-1550</index><R>205</R><G>25</G><B>25</B></point>
 <point><index>-500</index><R>205</R><G>25</G><B>25</B></point>
@@ -13,6 +13,12 @@
 <width>1759</width>
 <level>488</level>
 </WindowLevel>
+<Background>
+		<R>0</R>
+		<G>0</G>
+		<B>0</B>
+		<A>0</A>
+</Background>
 <Material>
     <DiffuseColor>
 		<R>255</R>
@@ -27,5 +33,5 @@
 		<Factor>0.5</Factor>
 		<Shininess>8.0</Shininess>
 	  </SpecularColor>
-   </Material>
+</Material>
 </Lut>

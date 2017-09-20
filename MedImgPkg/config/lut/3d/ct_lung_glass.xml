@@ -1,4 +1,4 @@
-<Lut name='CT_LUNG_GLASS'>
+<Lut name="CT_LUNG_GLASS">
 		<Color Interpolation="RGB">
 			<point>
 				<index>-735</index>
