@@ -16,7 +16,8 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_app_controller.o mi_app_thread_model.o mi_operation_command_handler.o mi_operation_factory.o mi_app_cell.o \
+OBJS = mi_app_controller.o mi_app_thread_model.o mi_operation_command_handler.o mi_heart_beat_command_handler.o \
+mi_operation_factory.o mi_app_cell.o \
 mi_ready_command_handler.o mi_shut_down_command_handler.o mi_app_data_base.o
 TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
@@ -38,6 +39,9 @@ mi_ready_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_ready_c
 
 mi_shut_down_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_shut_down_command_handler.h mi_shut_down_command_handler.cpp mi_app_thread_model.o mi_app_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_shut_down_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_heart_beat_command_handler.o: $(EXPORT_HEADER) mi_heart_beat_command_handler.h mi_heart_beat_command_handler.cpp mi_app_thread_model.o mi_app_controller.o
+	$(CC) -c -fPIC $(CFLAGS) mi_heart_beat_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_app_thread_model.o: $(EXPORT_HEADER) mi_operation_interface.h mi_app_thread_model.h mi_app_thread_model.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_app_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)

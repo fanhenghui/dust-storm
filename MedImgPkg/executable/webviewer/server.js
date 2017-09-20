@@ -49,6 +49,7 @@ var onlineCount = 0;
 // FE to BE
 var COMMAND_ID_FE_SHUT_DOWN = 120000;
 var COMMAND_ID_FE_READY = 120001;
+var COMMAND_ID_FE_HEARTBEAT = 119999;
 ////////////////////////////////////////////////////////////
 
 io.on( 'connection', function(socket) {
@@ -98,11 +99,28 @@ io.on( 'connection', function(socket) {
         msgFEReady.writeUIntLE(0, 28, 4);
 
         if (ipc != undefined) {
-          // close IPC
           ipc.server.emit(localSocket, msgFEReady);
-          //ipc.server.stop(); // @r.wang why close it here? commented by c.zhang
         }
         onlineLocalSockets[obj.userid] = localSocket;
+
+        //send heart bet package
+        const heartBeatTime = 2*1000;
+        setInterval(function() {
+          console.log("server heart beat for user: " + obj.username);
+          const msgHeartBeat = new Buffer(32);
+          msgHeartBeat.writeUIntLE(1, 0, 4);
+          msgHeartBeat.writeUIntLE(0, 4, 4);
+          msgHeartBeat.writeUIntLE(COMMAND_ID_FE_HEARTBEAT, 8, 4);
+          msgHeartBeat.writeUIntLE(0, 12, 4);
+          msgHeartBeat.writeUIntLE(0, 16, 4);
+          msgHeartBeat.writeUIntLE(0, 20, 4);
+          msgHeartBeat.writeUIntLE(0, 24, 4);
+          msgHeartBeat.writeUIntLE(0, 28, 4);
+  
+          if (ipc != undefined) {
+            ipc.server.emit(localSocket, msgHeartBeat);
+          }
+        }, heartBeatTime);
       });
 
       // sever get logic process's tcp package and transfer to FE directly(not parse)
