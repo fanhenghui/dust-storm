@@ -14,7 +14,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./public/routes/index');
 
-global.dbHandel = require('./public/database/dbHandel');
+global.dbHandel = require('./public/database/dbhandel');
 global.db = mongoose.connect('mongodb://localhost:27017/nodedb');
 global.db.connection.on("error", function (error) {
   console.log("connect user mongon DB failed：" + error);
@@ -130,29 +130,18 @@ io.on( 'connection', function(socket) {
       review_server_path = data;
       console.log('app path : ' + review_server_path);
 
-      //// TODO Test 自己起C++ BE
-       // const out_log = fs.openSync(
-      //     './out_' + util.inspect(obj.username) + '.log', 'a');
-      // const err_log = fs.openSync(
-      //     './err_' + util.inspect(obj.username) + '.log', 'a');
-      // var worker = childProcess.spawn(
-      //     review_server_path.toString(), ['/tmp/app.' +
-      //     obj.username],
-      //     {detached: true, stdio: ['ignore', out_log, err_log]});
-      // onlineLogicProcessID[obj.userid] = worker;
-      // console.log('<><><><><><> login in success <><><><><><>');
+      ///run process
       var worker = childProcess.spawn(
           review_server_path.toString(), ['/tmp/app.' + obj.username], {detached: true});
       onlineLogicProcessID[obj.userid] = worker;
 
-      worker.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-      });
-      
-      worker.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-      });
-      
+      //// std ouput to server device
+      // worker.stdout.on('data', (data) => {
+      //   console.log(`stdout: ${data}`);
+      // });
+      // worker.stderr.on('data', (data) => {
+      //   console.log(`stderr: ${data}`);
+      // });
       worker.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
       });
