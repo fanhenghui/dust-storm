@@ -11,7 +11,6 @@
 
 #include "util/mi_configuration.h"
 
-#include "mi_load_series_command_handler.h"
 #include "mi_search_worklist_command_handler.h"
 #include "mi_mpr_play_command_handler.h"
 #include "mi_vr_play_command_handler.h"
@@ -60,13 +59,6 @@ void ReviewController::initialize() {
     std::shared_ptr<SearchWorklistCommandHandler> handler_search_worklist(
         new SearchWorklistCommandHandler(app_controller));
     _proxy->register_command_handler(COMMAND_ID_WORKLIST, handler_search_worklist);
-
-    //   std::shared_ptr<ReviewController> review_controller =
-    //       std::dynamic_pointer_cast<ReviewController>(app_controller);
-    //   std::shared_ptr<LoadSeriesCommandHandler> handler_loadseries(
-    //       new LoadSeriesCommandHandler(review_controller));
-    //   _proxy->register_command_handler(COMMAND_ID_FE_LOAD_SERIES,
-    //                                    handler_loadseries);
 
     // Register operation
     OperationFactory::instance()->register_operation(
