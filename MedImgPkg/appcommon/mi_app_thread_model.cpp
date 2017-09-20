@@ -14,6 +14,7 @@
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
 #include "mi_operation_interface.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -69,7 +70,6 @@ void AppThreadModel::start() {
     try {
         _th_operating->_th =
             boost::thread(boost::bind(&AppThreadModel::process_operating, this));
-        //_op_queue->_msg_queue.activate();
 
         _th_sending->_th =
             boost::thread(boost::bind(&AppThreadModel::process_sending, this));
@@ -77,7 +77,8 @@ void AppThreadModel::start() {
         _th_rendering->_th =
             boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
     } catch (...) {
-        // TODO ERROR
+        MI_APPCOMMON_LOG(MI_FATAL) << "app thread model start failed.";
+        APPCOMMON_THROW_EXCEPTION("app thread model start failed.");
     }
 }
 
@@ -98,48 +99,45 @@ void AppThreadModel::stop() {
     _op_queue->_msg_queue.deactivate();
 }
 
-void AppThreadModel::process_operating() {
-    try {
-        for (;;) {
+void AppThreadModel::process_operating() {   
+    try{ 
+        while(true) {
             std::shared_ptr<IOperation> op;
             this->pop_operation(&op);
 
             boost::mutex::scoped_lock locker(_th_rendering->_mutex);
 
-            // std::cout << "Execute op begin\n";
-            int err = op->execute();
-
-            if (-1 == err) {
-                // TODO execute failed
+            try {
+                int err = op->execute();
+                if (-1 == err) {
+                    MI_APPCOMMON_LOG(MI_ERROR) << "op execute failed.";
+                    continue;
+                }
+            } catch (const Exception& e) {
+                MI_APPCOMMON_LOG(MI_ERROR) << "operating run failed with exception: " << e.what() << "(SKIP IT FOR KEEPTING RUNNING)";
+                continue;
+            } catch (const std::exception& e) {
+                MI_APPCOMMON_LOG(MI_ERROR) << "operating run failed with exception: " << e.what() << "(SKIP IT FOR KEEPTING RUNNING)";
+                continue;
             }
-
-            // std::cout << "Execute op done\n";
 
             // interrupt point
             boost::this_thread::interruption_point();
-
             _rendering = true;
             _th_rendering->_condition.notify_one();
-
-            // std::cout << "Execute op done 2\n";
         }
-
-    } catch (const Exception& e) {
-        //DO nothing to keep running
-        printf("operation has catch exception : %s\n" , e.what());
-        //throw e;
-        // TODO ERROR
-    } catch (boost::thread_interrupted& e) {
-        //throw e;
-        // TODO thread interrupted
+    }  catch (boost::thread_interrupted& e) {
+        MI_APPCOMMON_LOG(MI_INFO) << "operating thread is interrupted.";;
+        throw e;
     } catch (...) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "operating run failed with unknow exception";
+        throw;
     }
 }
 
 void AppThreadModel::process_rendering() {
     try {
-        for (;;) {
-
+        while (true) {
             std::deque<unsigned int> dirty_cells;
             std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
@@ -152,8 +150,6 @@ void AppThreadModel::process_rendering() {
                     _th_rendering->_condition.wait(_th_rendering->_mutex);
                 }
 
-                // std::cout << "Begin rendering \n";
-                ////////////////////////////////////////
                 // render all dirty cells
                 std::shared_ptr<AppController> controller = _controller.lock();
                 APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -172,21 +168,13 @@ void AppThreadModel::process_rendering() {
                         scene->set_dirty(false);
                     }
                 }
-
-                // std::cout << "Rendering done \n";
-                ////////////////////////////////////////
-
                 // interrupt point
                 boost::this_thread::interruption_point();
-
                 _rendering = false;
             }
 
             /// \2 get image result to buffer
-
-            ////////////////////////////////////////
             // download all dirty scene image to buffer
-            // std::cout << "Begin download \n";
             for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
                 (*it)->download_image_buffer();
             }
@@ -200,30 +188,28 @@ void AppThreadModel::process_rendering() {
                     (*it)->swap_image_buffer();
                 }
             }
-            // std::cout << "Download done \n";
-            ////////////////////////////////////////
             _sending = true;
             _th_sending->_condition.notify_one();
 
             _glcontext->make_noncurrent();
         }
-
     } catch (const Exception& e) {
-        //DO nothing to keep running
-        printf("operation has catch exception : %s\n" , e.what());
-        //throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
+        throw e;
+    } catch (const std::exception& e) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
+        throw e;
     } catch (boost::thread_interrupted& e) {
-        //DO nothing to keep running
-        //throw e;
-        // TODO
+        MI_APPCOMMON_LOG(MI_INFO) << "rendering thread is interrupted.";
     } catch (...) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed failed with unknow exception";
+        throw;
     }
 }
 
 void AppThreadModel::process_sending() {
     try {
-        for (;;) {
-
+        while (true) {
             ///\ sending image to fe by pic proxy
             boost::mutex::scoped_lock locker(_th_sending->_mutex);
 
@@ -231,9 +217,6 @@ void AppThreadModel::process_sending() {
                 _th_sending->_condition.wait(_th_sending->_mutex);
             }
 
-            // std::cout << "Begin sending \n";
-
-            ////////////////////////////////////////
             // get dirty cells to be sending
             std::deque<unsigned int> dirty_cells;
             {
@@ -284,21 +267,21 @@ void AppThreadModel::process_sending() {
                 _proxy->async_send_message(header, (char*)buffer);
             }
 
-            ////////////////////////////////////////
-            // std::cout << "Sending done \n";
             // interrupt point
             boost::this_thread::interruption_point();
-
             _sending = false;
         }
     } catch (const Exception& e) {
-        //DO nothing to keep running
-        printf("operation has catch exception : %s\n" , e.what());
-        //throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed with exception: " << e.what();
+        throw e;
+    } catch (const std::exception& e) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed with exception: " << e.what();
+        throw e;
     } catch (boost::thread_interrupted& e) {
-        //throw e;
-        // TODO
+        MI_APPCOMMON_LOG(MI_INFO) << "sending thread is interrupted.";
     } catch (...) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed failed with unknow exception";
+        throw;
     }
 }
 

@@ -7,6 +7,7 @@
 #include "cppconn/sqlstring.h"
 #include "cppconn/statement.h"
 #include "mysql_connection.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -20,50 +21,47 @@ AppDataBase::~AppDataBase() {
 
 int AppDataBase::connect(const std::string& user, const std::string& ip_port,
                          const std::string& pwd, const std::string& db_name) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db connect."; 
     if (user.empty()) {
-        //UTIL_THROW_EXCEPTION("connect DB user is empty.");
+        MI_APPCOMMON_LOG(MI_ERROR) << "connect DB: user is empty.";
         return -1;
     }
 
     if (ip_port.empty()) {
-        //UTIL_THROW_EXCEPTION("connect DB ip&port is empty.");
+        MI_APPCOMMON_LOG(MI_ERROR) << "connect DB: ip/port is empty.";
         return -1;
     }
 
     if (pwd.empty()) {
-        //UTIL_THROW_EXCEPTION("connect DB pwd is empty.");
+        MI_APPCOMMON_LOG(MI_ERROR) << "connect DB: password is empty.";
         return -1;
     }
 
     if (db_name.empty()) {
-        //UTIL_THROW_EXCEPTION("connect DB db name is empty.");
+        MI_APPCOMMON_LOG(MI_ERROR) << "connect DB: db name is empty.";
         return -1;
     }
 
     _connection = nullptr;
-
     try {
         // create connect
         sql::Driver* driver = get_driver_instance();
         _connection = driver->connect(ip_port.c_str(), user.c_str(), pwd.c_str());
-        // con = driver->connect("tcp://127.0.0.1:3306", "root", "0123456");
+        // _connection = driver->connect("tcp://127.0.0.1:3306", "root", "0123456");
         _connection->setSchema(db_name.c_str());
     } catch (const sql::SQLException& e) {
         std::stringstream ss;
-        ss << "ERROR : ";
-        ss << "# ERR: SQLException in " << __FILE__;
-        ss << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-        ss << "# ERR: " << e.what();
-        ss << " (MySQL error code: " << e.getErrorCode();
-        ss << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-        std::cout << ss.str();
-        //TODO log
+        ss << "# ERR: " << e.what()
+        << " (MySQL error code: " << e.getErrorCode()
+        << ", SQLState: " << e.getSQLState() << " )";
+        MI_APPCOMMON_LOG(MI_ERROR) << "connect db failed with exception: " << ss.str();
         delete _connection;
         _connection = nullptr;
-
         return -1;
     }
 
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db connect.";
+    MI_APPCOMMON_LOG(MI_INFO) << "connect to db success.";
     return 0;
 }
 
@@ -71,14 +69,15 @@ int AppDataBase::disconnect() {
     if (_connection) {
         delete _connection;
     }
-
     _connection = nullptr;
+    MI_APPCOMMON_LOG(MI_INFO) << "disconnect db success.";
+    return 0;
 }
 
-int AppDataBase::get_series_path(const std::string& series_id, std::string& path,
-                                 const std::string& tbl) {
+int AppDataBase::get_series_path(const std::string& series_id, std::string& path, const std::string& tbl) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query get series path."; 
     if (nullptr == _connection) {
-        // TODO log
+        MI_APPCOMMON_LOG(MI_ERROR) << "db connection is null.";
         return -1;
     }
 
@@ -108,18 +107,21 @@ int AppDataBase::get_series_path(const std::string& series_id, std::string& path
             return -1;
         }
     } catch (const sql::SQLException& e) {
-        std::cout << "# ERR: SQLException in " << __FILE__;
-        std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-        std::cout << "# ERR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        std::stringstream ss;
+        ss << "# ERR: " << e.what()
+        << " (MySQL error code: " << e.getErrorCode()
+        << ", SQLState: " << e.getSQLState() << " )";
+        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when get series path failed with exception: " << ss.str();
         return -1;
     }
+
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query get series path."; 
 }
 
 int AppDataBase::get_all_item(std::vector<ImgItem>& items , const std::string& tbl) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query get all item."; 
     if (nullptr == _connection) {
-        // TODO log
+        MI_APPCOMMON_LOG(MI_ERROR) << "db connection is null.";
         return -1;
     }
 
@@ -157,18 +159,20 @@ int AppDataBase::get_all_item(std::vector<ImgItem>& items , const std::string& t
         pstmt = nullptr;
         return 0;
     } catch (const sql::SQLException& e) {
-        std::cout << "# ERR: SQLException in " << __FILE__;
-        std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-        std::cout << "# ERR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
+        std::stringstream ss;
+        ss << "# ERR: " << e.what()
+        << " (MySQL error code: " << e.getErrorCode()
+        << ", SQLState: " << e.getSQLState() << " )";
+        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when get all items failed with exception: " << ss.str();
         return -1;
     }
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query get all item."; 
 }
 
 int AppDataBase::insert_item(const ImgItem& item) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query inset item."; 
     if (nullptr == _connection) {
-        // TODO log
+        MI_APPCOMMON_LOG(MI_ERROR) << "db connection is null.";
         return -1;
     }
 
@@ -235,17 +239,16 @@ int AppDataBase::insert_item(const ImgItem& item) {
         res = nullptr;
 
     } catch (const sql::SQLException& e) {
-        std::cout << "ERROR : ";
-        std::cout << "# ERR: SQLException in " << __FILE__;
-        std::cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << std::endl;
-        std::cout << "# ERR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << " )" << std::endl;
-
+        std::stringstream ss;
+        ss << "# ERR: " << e.what()
+        << " (MySQL error code: " << e.getErrorCode()
+        << ", SQLState: " << e.getSQLState() << " )";
+        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
         // TODO recovery DB
 
         return -1;
     }
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query inset item."; 
 }
 
 MED_IMG_END_NAMESPACE

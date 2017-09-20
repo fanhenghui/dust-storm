@@ -87,6 +87,8 @@ void SocketClient::run() {
             MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
             continue;
         }
+        
+        MI_UTIL_LOG(MI_DEBUG) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
 
         if (header._data_len <= 0) {
             MI_UTIL_LOG(MI_INFO) << "client received data buffer length less than 0.";
