@@ -136,12 +136,13 @@ io.on( 'connection', function(socket) {
       onlineLogicProcessID[obj.userid] = worker;
 
       //// std ouput to server device
-      // worker.stdout.on('data', (data) => {
-      //   console.log(`stdout: ${data}`);
-      // });
-      // worker.stderr.on('data', (data) => {
-      //   console.log(`stderr: ${data}`);
-      // });
+      worker.stdout.on('data', (data) => {
+        //console.log(`stdout: ${data}`);
+      });
+      worker.stderr.on('data', (data) => {
+        //console.log(`stderr: ${data}`);
+      });
+      
       worker.on('close', (code) => {
         console.log(`child process exited with code ${code}`);
       });
