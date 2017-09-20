@@ -38,6 +38,14 @@ ReviewConfig::~ReviewConfig() {
 
 }
 
+std::string ReviewConfig::get_config_root() const {
+    return std::string("../config/");
+}
+
+std::string ReviewConfig::get_log_config_file() const {
+    return this->get_config_root() + std::string("log_config");
+}
+
 ReviewConfig* ReviewConfig::instance() {
     if (nullptr == _instance) {
         boost::mutex::scoped_lock locker(_mutex);

@@ -12,6 +12,8 @@ public:
     static ReviewConfig* instance();
     ~ReviewConfig();
 
+    std::string get_config_root() const;
+    std::string get_log_config_file() const;
     std::string get_test_data_root() const;
     std::string get_db_pwd() const;
 
