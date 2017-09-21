@@ -1,4 +1,4 @@
-#include "mi_heart_beat_command_handler.h"
+#include "mi_heartbeat_command_handler.h"
 
 #include "util/mi_ipc_client_proxy.h"
 
@@ -8,13 +8,13 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-HeartBeatCommandHandler::HeartBeatCommandHandler(
+HeartbeatCommandHandler::HeartbeatCommandHandler(
     std::shared_ptr<AppController> controller)
     : _controller(controller) {}
 
-HeartBeatCommandHandler::~HeartBeatCommandHandler() {}
+HeartbeatCommandHandler::~HeartbeatCommandHandler() {}
 
-int HeartBeatCommandHandler::handle_command(const IPCDataHeader &ipcheader,
+int HeartbeatCommandHandler::handle_command(const IPCDataHeader &ipcheader,
                                             char *buffer) {
   std::shared_ptr<AppController> controller = _controller.lock();
 
@@ -25,7 +25,7 @@ int HeartBeatCommandHandler::handle_command(const IPCDataHeader &ipcheader,
   IPCDataHeader header;
   header._msg_id = COMMAND_ID_BE_HEARTBEAT;
 
-  MI_APPCOMMON_LOG(MI_INFO) << "BE reveive heart beat.";
+  MI_APPCOMMON_LOG(MI_INFO) << "BE reveive heartbeat.";
   controller->get_client_proxy()->async_send_message(header, nullptr);
 
   return 0;

@@ -84,7 +84,7 @@
         showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_HEARTBEAT:
-        window.FE.heartBeat();
+        window.FE.heartbeat();
         break;
       default:
         break;
@@ -380,7 +380,7 @@
 
     },
 
-    heartBeat: function() {
+    heartbeat: function() {
       this.socket.emit('heartbeat', {
         userid: this.userid,
         username: this.username});

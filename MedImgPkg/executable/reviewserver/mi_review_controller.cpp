@@ -8,7 +8,7 @@
 #include "appcommon/mi_operation_factory.h"
 #include "appcommon/mi_ready_command_handler.h"
 #include "appcommon/mi_shut_down_command_handler.h"
-#include "appcommon/mi_heart_beat_command_handler.h"
+#include "appcommon/mi_heartbeat_command_handler.h"
 
 #include "util/mi_configuration.h"
 
@@ -37,8 +37,8 @@ void ReviewController::initialize() {
 
     // Register command handler
     std::shared_ptr<AppController> app_controller = shared_from_this();
-    std::shared_ptr<HeartBeatCommandHandler> handler_heart_beat(
-        new HeartBeatCommandHandler(app_controller));
+    std::shared_ptr<HeartbeatCommandHandler> handler_heart_beat(
+        new HeartbeatCommandHandler(app_controller));
     _proxy->register_command_handler(COMMAND_ID_FE_HEARTBEAT, handler_heart_beat);
 
     std::shared_ptr<ReadyCommandHandler> handler_ready(
