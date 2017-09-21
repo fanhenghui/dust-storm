@@ -42,7 +42,7 @@ module.exports = {
       ipc.config.retry = 1500;
       ipc.config.rawBuffer = true;
       ipc.config.encoding = 'hex';
-      ipc.serve(function() {
+      ipc.serve(function() { 
         ipc.server.on('connect', function(localSocket) {
           // when IPC is constructed between server and BE
           // server send a ready MSG to BE to make sure BE is ready
@@ -76,7 +76,6 @@ module.exports = {
             msgHeartBeat.writeUIntLE(0, 20, 4);
             msgHeartBeat.writeUIntLE(0, 24, 4);
             msgHeartBeat.writeUIntLE(0, 28, 4);
-
             if (ipc != undefined) {
               ipc.server.emit(localSocket, msgHeartBeat);
             }
@@ -101,32 +100,30 @@ module.exports = {
       console.log('path: ' + '/tmp/app.' + obj.username);
       // reader BE process path form config file
       var review_server_path;
-      fs.readFile(
-          __dirname + '/be_path', function(err, data) {
-            if (err) {
-              throw err;
-            }
-            review_server_path = data;
-            console.log('app path : ' + review_server_path);
+      fs.readFile(__dirname + '/be_path', function(err, data) {
+        if (err) { 
+          throw err;
+        }
+        review_server_path = data;
+        console.log('app path : ' + review_server_path);
 
-            /// run process
-            var worker = childProcess.spawn( review_server_path.toString(), ['/tmp/app.' + obj.username], {detached: true});
-            onlineLogicProcessID[obj.userid] = worker;
+        /// run process
+        var worker = childProcess.spawn( review_server_path.toString(), ['/tmp/app.' + obj.username], {detached: true});
+        onlineLogicProcessID[obj.userid] = worker;
 
-            //// std ouput to server device
-            worker.stdout.on('data', (data) => {
-              // console.log(`stdout: ${data}`);
-            });
-            worker.stderr.on('data', (data) => {
-              // console.log(`stderr: ${data}`);
-            });
+        //// std ouput to server device
+        worker.stdout.on('data', (data) => {
+          // console.log(`stdout: ${data}`);
+        });
+        worker.stderr.on('data', (data) => {
+          // console.log(`stderr: ${data}`);
+        });
 
-            worker.on('close', (code) => {
-              console.log(`child process exited with code ${code}`);
-            });
-
-            console.log('<><><><><><> login in success <><><><><><>');
-          });
+        worker.on('close', (code) => {
+          console.log(`child process exited with code ${code}`);
+        });
+        console.log('<><><><><><> login in success <><><><><><>');
+      });
     });
 
     // listen user disconnect(leave review page)
