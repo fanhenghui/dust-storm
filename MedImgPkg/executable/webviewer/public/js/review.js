@@ -7,6 +7,7 @@
   COMMAND_ID_FE_VR_PLAY = 120004;
   COMMAND_ID_FE_SEARCH_WORKLIST = 120005;
   // BE to FE
+  COMMAND_ID_BE_HEARTBEAT = 269999
   COMMAND_ID_BE_READY = 270000;
   COMMAND_ID_BE_SEND_IMAGE = 270001;
   COMMAND_ID_BE_SEND_WORKLIST = 270002;
@@ -77,9 +78,13 @@
         break;
       case COMMAND_ID_BE_READY:
         //window.FE.triggerOnBE('test_uid');
+        //TODO trigger on ready flag
         break;
       case COMMAND_ID_BE_SEND_WORKLIST:
         showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+        break;
+      case COMMAND_ID_BE_HEARTBEAT:
+        window.FE.heartBeat();
         break;
       default:
         break;
@@ -356,7 +361,7 @@
       this.username = username;
 
       //链接websocket服务器
-      this.socket = io.connect('http://172.23.236.96:8000');
+      this.socket = io.connect('http://172.23.236.130:8000');
 
       //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
       this.socket.emit('login', {userid: this.userid, username: this.username});
@@ -365,8 +370,7 @@
       this.socket.emit('message', {
         userid: this.userid,
         username: this.username,
-        content: 'first message'
-      });
+        content: 'first message'});
 
 
       this.socket.on('data', function(arraybuffer) {
@@ -374,6 +378,12 @@
         processTCPMsg(arraybuffer);
       });
 
+    },
+
+    heartBeat: function() {
+      this.socket.emit('heartbeat', {
+        userid: this.userid,
+        username: this.username});
     },
 
     userLogOut: function() {
@@ -661,24 +671,6 @@
       }).bind(this);
 
       protobuf.load('./data/mi_message.proto', binding_func);
-    },
-
-    loadSeries: function() {
-      var header_buffer = new ArrayBuffer(32);
-      var header = new Uint32Array(header_buffer);
-      header[0] = 0;
-      header[1] = 0;
-      header[2] = COMMAND_ID_FE_LOAD_SERIES;
-      header[3] = 0;  // paging
-      header[4] = 0;
-      header[5] = 0;
-      header[6] = 0;
-      header[7] = 0;
-      this.socket.emit('data', {
-        userid: this.userid,
-        username: this.username,
-        content: header_buffer
-      })
     },
 
     searchWorkList: function () {

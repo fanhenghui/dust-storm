@@ -8,10 +8,77 @@ var COMMAND_ID_FE_HEARTBEAT = 119999;
 var onlineUsers = {};
 var onlineLocalSockets = {};
 var onlineLocalIPC = {};
-var onlineLogicProcessID = {};
-var onlineBEHBTic = {};
-var onlineFEHBTic = {};
+var onlineLogicProcess = {};
+var onlineBEHBClock = {};
+var onlineBETic = {};
+var onlineFETic = {};
 var onlineCount = 0;
+
+const TIC_LIMIT = 4294967296;
+const HEARTBEAT_INTERVAL = 5*1000;
+
+var disconnectBE = function(userid) {
+  if (!onlineUsers.hasOwnProperty(userid)) {
+    console.log(userid + ' disconnecting failed.');
+    return;
+  }
+
+  console.log(userid + ' has disconnecting.');
+
+  // send last msg tp BE to notify BE shut down
+  if (!onlineLocalIPC.hasOwnProperty(userid)) {
+    var ipc = undefined;
+  } else {
+    var ipc = onlineLocalIPC[userid];
+  }
+  
+  if (!onlineLocalSockets.hasOwnProperty(userid)) {
+    var localSocket = undefined;
+  } else {
+    var localSocket = onlineLocalSockets[userid];
+  }
+
+  const quitMsg = new Buffer(32);
+  quitMsg.writeUIntLE(1, 0, 4);
+  quitMsg.writeUIntLE(0, 4, 4);
+  quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
+  quitMsg.writeUIntLE(0, 12, 4);
+  quitMsg.writeUIntLE(0, 16, 4);
+  quitMsg.writeUIntLE(0, 20, 4);
+  quitMsg.writeUIntLE(0, 24, 4);
+  quitMsg.writeUIntLE(0, 28, 4);
+
+  if (ipc != undefined) {
+    ipc.server.emit(localSocket, quitMsg);
+    ipc.server.stop();
+  }
+
+  // purge user's infos
+  if (onlineUsers.hasOwnProperty(userid)) {
+    delete onlineUsers[userid];
+  }
+  if (onlineLocalSockets.hasOwnProperty(userid)) {
+    delete onlineLocalSockets[userid];
+  }
+  if(onlineLocalIPC.hasOwnProperty(userid)) {
+    delete onlineLocalIPC[userid];
+  }     
+  if(onlineBEHBClock.hasOwnProperty(userid)) {
+    clearInterval(onlineBEHBClock[userid]);
+    delete onlineBEHBClock[userid];
+  }
+  onlineCount--;
+  console.log(userid + ' disconnecting success.');
+
+  //wait for kill worker
+  setTimeout(function(){
+    if(onlineLogicProcess.hasOwnProperty(userid)) {
+      console.log("kill " + userid +  "'s process froce just in case");
+      onlineLogicProcess[userid].kill('SIGHUP');
+      delete onlineLogicProcess[userid];
+    }
+  }, 3000);
+};
 
 module.exports = {
   onIOSocketConnect: function(socket) {
@@ -66,7 +133,7 @@ module.exports = {
           onlineLocalSockets[obj.userid] = localSocket;
 
           // send heart bet package
-          var heartBeatBE = (function() {
+          var heartbeatBE = (function() {
             if (onlineLocalIPC.hasOwnProperty(obj.userid) && onlineLocalSockets.hasOwnProperty(obj.userid)) {
               const msgHeartBeat = new Buffer(32);
               msgHeartBeat.writeUIntLE(1, 0, 4);
@@ -78,11 +145,23 @@ module.exports = {
               msgHeartBeat.writeUIntLE(0, 24, 4);
               msgHeartBeat.writeUIntLE(0, 28, 4);
               onlineLocalIPC[obj.userid].server.emit(onlineLocalSockets[obj.userid], msgHeartBeat);
-              console.log("server heart beat for user: " + obj.username);
+
+              //check heartbeat
+              if(onlineBETic[obj.userid] != onlineFETic[obj.userid]) {
+                //TODO disconnect
+                console.log("the heart does't jump more than " + HEARTBEAT_INTERVAL + ". kill BE.");
+                disconnectBE();
+              }
+              onlineBETic[obj.userid] += 1;
+              if(onlineBETic[obj.userid] > TIC_LIMIT) {
+                onlineBETic[obj.userid] = 0;
+              }
+              console.log("server heart beat for user: " + obj.username + " " + onlineBETic[obj.userid]);
             }
           });
-          const heartBeatTime = 2 * 1000;
-          onlineBEHBTic[obj.userid] = setInterval(heartBeatBE, heartBeatTime);
+          onlineBETic[obj.userid] = 0;
+          onlineFETic[obj.userid] = 0;
+          onlineBEHBClock[obj.userid] = setInterval(heartbeatBE, HEARTBEAT_INTERVAL);
         });
 
         // sever get logic process's tcp package and transfer to FE directly(not parse)
@@ -112,7 +191,7 @@ module.exports = {
 
         /// run process
         var worker = childProcess.spawn( review_server_path, ['/tmp/app.' + obj.username], {detached: true});
-        onlineLogicProcessID[obj.userid] = worker;
+        onlineLogicProcess[obj.userid] = worker;
 
         //// std ouput to server device
         worker.stdout.on('data', (data) => {
@@ -123,93 +202,67 @@ module.exports = {
         });
 
         worker.on('close', (code) => {
-          console.log(`child process exited with code ${code}`);
+          console.log("child process exited with code: " + code);
+          //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
         });
         console.log('<><><><><><> login in success <><><><><><>');
       });
     });
 
-    // listen user disconnect(leave review page)
-    socket.on('disconnect', function(obj) {
-      if (obj.username == '') {
-        console.log('invalid null username when disconnect!');
-        return;
-      }
+    var disconnectBEExt = function() {
       var userid = socket.name;
-      if (!onlineUsers.hasOwnProperty(userid)) {
-        console.log(obj.username + ' disconnecting failed.');
-        return;
-      }
+      disconnectBE(userid);
+    };
 
-      console.log(obj.username + ' has disconnecting.');
-      console.log('id : ' + userid);
-
-      // send last msg tp BE to notify BE shut down
-      var ipc = onlineLocalIPC[userid];
-      var localSocket = onlineLocalSockets[userid];
-
-      const quitMsg = new Buffer(32);
-      quitMsg.writeUIntLE(1, 0, 4);
-      quitMsg.writeUIntLE(0, 4, 4);
-      quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
-      quitMsg.writeUIntLE(0, 12, 4);
-      quitMsg.writeUIntLE(0, 16, 4);
-      quitMsg.writeUIntLE(0, 20, 4);
-      quitMsg.writeUIntLE(0, 24, 4);
-      quitMsg.writeUIntLE(0, 28, 4);
-
-      if (ipc != undefined) {
-        ipc.server.emit(localSocket, quitMsg);
-        ipc.server.stop();
-      }
-
-      // purge user's infos
-      if (onlineUsers.hasOwnProperty(userid)) {
-        delete onlineUsers[userid];
-      }
-      if (onlineLocalSockets.hasOwnProperty(userid)) {
-        delete onlineLocalSockets[userid];
-      }
-      if(onlineLocalIPC.hasOwnProperty(userid)) {
-        delete onlineLocalIPC[userid];
-      }     
-      if(onlineBEHBTic.hasOwnProperty(userid)) {
-        clearInterval(onlineBEHBTic[userid]);
-        delete onlineBEHBTic[userid];
-      }
-      onlineCount--;
-      console.log(obj.username + ' disconnecting success.');
-    });
+    // listen user disconnect(leave review page)
+    socket.on('disconnect', disconnectBEExt);
 
     // listen string message for test
     socket.on('message', function(obj) {
       console.log(obj.username + ' message : ' + obj.content);
     });
 
+    socket.on('heartbeat', function(obj) {
+      if(onlineFETic.hasOwnProperty(obj.userid)){
+        onlineFETic[obj.userid] += 1;
+        if(onlineFETic[obj.userid] > TIC_LIMIT) {
+          onlineFETic[obj.userid] = 0;
+        }
+        console.log("server receive FE heart beat for user: " + obj.username + " " + onlineFETic[obj.userid]);
+      }
+    });
+
     socket.on('data', function(obj) {
-      // TODO FE 的　TCP 粘包问题是在BE端解?
+      //FE发来的TCP 粘包问题是在BE端解决(UNIX socket 可以控制每次recv的字节数，因此可以天然解决粘包问题)
       userid = obj.userid;
       console.log('socket on data , userid : ' + userid);
-      var ipc = onlineLocalIPC[userid];
-      if (ipc === undefined || ipc == null) {
+      if (!onlineLocalIPC.hasOwnProperty(userid)) {
         console.log('socket on data , ERROR IPC');
         return;
       }
-
-      var localSocket = onlineLocalSockets[userid];
-      if (localSocket === undefined || localSocket == null) {
+      var ipc = onlineLocalIPC[userid];
+      if (!onlineLocalSockets.hasOwnProperty(userid)) {
         console.log('socket on data , ERROR SOCKET');
-        return;
       }
+      var localSocket = onlineLocalSockets[userid];
 
-      console.log('web send to server : username ' + obj.username);
       var buffer = obj.content;
       var commandID = buffer.readUIntLE(8, 4);
-
-      console.log('buffer length : ' + buffer.byteLength);
-      console.log('command id :' + commandID);
+      //console.log('web send to server : username ' + obj.username);
+      //console.log('buffer length : ' + buffer.byteLength);
+      //console.log('command id :' + commandID);
 
       ipc.server.emit(localSocket, buffer);
     });
+  },
+
+  cleanIOSocketConnect: function() {
+    var innerUsers = {};
+    for (var userid in onlineUsers) {
+      innerUsers[userid] = onlineUsers[userid];
+    }
+    for (var userid in innerUsers) {
+      disconnectBE(userid);
+    }
   }
 }

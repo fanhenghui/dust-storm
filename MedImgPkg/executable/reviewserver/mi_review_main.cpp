@@ -48,12 +48,15 @@ int main(int argc , char* argv[]) {
         controller->run(path);
     } catch (Exception& e) {
         MI_REVIEW_LOG(MI_FATAL) << "review server error exit with exception: " << e.what();
+        return -1;
     }
     catch (std::exception& e) {
         MI_REVIEW_LOG(MI_FATAL) << "review server error exit with exception: " << e.what();
+        return -1;
     }
     catch (...) {
         MI_REVIEW_LOG(MI_FATAL) << "review server error exit with unknown exception.";
+        return -1;
     }
     MI_REVIEW_LOG(MI_INFO) << "bye review server.";
     return 0;

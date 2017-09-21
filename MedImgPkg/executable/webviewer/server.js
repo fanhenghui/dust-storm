@@ -37,6 +37,20 @@ app.use('/', routes);
 //connect to web socket
 io.on('connection', require('./public/be/be_proxy').onIOSocketConnect);
 
+//process quit callback
+process.on('exit', function (err) {
+  console.log('process exit.');
+  require('./public/be/be_proxy').cleanIOSocketConnect();
+});
+process.on('uncaughtException', function (err) {
+  console.error('An uncaught error occurred!');
+  process.exit(99);
+});
+process.on('SIGINT', function (err) {
+  console.log('catches ctrl+c event.');
+  process.exit(2);
+});
+
 var server = http.listen(8000, function() {
   var address = server.address();
   console.log('address is ', util.inspect(address));
