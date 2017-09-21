@@ -303,7 +303,7 @@ mi_shader_collection.h
 
 #User Config File
 configure.txt
-run_time.config
+be_path
 
 #ProtocolBuffer Auto-gen
 *.pb.cc
