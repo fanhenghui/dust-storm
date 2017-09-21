@@ -3,6 +3,7 @@ CC = g++
 CFLAGS += -std=c++11 -Wall
 
 ifeq ($(ver) , release)	
+CFLAGS += -O3
 else
 CFLAGS += -g
 endif
