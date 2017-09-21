@@ -9,6 +9,8 @@ var onlineUsers = {};
 var onlineLocalSockets = {};
 var onlineLocalIPC = {};
 var onlineLogicProcessID = {};
+var onlineBEHBTic = {};
+var onlineFEHBTic = {};
 var onlineCount = 0;
 
 module.exports = {
@@ -64,22 +66,23 @@ module.exports = {
           onlineLocalSockets[obj.userid] = localSocket;
 
           // send heart bet package
-          const heartBeatTime = 2 * 1000;
-          setInterval(function() {
-            console.log("server heart beat for user: " + obj.username);
-            const msgHeartBeat = new Buffer(32);
-            msgHeartBeat.writeUIntLE(1, 0, 4);
-            msgHeartBeat.writeUIntLE(0, 4, 4);
-            msgHeartBeat.writeUIntLE(COMMAND_ID_FE_HEARTBEAT, 8, 4);
-            msgHeartBeat.writeUIntLE(0, 12, 4);
-            msgHeartBeat.writeUIntLE(0, 16, 4);
-            msgHeartBeat.writeUIntLE(0, 20, 4);
-            msgHeartBeat.writeUIntLE(0, 24, 4);
-            msgHeartBeat.writeUIntLE(0, 28, 4);
-            if (ipc != undefined) {
-              ipc.server.emit(localSocket, msgHeartBeat);
+          var heartBeatBE = (function() {
+            if (onlineLocalIPC.hasOwnProperty(obj.userid) && onlineLocalSockets.hasOwnProperty(obj.userid)) {
+              const msgHeartBeat = new Buffer(32);
+              msgHeartBeat.writeUIntLE(1, 0, 4);
+              msgHeartBeat.writeUIntLE(0, 4, 4);
+              msgHeartBeat.writeUIntLE(COMMAND_ID_FE_HEARTBEAT, 8, 4);
+              msgHeartBeat.writeUIntLE(0, 12, 4);
+              msgHeartBeat.writeUIntLE(0, 16, 4);
+              msgHeartBeat.writeUIntLE(0, 20, 4);
+              msgHeartBeat.writeUIntLE(0, 24, 4);
+              msgHeartBeat.writeUIntLE(0, 28, 4);
+              onlineLocalIPC[obj.userid].server.emit(onlineLocalSockets[obj.userid], msgHeartBeat);
+              console.log("server heart beat for user: " + obj.username);
             }
-          }, heartBeatTime);
+          });
+          const heartBeatTime = 2 * 1000;
+          onlineBEHBTic[obj.userid] = setInterval(heartBeatBE, heartBeatTime);
         });
 
         // sever get logic process's tcp package and transfer to FE directly(not parse)
@@ -104,11 +107,11 @@ module.exports = {
         if (err) { 
           throw err;
         }
-        review_server_path = data;
+        review_server_path = data.toString();
         console.log('app path : ' + review_server_path);
 
         /// run process
-        var worker = childProcess.spawn( review_server_path.toString(), ['/tmp/app.' + obj.username], {detached: true});
+        var worker = childProcess.spawn( review_server_path, ['/tmp/app.' + obj.username], {detached: true});
         onlineLogicProcessID[obj.userid] = worker;
 
         //// std ouput to server device
@@ -161,10 +164,19 @@ module.exports = {
       }
 
       // purge user's infos
-      delete onlineUsers[userid];
-      delete onlineLocalSockets[userid];
-      // delete onlineLogicProcessID[userid];
-      delete onlineLocalIPC[userid];
+      if (onlineUsers.hasOwnProperty(userid)) {
+        delete onlineUsers[userid];
+      }
+      if (onlineLocalSockets.hasOwnProperty(userid)) {
+        delete onlineLocalSockets[userid];
+      }
+      if(onlineLocalIPC.hasOwnProperty(userid)) {
+        delete onlineLocalIPC[userid];
+      }     
+      if(onlineBEHBTic.hasOwnProperty(userid)) {
+        clearInterval(onlineBEHBTic[userid]);
+        delete onlineBEHBTic[userid];
+      }
       onlineCount--;
       console.log(obj.username + ' disconnecting success.');
     });
