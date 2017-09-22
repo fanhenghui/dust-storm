@@ -46,6 +46,7 @@ int main(int argc , char* argv[]) {
         std::shared_ptr<ReviewController> controller(new ReviewController());
         controller->initialize();
         controller->run(path);
+        controller->finalize();
     } catch (Exception& e) {
         MI_REVIEW_LOG(MI_FATAL) << "review server error exit with exception: " << e.what();
         return -1;

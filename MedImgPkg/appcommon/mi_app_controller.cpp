@@ -26,6 +26,10 @@ void AppController::initialize() {
     _thread_model->set_controller(shared_from_this());
 }
 
+void AppController::finalize() {
+    _thread_model->stop();
+}
+
 pid_t AppController::get_local_pid() const {
     return _local_pid;
 }

@@ -19,6 +19,7 @@ public:
 
     virtual void initialize();
     void run(const std::string& path);
+    virtual void finalize();
 
     std::shared_ptr<AppThreadModel> get_thread_model();
     std::shared_ptr<IPCClientProxy> get_client_proxy();
