@@ -116,6 +116,7 @@ module.exports = {
           // when IPC is constructed between server and BE
           // server send a ready MSG to BE to make sure BE is ready
           console.log('IPC connect. Send FE ready to BE.');
+          onlineLocalSockets[obj.userid] = localSocket;
 
           const msgFEReady = new Buffer(32);
           msgFEReady.writeUIntLE(1, 0, 4);
@@ -130,8 +131,7 @@ module.exports = {
           if (ipc != undefined) {
             ipc.server.emit(localSocket, msgFEReady);
           }
-          onlineLocalSockets[obj.userid] = localSocket;
-
+          
           // send heart bet package
           var heartbeatBE = (function() {
             if (onlineLocalIPC.hasOwnProperty(obj.userid) && onlineLocalSockets.hasOwnProperty(obj.userid)) {
@@ -195,10 +195,10 @@ module.exports = {
 
         //// std ouput to server device
         worker.stdout.on('data', (data) => {
-          // console.log(`stdout: ${data}`);
+          //console.log(`stdout: ${data}`);
         });
         worker.stderr.on('data', (data) => {
-          // console.log(`stderr: ${data}`);
+          //console.log(`stderr: ${data}`);
         });
 
         worker.on('close', (code) => {
@@ -243,6 +243,7 @@ module.exports = {
       var ipc = onlineLocalIPC[userid];
       if (!onlineLocalSockets.hasOwnProperty(userid)) {
         console.log('socket on data , ERROR SOCKET');
+        reutrn;
       }
       var localSocket = onlineLocalSockets[userid];
 
