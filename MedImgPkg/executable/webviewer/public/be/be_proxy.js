@@ -73,7 +73,7 @@ var disconnectBE = function(userid) {
   //wait for kill worker
   setTimeout(function(){
     if(onlineLogicProcess.hasOwnProperty(userid)) {
-      console.log("kill " + userid +  "'s process froce just in case");
+      console.log('kill ' + userid +  '\'s process froce just in case');
       onlineLogicProcess[userid].kill('SIGHUP');
       delete onlineLogicProcess[userid];
     }
@@ -149,14 +149,14 @@ module.exports = {
               //check heartbeat
               if(onlineBETic[obj.userid] != onlineFETic[obj.userid]) {
                 //TODO disconnect
-                console.log("the heart does't jump more than " + HEARTBEAT_INTERVAL + ". kill BE.");
+                console.log('the heart does\'t jump more than ' + HEARTBEAT_INTERVAL + '. kill BE.');
                 disconnectBE();
               }
               onlineBETic[obj.userid] += 1;
               if(onlineBETic[obj.userid] > TIC_LIMIT) {
                 onlineBETic[obj.userid] = 0;
               }
-              console.log("server heart beat for user: " + obj.username + " " + onlineBETic[obj.userid]);
+              console.log('server heart beat for user: ' + obj.username + ' ' + onlineBETic[obj.userid]);
             }
           });
           onlineBETic[obj.userid] = 0;
@@ -202,7 +202,7 @@ module.exports = {
         });
 
         worker.on('close', (code) => {
-          console.log("child process exited with code: " + code);
+          console.log('child process exited with code: ' + code);
           //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
         });
         console.log('<><><><><><> login in success <><><><><><>');
@@ -228,7 +228,7 @@ module.exports = {
         if(onlineFETic[obj.userid] > TIC_LIMIT) {
           onlineFETic[obj.userid] = 0;
         }
-        console.log("server receive FE heart beat for user: " + obj.username + " " + onlineFETic[obj.userid]);
+        console.log('server receive FE heart beat for user: ' + obj.username + ' ' + onlineFETic[obj.userid]);
       }
     });
 

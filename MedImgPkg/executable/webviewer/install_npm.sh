@@ -17,5 +17,6 @@ npm install node-ipc --save
 npm install multer@0 --save
 npm install ejs --save
 npm install ipaddr.js --save
+npm install log4js --save
 sudo npm install iconv-lite -g
 sudo npm install pm2 -g  

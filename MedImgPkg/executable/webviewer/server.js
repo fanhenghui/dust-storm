@@ -10,14 +10,39 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./public/routes/index');
+//var log4js = require('./public/log/log').log4js();
+
+// log4js.configure({
+//   appenders: [
+//     {type: 'concole'},
+//     {
+//       type: 'file',
+//       filename: 'log/logs//server.log',
+//       maxLogSize: 1024,
+//       backup:3,
+//       category: 'normal'
+//     }
+//   ],
+//   replaceConsole: true
+// });
+
+// log4js.configure({
+//   appenders: {
+//     out: { type: 'stdout' },
+//     app: { type: 'file', filename: 'application.log' }
+//   },
+//   categories: {
+//     default: { appenders: [ 'out', 'app' ], level: 'debug' }
+//   }
+// });
 
 global.dbHandel = require('./public/database/dbhandel');
 global.db = mongoose.connect('mongodb://localhost:27017/nodedb');
-global.db.connection.on("error", function (error) {
-  console.log("connect user mongon DB failed：" + error);
+global.db.connection.on('error', function (error) {
+  console.log('connect user mongon DB failed：' + error);
 });
-global.db.connection.on("open", function () {
-  console.log("connect user mongon DB success.")
+global.db.connection.on('open', function () {
+  console.log('connect user mongon DB success.')
 });
 
 // use session for login
@@ -34,6 +59,7 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.use('/', routes);
 
+//app.use(log4js.connectLogger(this.logger('normal') , {level:'auto', format:':method :url '}));
 //connect to web socket
 io.on('connection', require('./public/be/be_proxy').onIOSocketConnect);
 
