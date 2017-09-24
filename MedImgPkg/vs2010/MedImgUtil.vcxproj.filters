@@ -26,9 +26,6 @@
     <ClInclude Include="..\include\util\mi_ipc_common.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\util\mi_ipc_server_proxy.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\util\mi_message_queue.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -42,9 +39,6 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\util\mi_socket_client.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\util\mi_socket_server.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\util\mi_string_number_converter.h">
@@ -63,9 +57,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\util\mi_socket_server.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\util\mi_configuration.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -73,9 +64,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_ipc_client_proxy.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\mi_ipc_server_proxy.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_model_interface.cpp">

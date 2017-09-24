@@ -94,13 +94,11 @@
     <ClInclude Include="..\include\util\mi_file_util.h" />
     <ClInclude Include="..\include\util\mi_ipc_client_proxy.h" />
     <ClInclude Include="..\include\util\mi_ipc_common.h" />
-    <ClInclude Include="..\include\util\mi_ipc_server_proxy.h" />
     <ClInclude Include="..\include\util\mi_message_queue.h" />
     <ClInclude Include="..\include\util\mi_model_interface.h" />
     <ClInclude Include="..\include\util\mi_model_progress.h" />
     <ClInclude Include="..\include\util\mi_observer_interface.h" />
     <ClInclude Include="..\include\util\mi_socket_client.h" />
-    <ClInclude Include="..\include\util\mi_socket_server.h" />
     <ClInclude Include="..\include\util\mi_string_number_converter.h" />
     <ClInclude Include="..\include\util\mi_util_export.h" />
     <ClInclude Include="..\include\util\mi_util_logger.h" />
@@ -112,10 +110,8 @@
     <ClCompile Include="..\util\mi_configuration.cpp" />
     <ClCompile Include="..\util\mi_file_util.cpp" />
     <ClCompile Include="..\util\mi_ipc_client_proxy.cpp" />
-    <ClCompile Include="..\util\mi_ipc_server_proxy.cpp" />
     <ClCompile Include="..\util\mi_model_interface.cpp" />
     <ClCompile Include="..\util\mi_socket_client.cpp" />
-    <ClCompile Include="..\util\mi_socket_server.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
