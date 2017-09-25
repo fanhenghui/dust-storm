@@ -56,7 +56,7 @@
 
   function handleImage(
       cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
-    console.log('in render');
+    //console.log('in render');
     if (withHeader) {  // receive a new image
       cellJpeg[cellID] = '';
     }
@@ -276,9 +276,13 @@
     document.getElementById('test-info').innerText = 'up' + cellname;
   }
 
-  cellCanvas[0].addEventListener('mousemove', mouseMoveEvent);
-  cellCanvas[0].addEventListener('mousedown', mouseDownEvent);
-  cellCanvas[0].addEventListener('mouseup', mouseUpEvent);
+  // cellCanvas[0].addEventListener('mousemove', mouseMoveEvent);
+  // cellCanvas[0].addEventListener('mousedown', mouseDownEvent);
+  // cellCanvas[0].addEventListener('mouseup', mouseUpEvent);
+
+  document.getElementById('svg0').addEventListener('mousemove', mouseMoveEvent);
+  document.getElementById('svg0').addEventListener('mousedown', mouseDownEvent);
+  document.getElementById('svg0').addEventListener('mouseup', mouseUpEvent);
 
   cellCanvas[1].addEventListener('mousemove', mouseMoveEvent);
   cellCanvas[1].addEventListener('mousedown', mouseDownEvent);
@@ -416,7 +420,7 @@
 
 
     genUID: function(username) {
-      return username + new Date().getTime() + '' +
+      return username + new Date().getTime() +
           Math.floor(Math.random() * 173 + 511);
     },
 
@@ -426,21 +430,13 @@
       this.username = username;
 
       //链接websocket服务器
-      this.socket = io.connect('http://172.23.236.164:8000');
+      this.socket = io.connect('http://127.0.0.1:8000');
 
       //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
       this.socket.emit('login', {userid: this.userid, username: this.username});
 
-      //发送一段message
-      this.socket.emit('message', {
-        userid: this.userid,
-        username: this.username,
-        content: 'first message'
-      });
-
-
       this.socket.on('data', function(arraybuffer) {
-        console.log('receive data.');
+        //console.log('receive data.');
         processTCPMsg(arraybuffer);
       });
 
@@ -452,11 +448,6 @@
     },
 
     userLogOut: function() {
-      this.socket.emit('logout', {
-        userid: this.userid,
-        username: this.username,
-        content: 'last message'
-      });
       this.socket.emit(
           'disconnect', {userid: this.userid, username: this.username});
       location.reload();
@@ -684,6 +675,9 @@
                   (window.innerHeight - navigatorHeight - 40) / 2;
             }
 
+            document.getElementById("svg0").width = cellCanvas[0].width;
+            document.getElementById("svg0").height = cellCanvas[0].height;
+
             var MsgResize = root.lookup('medical_imaging.MsgResize');
             var msgResize = MsgResize.create();
 
@@ -855,10 +849,11 @@
       newCircle.attr("cx", 19)
           .attr("cy", 21)
           .attr("r", 10)
-          .style("fill-opacity", 0.0)
+          .style("fill-opacity", 0.0)//热点是整个圆
+          //.style("fill", 'none')//热点是圆圈
           .style("stroke", "red")
           .style("stroke-opacity", 0.8)
-          .style("stroke-width", 3)
+          .style("stroke-width", 2)
           .style("cursor", "move")
           .on("contextmenu", function(data, index) {
             d3.event.preventDefault();
@@ -867,6 +862,10 @@
 
       newCircle.on("mousedown", function() {
         selectedElement = event.target;
+        if (!selectedElement) {
+          console.log("select no element");
+          return ;
+        }
         if (event.button == BTN_LEFT)  // move circle
         {
           currentX = event.clientX;

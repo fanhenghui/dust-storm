@@ -217,11 +217,6 @@ module.exports = {
     // listen user disconnect(leave review page)
     socket.on('disconnect', disconnectBEExt);
 
-    // listen string message for test
-    socket.on('message', function(obj) {
-      console.log(obj.username + ' message : ' + obj.content);
-    });
-
     socket.on('heartbeat', function(obj) {
       if(onlineFETic.hasOwnProperty(obj.userid)){
         onlineFETic[obj.userid] += 1;
