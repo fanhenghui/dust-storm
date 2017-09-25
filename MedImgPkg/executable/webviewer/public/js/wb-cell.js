@@ -36,33 +36,37 @@ function Cell(cellName, cellID, canvas, svg, socket) {
 
     //register event linsener
 
-};
+}
+
+function refreshCanvas(canvas, img) {
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+}
 
 Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     if (withHeader) {
         this.jpegStr = '';
-    } else {
-        var imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        this.jpegStr += String.fromCharCode.apply(null, imgBUffer);
-        if(restDataLen <= 0) {
-            this.jpegImg.src =  'data:image/jpg;base64,' + btoa(this.jpegStr);
-            this.jpegImg.onload = function() {
-                this.canvas.getContext('2d').drawImage(this,jpegImg, 0, 0, this.canvas.width, this.canvas.height);
-            };
-        }
+    } 
+    var imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+    this.jpegStr += String.fromCharCode.apply(null, imgBuffer);
+    if(restDataLen <= 0) {
+        this.jpegImg.src =  'data:image/jpg;base64,' + btoa(this.jpegStr);
+        loadImg = (function(){
+            refreshCanvas(this.canvas, this.jpegImg);
+        }).bind(this);
+        this.jpegImg.onload = loadImg;
     }
-};
+}
 
 Cell.prototype.resize = function(width, height) {
     //canvas resize
-    canvas.width = width;
-    canvas.height = height;
+    this.canvas.width = width;
+    this.canvas.height = height;
     //TODO svg resize
 
     //send msg to notigy BE resize will be call outside
-};
+}
 
-cell.prototype.mouseDown = function(event) {
+Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
 
@@ -70,9 +74,9 @@ cell.prototype.mouseDown = function(event) {
     var y = event.clientY - event.toElement.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
-};
+}
 
-cell.prototype.mouseMove = function(event) {
+Cell.prototype.mouseMove = function(event) {
     if (this.mouseBtn != BTN_DOWN) {
         return;
     }
@@ -80,9 +84,9 @@ cell.prototype.mouseMove = function(event) {
     var x = event.clientX - event.toElement.getBoundingClientRect().left;
     var y = event.clientY - event.toElement.getBoundingClientRect().top;
     this.processMouseAction();
-};
+}
 
-cell.prototype.processMouseAction = function() {
+Cell.prototype.processMouseAction = function() {
     //prevent mouse msg too dense
     var curClock = this.date.getTime();
     if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
@@ -113,18 +117,24 @@ cell.prototype.processMouseAction = function() {
     SocketClient.sendData(this.socket, COMMAND_ID_FE_OPERATION, this.mouseAction, this.cellID, msgBuffer.byteLength, msgBuffer);
 }
 
-cell.prototype.mouseUp = function(event) {
+Cell.prototype.mouseUp = function(event) {
     this.mouseBtn = BTN_NONE;
     this.mouseStatus = BTN_UP;
     this.mousePre.x = 0;
     this.mousePre.y = 0;
-};
+}
 
 Cell.prototype.prepare = function() {
     if(this.svg != null) {
-        this.svg.addEventLister('mousedown', this.prototype.mouseDown);
-        this.svg.addEventLister('mousemove', this.prototype.mouseMove);
-        this.svg.addEventLister('mouseup', this.prototype.mouseUp);
+        this.svg.addEventListener('mousedown', function(event) {
+            this.mouseDown(event);
+        });
+        this.svg.addEventListener('mousemove', function(event) {
+            this.mouseMove(event);
+        });
+        this.svg.addEventListener('mouseup', function(event) {
+            this.mouseUp(event);
+        });
         return true;
     } else {
         return false;
