@@ -223,6 +223,7 @@
 
   function mouseMoveEvent(event) {
     var cellname = event.toElement.id;
+    if(!cellname) {return;};
     var cellid_s = cellname.slice(cellname.length - 1);
     var cellid = parseInt(cellid_s);
     if (btnStatus[cellid] != BTN_DOWN) {
@@ -253,6 +254,7 @@
 
   function mouseDownEvent(event) {
     var cellname = event.toElement.id;
+    if(!cellname) {return;};
     var cellid_s = cellname.slice(cellname.length - 1);
     var cellid = parseInt(cellid_s);
     btnStatus[cellid] = BTN_DOWN;
@@ -268,6 +270,7 @@
   }
 
   function mouseUpEvent(event) {
+    if(!cellname) {return;};
     var cellname = event.toElement.id;
     var cellid_s = cellname.slice(cellname.length - 1);
     var cellid = parseInt(cellid_s);
@@ -1007,6 +1010,29 @@
     window.FE.userLogOut();
     return message;
   };
+
+  var comToolsDiv = document.getElementById('common-tools');
+  var comToolsBtns = comToolsDiv.getElementsByTagName('button');
+  for (var i = 0; i < comToolsBtns.length; ++i) {
+    comToolsBtns[i].addEventListener('click', function(event) {
+      FE.switchCommonTool(this.id);
+    });
+  }
+
+  var btnVRRotate = document.getElementById('btn-vr-rotate');
+  btnVRRotate.addEventListener('click', function() {
+    FE.playVR();
+  });
+
+  var btnAddAnnotation = document.getElementById('btn-addannotation');
+  btnAddAnnotation.addEventListener('click', function() {
+    FE.addAnnotation();
+  });
+
+  var btnRemoveAnnotation = document.getElementById('btn-removeannotation');
+  btnRemoveAnnotation.addEventListener('click', function() {
+    FE.removeAnnotation();
+  });
 
   window.onresize = window.onresize = function() { window.FE.resize(); };
 

@@ -183,21 +183,21 @@
                             </div>
                         </div>
                         <div class="row clearfix">
-                            <div class="btn-group">
-                                <button class="btn btn-default" type="button" id="common-tool-arrow" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-left"></em>Ar</button>
-                                <button class="btn btn-default" type="button" id="common-tool-zoom" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-center"></em>Zo</button>
-                                <button class="btn btn-default" type="button" id="common-tool-rotate" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-right"></em>Ro</button>
+                            <div class="btn-group" id="common-tools">
+                                <button class="btn btn-default" type="button" id="common-tool-arrow" ><em class="glyphicon glyphicon-align-left"></em>Ar</button>
+                                <button class="btn btn-default" type="button" id="common-tool-zoom" ><em class="glyphicon glyphicon-align-center"></em>Zo</button>
+                                <button class="btn btn-default" type="button" id="common-tool-rotate" ><em class="glyphicon glyphicon-align-right"></em>Ro</button>
                                 <br>
-                                <button class="btn btn-default" type="button" id="common-tool-pan" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-left"></em>Pan</button>
-                                <button class="btn btn-default" type="button" id="common-tool-windowing" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-center"></em>Win</button>
-                                <button class="btn btn-canvas2default" type="button" id="common-tool-annotation" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-right"></em>An</button>
+                                <button class="btn btn-default" type="button" id="common-tool-pan" ><em class="glyphicon glyphicon-align-left"></em>Pan</button>
+                                <button class="btn btn-default" type="button" id="common-tool-windowing" ><em class="glyphicon glyphicon-align-center"></em>Win</button>
+                                <button class="btn btn-canvas2default" type="button" id="common-tool-annotation" ><em class="glyphicon glyphicon-align-right"></em>An</button>
                             </div>
                         </div>
                         <div class="row clearfix">
-                            <button type="button" class="btn btn-vr-rotate" onclick="FE.playVR()">play-vr</button>
+                            <button type="button" class="btn btn-vr-rotate" id="btn-vr-rotate">play-vr</button>
                             <br>
-                            <button type="button" onclick="FE.addAnnotation()" > add circle </button>
-                            <button type="button" onclick="FE.removeAnnotation()" > delete circle</button>
+                            <button type="button" id="btn-addannotation" > add circle </button>
+                            <button type="button" id="btn-removeannotation"> delete circle</button>
                         </div>
                         <p id="test-info">
                         </p>
