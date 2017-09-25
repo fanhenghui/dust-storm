@@ -61,3 +61,10 @@ message MsgWorklistItem{
 message MsgWorklist{
     repeated MsgWorklistItem items = 1;
 };
+
+message MsgAnnotation{
+    required int32 type = 1;
+    optional float para1 = 2;
+    optional float para2 = 3;
+    optional float para3 = 4;
+};

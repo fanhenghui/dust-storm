@@ -6,11 +6,14 @@
   COMMAND_ID_FE_MPR_PLAY = 120003;
   COMMAND_ID_FE_VR_PLAY = 120004;
   COMMAND_ID_FE_SEARCH_WORKLIST = 120005;
+
   // BE to FE
-  COMMAND_ID_BE_HEARTBEAT = 269999
+  COMMAND_ID_BE_HEARTBEAT = 269999;
   COMMAND_ID_BE_READY = 270000;
   COMMAND_ID_BE_SEND_IMAGE = 270001;
   COMMAND_ID_BE_SEND_WORKLIST = 270002;
+  COMMAND_ID_BE_SEND_ANNOTATION = 270003;
+
   // FE to BE Operation ID
   OPERATION_ID_INIT = 310000;
   OPERATION_ID_MPR_PAGING = 310001;
@@ -19,6 +22,7 @@
   OPERATION_ID_ROTATE = 310004;
   OPERATION_ID_WINDOWING = 310005;
   OPERATION_ID_RESIZE = 310006;
+  OPERATION_ID_ANNOTATION = 310007;
 
   // init
   cellCanvas = [
@@ -42,19 +46,20 @@
   for (var index = 0; index < cellCanvas.length; index++) {
     cellCanvas[index].width = (cellContainerWidth - 20) / 2;
     cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
-    }
+  }
 
   function refreshCanvas(cellID) {
     cellCanvas[cellID].getContext('2d').drawImage(
         cellImage[cellID], 0, 0, cellCanvas[cellID].width,
         cellCanvas[cellID].height);
-    }
+  }
 
-  function handleImage( cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+  function handleImage(
+      cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     console.log('in render');
     if (withHeader) {  // receive a new image
       cellJpeg[cellID] = '';
-      }
+    }
 
     var imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
     cellJpeg[cellID] += String.fromCharCode.apply(null, imgBuffer);
@@ -77,14 +82,17 @@
             cellID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_READY:
-        //window.FE.triggerOnBE('test_uid');
-        //TODO trigger on ready flag
+        // window.FE.triggerOnBE('test_uid');
         break;
       case COMMAND_ID_BE_SEND_WORKLIST:
         showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_HEARTBEAT:
         window.FE.heartbeat();
+        break;
+      case COMMAND_ID_BE_SEND_ANNOTATION:
+        // alert("delete selected annotation");
+        window.FE.changeAnnotation();
         break;
       default:
         break;
@@ -110,7 +118,7 @@
         lastMsgHeaderLen = tcpPackageLen;
         tcpBuffer.copy(lastMsgHeader, 0, 0);
         return;
-        }
+      }
       var header = new Uint32Array(tcpBuffer, 0, 8);
       msgCmdID = header[2];
       msgCellID = header[3];
@@ -220,7 +228,7 @@
     if (btnStatus[cellid] != BTN_DOWN) {
       document.getElementById('test-info').innerText = '';
       return;
-      }
+    }
     var button = event.button;
     var x = event.clientX - event.toElement.getBoundingClientRect().left;
     var y = event.clientY - event.toElement.getBoundingClientRect().top;
@@ -229,9 +237,9 @@
 
     if (preMousePos[cellid].x == x && preMousePos[cellid].y == y) {
       return;
-      }
+    }
     if (button == BTN_LEFT) {
-      //if (curAction == ACTION_ID_ARROW) {
+      // if (curAction == ACTION_ID_ARROW) {
       //  return;
       //}
       window.FE.mouseAction(
@@ -241,7 +249,7 @@
 
     preMousePos[cellid].x = x;
     preMousePos[cellid].y = y;
-    }
+  }
 
   function mouseDownEvent(event) {
     var cellname = event.toElement.id;
@@ -257,7 +265,7 @@
     preMousePos[cellid].y = y;
 
     document.getElementById('test-info').innerText = 'down' + cellname;
-    }
+  }
 
   function mouseUpEvent(event) {
     var cellname = event.toElement.id;
@@ -288,12 +296,11 @@
   searchBtn = document.getElementById('searchBtn');
   loadBtn = document.getElementById('loadBtn');
 
-  
   var worklistBuffer;
-  function showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader)
-  {
-    console.log ('prepare data 4 worklist!');
-    if (withHeader) { 
+  function showWorklist(
+      tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    console.log('prepare data 4 worklist!');
+    if (withHeader) {
       worklistBuffer = new ArrayBuffer(dataLen);
     }
 
@@ -301,19 +308,16 @@
     var dstview = new Uint8Array(worklistBuffer);
     var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
 
-    for(var i=0; i<dataLen; i++)
-    {
-        dstview[i] = srcview[i];
+    for (var i = 0; i < dataLen; i++) {
+      dstview[i] = srcview[i];
     }
 
-    if (restDataLen <= 0) 
-    {
+    if (restDataLen <= 0) {
       window.FE.showWorklist();
     }
   };
 
-  function searchWorkList(event)
-  {
+  function searchWorkList(event) {
     console.log('searchWorkList');
     window.FE.searchWorkList();
   }
@@ -332,23 +336,84 @@
   searchBtn.addEventListener('click', searchWorkList);
   // loadBtn.addEventListener('click', loadOneSeries);
 
- $("#loadBtn").on('click', function(e){
-   var series_id = $("#table tbody tr.success td:nth-child(3)").html();
-   console.log('loadOneSeries: ', series_id);
-   alert(series_id);
-   document.getElementById("worklist-div").hidden = true;
-   document.getElementById("review-div").hidden = false;
-   window.FE.triggerOnBE(series_id); //'test_uid'
- });
+  $("#loadBtn")
+      .on('click', function(e) {
+        var series_id = $("#table tbody tr.success td:nth-child(3)").html();
+        console.log('loadOneSeries: ', series_id);
+        alert(series_id);
+        document.getElementById("worklist-div").hidden = true;
+        document.getElementById("review-div").hidden = false;
+        window.FE.triggerOnBE(series_id);  //'test_uid'
+      });
 
 
+  var selectedElement = 0;
+  var moveType = 0;
+  var currentX = 0;
+  var currentY = 0;
+
+  function moveElement(evt) {
+    dx = evt.clientX - currentX;
+    dy = evt.clientY - currentY;
+
+    if (selectedElement != 0) {
+      if (moveType == BTN_LEFT) {
+        //   currentMatrix[4] += dx;
+        //   currentMatrix[5] += dy;
+        //   newMatrix = "matrix(" + currentMatrix.join(' ') + ")";
+        //   selectedElement.setAttributeNS(null, "transform", newMatrix);
+
+        var cx = parseFloat(selectedElement.getAttribute('cx'));
+        selectedElement.setAttribute('cx', cx + dx);
+
+        var cy = parseFloat(selectedElement.getAttribute('cy'));
+        selectedElement.setAttribute('cy', cy + dy);
+      } else if (moveType == BTN_RIGHT) {
+        var cx = selectedElement.getAttribute('cx');
+        var cy = selectedElement.getAttribute('cy');
+        
+        // TODO: capture the right canvas
+        var bBox = document.getElementById("canvas0").getBoundingClientRect();
+        // console.log(bBox.left);
+        // console.log(bBox.top);
+        var r = Math.sqrt(
+            (evt.clientX - bBox.left - cx) * (evt.clientX - bBox.left - cx) +
+            (evt.clientY - bBox.top - cy) * (evt.clientY - bBox.top - cy));
+        selectedElement.setAttribute('r', r);
+        }
+    }
+    currentX = evt.clientX;
+    currentY = evt.clientY;
+  }
+
+  function deselectElement(evt) {
+    if (selectedElement != 0) {
+
+      // Tell BE my new status
+      // canvas_0, primitive type (0: circle), data
+      window.FE.sendAnnotation(0, 0, 
+        {
+          cx: parseFloat(selectedElement.getAttribute('cx')),
+          cy: parseFloat(selectedElement.getAttribute('cy')),
+          r: parseFloat(selectedElement.getAttribute('r'))
+        }); 
+
+      // selectedElement.removeAttributeNS(null, "onmousemove");
+      document.onmousemove = null;
+      selectedElement.removeAttributeNS(null, "onmouseout");
+      selectedElement.removeAttributeNS(null, "onmouseup");
+      selectedElement = 0;
+      moveType = 0;
+    }
+  }
 
   window.FE = {
     username: null,
     userid: null,
     socket: null,
     mouseActionTik: new Date().getTime(),
-    series_uid : "",
+    series_uid: "",
+
 
     genUID: function(username) {
       return username + new Date().getTime() + '' +
@@ -361,7 +426,7 @@
       this.username = username;
 
       //链接websocket服务器
-      this.socket = io.connect('http://172.23.236.130:8000');
+      this.socket = io.connect('http://172.23.236.164:8000');
 
       //通知服务器有用户登录 TODO 这段逻辑应该在登录的时候做
       this.socket.emit('login', {userid: this.userid, username: this.username});
@@ -370,7 +435,8 @@
       this.socket.emit('message', {
         userid: this.userid,
         username: this.username,
-        content: 'first message'});
+        content: 'first message'
+      });
 
 
       this.socket.on('data', function(arraybuffer) {
@@ -381,9 +447,8 @@
     },
 
     heartbeat: function() {
-      this.socket.emit('heartbeat', {
-        userid: this.userid,
-        username: this.username});
+      this.socket.emit(
+          'heartbeat', {userid: this.userid, username: this.username});
     },
 
     userLogOut: function() {
@@ -401,7 +466,7 @@
       var username = document.getElementById('username').innerHTML;
       this.init(username);
     },
-    
+
     switchCommonTool: function(btnID) {
       switch (btnID) {
         case 'common-tool-arrow':
@@ -435,245 +500,272 @@
     },
 
     mouseAction: function(cellid, prePos, curPos, actionID) {
-      var binding_func = (function(err, root) {
-        if (err) {
-          console.log('load proto failed!');
-          throw err;
-        }
+      var binding_func =
+          (function(err, root) {
+            if (err) {
+              console.log('load proto failed!');
+              throw err;
+            }
 
-        var curTick = new Date().getTime();
-        if (Math.abs(window.FE.mouseActionTik - curTick) < 10) {
-          return;
-        }
-        window.FE.mouseActionTik = curTick
-        if(cellid == 0 || cellid == 1 || cellid == 2) {
-          if(actionID == ACTION_ID_ARROW) {
-            actionID = OPERATION_ID_MPR_PAGING;
-          } else if (actionID == ACTION_ID_ROTATE) {
-            return;
-          }
-        } else {
-          if(actionID == ACTION_ID_ARROW) {
-            actionID = ACTION_ID_ROTATE;
-          }
-        }
+            var curTick = new Date().getTime();
+            if (Math.abs(window.FE.mouseActionTik - curTick) < 10) {
+              return;
+            }
+            window.FE.mouseActionTik = curTick;
+            if (cellid == 0 || cellid == 1 || cellid == 2) {
+              if (actionID == ACTION_ID_ARROW) {
+                actionID = OPERATION_ID_MPR_PAGING;
+              } else if (actionID == ACTION_ID_ROTATE) {
+                return;
+              }
+            } else {
+              if (actionID == ACTION_ID_ARROW) {
+                actionID = ACTION_ID_ROTATE;
+              }
+            }
 
-        var MsgMouse = root.lookup('medical_imaging.MsgMouse');
-        var msgMouse = MsgMouse.create({
-          pre: {x: prePos.x, y: prePos.y},
-          cur: {x: curPos.x, y: curPos.y},
-          tag: 0
-        });
-        var msgBuffer = MsgMouse.encode(msgMouse).finish();
-        var msgLength = msgBuffer.byteLength;
-        var cmdBuffer = new ArrayBuffer(32 + msgLength);
-        // header
-        var header = new Uint32Array(cmdBuffer, 0, 8);
-        header[0] = 0;
-        header[1] = 0;
-        header[2] = COMMAND_ID_FE_OPERATION;
-        header[3] = cellid;
-        header[4] = actionID;
-        header[5] = 0;
-        header[6] = 0;
-        header[7] = msgLength
-        // data
-        var srcBuffer = new Uint8Array(msgBuffer);
-        var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
-        for (var index = 0; index < msgLength; index++) {
-          dstBuffer[index] = srcBuffer[index];
-        }
-        console.log('emit mouse action message.');
+            var MsgMouse = root.lookup('medical_imaging.MsgMouse');
+            var msgMouse = MsgMouse.create({
+              pre: {x: prePos.x, y: prePos.y},
+              cur: {x: curPos.x, y: curPos.y},
+              tag: 0
+            });
+            var msgBuffer = MsgMouse.encode(msgMouse).finish();
+            var msgLength = msgBuffer.byteLength;
+            var cmdBuffer = new ArrayBuffer(32 + msgLength);
+            // header
+            var header = new Uint32Array(cmdBuffer, 0, 8);
+            header[0] = 0;
+            header[1] = 0;
+            header[2] = COMMAND_ID_FE_OPERATION;
+            header[3] = cellid;
+            header[4] = actionID;
+            header[5] = 0;
+            header[6] = 0;
+            header[7] = msgLength;
+            // data
+            var srcBuffer = new Uint8Array(msgBuffer);
+            var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
+            for (var index = 0; index < msgLength; index++) {
+              dstBuffer[index] = srcBuffer[index];
+            }
+            console.log('emit mouse action message.');
 
-        this.socket.emit('data', {
-          userid: this.userid,
-          username: this.username,
-          content: cmdBuffer
-        });
-      }).bind(this);
+            this.socket.emit('data', {
+              userid: this.userid,
+              username: this.username,
+              content: cmdBuffer
+            });
+          }).bind(this);
 
       protobuf.load('./data/mi_message.proto', binding_func);
     },
 
     triggerOnBE: function(series_uid) {
       this.series_uid = series_uid;
-      var binding_func = (function(err, root) {
-        if (err) {
-          console.log('load proto failed!');
-        throw err;
-        }
-        var MsgInit = root.lookup('medical_imaging.MsgInit');
-        var msgInit = MsgInit.create();
-        msgInit.seriesUid = this.series_uid;
-        msgInit.pid = 1000;
+      var binding_func =
+          (function(err, root) {
+            if (err) {
+              console.log('load proto failed!');
+              throw err;
+            }
+            var MsgInit = root.lookup('medical_imaging.MsgInit');
+            var msgInit = MsgInit.create();
+            msgInit.seriesUid = this.series_uid;
+            msgInit.pid = 1000;
 
-        //adjust width&height
-        cellContainerWidth =
-        document.getElementById('cell-container').offsetWidth;
-        cellContainerHeight =
-            document.getElementById('cell-container').offsetHeight;
-        navigatorHeight =
-            document.getElementById('navigator-div').offsetHeight;
+            // adjust width&height
+            cellContainerWidth =
+                document.getElementById('cell-container').offsetWidth;
+            cellContainerHeight =
+                document.getElementById('cell-container').offsetHeight;
+            navigatorHeight =
+                document.getElementById('navigator-div').offsetHeight;
 
-        console.log('cells w:' + cellContainerWidth);
-        console.log('cells h:' + cellContainerHeight);
+            console.log('cells w:' + cellContainerWidth);
+            console.log('cells h:' + cellContainerHeight);
 
-        for (var index = 0; index < cellCanvas.length; index++) {
-          cellCanvas[index].width = (cellContainerWidth - 20) / 2;
-          cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
-        }
+            for (var index = 0; index < cellCanvas.length; index++) {
+              cellCanvas[index].width = (cellContainerWidth - 20) / 2;
+              cellCanvas[index].height =
+                  (window.innerHeight - navigatorHeight - 40) / 2;
+            }
 
 
-        // MPR
-        msgInit.cells.push({
-          id: 0,
-          type: 1,
-          direction: 0,
-          width: cellCanvas[0].width,
-          height: cellCanvas[0].height
-        });
-        msgInit.cells.push({
-          id: 1,
-          type: 1,
-          direction: 1,
-          width: cellCanvas[1].width,
-          height: cellCanvas[1].height
-        });
-        msgInit.cells.push({
-          id: 2,
-          type: 1,
-          direction: 2,
-          width: cellCanvas[2].width,
-          height: cellCanvas[2].height
-        });
-        msgInit.cells.push({
-          id: 3,
-          type: 2,
-          direction: 0,
-          width: cellCanvas[3].width,
-          height: cellCanvas[3].height
-        });
+            // MPR
+            msgInit.cells.push({
+              id: 0,
+              type: 1,
+              direction: 0,
+              width: cellCanvas[0].width,
+              height: cellCanvas[0].height
+            });
+            
+            d3.select("#svg0")
+            .attr('width', cellCanvas[0].width)
+            .attr('height', cellCanvas[0].height);
 
-        var msgBuffer = MsgInit.encode(msgInit).finish();
-        var msgLength = msgBuffer.byteLength;
-        var cmdBuffer = new ArrayBuffer(32 + msgLength);
+            msgInit.cells.push({
+              id: 1,
+              type: 1,
+              direction: 1,
+              width: cellCanvas[1].width,
+              height: cellCanvas[1].height
+            });
+            msgInit.cells.push({
+              id: 2,
+              type: 1,
+              direction: 2,
+              width: cellCanvas[2].width,
+              height: cellCanvas[2].height
+            });
+            msgInit.cells.push({
+              id: 3,
+              type: 2,
+              direction: 0,
+              width: cellCanvas[3].width,
+              height: cellCanvas[3].height
+            });
 
-        // header
-        var header = new Uint32Array(cmdBuffer, 0, 8);
-        header[0] = 0;
-        header[1] = 0;
-        header[2] = COMMAND_ID_FE_OPERATION;
-        header[3] = 0;
-        header[4] = OPERATION_ID_INIT;
-        header[5] = 0;
-        header[6] = 0;
-        header[7] = msgLength;
+            var msgBuffer = MsgInit.encode(msgInit).finish();
+            var msgLength = msgBuffer.byteLength;
+            var cmdBuffer = new ArrayBuffer(32 + msgLength);
 
-        // data
-        var srcBuffer = new Uint8Array(msgBuffer);
-        var dstBuffer =
-            new Uint8Array(cmdBuffer, 8 * 4, msgLength);
-        for (var index = 0; index < msgLength; index++) {
-          dstBuffer[index] = srcBuffer[index];
-        }
-        console.log('emit trigger BE message.');
+            // header
+            var header = new Uint32Array(cmdBuffer, 0, 8);
+            header[0] = 0;
+            header[1] = 0;
+            header[2] = COMMAND_ID_FE_OPERATION;
+            header[3] = 0;
+            header[4] = OPERATION_ID_INIT;
+            header[5] = 0;
+            header[6] = 0;
+            header[7] = msgLength;
 
-        this.socket.emit('data', {
-          userid: this.userid,
-          username: this.username,
-          content: cmdBuffer
-        });
-      }).bind(this);
+            // data
+            var srcBuffer = new Uint8Array(msgBuffer);
+            var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
+            for (var index = 0; index < msgLength; index++) {
+              dstBuffer[index] = srcBuffer[index];
+            }
+            console.log('emit trigger BE message.');
+
+            this.socket.emit('data', {
+              userid: this.userid,
+              username: this.username,
+              content: cmdBuffer
+            });
+          }).bind(this);
 
       protobuf.load('./data/mi_message.proto', binding_func);
     },
 
     resize: function() {
       console.log('resize');
-      var binding_func = (function(err, root) {
-        if (err) {
-          console.log('load proto failed!');
-          throw err;
-        }
-        cellContainerWidth =
-            document.getElementById('cell-container').offsetWidth;
-        cellContainerHeight =
-            document.getElementById('cell-container').offsetHeight;
-        navigatorHeight =
-            document.getElementById('navigator-div').offsetHeight;
+      var binding_func =
+          (function(err, root) {
+            if (err) {
+              console.log('load proto failed!');
+              throw err;
+            }
+            cellContainerWidth =
+                document.getElementById('cell-container').offsetWidth;
+            cellContainerHeight =
+                document.getElementById('cell-container').offsetHeight;
+            navigatorHeight =
+                document.getElementById('navigator-div').offsetHeight;
 
-        console.log('cells w:' + cellContainerWidth);
-        console.log('cells h:' + cellContainerHeight);
+            console.log('cells w:' + cellContainerWidth);
+            console.log('cells h:' + cellContainerHeight);
 
-        for (var index = 0; index < cellCanvas.length; index++) {
-          cellCanvas[index].width = (cellContainerWidth - 20) / 2;
-          cellCanvas[index].height = (window.innerHeight - navigatorHeight - 40) / 2;
-        }
+            for (var index = 0; index < cellCanvas.length; index++) {
+              cellCanvas[index].width = (cellContainerWidth - 20) / 2;
+              cellCanvas[index].height =
+                  (window.innerHeight - navigatorHeight - 40) / 2;
+            }
 
-        var MsgResize = root.lookup('medical_imaging.MsgResize');
-        var msgResize = MsgResize.create();
+            var MsgResize = root.lookup('medical_imaging.MsgResize');
+            var msgResize = MsgResize.create();
 
-        // MPR
-        msgResize.cells.push({
-          id: 0,
-          type: 1,
-          direction: 0,
-          width: cellCanvas[0].width,
-          height: cellCanvas[0].height
-        });
-        msgResize.cells.push({
-          id: 1,
-          type: 1,
-          direction: 1,
-          width: cellCanvas[1].width,
-          height: cellCanvas[1].height
-        });
-        msgResize.cells.push({
-          id: 2,
-          type: 1,
-          direction: 2,
-          width: cellCanvas[2].width,
-          height: cellCanvas[2].height
-        });
-        msgResize.cells.push({
-          id: 3,
-          type: 2,
-          direction: 0,
-          width: cellCanvas[3].width,
-          height: cellCanvas[3].height
-        });
-        var msgBuffer = MsgResize.encode(msgResize).finish();
-        var msgLength = msgBuffer.byteLength;
-        var cmdBuffer = new ArrayBuffer(32 + msgLength);
-        // header
-        var header = new Uint32Array(cmdBuffer, 0, 8);
-        header[0] = 0;
-        header[1] = 0;
-        header[2] = COMMAND_ID_FE_OPERATION;
-        header[3] = 0;
-        header[4] = OPERATION_ID_RESIZE;
-        header[5] = 0;
-        header[6] = 0;
-        header[7] = msgLength;
-        // data
-        var srcBuffer = new Uint8Array(msgBuffer);
-        var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
-        for (var index = 0; index < msgLength; index++) {
-          dstBuffer[index] = srcBuffer[index];
-        }
-        console.log('emit resize message.');
+            // MPR
+            msgResize.cells.push({
+              id: 0,
+              type: 1,
+              direction: 0,
+              width: cellCanvas[0].width,
+              height: cellCanvas[0].height
+            });
+            msgResize.cells.push({
+              id: 1,
+              type: 1,
+              direction: 1,
+              width: cellCanvas[1].width,
+              height: cellCanvas[1].height
+            });
+            msgResize.cells.push({
+              id: 2,
+              type: 1,
+              direction: 2,
+              width: cellCanvas[2].width,
+              height: cellCanvas[2].height
+            });
+            msgResize.cells.push({
+              id: 3,
+              type: 2,
+              direction: 0,
+              width: cellCanvas[3].width,
+              height: cellCanvas[3].height
+            });
+            var msgBuffer = MsgResize.encode(msgResize).finish();
+            var msgLength = msgBuffer.byteLength;
+            var cmdBuffer = new ArrayBuffer(32 + msgLength);
+            // header
+            var header = new Uint32Array(cmdBuffer, 0, 8);
+            header[0] = 0;
+            header[1] = 0;
+            header[2] = COMMAND_ID_FE_OPERATION;
+            header[3] = 0;
+            header[4] = OPERATION_ID_RESIZE;
+            header[5] = 0;
+            header[6] = 0;
+            header[7] = msgLength;
+            // data
+            var srcBuffer = new Uint8Array(msgBuffer);
+            var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
+            for (var index = 0; index < msgLength; index++) {
+              dstBuffer[index] = srcBuffer[index];
+            }
+            console.log('emit resize message.');
 
-        this.socket.emit('data', {
-          userid: this.userid,
-          username: this.username,
-          content: cmdBuffer
-        });
-      }).bind(this);
+            this.socket.emit('data', {
+              userid: this.userid,
+              username: this.username,
+              content: cmdBuffer
+            });
+          }).bind(this);
 
       protobuf.load('./data/mi_message.proto', binding_func);
     },
 
-    searchWorkList: function () {
+    loadSeries: function() {
+      var header_buffer = new ArrayBuffer(32);
+      var header = new Uint32Array(header_buffer);
+      header[0] = 0;
+      header[1] = 0;
+      header[2] = COMMAND_ID_FE_LOAD_SERIES;
+      header[3] = 0;  // paging
+      header[4] = 0;
+      header[5] = 0;
+      header[6] = 0;
+      header[7] = 0;
+      this.socket.emit('data', {
+        userid: this.userid,
+        username: this.username,
+        content: header_buffer
+      })
+    },
+
+    searchWorkList: function() {
       var header_buffer = new ArrayBuffer(32);
       var header = new Uint32Array(header_buffer);
       header[0] = 0;
@@ -690,7 +782,7 @@
         username: this.username,
         content: header_buffer
       });
-      // for test 
+      // for test
       // this.socket.emit('message', {
       //   userid: this.userid,
       //   username: this.username,
@@ -698,49 +790,54 @@
       // });
     },
 
-    showWorklist : function () {
+    showWorklist: function() {
       protobuf.load('./data/mi_message.proto', function(err, root) {
-          if (err) { console.log('load proto failed!'); throw err;}
-          var MsgWorklistType = root.lookup('medical_imaging.MsgWorklist');
-          var worklistView = new Uint8Array(worklistBuffer)
-          var message = MsgWorklistType.decode(worklistView);
-          console.log(worklist);
-          var obj = MsgWorklistType.toObject(message, {
-              patient_name : String, 
-              patient_id: String,
-              series_uid: String,
-              imaging_modality: String}).items;
-
-          var tbody = document.getElementById("worklist");
-          tbody.innerHTML = "";
-          for (var i = 0; i < obj.length; i++) {
-              var tr = "<tr>";
-              for(var propt in obj[i])
-              {
-                tr += "<td>" + obj[i][propt] + "</td>"
-              }
-              tr += "</tr>";
-
-              /* We add the table row to the table body */
-              tbody.innerHTML += tr;
-          }
-
-          $("#table tbody tr").click(function(){
-            $(this).addClass('success').siblings().removeClass('success');    
-            // var value = $(this).find('td:nth-child(3)').html();
-            // alert(value);
-         });
+        if (err) {
+          console.log('load proto failed!');
+          throw err;
         }
-      );
+        var MsgWorklistType = root.lookup('medical_imaging.MsgWorklist');
+        var worklistView = new Uint8Array(worklistBuffer);
+        var message = MsgWorklistType.decode(worklistView);
+        console.log(worklist);
+        var obj = MsgWorklistType
+                      .toObject(message, {
+                        patient_name: String,
+                        patient_id: String,
+                        series_uid: String,
+                        imaging_modality: String
+                      })
+                      .items;
+
+        var tbody = document.getElementById("worklist");
+        tbody.innerHTML = "";
+        for (var i = 0; i < obj.length; i++) {
+          var tr = "<tr>";
+          for (var propt in obj[i]) {
+            tr += "<td>" + obj[i][propt] + "</td>"
+          }
+          tr += "</tr>";
+
+          /* We add the table row to the table body */
+          tbody.innerHTML += tr;
+        }
+
+        $("#table tbody tr")
+            .click(function() {
+              $(this).addClass('success').siblings().removeClass('success');
+              // var value = $(this).find('td:nth-child(3)').html();
+              // alert(value);
+            });
+      });
     },
 
-    playVR : function() {
+    playVR: function() {
       var header_buffer = new ArrayBuffer(32);
       var header = new Uint32Array(header_buffer);
       header[0] = 0;
       header[1] = 0;
       header[2] = COMMAND_ID_FE_VR_PLAY;
-      header[3] = 3;//VR cell id
+      header[3] = 3;  // VR cell id
       header[4] = 0;
       header[5] = 0;
       header[6] = 0;
@@ -750,6 +847,131 @@
         username: this.username,
         content: header_buffer
       });
+    },
+
+    addAnnotation: function() {
+      // add a circle
+      var newCircle = d3.select("#svg0").append("circle");
+      newCircle.attr("cx", 19)
+          .attr("cy", 21)
+          .attr("r", 10)
+          .style("fill-opacity", 0.0)
+          .style("stroke", "red")
+          .style("stroke-opacity", 0.8)
+          .style("stroke-width", 3)
+          .style("cursor", "move")
+          .on("contextmenu", function(data, index) {
+            d3.event.preventDefault();
+            return false;
+          });
+
+      newCircle.on("mousedown", function() {
+        selectedElement = event.target;
+        if (event.button == BTN_LEFT)  // move circle
+        {
+          currentX = event.clientX;
+          currentY = event.clientY;
+          moveType = BTN_LEFT;
+        }
+
+        else if (event.button == BTN_RIGHT)  // change circle radius
+        {
+          moveType = BTN_RIGHT;
+        }
+
+        // selectedElement.setAttributeNS(null, "onmousemove",
+        // "moveElement(evt)");
+        document.onmousemove = moveElement;
+
+        // selectedElement.setAttributeNS(null, "onmouseout",
+        // "deselectElement(evt)");
+
+        document.onmouseup = deselectElement;
+        // selectedElement.setAttributeNS(null, "onmouseup",
+        // "deselectElement(evt)");
+        // document.getElementById("svg0").appendChild(selectedElement);
+      });
+
+      // emit msg to server
+      // canvas_0, primitive type (0: circle), data
+      this.sendAnnotation(0, 0, 
+        {
+          cx: parseFloat(newCircle.attr('cx')),
+          cy: parseFloat(newCircle.attr('cy')),
+          r: parseFloat(newCircle.attr('r'))
+        }); 
+    },
+
+    removeAnnotation : function ()
+    {
+      var cmdBuffer = new ArrayBuffer(32);
+      var header = new Uint32Array(cmdBuffer, 0, 8);
+      header[0] = 0;
+      header[1] = 0;
+      header[2] = COMMAND_ID_FE_OPERATION;
+      header[3] = 0; // cellid;
+      header[4] = OPERATION_ID_ANNOTATION;
+      header[5] = 0;
+      header[6] = 0;
+      header[7] = 0;
+
+      this.socket.emit('data', {
+        userid: this.userid,
+        username: this.username,
+        content: cmdBuffer
+      });
+    },
+
+    sendAnnotation : function(cellid, annotationType, annotationData)
+    {
+      var annotationProto = (function(err, root){
+        if (err) {
+          console.log('load proto failed!');
+          throw err;
+        }
+
+        var MsgAnnotation = root.lookup('medical_imaging.MsgAnnotation');
+        var annotation = MsgAnnotation.create({
+          type: annotationType,
+          para1: annotationData.cx,
+          para2: annotationData.cy,
+          para3: annotationData.r,
+        });
+
+        var msgBuffer = MsgAnnotation.encode(annotation).finish();
+        var msgLength = msgBuffer.byteLength;
+        var cmdBuffer = new ArrayBuffer(32 + msgLength);
+        // header
+        var header = new Uint32Array(cmdBuffer, 0, 8);
+        header[0] = 0;
+        header[1] = 0;
+        header[2] = COMMAND_ID_FE_OPERATION;
+        header[3] = cellid;
+        header[4] = OPERATION_ID_ANNOTATION;
+        header[5] = 0;
+        header[6] = 0;
+        header[7] = msgLength;
+        // data
+        var srcBuffer = new Uint8Array(msgBuffer);
+        var dstBuffer = new Uint8Array(cmdBuffer, 8 * 4, msgLength);
+        for (var index = 0; index < msgLength; index++) {
+          dstBuffer[index] = srcBuffer[index];
+        }
+        console.log('emit annotation location message.');
+
+        this.socket.emit('data', {
+          userid: this.userid,
+          username: this.username,
+          content: cmdBuffer
+        });
+      }).bind(this);
+      protobuf.load('./data/mi_message.proto', annotationProto);
+    },
+
+    changeAnnotation : function ()
+    {
+      d3.selectAll("circle").remove();
+      // d3.select("#" + myDatum.data.uniqueID);
     }
     // changeLayout1x1: function() {
     //     document.getElementById("cell1").style.visibility = "hidden";
@@ -787,8 +1009,6 @@
     return message;
   };
 
-  window.onresize = window.onresize = function(){
-    window.FE.resize();
-  };
+  window.onresize = window.onresize = function() { window.FE.resize(); };
 
 })()

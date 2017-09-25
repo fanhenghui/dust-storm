@@ -22,6 +22,7 @@
 #include "mi_operation_rotate.h"
 #include "mi_operation_windowing.h"
 #include "mi_operation_zoom.h"
+#include "mi_operation_annotation.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -80,6 +81,9 @@ void ReviewController::initialize() {
         OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
+
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
 }
 
 void ReviewController::set_volume_infos(

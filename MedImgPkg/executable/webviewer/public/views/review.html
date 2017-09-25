@@ -22,6 +22,14 @@
     <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/bootstrap.min.js"></script> -->
 
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
     <script src="socket.io/socket.io.js"></script>
     <script src="js/bytebuffer.js"></script>
     <script src="js/bcrypt.js"></script>
@@ -110,7 +118,8 @@
         </div>
     </div>
     <hr>
-    <div class="container-fluid" hidden="true" id="review-div">
+    <div class="container-fluid" hidden="false" id="review-div">
+        <!-- hidden="false" -->
         <div class="row clearfix">
             <div class="col-md-12 column">
                 <nav class="navbar navbar-default" role="navigation">
@@ -181,11 +190,14 @@
                                 <br>
                                 <button class="btn btn-default" type="button" id="common-tool-pan" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-left"></em>Pan</button>
                                 <button class="btn btn-default" type="button" id="common-tool-windowing" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-center"></em>Win</button>
-                                <button class="btn btn-default" type="button" id="common-tool-annotation" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-right"></em>An</button>
+                                <button class="btn btn-canvas2default" type="button" id="common-tool-annotation" onclick="FE.switchCommonTool(this.id)"><em class="glyphicon glyphicon-align-right"></em>An</button>
                             </div>
                         </div>
                         <div class="row clearfix">
                             <button type="button" class="btn btn-vr-rotate" onclick="FE.playVR()">play-vr</button>
+                            <br>
+                            <button type="button" onclick="FE.addAnnotation()" > add circle </button>
+                            <button type="button" onclick="FE.removeAnnotation()" > delete circle</button>
                         </div>
                         <p id="test-info">
                         </p>
@@ -195,19 +207,21 @@
 
                         <div class="col-md-6 column" id="cell02-container" style="padding: 0; margin: 0 ;">
                             <div class="row clearfix" id="cell0-container" style="padding: 0; margin: 0;">
-                                <canvas id="canvas0" style="border: 1px solid #ffffff"></canvas>
+                                <canvas id="canvas0" style="border: 0px solid black"></canvas>
+                                <svg id="svg0" style ="border: 0px solid black;"> </svg>
                             </div>
                             <div class="row clearfix" id="cell2-container" style="padding: 0; margin: 0;">
-                                <canvas id="canvas2" style="border: 1px solid #ffffff"></canvas>
+                                <canvas id="canvas2" style="border: 0px solid #ffffff"></canvas>                             
                             </div>
                         </div>
 
                         <div class="col-md-6 column" id="cell13-container" style="padding: 0; margin: 0;">
                             <div class="row clearfix" id="cell1-container" style="padding: 0; margin: 0;">
-                                <canvas id="canvas1" style="border: 1px solid #ffffff"></canvas>
+                                <canvas id="canvas1" style="border: 0px solid #ffffff"></canvas>
+                                <!-- <svg id="svg1" style ="border: 1px solid black;"> </svg>                                 -->
                             </div>
                             <div class="row clearfix" id="cell3-container" style="padding: 0; margin: 0;">
-                                <canvas id="canvas3" style="border: 1px solid #ffffff"></canvas>
+                                <canvas id="canvas3" style="border: 0px solid #ffffff"></canvas>                             
                             </div>
                         </div>
 
