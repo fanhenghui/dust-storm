@@ -22,24 +22,10 @@ var socketClient = null;
       // add userName&userID attribute
       socket.userName = document.getElementById('username').innerHTML;
       socket.userID = getUserID(socket.userName);
-      socketClient = new SocketClient(socket);
-      // load protoc
-      socketClient.loadProtoc(PROTOBUF_BE_FE);
 
-      // prepare cell
-      // calcualte size and init cell size
-      var cellSize = getProperCellSize();
-      cells = [null, null, null, null];
-      for (var i = 0; i < 4; i++) {
-        var cellName = 'cell_' +i;
-        var canvas = cellCanvases[i];
-        var svg = cellSVGs[i];
-        cells[i] = new Cell(cellName, i, canvas, svg, socket);
-        cells[i].resize(cellSize.width, cellSize.height);
-        if (!cells[i].prepare()) {
-          // TODO log
-        }
-      }
+      //create socketClient
+      socketClient = new SocketClient(socket);
+      socketClient.loadProtoc(PROTOBUF_BE_FE);
 
       socket.emit('login', {userid: socket.userID, username: socket.userName});
       socket.on('data', function(tcpBuffer) { socketClient.recvData(tcpBuffer, cmdHandler); });
@@ -166,14 +152,30 @@ var socketClient = null;
       return;
     }
 
+    //create cells
     var cellSize = getProperCellSize();
     var w = cellSize.width;
     var h = cellSize.height;
 
-    for (var i = 0; i < cells.length; ++i) {
-      cells[i].resize(w, h);
+    cells = [null, null, null, null];
+    for (var i = 0; i < 4; i++) {
+      var cellName = 'cell_' +i;
+      var canvas = cellCanvases[i];
+      var svg = cellSVGs[i];
+      cells[i] = new Cell(cellName, i, canvas, svg, socketClient);
+      cells[i].resize(cellSize.width, cellSize.height);
+      if (!cells[i].prepare()) {
+        // TODO log
+      }
     }
 
+    //init default cell action
+    cells[0].mouseAction = ACTION_ID_MPR_PAGING;
+    cells[1].mouseAction = ACTION_ID_MPR_PAGING;
+    cells[2].mouseAction = ACTION_ID_MPR_PAGING;
+    cells[3].mouseAction = ACTION_ID_ROTATE;
+
+    //nofity BE
     var MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
     var msgInit = MsgInit.create();
     msgInit.seriesUid = seriesUID;
@@ -183,11 +185,6 @@ var socketClient = null;
     msgInit.cells.push({id: 2, type: 1, direction: 2, width: w, height: h});
     msgInit.cells.push({id: 3, type: 2, direction: 0, width: w, height: h});
 
-    // TODO add d3
-    // d3.select("#svg0")
-    // .attr('width', cellCanvas[0].width)
-    // .attr('height', cellCanvas[0].height);
-
     var msgBuffer = MsgInit.encode(msgInit).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_INIT, 0, msgBuffer.byteLength,msgBuffer);
   };
@@ -196,34 +193,33 @@ var socketClient = null;
     document.getElementById('test-info').innerText = btnID;
     switch (btnID) {
       case 'common-tool-arrow':
-        cells[0].curAction = ACTION_ID_MPR_PAGING;
-        cells[1].curAction = ACTION_ID_MPR_PAGING;
-        cells[2].curAction = ACTION_ID_MPR_PAGING;
-        cells[3].curAction = ACTION_ID_ROTATE;
+        cells[0].mouseAction = ACTION_ID_MPR_PAGING;
+        cells[1].mouseAction = ACTION_ID_MPR_PAGING;
+        cells[2].mouseAction = ACTION_ID_MPR_PAGING;
+        cells[3].mouseAction = ACTION_ID_ROTATE;
         break;
       case 'common-tool-zoom':
         for (var i = 0; i < cells.length; ++i) {
-          cells[i].curAction = ACTION_ID_ZOOM;
+          cells[i].mouseAction = ACTION_ID_ZOOM;
         }
         break;
       case 'common-tool-pan':
         for (var i = 0; i < cells.length; ++i) {
-          cells[i].curAction = ACTION_ID_PAN;
+          cells[i].mouseAction = ACTION_ID_PAN;
         }
         break;
       case 'common-tool-rotate':
         for (var i = 0; i < cells.length; ++i) {
-          cells[i].curAction = ACTION_ID_ROTATE;
+          cells[i].mouseAction = ACTION_ID_ROTATE;
         }
         break;
       case 'common-tool-windowing':
         for (var i = 0; i < cells.length; ++i) {
-          cells[i].curAction = ACTION_ID_WINDOWING;
+          cells[i].mouseAction = ACTION_ID_WINDOWING;
         }
         break;
       case 'common-tool-annotation':
         // TODO annotation
-        // curAction = ACTION_ID_ARROW;
         break;
       default:
         // TODO ERR
