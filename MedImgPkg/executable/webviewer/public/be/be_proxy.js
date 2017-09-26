@@ -195,10 +195,10 @@ module.exports = {
 
         //// std ouput to server device
         worker.stdout.on('data', (data) => {
-          //console.log(`stdout: ${data}`);
+          console.log(`stdout: ${data}`);
         });
         worker.stderr.on('data', (data) => {
-          //console.log(`stderr: ${data}`);
+          console.log(`stderr: ${data}`);
         });
 
         worker.on('close', (code) => {

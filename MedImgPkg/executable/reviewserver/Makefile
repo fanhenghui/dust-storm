@@ -41,8 +41,8 @@ main-build: $(TARGET)
 
 EXPORT_HEADER = mi_review_common.h
 
-$(TARGET): mi_message.pb.o $(OBJS)
-	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
+$(TARGET): mi_message.pb.o mi_review_main.o $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) mi_message.pb.o mi_review_main.o $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
 mi_review_main.o: $(EXPORT_HEADER)  mi_review_main.cpp  mi_review_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_review_main.cpp $(ADDITINAL_INCLUDE_DIR)
