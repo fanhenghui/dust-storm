@@ -57,19 +57,18 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
 }
 
 Cell.prototype.resize = function(width, height) {
-    //canvas resize
+    //canvas&svg resize
+    //send msg to notigy BE resize will be call outside
     this.canvas.width = width;
     this.canvas.height = height;
-
-    // this.svg.width = width;
-    // this.svg.height = height;
-    var tm = "#"+this.svg.id;
-    d3.select(tm)
-    .attr('width', width)
-    .attr('height', height);
-    //TODO svg resize
-
-    //send msg to notigy BE resize will be call outside
+    var top = this.canvas.offsetTop;
+    var left = this.canvas.offsetLeft;
+    var viewBox = left.toString() + ' ' + top + ' ' + width + ' ' + height; 
+    this.svg.setAttribute('viewBox', viewBox);
+    this.svg.setAttribute('width', width);
+    this.svg.setAttribute('height', height);
+    // this.svg.setAttribute('x', left);
+    // this.svg.setAttribute('y', top);
 }
 
 Cell.prototype.mouseDown = function(event) {

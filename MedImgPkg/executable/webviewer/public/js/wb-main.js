@@ -78,17 +78,14 @@ var socketClient = null;
           tr += "<td>" + obj[i][propt] + "</td>"
         }
         tr += "</tr>";
-        // We add the table row to the table body
         tbody.innerHTML += tr;
       }
     };
 
-    $("#table tbody tr")
-        .click(function() {
-          $(this).addClass('success').siblings().removeClass('success');
-          // var value = $(this).find('td:nth-child(3)').html();
-          // alert(value);
-        });
+    //style changed when choose tr (based on bootstrap)
+    $("#table tbody tr").click(function() {
+        $(this).addClass('success').siblings().removeClass('success');
+    });
   };
 
   function cmdHandler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
@@ -132,7 +129,7 @@ var socketClient = null;
     var w = cellSize.width;
     var h = cellSize.height;
     for (var i = 0; i < 4; i++) {
-      wbCells[i].resize(w, h);
+      cells[i].resize(w, h);
     }
 
     var MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
@@ -266,7 +263,7 @@ var socketClient = null;
 
     // register window quit linsener
     window.onbeforeunload = function(event) { logout(); }
-
+    window.onresize = function() {resize()};
     var username = document.getElementById('username').innerHTML;
     login();
   };
