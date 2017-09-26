@@ -1,4 +1,4 @@
-#include "mi_none_image.h"
+#include "mi_none_image_item.h"
 #include "mi_message.pb.h"
 #include "mi_review_logger.h"
 

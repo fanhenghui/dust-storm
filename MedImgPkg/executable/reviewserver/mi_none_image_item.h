@@ -1,5 +1,5 @@
-#ifndef MED_IMG_MI_NONE_IMAGE_H
-#define MED_IMG_MI_NONE_IMAGE_H
+#ifndef MED_IMG_MI_NONE_IMAGE_ITEM_H
+#define MED_IMG_MI_NONE_IMAGE_ITEM_H
 
 #include <string>
 #include <vector>
