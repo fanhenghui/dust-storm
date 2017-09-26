@@ -51,13 +51,14 @@ private:
     struct InnerQueue;
     std::unique_ptr<InnerQueue> _op_queue;
 
-    std::deque<unsigned int> _dirty_cells;
-    boost::mutex _dirty_cells_mutex;
+    std::deque<unsigned int> _dirty_images;
+    boost::mutex _dirty_images_mutex;
 
+    std::deque<unsigned int> _dirty_none_images;
+    boost::mutex _dirty_none_images_mutex;
 
     bool _rendering;
     bool _sending;
-
 };
 
 MED_IMG_END_NAMESPACE

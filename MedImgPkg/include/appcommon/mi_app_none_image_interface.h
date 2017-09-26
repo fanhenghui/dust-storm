@@ -1,5 +1,9 @@
-#ifndef MED_IMH_APP_NONE_IMAGE_H
-#define MED_IMH_APP_NONE_IMAGE_H
+#ifndef MED_IMH_APP_NONE_IMAGE_INTERFACE_H
+#define MED_IMH_APP_NONE_IMAGE_INTERFACE_H
+
+#include "appcommon/mi_app_common_export.h"
+
+MED_IMG_BEGIN_NAMESPACE
 
 class IAppNoneImage {
 public:
@@ -25,4 +29,5 @@ private:
     bool _dirty;
 };
 
+MED_IMG_END_NAMESPACE
 #endif

@@ -20,11 +20,11 @@ std::shared_ptr<SceneBase> AppCell::get_scene() {
     return _scene;
 }
 
-void AppCell::set_noneimage(std::shared_ptr<IAppNoneImage> noneimage) {
+void AppCell::set_none_image(std::shared_ptr<IAppNoneImage> noneimage) {
     _none_img = noneimage;
 }
 
-std::shared_ptr<IAppNoneImage> AppCell::get_noneimage() {
+std::shared_ptr<IAppNoneImage> AppCell::get_none_image() {
     return _none_img;
 }
 

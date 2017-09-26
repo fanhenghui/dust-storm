@@ -16,8 +16,8 @@ public:
     void set_scene(std::shared_ptr<SceneBase> scene);
     std::shared_ptr<SceneBase> get_scene();
 
-    void set_noneimage(std::shared_ptr<IAppNoneImage> noneimage);
-    std::shared_ptr<IAppNoneImage> get_noneimage();
+    void set_none_image(std::shared_ptr<IAppNoneImage> noneimage);
+    std::shared_ptr<IAppNoneImage> get_none_image();
 
 protected:
 private:

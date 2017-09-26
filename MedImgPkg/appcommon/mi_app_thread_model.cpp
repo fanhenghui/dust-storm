@@ -15,6 +15,7 @@
 #include "mi_app_controller.h"
 #include "mi_operation_interface.h"
 #include "mi_app_common_logger.h"
+#include "mi_app_none_image_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -138,7 +139,8 @@ void AppThreadModel::process_operating() {
 void AppThreadModel::process_rendering() {
     try {
         while (true) {
-            std::deque<unsigned int> dirty_cells;
+            std::deque<unsigned int> dirty_images;
+            std::deque<unsigned int> dirty_none_images;
             std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
             _glcontext->make_current(RENDERING_CONTEXT);
@@ -160,12 +162,18 @@ void AppThreadModel::process_rendering() {
                 for (auto it = cells.begin(); it != cells.end(); ++it) {
                     std::shared_ptr<SceneBase> scene = it->second->get_scene();
                     APPCOMMON_CHECK_NULL_EXCEPTION(scene);
-
                     if (scene->get_dirty()) {
-                        dirty_cells.push_back(it->first);
+                        dirty_images.push_back(it->first);
                         dirty_scenes.push_back(scene);
                         scene->render();
                         scene->set_dirty(false);
+                    }
+
+                    std::shared_ptr<IAppNoneImage> none_image = it->second->get_none_image();
+                    if(none_image && none_image->check_dirty()) {
+                        dirty_none_images.push_back(it->first);
+                        none_image->update();
+                        none_image->set_dirty(false);
                     }
                 }
                 // interrupt point
@@ -181,12 +189,16 @@ void AppThreadModel::process_rendering() {
 
             // tell sending the change and swap dirty scene image buffer
             {
-                boost::mutex::scoped_lock dirty_cells_locker(_dirty_cells_mutex);
-                _dirty_cells = dirty_cells;
+                boost::mutex::scoped_lock dirty_images_locker(_dirty_images_mutex);
+                _dirty_images = dirty_images;
 
                 for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
                     (*it)->swap_image_buffer();
                 }
+            }
+            {
+                boost::mutex::scoped_lock dirty_none_images_locker(_dirty_none_images_mutex);
+                _dirty_none_images = dirty_none_images;
             }
             _sending = true;
             _th_sending->_condition.notify_one();
@@ -217,18 +229,17 @@ void AppThreadModel::process_sending() {
                 _th_sending->_condition.wait(_th_sending->_mutex);
             }
 
-            // get dirty cells to be sending
-            std::deque<unsigned int> dirty_cells;
-            {
-                boost::mutex::scoped_lock dirty_cells_locker(_dirty_cells_mutex);
-                dirty_cells = _dirty_cells;
-            }
-
             std::shared_ptr<AppController> controller = _controller.lock();
             APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
+            // get dirty scenes to be sending
+            std::deque<unsigned int> dirty_images;
+            {
+                boost::mutex::scoped_lock dirty_images_locker(_dirty_images_mutex);
+                dirty_images = _dirty_images;
+            }
             // sendong image buffer
-            for (auto it = dirty_cells.begin(); it != dirty_cells.end(); ++it) {
+            for (auto it = dirty_images.begin(); it != dirty_images.end(); ++it) {
                 const unsigned int cell_id = *it;
                 std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
                 APPCOMMON_CHECK_NULL_EXCEPTION(cell);
@@ -239,9 +250,7 @@ void AppThreadModel::process_sending() {
 
                 IPCDataHeader header;
                 header._sender = static_cast<unsigned int>(controller->get_local_pid());
-                header._receiver =
-                    static_cast<unsigned int>(controller->get_server_pid());
-                ;
+                header._receiver = static_cast<unsigned int>(controller->get_server_pid());
                 header._msg_id = COMMAND_ID_BE_SEND_IMAGE;
                 header._msg_info0 = cell_id;
                 header._msg_info1 = 0;
@@ -254,8 +263,7 @@ void AppThreadModel::process_sending() {
                 APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
                 header._data_len = static_cast<unsigned int>(buffer_size);
 
-                std::cout << "send data length : "
-                          << static_cast<unsigned int>(buffer_size) << std::endl;
+                MI_APPCOMMON_LOG(MI_TRACE) << "send image data length: " << buffer_size;
 
                 // Testing code write image to disk
                 //{
@@ -265,6 +273,39 @@ void AppThreadModel::process_sending() {
                 //}
 
                 _proxy->async_send_message(header, (char*)buffer);
+            }
+
+            // get dirty cells to be sending
+            std::deque<unsigned int> dirty_none_images;
+            {
+                boost::mutex::scoped_lock dirty_none_images_locker(_dirty_none_images_mutex);
+                dirty_none_images = _dirty_none_images;
+            }
+            for (auto it = dirty_none_images.begin(); it != dirty_none_images.end(); ++it) {
+                const unsigned int cell_id = *it;
+                std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
+                APPCOMMON_CHECK_NULL_EXCEPTION(cell);
+                std::shared_ptr<IAppNoneImage> none_image = cell->get_none_image();
+                APPCOMMON_CHECK_NULL_EXCEPTION(none_image);
+
+                IPCDataHeader header;
+                header._sender = static_cast<unsigned int>(controller->get_local_pid());
+                header._receiver = static_cast<unsigned int>(controller->get_server_pid());
+                header._msg_id = COMMAND_ID_BE_SEND_NONE_IMAGE;
+                header._msg_info0 = cell_id;
+                header._msg_info1 = 0;
+                header._data_type = 0;
+                header._big_end = 0;
+
+                int buffer_size = 0;
+                char* buffer = none_image->serialize_dirty(buffer_size);
+                if (nullptr == buffer || buffer_size == 0) {
+                    MI_APPCOMMON_LOG(MI_WARNING) << "dirty none image has no serialized dirty buffer.";
+                    continue;
+                }
+                header._data_len = static_cast<unsigned int>(buffer_size);
+                MI_APPCOMMON_LOG(MI_TRACE) << "send none image data length: " << buffer_size;
+                _proxy->async_send_message(header, buffer);
             }
 
             // interrupt point
