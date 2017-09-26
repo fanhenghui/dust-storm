@@ -12,6 +12,7 @@ function SocketClient(socket) {
   this.socket = socket;
 }
 
+//Handler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader)
 SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
   var tcpPackageLen = tcpBuffer.byteLength;
 
@@ -32,7 +33,7 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
       msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, lastMsgDatalen, 0, true);
     } else if (tcpPackageLen - MSG_HEADER_LEN < lastMsgDatalen) {  // not completed one Msg
       this.msgRestDataLen = lastMsgDatalen - (tcpPackageLen - MSG_HEADER_LEN);
-      msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, tcpPackageLen - 32, this.msgRestDataLen, true);
+      msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, tcpPackageLen - MSG_HEADER_LEN, this.msgRestDataLen, true);
       this.tcpPacketEnd = 1;
     } else {  // this buffer carry next Msg process current one
       msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, lastMsgDatalen, 0, true);
@@ -83,7 +84,7 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
 
 SocketClient.prototype.sendData = function(msgID, opID, cellID, dataLen, buffer) {
   if(dataLen <= 0) {
-    let headerBuffer = new ArrayBuffer(32);
+    let headerBuffer = new ArrayBuffer(MSG_HEADER_LEN);
     let header = new Uint32Array(headerBuffer);
     header[0] = 0;
     header[1] = 0;

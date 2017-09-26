@@ -6,6 +6,7 @@ var cells = null;
 var protocRoot = null;
 var worklistBuffer = null;
 var socketClient = null;
+var revcBEReady = false;
 
 (function() {
   function getUserID(userName) {
@@ -40,26 +41,26 @@ var socketClient = null;
     }
   };
 
-  function showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
-    console.log('show worklist!');
+  function recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    if (!socketClient.protocRoot) {
+      // TODO LOG
+      return;
+    }
+
     if (withHeader) {
-      worklistBuffer = new ArrayBuffer(dataLen);
+      worklistBuffer = new ArrayBuffer(dataLen + restDataLen);
     }
 
     // TODO: handle multiple parts later, now assume passing as a whole
     var dstview = new Uint8Array(worklistBuffer);
     var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-
-    for (var i = 0; i < dataLen; i++) {
+    var cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
+    for (var i = cpSrc; i < dataLen; i++) {
       dstview[i] = srcview[i];
     }
 
     if (restDataLen <= 0) {
-      if (!socketClient.protocRoot) {
-        // LOG
-        return;
-      }
-
+      console.log('recv worklist.');
       var MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
       var worklistView = new Uint8Array(worklistBuffer);
       var message = MsgWorklistType.decode(worklistView);
@@ -94,17 +95,15 @@ var socketClient = null;
         cells[cellID].handleJpegBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_READY:
-        // window.FE.triggerOnBE('test_uid');
+        revcBEReady = true;
         break;
       case COMMAND_ID_BE_SEND_WORKLIST:
-        showWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+        recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
         break;
       case COMMAND_ID_BE_HEARTBEAT:
         socketClient.heartbeat();
         break;
-      case COMMAND_ID_BE_SEND_ANNOTATION:
-        // alert("delete selected annotation");
-        // window.FE.changeAnnotation();
+      case COMMAND_ID_BE_SEND_ANNOTATION: 
         break;
       default:
         break;
@@ -128,7 +127,7 @@ var socketClient = null;
     var cellSize = getProperCellSize();
     var w = cellSize.width;
     var h = cellSize.height;
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < cells.length; i++) {
       cells[i].resize(w, h);
     }
 
@@ -225,6 +224,12 @@ var socketClient = null;
   };
 
   function searchWorklist() {
+    if (!revcBEReady) {
+      // TODO LOG
+      console.log('BE not ready!');
+      alert('BE not ready!');
+      reutrn;
+    }
     socketClient.sendData(COMMAND_ID_FE_SEARCH_WORKLIST,0,0,null);
   }
 
@@ -247,7 +252,7 @@ var socketClient = null;
     var loadSeriesBtn = document.getElementById('loadBtn');
     loadSeriesBtn.addEventListener('click', function(event) {
       var series = $("#table tbody tr.success td:nth-child(3)").html();
-      alert('load series: ' + series);
+      if(!series) {reutrn;}
       document.getElementById("worklist-div").hidden = true;
       document.getElementById("review-div").hidden = false;
       loadSeries(series);
