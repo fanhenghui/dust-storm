@@ -62,6 +62,26 @@ message MsgWorklist{
     repeated MsgWorklistItem items = 1;
 };
 
+message MsgCircleUnit{
+    required float cx = 1;
+    required float cy = 2;
+    required float r = 3;
+};
+
+message MsgNoneImgCircles{
+    repeated MsgCircleUnit circles = 1;
+};
+
+message MsgNoneImgCornerInfos{
+    required string infos = 1;
+};
+
+message MsgNoneImgCollection{
+    optional MsgNoneImgCornerInfos corner_infos = 1;
+    optional MsgNoneImgCircles circles = 2;
+
+};
+
 message MsgAnnotation{
     required int32 type = 1;
     optional float para1 = 2;
