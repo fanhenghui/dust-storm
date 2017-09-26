@@ -12,7 +12,7 @@ var revcBEReady = false;
   function getUserID(userName) {
     return userName + new Date().getTime() +
         Math.floor(Math.random() * 173 + 511);
-  };
+  }
 
   function login() {
     socket = io.connect(SOCKET_IP);
@@ -23,15 +23,13 @@ var revcBEReady = false;
       // add userName&userID attribute
       socket.userName = document.getElementById('username').innerHTML;
       socket.userID = getUserID(socket.userName);
-
       //create socketClient
       socketClient = new SocketClient(socket);
       socketClient.loadProtoc(PROTOBUF_BE_FE);
-
       socket.emit('login', {userid: socket.userID, username: socket.userName});
       socket.on('data', function(tcpBuffer) { socketClient.recvData(tcpBuffer, cmdHandler); });
     }
-  };
+  }
 
   function logout() {
     if (socket != null) {
@@ -39,19 +37,17 @@ var revcBEReady = false;
           'disconnect', {userid: socket.userID, username: socket.userName});
       location.reload();
     }
-  };
+  }
 
   function recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     if (!socketClient.protocRoot) {
       // TODO LOG
       return;
     }
-
     if (withHeader) {
       worklistBuffer = new ArrayBuffer(dataLen + restDataLen);
     }
 
-    // TODO: handle multiple parts later, now assume passing as a whole
     var dstview = new Uint8Array(worklistBuffer);
     var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
     var cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
@@ -81,13 +77,13 @@ var revcBEReady = false;
         tr += '</tr>';
         tbody.innerHTML += tr;
       }
-    };
+    }
 
     //style changed when choose tr (based on bootstrap)
     $('#table tbody tr').click(function() {
         $(this).addClass('success').siblings().removeClass('success');
     });
-  };
+  }
 
   function cmdHandler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     switch (cmdID) {
@@ -108,7 +104,7 @@ var revcBEReady = false;
       default:
         break;
     }
-  };
+  }
 
   function getProperCellSize() {
     var cellContainerW = document.getElementById('cell-container').offsetWidth;
@@ -121,10 +117,12 @@ var revcBEReady = false;
 
   function resize() {
     if (!revcBEReady) {
+      // TODO LOG
       return;
     }
-    if(seriesUID === '') {
-        return;
+    if (seriesUID === '') {
+      // TODO LOG
+      return;
     }
     if (!socketClient.protocRoot) {
       // TODO LOG
@@ -158,7 +156,6 @@ var revcBEReady = false;
     var cellSize = getProperCellSize();
     var w = cellSize.width;
     var h = cellSize.height;
-
     cells = [null, null, null, null];
     for (var i = 0; i < 4; i++) {
       var cellName = 'cell_' +i;
@@ -189,7 +186,7 @@ var revcBEReady = false;
 
     var msgBuffer = MsgInit.encode(msgInit).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_INIT, 0, msgBuffer.byteLength,msgBuffer);
-  };
+  }
 
   function switchCommonTool(btnID) {
     document.getElementById('test-info').innerText = btnID;
@@ -227,7 +224,7 @@ var revcBEReady = false;
         // TODO ERR
         break;
     }
-  };
+  }
 
   function searchWorklist() {
     if (!revcBEReady) {
@@ -237,6 +234,10 @@ var revcBEReady = false;
       reutrn;
     }
     socketClient.sendData(COMMAND_ID_FE_SEARCH_WORKLIST,0,0,null);
+  }
+
+  function playVR() {
+    socketClient.sendData(COMMAND_ID_FE_VR_PLAY,0,3,null);
   }
 
   function prepare() {
@@ -274,13 +275,18 @@ var revcBEReady = false;
         switchCommonTool(this.id);
       });
     }
+    
+    var playVRBtn = document.getElementById('btn-play-vr');
+    playVRBtn.addEventListener('click', function() {
+      playVR();
+    });
 
     // register window quit linsener
     window.onbeforeunload = function(event) { logout(); }
     window.onresize = function() {resize()};
     var username = document.getElementById('username').innerHTML;
     login();
-  };
+  }
 
   prepare();
 })();

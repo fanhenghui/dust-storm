@@ -1019,7 +1019,7 @@
     });
   }
 
-  var btnVRRotate = document.getElementById('btn-vr-rotate');
+  var btnVRRotate = document.getElementById('btn-play-vr');
   btnVRRotate.addEventListener('click', function() {
     FE.playVR();
   });
