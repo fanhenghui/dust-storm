@@ -71,20 +71,20 @@ var revcBEReady = false;
                       series_uid: String,
                       imaging_modality: String
                     }).items;
-      var tbody = document.getElementById("worklist");
-      tbody.innerHTML = "";
+      var tbody = document.getElementById('worklist');
+      tbody.innerHTML = '';
       for (var i = 0; i < obj.length; i++) {
-        var tr = "<tr>";
+        var tr = '<tr>';
         for (var propt in obj[i]) {
-          tr += "<td>" + obj[i][propt] + "</td>"
+          tr += '<td>' + obj[i][propt] + '</td>';
         }
-        tr += "</tr>";
+        tr += '</tr>';
         tbody.innerHTML += tr;
       }
     };
 
     //style changed when choose tr (based on bootstrap)
-    $("#table tbody tr").click(function() {
+    $('#table tbody tr').click(function() {
         $(this).addClass('success').siblings().removeClass('success');
     });
   };
@@ -251,10 +251,10 @@ var revcBEReady = false;
 
     var loadSeriesBtn = document.getElementById('loadBtn');
     loadSeriesBtn.addEventListener('click', function(event) {
-      var series = $("#table tbody tr.success td:nth-child(3)").html();
+      var series = $('#table tbody tr.success td:nth-child(3)').html();
       if(!series) {reutrn;}
-      document.getElementById("worklist-div").hidden = true;
-      document.getElementById("review-div").hidden = false;
+      document.getElementById('worklist-div').hidden = true;
+      document.getElementById('review-div').hidden = false;
       loadSeries(series);
     });
 
