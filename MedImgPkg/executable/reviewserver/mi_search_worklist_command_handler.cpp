@@ -13,8 +13,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-SearchWorklistCommandHandler::SearchWorklistCommandHandler(std::shared_ptr<AppController>
-        controller)
+SearchWorklistCommandHandler::SearchWorklistCommandHandler(std::shared_ptr<AppController> controller)
     : _controller(controller) {}
 
 SearchWorklistCommandHandler::~SearchWorklistCommandHandler() {}
@@ -28,10 +27,9 @@ int SearchWorklistCommandHandler::handle_command(const IPCDataHeader& datahaeder
 
     std::cout << "Received Msg Searck Worklist" << std::endl;
     MsgWorklist* worklist = this->createWorklist();
-    // MsgWorklistItem * worklist = this->createWorklistItem();
     // serialize worklist, attach to header, and send
     int size = worklist->ByteSize();
-    void* data = malloc(size);
+    char* data = new char[size];
     bool res = worklist->SerializeToArray(data, size);
 
     IPCDataHeader header;
@@ -47,7 +45,7 @@ int SearchWorklistCommandHandler::handle_command(const IPCDataHeader& datahaeder
     }
 
     header._data_len = size;
-    controller->get_client_proxy()->async_send_message(header, reinterpret_cast<char*>(data));
+    controller->get_client_proxy()->async_send_message(header, data);
 
     return 0;
 }
