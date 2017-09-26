@@ -31,6 +31,7 @@
 #include "mi_review_config.h"
 #include "mi_review_controller.h"
 #include "mi_review_logger.h"
+#include "mi_review_none_image.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -156,9 +157,11 @@ int OpInit::execute() {
             const float DEFAULT_WL = -400;
 
             std::shared_ptr<AppCell> cell(new AppCell);
-
+            std::shared_ptr<ReviewNoneImage> none_image(new ReviewNoneImage());
+            cell->set_none_image(none_image);
             if (type_id == 1) { // MPR
                 std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+                none_image->initialize(volume_infos, mpr_scene);
                 cell->set_scene(mpr_scene);
                 mpr_scene->set_test_code(0); {
                     std::stringstream ss;
@@ -201,6 +204,7 @@ int OpInit::execute() {
                 }
             } else if (type_id == 2) {  // VR
                 std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+                none_image->initialize(volume_infos, vr_scene);
                 cell->set_scene(vr_scene);
                 vr_scene->set_test_code(0);
                 {
@@ -263,7 +267,6 @@ int OpInit::execute() {
                 MI_REVIEW_LOG(MI_FATAL) << "invalid cell type id: " << type_id;
                 REVIEW_THROW_EXCEPTION("invalid cell type id!");
             }
-
             controller->add_cell(cell_id, cell);
         }
 
@@ -293,9 +296,11 @@ int OpInit::execute() {
         const float DEFAULT_WL = -400;
 
         std::shared_ptr<AppCell> cell(new AppCell);
-
+        std::shared_ptr<ReviewNoneImage> none_image(new ReviewNoneImage());
+        cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+            none_image->initialize(volume_infos, mpr_scene);
             cell->set_scene(mpr_scene);
             mpr_scene->set_test_code(0);
             {
@@ -325,6 +330,7 @@ int OpInit::execute() {
             }
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+            none_image->initialize(volume_infos, vr_scene);
             cell->set_scene(vr_scene);
             vr_scene->set_test_code(0);
             {
