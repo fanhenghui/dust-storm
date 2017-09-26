@@ -19,7 +19,6 @@ public:
 
 private:
     MsgWorklist* createWorklist();
-    MsgWorklistItem* createWorklistItem();
 
 private:
     std::weak_ptr<AppController> _controller;

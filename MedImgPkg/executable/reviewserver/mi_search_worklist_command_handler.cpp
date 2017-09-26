@@ -80,13 +80,4 @@ MsgWorklist* SearchWorklistCommandHandler::createWorklist() {
     return list;
 }
 
-MsgWorklistItem* SearchWorklistCommandHandler::createWorklistItem() {
-    MsgWorklistItem* item = new MsgWorklistItem;
-    item->set_patient_id("pid");
-    item->set_patient_name("pname");
-    item->set_series_uid("sid");
-    item->set_imaging_modality("CT");
-    return item;
-}
-
 MED_IMG_END_NAMESPACE
