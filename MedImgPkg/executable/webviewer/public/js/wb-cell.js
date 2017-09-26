@@ -67,8 +67,8 @@ Cell.prototype.resize = function(width, height) {
     this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', width);
     this.svg.setAttribute('height', height);
-    // this.svg.setAttribute('x', left);
-    // this.svg.setAttribute('y', top);
+    this.svg.setAttribute('x', left);
+    this.svg.setAttribute('y', top);
 }
 
 Cell.prototype.mouseDown = function(event) {
@@ -97,6 +97,7 @@ Cell.prototype.processMouseAction = function(curPos) {
     if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
         return;
     }
+    //update mouse clock
     this.mouseClock = curClock;
 
     //create mouse msg and send to BE
@@ -120,6 +121,10 @@ Cell.prototype.processMouseAction = function(curPos) {
     }
     var msgBuffer = MsgMouse.encode(msgMouse).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, this.mouseAction, this.cellID, msgBuffer.byteLength, msgBuffer);
+
+    //reset previous position
+    this.mousePre.x = curPos.x;
+    this.mousePre.y = curPos.y;
 }
 
 Cell.prototype.mouseUp = function(event) {

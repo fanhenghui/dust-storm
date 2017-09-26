@@ -120,6 +120,12 @@ var revcBEReady = false;
   }
 
   function resize() {
+    if (!revcBEReady) {
+      return;
+    }
+    if(seriesUID === '') {
+        return;
+    }
     if (!socketClient.protocRoot) {
       // TODO LOG
       return;
@@ -252,7 +258,10 @@ var revcBEReady = false;
     var loadSeriesBtn = document.getElementById('loadBtn');
     loadSeriesBtn.addEventListener('click', function(event) {
       var series = $('#table tbody tr.success td:nth-child(3)').html();
-      if(!series) {reutrn;}
+      if (!series) {
+        alert('please choose one series.');
+        reutrn;
+      }
       document.getElementById('worklist-div').hidden = true;
       document.getElementById('review-div').hidden = false;
       loadSeries(series);
