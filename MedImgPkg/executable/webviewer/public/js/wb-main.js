@@ -231,7 +231,7 @@ var revcBEReady = false;
       // TODO LOG
       console.log('BE not ready!');
       alert('BE not ready!');
-      reutrn;
+      return;
     }
     socketClient.sendData(COMMAND_ID_FE_SEARCH_WORKLIST,0,0,null);
   }
