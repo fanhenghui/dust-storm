@@ -22,7 +22,7 @@ int OpAnnotation::execute() {
         return -1;
     }
 
-    MsgAnnotation msgAnnotation;
+    MsgAnnotationUnit msgAnnotation;
     if (!msgAnnotation.ParseFromArray(_buffer, _header._data_len)) {
         MI_REVIEW_LOG(MI_ERROR) << "parse annotation message failed.";
         return -1;
@@ -51,6 +51,7 @@ int OpAnnotation::execute() {
     } else if (annotation_status = ModelAnnotation::DELETE) {
 
     } else if (annotation_status = ModelAnnotation::MODIFYING) {
+        //TODO change annotation non-image direction to prevent update non-image when rendering
 
     } else if (annotation_status = ModelAnnotation::MODIFY_COMPLETED) {
 

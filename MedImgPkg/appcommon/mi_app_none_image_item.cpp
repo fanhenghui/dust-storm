@@ -4,34 +4,37 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-void NoneImgCircles::add_circle(const NoneImgCircles::CircleUnit& circle) {
-    _circles.push_back(circle);
+void NoneImgAnnotations::add_annotation(const NoneImgAnnotations::AnnotationUnit& anno) {
+    _annotations.push_back(anno);
 }
 
-void NoneImgCircles::set_circle(const std::vector<CircleUnit> circles) {
-    _circles = circles;
+void NoneImgAnnotations::set_annotations(const std::vector<NoneImgAnnotations::AnnotationUnit> annotations) {
+    _annotations = annotations;
 }
-const std::vector<NoneImgCircles::CircleUnit>& NoneImgCircles::get_circles() const {
-    return _circles;
+const std::vector<NoneImgAnnotations::AnnotationUnit>& NoneImgAnnotations::get_annotations() const {
+    return _annotations;
 }
 
-char* NoneImgCircles::serialize_to_array(int &bytelength) {
-    MsgNoneImgCircles msg;
-    for (size_t i = 0; i< _circles.size(); ++i) {
-        MsgCircleUnit* unit = msg.add_circles();
-        unit->set_cx(_circles[i].cx);
-        unit->set_cy(_circles[i].cy);
-        unit->set_r(_circles[i].r);
+char* NoneImgAnnotations::serialize_to_array(int &bytelength) {
+    MsgNoneImgAnnotations msg;
+    for (size_t i = 0; i< _annotations.size(); ++i) {
+        MsgAnnotationUnit* unit = msg.add_annotation();
+        unit->set_type(_annotations[i].type);
+        unit->set_id(_annotations[i].id);
+        unit->set_status(_annotations[i].status);
+        unit->set_para0(_annotations[i].para0);
+        unit->set_para1(_annotations[i].para1);
+        unit->set_para2(_annotations[i].para2);
     }
 
     bytelength = msg.ByteSize();
     if(bytelength == 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-circles: byte length is 0.";
+        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-annotations: byte length is 0.";
         return nullptr;
     }
     char* data = new char[bytelength];
     if (!msg.SerializeToArray(data, bytelength)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-circles: serialize failed.";
+        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-annotations: serialize failed.";
         delete [] data;
         bytelength = 0;
         return nullptr; 
@@ -100,8 +103,8 @@ char* NoneImgCornerInfos::serialize_to_array(int &bytelength) {
     }
 }
 
-void NoneImgCollection::set_circles(std::shared_ptr<NoneImgCircles> circles) {
-    _circles = circles;
+void NoneImgCollection::set_annotations(std::shared_ptr<NoneImgAnnotations> annotations) {
+    _annotations = annotations;
 }
 
 void NoneImgCollection::set_corner_infos(std::shared_ptr<NoneImgCornerInfos> corner_infos) {
@@ -110,18 +113,21 @@ void NoneImgCollection::set_corner_infos(std::shared_ptr<NoneImgCornerInfos> cor
 
 char* NoneImgCollection::serialize_to_array(int &bytelength) {
     MsgNoneImgCollection msg;
-    if(_circles == nullptr && _corner_infos == nullptr) {
+    if(_annotations == nullptr && _corner_infos == nullptr) {
         return nullptr;
     }
 
-    if(_circles) {
-        MsgNoneImgCircles* circles_msg = msg.mutable_circles();
-        auto circles = _circles->get_circles();
-        for (size_t i = 0; i< circles.size(); ++i) {
-            MsgCircleUnit* unit = circles_msg->add_circles();
-            unit->set_cx(circles[i].cx);
-            unit->set_cy(circles[i].cy);
-            unit->set_r(circles[i].r);
+    if(_annotations) {
+        MsgNoneImgAnnotations* annotations_msg = msg.mutable_annotations();
+        auto annotations = _annotations->get_annotations();
+        for (size_t i = 0; i< annotations.size(); ++i) {
+            MsgAnnotationUnit* unit = annotations_msg->add_annotation();
+            unit->set_type(annotations[i].type);
+            unit->set_id(annotations[i].id);
+            unit->set_status(annotations[i].status);
+            unit->set_para0(annotations[i].para0);
+            unit->set_para1(annotations[i].para1);
+            unit->set_para2(annotations[i].para2);
         }
     }
     if(_corner_infos) { 

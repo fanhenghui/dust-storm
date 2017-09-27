@@ -31,25 +31,28 @@ private:
     std::string _name;
 };
 
-class NoneImgCircles : public INoneImg {
+class NoneImgAnnotations : public INoneImg {
 public:
-    struct CircleUnit {
-        float cx;//center x
-        float cy;//center y
-        float r;//radius
+    struct AnnotationUnit {
+        int type;
+        int id;
+        int status;
+        float para0;//center x
+        float para1;//center y
+        float para2;//radius
     };
 
 public:
-    NoneImgCircles():INoneImg("circles") {};
-    virtual ~NoneImgCircles() {};
+    NoneImgAnnotations():INoneImg("annotations") {};
+    virtual ~NoneImgAnnotations() {};
     virtual char* serialize_to_array(int &bytelength);
 
-    void add_circle(const CircleUnit& circle);
-    void set_circle(const std::vector<CircleUnit> circles);
-    const std::vector<CircleUnit>& get_circles() const;
+    void add_annotation(const AnnotationUnit& anno);
+    void set_annotations(const std::vector<AnnotationUnit> circles);
+    const std::vector<AnnotationUnit>& get_annotations() const;
 
 private:
-    std::vector<CircleUnit> _circles;
+    std::vector<AnnotationUnit> _annotations;
 };
 
 // LT|1:patientName|2:patientID\n
@@ -81,11 +84,12 @@ public:
     virtual ~NoneImgCollection() {};
     virtual char* serialize_to_array(int &bytelength);
 
-    void set_circles(std::shared_ptr<NoneImgCircles> circles);
+    void set_annotations(std::shared_ptr<NoneImgAnnotations> annotations);
     void set_corner_infos(std::shared_ptr<NoneImgCornerInfos> corner_infos);
 private:
-    std::shared_ptr<NoneImgCircles> _circles;
+    std::shared_ptr<NoneImgAnnotations> _annotations;
     std::shared_ptr<NoneImgCornerInfos> _corner_infos;
+    
 };
 
 
