@@ -2,6 +2,7 @@
 
 #include "util/mi_ipc_client_proxy.h"
 #include "glresource/mi_gl_context.h"
+#include "renderalgo/mi_volume_infos.h"
 
 #include "mi_app_thread_model.h"
 #include "mi_app_common_define.h"
@@ -79,8 +80,18 @@ std::shared_ptr<AppCell> AppController::get_cell(unsigned int id) {
     }
 }
 
-std::map<unsigned int , std::shared_ptr<AppCell>> AppController::get_cells() {
+std::map<unsigned int, std::shared_ptr<AppCell>> AppController::get_cells() {
     return _cells;
+}
+
+
+void AppController::set_volume_infos(
+    std::shared_ptr<VolumeInfos> volumeinfos) {
+    _volumeinfos = volumeinfos;
+}
+
+std::shared_ptr<VolumeInfos> AppController::get_volume_infos() {
+    return _volumeinfos;
 }
 
 MED_IMG_END_NAMESPACE

@@ -20,10 +20,9 @@ PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-OBJS = mi_review_config.o mi_review_controller.o mi_none_image_item.o mi_review_none_image.o \
-mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \
-mi_operation_windowing.o mi_operation_resize.o mi_operation_init.o mi_operation_annotation.o \
-mi_search_worklist_command_handler.o mi_mpr_play_command_handler.o mi_vr_play_command_handler.o
+OBJS = mi_review_config.o mi_review_controller.o \
+mi_operation_init.o mi_operation_annotation.o \
+mi_cmd_handler_search_worklist.o
 
 TARGET = $(BIN_DIR)/review_server
 

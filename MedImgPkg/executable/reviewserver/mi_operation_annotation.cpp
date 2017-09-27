@@ -3,9 +3,9 @@
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_common_logger.h"
 #include "appcommon/mi_app_controller.h"
+#include "util/mi_ipc_client_proxy.h"
 
 #include "mi_message.pb.h"
-#include "mi_review_controller.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

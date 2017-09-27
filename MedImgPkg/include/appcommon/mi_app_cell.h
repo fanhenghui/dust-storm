@@ -1,5 +1,5 @@
-#ifndef MED_IMH_APP_COMMON_CELL_H_
-#define MED_IMH_APP_COMMON_CELL_H_
+#ifndef MED_IMG_APPCOMMON_MI_APP_CELL_H
+#define MED_IMG_APPCOMMON_MI_APP_CELL_H
 
 #include "appcommon/mi_app_common_export.h"
 #include <memory>

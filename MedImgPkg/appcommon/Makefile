@@ -17,45 +17,39 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_app_controller.o mi_app_thread_model.o mi_operation_command_handler.o mi_heartbeat_command_handler.o \
-mi_operation_factory.o mi_app_cell.o \
-mi_ready_command_handler.o mi_shut_down_command_handler.o mi_app_data_base.o
+OBJS = mi_app_database.o mi_app_cell.o mi_operation_factory.o mi_app_none_image_item.o mi_app_none_image.o \
+mi_app_controller.o mi_app_thread_model.o \
+mi_cmd_handler_operating.o mi_cmd_handler_heartbeat.o mi_cmd_handler_fe_ready.o mi_cmd_handler_shutdown.o \
+mi_cmd_handler_mpr_play.o mi_cmd_handler_vr_play.o \
+mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \
+mi_operation_windowing.o mi_operation_resize.o
+
+PROTOC = mi_message.pb.o
+
 TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
 EXPORT_HEADER = mi_app_common_export.h mi_app_common_define.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_renderalgo -lboost_system -lboost_filesystem -lboost_thread -lmysqlcppconn
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_renderalgo \
+-lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lboost_log_setup -lmysqlcppconn -lGL -lGLEW -lprotobuf
 
-$(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so
-	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
+all: pre-build main-build
 
-mi_app_controller.o: $(EXPORT_HEADER) mi_app_controller.h mi_app_controller.cpp mi_app_thread_model.o
-	$(CC) -c -fPIC $(CFLAGS) mi_app_controller.cpp $(ADDITINAL_INCLUDE_DIR)
+pre-build:
+	sh protoc-gen.sh
 
-mi_operation_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_operation_command_handler.h mi_operation_command_handler.cpp mi_operation_factory.o mi_app_thread_model.o
-	$(CC) -c -fPIC $(CFLAGS) mi_operation_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+main-build: $(TARGET)
 
-mi_ready_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_ready_command_handler.h mi_ready_command_handler.cpp mi_app_thread_model.o mi_app_controller.o
-	$(CC) -c -fPIC $(CFLAGS) mi_ready_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+$(TARGET): $(PROTOC) $(OBJS)
+	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(PROTOC) $(ADDITIANL_DEPENDENCIES)
 
-mi_shut_down_command_handler.o: $(EXPORT_HEADER) mi_operation_interface.h mi_shut_down_command_handler.h mi_shut_down_command_handler.cpp mi_app_thread_model.o mi_app_controller.o
-	$(CC) -c -fPIC $(CFLAGS) mi_shut_down_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
+$(PROTOC): mi_message.pb.h mi_message.pb.cc 
+	$(CC) -c -fPIC $(CFLAGS) mi_message.pb.cc $(ADDITINAL_INCLUDE_DIR)
 
-mi_heartbeat_command_handler.o: $(EXPORT_HEADER) mi_heartbeat_command_handler.h mi_heartbeat_command_handler.cpp mi_app_thread_model.o mi_app_controller.o
-	$(CC) -c -fPIC $(CFLAGS) mi_heartbeat_command_handler.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_app_thread_model.o: $(EXPORT_HEADER) mi_operation_interface.h mi_app_thread_model.h mi_app_thread_model.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_app_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_operation_factory.o: $(EXPORT_HEADER) mi_operation_interface.h mi_operation_factory.h mi_operation_factory.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_operation_factory.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_app_cell.o: $(EXPORT_HEADER) mi_app_cell.h mi_app_cell.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_app_cell.cpp $(ADDITINAL_INCLUDE_DIR)	
-
-mi_app_data_base.o : $(EXPORT_HEADER) mi_app_data_base.h mi_app_data_base.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_app_data_base.cpp $(ADDITINAL_INCLUDE_DIR)	
+$(OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
+	$(CC) -c -fPIC $(CFLAGS) $< -o $@ $(ADDITINAL_INCLUDE_DIR)	
 
 .PHONY : clean
 clean:
-	-rm $(OBJS) $(TARGET)
+	-rm *.o $(TARGET)
+	-rm *.pb.cc *.pb.h

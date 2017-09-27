@@ -26,12 +26,12 @@
 #include "appcommon//mi_app_thread_model.h"
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_data_base.h"
+#include "appcommon/mi_app_database.h"
+#include "appcommon/mi_app_controller.h"
+#include "appcommon/mi_app_none_image.h"
 
 #include "mi_review_config.h"
-#include "mi_review_controller.h"
 #include "mi_review_logger.h"
-#include "mi_review_none_image.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -42,9 +42,7 @@ OpInit::~OpInit() {}
 int OpInit::execute() {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation.";
 
-    std::shared_ptr<AppController> app_controller(_controller.lock());
-    std::shared_ptr<ReviewController> controller =
-        std::dynamic_pointer_cast<ReviewController>(app_controller);
+    std::shared_ptr<AppController> controller = _controller.lock();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
 
     REVIEW_CHECK_NULL_EXCEPTION(_buffer);
@@ -58,7 +56,7 @@ int OpInit::execute() {
     // get series path from img cache db
     const std::string series_uid = msg_init.series_uid();
     MI_REVIEW_LOG(MI_TRACE) << "try to get series from local img cache db. series id: " << series_uid;
-    AppDataBase db;
+    AppDB db;
     const std::string db_wpd = ReviewConfig::instance()->get_db_pwd();
     if (0 != db.connect("root", "127.0.0.1:3306", db_wpd.c_str(), "med_img_cache_db")) {
         MI_REVIEW_LOG(MI_ERROR) << "connect to local img cache db failed.";
@@ -157,7 +155,7 @@ int OpInit::execute() {
             const float DEFAULT_WL = -400;
 
             std::shared_ptr<AppCell> cell(new AppCell);
-            std::shared_ptr<ReviewNoneImage> none_image(new ReviewNoneImage());
+            std::shared_ptr<AppNoneImage> none_image(new AppNoneImage());
             cell->set_none_image(none_image);
             if (type_id == 1) { // MPR
                 std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
@@ -296,7 +294,7 @@ int OpInit::execute() {
         const float DEFAULT_WL = -400;
 
         std::shared_ptr<AppCell> cell(new AppCell);
-        std::shared_ptr<ReviewNoneImage> none_image(new ReviewNoneImage());
+        std::shared_ptr<AppNoneImage> none_image(new AppNoneImage());
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));

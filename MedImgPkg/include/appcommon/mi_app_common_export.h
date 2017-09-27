@@ -1,5 +1,5 @@
-#ifndef MED_IMG_APP_COMMON_EXPORT_H
-#define MED_IMG_APP_COMMON_EXPORT_H
+#ifndef MED_IMG_APPCOMMON_MI_APP_COMMON_EXPORT_H
+#define MED_IMG_APPCOMMON_MI_APP_COMMON_EXPORT_H
 
 #include "med_img_pkg_config.h"
 #include "util/mi_exception.h"

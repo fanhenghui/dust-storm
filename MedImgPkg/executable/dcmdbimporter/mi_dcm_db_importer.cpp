@@ -29,7 +29,7 @@
 #include <dlfcn.h>
 #endif
 
-#include "appcommon/mi_app_data_base.h"
+#include "appcommon/mi_app_database.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
@@ -37,7 +37,7 @@
 
 using namespace medical_imaging;
 
-AppDataBase data_base;
+AppDB data_base;
 
 static std::ofstream out_log;
 class LogSheild {

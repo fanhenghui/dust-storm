@@ -1,5 +1,5 @@
-#ifndef MED_IMG_OPERATION_INTERFACE_H_
-#define MED_IMG_OPERATION_INTERFACE_H_
+#ifndef MED_IMG_APPCOMMON_MI_OPERATION_INTERFACE_H
+#define MED_IMG_APPCOMMON_MI_OPERATION_INTERFACE_H
 
 #include "appcommon/mi_app_common_export.h"
 #include <string.h>
