@@ -74,16 +74,24 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
     }
     //Add
     if (ModelAnnotation::ADD == code_id) {
-        //add a annotation 
-        unsigned char label_added = MaskLabelStore::instance()->acquire_label();
-        VOISphere voi_added;
-        model->add_annotation(voi_added, label_added);
-        const std::vector<VOISphere>& vois = model->get_annotations();
-        const std::vector<unsigned char>& labels = model->get_labels();
+        //get added annotation form list rear
+        const VOISphere voi_added = model->get_annotation(vois.size() - 1);
+        const unsigned char label_added = model->get_label(vois.size() - 1);
 
-        //init cache
-        _pre_voi_aabbs[label_added] = AABBUI();
-        _pre_vois = vois;
+        if (voi_added.diameter < 0.1f) {
+            _pre_voi_aabbs[label_added] = AABBUI();
+            _pre_vois = vois;
+        } else {
+            if (_pre_voi_aabbs.find(label_added) == _pre_voi_aabbs.end()) {
+                MI_REVIEW_LOG(MI_WARNING) << "add a same annotation.";
+            }
+            Ellipsoid ellipsoid = voi_patient_to_volume(voi_added);
+            AABBUI aabb;
+            get_aabb_i(ellipsoid, aabb);
+            segment_i(ellipsoid , aabb , label_added);
+            _pre_voi_aabbs[label_added] = aabb;
+            _pre_vois = vois;
+        }
 
         //Update mpr/vr (visible labels and LUT)
         for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {

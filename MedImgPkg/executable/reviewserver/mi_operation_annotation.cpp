@@ -47,14 +47,21 @@ int OpAnnotation::execute() {
     int annotation_type = msgAnnotation.type();
     int annotation_status = msgAnnotation.status();
     if (annotation_status = ModelAnnotation::ADD) {
+        unsigned char label_added = MaskLabelStore::instance()->acquire_label();
+        VOISphere voi_added;
+        model->add_annotation(voi_added, label_added);
+        model->notify(ModelAnnotation::Add);
 
     } else if (annotation_status = ModelAnnotation::DELETE) {
 
     } else if (annotation_status = ModelAnnotation::MODIFYING) {
         //TODO change annotation non-image direction to prevent update non-image when rendering
+        //modify list rear annotation
+        model->notify(ModelAnnotation::MODIFYING);
 
     } else if (annotation_status = ModelAnnotation::MODIFY_COMPLETED) {
-
+        //modify list rear annotation
+        model->notify(ModelAnnotation::MODIFY_COMPLETED);
     }
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT OpAnnotation.";
