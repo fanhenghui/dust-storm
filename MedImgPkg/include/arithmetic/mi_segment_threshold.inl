@@ -7,9 +7,9 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid, T threshold) {
     const double& cc_r = 1.0 / (ellipsoid._c * ellipsoid._c);
 
     unsigned int begin[3], end[3];
-    ArithmeticUtils::get_valid_region(_dim, ellipsoid, begin, end);
+    ArithmeticUtils::get_valid_region(this->_dim, ellipsoid, begin, end);
 
-    const unsigned int layer = _dim[0] * _dim[1];
+    const unsigned int layer = this->_dim[0] * this->_dim[1];
 
 #ifndef _DEBUG
     #pragma omp parallel for
@@ -30,11 +30,11 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid, T threshold) {
 
                 if (pt.x * pt.x * aa_r + pt.y * pt.y * bb_r + pt.z * pt.z * cc_r <
                         1.0) {
-                    unsigned int idx = z * layer + y * _dim[0] + x;
-                    T tmp = _data_ref[idx];
+                    unsigned int idx = z * layer + y * this->_dim[0] + x;
+                    T tmp = this->_data_ref[idx];
 
                     if (tmp > threshold) {
-                        _mask_ref[idx] = _target_label;
+                        this->_mask_ref[idx] = this->_target_label;
                     }
                 }
             }
@@ -44,28 +44,28 @@ void SegmentThreshold<T>::segment(const Ellipsoid& ellipsoid, T threshold) {
 
 template <class T>
 void SegmentThreshold<T>::segment(T threshold) {
-    const unsigned int layer = _dim[0] * _dim[1];
+    const unsigned int layer = this->_dim[0] * this->_dim[1];
 
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
 
-    for (int z = 0; z < _dim[2]; ++z) {
+    for (int z = 0; z < this->_dim[2]; ++z) {
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
 
-        for (int y = 0; y < _dim[1]; ++y) {
+        for (int y = 0; y < this->_dim[1]; ++y) {
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
 
-            for (int x = 0; x < _dim[0]; ++x) {
-                unsigned int idx = z * layer + y * _dim[0] + x;
-                T tmp = _data_ref[idx];
+            for (int x = 0; x < this->_dim[0]; ++x) {
+                unsigned int idx = z * layer + y * this->_dim[0] + x;
+                T tmp = this->_data_ref[idx];
 
                 if (tmp > threshold) {
-                    _mask_ref[idx] = _target_label;
+                    this->_mask_ref[idx] = this->_target_label;
                 }
             }
         }
@@ -101,8 +101,8 @@ template <class T>
 T SegmentThreshold<T>::get_threshold_center_i(const Ellipsoid& ellipsoid) {
     Sampler<T> sampler;
     float v = sampler.sample_3d_linear(ellipsoid._center.x, ellipsoid._center.y,
-                                       ellipsoid._center.z, _dim[0], _dim[1],
-                                       _dim[2], _data_ref);
+                                       ellipsoid._center.z, this->_dim[0], this->_dim[1],
+                                       this->_dim[2], this->_data_ref);
     v -= 200;
     return static_cast<T>(v);
 }
@@ -115,9 +115,9 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
     const double& cc_r = 1.0 / (ellipsoid._c * ellipsoid._c);
 
     unsigned int begin[3], end[3];
-    ArithmeticUtils::get_valid_region(_dim, ellipsoid, begin, end);
+    ArithmeticUtils::get_valid_region(this->_dim, ellipsoid, begin, end);
 
-    const unsigned int layer = _dim[0] * _dim[1];
+    const unsigned int layer = this->_dim[0] * this->_dim[1];
 
     // 1 Calculate histogram
     const int gray_level = 256;
@@ -127,7 +127,7 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
     int pixel_num = 0;
     float sum = 0;
 
-    const float ww = _max_scalar - _min_scalar;
+    const float ww = this->_max_scalar - this->_min_scalar;
     const float ww_r = 1.0f / ww;
 
     //#ifndef _DEBUG
@@ -146,9 +146,9 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
 
                 if (!(pt.x * pt.x * aa_r + pt.y * pt.y * bb_r + pt.z * pt.z * cc_r >
                         1.0)) {
-                    unsigned int idx = z * layer + y * _dim[0] + x;
-                    T tmp = _data_ref[idx];
-                    float temp_norm = (tmp - _min_scalar) * ww_r;
+                    unsigned int idx = z * layer + y * this->_dim[0] + x;
+                    T tmp = this->_data_ref[idx];
+                    float temp_norm = (tmp - this->_min_scalar) * ww_r;
                     temp_norm = temp_norm > 1.0f ? 1.0f : temp_norm;
                     temp_norm = temp_norm < 0.0f ? 0.0f : temp_norm;
                     int gray_scalar = int(temp_norm * (gray_level - 1));
@@ -204,13 +204,13 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
     }
 
     float gray_norm = (float)max_gray_scalar / (float)gray_level;
-    return T(gray_norm * ww + _min_scalar);
+    return T(gray_norm * ww + this->_min_scalar);
 }
 
 template <class T>
 T SegmentThreshold<T>::get_threshold_otsu_i() {
 
-    const unsigned int layer = _dim[0] * _dim[1];
+    const unsigned int layer = this->_dim[0] * this->_dim[1];
 
     // 1 Calculate histogram
     const int gray_level = 256;
@@ -220,24 +220,24 @@ T SegmentThreshold<T>::get_threshold_otsu_i() {
     unsigned int pixel_num = 0;
     float sum = 0;
 
-    const float ww = _max_scalar - _min_scalar;
+    const float ww = this->_max_scalar - this->_min_scalar;
     const float ww_r = 1.0f / ww;
 
     //#ifndef _DEBUG
     //#pragma omp parallel for
     //#endif
-    for (unsigned int z = 0; z < _dim[2]; ++z) {
+    for (unsigned int z = 0; z < this->_dim[2]; ++z) {
         //#ifndef _DEBUG
         //#pragma omp parallel for
         //#endif
-        for (unsigned int y = 0; y < _dim[1]; ++y) {
+        for (unsigned int y = 0; y < this->_dim[1]; ++y) {
             //#ifndef _DEBUG
             //#pragma omp parallel for
             //#endif
-            for (unsigned int x = 0; x < _dim[0]; ++x) {
-                unsigned int idx = z * layer + y * _dim[0] + x;
-                T tmp = _data_ref[idx];
-                float temp_norm = (tmp - _min_scalar) * ww_r;
+            for (unsigned int x = 0; x < this->_dim[0]; ++x) {
+                unsigned int idx = z * layer + y * this->_dim[0] + x;
+                T tmp = this->_data_ref[idx];
+                float temp_norm = (tmp - this->_min_scalar) * ww_r;
                 temp_norm = temp_norm > 1.0f ? 1.0f : temp_norm;
                 temp_norm = temp_norm < 0.0f ? 0.0f : temp_norm;
                 int gray_scalar = int(temp_norm * (gray_level - 1));
@@ -292,5 +292,5 @@ T SegmentThreshold<T>::get_threshold_otsu_i() {
     }
 
     float gray_norm = (float)max_gray_scalar / (float)gray_level;
-    return T(gray_norm * ww + _min_scalar);
+    return T(gray_norm * ww + this->_min_scalar);
 }
