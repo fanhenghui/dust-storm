@@ -97,6 +97,7 @@ var revcBEReady = false;
                 cells[cellID].handleJpegBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_SEND_NONE_IMAGE:
+                cells[cellID].handleNongImgBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_READY:
                 revcBEReady = true;
