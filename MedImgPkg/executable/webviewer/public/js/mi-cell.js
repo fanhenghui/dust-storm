@@ -32,9 +32,6 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.mouseStatus = BTN_UP;
     this.mousePre = {x:0,y:0};
     this.mouseClock = new Date().getTime();
-    
-    //register event linsener
-
 }
 
 function refreshCanvas(canvas, img) {
@@ -58,7 +55,7 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
 
 Cell.prototype.resize = function(width, height) {
     //canvas&svg resize
-    //send msg to notigy BE resize will be call outside
+    //send msg to notigy BE resize will be call in main
     this.canvas.width = width;
     this.canvas.height = height;
     var top = this.canvas.offsetTop;
@@ -102,12 +99,12 @@ Cell.prototype.processMouseAction = function(curPos) {
 
     //create mouse msg and send to BE
     if(!socketClient.protocRoot) {
-        //TODO log
+        console.log('null protocbuf.');
         return;
     }
     var MsgMouse = socketClient.protocRoot.lookup('medical_imaging.MsgMouse');
     if(!MsgMouse) {
-        //TOOD log
+        console.log('get mouse message type failed.');
         return;
     }
     var msgMouse = MsgMouse.create({
@@ -116,7 +113,7 @@ Cell.prototype.processMouseAction = function(curPos) {
       tag: 0
     });
     if(!msgMouse) {
-        //TOOD log
+        console.log('create mouse message failed.');
         return;
     }
     var msgBuffer = MsgMouse.encode(msgMouse).finish();
