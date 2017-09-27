@@ -7,7 +7,7 @@ else
 CFLAGS += -g 
 endif
 
-DEFS = -DBOOST_LOG_DYN_LINK
+DEFS = -DBOOST_LOG_DYN_LINK -D_DEBUG
 CFLAGS += $(DEFS)
 
 ROOT = ..

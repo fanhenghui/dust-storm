@@ -12,6 +12,7 @@ class AppThreadModel;
 class IPCClientProxy;
 class AppCell;
 class VolumeInfos;
+class IModel;
 class AppCommon_Export AppController
         : public std::enable_shared_from_this<AppController> {
 public:
@@ -32,12 +33,20 @@ public:
     // Cell container
     void add_cell(unsigned int id, std::shared_ptr<AppCell> cell);
     void remove_cell(unsigned int id);
-    std::shared_ptr<AppCell> get_cell(unsigned int id);
-    std::map<unsigned int, std::shared_ptr<AppCell>> get_cells();
+    void remove_all_cells();
+    std::shared_ptr<AppCell> get_cell(unsigned int id) const;
+    std::map<unsigned int, std::shared_ptr<AppCell>> get_cells() const;
 
     //volume infos
     void set_volume_infos(std::shared_ptr<VolumeInfos> volumeinfos);
-    std::shared_ptr<VolumeInfos> get_volume_infos();
+    std::shared_ptr<VolumeInfos> get_volume_infos() const;
+
+    //models
+    void add_model(unsigned int id, std::shared_ptr<IModel> model);
+    void remove_model(unsigned int id);
+    void remove_all_models();
+    std::shared_ptr<IModel> get_model(unsigned int id) const;
+    std::map<unsigned int, std::shared_ptr<IModel>> get_modelss() const;
 
 protected:
     std::shared_ptr<IPCClientProxy> _proxy;
@@ -45,6 +54,8 @@ protected:
 
     // Cells
     std::map<unsigned int, std::shared_ptr<AppCell>> _cells;
+    // Models
+    std::map<unsigned int, std::shared_ptr<IModel>> _models;
 
 private:
     // process info

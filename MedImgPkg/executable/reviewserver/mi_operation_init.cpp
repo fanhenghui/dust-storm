@@ -22,6 +22,7 @@
 #include "renderalgo/mi_color_transfer_function.h"
 #include "renderalgo/mi_opacity_transfer_function.h"
 #include "renderalgo/mi_transfer_function_loader.h"
+#include "renderalgo/mi_mask_label_store.h"
 
 #include "appcommon//mi_app_thread_model.h"
 #include "appcommon/mi_app_cell.h"
@@ -138,6 +139,12 @@ int OpInit::execute() {
                 }
             }
             delete[] mask_target;
+
+            //fill mask label store
+            MaskLabelStore::instance()->fill_label(1);
+            for (auto it = target_label_set.begin(); it != target_label_set.end(); ++it) {
+                MaskLabelStore::instance()->fill_label(*it);
+            }
         }
 
         volume_infos->set_mask(mask_data);

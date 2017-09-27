@@ -1,5 +1,5 @@
-#ifndef MED_IMG_REVIEW_CONTROLLER_H_
-#define MED_IMG_REVIEW_CONTROLLER_H_
+#ifndef MED_IMG_REVIEW_CONTROLLER_H
+#define MED_IMG_REVIEW_CONTROLLER_H
 
 #include "util/mi_ipc_client_proxy.h"
 
@@ -10,7 +10,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class VolumeInfos;
+class ModelAnnotation;
 class ReviewController : public AppController {
 public:
     ReviewController();
@@ -18,7 +18,9 @@ public:
 
     virtual void initialize();
 
-protected:
+private:
+    void register_command_handler_i();
+    void create_model_i();
 private:
 };
 
