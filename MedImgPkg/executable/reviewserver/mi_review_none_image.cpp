@@ -20,7 +20,7 @@ void ReviewNoneImage::update() {
     //save wl cache to update
 }
 
-char* ReviewNoneImage::serialize_dirty(int buffer_size) const {
+char* ReviewNoneImage::serialize_dirty(int& buffer_size) const {
     NoneImgCollection msgcoll;
     if(_fix_corner_infos_dirty) {
         std::shared_ptr<NoneImgCornerInfos> noneimg_cinfos(new NoneImgCornerInfos());
@@ -46,6 +46,8 @@ void ReviewNoneImage::initialize(std::shared_ptr<VolumeInfos> volume_infos, std:
     if (mpr_scene) {
         _wl_page_dirty = true;
     }
+
+    this->set_dirty(true);
 }
 
 bool ReviewNoneImage::check_dirty_i() {

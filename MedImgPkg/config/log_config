@@ -1,5 +1,5 @@
 TargetDirection = logs
-Level = Info
+Level = Debug
 MinFreeSpace = 1024
 MaxLogSize = 32
 RotationSize = 4

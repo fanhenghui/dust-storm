@@ -22,7 +22,7 @@ public:
     }
 
     virtual void update() = 0;
-    virtual char* serialize_dirty(int buffer_size) const = 0;
+    virtual char* serialize_dirty(int& buffer_size) const = 0;
 protected:
     virtual bool check_dirty_i() = 0;
 private:

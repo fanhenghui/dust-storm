@@ -16,7 +16,7 @@ public:
     virtual ~ReviewNoneImage();
 
     virtual void update();
-    virtual char* serialize_dirty(int buffer_size) const;
+    virtual char* serialize_dirty(int& buffer_size) const;
 
     void initialize(std::shared_ptr<VolumeInfos> volume_infos, std::shared_ptr<SceneBase> scene);
     //TODO set model

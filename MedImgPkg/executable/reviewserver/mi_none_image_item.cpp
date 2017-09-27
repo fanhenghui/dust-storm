@@ -67,7 +67,7 @@ std::string NoneImgCornerInfos::to_string() const {
                 ss << "|" << it->second[i].first << ":" << it->second[i].second;
             }
             ss << "\n";
-            MI_REVIEW_LOG(MI_ERROR) << ss.str();
+            MI_REVIEW_LOG(MI_DEBUG) <<"corner info str: " << ss.str();
         }
     }
 
