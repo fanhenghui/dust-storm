@@ -4,24 +4,11 @@
 <head>
     <meta charset="utf-8">
     <title>MED-REVIEW</title>
-    <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <!-- <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-        crossorigin="anonymous">
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-
-    <!-- <link rel="stylesheet" href="css/bootstrap.min.css">
-    <script src="js/bootstrap.min.js"></script> -->
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <style>
         svg {
@@ -35,46 +22,15 @@
     <script src="js/bcrypt.js"></script>
     <script src="js/long.js"></script>
     <script src="js/protobuf.js"></script>
-
 </head>
 
-<body>    
-    <!-- <div id="container" style="width:1240px">
-        <div id="header" style="background-color:darkgray;float:none">
-            <h1>Medcial Review</h1>
-        </div>
-
-        <div id="nav" style="background-color:dimgrey;width:200px;height:1024px;float:left">
-            <button id="btnLayout1x1" onclick="FE.changeLayout1x1()">Layout1x1</button>
-            <button id="btnLayout2x2" onclick="FE.changeLayout2x2()">Layout2x2</button>
-            <br> Annotation
-            <br> CommonTools
-            <br>
-        </div>
-
-        <div id="cell0" style="width:518;height:width;float:left">
-            <canvas id="cell0Canvas" width="512" height="512" style="border:1px solid #000000"></canvas>
-        </div>
-
-        <div id="cell1" style="width:518;height:width;float:left">
-            <canvas id="cell1Canvas" width="512" height="512" style="border:1px solid #000000"></canvas>
-        </div>
-
-        <div id="cell2" style="width:518;height:width;float:left">
-            <canvas id="cell2Canvas" width="512" height="512" style="border:1px solid #000000"></canvas>
-        </div>
-
-        <div id="cell3" style="width:518;height:width;float:left">
-            <canvas id="cell3Canvas" width="512" height="512" style="border:1px solid #000000"></canvas>
-        </div>
-
-    </div> -->
+<body>
     <div class="container-fluid" id="worklist-div">
         <div style="display:none">
             <p id="username"><%=username%></p>
         </div>
 
-        <div clss="row" >
+        <div clss="row">
             <div class="col-md-12">
                 <h3 class="text-primary">
                     Study List
@@ -96,20 +52,20 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody id = "worklist">
+                    <tbody id="worklist">
                         <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
                         <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
                     </tbody>
                 </table>
                 <div class="row">
                     <div class="col-md-6">
-                        <button type="button" class="btn btn-default" id="searchBtn">
+                        <button type="button" class="btn btn-default" id="btn-search-worklist">
                             Search
                         </button>
                     </div>
                     <div class="col-md-6">
-                         
-                        <button type="button" class="btn btn-default" id="loadBtn">
+
+                        <button type="button" class="btn btn-default" id="btn-load-series">
                             Load
                         </button>
                     </div>
@@ -184,19 +140,19 @@
                         </div>
                         <div class="row clearfix">
                             <div class="btn-group" id="common-tools">
-                                <button class="btn btn-default" type="button" id="common-tool-arrow" ><em class="glyphicon glyphicon-align-left"></em>Ar</button>
-                                <button class="btn btn-default" type="button" id="common-tool-zoom" ><em class="glyphicon glyphicon-align-center"></em>Zo</button>
-                                <button class="btn btn-default" type="button" id="common-tool-rotate" ><em class="glyphicon glyphicon-align-right"></em>Ro</button>
+                                <button class="btn btn-default" type="button" id="common-tool-arrow"><em class="glyphicon glyphicon-align-left"></em>Ar</button>
+                                <button class="btn btn-default" type="button" id="common-tool-zoom"><em class="glyphicon glyphicon-align-center"></em>Zo</button>
+                                <button class="btn btn-default" type="button" id="common-tool-rotate"><em class="glyphicon glyphicon-align-right"></em>Ro</button>
                                 <br>
-                                <button class="btn btn-default" type="button" id="common-tool-pan" ><em class="glyphicon glyphicon-align-left"></em>Pan</button>
-                                <button class="btn btn-default" type="button" id="common-tool-windowing" ><em class="glyphicon glyphicon-align-center"></em>Win</button>
-                                <button class="btn btn-canvas2default" type="button" id="common-tool-annotation" ><em class="glyphicon glyphicon-align-right"></em>An</button>
+                                <button class="btn btn-default" type="button" id="common-tool-pan"><em class="glyphicon glyphicon-align-left"></em>Pan</button>
+                                <button class="btn btn-default" type="button" id="common-tool-windowing"><em class="glyphicon glyphicon-align-center"></em>Win</button>
+                                <button class="btn btn-canvas2default" type="button" id="common-tool-annotation"><em class="glyphicon glyphicon-align-right"></em>An</button>
                             </div>
                         </div>
                         <div class="row clearfix">
                             <button class="btn btn-play-vr" type="button" id="btn-play-vr"><em class="glyphicon glyphicon-align-left"></em>PlayVR</button>
                             <br>
-                            <button type="button" id="btn-addannotation" > add circle </button>
+                            <button type="button" id="btn-addannotation"> add circle </button>
                             <button type="button" id="btn-removeannotation"> delete circle</button>
                         </div>
                         <p id="test-info">
@@ -208,23 +164,23 @@
                         <div class="col-md-6 column" id="cell02-container" style="padding: 0; margin: 0;">
                             <div class="row clearfix" id="cell0-container" style="padding: 0; margin: 0; position: relative;">
                                 <canvas id="canvas0" style="border: 0px solid black"></canvas>
-                                <svg id="svg0" style ="border: 0px solid black;"> </svg>
+                                <svg id="svg0" style="border: 0px solid black;"> </svg>
                             </div>
                             <div class="row clearfix" id="cell2-container" style="padding: 0; margin: 0; position: relative;">
-                                <canvas id="canvas2" style="border: 0px solid black"></canvas>  
-                                <svg id="svg2" style ="border: 0px solid black;" > </svg>                           
+                                <canvas id="canvas2" style="border: 0px solid black"></canvas>
+                                <svg id="svg2" style="border: 0px solid black;"> </svg>
                             </div>
                         </div>
 
                         <div class="col-md-6 column" id="cell13-container" style="padding: 0; margin: 0;">
                             <div class="row clearfix" id="cell1-container" style="padding: 0; margin: 0; position: relative;">
                                 <canvas id="canvas1" style="border: 0px solid black"></canvas>
-                                <svg id="svg1" style ="border: 0px solid black;"> </svg>
+                                <svg id="svg1" style="border: 0px solid black;"> </svg>
                                 <!-- <svg id="svg1" style ="border: 1px solid black;"> </svg>                                 -->
                             </div>
                             <div class="row clearfix" id="cell3-container" style="padding: 0; margin: 0; position: relative;">
-                                <canvas id="canvas3" style="border: 0px solid black"></canvas>                             
-                                <svg id="svg3" style ="border: 0px solid black;"> </svg>
+                                <canvas id="canvas3" style="border: 0px solid black"></canvas>
+                                <svg id="svg3" style="border: 0px solid black;"> </svg>
                             </div>
                         </div>
 
@@ -235,7 +191,6 @@
     </div>
 </body>
 
-<!-- <script src="js/review.js"></script> -->
 <script src="js/mi-msg-id.js"></script>
 <script src="js/mi-socket-ip.js"></script>
 <script src="js/mi-socket-client.js"></script>

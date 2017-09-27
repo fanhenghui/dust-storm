@@ -26,6 +26,9 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.jpegStr = '';
     this.jpegImg = new Image();
 
+    //svg(d3.js) based graphic
+    this.noneImgBuf = null;
+
     //mouse event
     this.mouseAction = ACTION_ID_NONE;
     this.mouseBtn = BTN_NONE;
@@ -51,6 +54,10 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
         }).bind(this);
         this.jpegImg.onload = loadImg;
     }
+}
+
+Cell.prototype.handleNongImgBuffer = function(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    
 }
 
 Cell.prototype.resize = function(width, height) {
@@ -147,8 +154,5 @@ Cell.prototype.prepare = function() {
             this.mouseUp(event);
         }).bind(this);
         this.svg.addEventListener('mouseup', mouseUp_);
-        return true;
-    } else {
-        return false;
     }
 }

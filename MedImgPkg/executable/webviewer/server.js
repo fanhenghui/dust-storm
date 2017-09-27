@@ -38,18 +38,25 @@ var routes = require('./public/routes/index');
 
 global.dbHandel = require('./public/database/dbhandel');
 global.db = mongoose.connect('mongodb://localhost:27017/nodedb');
-global.db.connection.on('error', function (error) {
-  console.log('connect user mongon DB failed：' + error);
+global.db.connection.on('error', function(error) {
+    console.log('connect user mongon DB failed：' + error);
 });
-global.db.connection.on('open', function () {
-  console.log('connect user mongon DB success.')
+global.db.connection.on('open', function() {
+    console.log('connect user mongon DB success.')
 });
 
 // use session for login
-app.use(session( {secret: 'secret', cookie: {maxAge: 1000 * 60 * 30}}));  // 30 min timeout
+app.use(session({
+    secret: 'secret',
+    cookie: {
+        maxAge: 1000 * 60 * 30
+    }
+})); // 30 min timeout
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 app.use(cookieParser());
 app.use(require('express').static(__dirname + '/public'));
 
@@ -64,20 +71,20 @@ app.use('/', routes);
 io.on('connection', require('./public/be/be_proxy').onIOSocketConnect);
 
 //process quit callback
-process.on('exit', function (err) {
-  console.log('process exit.');
-  require('./public/be/be_proxy').cleanIOSocketConnect();
+process.on('exit', function(err) {
+    console.log('process exit.');
+    require('./public/be/be_proxy').cleanIOSocketConnect();
 });
-process.on('uncaughtException', function (err) {
-  console.error('An uncaught error occurred!');
-  process.exit(99);
+process.on('uncaughtException', function(err) {
+    console.error('An uncaught error occurred!');
+    process.exit(99);
 });
-process.on('SIGINT', function (err) {
-  console.log('catches ctrl+c event.');
-  process.exit(2);
+process.on('SIGINT', function(err) {
+    console.log('catches ctrl+c event.');
+    process.exit(2);
 });
 
 var server = http.listen(8000, function() {
-  var address = server.address();
-  console.log('address is ', util.inspect(address));
+    var address = server.address();
+    console.log('address is ', util.inspect(address));
 });
