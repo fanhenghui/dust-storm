@@ -6,6 +6,7 @@
 
 #include "mi_app_thread_model.h"
 #include "mi_app_common_define.h"
+#include "util/mi_model_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -62,17 +63,18 @@ void AppController::add_cell(unsigned int id , std::shared_ptr<AppCell> cell) {
 }
 
 void AppController::remove_cell(unsigned int id) {
-    //TODO release cell
     auto it = _cells.find(id);
-
     if (it != _cells.end()) {
         _cells.erase(it);
     }
 }
 
-std::shared_ptr<AppCell> AppController::get_cell(unsigned int id) {
-    auto it = _cells.find(id);
+void AppController::remove_all_cells() {
+    _cells.clear();
+}
 
+std::shared_ptr<AppCell> AppController::get_cell(unsigned int id) const {
+    std::map<unsigned int, std::shared_ptr<AppCell>>::const_iterator it = _cells.find(id);
     if (it != _cells.end()) {
         return it->second;
     } else {
@@ -80,7 +82,7 @@ std::shared_ptr<AppCell> AppController::get_cell(unsigned int id) {
     }
 }
 
-std::map<unsigned int, std::shared_ptr<AppCell>> AppController::get_cells() {
+std::map<unsigned int, std::shared_ptr<AppCell>> AppController::get_cells() const {
     return _cells;
 }
 
@@ -90,8 +92,36 @@ void AppController::set_volume_infos(
     _volumeinfos = volumeinfos;
 }
 
-std::shared_ptr<VolumeInfos> AppController::get_volume_infos() {
+std::shared_ptr<VolumeInfos> AppController::get_volume_infos() const {
     return _volumeinfos;
+}
+
+void AppController::add_model(unsigned int id, std::shared_ptr<IModel> model) {
+    _models[id] = model;
+}
+
+void AppController::remove_model(unsigned int id) {
+    auto it = _models.find(id);
+    if (it != _models.end()) {
+        _models.erase(it);
+    }
+}
+
+void AppController::remove_all_models() {
+    _models.clear();
+}
+
+std::shared_ptr<IModel> AppController::get_model(unsigned int id) const {
+    std::map<unsigned int, std::shared_ptr<IModel>>::const_iterator it = _models.find(id);
+    if (it != _models.end()) {
+        return it->second;
+    } else {
+        return nullptr;
+    }
+}
+
+std::map<unsigned int, std::shared_ptr<IModel>> AppController::get_modelss() const {
+    return _models;
 }
 
 MED_IMG_END_NAMESPACE

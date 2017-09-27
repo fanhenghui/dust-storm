@@ -60,15 +60,25 @@ std::vector<unsigned char> MaskLabelStore::acquire_labels(int num) {
     return candidates;
 }
 
+void MaskLabelStore::fill_label(unsigned char label) {
+    boost::unique_lock<boost::mutex> locker(_mutex);\
+    _label_store[label] = 1;
+}
+
+void MaskLabelStore::fill_labels(std::vector<unsigned char> labels) {
+    boost::unique_lock<boost::mutex> locker(_mutex);
+    for (auto it = labels.begin(); it != labels.end(); ++it) {
+        _label_store[*it] = 1;
+    }
+}
+
 void MaskLabelStore::recycle_label(unsigned char label) {
     boost::unique_lock<boost::mutex> locker(_mutex);
-
     _label_store[label] = 0;
 }
 
 void MaskLabelStore::recycle_labels(std::vector<unsigned char> labels) {
     boost::unique_lock<boost::mutex> locker(_mutex);
-
     for (auto it = labels.begin(); it != labels.end(); ++it) {
         _label_store[*it] = 0;
     }

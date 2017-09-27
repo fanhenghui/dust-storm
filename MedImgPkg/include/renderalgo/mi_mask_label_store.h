@@ -13,6 +13,9 @@ public:
     static MaskLabelStore* instance();
     ~MaskLabelStore();
 
+    void fill_label(unsigned char label);
+    void fill_labels(std::vector<unsigned char> labels);
+
     unsigned char acquire_label();
     std::vector<unsigned char> acquire_labels(int num);
 

@@ -23,6 +23,7 @@
 #include "mi_cmd_handler_search_worklist.h"
 #include "mi_operation_init.h"
 #include "mi_operation_annotation.h"
+#include "mi_model_annotation.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
@@ -33,10 +34,15 @@ ReviewController::~ReviewController() {}
 
 void ReviewController::initialize() {
     AppController::initialize();
-
-    // Configure
+    // configure
     Configuration::instance()->set_processing_unit_type(GPU);
+    // register command handler and operation
+    register_command_handler_i();
+    // create model&observer
+    
+}
 
+void ReviewController::register_command_handler_i() {
     // Register command handler
     std::shared_ptr<AppController> app_controller = shared_from_this();
     std::shared_ptr<CmdHandlerHeartbeat> handler_heart_beat(
@@ -86,5 +92,11 @@ void ReviewController::initialize() {
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
 }
+
+void ReviewController::create_model_i() {
+    std::shared_ptr<ModelAnnotation> annotation(new ModelAnnotation());
+    this->add_model(MI_MODEL_ID_ANNOTATION , annotation);
+}
+
 
 MED_IMG_END_NAMESPACE
