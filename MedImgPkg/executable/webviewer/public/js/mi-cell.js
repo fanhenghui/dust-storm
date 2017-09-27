@@ -101,8 +101,8 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                 tspans.enter()
                     .append('tspan')
                     .attr('x', xpos[i])
-                    .attr('dy', function (d, i) {
-                        return i ? (1.2 * txtspacing) : txtspacing
+                    .attr('dy', function (d, idx) {
+                        return idx ? (1.2 * txtspacing) : (i % 2 == 0 ? txtspacing : 0.0)
                     })
                     .text(function (d, i) {
                         return d;
@@ -233,6 +233,7 @@ Cell.prototype.prepare = function() {
             .attr('id', function (d) {
                 return d;
             })
-            .attr('font-size', "15px");
+            .attr('font-size', "15px")
+            .attr('class', 'no-select-text');
     }
 }
