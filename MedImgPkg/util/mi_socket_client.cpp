@@ -88,10 +88,10 @@ void SocketClient::run() {
             continue;
         }
         
-        MI_UTIL_LOG(MI_DEBUG) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
+        MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
 
         if (header._data_len <= 0) {
-            MI_UTIL_LOG(MI_INFO) << "client received data buffer length less than 0.";
+            MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
         } else {
             buffer = new char[header._data_len];
             if (-1 == recv(_fd_server, buffer, header._data_len, 0)) {
