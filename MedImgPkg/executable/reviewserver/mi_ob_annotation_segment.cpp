@@ -12,8 +12,13 @@
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
+#include "renderalgo/mi_color_transfer_function.h"
+#include "renderalgo/mi_opacity_transfer_function.h"
+#include "renderalgo/mi_transfer_function_loader.h"
+#include "renderalgo/mi_mask_label_store.h"
 
 #include "mi_model_annotation.h"
+#include "mi_review_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -37,7 +42,7 @@ void OBAnnotationSegment::set_mpr_scenes(std::vector<std::shared_ptr<MPRScene>> 
     _mpr_scenes = scenes;
 }
 
-void OBAnnotationSegment::set_mpr_scenes(std::vector<std::shared_ptr<VRScene>> scenes) {
+void OBAnnotationSegment::set_vr_scenes(std::vector<std::shared_ptr<VRScene>> scenes) {
     _vr_scenes = scenes;
 }
 
@@ -52,26 +57,28 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
     std::shared_ptr<ModelAnnotation> model = _model.lock();
     REVIEW_CHECK_NULL_EXCEPTION(model);
+    const std::vector<VOISphere>& vois = model->get_annotations();
+    const std::vector<unsigned char>& labels = model->get_labels();
 
     //1 Update overlay mask mode
     if (ModelAnnotation::ADD == code_id || ModelAnnotation::DELETE == code_id) {
         if (vois.empty()) {
-            for (auto it = _scenes.begin(); it != _scenes.end(); ++it) {
+            for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
                 (*it)->set_mask_overlay_mode(MASK_OVERLAY_DISABLE);
             }
-        } else {
-        for (auto it = _scenes.begin(); it != _scenes.end(); ++it) {
-            (*it)->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
+         } else {
+             for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
+                 (*it)->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
+            }
         }
     }
-    
     //Add
     if (ModelAnnotation::ADD == code_id) {
         //add a annotation 
         unsigned char label_added = MaskLabelStore::instance()->acquire_label();
         VOISphere voi_added;
-        model->add_annotation(label_added, voi_added);
-        const std::vector<VOISphere>& vois = model->get_vois();
+        model->add_annotation(voi_added, label_added);
+        const std::vector<VOISphere>& vois = model->get_annotations();
         const std::vector<unsigned char>& labels = model->get_labels();
 
         //init cache
@@ -81,7 +88,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         //Update mpr/vr (visible labels and LUT)
         for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
             (*it)->set_mask_overlay_color(RGBAUnit(255.0f,0.0f,0.0f) , label_added);
-            (*it)->set_visible_labels(labels)
+            (*it)->set_visible_labels(labels);
         }
         if(!_vr_scenes.empty()) {
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_nodule.xml";
@@ -110,8 +117,6 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         if (_pre_vois.empty()) {
             return;
         }
-        const std::vector<VOISphere>& vois = model->get_vois();
-        const std::vector<unsigned char>& labels = model->get_labels();
         //get deleted VOI from compare
         auto it_deleted = _pre_voi_aabbs.begin();
         for (; it_deleted != _pre_voi_aabbs.end() ; ++it_deleted) {
@@ -130,13 +135,13 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         unsigned char label_deleted = it_deleted->first;
         AABBUI aabb_deleted = it_deleted->second;
         if(label_deleted == 0 ) {
-            MI_REVIEW_LOG(MI_ERRPR) << "delete 0 label annotation.";
+            MI_REVIEW_LOG(MI_ERROR) << "delete 0 label annotation.";
         } else {
             //Recover mask
             recover_i(aabb_deleted , label_deleted);
             _pre_voi_aabbs.erase(it_deleted);
             _pre_vois = vois;
-            MaskLabelStore::instance()->recover(label_deleted);
+            MaskLabelStore::instance()->recycle_label(label_deleted);
         }
     }
 
@@ -153,8 +158,6 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             return;
         }
 
-        const std::vector<VOISphere>& vois = model->get_vois();
-        const std::vector<unsigned char>& labels = model->get_labels();
         int idx = -1;
         for (int i = 0 ; i < vois.size() ; ++i) {
             if (_pre_vois[i] != vois[i]) {
@@ -171,21 +174,22 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         //1 Recover
         recover_i(_pre_voi_aabbs[label_modify] , label_modify);
         //2 Segment
-        Ellipsoid ellipsoid = voi_patient_to_volume(model->get_voi(idx));
+        Ellipsoid ellipsoid = voi_patient_to_volume(model->get_annotation(idx));
         AABBUI aabb;
         get_aabb_i(ellipsoid, aabb);
         segment_i(ellipsoid , aabb , label_modify);
         _pre_voi_aabbs[label_modify] = aabb;
         _pre_vois = vois;
-        for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it) {
+        for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
+            (*it)->set_dirty(true);
+        }
+        for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
             (*it)->set_dirty(true);
         }
     }
-
 }
 
-Ellipsoid OBAnnotationSegment::voi_patient_to_volume(const VOISphere& voi)
-{
+Ellipsoid OBAnnotationSegment::voi_patient_to_volume(const VOISphere& voi) {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
 

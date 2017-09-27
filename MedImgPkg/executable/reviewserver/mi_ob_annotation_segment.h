@@ -2,8 +2,13 @@
 #define MED_IMG_REVIEW_MI_OB_ANNOTATION_SEGMENTATION_H
 
 #include <vector>
-#include "mi_review_commohn.h"
+#include <map>
+#include <memory>
+#include "mi_review_common.h"
 #include "util/mi_observer_interface.h"
+#include "arithmetic/mi_ellipsoid.h"
+#include "arithmetic/mi_aabb.h"
+#include "io/mi_voi.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,7 +24,7 @@ public:
     void set_model(std::shared_ptr<ModelAnnotation> model);
     void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
     void set_mpr_scenes(std::vector<std::shared_ptr<MPRScene>> scenes);
-    void set_vr_scenes(std::vector<std::shared_ptr<VRScene>> scenes)
+    void set_vr_scenes(std::vector<std::shared_ptr<VRScene>> scenes);
 
     virtual void update(int code_id = 0);
 
