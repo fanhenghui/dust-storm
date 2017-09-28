@@ -27,8 +27,29 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
         //TODO set corner based on config file
         APPCOMMON_CHECK_NULL_EXCEPTION(_volume_infos);
         std::shared_ptr<ImageDataHeader> header = _volume_infos->get_data_header();
+        
+        // patient descriptor
         noneimg_cinfos->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->patient_name));
         noneimg_cinfos->add_info(NoneImgCornerInfos::LT, std::make_pair(1, header->patient_id));
+
+        // parameters that can be tuned
+        noneimg_cinfos->add_info(NoneImgCornerInfos::LB, std::make_pair(0, "Current Slice "));
+        noneimg_cinfos->add_info(NoneImgCornerInfos::LB, std::make_pair(1, "W 100 L 100"));
+        
+        // volume structure descriptor
+        std::stringstream ss;
+        ss << header->columns << " " << header->rows << " " << header->slice_location.size();
+        noneimg_cinfos->add_info(NoneImgCornerInfos::RT, std::make_pair(0, ss.str()));
+        
+        ss.str(std::string());
+        ss << header->slice_thickness;
+        noneimg_cinfos->add_info(NoneImgCornerInfos::RT, std::make_pair(1, ss.str()));
+
+        // volume physical descriptor
+        ss.str(std::string());
+        ss << header->kvp;
+        noneimg_cinfos->add_info(NoneImgCornerInfos::RB, std::make_pair(0, ss.str()));
+
         msgcoll.set_corner_infos(noneimg_cinfos);
     }
 

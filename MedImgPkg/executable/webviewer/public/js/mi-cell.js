@@ -126,6 +126,16 @@ Cell.prototype.resize = function(width, height) {
     this.svg.setAttribute('height', height);
     this.svg.setAttribute('x', left);
     this.svg.setAttribute('y', top);
+
+    // resize the txts located at 4 corners
+    d3.select(this.svg)
+        .selectAll('text')
+        .attr('x', function(d, i) { return (i < 2) ? 4 : width - 4; })
+        .attr('y', function(d, i) { return (i % 2 == 0) ? 4 : height - 4; })
+        .each(function(d, i) {
+          d3.select(this).selectAll('tspan').attr(
+              'x', function(datum, j) { return (i < 2) ? 4 : width - 4; })
+        });
 }
 
 Cell.prototype.mouseDown = function(event) {
@@ -211,7 +221,7 @@ Cell.prototype.prepare = function() {
         // add texts at four corners
         var width = this.canvas.width;
         var height = this.canvas.height;
-        d3.select('#' + this.svg.id)
+        d3.select(this.svg)
             .selectAll('text')
             .data(["LT", "LB", "RT", "RB"])
             .enter()

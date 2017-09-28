@@ -259,6 +259,9 @@ var revcBEReady = false;
     }
 
     function prepare() {
+        // disable the annoying context menu triggered by the right button
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        
         // Create cell object
         var cellContainer = document.getElementById('cell-container');
         cellCanvases = [

@@ -24,6 +24,8 @@
   OPERATION_ID_RESIZE = 310006;
   OPERATION_ID_ANNOTATION = 310007;
 
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  
   // init
   cellCanvas = [
     document.getElementById('canvas0'), document.getElementById('canvas1'),
