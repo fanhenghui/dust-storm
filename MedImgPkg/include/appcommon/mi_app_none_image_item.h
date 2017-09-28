@@ -14,7 +14,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 enum NoneImageType {
-    InvalidTyoe = -1,
+    InvalidType = -1,
     CornerInfos = 0,
     WindowLevel = 1,
     MPRPage = 2,
@@ -25,7 +25,7 @@ class MsgNoneImgCollection;
 class SceneBase;
 class INoneImg {
 public:
-    INoneImg(const NoneImageType& type):_type(InvalidTyoe) {};
+    INoneImg( NoneImageType type):_type(type) {};
     virtual ~INoneImg() {};
 
     virtual void fill_msg(MsgNoneImgCollection* msg) const = 0;

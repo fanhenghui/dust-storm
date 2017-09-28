@@ -238,6 +238,12 @@ int OpInit::execute() {
                 std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
                 noneimg_infos->set_scene(mpr_scene);
                 none_image->add_none_image_item(noneimg_infos);
+                std::shared_ptr<NoneImgAnnotations> noneimg_annotations(new NoneImgAnnotations());
+                noneimg_annotations->set_scene(mpr_scene);
+                std::shared_ptr<IModel> model_ =  controller->get_model(MODEL_ID_ANNOTATION);
+                std::shared_ptr<ModelAnnotation> model = std::dynamic_pointer_cast<ModelAnnotation>(model_);
+                noneimg_annotations->set_model(model);
+                none_image->add_none_image_item(noneimg_annotations);
                 mpr_none_images.push_back(none_image);
 
             } else if (type_id == 2) {  // VR
@@ -379,6 +385,12 @@ int OpInit::execute() {
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(mpr_scene);
             none_image->add_none_image_item(noneimg_infos);
+            std::shared_ptr<NoneImgAnnotations> noneimg_annotations(new NoneImgAnnotations());
+            noneimg_annotations->set_scene(mpr_scene);
+            std::shared_ptr<IModel> model_ =  controller->get_model(MODEL_ID_ANNOTATION);
+            std::shared_ptr<ModelAnnotation> model = std::dynamic_pointer_cast<ModelAnnotation>(model_);
+            noneimg_annotations->set_model(model);
+            none_image->add_none_image_item(noneimg_annotations);
             mpr_none_images.push_back(none_image);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));

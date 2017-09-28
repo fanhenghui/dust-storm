@@ -59,12 +59,12 @@ bool  NoneImgAnnotations::check_dirty() {
 
     if (_pre_width == width && _pre_height == height 
         && *ortho_camera == _pre_camera && _pre_vois == vois) {
+        return false;
+    } else {
         _pre_width = width;
         _pre_height = height;
         _pre_camera = *ortho_camera;
         _pre_vois = vois;
-        return false;
-    } else {
         return true;
     }
 }
