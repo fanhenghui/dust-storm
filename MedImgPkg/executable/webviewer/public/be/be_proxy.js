@@ -190,23 +190,23 @@ module.exports = {
                 console.log('app path : ' + review_server_path);
 
                 /// run process
-                // var worker = childProcess.spawn(review_server_path, ['/tmp/app.' + obj.username], {
-                //     detached: true
-                // });
-                // onlineLogicProcess[obj.userid] = worker;
+                var worker = childProcess.spawn(review_server_path, ['/tmp/app.' + obj.username], {
+                    detached: true
+                });
+                onlineLogicProcess[obj.userid] = worker;
 
-                // //// std ouput to server device
-                // worker.stdout.on('data', (data) => {
-                //     console.log(`stdout: ${data}`);
-                // });
-                // worker.stderr.on('data', (data) => {
-                //     console.log(`stderr: ${data}`);
-                // });
+                //// std ouput to server device
+                worker.stdout.on('data', (data) => {
+                    console.log(`stdout: ${data}`);
+                });
+                worker.stderr.on('data', (data) => {
+                    console.log(`stderr: ${data}`);
+                });
 
-                // worker.on('close', (code) => {
-                //     console.log('child process exited with code: ' + code);
-                //     //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
-                // });
+                worker.on('close', (code) => {
+                    console.log('child process exited with code: ' + code);
+                    //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
+                });
                 console.log('<><><><><><> login in success <><><><><><>');
             });
         });
