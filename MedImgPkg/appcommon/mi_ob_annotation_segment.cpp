@@ -95,8 +95,10 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
         //Update mpr/vr (visible labels and LUT)
         for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
+            std::vector<unsigned char> vis_labels = (*it)->get_visible_labels();
+            vis_labels.push_back(label_added);
             (*it)->set_mask_overlay_color(RGBAUnit(255.0f,0.0f,0.0f) , label_added);
-            (*it)->set_visible_labels(labels);
+            (*it)->set_visible_labels(vis_labels);
         }
         if(!_vr_scenes.empty()) {
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_nodule.xml";
@@ -109,12 +111,13 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
                 MI_APPCOMMON_LOG(MI_ERROR) << "load lut: " << color_opacity_xml << " failed.";
             } else {
                 for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
-                    for (auto itlabel = labels.begin(); itlabel != labels.end(); ++itlabel) {
-                        (*it)->set_color_opacity(color, opacity, *itlabel);
-                        (*it)->set_material(material, *itlabel);
-                        (*it)->set_window_level(ww, wl, *itlabel);
-                    }
-                    (*it)->set_visible_labels(labels);
+                    (*it)->set_color_opacity(color, opacity, label_added);
+                    (*it)->set_material(material, label_added);
+                    (*it)->set_window_level(ww, wl, label_added);
+
+                    std::vector<unsigned char> vis_labels = (*it)->get_visible_labels();
+                    vis_labels.push_back(label_added);
+                    (*it)->set_visible_labels(vis_labels);
                 }
             }
         }

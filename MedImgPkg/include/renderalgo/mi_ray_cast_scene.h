@@ -47,6 +47,7 @@ public:
 
     // Label parameter
     virtual void set_visible_labels(std::vector<unsigned char> labels);
+    std::vector<unsigned char> get_visible_labels() const;
 
     // Window level parameter ( unregulated)
     // EG: CT modality , the unit is HU

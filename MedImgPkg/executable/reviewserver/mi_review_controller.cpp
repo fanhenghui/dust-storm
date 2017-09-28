@@ -38,7 +38,7 @@ void ReviewController::initialize() {
     // register command handler and operation
     register_command_handler_i();
     // create model&observer
-    
+    create_model_i();
 }
 
 void ReviewController::register_command_handler_i() {
@@ -94,7 +94,7 @@ void ReviewController::register_command_handler_i() {
 
 void ReviewController::create_model_i() {
     std::shared_ptr<ModelAnnotation> annotation(new ModelAnnotation());
-    this->add_model(MI_MODEL_ID_ANNOTATION , annotation);
+    this->add_model(MODEL_ID_ANNOTATION , annotation);
 }
 
 

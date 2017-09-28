@@ -10,7 +10,6 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class ModelAnnotation;
 class ReviewController : public AppController {
 public:
     ReviewController();

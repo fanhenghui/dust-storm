@@ -53,8 +53,16 @@ bool  NoneImgAnnotations::check_dirty() {
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
     const std::vector<VOISphere>& vois = model->get_annotations();
 
+    if(_pre_vois.empty() && vois.empty()) {
+        return false;
+    }
+
     if (_pre_width == width && _pre_height == height 
         && *ortho_camera == _pre_camera && _pre_vois == vois) {
+        _pre_width = width;
+        _pre_height = height;
+        _pre_camera = *ortho_camera;
+        _pre_vois = vois;
         return false;
     } else {
         return true;
@@ -78,8 +86,8 @@ void  NoneImgAnnotations::update() {
         unit.id = (int)i;
         unit.status = 0;
         unit.visibility = false;
-        unit.para0 = 0;
-        unit.para1 = 0;
+        unit.para0 = -1;
+        unit.para1 = -1;
         unit.para2 = 0;
         Circle circle;
         if( AnnotationCalculator::patient_sphere_to_dc_circle(vois[i], camera_cal, mpr_scene, circle) ) {
@@ -88,6 +96,7 @@ void  NoneImgAnnotations::update() {
             unit.para1 = circle._center.y;
             unit.para2 = circle._radius;
         }
+        this->add_annotation(unit);
     }
 }
 

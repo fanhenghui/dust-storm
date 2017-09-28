@@ -60,7 +60,7 @@ int OpAnnotation::execute() {
         return -1;
     }
 
-    std::shared_ptr<IModel> model_i = controller->get_model(MI_MODEL_ID_ANNOTATION);
+    std::shared_ptr<IModel> model_i = controller->get_model(MODEL_ID_ANNOTATION);
     if (!model_i) {
         MI_APPCOMMON_LOG(MI_ERROR) << "annotation null.";
         return -1;

@@ -78,8 +78,8 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         //decode the byte array with protobuffer
         var noneImgBufView = new Uint8Array(noneImgBuf);
         var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
-        if (receivedMsg.cornerInfos) // contains the 2nd optional array
-        {
+        if (receivedMsg.cornerInfos) {
+            // contains the 2nd optional array
             var txt = receivedMsg.cornerInfos.infos;
             var corners = txt.split('\n');
 
@@ -109,6 +109,8 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     });
                 tspans.exit().remove();
             }
+        } else if (receivedMsg.annotations) {
+            
         }
     }
 }

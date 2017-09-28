@@ -139,8 +139,7 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
         _mask_brick_info_array_set.insert(std::make_pair(key, std::move(info_array)));
 
         UIDType uid;
-        GLBufferPtr info_buffer =
-            GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+        GLBufferPtr info_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
         info_buffer->set_description("mask brick info buffer " + key.key);
         info_buffer->initialize();
         info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);

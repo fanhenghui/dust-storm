@@ -319,6 +319,65 @@ var revcBEReady = false;
         } else {
             console.log('get btn-play-vr node failed.');
         }
+
+        //TODO Test Code
+        document.getElementById('btn-test-add').onclick = function() {     
+            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+            var msgAnnoUnit = MsgAnnotationUnit.create();
+            msgAnnoUnit.type = 0;
+            msgAnnoUnit.id = 0;
+            msgAnnoUnit.status = 0;
+            msgAnnoUnit.visibility = true;
+            msgAnnoUnit.para0 = cellCanvases[0].width/2;
+            msgAnnoUnit.para1 = cellCanvases[0].height/2;
+            msgAnnoUnit.para2 = 1;
+            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+            alert('add');
+        };
+        document.getElementById('btn-test-modifying').onclick = function() {
+            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+            var msgAnnoUnit = MsgAnnotationUnit.create();
+            msgAnnoUnit.type = 0;
+            msgAnnoUnit.id = 0;
+            msgAnnoUnit.status = 2;
+            msgAnnoUnit.visibility = true;
+            msgAnnoUnit.para0 = cellCanvases[0].width/2;
+            msgAnnoUnit.para1 = cellCanvases[0].height/2;
+            msgAnnoUnit.para2 = 20;
+            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+            alert('modifying');
+        };
+        document.getElementById('btn-test-modifycompleted').onclick = function() {
+            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+            var msgAnnoUnit = MsgAnnotationUnit.create();
+            msgAnnoUnit.type = 0;
+            msgAnnoUnit.id = 0;
+            msgAnnoUnit.status = 3;
+            msgAnnoUnit.visibility = true;
+            msgAnnoUnit.para0 = cellCanvases[0].width/2;
+            msgAnnoUnit.para1 = cellCanvases[0].height/2;
+            msgAnnoUnit.para2 = 20;
+            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+            alert('modify completed');
+        };
+        document.getElementById('btn-test-delete').onclick = function() {
+            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+            var msgAnnoUnit = MsgAnnotationUnit.create();
+            msgAnnoUnit.type = 0;
+            msgAnnoUnit.id = 0;
+            msgAnnoUnit.status = 1;
+            msgAnnoUnit.visibility = true;
+            msgAnnoUnit.para0 = cellCanvases[0].width/2;
+            msgAnnoUnit.para1 = cellCanvases[0].height/2;
+            msgAnnoUnit.para2 = 20;
+            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+            
+            alert('delete');
+        };
         
         // register window quit linsener
         window.onbeforeunload = function(event) {

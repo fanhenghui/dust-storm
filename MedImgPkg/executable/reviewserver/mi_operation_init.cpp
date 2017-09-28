@@ -30,6 +30,11 @@
 #include "appcommon/mi_app_database.h"
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_none_image.h"
+#include "appcommon/mi_model_annotation.h"
+#include "appcommon/mi_ob_annotation_none_image.h"
+#include "appcommon/mi_ob_annotation_segment.h"
+#include "appcommon/mi_ob_annotation_statistic.h"
+#include "appcommon/mi_app_common_define.h"
 
 #include "mi_review_config.h"
 #include "mi_review_logger.h"
@@ -96,6 +101,27 @@ int OpInit::execute() {
     std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos());
     volume_infos->set_data_header(data_header);
     volume_infos->set_volume(img_data); // load volume texture if has graphic card
+
+
+    //model&observer
+    std::shared_ptr<IModel> anno_model_ = controller->get_model(MODEL_ID_ANNOTATION);
+    std::shared_ptr<ModelAnnotation> anno_model = std::dynamic_pointer_cast<ModelAnnotation>(anno_model_);
+    REVIEW_CHECK_NULL_EXCEPTION(anno_model);
+    std::shared_ptr<OBAnnotationSegment> ob_annotation_segment(new OBAnnotationSegment());
+    ob_annotation_segment->set_model(anno_model);
+    ob_annotation_segment->set_volume_infos(volume_infos);
+    // std::shared_ptr<OBAnnotationStatistic> ob_annotation_statistic(new OBAnnotationStatistic());
+    // ob_annotation_statistic->set_model(anno_model);
+    std::shared_ptr<OBAnnotationNoneImg> ob_annotation_noneimg(new OBAnnotationNoneImg());
+    ob_annotation_noneimg->set_model(anno_model);
+
+    anno_model->add_observer(ob_annotation_segment);
+    //anno_model->add_observer(ob_annotation_statistic);
+    anno_model->add_observer(ob_annotation_noneimg);
+
+    std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
+    std::vector<std::shared_ptr<VRScene>> vr_scenes;
+    std::vector<std::shared_ptr<AppNoneImage>> mpr_none_images;
 
     //TODO hard coding for demo
     if (series_uid == "1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405") {
@@ -166,6 +192,7 @@ int OpInit::execute() {
             cell->set_none_image(none_image);
             if (type_id == 1) { // MPR
                 std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+                mpr_scenes.push_back(mpr_scene);
                 cell->set_scene(mpr_scene);
                 mpr_scene->set_test_code(0); {
                     std::stringstream ss;
@@ -211,9 +238,11 @@ int OpInit::execute() {
                 std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
                 noneimg_infos->set_scene(mpr_scene);
                 none_image->add_none_image_item(noneimg_infos);
+                mpr_none_images.push_back(none_image);
 
             } else if (type_id == 2) {  // VR
                 std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+                vr_scenes.push_back(vr_scene);
                 cell->set_scene(vr_scene);
                 vr_scene->set_test_code(0);
                 {
@@ -229,7 +258,7 @@ int OpInit::execute() {
                 vr_scene->set_mask_mode(MASK_MULTI_LABEL);
                 vr_scene->set_interpolation_mode(LINEAR);
                 vr_scene->set_shading_mode(SHADING_PHONG);
-                vr_scene->set_proxy_geometry(PG_BRICKS);
+                vr_scene->set_proxy_geometry(PG_CUBE);
 
                 // load color opacity
                 std::string color_opacity_xml =
@@ -282,6 +311,10 @@ int OpInit::execute() {
                 REVIEW_THROW_EXCEPTION("invalid cell type id!");
             }
             controller->add_cell(cell_id, cell);
+
+            ob_annotation_noneimg->set_mpr_none_image(mpr_none_images);
+            ob_annotation_segment->set_vr_scenes(vr_scenes);
+            ob_annotation_segment->set_mpr_scenes(mpr_scenes);
         }
 
         return 0;
@@ -314,6 +347,7 @@ int OpInit::execute() {
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+            mpr_scenes.push_back(mpr_scene);
             cell->set_scene(mpr_scene);
             mpr_scene->set_test_code(0);
             {
@@ -345,8 +379,10 @@ int OpInit::execute() {
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(mpr_scene);
             none_image->add_none_image_item(noneimg_infos);
+            mpr_none_images.push_back(none_image);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+            vr_scenes.push_back(vr_scene);
             cell->set_scene(vr_scene);
             vr_scene->set_test_code(0);
             {
@@ -362,10 +398,10 @@ int OpInit::execute() {
             vr_scene->set_mask_mode(MASK_NONE);
             vr_scene->set_interpolation_mode(LINEAR);
             vr_scene->set_shading_mode(SHADING_PHONG);
-            vr_scene->set_proxy_geometry(PG_BRICKS);
+            vr_scene->set_proxy_geometry(PG_CUBE);
 
             // load color opacity
-            const std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
+            const std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
             std::shared_ptr<ColorTransFunc> color;
             std::shared_ptr<OpacityTransFunc> opacity;
             float ww, wl;
@@ -393,7 +429,15 @@ int OpInit::execute() {
             REVIEW_THROW_EXCEPTION("invalid cell type id!");
         }
         controller->add_cell(cell_id, cell);
+
+        ob_annotation_noneimg->set_mpr_none_image(mpr_none_images);
+        ob_annotation_segment->set_vr_scenes(vr_scenes);
+        ob_annotation_segment->set_mpr_scenes(mpr_scenes);
+
     }
+
+
+    
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation.";
     return 0;

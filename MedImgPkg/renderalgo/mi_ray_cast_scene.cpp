@@ -350,6 +350,10 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
     }
 }
 
+std::vector<unsigned char> RayCastScene::get_visible_labels() const {
+    return _ray_caster->get_visible_labels();
+}
+
 void RayCastScene::set_window_level(float ww, float wl, unsigned char label) {
     RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
     auto it = _window_levels.find(label);

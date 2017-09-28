@@ -47,8 +47,7 @@ public:
 
     void calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels);
     void update_mask_brick_info(const AABBUI& aabb);
-    MaskBrickInfo*
-    get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const;
+    MaskBrickInfo* get_mask_brick_info(const std::vector<unsigned char>& vis_labels) const;
     void write_mask_brick_info(const std::string& path,
                                const std::vector<unsigned char>& visible_labels);
 
