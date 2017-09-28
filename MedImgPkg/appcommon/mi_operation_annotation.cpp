@@ -109,6 +109,7 @@ int OpAnnotation::execute() {
             return 0;
         }
     } else if (ModelAnnotation::MODIFY_COMPLETED == anno_status) {
+        model->set_changed();
         model->notify(ModelAnnotation::MODIFY_COMPLETED);
     }
 

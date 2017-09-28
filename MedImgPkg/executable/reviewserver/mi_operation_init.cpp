@@ -258,7 +258,7 @@ int OpInit::execute() {
                 vr_scene->set_mask_mode(MASK_MULTI_LABEL);
                 vr_scene->set_interpolation_mode(LINEAR);
                 vr_scene->set_shading_mode(SHADING_PHONG);
-                vr_scene->set_proxy_geometry(PG_CUBE);
+                vr_scene->set_proxy_geometry(PG_BRICKS);
 
                 // load color opacity
                 std::string color_opacity_xml =
@@ -398,7 +398,7 @@ int OpInit::execute() {
             vr_scene->set_mask_mode(MASK_NONE);
             vr_scene->set_interpolation_mode(LINEAR);
             vr_scene->set_shading_mode(SHADING_PHONG);
-            vr_scene->set_proxy_geometry(PG_CUBE);
+            vr_scene->set_proxy_geometry(PG_BRICKS);
 
             // load color opacity
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
@@ -435,9 +435,6 @@ int OpInit::execute() {
         ob_annotation_segment->set_mpr_scenes(mpr_scenes);
 
     }
-
-
-    
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation.";
     return 0;

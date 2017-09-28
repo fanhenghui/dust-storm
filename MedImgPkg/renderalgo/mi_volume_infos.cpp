@@ -234,15 +234,22 @@ void VolumeInfos::refresh_update_mask_i() {
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
 
-        refresh_mask_brick_info_i();
+        refresh_stored_mask_brick_info_i();
     }
 }
 
-void VolumeInfos::refresh_mask_brick_info_i()
-{
+void VolumeInfos::refresh_cache_mask_brick_info_i() {
     std::vector<std::vector<unsigned char>> vis_labels;
     _brick_pool->get_visible_labels_cache(vis_labels);
     for (auto it = vis_labels.begin(); it != vis_labels.end(); ++it) {
+        _brick_pool->calculate_mask_brick_info(*it);
+    }
+    _brick_pool->clear_visible_labels_cache();
+}
+
+void VolumeInfos::refresh_stored_mask_brick_info_i() {
+    std::vector<std::vector<unsigned char>> stored_labels = _brick_pool->get_stored_visible_labels();
+    for (auto it = stored_labels.begin(); it != stored_labels.end(); ++it) {
         _brick_pool->calculate_mask_brick_info(*it);
     }
 }
@@ -264,7 +271,7 @@ void VolumeInfos::refresh_upload_mask_i() {
     tex->unbind();
     CHECK_GL_ERROR;
 
-    refresh_mask_brick_info_i();
+    refresh_stored_mask_brick_info_i();
 
     _mask_dirty = false;
 }
@@ -339,6 +346,8 @@ void VolumeInfos::refresh() {
     refresh_upload_mask_i();
 
     refresh_update_mask_i();
+
+    refresh_cache_mask_brick_info_i();
 }
 
 MED_IMG_END_NAMESPACE

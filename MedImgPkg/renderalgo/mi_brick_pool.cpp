@@ -115,17 +115,23 @@ void BrickPool::add_visible_labels_cache(const std::vector<unsigned char>& vis_l
     _vis_labels_cache[LabelKey(vis_labels)] = (vis_labels);
 }
 
-void BrickPool::get_visible_labels_cache(std::vector<std::vector<unsigned char>>& vis_labels)
-{
+void BrickPool::get_visible_labels_cache(std::vector<std::vector<unsigned char>>& vis_labels) {
     vis_labels.clear();
     for (auto it = _vis_labels_cache.begin(); it != _vis_labels_cache.end(); ++it) {
         vis_labels.push_back(it->second);
     }
 }
 
-void BrickPool::clear_visible_labels_cache()
-{
+void BrickPool::clear_visible_labels_cache() {
     _vis_labels_cache.clear();
+}
+
+std::vector<std::vector<unsigned char>> BrickPool::get_stored_visible_labels() {
+    std::vector<std::vector<unsigned char>> stored_labels;
+    for (auto it = _mask_brick_info_array_set.begin(); it != _mask_brick_info_array_set.end(); ++it) {
+        stored_labels.push_back(LabelKey::extract_labels(it->first));
+    }
+    return stored_labels;
 }
 
 void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels) {

@@ -110,7 +110,7 @@ bool AnnotationCalculator::dc_circle_update_to_patient_sphere(
     const Matrix4 mat_p2w = camera_cal->get_patient_to_world_matrix();
 
     VOISphere pre_voi = voi;
-    //1 update ceneter
+    //1 update ceneter(circle center may not be sphere center)
     //Calculate current circle center world
     Point2 cur_circle_center_ndc = ArithmeticUtils::dc_to_ndc(circle._center, width, height);
     Point3 cur_circle_center = mat_vp_inv.transform( Point3(cur_circle_center_ndc.x, cur_circle_center_ndc.y , 0.0));
@@ -125,24 +125,19 @@ bool AnnotationCalculator::dc_circle_update_to_patient_sphere(
     Point3 new_center = pre_voi.center + translate;
     voi.center = new_center;
 
-    //2 update radius
-    const double diameter = pre_voi.diameter;
-    const double distance = norm.dot_product(look_at - sphere_center);
-    Point3 pt0 = sphere_center + distance*norm;
-    const double radius = sqrt(diameter*diameter*0.25 - distance*distance);
-    Point3 pt1 = pt0 + radius*up;
-    pt0 = mat_vp.transform(pt0);
-    pt1 = mat_vp.transform(pt1);
-    const Point2 pt_dc0 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt0.x , pt0.y) , width , height);
-    const Point2 pt_dc1 = ArithmeticUtils::ndc_to_dc_decimal(Point2(pt1.x , pt1.y) , width , height);
-    const double pre_radius = (pt_dc1 - pt_dc0).magnitude();
-
-    //Get current circle radius
-    const double cur_radius = circle._radius;
-    const double radio = fabs(cur_radius / pre_radius);
-    double new_radius = pre_voi.diameter*radio;
-    voi.diameter = new_radius;
-
+    //2 calculate dameter
+    Point2 cur_circle_edge_ndc = ArithmeticUtils::dc_to_ndc(circle._center + Vector2(circle._radius, 0), width, height);
+    Point3 cur_circle_edge = mat_vp_inv.transform( Point3(cur_circle_edge_ndc.x, cur_circle_edge_ndc.y , 0.0));
+    double circle_radius = (cur_circle_edge - cur_circle_center).magnitude();
+    double diameter = 0;
+    sphere_center = mat_p2w.transform(voi.center);
+    if(cur_circle_center == sphere_center) {
+        diameter = circle_radius*2;
+    } else {
+        double distance = (cur_circle_center - sphere_center).magnitude();
+        diameter = sqrt(circle_radius*circle_radius + distance*distance);
+    }
+    voi.diameter = diameter;
     return true;
 }
 

@@ -44,6 +44,7 @@ public:
     void add_visible_labels_cache(const std::vector<unsigned char>& vis_labels);
     void get_visible_labels_cache(std::vector<std::vector<unsigned char>>& vis_labels);
     void clear_visible_labels_cache();
+    std::vector<std::vector<unsigned char>> get_stored_visible_labels();
 
     void calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels);
     void update_mask_brick_info(const AABBUI& aabb);
