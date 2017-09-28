@@ -244,7 +244,7 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
             sphere_center = mat_p2w.transform(it->center);
             diameter = it->diameter;
             double distance = norm.dot_product(look_at - sphere_center);
-            if (abs(distance) < diameter*0.5)
+            if (fabs(distance) < diameter*0.5)
             {
                 Point3 pt0 = sphere_center + distance*norm;
                 double radius = sqrt(diameter*diameter*0.25 - distance*distance);

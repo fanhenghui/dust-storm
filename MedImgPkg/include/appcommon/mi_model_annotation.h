@@ -1,14 +1,14 @@
-#ifndef MED_IMG_REVIEWSERVER_MI_MODEL_ANNOTATION_H
-#define MED_IMG_REVIEWSERVER_MI_MODEL_ANNOTATION_H
+#ifndef MED_IMG_APPCOMMON_MI_MODEL_ANNOTATION_H
+#define MED_IMG_APPCOMMON_MI_MODEL_ANNOTATION_H
 
-#include "mi_review_common.h"
+#include "appcommon/mi_app_common_export.h"
 #include "util/mi_model_interface.h"
 #include "io/mi_voi.h"
 #include "arithmetic/mi_volume_statistician.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class ModelAnnotation : public IModel {
+class AppCommon_Export ModelAnnotation : public IModel {
 public:
     enum CodeID
     {
@@ -50,6 +50,9 @@ public:
     bool get_annotation_visibility() const;
     void set_annotation_visibility(bool flag);
 
+    void notify_cache(int process_annotation_id);
+    int get_notify_cache() const;
+
 protected:
 
 private:
@@ -57,6 +60,8 @@ private:
     std::vector<unsigned char>   _labels;
     std::vector<IntensityInfo>   _intensity_infos;
     bool _visibility;
+
+    int _notify_cache;
 };
 
 MED_IMG_END_NAMESPACE

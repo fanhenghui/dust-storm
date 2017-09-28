@@ -7,8 +7,9 @@
 #include <memory>
 #include "appcommon/mi_app_common_export.h"
 
-MED_IMG_BEGIN_NAMESPACE
 
+MED_IMG_BEGIN_NAMESPACE
+class SceneBase;
 class INoneImg {
 public:
     INoneImg(const std::string& type):_type(type) {};
@@ -21,22 +22,29 @@ public:
 
     void set_name(const std::string& name) {
         _name = name;
-    };/*  */
+    };
     std::string get_name() const {
         return _name;
     };
 
+    void set_scene(std::shared_ptr<SceneBase> scene) {_scene = scene;};
+
 private:
     std::string _type;
     std::string _name;
+
+protected:
+    std::shared_ptr<SceneBase> _scene;
 };
 
+class ModelAnnotataion;
 class NoneImgAnnotations : public INoneImg {
 public:
     struct AnnotationUnit {
         int type;
         int id;
         int status;
+        int visibility;
         float para0;//center x
         float para1;//center y
         float para2;//radius
@@ -51,8 +59,11 @@ public:
     void set_annotations(const std::vector<AnnotationUnit> circles);
     const std::vector<AnnotationUnit>& get_annotations() const;
 
+    void set_model(std::shared_ptr<ModelAnnotataion> model) {_model = model;};
+
 private:
     std::vector<AnnotationUnit> _annotations;
+    std::shared_ptr<ModelAnnotataion> _model;
 };
 
 // LT|1:patientName|2:patientID\n
@@ -89,7 +100,6 @@ public:
 private:
     std::shared_ptr<NoneImgAnnotations> _annotations;
     std::shared_ptr<NoneImgCornerInfos> _corner_infos;
-    
 };
 
 

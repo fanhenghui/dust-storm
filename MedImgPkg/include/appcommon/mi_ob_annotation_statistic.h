@@ -1,15 +1,15 @@
-#ifndef MED_IMG_REVIEW_MI_OB_ANNOTATION_STATISTIC_H
-#define MED_IMG_REVIEW_MI_OB_ANNOTATION_STATISTIC_H
+#ifndef MED_IMG_APPCOMMON_MI_OB_ANNOTATION_STATISTIC_H
+#define MED_IMG_APPCOMMON_MI_OB_ANNOTATION_STATISTIC_H
 
 #include <memory>
-#include "mi_review_common.h"
+#include "appcommon/mi_app_common_export.h"
 #include "util/mi_observer_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 class ModelAnnotation;
 class VolumeInfos;
-class OBAnnotationStatistic : public IObserver
+class AppCommon_Export OBAnnotationStatistic : public IObserver
 {
 public:
     OBAnnotationStatistic();

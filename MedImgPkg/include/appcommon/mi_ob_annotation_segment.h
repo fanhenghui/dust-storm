@@ -1,10 +1,10 @@
-#ifndef MED_IMG_REVIEW_MI_OB_ANNOTATION_SEGMENTATION_H
-#define MED_IMG_REVIEW_MI_OB_ANNOTATION_SEGMENTATION_H
+#ifndef MED_IMG_APPCOMMON_MI_OB_ANNOTATION_SEGMENTATION_H
+#define MED_IMG_APPCOMMON_MI_OB_ANNOTATION_SEGMENTATION_H
 
 #include <vector>
 #include <map>
 #include <memory>
-#include "mi_review_common.h"
+#include "appcommon/mi_app_common_export.h"
 #include "util/mi_observer_interface.h"
 #include "arithmetic/mi_ellipsoid.h"
 #include "arithmetic/mi_aabb.h"
@@ -16,7 +16,7 @@ class ModelAnnotation;
 class VolumeInfos;
 class MPRScene;
 class VRScene;
-class OBAnnotationSegment : public IObserver {
+class AppCommon_Export OBAnnotationSegment : public IObserver {
 public:
     OBAnnotationSegment();
     virtual ~OBAnnotationSegment();

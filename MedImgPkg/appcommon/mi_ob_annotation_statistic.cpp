@@ -38,19 +38,19 @@ void OBAnnotationStatistic::update(int code_id)
         return;
     }
 
-    REVIEW_CHECK_NULL_EXCEPTION(_volume_infos);
+    APPCOMMON_CHECK_NULL_EXCEPTION(_volume_infos);
 
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
-    REVIEW_CHECK_NULL_EXCEPTION(volume_data);
+    APPCOMMON_CHECK_NULL_EXCEPTION(volume_data);
 
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
-    REVIEW_CHECK_NULL_EXCEPTION(mask_data);
+    APPCOMMON_CHECK_NULL_EXCEPTION(mask_data);
 
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
-    REVIEW_CHECK_NULL_EXCEPTION(camera_cal);
+    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
 
     std::shared_ptr<ModelAnnotation> model = _model.lock();
-    REVIEW_CHECK_NULL_EXCEPTION(model);
+    APPCOMMON_CHECK_NULL_EXCEPTION(model);
 
     const Matrix4& mat_p2w = camera_cal->get_patient_to_world_matrix();
     const Matrix4& mat_w2v = camera_cal->get_world_to_volume_matrix();
@@ -108,7 +108,7 @@ void OBAnnotationStatistic::update(int code_id)
             }
         default:
             {
-                REVIEW_THROW_EXCEPTION("unsupported data type!");
+                APPCOMMON_THROW_EXCEPTION("unsupported data type!");
             }
         }
 

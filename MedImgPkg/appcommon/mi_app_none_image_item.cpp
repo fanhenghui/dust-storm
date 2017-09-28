@@ -22,6 +22,7 @@ char* NoneImgAnnotations::serialize_to_array(int &bytelength) {
         unit->set_type(_annotations[i].type);
         unit->set_id(_annotations[i].id);
         unit->set_status(_annotations[i].status);
+        unit->set_visibility(_annotations[i].visibility);
         unit->set_para0(_annotations[i].para0);
         unit->set_para1(_annotations[i].para1);
         unit->set_para2(_annotations[i].para2);
@@ -125,6 +126,7 @@ char* NoneImgCollection::serialize_to_array(int &bytelength) {
             unit->set_type(annotations[i].type);
             unit->set_id(annotations[i].id);
             unit->set_status(annotations[i].status);
+            unit->set_visibility(annotations[i].visibility);
             unit->set_para0(annotations[i].para0);
             unit->set_para1(annotations[i].para1);
             unit->set_para2(annotations[i].para2);

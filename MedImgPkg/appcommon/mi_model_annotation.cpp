@@ -1,9 +1,9 @@
 #include "mi_model_annotation.h"
-#include "mi_review_logger.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-ModelAnnotation::ModelAnnotation() :_visibility(true) {}
+ModelAnnotation::ModelAnnotation() :_visibility(true), _notify_cache(-1) {}
 
 ModelAnnotation::~ModelAnnotation() {}
 
@@ -58,8 +58,8 @@ VOISphere ModelAnnotation::get_annotation(int id) const {
     if (id < _annotations.size()) {
         return _annotations[id];
     } else {
-        MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
-        REVIEW_THROW_EXCEPTION("get annotation failed!");
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
+        APPCOMMON_THROW_EXCEPTION("get annotation failed!");
     }
 }
 
@@ -67,8 +67,8 @@ unsigned char ModelAnnotation::get_label(int id) const {
     if (id < _labels.size()) {
         return _labels[id];
     } else {
-        MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
-        REVIEW_THROW_EXCEPTION("get annotation label failed!");
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
+        APPCOMMON_THROW_EXCEPTION("get annotation label failed!");
     }
 }
 
@@ -89,7 +89,7 @@ void ModelAnnotation::modify_diameter(int id, double diameter) {
     _annotations[id].diameter = diameter;
     set_changed();
   } else {
-      MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
+      MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
   }
 }
 
@@ -98,7 +98,7 @@ void ModelAnnotation::modify_center(int id, const Point3 &center) {
         _annotations[id].center = center;
         set_changed();
     } else {
-        MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
     }
 }
 
@@ -106,7 +106,7 @@ void ModelAnnotation::modify_intensity_info(int id, IntensityInfo info) {
     if (id < _intensity_infos.size()) {
         _intensity_infos[id] = info;
     } else {
-        MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
     }
 }
 
@@ -114,8 +114,8 @@ IntensityInfo ModelAnnotation::get_intensity_info(int id) {
     if (id < _intensity_infos.size()) {
         return _intensity_infos[id];
     } else {
-        MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
-        REVIEW_THROW_EXCEPTION("get annotation intensity info failed!");
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
+        APPCOMMON_THROW_EXCEPTION("get annotation intensity info failed!");
     }
 }
 
@@ -141,8 +141,16 @@ VOISphere ModelAnnotation::get_annotation_by_label(unsigned char id) const {
             return _annotations[i];
         }
     }
-    MI_REVIEW_LOG(MI_ERROR) << "invalid annotation id: " << id;
-    REVIEW_THROW_EXCEPTION("get annotation by mask label failed!");
+    MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
+    APPCOMMON_THROW_EXCEPTION("get annotation by mask label failed!");
+}
+
+void ModelAnnotation::notify_cache(int process_annotation_id) {
+    _notify_cache = process_annotation_id;
+}
+
+int ModelAnnotation::get_notify_cache() const {
+    return _notify_cache;
 }
 
 MED_IMG_END_NAMESPACE

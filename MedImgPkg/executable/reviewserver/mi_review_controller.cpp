@@ -19,12 +19,11 @@
 #include "appcommon/mi_operation_rotate.h"
 #include "appcommon/mi_operation_windowing.h"
 #include "appcommon/mi_operation_zoom.h"
+#include "appcommon/mi_operation_annotation.h"
+#include "appcommon/mi_model_annotation.h"
 
 #include "mi_cmd_handler_search_worklist.h"
 #include "mi_operation_init.h"
-#include "mi_operation_annotation.h"
-#include "mi_model_annotation.h"
-
 
 MED_IMG_BEGIN_NAMESPACE
 

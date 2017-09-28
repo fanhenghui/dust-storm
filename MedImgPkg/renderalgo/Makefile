@@ -27,7 +27,8 @@ mi_entry_exit_points.o mi_mpr_entry_exit_points.o mi_vr_entry_exit_points.o mi_v
 mi_ray_caster_canvas.o mi_ray_caster_inner_buffer.o mi_ray_caster.o mi_ray_casting_cpu.o mi_ray_casting_gpu.o \
 mi_rc_step_color_inverse.o mi_rc_step_composite.o mi_rc_step_main.o mi_rc_step_mask_overlay.o \
 mi_rc_step_mask_sampler.o mi_rc_step_ray_casting.o mi_rc_step_shading.o mi_rc_step_utils.o mi_rc_step_volume_sampler.o \
-mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o mi_vr_scene.o
+mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o mi_vr_scene.o \
+mi_annotation_calculator.o
 
 TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
@@ -47,6 +48,9 @@ main-build: $(TARGET)
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_glresource.so $(BIN_DIR)/libmedimg_io.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
+mi_annotation_calculator.o: $(EXPORT_HEADER) mi_annotation_calculator.h mi_annotation_calculator.cpp mi_mpr_scene.o mi_camera_calculator.o
+	$(CC) -c -fPIC $(CFLAGS) mi_annotation_calculator.cpp $(ADDITINAL_INCLUDE_DIR)
+	
 #scene related
 mi_vr_scene.o: $(EXPORT_HEADER) mi_vr_scene.h mi_vr_scene.cpp mi_ray_cast_scene.o \
 mi_color_transfer_function.o mi_opacity_transfer_function.o mi_camera_calculator.o mi_camera_interactor.o mi_volume_infos.o mi_vr_entry_exit_points.o

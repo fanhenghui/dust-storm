@@ -68,11 +68,12 @@ message MsgNoneImgCornerInfos{
 
 message MsgAnnotationUnit{
     required int32 type = 1; //0 for circle ...
-    required int32 id = 2; // indetify of annotation(BE FE AnnotationTable)
+    required int32 id = 2; // annotation table row number
     required int32 status = 3; //0 add; 1 delete; 2 modifying; 3 modify_completed
-    optional float para0 = 4;
-    optional float para1 = 5;
-    optional float para2 = 6;
+    required int32 visibility = 4; // visibility
+    required float para0 = 5; //center x
+    required float para1 = 6; //center y
+    required float para2 = 7; //radius
 };
 
 message MsgNoneImgAnnotations {

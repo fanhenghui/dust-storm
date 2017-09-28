@@ -18,7 +18,7 @@
 #include "renderalgo/mi_mask_label_store.h"
 
 #include "mi_model_annotation.h"
-#include "mi_review_logger.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -47,16 +47,16 @@ void OBAnnotationSegment::set_vr_scenes(std::vector<std::shared_ptr<VRScene>> sc
 }
 
 void OBAnnotationSegment::update(int code_id /*= 0*/) {
-    REVIEW_CHECK_NULL_EXCEPTION(_volume_infos);
+    APPCOMMON_CHECK_NULL_EXCEPTION(_volume_infos);
 
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
-    REVIEW_CHECK_NULL_EXCEPTION(volume_data);
+    APPCOMMON_CHECK_NULL_EXCEPTION(volume_data);
 
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
-    REVIEW_CHECK_NULL_EXCEPTION(camera_cal);
+    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
 
     std::shared_ptr<ModelAnnotation> model = _model.lock();
-    REVIEW_CHECK_NULL_EXCEPTION(model);
+    APPCOMMON_CHECK_NULL_EXCEPTION(model);
     const std::vector<VOISphere>& vois = model->get_annotations();
     const std::vector<unsigned char>& labels = model->get_labels();
 
@@ -83,7 +83,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             _pre_vois = vois;
         } else {
             if (_pre_voi_aabbs.find(label_added) == _pre_voi_aabbs.end()) {
-                MI_REVIEW_LOG(MI_WARNING) << "add a same annotation.";
+                MI_APPCOMMON_LOG(MI_WARNING) << "add a same annotation.";
             }
             Ellipsoid ellipsoid = voi_patient_to_volume(voi_added);
             AABBUI aabb;
@@ -106,7 +106,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             RGBAUnit background;
             Material material;
             if (IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity, ww, wl, background, material)) {
-                MI_REVIEW_LOG(MI_ERROR) << "load lut: " << color_opacity_xml << " failed.";
+                MI_APPCOMMON_LOG(MI_ERROR) << "load lut: " << color_opacity_xml << " failed.";
             } else {
                 for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
                     for (auto itlabel = labels.begin(); itlabel != labels.end(); ++itlabel) {
@@ -143,13 +143,12 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         unsigned char label_deleted = it_deleted->first;
         AABBUI aabb_deleted = it_deleted->second;
         if(label_deleted == 0 ) {
-            MI_REVIEW_LOG(MI_ERROR) << "delete 0 label annotation.";
+            MI_APPCOMMON_LOG(MI_ERROR) << "delete 0 label annotation.";
         } else {
             //Recover mask
             recover_i(aabb_deleted , label_deleted);
             _pre_voi_aabbs.erase(it_deleted);
             _pre_vois = vois;
-            MaskLabelStore::instance()->recycle_label(label_deleted);
         }
     }
 
@@ -162,7 +161,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
     if (ModelAnnotation::MODIFY_COMPLETED == code_id) {
         assert(_pre_vois.size() == vois.size());
         if(_pre_vois.size() != vois.size()) {
-            MI_REVIEW_LOG(MI_ERROR) << "invalid annotation cache.";
+            MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation cache.";
             return;
         }
 
@@ -175,7 +174,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         }
         //Modify none
         if (idx == -1) {
-            MI_REVIEW_LOG(MI_WARNING) << "no annotation item modified.";
+            MI_APPCOMMON_LOG(MI_WARNING) << "no annotation item modified.";
             return;
         }
         const unsigned char label_modify = model->get_label(idx);
@@ -319,7 +318,7 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
             break;
         }
     default:
-        REVIEW_THROW_EXCEPTION("Unsupported data type!");
+        APPCOMMON_THROW_EXCEPTION("Unsupported data type!");
     }
 
     //Update to texture

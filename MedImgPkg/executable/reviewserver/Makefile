@@ -20,9 +20,7 @@ PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-OBJS = mi_review_config.o mi_review_controller.o \
-mi_model_annotation.o mi_ob_annotation_segment.o mi_ob_annotation_statistic.o \
-mi_operation_init.o mi_operation_annotation.o \
+OBJS = mi_review_config.o mi_review_controller.o mi_operation_init.o \
 mi_cmd_handler_search_worklist.o
 
 TARGET = $(BIN_DIR)/review_server
