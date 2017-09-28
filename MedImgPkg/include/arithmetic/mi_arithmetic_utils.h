@@ -19,15 +19,13 @@ public:
     static Vector3f convert_point(const Point3& v);
 
     static Point2 dc_to_ndc(const Point2& pt_dc, int width, int height);
-    static Point2
-    ndc_to_dc(Point2 pt_ndc, int width, int height,
-              int spill_tag); // spill_tag 1 X direction 2 Y direction 0 no spill
+    // spill_tag 1 X direction 2 Y direction 0 no spill
+    static Point2 ndc_to_dc(Point2 pt_ndc, int width, int height, int spill_tag); 
     static Point2 ndc_to_dc(Point2 pt_ndc, int width, int height);
     static Point2 ndc_to_dc_decimal(Point2 pt_ndc, int width, int height);
 
-    static bool
-    check_in_bound(const Point3& pt,
-                   const Point3& bound); // Check pt in [ (0,0,0) , bound ]
+    // Check pt in [ (0,0,0) , bound ]
+    static bool check_in_bound(const Point3& pt, const Point3& bound); 
 
     //0 inside bounding
     //-1 outside bounding
