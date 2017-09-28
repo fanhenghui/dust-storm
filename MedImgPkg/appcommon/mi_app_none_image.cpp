@@ -5,6 +5,8 @@
 #include "renderalgo/mi_mpr_scene.h"
 #include "io/mi_image_data_header.h"
 #include "mi_app_none_image_item.h"
+#include "mi_message.pb.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -17,63 +19,59 @@ AppNoneImage::~AppNoneImage() {
 }
 
 void AppNoneImage::update() {
-    //save wl cache to update
+    for (auto it = _dirty_cache.begin(); it != _dirty_cache.end(); ++it) {
+        _none_image_items[*it]->update();
+    }
 }
 
 char* AppNoneImage::serialize_dirty(int& buffer_size) const {
-    NoneImgCollection msgcoll;
-    if(_fix_corner_infos_dirty) {
-        std::shared_ptr<NoneImgCornerInfos> noneimg_cinfos(new NoneImgCornerInfos());
-        //TODO set corner based on config file
-        APPCOMMON_CHECK_NULL_EXCEPTION(_volume_infos);
-        std::shared_ptr<ImageDataHeader> header = _volume_infos->get_data_header();
-        
-        // patient descriptor
-        noneimg_cinfos->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->patient_name));
-        noneimg_cinfos->add_info(NoneImgCornerInfos::LT, std::make_pair(1, header->patient_id));
 
-        // parameters that can be tuned
-        noneimg_cinfos->add_info(NoneImgCornerInfos::LB, std::make_pair(0, "Current Slice "));
-        noneimg_cinfos->add_info(NoneImgCornerInfos::LB, std::make_pair(1, "W 100 L 100"));
-        
-        // volume structure descriptor
-        std::stringstream ss;
-        ss << header->columns << " " << header->rows << " " << header->slice_location.size();
-        noneimg_cinfos->add_info(NoneImgCornerInfos::RT, std::make_pair(0, ss.str()));
-        
-        ss.str(std::string());
-        ss << header->slice_thickness;
-        noneimg_cinfos->add_info(NoneImgCornerInfos::RT, std::make_pair(1, ss.str()));
-
-        // volume physical descriptor
-        ss.str(std::string());
-        ss << header->kvp;
-        noneimg_cinfos->add_info(NoneImgCornerInfos::RB, std::make_pair(0, ss.str()));
-
-        msgcoll.set_corner_infos(noneimg_cinfos);
+    MsgNoneImgCollection msg;
+    for (auto it = _dirty_cache.begin(); it != _dirty_cache.end(); ++it) {
+        typedef std::map<NoneImageType, std::shared_ptr<INoneImg>>::const_iterator const_iter;
+        const_iter it_item = _none_image_items.find(*it);
+        if (it_item != _none_image_items.end()) {
+            it_item->second->fill_msg(&msg);
+        }
     }
 
-    //TODO wl page annotation
-    return msgcoll.serialize_to_array(buffer_size);
-}
-
-void AppNoneImage::initialize(std::shared_ptr<VolumeInfos> volume_infos, std::shared_ptr<SceneBase> scene) {
-    _volume_infos = volume_infos;
-    _scene = scene;
-
-    _fix_corner_infos_dirty = true;
-    _wl_dirty = true;
-    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(scene);
-    if (mpr_scene) {
-        _wl_page_dirty = true;
+    buffer_size = msg.ByteSize();
+    if(buffer_size == 0) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: byte length is 0.";
+        return nullptr;
     }
-
-    this->set_dirty(true);
+    char* data = new char[buffer_size];
+    if (!msg.SerializeToArray(data, buffer_size)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: serialize failed.";
+        delete [] data;
+        buffer_size = 0;
+        return nullptr; 
+    } else {
+        return data;
+    }
 }
 
-bool AppNoneImage::check_dirty_i() {
-    //TODO check wl&paging&annotatio ...
-    return false;
+bool AppNoneImage::check_dirty() {
+    int dirty_items = 0;
+    _dirty_cache.clear();
+    for (auto it = _none_image_items.begin(); it != _none_image_items.end(); ++it) {
+        dirty_items += it->second->check_dirty() ? 1 : 0;
+        _dirty_cache.insert(it->first);
+    }
+    return dirty_items !=0 ;
+}
+
+void AppNoneImage::add_none_image_item(std::shared_ptr<INoneImg> none_image) {
+    _none_image_items[none_image->get_type()] = none_image;
+}
+
+std::shared_ptr<INoneImg> AppNoneImage::get_none_image_item(NoneImageType type) {
+    auto it = _none_image_items.find(type);
+    if (it == _none_image_items.end()) {
+        return nullptr;
+    } else {
+        return it->second;
+    }
 }
 
 MED_IMG_END_NAMESPACE

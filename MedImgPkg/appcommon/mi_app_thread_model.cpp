@@ -173,7 +173,6 @@ void AppThreadModel::process_rendering() {
                     if(none_image && none_image->check_dirty()) {
                         dirty_none_images.push_back(it->first);
                         none_image->update();
-                        none_image->set_dirty(false);
                     }
                 }
                 // interrupt point

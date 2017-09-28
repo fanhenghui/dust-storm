@@ -166,7 +166,6 @@ int OpInit::execute() {
             cell->set_none_image(none_image);
             if (type_id == 1) { // MPR
                 std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
-                none_image->initialize(volume_infos, mpr_scene);
                 cell->set_scene(mpr_scene);
                 mpr_scene->set_test_code(0); {
                     std::stringstream ss;
@@ -207,9 +206,14 @@ int OpInit::execute() {
                     mpr_scene->place_mpr(TRANSVERSE);
                     break;
                 }
+
+                //none-image
+                std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
+                noneimg_infos->set_scene(mpr_scene);
+                none_image->add_none_image_item(noneimg_infos);
+
             } else if (type_id == 2) {  // VR
                 std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
-                none_image->initialize(volume_infos, vr_scene);
                 cell->set_scene(vr_scene);
                 vr_scene->set_test_code(0);
                 {
@@ -268,6 +272,11 @@ int OpInit::execute() {
                     vr_scene->set_window_level(ww, wl, *it);
                 }
                 vr_scene->set_visible_labels(vis_labels);
+
+                //none-image
+                std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
+                noneimg_infos->set_scene(vr_scene);
+                none_image->add_none_image_item(noneimg_infos);
             } else {
                 MI_REVIEW_LOG(MI_FATAL) << "invalid cell type id: " << type_id;
                 REVIEW_THROW_EXCEPTION("invalid cell type id!");
@@ -305,7 +314,6 @@ int OpInit::execute() {
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
-            none_image->initialize(volume_infos, mpr_scene);
             cell->set_scene(mpr_scene);
             mpr_scene->set_test_code(0);
             {
@@ -313,7 +321,6 @@ int OpInit::execute() {
                 ss << "cell_" << cell_id;
                 mpr_scene->set_name(ss.str());
             }
-
             mpr_scene->set_volume_infos(volume_infos);
             mpr_scene->set_sample_rate(1.0);
             mpr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
@@ -333,9 +340,13 @@ int OpInit::execute() {
                 mpr_scene->place_mpr(TRANSVERSE);
                 break;
             }
+
+            //none-image
+            std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
+            noneimg_infos->set_scene(mpr_scene);
+            none_image->add_none_image_item(noneimg_infos);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
-            none_image->initialize(volume_infos, vr_scene);
             cell->set_scene(vr_scene);
             vr_scene->set_test_code(0);
             {
@@ -372,6 +383,11 @@ int OpInit::execute() {
             vr_scene->set_material(material, 0);
             vr_scene->set_window_level(ww, wl, 0);
             vr_scene->set_test_code(0);
+
+            //none-image
+            std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
+            noneimg_infos->set_scene(vr_scene);
+            none_image->add_none_image_item(noneimg_infos);
         } else {
             MI_REVIEW_LOG(MI_FATAL) << "invalid cell type id: " << type_id;
             REVIEW_THROW_EXCEPTION("invalid cell type id!");

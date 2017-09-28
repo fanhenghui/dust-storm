@@ -50,8 +50,8 @@ public:
     bool get_annotation_visibility() const;
     void set_annotation_visibility(bool flag);
 
-    void notify_cache(int process_annotation_id);
-    int get_notify_cache() const;
+    // void notify_cache(int process_annotation_id);
+    // int get_notify_cache() const;
 
 protected:
 
@@ -61,7 +61,7 @@ private:
     std::vector<IntensityInfo>   _intensity_infos;
     bool _visibility;
 
-    int _notify_cache;
+    //int _notify_cache;
 };
 
 MED_IMG_END_NAMESPACE

@@ -6,38 +6,43 @@
 #include <map>
 #include <memory>
 #include "appcommon/mi_app_common_export.h"
+#include "arithmetic/mi_volume_statistician.h"
+#include "arithmetic/mi_ortho_camera.h"
+#include "io/mi_voi.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
+
+enum NoneImageType {
+    InvalidTyoe = -1,
+    CornerInfos = 0,
+    WindowLevel = 1,
+    MPRPage = 2,
+    Direction = 3,
+    Annotation = 4,
+};
+class MsgNoneImgCollection;
 class SceneBase;
 class INoneImg {
 public:
-    INoneImg(const std::string& type):_type(type) {};
+    INoneImg(const NoneImageType& type):_type(InvalidTyoe) {};
     virtual ~INoneImg() {};
-    virtual char* serialize_to_array(int &bytelength) = 0;
 
-    std::string get_type() const {
-        return _type;
-    };
+    virtual void fill_msg(MsgNoneImgCollection* msg) const = 0;
+    virtual bool check_dirty() = 0;
+    virtual void update() = 0;//should be just update dirty to acc
 
-    void set_name(const std::string& name) {
-        _name = name;
-    };
-    std::string get_name() const {
-        return _name;
-    };
-
+    NoneImageType get_type() const { return _type;};
     void set_scene(std::shared_ptr<SceneBase> scene) {_scene = scene;};
 
 private:
-    std::string _type;
-    std::string _name;
+    NoneImageType _type;
 
 protected:
     std::shared_ptr<SceneBase> _scene;
 };
 
-class ModelAnnotataion;
+class ModelAnnotation;
 class NoneImgAnnotations : public INoneImg {
 public:
     struct AnnotationUnit {
@@ -51,22 +56,32 @@ public:
     };
 
 public:
-    NoneImgAnnotations():INoneImg("annotations") {};
+    NoneImgAnnotations():INoneImg(Annotation) ,_pre_width(0), _pre_height(0) {};
     virtual ~NoneImgAnnotations() {};
-    virtual char* serialize_to_array(int &bytelength);
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
 
     void add_annotation(const AnnotationUnit& anno);
     void set_annotations(const std::vector<AnnotationUnit> circles);
     const std::vector<AnnotationUnit>& get_annotations() const;
 
-    void set_model(std::shared_ptr<ModelAnnotataion> model) {_model = model;};
+    void set_model(std::shared_ptr<ModelAnnotation> model) {_model = model;};
 
 private:
     std::vector<AnnotationUnit> _annotations;
-    std::shared_ptr<ModelAnnotataion> _model;
+    std::weak_ptr<ModelAnnotation> _model;
+
+    //cache
+    std::vector<VOISphere> _pre_vois;
+    //std::vector<IntensityInfo> _pre_intensity_infos;
+    OrthoCamera _pre_camera;
+    int _pre_width;
+    int _pre_height;
 };
 
 // LT|1:patientName|2:patientID\n
+//just sending once
 class NoneImgCornerInfos : public INoneImg {
 public:
     enum PositionType {
@@ -77,9 +92,11 @@ public:
     };
 
 public:
-    NoneImgCornerInfos():INoneImg("cornerinfos") {};
+    NoneImgCornerInfos():INoneImg(CornerInfos),_init(false) {};
     virtual ~NoneImgCornerInfos() {};
-    virtual char* serialize_to_array(int &bytelength);
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
 
     void set_infos(PositionType pos, std::vector<std::pair<int, std::string>> infos);
     void add_info(PositionType pos, std::pair<int, std::string> info);
@@ -87,21 +104,8 @@ public:
 
 private:
     std::map<PositionType,std::vector<std::pair<int, std::string>>> _infos;
+    bool _init;
 };
-
-class NoneImgCollection: public INoneImg {
-public:
-    NoneImgCollection():INoneImg("cornerinfos") {};
-    virtual ~NoneImgCollection() {};
-    virtual char* serialize_to_array(int &bytelength);
-
-    void set_annotations(std::shared_ptr<NoneImgAnnotations> annotations);
-    void set_corner_infos(std::shared_ptr<NoneImgCornerInfos> corner_infos);
-private:
-    std::shared_ptr<NoneImgAnnotations> _annotations;
-    std::shared_ptr<NoneImgCornerInfos> _corner_infos;
-};
-
 
 MED_IMG_END_NAMESPACE
 

@@ -3,7 +3,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-ModelAnnotation::ModelAnnotation() :_visibility(true), _notify_cache(-1) {}
+ModelAnnotation::ModelAnnotation() :_visibility(true)/*, _notify_cache(-1)*/ {}
 
 ModelAnnotation::~ModelAnnotation() {}
 
@@ -145,12 +145,12 @@ VOISphere ModelAnnotation::get_annotation_by_label(unsigned char id) const {
     APPCOMMON_THROW_EXCEPTION("get annotation by mask label failed!");
 }
 
-void ModelAnnotation::notify_cache(int process_annotation_id) {
-    _notify_cache = process_annotation_id;
-}
+// void ModelAnnotation::notify_cache(int process_annotation_id) {
+//     _notify_cache = process_annotation_id;
+// }
 
-int ModelAnnotation::get_notify_cache() const {
-    return _notify_cache;
-}
+// int ModelAnnotation::get_notify_cache() const {
+//     return _notify_cache;
+// }
 
 MED_IMG_END_NAMESPACE

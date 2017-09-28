@@ -15,13 +15,13 @@ public:
     virtual ~OBAnnotationNoneImg();
 
     void set_model(std::shared_ptr<ModelAnnotation> model);
-    void set_mpr_none_image(std::vector<AppNoneImage> app_noneimgs);
+    void set_mpr_none_image(std::vector<std::shared_ptr<AppNoneImage>> app_noneimgs);
 
     virtual void update(int code_id = 0);
 
 private:
     std::weak_ptr<ModelAnnotation> _model;
-    std::vector<AppNoneImage> _app_noneimgs;
+    std::vector<std::shared_ptr<AppNoneImage>> _app_noneimgs;
 };
 
 MED_IMG_END_NAMESPACE
