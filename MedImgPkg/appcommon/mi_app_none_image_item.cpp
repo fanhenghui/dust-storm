@@ -181,4 +181,83 @@ void NoneImgCornerInfos::fill_msg(MsgNoneImgCollection* msg) const {
     }
 }
 
+void NoneImgWindowLevel::fill_msg(MsgNoneImgCollection* msg) const {
+    MsgNoneImgWindowLevel* wl_msg = msg->mutable_window_level();
+    wl_msg->set_ww(_ww);
+    wl_msg->set_wl(_wl);
+}
+
+bool NoneImgWindowLevel::check_dirty() {
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (mpr_scene) {
+        float ww(0), wl(0);
+        mpr_scene->get_global_window_level(ww, wl);
+        if(fabs(ww - _ww) > FLOAT_EPSILON || fabs(wl - _wl) > FLOAT_EPSILON ) {
+            _ww = ww;
+            _wl = wl;
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        //TODO VR WL
+    }
+}
+
+void NoneImgWindowLevel::update() {
+    //do nothing
+}
+
+void NoneImgMPRPage::fill_msg(MsgNoneImgCollection* msg) const {
+    MsgNoneImgMPRPage* page_msg = msg->mutable_mpr_page();
+    page_msg->set_page(_page);
+}
+
+bool NoneImgMPRPage::check_dirty() {
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
+    std::shared_ptr<VolumeInfos> volume_infos = mpr_scene->get_volume_infos();
+    APPCOMMON_CHECK_NULL_EXCEPTION(volume_infos);
+    std::shared_ptr<CameraCalculator> camera_cal = volume_infos->get_camera_calculator();
+    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
+    std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+    const int page = camera_cal->get_orthognal_mpr_page(ortho_camera);
+    if (page != _page) {
+        _page = page;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void NoneImgMPRPage::update() {
+
+}
+
+void NoneImgDirection::fill_msg(MsgNoneImgCollection* msg) const {
+    MsgNoneImgDirection* direction_msg = msg->mutable_direction();
+    direction_msg->set_info(_info);
+}
+
+bool NoneImgDirection::check_dirty() {
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+    if (*ortho_camera == _pre_camera) {
+        return false;
+    } else {
+        _pre_camera = *ortho_camera; 
+        return true;
+    }
+}
+
+void NoneImgDirection::update() {
+    //TODO calculate infos
+}
+
 MED_IMG_END_NAMESPACE

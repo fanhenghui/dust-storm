@@ -107,6 +107,49 @@ private:
     bool _init;
 };
 
+class NoneImgWindowLevel : public INoneImg {
+public:
+    NoneImgWindowLevel():INoneImg(WindowLevel), _ww(0), _wl(0) {};
+    virtual ~NoneImgWindowLevel() {};
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
+
+private:
+    float _ww;
+    float _wl;
+};
+
+class NoneImgMPRPage : public INoneImg {
+public:
+    NoneImgMPRPage():INoneImg(MPRPage), _page(-1) {};
+    virtual ~NoneImgMPRPage() {};
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
+
+    void set_mpr_page(int page);
+
+private:
+    int _page;
+};
+
+class NoneImgDirection : public INoneImg {
+public:
+    NoneImgDirection():INoneImg(Direction), _info("") {};
+    virtual ~NoneImgDirection() {};
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
+
+private:
+    //left|right|top|bottom
+    std::string _info;
+    OrthoCamera _pre_camera;
+};
+
+
+
 MED_IMG_END_NAMESPACE
 
 
