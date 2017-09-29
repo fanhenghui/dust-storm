@@ -55,8 +55,10 @@ bool AppNoneImage::check_dirty() {
     int dirty_items = 0;
     _dirty_cache.clear();
     for (auto it = _none_image_items.begin(); it != _none_image_items.end(); ++it) {
-        dirty_items += it->second->check_dirty() ? 1 : 0;
-        _dirty_cache.insert(it->first);
+        if (it->second->check_dirty()) {
+            ++dirty_items;    
+            _dirty_cache.insert(it->first);
+        }        
     }
     return dirty_items !=0 ;
 }

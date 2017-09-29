@@ -79,6 +79,8 @@ void  NoneImgAnnotations::update() {
     std::shared_ptr<CameraCalculator> camera_cal = volume_infos->get_camera_calculator();
     APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
 
+    //clear previous
+    _annotations.clear();
     const std::vector<VOISphere> &vois = model->get_annotations();
     for (size_t i = 0; i < vois.size(); ++i) {
         AnnotationUnit unit;
@@ -149,6 +151,9 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
     std::shared_ptr<VolumeInfos> volume_infos = raycast_scene->get_volume_infos();
     APPCOMMON_CHECK_NULL_EXCEPTION(volume_infos);
     std::shared_ptr<ImageDataHeader> header = volume_infos->get_data_header();
+
+    //clear pervious
+    _infos.clear();
 
     // patient descriptor
     this->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->patient_name));
