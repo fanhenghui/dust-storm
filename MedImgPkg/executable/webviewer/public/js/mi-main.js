@@ -119,8 +119,8 @@ var revcBEReady = false;
         var cellContainerW = document.getElementById('cell-container').offsetWidth;
         // var cellContainerH = document.getElementById('cell-container').offsetHeight;
         var navigatorHeight = document.getElementById('navigator-div').offsetHeight;
-        var w = (cellContainerW - 20) / 2;
-        var h = (window.innerHeight - navigatorHeight - 40) / 2;
+        var w = (cellContainerW - 66) / 2;
+        var h = (window.innerHeight - navigatorHeight - 60) / 2;
         return {
             width: w,
             height: h
@@ -238,6 +238,9 @@ var revcBEReady = false;
                 break;
             case 'common-tool-annotation':
                 // TODO annotation
+                for (var i = 0; i < (cells.length-1); ++i) {
+                    cells[i].mouseAction = ACTION_ID_MRP_ANNOTATION;
+                }
                 break;
             default:
                 // TODO ERR

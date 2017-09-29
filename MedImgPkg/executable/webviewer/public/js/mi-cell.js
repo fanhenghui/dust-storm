@@ -118,14 +118,14 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 Cell.prototype.resize = function(width, height) {
     //canvas&svg resize
     //send msg to notigy BE resize will be call in main
-    this.canvas.width = width;
-    this.canvas.height = height;
+    this.canvas.width = Math.floor(width);
+    this.canvas.height = Math.floor(height);
     var top = this.canvas.offsetTop;
     var left = this.canvas.offsetLeft;
-    var viewBox = left.toString() + ' ' + top + ' ' + width + ' ' + height; 
+    var viewBox = left.toString() + ' ' + top + ' ' + Math.floor(width) + ' ' + Math.floor(height); 
     this.svg.setAttribute('viewBox', viewBox);
-    this.svg.setAttribute('width', width);
-    this.svg.setAttribute('height', height);
+    this.svg.setAttribute('width', Math.floor(width));
+    this.svg.setAttribute('height', Math.floor(height));
     this.svg.setAttribute('x', left);
     this.svg.setAttribute('y', top);
 
