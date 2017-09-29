@@ -341,9 +341,9 @@ int OpInit::execute() {
     mask_postfix.insert(".rle");
     std::vector<std::string> mask_file;
     FileUtil::get_all_file_recursion(series_path, mask_postfix, mask_file);
+    bool has_no_mask = false;
     if (mask_file.empty()) {
-        memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
-        MaskLabelStore::instance()->fill_label(1);
+        has_no_mask = true;
     } else {
         const std::string rle_file = mask_file[0];
         if (0 != RunLengthOperator::decode(rle_file, (unsigned char*)mask_data->get_pixel_pointer(), image_buffer_size)) {
@@ -392,7 +392,10 @@ int OpInit::execute() {
             mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
             mpr_scene->set_mask_mode(MASK_NONE);
             mpr_scene->set_interpolation_mode(LINEAR);
-            mpr_scene->set_visible_labels(vis_labels);
+
+            if(!has_no_mask) {
+                mpr_scene->set_visible_labels(vis_labels);
+            }
 
             switch (direction) {
             case 0:
@@ -432,11 +435,17 @@ int OpInit::execute() {
             vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
             vr_scene->set_composite_mode(COMPOSITE_DVR);
             vr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
-            vr_scene->set_mask_mode(MASK_MULTI_LABEL);
             vr_scene->set_interpolation_mode(LINEAR);
             vr_scene->set_shading_mode(SHADING_PHONG);
-            vr_scene->set_proxy_geometry(PG_BRICKS);
-            vr_scene->set_visible_labels(vis_labels);
+            if(has_no_mask) {
+                vr_scene->set_mask_mode(MASK_NONE);
+                vr_scene->set_proxy_geometry(PG_BRICKS);
+            } else {
+                vr_scene->set_mask_mode(MASK_MULTI_LABEL);
+                vr_scene->set_proxy_geometry(PG_BRICKS);
+                vr_scene->set_visible_labels(vis_labels);
+            }
+            
 
             // load color opacity
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
@@ -458,10 +467,14 @@ int OpInit::execute() {
             vr_scene->set_window_level(ww, wl, 0);
             vr_scene->set_test_code(0);
 
-            vr_scene->set_color_opacity(color, opacity, 1);
-            vr_scene->set_material(material, 1);
-            vr_scene->set_window_level(ww, wl, 1);
-
+            if(!has_no_mask) {
+                vr_scene->set_color_opacity(color, opacity, 1);
+                vr_scene->set_material(material, 1);
+                vr_scene->set_window_level(ww, wl, 1);
+            } else {
+                vr_scene->set_global_window_level(ww, wl);
+            }
+        
             //none-image
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(vr_scene);
