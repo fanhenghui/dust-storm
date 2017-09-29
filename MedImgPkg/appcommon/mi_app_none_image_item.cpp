@@ -124,27 +124,64 @@ std::string NoneImgCornerInfos::to_string() const {
     for (const_it it = _infos.begin(); it != _infos.end(); ++it) {
         NoneImgCornerInfos::PositionType pos = it->first;
         if(!it->second.empty()) {
-            ss << pos_str[static_cast<int>(pos)] << "|";
+            ss << pos_str[static_cast<int>(pos)];
             for (size_t i = 0; i < it->second.size(); ++i) {
-                ss << "|" << it->second[i].first << ":" << it->second[i].second;
+                ss << "|" << it->second[i].first << "," << it->second[i].second;
             }
             ss << "\n";
-            MI_APPCOMMON_LOG(MI_DEBUG) <<"corner info str: " << ss.str();
         }
     }
+    MI_APPCOMMON_LOG(MI_DEBUG) <<"corner info str: " << ss.str();
     return ss.str();
 }
 
 bool NoneImgCornerInfos::check_dirty() {
-    if(!_init) {
-        _init = true;
-        return true;
-    } else {
-        return false;
+    _infos.clear();
+    int dirty_items = 0;
+
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (mpr_scene) {
+        //just MPR has window level & page info
+        APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
+        std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
+        APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
+        std::shared_ptr<CameraBase> camera = _scene->get_camera();
+        std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+        APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+
+        float ww(0), wl(0);
+        mpr_scene->get_global_window_level(ww, wl);
+        
+        if(fabs(ww - _ww) > FLOAT_EPSILON || fabs(wl - _wl) > FLOAT_EPSILON) {
+            ++dirty_items;
+            _ww = ww;
+            _wl = wl;
+            std::stringstream ss;
+            ss << "WW: " << _ww << " WL: " << _wl; 
+            this->add_info(NoneImgCornerInfos::LB, std::make_pair(1, ss.str()));
+        } 
+
+        const int page = camera_cal->get_orthognal_mpr_page(ortho_camera);
+        if(page != _mpr_page) {
+            ++dirty_items;
+            _mpr_page = page;
+            std::stringstream ss;
+            ss << "Slice: " << _mpr_page;
+            this->add_info(NoneImgCornerInfos::LB, std::make_pair(0, ss.str()));
+            
+        }
     }
+    
+    return (dirty_items != 0) || (!_init);
 }
 
 void NoneImgCornerInfos::update() {//TODO set corner based on config file
+    if(_init) {
+        return;
+    }
+
+    //update all infos 
     APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
     std::shared_ptr<RayCastScene> raycast_scene = std::dynamic_pointer_cast<RayCastScene>(_scene);
     APPCOMMON_CHECK_NULL_EXCEPTION(raycast_scene);
@@ -153,29 +190,64 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
     std::shared_ptr<ImageDataHeader> header = volume_infos->get_data_header();
 
     //clear pervious
-    _infos.clear();
+    const static std::string UNKNOWN = "UNKNOWN";
+    //LT
+    std::string modality = UNKNOWN;
+    switch(header->modality) {
+    case CR:
+        modality = "CR";
+        break;
+    case CT:
+        modality = "CT";
+        break;
+    case MR:
+        modality = "MR";
+        break;
+    case PT:
+        modality = "PT";
+        break;
+    default:
+        break;
+    }
+    this->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->manufacturer.empty() ? UNKNOWN : header->manufacturer));
+    this->add_info(NoneImgCornerInfos::LT, std::make_pair(1, header->manufacturer_model_name.empty() ? UNKNOWN : header->manufacturer_model_name));
+    this->add_info(NoneImgCornerInfos::LT, std::make_pair(2, modality));
+    this->add_info(NoneImgCornerInfos::LT, std::make_pair(3, header->image_date.empty() ? UNKNOWN : header->image_date));
 
-    // patient descriptor
-    this->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->patient_name));
-    this->add_info(NoneImgCornerInfos::LT, std::make_pair(1, header->patient_id));
+    //LB (MPR WL , MPR Slice)
 
-    // parameters that can be tuned
-    this->add_info(NoneImgCornerInfos::LB, std::make_pair(0, "Current Slice "));
-    this->add_info(NoneImgCornerInfos::LB, std::make_pair(1, "W 100 L 100"));
-    
-    // volume structure descriptor
+    //RT
+
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(0, header->patient_name.empty() ? UNKNOWN : header->patient_name));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(1, header->patient_id.empty() ? UNKNOWN : header->patient_id));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(2, header->patient_sex.empty() ? UNKNOWN : header->patient_sex));
     std::stringstream ss;
     ss << header->columns << " " << header->rows << " " << header->slice_location.size();
-    this->add_info(NoneImgCornerInfos::RT, std::make_pair(0, ss.str()));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(3, ss.str()));
     
-    ss.str(std::string());
-    ss << header->slice_thickness;
-    this->add_info(NoneImgCornerInfos::RT, std::make_pair(1, ss.str()));
+    //RB kvp and MPR thickness
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (mpr_scene) {
+        double thickness = 0.0;
+        Vector3 view_to = mpr_scene->get_camera()->get_view_direction();
+        std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
+        if ((1.0 - abs(view_to.dot_product(Vector3(1.0, 0.0, 0.0)))) < 1e-6 ) {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_left_patient_axis_info().volume_coord / 2]; 
+        } else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 1.0, 0.0)))) < 1e-6) {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_posterior_patient_axis_info().volume_coord / 2]; 
+        } else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 0.0, 1.0)))) < 1e-6 ) {
+            thickness = volume_infos->get_volume()->_spacing[camera_cal->get_head_patient_axis_info().volume_coord / 2];
+        }
+        ss.str(std::string());
+        ss << std::setprecision(3) << std::fixed << "thickness: " << thickness;
+        this->add_info(NoneImgCornerInfos::RB, std::make_pair(0, ss.str()));
+    }
 
-    // volume physical descriptor
     ss.str(std::string());
-    ss << header->kvp;
-    this->add_info(NoneImgCornerInfos::RB, std::make_pair(0, ss.str()));
+    ss << "kvp: " << header->kvp;
+    this->add_info(NoneImgCornerInfos::RB, std::make_pair(1, ss.str()));
+
+    _init = true;
 }
 
 void NoneImgCornerInfos::fill_msg(MsgNoneImgCollection* msg) const {
@@ -184,63 +256,6 @@ void NoneImgCornerInfos::fill_msg(MsgNoneImgCollection* msg) const {
     if(!str.empty()) {
         corner_msg->set_infos(str);
     }
-}
-
-void NoneImgWindowLevel::fill_msg(MsgNoneImgCollection* msg) const {
-    MsgNoneImgWindowLevel* wl_msg = msg->mutable_window_level();
-    wl_msg->set_ww(_ww);
-    wl_msg->set_wl(_wl);
-}
-
-bool NoneImgWindowLevel::check_dirty() {
-    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
-    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
-    if (mpr_scene) {
-        float ww(0), wl(0);
-        mpr_scene->get_global_window_level(ww, wl);
-        if(fabs(ww - _ww) > FLOAT_EPSILON || fabs(wl - _wl) > FLOAT_EPSILON ) {
-            _ww = ww;
-            _wl = wl;
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        //TODO VR WL
-    }
-}
-
-void NoneImgWindowLevel::update() {
-    //do nothing
-}
-
-void NoneImgMPRPage::fill_msg(MsgNoneImgCollection* msg) const {
-    MsgNoneImgMPRPage* page_msg = msg->mutable_mpr_page();
-    page_msg->set_page(_page);
-}
-
-bool NoneImgMPRPage::check_dirty() {
-    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
-    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
-    APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
-    std::shared_ptr<VolumeInfos> volume_infos = mpr_scene->get_volume_infos();
-    APPCOMMON_CHECK_NULL_EXCEPTION(volume_infos);
-    std::shared_ptr<CameraCalculator> camera_cal = volume_infos->get_camera_calculator();
-    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
-    std::shared_ptr<CameraBase> camera = _scene->get_camera();
-    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
-    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
-    const int page = camera_cal->get_orthognal_mpr_page(ortho_camera);
-    if (page != _page) {
-        _page = page;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void NoneImgMPRPage::update() {
-
 }
 
 void NoneImgDirection::fill_msg(MsgNoneImgCollection* msg) const {

@@ -92,7 +92,7 @@ public:
     };
 
 public:
-    NoneImgCornerInfos():INoneImg(CornerInfos),_init(false) {};
+    NoneImgCornerInfos():INoneImg(CornerInfos),_init(false), _ww(0), _wl(0), _mpr_page(-1) {};
     virtual ~NoneImgCornerInfos() {};
     virtual void fill_msg(MsgNoneImgCollection* msg) const;
     virtual bool check_dirty();
@@ -105,33 +105,9 @@ public:
 private:
     std::map<PositionType,std::vector<std::pair<int, std::string>>> _infos;
     bool _init;
-};
-
-class NoneImgWindowLevel : public INoneImg {
-public:
-    NoneImgWindowLevel():INoneImg(WindowLevel), _ww(0), _wl(0) {};
-    virtual ~NoneImgWindowLevel() {};
-    virtual void fill_msg(MsgNoneImgCollection* msg) const;
-    virtual bool check_dirty();
-    virtual void update();
-
-private:
     float _ww;
     float _wl;
-};
-
-class NoneImgMPRPage : public INoneImg {
-public:
-    NoneImgMPRPage():INoneImg(MPRPage), _page(-1) {};
-    virtual ~NoneImgMPRPage() {};
-    virtual void fill_msg(MsgNoneImgCollection* msg) const;
-    virtual bool check_dirty();
-    virtual void update();
-
-    void set_mpr_page(int page);
-
-private:
-    int _page;
+    int _mpr_page;
 };
 
 class NoneImgDirection : public INoneImg {

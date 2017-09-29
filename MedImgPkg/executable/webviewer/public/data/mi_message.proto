@@ -80,15 +80,6 @@ message MsgNoneImgAnnotations {
     repeated MsgAnnotationUnit annotation = 1;
 };
 
-message MsgNoneImgWindowLevel {
-    required float ww = 1;
-    required float wl = 2;
-};
-
-message MsgNoneImgMPRPage {
-    required int32 page = 1;
-};
-
 message MsgNoneImgDirection {
     required string info = 2;// left|right|top|bottom
 };
@@ -96,7 +87,5 @@ message MsgNoneImgDirection {
 message MsgNoneImgCollection{
     optional MsgNoneImgCornerInfos corner_infos = 1;
     optional MsgNoneImgAnnotations annotations = 2;
-    optional MsgNoneImgWindowLevel window_level = 3;
-    optional MsgNoneImgMPRPage mpr_page = 4;
     optional MsgNoneImgDirection direction = 5;
 };
