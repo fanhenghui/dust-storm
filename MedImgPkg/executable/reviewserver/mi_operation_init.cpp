@@ -335,6 +335,30 @@ int OpInit::execute() {
     volume_infos->set_mask(mask_data);
     controller->set_volume_infos(volume_infos);
 
+    // serach mask(rle)
+    const unsigned int image_buffer_size = mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2];
+    std::set<std::string> mask_postfix;
+    mask_postfix.insert(".rle");
+    std::vector<std::string> mask_file;
+    FileUtil::get_all_file_recursion(series_path, mask_postfix, mask_file);
+    if (mask_file.empty()) {
+        memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
+        MaskLabelStore::instance()->fill_label(1);
+    } else {
+        const std::string rle_file = mask_file[0];
+        if (0 != RunLengthOperator::decode(rle_file, (unsigned char*)mask_data->get_pixel_pointer(), image_buffer_size)) {
+            memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
+            MaskLabelStore::instance()->fill_label(1);
+        } else {
+            //TODO check mask label(or just set as 1)
+            MaskLabelStore::instance()->fill_label(1);
+            MI_REVIEW_LOG(MI_DEBUG) << "read rle mask success.";
+            //FileUtil::write_raw("/home/wangrui22/data/rleunzip.raw" , mask_data->get_pixel_pointer() , image_buffer_size);
+        }
+     }
+     std::vector<unsigned char> vis_labels;
+     vis_labels.push_back(1);
+    
     // create cells
     for (int i = 0; i < msg_init.cells_size(); ++i)
     {
@@ -368,6 +392,7 @@ int OpInit::execute() {
             mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
             mpr_scene->set_mask_mode(MASK_NONE);
             mpr_scene->set_interpolation_mode(LINEAR);
+            mpr_scene->set_visible_labels(vis_labels);
 
             switch (direction) {
             case 0:
@@ -407,10 +432,11 @@ int OpInit::execute() {
             vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
             vr_scene->set_composite_mode(COMPOSITE_DVR);
             vr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
-            vr_scene->set_mask_mode(MASK_NONE);
+            vr_scene->set_mask_mode(MASK_MULTI_LABEL);
             vr_scene->set_interpolation_mode(LINEAR);
             vr_scene->set_shading_mode(SHADING_PHONG);
             vr_scene->set_proxy_geometry(PG_BRICKS);
+            vr_scene->set_visible_labels(vis_labels);
 
             // load color opacity
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
@@ -431,6 +457,10 @@ int OpInit::execute() {
             vr_scene->set_material(material, 0);
             vr_scene->set_window_level(ww, wl, 0);
             vr_scene->set_test_code(0);
+
+            vr_scene->set_color_opacity(color, opacity, 1);
+            vr_scene->set_material(material, 1);
+            vr_scene->set_window_level(ww, wl, 1);
 
             //none-image
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());

@@ -1,5 +1,7 @@
 #include "mi_run_length_operator.h"
 #include "mi_arithmetic_logger.h"
+#include <fstream>
+#include "mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -87,6 +89,7 @@ int RunLengthOperator::decode(
     }
 
     if (voxel_num != mask_buffer_len) {
+        MI_ARITHMETIC_LOG(MI_ERROR) << "decode rle file failed beause input buffer size is not match.";
         return -1;
     }
 
@@ -104,6 +107,28 @@ int RunLengthOperator::decode(
         target_mask[voxel] = cur_label;
     }
     return 0;
+}
+
+int RunLengthOperator::decode(const std::string& rle_file, unsigned char* target_mask, unsigned int target_mask_size) {
+    std::ifstream in(rle_file);
+    if (!in.is_open()) {
+        MI_ARITHMETIC_LOG(MI_ERROR) << "open rle file: " << rle_file << " failed.";
+        return -1;
+    }
+
+    // get size in bytes
+    in.seekg (0, in.end);
+    const unsigned int file_size = in.tellg();
+    in.seekg (0, in.beg);
+
+    // prepare the buffer and copy into it
+    const int number_of_entries = file_size/sizeof(int);
+    std::vector<unsigned int> labels(number_of_entries);
+    char* buffer = reinterpret_cast<char*>(labels.data());
+    in.read(buffer, file_size);
+    in.close();
+
+    return RunLengthOperator::decode((unsigned int*)buffer, file_size/sizeof(unsigned int), target_mask, target_mask_size);
 }
 
 MED_IMG_END_NAMESPACE

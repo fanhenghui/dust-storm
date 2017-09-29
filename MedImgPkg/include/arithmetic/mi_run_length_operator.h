@@ -15,6 +15,7 @@ public:
     static std::vector<unsigned char> decode(const std::vector<unsigned int>& to_be_decoded);
     static int decode(unsigned int* code_buffer , unsigned int code_buffer_len , 
         unsigned char* target_mask , unsigned int mask_buffer_len);
+    static int decode(const std::string& rle_file, unsigned char* target_mask, unsigned int target_mask_size);
 };
 
 MED_IMG_END_NAMESPACE
