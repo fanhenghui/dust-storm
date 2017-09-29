@@ -228,14 +228,17 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
     //RB kvp and MPR thickness
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
     if (mpr_scene) {
-        double thickness = 0.0;
         Vector3 view_to = mpr_scene->get_camera()->get_view_direction();
         std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
-        if ((1.0 - abs(view_to.dot_product(Vector3(1.0, 0.0, 0.0)))) < 1e-6 ) {
+        const double left = fabs(view_to.dot_product(Vector3(1.0, 0.0, 0.0)));
+        const double posterior = fabs(view_to.dot_product(Vector3(0.0, 1.0, 0.0)));
+        const double head = fabs(view_to.dot_product(Vector3(0.0, 0.0, 1.0)));
+        double thickness = 0.0;
+        if(left > posterior && left > head) {
             thickness = volume_infos->get_volume()->_spacing[camera_cal->get_left_patient_axis_info().volume_coord / 2]; 
-        } else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 1.0, 0.0)))) < 1e-6) {
+        } else if(posterior > left && posterior > head) {
             thickness = volume_infos->get_volume()->_spacing[camera_cal->get_posterior_patient_axis_info().volume_coord / 2]; 
-        } else if ((1.0 - abs(view_to.dot_product(Vector3(0.0, 0.0, 1.0)))) < 1e-6 ) {
+        } else {
             thickness = volume_infos->get_volume()->_spacing[camera_cal->get_head_patient_axis_info().volume_coord / 2];
         }
         ss.str(std::string());
