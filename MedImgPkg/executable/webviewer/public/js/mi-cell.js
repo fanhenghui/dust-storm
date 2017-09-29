@@ -11,6 +11,17 @@ const BTN_UP = 1;
 //mouse interval
 const MOUSE_MSG_INTERVAL = 10;
 
+const TEXT_MARGIN = 4;
+//primitive
+const ADD_PRIMITIVE = 0;
+const DELETE_PRIMITIVE = 1;
+const MODIFYING_PRIMITIVE = 2;
+const DONE_PRIMITIVE = 3;
+
+const LBN_NOTHING_PRIMITIVE = -1;
+const LBN_CREATING_PRIMITIVE = 0;
+const LBN_MODIFYING_PRIMITIVE = 1;
+
 function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.cellName = cellName;
     this.cellID = cellID;
@@ -35,6 +46,11 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.mouseStatus = BTN_UP;
     this.mousePre = {x:0,y:0};
     this.mouseClock = new Date().getTime();
+
+    //primitiveID
+    this.primitiveArray = [];
+    this.selectedPrimitive = null;
+    this.primitiveProcess = LBN_NOTHING_PRIMITIVE; // -1: none; 0: creating; 1: modifying
 }
 
 function refreshCanvas(canvas, img) {
@@ -60,11 +76,11 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
     if (withHeader) {
         noneImgBuf = new ArrayBuffer(dataLen + restDataLen);
     }
-    var dstview = new Uint8Array(noneImgBuf);
-    var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+    var dstRecord = new Uint8Array(noneImgBuf);
+    var srcRecord = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
     var cpSrc = noneImgBuf.byteLength - (dataLen + restDataLen);
     for (var i = cpSrc; i < dataLen; i++) {
-        dstview[i] = srcview[i];
+        dstRecord[i] = srcRecord[i];
     }
 
     // sucessfully receive all the incoming text
@@ -80,34 +96,68 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
         if (receivedMsg.cornerInfos) {
             // contains the 2nd optional array
-            var txt = receivedMsg.cornerInfos.infos;
+            var txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
             var corners = txt.split('\n');
 
             // for each corner
             // 'length-1': avoid the last empty string "" after '\n'
-            xpos = [4, 4, this.canvas.width-4, this.canvas.width-4];
-            for (i = 0; i < (corners.length - 1); ++i) {
-                var multiLine = corners[i].split('|');
-                // j starts from 2 (instead of 1) to avoid a redudent "" after the first '|'
-                var inforArray = [];
-                for (j = 2; j < multiLine.length; ++j) {
-                    var info = multiLine[j].split(':');
-                    inforArray.push(info[1]);
+            for (var i = 0; i < (corners.length - 1); ++i) {
+                var oneCornerInfo = corners[i].split('|');
+                let cornerTag = oneCornerInfo[0];
+                var infoContext = [];
+                for (var j = 1; j < oneCornerInfo.length; ++j) {
+                    var info = oneCornerInfo[j].split(',');
+                    infoContext.push({pos:info[0], context:info[1]});
                 }
                 
-                var svgText = d3.select('#' + this.svg.id).select('#' + multiLine[0])
-                var txtspacing = (i % 2 == 0 ? 1 : -1) * parseFloat(svgText.attr('font-size'));
-                var tspans = svgText.selectAll('tspan').data(inforArray);
-                tspans.enter()
+                var svgText = d3.select(this.svg).select('#' + cornerTag);
+                switch(cornerTag) {
+                    case 'LT':
+                    var xpos = TEXT_MARGIN;
+                    var txtspacing = parseFloat(svgText.attr('font-size'));
+                    var texorigin = 1.2*txtspacing;
+                    break;
+                    case 'RT':
+                    var xpos = this.canvas.width - TEXT_MARGIN;
+                    var txtspacing = parseFloat(svgText.attr('font-size'));
+                    var texorigin = 1.2*txtspacing;
+                    break;
+                    
+                    case 'LB':
+                    var xpos = TEXT_MARGIN;
+                    var txtspacing = -parseFloat(svgText.attr('font-size'));
+                    var texorigin = this.canvas.height + 0.2*txtspacing;
+                    break;
+                    case 'RB':
+                    var xpos = this.canvas.width - TEXT_MARGIN;
+                    var txtspacing = -parseFloat(svgText.attr('font-size'));
+                    var texorigin = this.canvas.height + 0.2*txtspacing;
+                    break;
+                }                
+
+                var tspans = svgText.selectAll('tspan');
+                if(tspans.empty())
+                {
+                    tspans.data(infoContext).enter()
                     .append('tspan')
-                    .attr('x', xpos[i])
-                    .attr('dy', function (d, idx) {
-                        return idx ? (1.2 * txtspacing) : (i % 2 == 0 ? txtspacing : 0.0)
+                    .attr('x', xpos)
+                    .attr('y', function (d) {
+                        return texorigin + (d.pos)*txtspacing;
+                    })
+                    .attr('id', function (d) {
+                        return cornerTag + '-' + d.pos;
                     })
                     .text(function (d, i) {
-                        return d;
+                        return d.context;
                     });
-                tspans.exit().remove();
+                } else {
+                    tspans.data(infoContext, function(d) {//change data[d.pos]
+                        return d.pos;
+                    })
+                    .text(function (d, i) {
+                        return d.context;
+                    });
+                }
             }
         } else if (receivedMsg.annotations) {
             
@@ -132,11 +182,11 @@ Cell.prototype.resize = function(width, height) {
     // resize the txts located at 4 corners
     d3.select(this.svg)
         .selectAll('text')
-        .attr('x', function(d, i) { return (i < 2) ? 4 : width - 4; })
-        .attr('y', function(d, i) { return (i % 2 == 0) ? 4 : height - 4; })
+        .attr('x', function(d, i) { return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
+        .attr('y', function(d, i) { return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN; })
         .each(function(d, i) {
           d3.select(this).selectAll('tspan').attr(
-              'x', function(datum, j) { return (i < 2) ? 4 : width - 4; })
+              'x', function(datum, j) { return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
         });
 }
 
@@ -144,20 +194,126 @@ Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
 
-    var x = event.clientX - event.toElement.getBoundingClientRect().left;
-    var y = event.clientY - event.toElement.getBoundingClientRect().top;
+    var x = event.clientX - this.svg.getBoundingClientRect().left;
+    var y = event.clientY - this.svg.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
+
+    // send a msg to notify BE we are adding an circle
+    if(this.mouseAction == ACTION_ID_MRP_ANNOTATION && this.mouseBtn == BTN_LEFT && !this.selectedPrimitive)
+    {
+        this.processAnnotationAction({'x':x,'y':y}, ADD_PRIMITIVE); //0:add
+    }
 }
 
-Cell.prototype.mouseMove = function(event) {
-    if (this.mouseBtn != BTN_DOWN) {
+Cell.prototype.mouseMove = function (event) {
+    if (this.mouseStatus != BTN_DOWN) {
         return;
     }
 
-    var curX = event.clientX - event.toElement.getBoundingClientRect().left;
-    var curY = event.clientY - event.toElement.getBoundingClientRect().top;
-    this.processMouseAction({x:curX,y:curY});
+    var curX = event.clientX - this.svg.getBoundingClientRect().left;
+    var curY = event.clientY - this.svg.getBoundingClientRect().top;
+    if (this.mouseAction == ACTION_ID_MRP_ANNOTATION) {
+        this.processAnnotationAction({'x': curX,'y': curY}, MODIFYING_PRIMITIVE); //2:modify
+    } else {
+        this.processMouseAction({x: curX,y: curY});
+    }
+    //reset previous position
+    this.mousePre.x = curX;
+    this.mousePre.y = curY;
+}
+
+Cell.prototype.processAnnotationAction = function (curPos, status) {
+    if (this.svg == null) {
+        return;
+    }
+
+    var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+    var msgAnnoUnit = MsgAnnotationUnit.create();
+    msgAnnoUnit.type = 0;
+    msgAnnoUnit.status = status;
+    msgAnnoUnit.visibility = true;
+
+    if (status == ADD_PRIMITIVE) {
+        // visual representation @ FE
+        var newCircle = d3.select(this.svg).append("circle")
+            .attr("cx", curPos.x)
+            .attr("cy", curPos.y)
+            .attr("r", 1)
+            .style("fill-opacity", 0.0) //热点是整个圆
+            //.style("fill", 'none')//热点是圆圈
+            .style("stroke", "red")
+            .style("stroke-opacity", 0.8)
+            .style("stroke-width", 2)
+            .style("cursor", "move")
+            .on("contextmenu", function (data, index) {
+                d3.event.preventDefault();
+                return false;
+            }).on("mousedown", function () {
+            //TODO: mark the currently selected primitive : d3.select(event.target).attr('id');
+            this.mouseAction = ACTION_ID_MRP_ANNOTATION;
+            this.mouseStatus = BTN_DOWN;
+            this.selectedPrimitive = d3.select(event.target);
+            // document.onmousemove = Cell.prototype.mouseMove;
+            // document.onmouseup = Cell.prototype.mouseUp;
+        }.bind(this));
+
+        
+        this.primitiveArray.push(newCircle._groups[0][0]);
+        this.selectedPrimitive = newCircle;
+        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
+
+        msgAnnoUnit.para0 = curPos.x;
+        msgAnnoUnit.para1 = curPos.y;
+        msgAnnoUnit.para2 = 1;
+        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+    } else if (status == MODIFYING_PRIMITIVE) {
+        //prevent mouse msg too dense
+        var curClock = new Date().getTime();
+        if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
+            return;
+        }
+        //update mouse clock
+        this.mouseClock = curClock;
+        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
+        // Check left (change radius) or right button (change position) is pressed
+        if (this.mouseBtn == BTN_LEFT) {
+            var cx = this.selectedPrimitive.attr('cx');
+            var cy = this.selectedPrimitive.attr('cy');
+            var r = Math.sqrt((curPos.x - cx) * (curPos.x - cx) + (curPos.y - cy) * (curPos.y - cy));
+            this.selectedPrimitive.attr('r', r);
+        } else if (this.mouseBtn == BTN_MIDDLE) {
+            this.selectedPrimitive.attr('cx', curPos.x);
+            this.selectedPrimitive.attr('cy', curPos.y);
+        }
+        msgAnnoUnit.para0 = this.selectedPrimitive.attr('cx');
+        msgAnnoUnit.para1 = this.selectedPrimitive.attr('cy');
+        msgAnnoUnit.para2 = this.selectedPrimitive.attr('r');
+        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+
+    } else if (status == DONE_PRIMITIVE) {
+        // underlying data communication with the BE
+        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
+        msgAnnoUnit.para0 = this.selectedPrimitive.attr('cx');
+        msgAnnoUnit.para1 = this.selectedPrimitive.attr('cy');
+        msgAnnoUnit.para2 = this.selectedPrimitive.attr('r');
+        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+    } else if (status == DELETE_PRIMITIVE) // delete
+    {
+        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
+        this.primitiveArray = this.primitiveArray.splice(msgAnnoUnit.id,1);
+        this.selectedPrimitive.remove();
+        msgAnnoUnit.visibility = false;
+        msgAnnoUnit.para0 = 0;
+        msgAnnoUnit.para1 = 0;
+        msgAnnoUnit.para2 = 0;
+        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
+    } else {;
+    }
 }
 
 Cell.prototype.processMouseAction = function(curPos) {
@@ -190,10 +346,6 @@ Cell.prototype.processMouseAction = function(curPos) {
     }
     var msgBuffer = MsgMouse.encode(msgMouse).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, this.mouseAction, this.cellID, msgBuffer.byteLength, msgBuffer);
-
-    //reset previous position
-    this.mousePre.x = curPos.x;
-    this.mousePre.y = curPos.y;
 }
 
 Cell.prototype.mouseUp = function(event) {
@@ -201,6 +353,14 @@ Cell.prototype.mouseUp = function(event) {
     this.mouseStatus = BTN_UP;
     this.mousePre.x = 0;
     this.mousePre.y = 0;
+
+    // send a msg to notify BE we are done with adding an circle
+    if (this.mouseAction == ACTION_ID_MRP_ANNOTATION) {
+        this.processAnnotationAction({x: 0,y: 0}, DONE_PRIMITIVE); //3:done
+        this.selectedPrimitive = null;
+        // document.onmousemove = null;
+        // document.onmouseup = null;
+    }
 }
 
 Cell.prototype.prepare = function() {
