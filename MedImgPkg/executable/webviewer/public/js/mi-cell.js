@@ -95,7 +95,6 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         var noneImgBufView = new Uint8Array(noneImgBuf);
         var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
         if (receivedMsg.cornerInfos) {
-            // contains the 2nd optional array
             var txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
             var corners = txt.split('\n');
 
@@ -249,7 +248,7 @@ Cell.prototype.processAnnotationAction = function (curPos, status) {
             .on("contextmenu", function (data, index) {
                 d3.event.preventDefault();
                 return false;
-            }).on("mousedown", function () {
+            }).on("mousedown", function (event) {
             //TODO: mark the currently selected primitive : d3.select(event.target).attr('id');
             this.mouseAction = ACTION_ID_MRP_ANNOTATION;
             this.mouseStatus = BTN_DOWN;
@@ -397,10 +396,10 @@ Cell.prototype.prepare = function() {
                 return (i < 2) ? "start" : 'end';
             })
             .attr('x', function (d, i) {
-                return (i < 2) ? "4px" : width - 4;
+                return (i < 2) ? "4px" : width - TEXT_MARGIN;
             })
             .attr('y', function (d, i) {
-                return (i % 2 == 0) ? "4px" : height - 4;
+                return (i % 2 == 0) ? "4px" : height - TEXT_MARGIN;
             })
             .attr('id', function (d) {
                 return d;
