@@ -384,7 +384,7 @@ Cell.prototype.prepare = function() {
         var height = this.canvas.height;
         d3.select(this.svg)
             .selectAll('text')
-            .data(["LT", "LB", "RT", "RB"])
+            .data(['LT', 'LB', 'RT', 'RB'])
             .enter()
             .append("text")
             .attr('font-family', 'monospace')
@@ -393,18 +393,18 @@ Cell.prototype.prepare = function() {
                 return (i % 2 == 0) ? 'hanging' : 'baseline';
             })
             .attr('text-anchor', function (d, i) {
-                return (i < 2) ? "start" : 'end';
+                return (i < 2) ? 'start' : 'end';
             })
             .attr('x', function (d, i) {
-                return (i < 2) ? "4px" : width - TEXT_MARGIN;
+                return (i < 2) ? '4px' : width - TEXT_MARGIN;
             })
             .attr('y', function (d, i) {
-                return (i % 2 == 0) ? "4px" : height - TEXT_MARGIN;
+                return (i % 2 == 0) ? '4px' : height - TEXT_MARGIN;
             })
             .attr('id', function (d) {
                 return d;
             })
-            .attr('font-size', "15px")
+            .attr('font-size', '15px')
             .attr('class', 'no-select-text');
     }
 }
