@@ -14,8 +14,8 @@ function ROICircle(key, svg, cx, cy, r){
     this.roiCtrlRT = null;
     this.roiCtrlRB = null;
     this.roiCtrlMove = null;
-    this.moveCallback = null;
-    this.stretchCallback = null;
+    this.dragingCallback = null;
+    this.dragEndCallback = null;
 
     this.key = key;
     this.keyMain = key+'-main';
@@ -92,20 +92,32 @@ function ROICircle(key, svg, cx, cy, r){
     .style('cursor', 'move');
 
     //dragger
+    var dragEndCtrl = (function(d) {
+        if(this.dragEndCallback) {
+            return this.dragEndCallback(this.cx, this.cy, this.r, this.key);
+        }
+    }).bind(this);
+
     this.roiCtrlMove.call(d3.drag().on('drag' , (function(d) {
         this.move(d3.event.x, d3.event.y);
-    }).bind(this)));
+        if(this.dragingCallback) {
+            this.dragingCallback(this.cx, this.cy, this.r, this.key);
+        }
+    }).bind(this)).on('end' ,dragEndCtrl));
 
     var dragCtrlStretch = (function(d) {
         let cx = this.roiMain.attr('cx');
         let cy = this.roiMain.attr('cy');
         let r = Math.sqrt((d3.event.x - cx)*(d3.event.x - cx) + (d3.event.y - cy)*(d3.event.y - cy));
         this.stretch(Math.floor(r));
+        if(this.dragingCallback) {
+            return this.dragingCallback(this.cx, this.cy, this.r, this.key);
+        }
     }).bind(this);
-    this.roiCtrlLT.call(d3.drag().on('drag' ,dragCtrlStretch));
-    this.roiCtrlLB.call(d3.drag().on('drag' ,dragCtrlStretch));
-    this.roiCtrlRT.call(d3.drag().on('drag' ,dragCtrlStretch));
-    this.roiCtrlRB.call(d3.drag().on('drag' ,dragCtrlStretch));
+    this.roiCtrlLT.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
+    this.roiCtrlLB.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
+    this.roiCtrlRT.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
+    this.roiCtrlRB.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
 }
 
 ROICircle.prototype.move = function(cx, cy) {
@@ -131,10 +143,6 @@ ROICircle.prototype.move = function(cx, cy) {
     this.roiCtrlMove
     .attr('cx', cx)
     .attr('cy', cy);
-
-    if(this.movecallBack) {
-        this.movecallBack();
-    }
 }
 
 ROICircle.prototype.stretch = function(r) {
@@ -159,10 +167,6 @@ ROICircle.prototype.stretch = function(r) {
     this.roiCtrlMove
     .attr('cx', cx)
     .attr('cy', cy);
-
-    if(this.stretchCallback) {
-        this.stretchCallback();
-    }
 }
 
 ROICircle.prototype.visible = function(flag) {

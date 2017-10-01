@@ -26,8 +26,8 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
 
     //mouse action
     this.mouseCurAction = null;
-    this.mouseActionCommon = new ActionCommon(socketClient);
-    this.mouseActionAnnotation = new ActionAnnotation(socketClient);
+    this.mouseActionCommon = new ActionCommon(socketClient, cellID);
+    this.mouseActionAnnotation = new ActionAnnotation(socketClient, cellID);
 
     //annotation ROI
     this.rois = [];
