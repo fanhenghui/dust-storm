@@ -181,10 +181,10 @@ var revcBEReady = false;
         }
 
         //init default cell action
-        cells[0].mouseAction = ACTION_ID_MPR_PAGING;
-        cells[1].mouseAction = ACTION_ID_MPR_PAGING;
-        cells[2].mouseAction = ACTION_ID_MPR_PAGING;
-        cells[3].mouseAction = ACTION_ID_ROTATE;
+        cells[0].activeAction(ACTION_ID_MPR_PAGING);
+        cells[1].activeAction(ACTION_ID_MPR_PAGING);
+        cells[2].activeAction(ACTION_ID_MPR_PAGING);
+        cells[3].activeAction(ACTION_ID_ROTATE);
 
         //nofity BE
         var MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
@@ -211,35 +211,37 @@ var revcBEReady = false;
         document.getElementById('test-info').innerText = btnID;
         switch (btnID) {
             case 'common-tool-arrow':
-                cells[0].mouseAction = ACTION_ID_MPR_PAGING;
-                cells[1].mouseAction = ACTION_ID_MPR_PAGING;
-                cells[2].mouseAction = ACTION_ID_MPR_PAGING;
-                cells[3].mouseAction = ACTION_ID_ROTATE;
+                cells[0].activeAction(ACTION_ID_MPR_PAGING);
+                cells[1].activeAction(ACTION_ID_MPR_PAGING);
+                cells[2].activeAction(ACTION_ID_MPR_PAGING);
+                cells[3].activeAction(ACTION_ID_ROTATE);
                 break;
             case 'common-tool-zoom':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].mouseAction = ACTION_ID_ZOOM;
+                    cells[0].activeAction(ACTION_ID_ZOOM);
                 }
                 break;
             case 'common-tool-pan':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].mouseAction = ACTION_ID_PAN;
+                    cells[i].activeAction(ACTION_ID_PAN);
                 }
                 break;
             case 'common-tool-rotate':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].mouseAction = ACTION_ID_ROTATE;
+                    cells[i].activeAction(ACTION_ID_ROTATE);
                 }
                 break;
             case 'common-tool-windowing':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].mouseAction = ACTION_ID_WINDOWING;
+                    cells[i].activeAction(ACTION_ID_WINDOWING);
                 }
                 break;
             case 'common-tool-annotation':
                 // TODO annotation
                 for (var i = 0; i < (cells.length-1); ++i) {
-                    cells[i].mouseAction = ACTION_ID_MRP_ANNOTATION;
+                    cells[0].activeAction(ACTION_ID_MRP_ANNOTATION);
+                    cells[1].activeAction(ACTION_ID_MRP_ANNOTATION);
+                    cells[2].activeAction(ACTION_ID_MRP_ANNOTATION);
                 }
                 break;
             default:

@@ -1,26 +1,5 @@
-//mouse button type
-const BTN_NONE = -1;
-const BTN_LEFT = 0;
-const BTN_MIDDLE = 1;
-const BTN_RIGHT = 2;
-
-//mouse button status
-const BTN_DOWN = 0;
-const BTN_UP = 1;
-
-//mouse interval
-const MOUSE_MSG_INTERVAL = 10;
-
+//corner info marin
 const TEXT_MARGIN = 4;
-//primitive
-const ADD_PRIMITIVE = 0;
-const DELETE_PRIMITIVE = 1;
-const MODIFYING_PRIMITIVE = 2;
-const DONE_PRIMITIVE = 3;
-
-const LBN_NOTHING_PRIMITIVE = -1;
-const LBN_CREATING_PRIMITIVE = 0;
-const LBN_MODIFYING_PRIMITIVE = 1;
 
 function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.cellName = cellName;
@@ -41,16 +20,18 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.noneImgBuf = null;
 
     //mouse event
-    this.mouseAction = ACTION_ID_NONE;
     this.mouseBtn = BTN_NONE;
     this.mouseStatus = BTN_UP;
     this.mousePre = {x:0,y:0};
-    this.mouseClock = new Date().getTime();
 
-    //primitiveID
-    this.primitiveArray = [];
-    this.selectedPrimitive = null;
-    this.primitiveProcess = LBN_NOTHING_PRIMITIVE; // -1: none; 0: creating; 1: modifying
+    //mouse action
+    this.mouseCurAction = null;
+    this.mouseActionCommon = new ActionCommon(socketClient);
+    this.mouseActionAnnotation = new ActionAnnotation(socketClient);
+
+    //annotation ROI
+    this.rois = [];
+    this.lastROI = null;
 }
 
 function refreshCanvas(canvas, img) {
@@ -198,167 +179,39 @@ Cell.prototype.mouseDown = function(event) {
     this.mousePre.x = x;
     this.mousePre.y = y;
 
-    // send a msg to notify BE we are adding an circle
-    if(this.mouseAction == ACTION_ID_MRP_ANNOTATION && this.mouseBtn == BTN_LEFT && !this.selectedPrimitive)
-    {
-        this.processAnnotationAction({'x':x,'y':y}, ADD_PRIMITIVE); //0:add
-    }
+    this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
 }
 
-Cell.prototype.mouseMove = function (event) {
-    if (this.mouseStatus != BTN_DOWN) {
-        return;
+Cell.prototype.mouseMove = function (event) {    
+    var x = event.clientX - this.svg.getBoundingClientRect().left;
+    var y = event.clientY - this.svg.getBoundingClientRect().top;
+
+    if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
+        //reset previous mouse position if move action done
+        this.mousePre.x = x;
+        this.mousePre.y = y;
     }
-
-    var curX = event.clientX - this.svg.getBoundingClientRect().left;
-    var curY = event.clientY - this.svg.getBoundingClientRect().top;
-    if (this.mouseAction == ACTION_ID_MRP_ANNOTATION) {
-        this.processAnnotationAction({'x': curX,'y': curY}, MODIFYING_PRIMITIVE); //2:modify
-    } else {
-        this.processMouseAction({x: curX,y: curY});
-    }
-    //reset previous position
-    this.mousePre.x = curX;
-    this.mousePre.y = curY;
-}
-
-Cell.prototype.processAnnotationAction = function (curPos, status) {
-    if (this.svg == null) {
-        return;
-    }
-
-    var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-    var msgAnnoUnit = MsgAnnotationUnit.create();
-    msgAnnoUnit.type = 0;
-    msgAnnoUnit.status = status;
-    msgAnnoUnit.visibility = true;
-
-    if (status == ADD_PRIMITIVE) {
-        // visual representation @ FE
-        var newCircle = d3.select(this.svg).append("circle")
-            .attr("cx", curPos.x)
-            .attr("cy", curPos.y)
-            .attr("r", 1)
-            .style("fill-opacity", 0.0) //热点是整个圆
-            //.style("fill", 'none')//热点是圆圈
-            .style("stroke", "red")
-            .style("stroke-opacity", 0.8)
-            .style("stroke-width", 2)
-            .style("cursor", "move")
-            .on("contextmenu", function (data, index) {
-                d3.event.preventDefault();
-                return false;
-            }).on("mousedown", function (event) {
-            //TODO: mark the currently selected primitive : d3.select(event.target).attr('id');
-            this.mouseAction = ACTION_ID_MRP_ANNOTATION;
-            this.mouseStatus = BTN_DOWN;
-            this.selectedPrimitive = d3.select(event.target);
-            // document.onmousemove = Cell.prototype.mouseMove;
-            // document.onmouseup = Cell.prototype.mouseUp;
-        }.bind(this));
-
-        
-        this.primitiveArray.push(newCircle._groups[0][0]);
-        this.selectedPrimitive = newCircle;
-        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
-
-        msgAnnoUnit.para0 = curPos.x;
-        msgAnnoUnit.para1 = curPos.y;
-        msgAnnoUnit.para2 = 1;
-        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-    } else if (status == MODIFYING_PRIMITIVE) {
-        //prevent mouse msg too dense
-        var curClock = new Date().getTime();
-        if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
-            return;
-        }
-        //update mouse clock
-        this.mouseClock = curClock;
-        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
-        // Check left (change radius) or right button (change position) is pressed
-        if (this.mouseBtn == BTN_LEFT) {
-            var cx = this.selectedPrimitive.attr('cx');
-            var cy = this.selectedPrimitive.attr('cy');
-            var r = Math.sqrt((curPos.x - cx) * (curPos.x - cx) + (curPos.y - cy) * (curPos.y - cy));
-            this.selectedPrimitive.attr('r', r);
-        } else if (this.mouseBtn == BTN_MIDDLE) {
-            this.selectedPrimitive.attr('cx', curPos.x);
-            this.selectedPrimitive.attr('cy', curPos.y);
-        }
-        msgAnnoUnit.para0 = this.selectedPrimitive.attr('cx');
-        msgAnnoUnit.para1 = this.selectedPrimitive.attr('cy');
-        msgAnnoUnit.para2 = this.selectedPrimitive.attr('r');
-        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-
-    } else if (status == DONE_PRIMITIVE) {
-        // underlying data communication with the BE
-        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
-        msgAnnoUnit.para0 = this.selectedPrimitive.attr('cx');
-        msgAnnoUnit.para1 = this.selectedPrimitive.attr('cy');
-        msgAnnoUnit.para2 = this.selectedPrimitive.attr('r');
-        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-    } else if (status == DELETE_PRIMITIVE) // delete
-    {
-        msgAnnoUnit.id = this.primitiveArray.indexOf(this.selectedPrimitive._groups[0][0]);
-        this.primitiveArray = this.primitiveArray.splice(msgAnnoUnit.id,1);
-        this.selectedPrimitive.remove();
-        msgAnnoUnit.visibility = false;
-        msgAnnoUnit.para0 = 0;
-        msgAnnoUnit.para1 = 0;
-        msgAnnoUnit.para2 = 0;
-        var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-    } else {;
-    }
-}
-
-Cell.prototype.processMouseAction = function(curPos) {
-    //prevent mouse msg too dense
-    var curClock = new Date().getTime();
-    if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
-        return;
-    }
-    //update mouse clock
-    this.mouseClock = curClock;
-
-    //create mouse msg and send to BE
-    if(!socketClient.protocRoot) {
-        console.log('null protocbuf.');
-        return;
-    }
-    var MsgMouse = socketClient.protocRoot.lookup('medical_imaging.MsgMouse');
-    if(!MsgMouse) {
-        console.log('get mouse message type failed.');
-        return;
-    }
-    var msgMouse = MsgMouse.create({
-      pre: {x: this.mousePre.x, y: this.mousePre.y},
-      cur: {x: curPos.x, y: curPos.y},
-      tag: 0
-    });
-    if(!msgMouse) {
-        console.log('create mouse message failed.');
-        return;
-    }
-    var msgBuffer = MsgMouse.encode(msgMouse).finish();
-    socketClient.sendData(COMMAND_ID_FE_OPERATION, this.mouseAction, this.cellID, msgBuffer.byteLength, msgBuffer);
 }
 
 Cell.prototype.mouseUp = function(event) {
-    this.mouseBtn = BTN_NONE;
     this.mouseStatus = BTN_UP;
+    var x = event.clientX - this.svg.getBoundingClientRect().left;
+    var y = event.clientY - this.svg.getBoundingClientRect().top;
+
+    this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+
+    //reset mouse status
+    this.mouseBtn = BTN_NONE;
     this.mousePre.x = 0;
     this.mousePre.y = 0;
+}
 
-    // send a msg to notify BE we are done with adding an circle
-    if (this.mouseAction == ACTION_ID_MRP_ANNOTATION) {
-        this.processAnnotationAction({x: 0,y: 0}, DONE_PRIMITIVE); //3:done
-        this.selectedPrimitive = null;
-        // document.onmousemove = null;
-        // document.onmouseup = null;
+Cell.prototype.activeAction = function(id) {
+    if(id == ACTION_ID_MRP_ANNOTATION) {
+        this.mouseCurAction = this.mouseActionAnnotation;
+    } else {
+        this.mouseCurAction = this.mouseActionCommon;
+        this.mouseActionCommon.registerOpID(id);
     }
 }
 
@@ -407,4 +260,6 @@ Cell.prototype.prepare = function() {
             .attr('font-size', '15px')
             .attr('class', 'no-select-text');
     }
+    this.mouseCurAction = this.mouseActionCommon;
+    this.mouseActionCommon.registerOpID(ACTION_ID_NONE);
 }

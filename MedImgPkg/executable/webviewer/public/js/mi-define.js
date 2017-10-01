@@ -34,3 +34,16 @@ const ACTION_ID_WINDOWING = OPERATION_ID_WINDOWING;
 const ACTION_ID_MRP_ANNOTATION = OPERATION_ID_ANNOTATION;
 
 const PROTOBUF_BE_FE = './data/mi_message.proto';
+
+//mouse button type
+const BTN_NONE = -1;
+const BTN_LEFT = 0;
+const BTN_MIDDLE = 1;
+const BTN_RIGHT = 2;
+
+//mouse button status
+const BTN_DOWN = 0;
+const BTN_UP = 1;
+
+//mouse message interval
+const MOUSE_MSG_INTERVAL = 10;
