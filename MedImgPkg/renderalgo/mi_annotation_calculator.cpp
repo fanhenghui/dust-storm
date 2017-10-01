@@ -132,10 +132,10 @@ bool AnnotationCalculator::dc_circle_update_to_patient_sphere(
     double diameter = 0;
     sphere_center = mat_p2w.transform(voi.center);
     if(cur_circle_center == sphere_center) {
-        diameter = circle_radius*2;
+        diameter = circle_radius*2.0;
     } else {
         double distance = (cur_circle_center - sphere_center).magnitude();
-        diameter = sqrt(circle_radius*circle_radius + distance*distance);
+        diameter = sqrt(circle_radius*circle_radius + distance*distance)*2.0;
     }
     voi.diameter = diameter;
     return true;
