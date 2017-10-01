@@ -36,7 +36,7 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         return;
     }
     var msgMouse = MsgMouse.create({
-      pre: {x: 0, y: 0},
+      pre: {x: preX, y: preY},
       cur: {x: x, y: y},
       tag: 0
     });
@@ -103,7 +103,7 @@ ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cel
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendMSG(cell.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r);
+    this.sendMSG(cell.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r);
 }
 
 ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell){
@@ -120,11 +120,11 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     }
 
     //send msg to BE
-    let annoID = cell.rois.length + 1;
+    let annoID = cell.rois.length;
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendMSG(cell.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r);
+    this.sendMSG(cell.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r);
 
     return true;
 }
@@ -135,10 +135,11 @@ ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell)
     cell.lastROI = null;
 
     //send msg to BE
-    let annoID = cell.rois.length + 1;
-    let cx = cell.lastROI.cx;
-    let cy = cell.lastROI.cy;
-    let r = cell.lastROI.r;
-    sendMSG(cell.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r);
+    let roi = cell.rois[cell.rois.length-1];
+    let annoID = cell.rois.length-1;
+    let cx = roi.cx;
+    let cy = roi.cy;
+    let r = roi.r;
+    this.sendMSG(cell.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r);
 }
 

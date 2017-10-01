@@ -1,5 +1,6 @@
-const CTRL_COLOR = 'white';
-const CTRL_SIZE = 8;
+const MAIN_COLOR = 'green';
+const CTRL_COLOR = 'red';
+const CTRL_SIZE = 3;
 const HIGHLIGHT_COLOR = 'yellow';
 
 function ROICircle(key, svg, cx, cy, r){
@@ -33,7 +34,7 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cy', function(d) { return d.cy;})
     .attr('r', function(d) { return d.r;})
     .style('fill', 'none')//热点是圆圈
-    .style('stroke', 'white')
+    .style('stroke', MAIN_COLOR)
     .style('stroke-opacity', 1.0)
     .style('stroke-width', 2);
 
@@ -109,7 +110,8 @@ function ROICircle(key, svg, cx, cy, r){
 
 ROICircle.prototype.move = function(cx, cy) {
     let r = parseFloat(this.roiMain.attr('r'));
-    this.r = r;
+    this.cx = cx;
+    this.cy = cy;
 
     this.roiMain
     .attr('cx', cx)
@@ -138,8 +140,7 @@ ROICircle.prototype.move = function(cx, cy) {
 ROICircle.prototype.stretch = function(r) {
     let cx = parseFloat(this.roiMain.attr('cx'));
     let cy = parseFloat(this.roiMain.attr('cy'));
-    this.cx = cx;
-    this.cy = cy;
+    this.r = r;
 
     this.roiMain
     .attr('r', r);

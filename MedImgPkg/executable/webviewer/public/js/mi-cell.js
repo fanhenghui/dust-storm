@@ -198,7 +198,7 @@ Cell.prototype.mouseUp = function(event) {
     var x = event.clientX - this.svg.getBoundingClientRect().left;
     var y = event.clientY - this.svg.getBoundingClientRect().top;
 
-    this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+    this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
 
     //reset mouse status
     this.mouseBtn = BTN_NONE;
