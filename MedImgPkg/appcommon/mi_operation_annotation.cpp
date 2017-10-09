@@ -13,8 +13,9 @@
 #include "mi_app_cell.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_controller.h"
-#include "mi_app_common_logger.h"
 #include "mi_app_common_define.h"
+#include "mi_app_none_image_item.h"
+#include "mi_app_none_image.h"
 #include "mi_message.pb.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -61,6 +62,15 @@ int OpAnnotation::execute() {
         return -1;
     }
 
+    std::shared_ptr<IAppNoneImage> app_none_image_ = cell->get_none_image();
+    APPCOMMON_CHECK_NULL_EXCEPTION(app_none_image_);
+    std::shared_ptr<AppNoneImage> app_none_image = std::dynamic_pointer_cast<AppNoneImage>(app_none_image_);
+    APPCOMMON_CHECK_NULL_EXCEPTION(app_none_image);
+    std::shared_ptr<INoneImg> annotation_nonimg_ = app_nonimg->get_none_image_item(Annotation);
+    APPCOMMON_CHECK_NULL_EXCEPTION(annotation_nonimg_);
+    std::shared_ptr<NoneImgAnnotations> annotation_nonimg = std::dynamic_pointer_cast<NoneImgAnnotations>(app_nonimg_);
+    APPCOMMON_CHECK_NULL_EXCEPTION(annotation_nonimg);
+
     std::shared_ptr<IModel> model_i = controller->get_model(MODEL_ID_ANNOTATION);
     if (!model_i) {
         MI_APPCOMMON_LOG(MI_ERROR) << "annotation null.";
@@ -80,7 +90,7 @@ int OpAnnotation::execute() {
             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
             model->add_annotation(new_voi, anno_id, new_label);
 
-            //TODO change operating cell's non-image 
+            //change operating cell's non-image
             
             model->notify(ModelAnnotation::ADD);
         } else {
