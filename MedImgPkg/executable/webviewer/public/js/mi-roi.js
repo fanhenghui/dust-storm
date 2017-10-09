@@ -1,5 +1,5 @@
-const MAIN_COLOR = 'green';
-const CTRL_COLOR = 'red';
+const MAIN_COLOR = 'red';
+const CTRL_COLOR = '#DC143C';
 const CTRL_SIZE = 3;
 const HIGHLIGHT_COLOR = 'yellow';
 
@@ -25,7 +25,8 @@ function ROICircle(key, svg, cx, cy, r){
     this.keyCtrlRB = key+'-rb';
     this.keyCtrlMove = key+'-move';
 
-    //ADD
+    //SVG circles
+    //main contour (can't be selected)
     this.roiMain = d3.select(svg).selectAll('circle')
     .data([{key:this.keyMain, cx:cx, cy:cy, r:r}], function(d) {
         return d.key;
@@ -33,11 +34,12 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return d.cx;})
     .attr('cy', function(d) { return d.cy;})
     .attr('r', function(d) { return d.r;})
-    .style('fill', 'none')//热点是圆圈
+    .style('fill', 'none')
     .style('stroke', MAIN_COLOR)
     .style('stroke-opacity', 1.0)
     .style('stroke-width', 2);
 
+    //4 ctrl circle for stretching (selected whole circle)
     this.roiCtrlLT = d3.select(svg).selectAll('circle')
     .data([{key:this.keyCtrlLT, cx:cx, cy:cy, r:r}], function(d) {
         return d.key;
@@ -45,7 +47,7 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
     .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR) //热点是整个圆
+    .style('fill', CTRL_COLOR)
     .style('cursor', 'move');
 
     this.roiCtrlLB = d3.select(svg).selectAll('circle')
@@ -55,7 +57,7 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
     .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR) //热点是整个圆
+    .style('fill', CTRL_COLOR)
     .style('cursor', 'move');
 
     this.roiCtrlRT = d3.select(svg).selectAll('circle')
@@ -65,7 +67,7 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
     .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR) //热点是整个圆
+    .style('fill', CTRL_COLOR)
     .style('cursor', 'move');
 
     this.roiCtrlRB = d3.select(svg).selectAll('circle')
@@ -75,9 +77,10 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
     .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR) //热点是整个圆
+    .style('fill', CTRL_COLOR)
     .style('cursor', 'move');
 
+    //1 ctrl circle for moving (selected loop)
     this.roiCtrlMove = d3.select(svg).selectAll('circle')
     .data([{key:this.keyCtrlMove, cx:cx, cy:cy, r:r}], function(d) {
         return d.key;
@@ -85,7 +88,7 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return d.cx;})
     .attr('cy', function(d) { return d.cy;})
     .attr('r', CTRL_SIZE)
-    .style('fill-opacity', 0.0) //热点是整个圆
+    .style('fill-opacity', 0.0)
     .style('stroke', CTRL_COLOR)
     .style('stroke-opacity', 1.0)
     .style('stroke-width', 3)
