@@ -64,7 +64,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         dstRecord[i] = srcRecord[i];
     }
 
-    // sucessfully receive all the incoming text
+    // sucessfully receive all none-image
     if (restDataLen <= 0) {
         console.log('receive Nong Img Buffer.');
         var MsgNoneImgCollection = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');

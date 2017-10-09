@@ -39,8 +39,8 @@ void OBAnnotationNoneImg::update(int code_id) {
             MI_APPCOMMON_LOG(MI_ERROR) << "annotation none image type error.";
             continue;
         }
-        anno_none_img->check_dirty();
-        anno_none_img->update();
+        //anno_none_img->check_dirty();
+        //anno_none_img->update();
     }
 }
 

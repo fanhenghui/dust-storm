@@ -38,7 +38,7 @@ int OpAnnotation::execute() {
     }
     const int anno_type = msgAnnotation.type();
     const std::string anno_id = msgAnnotation.id();
-    MI_APPCOMMON_LOG(MI_DEBUG) << "annotation ID: " << anno_id;
+    //MI_APPCOMMON_LOG(MI_DEBUG) << "annotation ID: " << anno_id;
     const int anno_status = msgAnnotation.status();
     const float anno_para0 = msgAnnotation.para0();
     const float anno_para1 = msgAnnotation.para1();
@@ -66,9 +66,9 @@ int OpAnnotation::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(app_none_image_);
     std::shared_ptr<AppNoneImage> app_none_image = std::dynamic_pointer_cast<AppNoneImage>(app_none_image_);
     APPCOMMON_CHECK_NULL_EXCEPTION(app_none_image);
-    std::shared_ptr<INoneImg> annotation_nonimg_ = app_nonimg->get_none_image_item(Annotation);
+    std::shared_ptr<INoneImg> annotation_nonimg_ = app_none_image->get_none_image_item(Annotation);
     APPCOMMON_CHECK_NULL_EXCEPTION(annotation_nonimg_);
-    std::shared_ptr<NoneImgAnnotations> annotation_nonimg = std::dynamic_pointer_cast<NoneImgAnnotations>(app_nonimg_);
+    std::shared_ptr<NoneImgAnnotations> annotation_nonimg = std::dynamic_pointer_cast<NoneImgAnnotations>(annotation_nonimg_);
     APPCOMMON_CHECK_NULL_EXCEPTION(annotation_nonimg);
 
     std::shared_ptr<IModel> model_i = controller->get_model(MODEL_ID_ANNOTATION);
@@ -91,7 +91,8 @@ int OpAnnotation::execute() {
             model->add_annotation(new_voi, anno_id, new_label);
 
             //change operating cell's non-image
-            
+            annotation_nonimg->check_dirty();
+            annotation_nonimg->update();
             model->notify(ModelAnnotation::ADD);
         } else {
             MI_APPCOMMON_LOG(MI_WARNING) << "annotation outside the image.";
@@ -113,6 +114,8 @@ int OpAnnotation::execute() {
             if(pre_voi != voi) {
                 model->modify_center(anno_id, voi.center);
                 model->modify_diameter(anno_id, voi.diameter);
+                annotation_nonimg->check_dirty();
+                annotation_nonimg->update();
                 model->notify(ModelAnnotation::MODIFYING);
             } else {
                 MI_APPCOMMON_LOG(MI_WARNING) << "annotation circle update to patient sphere does not change.";
