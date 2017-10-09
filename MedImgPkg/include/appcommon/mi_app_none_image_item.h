@@ -47,7 +47,7 @@ class NoneImgAnnotations : public INoneImg {
 public:
     struct AnnotationUnit {
         int type;
-        int id;
+        std::string id;
         int status;
         int visibility;
         float para0;//center x
@@ -56,7 +56,7 @@ public:
     };
 
 public:
-    NoneImgAnnotations():INoneImg(Annotation) ,_pre_width(0), _pre_height(0) {};
+    NoneImgAnnotations():INoneImg(Annotation) {};
     virtual ~NoneImgAnnotations() {};
     virtual void fill_msg(MsgNoneImgCollection* msg) const;
     virtual bool check_dirty();
@@ -72,12 +72,14 @@ private:
     std::vector<AnnotationUnit> _annotations;
     std::weak_ptr<ModelAnnotation> _model;
 
+    struct VOIUnit {
+        VOISphere voi;
+        IntensityInfo intensity_info;
+        VOIUnit(const VOISphere& v, const IntensityInfo& info): voi(v), intensity_info(info) {};
+    };
     //cache
-    std::vector<VOISphere> _pre_vois;
-    //std::vector<IntensityInfo> _pre_intensity_infos;
+    std::map<std::string, VOIUnit> _pre_vois;
     OrthoCamera _pre_camera;
-    int _pre_width;
-    int _pre_height;
 };
 
 // LT|1:patientName|2:patientID\n

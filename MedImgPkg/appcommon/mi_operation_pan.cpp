@@ -42,8 +42,7 @@ int OpPan::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(scene);
 
     scene->pan(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
-    std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
-    std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
+
     return 0;
 }
 

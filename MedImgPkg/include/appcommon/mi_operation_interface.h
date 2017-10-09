@@ -25,12 +25,12 @@ public:
 
     virtual ~IOperation() {
         if (nullptr != _buffer) {
-            delete[] _buffer;
+            delete [] _buffer;
             _buffer = nullptr;
         }
     };
 
-    void set_data(const OpDataHeader& data, void* buffer) {
+    void set_data(const OpDataHeader& data, char* buffer) {
         _header = data;
         _buffer = buffer;
     };
@@ -52,7 +52,7 @@ public:
 
 protected:
     OpDataHeader _header;
-    void* _buffer;
+    char* _buffer;
     std::weak_ptr<AppController> _controller;
 
 private:

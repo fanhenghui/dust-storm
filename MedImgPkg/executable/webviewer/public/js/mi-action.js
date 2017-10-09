@@ -93,25 +93,30 @@ function sendMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, pa
 function ActionAnnotation(socketClient, cellID) {
     this.socketClient = socketClient;
     this.mouseClock = new Date().getTime();
-    this.cellId = cellID;
+    this.cellID = cellID;
 };
 
-ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
-    let annoID = cell.rois.length;
-    //add a new ROI to operating cell
-    cell.lastROI = new ROICircle(cell.rois.length, cell.svg, x, y, annoID);
-
+ActionAnnotation.prototype.createROICircle = function(id, svg, x, y, r) {
+    var roi = new ROICircle(id, svg, x, y, r);
     //bind drag callback
-    cell.lastROI.dragingCallback = (function(cx, cy, r, key) {
+    roi.dragingCallback = (function(cx, cy, r, key) {
         sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
         return true;
     }).bind(this);
 
-    cell.lastROI.dragEndCallback = (function(cx, cy, r, key) {
+    roi.dragEndCallback = (function(cx, cy, r, key) {
         sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
         return true;
     }).bind(this);
 
+    return roi;
+}
+
+ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
+    let annoID = new Date().getTime() + '|' + cell.rois.length;
+    //add a new ROI to operating cell
+    cell.lastROI = this.createROICircle(annoID, cell.svg, x, y, 0);
+    
     //send msg to BE
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
@@ -133,7 +138,7 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     }
 
     //send msg to BE
-    let annoID = cell.rois.length;
+    let annoID = cell.lastROI.key;
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
@@ -149,7 +154,7 @@ ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell)
 
     //send msg to BE
     let roi = cell.rois[cell.rois.length-1];
-    let annoID = cell.rois.length-1;
+    let annoID = roi.key;
     let cx = roi.cx;
     let cy = roi.cy;
     let r = roi.r;

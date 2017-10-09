@@ -36,7 +36,8 @@ int OpAnnotation::execute() {
         return -1;
     }
     const int anno_type = msgAnnotation.type();
-    const int anno_id = msgAnnotation.id();
+    const std::string anno_id = msgAnnotation.id();
+    MI_APPCOMMON_LOG(MI_DEBUG) << "annotation ID: " << anno_id;
     const int anno_status = msgAnnotation.status();
     const float anno_para0 = msgAnnotation.para0();
     const float anno_para1 = msgAnnotation.para1();
@@ -77,7 +78,10 @@ int OpAnnotation::execute() {
         if (mpr_scene->get_patient_position(center_dc, center_patient)) {
             VOISphere new_voi(center_patient, FLOAT_EPSILON);
             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
-            model->add_annotation(new_voi, new_label);
+            model->add_annotation(new_voi, anno_id, new_label);
+
+            //TODO change operating cell's non-image 
+            
             model->notify(ModelAnnotation::ADD);
         } else {
             MI_APPCOMMON_LOG(MI_WARNING) << "annotation outside the image.";

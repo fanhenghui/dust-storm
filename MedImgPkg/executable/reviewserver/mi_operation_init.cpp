@@ -181,7 +181,7 @@ int OpInit::execute() {
             const int width = cell_info.width();
             const int height = cell_info.height();
             const int direction = cell_info.direction();
-            const int cell_id = cell_info.id();
+            const unsigned int cell_id = static_cast<unsigned int>(cell_info.id());
             const int type_id = cell_info.type();
 
             const float DEFAULT_WW = 1500;
@@ -366,7 +366,7 @@ int OpInit::execute() {
         const int width = cell_info.width();
         const int height = cell_info.height();
         const int direction = cell_info.direction();
-        const int cell_id = cell_info.id();
+        const unsigned int cell_id = static_cast<unsigned int>(cell_info.id());
         const int type_id = cell_info.type();
 
         const float DEFAULT_WW = 1500;

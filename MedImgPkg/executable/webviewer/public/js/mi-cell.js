@@ -140,7 +140,40 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                 }
             }
         } else if (receivedMsg.annotations) {
-            
+            var annotations = receivedMsg.annotations.annotation;
+            if (annotations) {
+                for (var i = 0; i < annotations.length; ++i) {
+                    var annoUnit = annotations[i];
+                    var id = annoUnit.id;
+                    var status = annoUnit.status;
+                    var vis = annoUnit.visibility;
+                    var cx = annoUnit.para0;
+                    var cy = annoUnit.para1;
+                    var r = annoUnit.para2;
+                    switch (annoUnit.status) {
+                        case 0: //add
+                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r));
+                            break;
+                        case 1: //delete
+                            for (var i = 0; i < this.rois.length; ++i) {
+                                if (this.rois[i].key == id) {
+                                    this.rois.splice(i, 1);
+                                    break;
+                                }
+                            }
+                            break;
+                        case 2: //modifying
+                            for (var i = 0; i < this.rois.length; ++i) {
+                                if (this.rois[i].key == id) {
+                                    this.rois[i].locate(cx, cy, r);
+                                    this.rois[i].visible(vis)
+                                    break;
+                                }
+                            }
+                            break;
+                    }                    
+                }
+            }
         }
     }
 }

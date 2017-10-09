@@ -172,6 +172,32 @@ ROICircle.prototype.stretch = function(r) {
     .attr('cy', cy);
 }
 
+ROICircle.prototype.locate = function(cx, cy, r) {
+    this.cx = cx;
+    this.cy = cy;
+    this.r = r;
+
+    this.roiMain
+    .attr('cx', cx)
+    .attr('cy', cy)
+    .attr('r', r);
+    this.roiCtrlLT
+    .attr('cx', Math.floor(cx - 0.707*r))
+    .attr('cy', Math.floor(cy - 0.707*r));
+    this.roiCtrlLB
+    .attr('cx', Math.floor(cx - 0.707*r))
+    .attr('cy', Math.floor(cy + 0.707*r));
+    this.roiCtrlRT
+    .attr('cx', Math.floor(cx + 0.707*r))
+    .attr('cy', Math.floor(cy - 0.707*r));
+    this.roiCtrlRB
+    .attr('cx', Math.floor(cx + 0.707*r))
+    .attr('cy', Math.floor(cy + 0.707*r));
+    this.roiCtrlMove
+    .attr('cx', cx)
+    .attr('cy', cy);
+}
+
 ROICircle.prototype.visible = function(flag) {
     if( flag === true) {
         var vis = 'inline';

@@ -68,7 +68,7 @@ message MsgNoneImgCornerInfos{
 
 message MsgAnnotationUnit{
     required int32 type = 1; //0 for circle ...
-    required int32 id = 2; // annotation table row number
+    required string id = 2; // id format: "time|num"
     required int32 status = 3; //0 add; 1 delete; 2 modifying; 3 modify_completed
     required int32 visibility = 4; // visibility
     required float para0 = 5; //center x

@@ -48,58 +48,89 @@ bool  NoneImgAnnotations::check_dirty() {
     APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
     APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
+    std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
+    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
     int width(0),height(0);
     std::shared_ptr<CameraBase> camera = mpr_scene->get_camera();
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
-    const std::vector<VOISphere>& vois = model->get_annotations();
+    const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
+    typedef std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator VOIConstIter;
+    typedef std::map<std::string, NoneImgAnnotations::VOIUnit>::iterator PreVOIConstIter;
 
-    if(_pre_vois.empty() && vois.empty()) {
-        return false;
+    //TODO intensity info
+    bool dirty = false;
+    //check add and modifying
+    for (auto it = vois.begin(); it != vois.end(); ++it) {
+        const std::string& id = it->first;
+        const VOISphere& voi = it->second.voi;
+        auto it2 = _pre_vois.find(id);
+        int status = -1;
+        if(it2 == _pre_vois.end()) {
+            status = 0;//add
+        } else if(it2->second.voi != voi) {
+            status = 2;//modifying
+        }
+
+        if(status != -1) {
+            dirty = true;
+            AnnotationUnit unit;
+            unit.type = 0;
+            unit.id = id;
+            unit.status = status;
+            unit.visibility = false;
+            unit.para0 = -1;
+            unit.para1 = -1;
+            unit.para2 = 0;
+            Circle circle;
+            if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
+                unit.visibility = true;
+                unit.para0 = circle._center.x;
+                unit.para1 = circle._center.y;
+                unit.para2 = circle._radius;
+            }
+            this->add_annotation(unit);
+        }
     }
 
-    if (_pre_width == width && _pre_height == height 
-        && *ortho_camera == _pre_camera && _pre_vois == vois) {
-        return false;
-    } else {
-        _pre_width = width;
-        _pre_height = height;
+    //check delete
+    for (auto it2 = _pre_vois.begin(); it2 != _pre_vois.begin(); ++it2) {
+        const std::string& id = it2->first;
+        if (vois.find(id) == vois.end()) {
+            dirty = true;
+            AnnotationUnit unit;
+            unit.type = 0;
+            unit.id = id;
+            unit.status = 1;//delete
+            unit.visibility = false;
+            unit.para0 = -1;
+            unit.para1 = -1;
+            unit.para2 = 0;
+            this->add_annotation(unit);
+        }
+    }
+
+    if (!dirty) {
+        if (!(*ortho_camera == _pre_camera)) {
+            dirty = true;
+        }
+    }
+
+    if (dirty) {
         _pre_camera = *ortho_camera;
-        _pre_vois = vois;
-        return true;
+        _pre_vois.clear();
+        for (auto it = vois.begin(); it != vois.end(); ++it) {
+            const std::string& id = it->first;
+            const VOISphere& voi = it->second.voi;
+            const IntensityInfo& info = it->second.intensity_info;
+            _pre_vois.insert(std::make_pair(id, VOIUnit(voi, info)));
+        }
     }
+
+    return dirty;
 }
 
 void  NoneImgAnnotations::update() {
-    std::shared_ptr<ModelAnnotation> model = _model.lock();
-    APPCOMMON_CHECK_NULL_EXCEPTION(model);
-    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
-    APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
-    std::shared_ptr<VolumeInfos> volume_infos = mpr_scene->get_volume_infos();
-    APPCOMMON_CHECK_NULL_EXCEPTION(volume_infos);
-    std::shared_ptr<CameraCalculator> camera_cal = volume_infos->get_camera_calculator();
-    APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
-
-    //clear previous
-    _annotations.clear();
-    const std::vector<VOISphere> &vois = model->get_annotations();
-    for (size_t i = 0; i < vois.size(); ++i) {
-        AnnotationUnit unit;
-        unit.type = 0;
-        unit.id = (int)i;
-        unit.status = 0;
-        unit.visibility = false;
-        unit.para0 = -1;
-        unit.para1 = -1;
-        unit.para2 = 0;
-        Circle circle;
-        if( AnnotationCalculator::patient_sphere_to_dc_circle(vois[i], camera_cal, mpr_scene, circle) ) {
-            unit.visibility = true;
-            unit.para0 = circle._center.x;
-            unit.para1 = circle._center.y;
-            unit.para2 = circle._radius;
-        }
-        this->add_annotation(unit);
-    }
+    //do nothing
 }
 
 void NoneImgCornerInfos::set_infos(NoneImgCornerInfos::PositionType pos, std::vector<std::pair<int, std::string>> infos) {

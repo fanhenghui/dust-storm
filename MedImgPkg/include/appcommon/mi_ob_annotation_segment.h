@@ -42,9 +42,16 @@ private:
     std::vector<std::shared_ptr<MPRScene>> _mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> _vr_scenes;
 
+    struct VOIUnit {
+        VOISphere voi;
+        unsigned char label;
+        AABBUI aabb;
+
+        VOIUnit(const VOISphere& v, unsigned char l): voi(v), label(l) {};
+        VOIUnit(const VOISphere& v, unsigned char l, AABBUI ab): voi(v), label(l), aabb(ab) {};
+    };
     //previous status
-    std::vector<VOISphere> _pre_vois;
-    std::map<unsigned char , AABBUI> _pre_voi_aabbs;
+    std::map<std::string, VOIUnit> _pre_vois;
 };
 
 MED_IMG_END_NAMESPACE

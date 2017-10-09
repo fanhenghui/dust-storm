@@ -43,8 +43,6 @@ int OpRotate::execute() {
         const float cur_y = msg.cur().y();
     
         scene->rotate(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
-        std::cout << "pre pos : " << pre_x << " " << pre_y << "  ";
-        std::cout << "cur pos : " << cur_x << " " << cur_y << std::endl;
     } else {
         //second change to parse to rotation message
         MsgRotation msg;    
