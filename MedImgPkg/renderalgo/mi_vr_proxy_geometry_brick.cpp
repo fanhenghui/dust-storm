@@ -381,20 +381,16 @@ void ProxyGeometryBrick::brick_flitering_mask_i() {
 
                 brick_label = static_cast<unsigned char>(mask_brick_info[brick_idx].label);
                 if (brick_label == EMPTY_SPACE) {
+                    //empty brick
                     continue;
                 } else if(brick_label != CHASO_SPACE) {
-                    if (brick_label !=1 ) {
-                        int yyy = 1;
-                        yyy+=1;
-                        printf("get label%i\n",(int)brick_label);
-                    }
+                    //homogenous brick
                     const float brick_max = volume_brick_info[brick_idx].max;
                     if (brick_max < filter_min[brick_label]) {
                         continue;
                     }
                 } else if (brick_label == CHASO_SPACE) {
-                    int xxx = 0;
-                    xxx+=1;
+                    //chaso brick
                 }
 
                 memcpy(ele_idx_array + reset_brick_count * 36,
