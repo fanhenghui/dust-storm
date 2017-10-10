@@ -56,7 +56,7 @@ public:
     };
 
 public:
-    NoneImgAnnotations():INoneImg(Annotation) {};
+    NoneImgAnnotations():INoneImg(Annotation), _pre_width(-1), _pre_height(-1) {};
     virtual ~NoneImgAnnotations() {};
     virtual void fill_msg(MsgNoneImgCollection* msg) const;
     virtual bool check_dirty();
@@ -80,6 +80,8 @@ private:
     //cache
     std::map<std::string, VOIUnit> _pre_vois;
     OrthoCamera _pre_camera;
+    int _pre_width;
+    int _pre_height;
 };
 
 // LT|1:patientName|2:patientID\n

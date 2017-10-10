@@ -53,11 +53,12 @@ bool  NoneImgAnnotations::check_dirty() {
     std::shared_ptr<ModelAnnotation> model = _model.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(model);
     APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    int width(1), height(1);
+    _scene->get_display_size(width, height);
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
     APPCOMMON_CHECK_NULL_EXCEPTION(mpr_scene);
     std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
     APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
-    int width(0),height(0);
     std::shared_ptr<CameraBase> camera = mpr_scene->get_camera();
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
     const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
@@ -68,7 +69,8 @@ bool  NoneImgAnnotations::check_dirty() {
 
     _annotations.clear();
     bool voi_dirty = false;
-    bool camera_dirty = !(*ortho_camera == _pre_camera);
+    const bool camera_dirty = !(*ortho_camera == _pre_camera);
+    const bool canvas_dirty = (width != _pre_width || height != _pre_height); 
     std::vector<VOIConstIter> unchanged_vois;
     //check add and modifying
     for (VOIConstIter it = vois.begin(); it != vois.end(); ++it) {
@@ -122,8 +124,9 @@ bool  NoneImgAnnotations::check_dirty() {
         }
     }
 
-    //check camera changed
-    if (camera_dirty) {
+    //check camera changed & canvas size changed
+    if (camera_dirty || canvas_dirty) {
+        //update all 2D contours
         for (auto it = unchanged_vois.begin(); it != unchanged_vois.end(); ++it) {
             const std::string& id = (*it)->first;
             const VOISphere& voi = (*it)->second.voi;
@@ -149,6 +152,10 @@ bool  NoneImgAnnotations::check_dirty() {
     if (camera_dirty) {
         _pre_camera = *ortho_camera;
     }
+    if(canvas_dirty) {
+        _pre_width = width;
+        _pre_height = height;
+    }
     if (voi_dirty) {
         _pre_vois.clear();
         for (auto it = vois.begin(); it != vois.end(); ++it) {
@@ -159,7 +166,7 @@ bool  NoneImgAnnotations::check_dirty() {
         }
     }
 
-    return camera_dirty || voi_dirty;
+    return camera_dirty || voi_dirty || canvas_dirty;
 }
 
 void  NoneImgAnnotations::update() {
