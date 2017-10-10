@@ -31,7 +31,7 @@
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_none_image.h"
 #include "appcommon/mi_model_annotation.h"
-#include "appcommon/mi_ob_annotation_none_image.h"
+#include "appcommon/mi_ob_annotation_list.h"
 #include "appcommon/mi_ob_annotation_segment.h"
 #include "appcommon/mi_ob_annotation_statistic.h"
 #include "appcommon/mi_app_common_define.h"
@@ -112,12 +112,12 @@ int OpInit::execute() {
     ob_annotation_segment->set_volume_infos(volume_infos);
     // std::shared_ptr<OBAnnotationStatistic> ob_annotation_statistic(new OBAnnotationStatistic());
     // ob_annotation_statistic->set_model(anno_model);
-    std::shared_ptr<OBAnnotationNoneImg> ob_annotation_noneimg(new OBAnnotationNoneImg());
-    ob_annotation_noneimg->set_model(anno_model);
-
+    std::shared_ptr<OBAnnotationList> ob_annotation_list(new OBAnnotationList());
+    ob_annotation_list->set_model(anno_model);
+    ob_annotation_list->set_controller(controller);
     anno_model->add_observer(ob_annotation_segment);
     //anno_model->add_observer(ob_annotation_statistic);
-    anno_model->add_observer(ob_annotation_noneimg);
+    anno_model->add_observer(ob_annotation_list);
 
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
@@ -320,7 +320,6 @@ int OpInit::execute() {
             }
             controller->add_cell(cell_id, cell);
 
-            ob_annotation_noneimg->set_mpr_none_image(mpr_none_images);
             ob_annotation_segment->set_vr_scenes(vr_scenes);
             ob_annotation_segment->set_mpr_scenes(mpr_scenes);
         }
@@ -489,7 +488,6 @@ int OpInit::execute() {
         }
         controller->add_cell(cell_id, cell);
 
-        ob_annotation_noneimg->set_mpr_none_image(mpr_none_images);
         ob_annotation_segment->set_vr_scenes(vr_scenes);
         ob_annotation_segment->set_mpr_scenes(mpr_scenes);
 

@@ -18,7 +18,8 @@
         }
 
         .no-select-text {
-            cursor: default; /* cursor shape not change*/
+            cursor: default;
+            /* cursor shape not change*/
             -webkit-touch-callout: none;
             /* iOS Safari */
             -webkit-user-select: none;
@@ -104,10 +105,16 @@
                     <div class="col-md-2 column">
                         <div class="row clearfix">
                             <div class="col-md-12 column">
+                                <!-- <div class="col-md-6 column"> -->
                                 <button type="button" class="btn btn-default">L1x1</button>
+                                <!-- </div> -->
+                                <br>
+                                <!-- <div class="col-md-6 column"> -->
                                 <button type="button" class="btn btn-default">L2x2</button>
+                                <!-- </div> -->
                             </div>
                         </div>
+                        <br>
                         <div class="row clearfix">
                             <div class="col-md-12 column">
                                 <div class="btn-group">
@@ -126,53 +133,48 @@
                                 </div>
                             </div>
                         </div>
+                        <br>
                         <div class="row clearfix">
                             <div class="col-md-12 column">
                             </div>
                         </div>
                         <div class="row clearfix">
                             <div class="col-md-12 column">
-                                <ol>
-                                    <li>
-                                        nodule
-                                    </li>
-                                    <li>
-                                        nodule
-                                    </li>
-                                    <li>
-                                        nodule
-                                    </li>
-                                    <li>
-                                        nodule
-                                    </li>
-                                    <li>
-                                        nodule
-                                    </li>
-                                    <li>
-                                        nodule
-                                    </li>
-                                </ol>
+                                <table class="table table-condensed table-hover table-bordered" id="annotation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Position</th>
+                                            <th>Diameter</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="annotation-list">
+                                    </tbody>
+                                </table>
+                                <button class="btn btn-default" type="button" id="btn-delete-annotation"><em class="glyphicon glyphicon-align-left"></em>Del</button>
                             </div>
                         </div>
+                        <br>
                         <div class="row clearfix">
-                            <div class="btn-group" id="common-tools">
-                                <button class="btn btn-default" type="button" id="common-tool-arrow"><em class="glyphicon glyphicon-align-left"></em>Ar</button>
-                                <button class="btn btn-default" type="button" id="common-tool-zoom"><em class="glyphicon glyphicon-align-center"></em>Zo</button>
-                                <button class="btn btn-default" type="button" id="common-tool-rotate"><em class="glyphicon glyphicon-align-right"></em>Ro</button>
-                                <br>
-                                <button class="btn btn-default" type="button" id="common-tool-pan"><em class="glyphicon glyphicon-align-left"></em>Pan</button>
-                                <button class="btn btn-default" type="button" id="common-tool-windowing"><em class="glyphicon glyphicon-align-center"></em>Win</button>
-                                <button class="btn btn-default" type="button" id="common-tool-annotation"><em class="glyphicon glyphicon-align-right"></em>An</button>
-                                <!-- class="btn btn-canvas2default" -->
+                            <div class="col-md-12 column">
+                                <div class="btn-group" id="common-tools">
+                                    <button class="btn btn-default" type="button" id="common-tool-arrow"><em class="glyphicon glyphicon-align-left"></em>Ar</button>
+                                    <button class="btn btn-default" type="button" id="common-tool-zoom"><em class="glyphicon glyphicon-align-center"></em>Zo</button>
+                                    <button class="btn btn-default" type="button" id="common-tool-rotate"><em class="glyphicon glyphicon-align-right"></em>Ro</button>
+                                    <br>
+                                    <button class="btn btn-default" type="button" id="common-tool-pan"><em class="glyphicon glyphicon-align-left"></em>Pan</button>
+                                    <button class="btn btn-default" type="button" id="common-tool-windowing"><em class="glyphicon glyphicon-align-center"></em>Win</button>
+                                    <button class="btn btn-default" type="button" id="common-tool-annotation"><em class="glyphicon glyphicon-align-right"></em>An</button>
+                                    <!-- class="btn btn-canvas2default" -->
+                                </div>
                             </div>
+
                         </div>
+                        <br>
                         <div class="row clearfix">
-                            <button class="btn btn-play-vr" type="button" id="btn-play-vr"><em class="glyphicon glyphicon-align-left"></em>PlayVR</button>
-                            <br>
-                            <button type="button" id="btn-test-add"> test add </button> <br>
-                            <button type="button" id="btn-test-modifying"> test modifying</button> <br>
-                            <button type="button" id="btn-test-modifycompleted"> test modify completed</button> <br>
-                            <button type="button" id="btn-test-delete"> test delete</button> <br>
+                            <div class="col-md-12 column">
+                                <button class="btn btn-play-vr" type="button" id="btn-play-vr"><em class="glyphicon glyphicon-align-left"></em>PlayVR</button>
+                            </div>
                         </div>
                         <p id="test-info">
                         </p>

@@ -45,6 +45,7 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
     if (!msg.SerializeToArray(data, buffer_size)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: serialize failed.";
         delete [] data;
+        data = nullptr;
         buffer_size = 0;
         return nullptr; 
     } else {

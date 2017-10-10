@@ -24,6 +24,7 @@ public:
         VOISphere voi;
         unsigned char label;
         IntensityInfo intensity_info;
+        int row;
     };
 
     ModelAnnotation();
@@ -33,6 +34,8 @@ public:
     VOISphere get_annotation(const std::string& id) const;
     VOISphere get_annotation_by_label(unsigned char label) const;
     const std::map<std::string, ModelAnnotation::AnnotationUnit>& get_annotations() const;
+    std::string get_last_annotation() const;
+    int get_annotation_row(const std::string& id) const;
 
     unsigned char get_label(const std::string& id) const;
 
@@ -53,11 +56,16 @@ public:
     bool get_annotation_visibility() const;
     void set_annotation_visibility(bool flag);
 
+    void set_processing_cache(const std::string& id);
+    void get_processing_cache(std::string& id);
+
 protected:
 
 private:
     std::map<std::string, ModelAnnotation::AnnotationUnit>  _annotations;
     bool _visibility;
+
+    std::string _cache_id;
 };
 
 MED_IMG_END_NAMESPACE

@@ -8,6 +8,9 @@ var worklistBuffer = null;
 var socketClient = null;
 var revcBEReady = false;
 
+var annotationListBuffer = null;
+var annotationTBody = null;
+
 (function() {
     function getUserID(userName) {
         return userName + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
@@ -91,6 +94,80 @@ var revcBEReady = false;
         });
     }
 
+    function recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+        if (!socketClient.protocRoot) {
+            console.log('null protocbuf.');
+            return;
+        }
+        if (withHeader) {
+            annotationListBuffer = new ArrayBuffer(dataLen + restDataLen);
+        }
+
+        var dstview = new Uint8Array(annotationListBuffer);
+        var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+        var cpSrc = annotationListBuffer.byteLength - (dataLen + restDataLen);
+        for (var i = cpSrc; i < dataLen; i++) {
+            dstview[i] = srcview[i];
+        }
+
+        if (restDataLen <= 0) {
+            console.log('recv annotation list.');
+            var MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationList');
+            if (!MsgAnnotationListType) {
+                console.log('get annotation list message type failed.');
+            }
+            var annotationListView = new Uint8Array(annotationListBuffer);
+            var annotationList = MsgAnnotationListType.decode(annotationListView);
+            if (annotationList) {
+                var listItems = annotationList.item;
+                for (var i = 0; i < listItems.length; ++i) {
+                    var id = listItems[i].id;
+                    var info = listItems[i].info;
+                    var row = listItems[i].row;
+                    var status = listItems[i].status;
+                    var cx = listItems[i].para0;
+                    var cy = listItems[i].para1;
+                    var cz = listItems[i].para2;
+                    var diameter = listItems[i].para3;
+
+                    if(status == 0) {//add
+                        var rowItem = document.createElement('tr');
+                        $(rowItem).click(function(event) {
+                            $(this).addClass('success').siblings().removeClass('success');
+                        });
+
+                        //rowItem.setAttribute('id', id);
+                        var cellItem0 = document.createElement('td');
+                        cellItem0.innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+                        var cellItem1 = document.createElement('td');
+                        cellItem1.innerHTML = diameter.toFixed(2);  
+                        var cellItem2 = document.createElement('td');
+                        cellItem2.innerHTML = info;
+                        rowItem.appendChild(cellItem0);
+                        rowItem.appendChild(cellItem1);
+                        rowItem.appendChild(cellItem2);
+                        annotationTBody.appendChild(rowItem);
+
+                    } else if (status == 1) {// delete
+                        var childNodes = annotationTBody.childNodes;
+                        if (childNodes.length - 1 >= row) {
+                            annotationTBody.removeChild(childNodes[row]);
+                        }
+                    } else if (status == 2) {// modifying
+                        var childNodes = annotationTBody.childNodes;
+                        if (childNodes.length - 1 >= row) {
+                            var cellsItem = childNodes[row+1].cells;
+                            cellsItem[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+                            cellsItem[1].innerHTML = diameter.toFixed(2);  
+                            cellsItem[2].innerHTML = info;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
     function cmdHandler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
             case COMMAND_ID_BE_SEND_IMAGE:
@@ -108,7 +185,8 @@ var revcBEReady = false;
             case COMMAND_ID_BE_HEARTBEAT:
                 socketClient.heartbeat();
                 break;
-            case COMMAND_ID_BE_SEND_ANNOTATION:
+            case COMMAND_ID_BE_SEND_ANNOTATION_LIST:
+                recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             default:
                 break;
@@ -322,65 +400,8 @@ var revcBEReady = false;
             console.log('get btn-play-vr node failed.');
         }
 
-        //TODO Test Code
-        document.getElementById('btn-test-add').onclick = function() {     
-            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-            var msgAnnoUnit = MsgAnnotationUnit.create();
-            msgAnnoUnit.type = 0;
-            msgAnnoUnit.id = 0;
-            msgAnnoUnit.status = 0;
-            msgAnnoUnit.visibility = true;
-            msgAnnoUnit.para0 = cellCanvases[0].width/2;
-            msgAnnoUnit.para1 = cellCanvases[0].height/2;
-            msgAnnoUnit.para2 = 1;
-            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-            alert('add');
-        };
-        document.getElementById('btn-test-modifying').onclick = function() {
-            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-            var msgAnnoUnit = MsgAnnotationUnit.create();
-            msgAnnoUnit.type = 0;
-            msgAnnoUnit.id = 0;
-            msgAnnoUnit.status = 2;
-            msgAnnoUnit.visibility = true;
-            msgAnnoUnit.para0 = cellCanvases[0].width/2;
-            msgAnnoUnit.para1 = cellCanvases[0].height/2;
-            msgAnnoUnit.para2 = 20;
-            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-            alert('modifying');
-        };
-        document.getElementById('btn-test-modifycompleted').onclick = function() {
-            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-            var msgAnnoUnit = MsgAnnotationUnit.create();
-            msgAnnoUnit.type = 0;
-            msgAnnoUnit.id = 0;
-            msgAnnoUnit.status = 3;
-            msgAnnoUnit.visibility = true;
-            msgAnnoUnit.para0 = cellCanvases[0].width/2;
-            msgAnnoUnit.para1 = cellCanvases[0].height/2;
-            msgAnnoUnit.para2 = 20;
-            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-            alert('modify completed');
-        };
-        document.getElementById('btn-test-delete').onclick = function() {
-            var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-            var msgAnnoUnit = MsgAnnotationUnit.create();
-            msgAnnoUnit.type = 0;
-            msgAnnoUnit.id = 0;
-            msgAnnoUnit.status = 1;
-            msgAnnoUnit.visibility = true;
-            msgAnnoUnit.para0 = cellCanvases[0].width/2;
-            msgAnnoUnit.para1 = cellCanvases[0].height/2;
-            msgAnnoUnit.para2 = 20;
-            var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_ANNOTATION, 0, msgBuffer.byteLength, msgBuffer);
-            
-            alert('delete');
-        };
-        
+        annotationTBody = document.getElementById("annotation-list");
+
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();
