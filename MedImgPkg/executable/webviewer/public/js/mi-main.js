@@ -409,10 +409,20 @@ var annotationTBody = null;
                 if (choosedItem.length > 0) {
                     var id = choosedItem.attr('id')
                     if (id) {
-                        sendMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
+                        sendAnnotationMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
                     }
                 }
 
+            });
+        }
+
+        var annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
+        if (annotationOverlayCBox) {
+            annotationOverlayCBox.checked = true;
+            annotationOverlayCBox.addEventListener('click', function(event) {
+                if (this.checked) {
+                    //TODO send msg to be to change annotation overlay visibility(mask) not contour
+                }  
             });
         }
 

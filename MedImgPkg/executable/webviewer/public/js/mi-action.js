@@ -62,7 +62,7 @@ const ANNOTATION_DELETE = 1;
 const ANNOTATION_MODIFYING = 2;
 const ANNOTATION_MODIFYCOMPLETED = 3;
 
-function sendMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, socketClient) {
+function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, socketClient) {
     if(!socketClient.protocRoot) {
         console.log('null protocbuf.');
         return;
@@ -102,12 +102,12 @@ ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibi
     roi.setCtrlRadius(0.0);
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
-        sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
+        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
         return true;
     }).bind(this);
 
     roi.dragEndCallback = (function(cx, cy, r, key) {
-        sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
+        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
         return true;
     }).bind(this);
 
@@ -123,7 +123,7 @@ ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cel
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendMSG(this.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r, this.socketClient);
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r, this.socketClient);
 }
 
 ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell){
@@ -144,7 +144,7 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
 
     return true;
 }
@@ -160,6 +160,6 @@ ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell)
     let cx = roi.cx;
     let cy = roi.cy;
     let r = roi.r;
-    sendMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
 }
 
