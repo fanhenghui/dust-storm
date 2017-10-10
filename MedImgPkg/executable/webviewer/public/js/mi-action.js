@@ -99,6 +99,7 @@ function ActionAnnotation(socketClient, cellID) {
 ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility) {
     var roi = new ROICircle(id, svg, cx, cy, r);
     roi.visible(visibility);
+    roi.setCtrlRadius(0.0);
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
         sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);

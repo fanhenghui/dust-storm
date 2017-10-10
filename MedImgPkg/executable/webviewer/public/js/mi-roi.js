@@ -1,7 +1,10 @@
 const MAIN_COLOR = 'red';
-const CTRL_COLOR = '#DC143C';
-const CTRL_SIZE = 3;
+const CTRL_COLOR = 'yellow';//'#DC143C'
+const CTRL_SIZE = 6;
 const HIGHLIGHT_COLOR = 'yellow';
+
+const APPEARING_TIME = 250; // 250 ms
+const FADING_TIME = 2000; // 2s
 
 function ROICircle(key, svg, cx, cy, r){
     this.svg = svg;
@@ -24,20 +27,73 @@ function ROICircle(key, svg, cx, cy, r){
     this.keyCtrlRT = key+'-rt';
     this.keyCtrlRB = key+'-rb';
     this.keyCtrlMove = key+'-move';
+    this.hovering = false;
 
+    var hoveringFunc = (function () {
+        if (this.hovering == false) {
+            //each of the five circle is visible/draggble
+            this.roiCtrlLT.style('cursor', 'move');
+            this.roiCtrlLB.style('cursor', 'move');
+            this.roiCtrlRT.style('cursor', 'move');
+            this.roiCtrlRB.style('cursor', 'move');
+            this.roiCtrlMove.style('cursor', 'move');
+
+            this.roiCtrlLT.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+            this.roiCtrlLB.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+            this.roiCtrlRT.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+            this.roiCtrlRB.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+            this.roiCtrlMove.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+
+            //this.roiMain.style('cursor', 'default');
+            this.hovering = true;
+        }
+    }).bind(this);
+
+    var hoveringDoneFunc = (function () {
+        //each of the five circle is invisible none-draggble
+        this.roiCtrlLT.style('cursor', 'default');
+        this.roiCtrlLB.style('cursor', 'default');
+        this.roiCtrlRT.style('cursor', 'default');
+        this.roiCtrlRB.style('cursor', 'default');
+        this.roiCtrlMove.style('cursor', 'default');
+
+        this.roiCtrlLT.transition().duration(FADING_TIME).attr('r', 0.0);
+        this.roiCtrlLB.transition().duration(FADING_TIME).attr('r', 0.0);
+        this.roiCtrlRT.transition().duration(FADING_TIME).attr('r', 0.0);
+        this.roiCtrlRB.transition().duration(FADING_TIME).attr('r', 0.0);
+        this.roiCtrlMove.transition().duration(FADING_TIME).attr('r', 0.0);
+
+        //this.roiMain.style("cursor", "default");
+        this.hovering = false;
+    }).bind(this);
+    
     //SVG circles
-    //main contour (can't be selected)
+    //main contour (selected as hovering area)
     this.roiMain = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyMain, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return d.cx;})
-    .attr('cy', function(d) { return d.cy;})
-    .attr('r', function(d) { return d.r;})
-    .style('fill', 'none')
-    .style('stroke', MAIN_COLOR)
-    .style('stroke-opacity', 1.0)
-    .style('stroke-width', 2);
+        .data([{
+            key: this.keyMain,
+            cx: cx,
+            cy: cy,
+            r: r
+        }], function (d) {
+            return d.key;
+        }).enter().append('circle')
+        .attr('cx', function (d) {
+            return d.cx;
+        })
+        .attr('cy', function (d) {
+            return d.cy;
+        })
+        .attr('r', function (d) {
+            return d.r;
+        })
+        // .style('fill', 'none')
+        .style('fill-opacity', 0.0)
+        .style('stroke', MAIN_COLOR)
+        .style('stroke-opacity', 1.0)
+        .style('stroke-width', 2)
+        .on("mouseover", hoveringFunc)
+        .on("mouseout", hoveringDoneFunc);
 
     //4 ctrl circle for stretching (selected whole circle)
     this.roiCtrlLT = d3.select(svg).selectAll('circle')
@@ -48,7 +104,9 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
     .attr('r', CTRL_SIZE)
     .style('fill', CTRL_COLOR)
-    .style('cursor', 'move');
+    .on("mouseover", hoveringFunc)
+    .on("mouseout", hoveringDoneFunc);
+    //.style('cursor', 'move');
 
     this.roiCtrlLB = d3.select(svg).selectAll('circle')
     .data([{key:this.keyCtrlLB, cx:cx, cy:cy, r:r}], function(d) {
@@ -58,7 +116,9 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
     .attr('r', CTRL_SIZE)
     .style('fill', CTRL_COLOR)
-    .style('cursor', 'move');
+    .on("mouseover", hoveringFunc)
+    .on("mouseout", hoveringDoneFunc);
+    // .style('cursor', 'move');
 
     this.roiCtrlRT = d3.select(svg).selectAll('circle')
     .data([{key:this.keyCtrlRT, cx:cx, cy:cy, r:r}], function(d) {
@@ -68,7 +128,9 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
     .attr('r', CTRL_SIZE)
     .style('fill', CTRL_COLOR)
-    .style('cursor', 'move');
+    .on("mouseover", hoveringFunc)
+    .on("mouseout", hoveringDoneFunc);
+    // .style('cursor', 'move');
 
     this.roiCtrlRB = d3.select(svg).selectAll('circle')
     .data([{key:this.keyCtrlRB, cx:cx, cy:cy, r:r}], function(d) {
@@ -78,7 +140,9 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
     .attr('r', CTRL_SIZE)
     .style('fill', CTRL_COLOR)
-    .style('cursor', 'move');
+    .on("mouseover", hoveringFunc)
+    .on("mouseout", hoveringDoneFunc);
+    // .style('cursor', 'move');
 
     //1 ctrl circle for moving (selected loop)
     this.roiCtrlMove = d3.select(svg).selectAll('circle')
@@ -88,39 +152,44 @@ function ROICircle(key, svg, cx, cy, r){
     .attr('cx', function(d) { return d.cx;})
     .attr('cy', function(d) { return d.cy;})
     .attr('r', CTRL_SIZE)
-    .style('fill-opacity', 0.0)
-    .style('stroke', CTRL_COLOR)
-    .style('stroke-opacity', 1.0)
-    .style('stroke-width', 3)
-    .style('cursor', 'move');
+    .style('fill', CTRL_COLOR)
+    .on("mouseover", hoveringFunc)
+    .on("mouseout", hoveringDoneFunc);
+    // .style('fill-opacity', 0.0)
+    // .style('stroke', CTRL_COLOR)
+    // .style('stroke-opacity', 1.0)
+    // .style('stroke-width', 3);
+    // .style('cursor', 'move');
 
     //dragger
-    var dragEndCtrl = (function(d) {
-        if(this.dragEndCallback) {
+    var dragEndCtrl = (function (d) {
+        if (this.dragEndCallback) {
             return this.dragEndCallback(this.cx, this.cy, this.r, this.key);
         }
     }).bind(this);
 
-    this.roiCtrlMove.call(d3.drag().on('drag' , (function(d) {
+    this.roiCtrlMove.call(d3.drag().on('drag', (function (d) {
         this.move(d3.event.x, d3.event.y);
-        if(this.dragingCallback) {
+        if (this.dragingCallback) {
             this.dragingCallback(this.cx, this.cy, this.r, this.key);
         }
-    }).bind(this)).on('end' ,dragEndCtrl));
+    }).bind(this)).on('end', dragEndCtrl));
 
-    var dragCtrlStretch = (function(d) {
+    var dragCtrlStretch = (function (d) {
         let cx = this.roiMain.attr('cx');
         let cy = this.roiMain.attr('cy');
-        let r = Math.sqrt((d3.event.x - cx)*(d3.event.x - cx) + (d3.event.y - cy)*(d3.event.y - cy));
+        let r = Math.sqrt((d3.event.x - cx) * (d3.event.x - cx) + (d3.event.y - cy) * (d3.event.y - cy));
         this.stretch(Math.floor(r));
-        if(this.dragingCallback) {
+        if (this.dragingCallback) {
             return this.dragingCallback(this.cx, this.cy, this.r, this.key);
         }
     }).bind(this);
-    this.roiCtrlLT.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
-    this.roiCtrlLB.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
-    this.roiCtrlRT.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
-    this.roiCtrlRB.call(d3.drag().on('drag' ,dragCtrlStretch).on('end' ,dragEndCtrl));
+
+    //2:register drop operation
+    this.roiCtrlLT.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
+    this.roiCtrlLB.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
+    this.roiCtrlRT.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
+    this.roiCtrlRB.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
 }
 
 ROICircle.prototype.move = function(cx, cy) {
@@ -213,6 +282,14 @@ ROICircle.prototype.visible = function(flag) {
     this.roiCtrlMove.style('display', vis);
 }
 
+ROICircle.prototype.setCtrlRadius = function(radius) {
+    this.roiCtrlLT.attr('r', radius);
+    this.roiCtrlLB.attr('r', radius);
+    this.roiCtrlRT.attr('r', radius);
+    this.roiCtrlRB.attr('r', radius);
+    this.roiCtrlMove.attr('r', radius);
+}
+
 ROICircle.prototype.creating = function(x, y) {
     let cx = parseFloat(this.roiMain.attr('cx'));
     let cy = parseFloat(this.roiMain.attr('cy'));
@@ -239,6 +316,3 @@ ROICircle.prototype.release = function() {
         return d.key;
     }).exit().remove();
 }
-
-
-
