@@ -218,7 +218,7 @@ var revcBEReady = false;
                 break;
             case 'common-tool-zoom':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[0].activeAction(ACTION_ID_ZOOM);
+                    cells[i].activeAction(ACTION_ID_ZOOM);
                 }
                 break;
             case 'common-tool-pan':
@@ -237,12 +237,9 @@ var revcBEReady = false;
                 }
                 break;
             case 'common-tool-annotation':
-                // TODO annotation
-                for (var i = 0; i < (cells.length-1); ++i) {
-                    cells[0].activeAction(ACTION_ID_MRP_ANNOTATION);
-                    cells[1].activeAction(ACTION_ID_MRP_ANNOTATION);
-                    cells[2].activeAction(ACTION_ID_MRP_ANNOTATION);
-                }
+                cells[0].activeAction(ACTION_ID_MRP_ANNOTATION);
+                cells[1].activeAction(ACTION_ID_MRP_ANNOTATION);
+                cells[2].activeAction(ACTION_ID_MRP_ANNOTATION);
                 break;
             default:
                 // TODO ERR

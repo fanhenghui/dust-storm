@@ -192,6 +192,7 @@ int OpInit::execute() {
             cell->set_none_image(none_image);
             if (type_id == 1) { // MPR
                 std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+                mpr_scene->set_mask_label_level(L_32);
                 mpr_scenes.push_back(mpr_scene);
                 cell->set_scene(mpr_scene);
                 mpr_scene->set_test_code(0); {
@@ -248,6 +249,7 @@ int OpInit::execute() {
 
             } else if (type_id == 2) {  // VR
                 std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+                vr_scene->set_mask_label_level(L_32);
                 vr_scenes.push_back(vr_scene);
                 cell->set_scene(vr_scene);
                 vr_scene->set_test_code(0);
@@ -377,6 +379,7 @@ int OpInit::execute() {
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+            mpr_scene->set_mask_label_level(L_32);
             mpr_scenes.push_back(mpr_scene);
             cell->set_scene(mpr_scene);
             mpr_scene->set_test_code(0);
@@ -422,6 +425,7 @@ int OpInit::execute() {
             mpr_none_images.push_back(none_image);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+            vr_scene->set_mask_label_level(L_32);
             vr_scenes.push_back(vr_scene);
             cell->set_scene(vr_scene);
             vr_scene->set_test_code(0);
