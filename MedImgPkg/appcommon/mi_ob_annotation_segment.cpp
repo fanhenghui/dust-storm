@@ -162,6 +162,13 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             recover_i(aabb , label);
             _pre_vois.erase(*it);
         }
+
+        for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
+            (*it)->set_dirty(true);
+        }
+        for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
+            (*it)->set_dirty(true);
+        }
     }
 
     /// \Modifying

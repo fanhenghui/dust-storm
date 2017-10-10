@@ -159,6 +159,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                         case 1: //delete
                             for (var i = 0; i < this.rois.length; ++i) {
                                 if (this.rois[i].key == id) {
+                                    this.rois[i].release();
                                     this.rois.splice(i, 1);
                                     break;
                                 }

@@ -108,7 +108,7 @@ bool  NoneImgAnnotations::check_dirty() {
     }
 
     //check delete
-    for (auto it2 = _pre_vois.begin(); it2 != _pre_vois.begin(); ++it2) {
+    for (auto it2 = _pre_vois.begin(); it2 != _pre_vois.end(); ++it2) {
         const std::string& id = it2->first;
         if (vois.find(id) == vois.end()) {
             voi_dirty = true;
@@ -121,6 +121,7 @@ bool  NoneImgAnnotations::check_dirty() {
             unit.para1 = 0;
             unit.para2 = 0;
             this->add_annotation(unit);
+            //MI_APPCOMMON_LOG(MI_DEBUG) << "delete annotation: " << id;
         }
     }
 

@@ -150,13 +150,13 @@ var annotationTBody = null;
 
                     } else if (status == 1) {// delete
                         var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length - 1 >= row) {
-                            annotationTBody.removeChild(childNodes[row]);
+                        if (childNodes.length >= row + 1) {
+                            annotationTBody.removeChild(childNodes[row + 1]);
                         }
                     } else if (status == 2) {// modifying
                         var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length - 1 >= row) {
-                            var cellsItem = childNodes[row+1].cells;
+                        if (childNodes.length >= row + 1) {
+                            var cellsItem = childNodes[row + 1].cells;
                             cellsItem[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
                             cellsItem[1].innerHTML = diameter.toFixed(2);  
                             cellsItem[2].innerHTML = info;
