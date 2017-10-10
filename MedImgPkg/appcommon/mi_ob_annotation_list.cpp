@@ -28,7 +28,7 @@ void OBAnnotationList::set_controller(std::shared_ptr<AppController> controller)
 }
 
 void OBAnnotationList::update(int code_id) {
-    MI_APPCOMMON_LOG(MI_DEBUG) << "IN OBAnnotationList";
+    MI_APPCOMMON_LOG(MI_INFO) << "IN OBAnnotationList";
     std::shared_ptr<ModelAnnotation> model = _model.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(model);
     std::string processing_id;
@@ -136,7 +136,7 @@ void OBAnnotationList::update(int code_id) {
     header._data_len = static_cast<unsigned int>(buffer_size);
     controller->get_client_proxy()->async_send_message(header, buffer);
 
-    MI_APPCOMMON_LOG(MI_DEBUG) << "OUT OBAnnotationList";
+    MI_APPCOMMON_LOG(MI_INFO) << "OUT OBAnnotationList";
 }
 
 MED_IMG_END_NAMESPACE

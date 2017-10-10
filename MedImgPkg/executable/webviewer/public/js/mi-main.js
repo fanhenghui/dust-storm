@@ -150,12 +150,12 @@ var annotationTBody = null;
 
                     } else if (status == 1) {// delete
                         var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length >= row + 1) {
+                        if (childNodes.length > row + 1) {
                             annotationTBody.removeChild(childNodes[row + 1]);
                         }
                     } else if (status == 2) {// modifying
                         var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length >= row + 1) {
+                        if (childNodes.length > row + 1) {
                             var cellsItem = childNodes[row + 1].cells;
                             cellsItem[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
                             cellsItem[1].innerHTML = diameter.toFixed(2);  
@@ -406,9 +406,11 @@ var annotationTBody = null;
         if (deleteAnnotationBtn) {
             deleteAnnotationBtn.addEventListener('click', function(event) {
                 var choosedItem = $('#annotation-list tr.success');
-                if (choosedItem) {
+                if (choosedItem.length > 0) {
                     var id = choosedItem.attr('id')
-                    sendMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
+                    if (id) {
+                        sendMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
+                    }
                 }
 
             });
