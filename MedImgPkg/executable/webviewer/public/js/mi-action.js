@@ -96,8 +96,9 @@ function ActionAnnotation(socketClient, cellID) {
     this.cellID = cellID;
 };
 
-ActionAnnotation.prototype.createROICircle = function(id, svg, x, y, r) {
-    var roi = new ROICircle(id, svg, x, y, r);
+ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility) {
+    var roi = new ROICircle(id, svg, cx, cy, r);
+    roi.visible(visibility);
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
         sendMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
@@ -115,7 +116,7 @@ ActionAnnotation.prototype.createROICircle = function(id, svg, x, y, r) {
 ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
     let annoID = new Date().getTime() + '|' + cell.rois.length;
     //add a new ROI to operating cell
-    cell.lastROI = this.createROICircle(annoID, cell.svg, x, y, 0);
+    cell.lastROI = this.createROICircle(annoID, cell.svg, x, y, 0, true);
     
     //send msg to BE
     let cx = cell.lastROI.cx;

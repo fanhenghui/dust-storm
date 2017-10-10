@@ -139,7 +139,9 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     });
                 }
             }
-        } else if (receivedMsg.annotations) {
+        }
+        
+        if (receivedMsg.annotations) {
             var annotations = receivedMsg.annotations.annotation;
             if (annotations) {
                 for (var i = 0; i < annotations.length; ++i) {
@@ -152,7 +154,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     var r = annoUnit.para2;
                     switch (annoUnit.status) {
                         case 0: //add
-                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r));
+                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0)));
                             break;
                         case 1: //delete
                             for (var i = 0; i < this.rois.length; ++i) {

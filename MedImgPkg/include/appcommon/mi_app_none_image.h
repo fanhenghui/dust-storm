@@ -6,6 +6,7 @@
 #include <set>
 #include "appcommon/mi_app_none_image_interface.h"
 #include "appcommon/mi_app_none_image_item.h"
+#include "boost/thread/mutex.hpp"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -25,6 +26,8 @@ public:
 private:
     std::map<NoneImageType, std::shared_ptr<INoneImg>> _none_image_items;
     std::set<NoneImageType> _dirty_cache;
+    mutable boost::mutex _mutex;
+    
 };
 
 MED_IMG_END_NAMESPACE

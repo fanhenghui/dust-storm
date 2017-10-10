@@ -199,7 +199,7 @@ ROICircle.prototype.locate = function(cx, cy, r) {
 }
 
 ROICircle.prototype.visible = function(flag) {
-    if( flag === true) {
+    if( flag == true) {
         var vis = 'inline';
     } else {
         var vis = 'none';

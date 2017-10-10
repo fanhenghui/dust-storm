@@ -29,6 +29,10 @@ const std::vector<NoneImgAnnotations::AnnotationUnit>& NoneImgAnnotations::get_a
 }
 
 void NoneImgAnnotations::fill_msg(MsgNoneImgCollection* msg) const {
+    if (_annotations.empty()) {
+        return;
+    }
+    
     MsgNoneImgAnnotations* annotations_msg = msg->mutable_annotations();
     for (size_t i = 0; i< _annotations.size(); ++i) {
         MsgAnnotationUnit* unit = annotations_msg->add_annotation();
@@ -39,6 +43,9 @@ void NoneImgAnnotations::fill_msg(MsgNoneImgCollection* msg) const {
         unit->set_para0(_annotations[i].para0);
         unit->set_para1(_annotations[i].para1);
         unit->set_para2(_annotations[i].para2);
+        // MI_APPCOMMON_LOG(MI_DEBUG) << "in annotation fill msg. id: " << _annotations[i].id << " status: " <<
+        // _annotations[i].status << " vis: " << _annotations[i].visibility << " p0: " << _annotations[i].para0 <<
+        // " p1: " << _annotations[i].para1 << " p2: " << _annotations[i].para2;
     }
 }
 
@@ -58,9 +65,13 @@ bool  NoneImgAnnotations::check_dirty() {
     typedef std::map<std::string, NoneImgAnnotations::VOIUnit>::iterator PreVOIConstIter;
 
     //TODO intensity info
-    bool dirty = false;
+
+    _annotations.clear();
+    bool voi_dirty = false;
+    bool camera_dirty = !(*ortho_camera == _pre_camera);
+    std::vector<VOIConstIter> unchanged_vois;
     //check add and modifying
-    for (auto it = vois.begin(); it != vois.end(); ++it) {
+    for (VOIConstIter it = vois.begin(); it != vois.end(); ++it) {
         const std::string& id = it->first;
         const VOISphere& voi = it->second.voi;
         auto it2 = _pre_vois.find(id);
@@ -72,14 +83,57 @@ bool  NoneImgAnnotations::check_dirty() {
         }
 
         if(status != -1) {
-            dirty = true;
+            voi_dirty = true;
             AnnotationUnit unit;
             unit.type = 0;
             unit.id = id;
             unit.status = status;
             unit.visibility = false;
-            unit.para0 = -1;
-            unit.para1 = -1;
+            unit.para0 = 0;
+            unit.para1 = 0;
+            unit.para2 = 0;
+            Circle circle;
+            if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
+                unit.visibility = true;
+                unit.para0 = circle._center.x;
+                unit.para1 = circle._center.y;
+                unit.para2 = circle._radius;
+            }
+            this->add_annotation(unit);
+        } else {
+            unchanged_vois.push_back(it);
+        }
+    }
+
+    //check delete
+    for (auto it2 = _pre_vois.begin(); it2 != _pre_vois.begin(); ++it2) {
+        const std::string& id = it2->first;
+        if (vois.find(id) == vois.end()) {
+            voi_dirty = true;
+            AnnotationUnit unit;
+            unit.type = 0;
+            unit.id = id;
+            unit.status = 1;//delete
+            unit.visibility = false;
+            unit.para0 = 0;
+            unit.para1 = 0;
+            unit.para2 = 0;
+            this->add_annotation(unit);
+        }
+    }
+
+    //check camera changed
+    if (camera_dirty) {
+        for (auto it = unchanged_vois.begin(); it != unchanged_vois.end(); ++it) {
+            const std::string& id = (*it)->first;
+            const VOISphere& voi = (*it)->second.voi;
+            AnnotationUnit unit;
+            unit.type = 0;
+            unit.id = id;
+            unit.status = 2;//modifying
+            unit.visibility = false;
+            unit.para0 = 0;
+            unit.para1 = 0;
             unit.para2 = 0;
             Circle circle;
             if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
@@ -92,31 +146,10 @@ bool  NoneImgAnnotations::check_dirty() {
         }
     }
 
-    //check delete
-    for (auto it2 = _pre_vois.begin(); it2 != _pre_vois.begin(); ++it2) {
-        const std::string& id = it2->first;
-        if (vois.find(id) == vois.end()) {
-            dirty = true;
-            AnnotationUnit unit;
-            unit.type = 0;
-            unit.id = id;
-            unit.status = 1;//delete
-            unit.visibility = false;
-            unit.para0 = -1;
-            unit.para1 = -1;
-            unit.para2 = 0;
-            this->add_annotation(unit);
-        }
-    }
-
-    if (!dirty) {
-        if (!(*ortho_camera == _pre_camera)) {
-            dirty = true;
-        }
-    }
-
-    if (dirty) {
+    if (camera_dirty) {
         _pre_camera = *ortho_camera;
+    }
+    if (voi_dirty) {
         _pre_vois.clear();
         for (auto it = vois.begin(); it != vois.end(); ++it) {
             const std::string& id = it->first;
@@ -126,7 +159,7 @@ bool  NoneImgAnnotations::check_dirty() {
         }
     }
 
-    return dirty;
+    return camera_dirty || voi_dirty;
 }
 
 void  NoneImgAnnotations::update() {
@@ -162,7 +195,7 @@ std::string NoneImgCornerInfos::to_string() const {
             ss << "\n";
         }
     }
-    MI_APPCOMMON_LOG(MI_DEBUG) <<"corner info str: " << ss.str();
+    //MI_APPCOMMON_LOG(MI_DEBUG) <<"corner info str: " << ss.str();
     return ss.str();
 }
 
