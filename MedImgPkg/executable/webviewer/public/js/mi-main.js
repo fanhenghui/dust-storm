@@ -136,7 +136,7 @@ var annotationTBody = null;
                             $(this).addClass('success').siblings().removeClass('success');
                         });
 
-                        //rowItem.setAttribute('id', id);
+                        rowItem.setAttribute('id', id);
                         var cellItem0 = document.createElement('td');
                         cellItem0.innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
                         var cellItem1 = document.createElement('td');
@@ -401,6 +401,18 @@ var annotationTBody = null;
         }
 
         annotationTBody = document.getElementById("annotation-list");
+
+        var deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
+        if (deleteAnnotationBtn) {
+            deleteAnnotationBtn.addEventListener('click', function(event) {
+                var choosedItem = $('#annotation-list tr.success');
+                if (choosedItem) {
+                    var id = choosedItem.attr('id')
+                    sendMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
+                }
+
+            });
+        }
 
         // register window quit linsener
         window.onbeforeunload = function(event) {
