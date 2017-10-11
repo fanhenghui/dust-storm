@@ -11,6 +11,12 @@ var revcBEReady = false;
 var annotationListBuffer = null;
 var annotationTable = null;
 
+//layout parameter
+const LAYOUT_1X1 = '1x1';
+const LAYOUT_2X2 = '2x2';
+var layoutStatus = LAYOUT_2X2;
+var maxCellID = -1;
+
 (function() {
     function getUserID(userName) {
         return userName + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
@@ -223,6 +229,73 @@ var annotationTable = null;
         socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
     }
 
+    function resizeCell(cellID, w, h) {
+        if (!revcBEReady) {
+            return;
+        }
+        if (seriesUID === '') {
+            return;
+        }
+        if (!socketClient.protocRoot) {
+            console.log('null protocbuf.')
+            return;
+        }
+        cells[cellID].resize(w, h);
+
+        var MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
+        var msgResize = MsgResize.create();
+        msgResize.cells.push({id: cellID, type: 1, direction: 0, width: w, height: h});
+        var msgBuffer = MsgResize.encode(msgResize).finish();
+        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
+    }
+
+    function changeLayout(cellID) {
+        if (layoutStatus == LAYOUT_1X1) {
+            if (maxCellID == -1) {
+                console.log('invalid max cell ID');
+                reutrn;
+            }
+            document.getElementById('cell02-container').hidden = false;
+            document.getElementById('cell13-container').hidden = false;
+            document.getElementById('cell0-container').hidden = false;
+            document.getElementById('cell1-container').hidden = false;
+            document.getElementById('cell2-container').hidden = false;
+            document.getElementById('cell3-container').hidden = false;
+            
+            var cellSize = getProperCellSize();
+            resizeCell(maxCellID, cellSize.width, cellSize.height);
+            maxCellID = -1;
+            layoutStatus = LAYOUT_2X2;
+        } else if (layoutStatus == LAYOUT_2X2) {
+            switch (cellID) {
+                case 0:
+                    document.getElementById('cell13-container').hidden = true;
+                    document.getElementById('cell2-container').hidden = true;
+                    document.getElementById('cell0-container').hidden = false;
+                    break
+                case 1:
+                    document.getElementById('cell02-container').hidden = true;
+                    document.getElementById('cell3-container').hidden = true;
+                    document.getElementById('cell1-container').hidden = false;
+                    break;
+                case 2:
+                    document.getElementById('cell13-container').hidden = true;
+                    document.getElementById('cell0-container').hidden = true;
+                    document.getElementById('cell2-container').hidden = false;
+                    break;
+                case 3:
+                    document.getElementById('cell02-container').hidden = true;
+                    document.getElementById('cell1-container').hidden = true;
+                    document.getElementById('cell3-container').hidden = false;
+                    break;
+            }
+            var cellSize = getProperCellSize();
+            resizeCell(cellID, cellSize.width*2, cellSize.height*2);
+            maxCellID = cellID;
+            layoutStatus = LAYOUT_1X1;
+        }
+    }
+
     function loadSeries(series) {
         seriesUID = series;
         if (!socketClient) {
@@ -246,6 +319,7 @@ var annotationTable = null;
             cells[i] = new Cell(cellName, i, canvas, svg, socketClient);
             cells[i].resize(cellSize.width, cellSize.height);
             cells[i].prepare();
+            cells[i].mouseDoubleClickEvent = changeLayout;
         }
 
         //init default cell action

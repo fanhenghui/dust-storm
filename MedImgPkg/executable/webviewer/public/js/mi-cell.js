@@ -1,5 +1,6 @@
 //corner info marin
 const TEXT_MARGIN = 4;
+const DOUBLE_CLICK_INTERVAL = 300;
 
 function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.cellName = cellName;
@@ -23,11 +24,13 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.mouseBtn = BTN_NONE;
     this.mouseStatus = BTN_UP;
     this.mousePre = {x:0,y:0};
+    this.mouseClickTick = 0;
 
     //mouse action
     this.mouseCurAction = null;
     this.mouseActionCommon = new ActionCommon(socketClient, cellID);
     this.mouseActionAnnotation = new ActionAnnotation(socketClient, cellID);
+    this.mouseDoubleClickEvent = null;
 
     //annotation ROI
     this.rois = [];
@@ -198,22 +201,41 @@ Cell.prototype.resize = function(width, height) {
     // resize the txts located at 4 corners
     d3.select(this.svg)
         .selectAll('text')
-        .attr('x', function(d, i) { return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
-        .attr('y', function(d, i) { return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN; })
+        .attr('x', function(d, i) { 
+            return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
+        .attr('y', function(d, i) { 
+            return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN; })
         .each(function(d, i) {
-          d3.select(this).selectAll('tspan').attr(
-              'x', function(datum, j) { return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
+            d3.select(this).selectAll('tspan')
+            .attr('x', function(datum, j) {
+                return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; });
         });
+}
+
+Cell.prototype.mouseClickTicker = function() {
+    if (this.mouseClickTick >= 2) {
+        //double click event
+        if (this.mouseDoubleClickEvent) {
+            this.mouseDoubleClickEvent(this.cellID);
+        }
+    }
+    //reset tick
+    this.mouseClickTick = 0;
 }
 
 Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
+    this.mouseClickTick += 1;//mouse click tick for check double click
 
     var x = event.clientX - this.svg.getBoundingClientRect().left;
     var y = event.clientY - this.svg.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
+
+    setTimeout((function(event) {
+        this.mouseClickTicker();
+    }).bind(this), DOUBLE_CLICK_INTERVAL);
 
     this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
 }
@@ -285,10 +307,10 @@ Cell.prototype.prepare = function() {
                 return (i < 2) ? 'start' : 'end';
             })
             .attr('x', function (d, i) {
-                return (i < 2) ? '4px' : width - TEXT_MARGIN;
+                return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN;
             })
             .attr('y', function (d, i) {
-                return (i % 2 == 0) ? '4px' : height - TEXT_MARGIN;
+                return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN;
             })
             .attr('id', function (d) {
                 return d;
