@@ -127,8 +127,16 @@ int OpAnnotation::execute() {
             return 0;
         }
     } else if (ModelAnnotation::MODIFY_COMPLETED == anno_status) {
-        model->set_changed();
-        model->notify(ModelAnnotation::MODIFY_COMPLETED);
+        VOISphere voi_latest = model->get_annotation(anno_id);
+        if (fabs(voi_latest.diameter) < 0.01f) {
+            const unsigned char label_deleted = model->get_label(anno_id);
+            model->remove_annotation(anno_id);
+            MaskLabelStore::instance()->recycle_label(label_deleted);
+            model->notify(ModelAnnotation::DELETE);
+        } else {
+            model->set_changed();
+            model->notify(ModelAnnotation::MODIFY_COMPLETED);
+        }
     }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpAnnotation.";

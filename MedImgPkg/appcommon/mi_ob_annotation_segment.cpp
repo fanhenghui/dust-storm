@@ -91,7 +91,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             const VOISphere& voi = (*it)->second.voi;
             const unsigned char label = (*it)->second.label;
             add_labels.push_back(label);
-            if (voi.diameter > 0.1f) {
+            if (voi.diameter >= 0.01f) {
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi);
                 AABBUI aabb;
                 get_aabb_i(ellipsoid, aabb);
