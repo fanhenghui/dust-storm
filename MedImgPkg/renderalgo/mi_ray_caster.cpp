@@ -22,7 +22,8 @@ RayCaster::RayCaster()
       _interpolation_mode(LINEAR), _shading_mode(SHADING_NONE),
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
       _mask_overlay_mode(MASK_OVERLAY_DISABLE), _strategy(CPU_BASE),
-      _test_code(0) {
+      _test_code(0),
+      _mask_overlay_opacity(0.2f) {
     _ambient_color[0] = 1.0f;
     _ambient_color[1] = 1.0f;
     _ambient_color[2] = 1.0f;
@@ -306,6 +307,14 @@ void RayCaster::set_test_code(int test_code) {
 
 int RayCaster::get_test_code() const {
     return _test_code;
+}
+
+void RayCaster::set_mask_overlay_opacity(float opacity) {
+    _mask_overlay_opacity = opacity;
+}
+
+float RayCaster::get_mask_overlay_opacity() const {
+    return _mask_overlay_opacity;
 }
 
 MED_IMG_END_NAMESPACE

@@ -7,9 +7,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RCStepMaskOverlayEnable : public RCStepBase {
 public:
-    RCStepMaskOverlayEnable(std::shared_ptr<RayCaster> ray_caster,
-                            std::shared_ptr<GLProgram> program)
-        : RCStepBase(ray_caster, program), _loc_visible_label_count(-1) {};
+    RCStepMaskOverlayEnable(std::shared_ptr<RayCaster> ray_caster, std::shared_ptr<GLProgram> program)
+        : RCStepBase(ray_caster, program), _loc_visible_label_count(-1), _loc_overlay_opacity(-1) {};
 
     virtual ~RCStepMaskOverlayEnable() {};
 
@@ -21,6 +20,7 @@ public:
 
 private:
     int _loc_visible_label_count;
+    int _loc_overlay_opacity;
 };
 
 class RCStepMaskOverlayDisable : public RCStepBase {

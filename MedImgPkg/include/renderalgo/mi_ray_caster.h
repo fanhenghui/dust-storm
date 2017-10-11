@@ -108,6 +108,8 @@ public:
     void set_mask_overlay_color(std::map<unsigned char, RGBAUnit> colors);
     void set_mask_overlay_color(RGBAUnit color, unsigned char label);
     const std::map<unsigned char, RGBAUnit>& get_mask_overlay_color() const;
+    void set_mask_overlay_opacity(float opacity);
+    float get_mask_overlay_opacity() const;
 
     // Enhancement parameter
     void set_sillhouette_enhancement();
@@ -198,6 +200,9 @@ protected:
     ShadingMode _shading_mode;
     ColorInverseMode _color_inverse_mode;
     MaskOverlayMode _mask_overlay_mode;
+
+    // Mask overlay opacity
+    float _mask_overlay_opacity;
 
     // Ambient
     float _ambient_color[4];

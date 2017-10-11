@@ -31,16 +31,15 @@ void RCStepMaskOverlayEnable::set_gpu_parameter() {
     buffer_visible_label->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                            BUFFER_BINDING_VISIBLE_LABEL_ARRAY);
 
-    glUniform1i(_loc_visible_label_count,
-                static_cast<int>(inner_buffer->get_visible_labels().size()));
+    glUniform1i(_loc_visible_label_count, static_cast<int>(inner_buffer->get_visible_labels().size()));
+    glUniform1f(_loc_overlay_opacity, ray_caster->get_mask_overlay_opacity());
 }
 
 void RCStepMaskOverlayEnable::get_uniform_location() {
     GLProgramPtr program = _gl_program.lock();
-    _loc_visible_label_count =
-        program->get_uniform_location("visible_label_count");
-
-    if (-1 == _loc_visible_label_count) {
+    _loc_visible_label_count = program->get_uniform_location("visible_label_count");
+    _loc_overlay_opacity = program->get_uniform_location("overlay_opacity");
+    if (-1 == _loc_visible_label_count || -1 == _loc_overlay_opacity) {
         RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
     }
 }
