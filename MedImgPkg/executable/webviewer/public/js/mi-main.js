@@ -9,7 +9,7 @@ var socketClient = null;
 var revcBEReady = false;
 
 var annotationListBuffer = null;
-var annotationTBody = null;
+var annotationTable = null;
 
 (function() {
     function getUserID(userName) {
@@ -111,7 +111,6 @@ var annotationTBody = null;
         }
 
         if (restDataLen <= 0) {
-            console.log('recv annotation list.');
             var MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationList');
             if (!MsgAnnotationListType) {
                 console.log('get annotation list message type failed.');
@@ -131,35 +130,26 @@ var annotationTBody = null;
                     var diameter = listItems[i].para3;
 
                     if(status == 0) {//add
-                        var rowItem = document.createElement('tr');
+                        var rowItem = annotationTable.insertRow(row + 1);
                         $(rowItem).click(function(event) {
                             $(this).addClass('success').siblings().removeClass('success');
                         });
-
-                        rowItem.setAttribute('id', id);
-                        var cellItem0 = document.createElement('td');
-                        cellItem0.innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-                        var cellItem1 = document.createElement('td');
-                        cellItem1.innerHTML = diameter.toFixed(2);  
-                        var cellItem2 = document.createElement('td');
-                        cellItem2.innerHTML = info;
-                        rowItem.appendChild(cellItem0);
-                        rowItem.appendChild(cellItem1);
-                        rowItem.appendChild(cellItem2);
-                        annotationTBody.appendChild(rowItem);
-
+                        rowItem.setAttribute('id',id);
+                        rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+                        rowItem.insertCell(1).innerHTML = diameter.toFixed(2);
+                        rowItem.insertCell(2).innerHTML = info;
                     } else if (status == 1) {// delete
-                        var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length > row + 1) {
-                            annotationTBody.removeChild(childNodes[row + 1]);
+                        var annoTableRows = annotationTable.rows;
+                        if (annoTableRows.length > row + 1) {
+                            annotationTable.deleteRow(row + 1);
                         }
                     } else if (status == 2) {// modifying
-                        var childNodes = annotationTBody.childNodes;
-                        if (childNodes.length > row + 1) {
-                            var cellsItem = childNodes[row + 1].cells;
-                            cellsItem[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-                            cellsItem[1].innerHTML = diameter.toFixed(2);  
-                            cellsItem[2].innerHTML = info;
+                        var annoTableRows = annotationTable.rows;
+                        if (annoTableRows.length > row + 1) {
+                            var annoCell = annoTableRows[row + 1].cells;
+                            annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+                            annoCell[1].innerHTML = diameter.toFixed(2);  
+                            annoCell[2].innerHTML = info;
                         }
                     }
 
@@ -400,12 +390,12 @@ var annotationTBody = null;
             console.log('get btn-play-vr node failed.');
         }
 
-        annotationTBody = document.getElementById("annotation-list");
+        annotationTable = document.getElementById("annotation-table");
 
         var deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
         if (deleteAnnotationBtn) {
             deleteAnnotationBtn.addEventListener('click', function(event) {
-                var choosedItem = $('#annotation-list tr.success');
+                var choosedItem = $('#annotation-table tr.success');
                 if (choosedItem.length > 0) {
                     var id = choosedItem.attr('id')
                     if (id) {
