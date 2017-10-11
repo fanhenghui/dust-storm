@@ -52,7 +52,7 @@ void LIFOQueue<T>::clear() {
 
 template<class T>
 void LIFOQueue<T>::pop(T* elem) {
-    *elem = std::move(_container.front());
+    *elem = std::move(_container.back());
     _container.pop_back(elem);
 }
 
