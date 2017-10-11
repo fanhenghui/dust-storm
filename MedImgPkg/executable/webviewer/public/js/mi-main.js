@@ -540,6 +540,31 @@ var maxCellID = -1;
             mprMaskOverlayOpacityRange.oninput = mprMaskOverlayFunc;
         }
 
+        var layout1x1Btn = document.getElementById('btn-layout1x1');
+        if (layout1x1Btn) {
+            layout1x1Btn.onclick = function(event) {
+                if (layoutStatus == LAYOUT_2X2) {
+                    var focusCellID = 0;
+                    for (var i = 0; i< cells.length; ++i) {
+                        if (cells[i].mouseFocus) {
+                            focusCellID = i;
+                            break;
+                        }
+                    }
+                    changeLayout(focusCellID);
+                }
+            }
+        }
+
+        var layout2x2Btn = document.getElementById('btn-layout2x2');
+        if (layout2x2Btn) {
+            layout2x2Btn.onclick = function(event) {
+                if (layoutStatus == LAYOUT_1X1 && maxCellID != -1) {
+                    changeLayout(maxCellID);
+                }
+            }
+        }
+
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();
