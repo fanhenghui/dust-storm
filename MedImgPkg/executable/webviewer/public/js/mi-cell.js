@@ -31,6 +31,8 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.mouseActionCommon = new ActionCommon(socketClient, cellID);
     this.mouseActionAnnotation = new ActionAnnotation(socketClient, cellID);
     this.mouseDoubleClickEvent = null;
+    this.mouseFocus = false;
+    this.mouseFocusEvent = null;
 
     //annotation ROI
     this.rois = [];
@@ -227,6 +229,9 @@ Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
     this.mouseClickTick += 1;//mouse click tick for check double click
+    if (!this.mouseFocus && this.mouseFocusEvent) {
+        this.mouseFocusEvent(this.cellID);
+    }
 
     var x = event.clientX - this.svg.getBoundingClientRect().left;
     var y = event.clientY - this.svg.getBoundingClientRect().top;

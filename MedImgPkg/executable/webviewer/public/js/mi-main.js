@@ -296,6 +296,18 @@ var maxCellID = -1;
         }
     }
 
+    function focusCell(cellID) {
+        for (var i = 0; i < cells.length; ++i) {
+            if (i == cellID) { 
+                cells[i].mouseFocus = true;
+                cellCanvases[i].style.border = '3px solid #333333';
+            } else {
+                cells[i].mouseFocus = false;
+                cellCanvases[i].style.border = '3px solid #F5F5F5';
+            }
+        }        
+    }
+
     function loadSeries(series) {
         seriesUID = series;
         if (!socketClient) {
@@ -320,6 +332,7 @@ var maxCellID = -1;
             cells[i].resize(cellSize.width, cellSize.height);
             cells[i].prepare();
             cells[i].mouseDoubleClickEvent = changeLayout;
+            cells[i].mouseFocusEvent = focusCell;
         }
 
         //init default cell action
