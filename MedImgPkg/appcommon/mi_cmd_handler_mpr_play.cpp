@@ -1,5 +1,7 @@
 #include "mi_cmd_handler_mpr_play.h"
 
+#include "util/mi_memory_shield.h"
+
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
 #include "mi_operation_factory.h"
@@ -25,6 +27,8 @@ CmdHandlerMPRPlay::~CmdHandlerMPRPlay() {
 }
 
 int CmdHandlerMPRPlay::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
+    MemShield shield(buffer);
+
     if (_playing) {
         return 0;
     }

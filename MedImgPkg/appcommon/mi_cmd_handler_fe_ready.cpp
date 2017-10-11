@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_memory_shield.h"
 
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
@@ -18,6 +19,8 @@ CmdHandlerFEReady::~CmdHandlerFEReady() {}
 
 int CmdHandlerFEReady::handle_command(const IPCDataHeader& ipcheader, char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN ready cmd handler.";
+    MemShield shield(buffer);
+
     std::shared_ptr<AppController> controller = _controller.lock();
     if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");

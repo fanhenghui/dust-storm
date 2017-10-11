@@ -3,13 +3,16 @@
 #include <iostream>
 #include <vector>
 
-#include "mi_message.pb.h"
+#include "util/mi_ipc_client_proxy.h"
+#include "util/mi_memory_shield.h"
+
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_database.h"
-#include "util/mi_ipc_client_proxy.h"
 
+#include "mi_message.pb.h"
 #include "mi_review_config.h"
+#include "mi_review_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,6 +22,8 @@ CmdHandlerSearchWorklist::CmdHandlerSearchWorklist(std::shared_ptr<AppController
 CmdHandlerSearchWorklist::~CmdHandlerSearchWorklist() {}
 
 int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, char* buffer) {
+    MI_REVIEW_LOG(MI_TRACE) << "IN CmdHandler search worklist";
+    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
 
     if (nullptr == controller) {
@@ -47,6 +52,7 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, ch
     header._data_len = size;
     controller->get_client_proxy()->async_send_message(header, data);
 
+    MI_REVIEW_LOG(MI_TRACE) << "OUT CmdHandler search worklist";
     return 0;
 }
 

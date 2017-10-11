@@ -2,6 +2,7 @@
 
 #include "mi_app_controller.h"
 #include "util/mi_ipc_common.h"
+#include "util/mi_memory_shield.h"
 
 #include <arpa/inet.h>
 
@@ -17,6 +18,7 @@ CmdHandlerShutdown::~CmdHandlerShutdown() {
 }
 
 int CmdHandlerShutdown::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
+    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
 
     if (nullptr == controller) {

@@ -110,6 +110,7 @@ void AppThreadModel::process_operating() {
 
             try {
                 int err = op->execute();
+                op->reset();//release ipc data
                 if (-1 == err) {
                     MI_APPCOMMON_LOG(MI_ERROR) << "op execute failed.";
                     continue;
