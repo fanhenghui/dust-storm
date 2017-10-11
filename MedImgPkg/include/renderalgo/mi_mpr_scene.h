@@ -17,6 +17,7 @@ public:
 
     void set_mask_overlay_color(std::map<unsigned char, RGBAUnit> colors);
     void set_mask_overlay_color(RGBAUnit color, unsigned char label);
+    void set_mask_overlay_opacity(float opacity);
 
     virtual void rotate(const Point2& pre_pt, const Point2& cur_pt);
 

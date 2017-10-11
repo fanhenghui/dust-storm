@@ -154,6 +154,10 @@ void MPRScene::set_mask_overlay_color(RGBAUnit color, unsigned char label) {
     _ray_caster->set_mask_overlay_color(color, label);
 }
 
+void MPRScene::set_mask_overlay_opacity(float opacity) {
+    _ray_caster->set_mask_overlay_opacity(opacity);
+}
+
 Point3 MPRScene::get_entry_point(int x, int y) {
     Vector4f* entry_array = _entry_exit_points->get_entry_points_array();
 

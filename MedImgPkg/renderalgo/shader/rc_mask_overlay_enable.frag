@@ -79,9 +79,7 @@ vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step
             {
                 exist_active_label = true;
                 label_color = mask_overlay_color[cur_label];
-                current_integral_color.xyz = (1.0 - overlay_opacity) * current_integral_color.xyz + label_color.w * label_color.xyz;
-                //current_integral_color.xyz += (1 - current_integral_color.w) * label_color.w * label_color.xyz;
-                //current_integral_color.w += (1 - current_integral_color.w) * label_color.w;
+                current_integral_color.xyz = (1.0 - overlay_opacity) * current_integral_color.xyz + overlay_opacity * label_color.xyz;
             }
         }
 

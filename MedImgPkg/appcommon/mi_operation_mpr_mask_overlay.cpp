@@ -24,12 +24,13 @@ int OpMPRMaskOverlay::execute() {
         return -1;
     }
 
-    MsgFlag msg;
+    MsgMPRMaskOverlay msg;
     if (!msg.ParseFromArray(_buffer, _header._data_len)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "parse mask overlay message failed.";
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse MPR mask overlay message failed.";
         return -1;
     }
     const int flag = msg.flag();
+    const float opacity = msg.opacity();
     const MaskOverlayMode mask_overlay_mode = flag != 0 ? MASK_OVERLAY_ENABLE : MASK_OVERLAY_DISABLE;
 
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -41,6 +42,7 @@ int OpMPRMaskOverlay::execute() {
         std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(scene);
         if (mpr_scene) {
             mpr_scene->set_mask_overlay_mode(mask_overlay_mode);
+            mpr_scene->set_mask_overlay_opacity(opacity);
             mpr_scene->set_dirty(true);
         } 
     }

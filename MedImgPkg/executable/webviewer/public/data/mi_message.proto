@@ -108,3 +108,8 @@ message MsgNoneImgCollection {
     optional MsgNoneImgAnnotations annotations = 2;
     optional MsgNoneImgDirection direction = 5;
 };
+
+message MsgMPRMaskOverlay {
+    required int32 flag = 1;
+    required float opacity = 2;
+}

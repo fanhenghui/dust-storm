@@ -23,7 +23,7 @@ RayCaster::RayCaster()
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
       _mask_overlay_mode(MASK_OVERLAY_DISABLE), _strategy(CPU_BASE),
       _test_code(0),
-      _mask_overlay_opacity(0.2f) {
+      _mask_overlay_opacity(0.5f) {
     _ambient_color[0] = 1.0f;
     _ambient_color[1] = 1.0f;
     _ambient_color[2] = 1.0f;

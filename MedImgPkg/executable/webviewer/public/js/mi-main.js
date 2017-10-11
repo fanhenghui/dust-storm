@@ -406,31 +406,51 @@ var annotationTable = null;
             });
         }
 
+        var mprMaskOverlayFunc = function(event) {
+            var flag = 1;
+            if( document.getElementById('cbox-overlay-annotation') ) {
+                flag = document.getElementById('cbox-overlay-annotation').checked ? 1 : 0;
+            }
+            var opacity = 0.5;
+            if (document.getElementById('range-mpr-overlay-opacity')) {
+                opacity = document.getElementById('range-mpr-overlay-opacity').value;
+            } 
+            
+            if (!socketClient.protocRoot) {
+                console.log('null protobuf.');
+                return;
+            }
+            var MsgMPRMaskOverlayType = socketClient.protocRoot.lookup('medical_imaging.MsgMPRMaskOverlay');
+            if (!MsgMPRMaskOverlayType) {
+                console.log('get MsgMPRMaskOverlay type failed.');
+                return;
+            }
+            var msg = MsgMPRMaskOverlayType.create({flag:flag, opacity:opacity});
+            if (!msg) {
+                console.log('create mpr mask overlay message failed.');
+                return;
+            }
+            var msgBuffer = MsgMPRMaskOverlayType.encode(msg).finish();
+            if (!msgBuffer) {
+                console.log('encode mpr mask overlay message failed.');
+            }
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
+        }
+
         var annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
         if (annotationOverlayCBox) {
-            annotationOverlayCBox.checked = true;
-            annotationOverlayCBox.addEventListener('click', function(event) {
-                var flag = this.checked ? 1 : 0;
-                if (!socketClient.protocRoot) {
-                    console.log('null protobuf.');
-                    return;
-                }
-                var MsgFlagType = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
-                if (!MsgFlagType) {
-                    console.log('get MsgFlag type failed.');
-                    return;
-                }
-                var msgFlag = MsgFlagType.create({flag:flag});
-                if (!msgFlag) {
-                    console.log('create flag message failed.');
-                    return;
-                }
-                var msgBuffer = MsgFlagType.encode(msgFlag).finish();
-                if (!msgBuffer) {
-                    console.log('encode flag message failed.');
-                }
-                socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
-            });
+            annotationOverlayCBox.defaultChecked = true;
+            annotationOverlayCBox.onclick = mprMaskOverlayFunc;
+        }
+
+        var mprMaskOverlayOpacityRange = document.getElementById('range-mpr-overlay-opacity');
+        if (mprMaskOverlayOpacityRange) {
+            mprMaskOverlayOpacityRange.max = 1;
+            mprMaskOverlayOpacityRange.min = 0;
+            mprMaskOverlayOpacityRange.step = 0.025;
+            mprMaskOverlayOpacityRange.defaultValue = 0.5;
+            mprMaskOverlayOpacityRange.onchange = mprMaskOverlayFunc;
+            mprMaskOverlayOpacityRange.oninput = mprMaskOverlayFunc;
         }
 
         // register window quit linsener
