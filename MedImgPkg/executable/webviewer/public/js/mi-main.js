@@ -420,9 +420,26 @@ var annotationTBody = null;
         if (annotationOverlayCBox) {
             annotationOverlayCBox.checked = true;
             annotationOverlayCBox.addEventListener('click', function(event) {
-                if (this.checked) {
-                    //TODO send msg to be to change annotation overlay visibility(mask) not contour
-                }  
+                var flag = this.checked ? 1 : 0;
+                if (!socketClient.protocRoot) {
+                    console.log('null protobuf.');
+                    return;
+                }
+                var MsgFlagType = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
+                if (!MsgFlagType) {
+                    console.log('get MsgFlag type failed.');
+                    return;
+                }
+                var msgFlag = MsgFlagType.create({flag:flag});
+                if (!msgFlag) {
+                    console.log('create flag message failed.');
+                    return;
+                }
+                var msgBuffer = MsgFlagType.encode(msgFlag).finish();
+                if (!msgBuffer) {
+                    console.log('encode flag message failed.');
+                }
+                socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
             });
         }
 

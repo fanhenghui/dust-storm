@@ -2,7 +2,11 @@ syntax="proto2";
 
 package medical_imaging;
 
-message MsgString{
+message MsgFlag {
+    required int32 flag = 1; 
+}
+
+message MsgString {
     required string context = 1;
 };
 
@@ -33,7 +37,7 @@ message MsgMouse {
     required int32 tag = 3;
 };
 
-message MsgCellInfo{
+message MsgCellInfo {
     required int32 id = 1;
     required int32 type = 2;
     required int32 direction = 3;
@@ -41,32 +45,32 @@ message MsgCellInfo{
     required int32 height = 5;
 };
 
-message MsgInit{
+message MsgInit {
     required int32 pid = 1;
     required string series_uid = 2;
     repeated MsgCellInfo cells = 3; 
 };
 
-message MsgResize{
+message MsgResize {
     repeated MsgCellInfo cells = 1;
 };
 
-message MsgWorklistItem{
+message MsgWorklistItem {
     required string patient_name = 1;
     required string patient_id = 2;
     required string series_uid = 3;
     required string imaging_modality = 4; 
 };
 
-message MsgWorklist{
+message MsgWorklist {
     repeated MsgWorklistItem items = 1;
 };
 
-message MsgNoneImgCornerInfos{
+message MsgNoneImgCornerInfos {
     required string infos = 1;
 };
 
-message MsgAnnotationUnit{
+message MsgAnnotationUnit {
     required int32 type = 1; //0 for circle ...
     required string id = 2; // id format: "time|num"
     required int32 status = 3; //0 add; 1 delete; 2 modifying; 3 modify_completed
@@ -80,7 +84,7 @@ message MsgNoneImgAnnotations {
     repeated MsgAnnotationUnit annotation = 1;
 };
 
-message MsgAnnotationListItem{
+message MsgAnnotationListItem {
     required string id = 1; // id format: "time|num"
     required string info = 2; // nodule type
     required int32 row = 3; //row value
@@ -99,7 +103,7 @@ message MsgNoneImgDirection {
     required string info = 2;// left|right|top|bottom
 };
 
-message MsgNoneImgCollection{
+message MsgNoneImgCollection {
     optional MsgNoneImgCornerInfos corner_infos = 1;
     optional MsgNoneImgAnnotations annotations = 2;
     optional MsgNoneImgDirection direction = 5;

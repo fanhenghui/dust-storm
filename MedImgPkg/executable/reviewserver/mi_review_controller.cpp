@@ -20,6 +20,7 @@
 #include "appcommon/mi_operation_windowing.h"
 #include "appcommon/mi_operation_zoom.h"
 #include "appcommon/mi_operation_annotation.h"
+#include "appcommon/mi_operation_mpr_mask_overlay.h"
 #include "appcommon/mi_model_annotation.h"
 
 #include "mi_cmd_handler_search_worklist.h"
@@ -87,6 +88,8 @@ void ReviewController::register_command_handler_i() {
         OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_MPR_MASK_OVERLAY, std::shared_ptr<OpMPRMaskOverlay>(new OpMPRMaskOverlay()));
 
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
