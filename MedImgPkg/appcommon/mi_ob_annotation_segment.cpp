@@ -61,9 +61,9 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
     //update overlay mask mode
     if (ModelAnnotation::ADD == code_id || ModelAnnotation::DELETE == code_id) {
         if (model->get_annotations().empty()) {
-            for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
-                (*it)->set_mask_overlay_mode(MASK_OVERLAY_DISABLE);
-            }
+            //for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
+            //    (*it)->set_mask_overlay_mode(MASK_OVERLAY_DISABLE);
+            //}
          } else {
              for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
                  (*it)->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
