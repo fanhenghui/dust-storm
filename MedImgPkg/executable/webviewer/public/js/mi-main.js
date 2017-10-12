@@ -565,6 +565,36 @@ var maxCellID = -1;
             }
         }
 
+        var switchPresetWLFunc = function(obj) {
+            document.getElementById('btn-preset-wl').innerHTML = 'PresetWL ' + obj.innerHTML + '<span class="caret"></span>';
+            //send message to BE
+            if (!socketClient.protocRoot) {
+                console.log('null protobuf.');
+                return;
+            }
+            var MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
+            if (!MsgStringType) {
+                console.log('get MsgMsgStringType type failed.');
+                return;
+            }
+            var msg = MsgStringType.create({context:obj.innerHTML});
+            if (!msg) {
+                console.log('create switch preset WL message failed.');
+                return;
+            }
+            var msgBuffer = MsgStringType.encode(msg).finish();
+            if (!msgBuffer) {
+                console.log('encode switch preset WL message failed.');
+            }
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
+        }
+        document.getElementById('a-preset-wl-abdomen').onclick = function(event) {switchPresetWLFunc(this);return false;}
+        document.getElementById('a-preset-wl-lung').onclick = function(event) {switchPresetWLFunc(this);return false;}
+        document.getElementById('a-preset-wl-brain').onclick = function(event) {switchPresetWLFunc(this);return false;}
+        document.getElementById('a-preset-wl-angio').onclick = function(event) {switchPresetWLFunc(this);return false;}
+        document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
+        document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
+
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();
