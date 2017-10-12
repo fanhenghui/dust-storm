@@ -81,7 +81,7 @@ int OpAnnotation::execute() {
         MI_APPCOMMON_LOG(MI_ERROR) << "error model id to acquire annotation model.";
         return -1;
     }
-    model->set_processing_cache(anno_id);
+    model->set_processing_cache(std::vector<std::string>(1, anno_id));
 
     if (ModelAnnotation::ADD == anno_status) {
         Point2 center_dc(anno_para0, anno_para1); 

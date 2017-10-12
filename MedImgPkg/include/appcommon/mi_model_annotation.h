@@ -56,8 +56,8 @@ public:
     bool get_annotation_visibility() const;
     void set_annotation_visibility(bool flag);
 
-    void set_processing_cache(const std::string& id);
-    void get_processing_cache(std::string& id);
+    void set_processing_cache(const std::vector<std::string>& ids);
+    void get_processing_cache(std::vector<std::string>& ids);
 
 protected:
 
@@ -65,7 +65,7 @@ private:
     std::map<std::string, ModelAnnotation::AnnotationUnit>  _annotations;
     bool _visibility;
 
-    std::string _cache_id;
+    std::vector<std::string> _cache_ids;
 };
 
 MED_IMG_END_NAMESPACE

@@ -152,12 +152,12 @@ VOISphere ModelAnnotation::get_annotation_by_label(unsigned char label) const {
     APPCOMMON_THROW_EXCEPTION("get annotation by mask label failed!");
 }
 
-void ModelAnnotation::set_processing_cache(const std::string& id) {
-    _cache_id = id;
+void ModelAnnotation::set_processing_cache(const std::vector<std::string>& ids) {
+    _cache_ids = ids;
 }
 
-void ModelAnnotation::get_processing_cache(std::string& id) {
-    id = _cache_id;
+void ModelAnnotation::get_processing_cache(std::vector<std::string>& ids) {
+    ids = _cache_ids;
 }
 
 MED_IMG_END_NAMESPACE
