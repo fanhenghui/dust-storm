@@ -194,7 +194,7 @@ var maxCellID = -1;
         // var cellContainerH = document.getElementById('cell-container').offsetHeight;
         var navigatorHeight = document.getElementById('navigator-div').offsetHeight;
         var w = (cellContainerW - 66) / 2;
-        var h = (window.innerHeight - navigatorHeight - 60) / 2;
+        var h = (window.innerHeight - navigatorHeight - 90) / 2;
         return {
             width: w,
             height: h

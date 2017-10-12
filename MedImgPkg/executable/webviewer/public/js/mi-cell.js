@@ -186,32 +186,48 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
     }
 }
 
-Cell.prototype.resize = function(width, height) {
+Cell.prototype.resize = function (width, height) {
     //canvas&svg resize
     //send msg to notigy BE resize will be call in main
     this.canvas.width = Math.floor(width);
     this.canvas.height = Math.floor(height);
     var top = this.canvas.offsetTop;
     var left = this.canvas.offsetLeft;
-    var viewBox = left.toString() + ' ' + top + ' ' + Math.floor(width) + ' ' + Math.floor(height); 
+    var viewBox = left.toString() + ' ' + top + ' ' + Math.floor(width) + ' ' + Math.floor(height);
     this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', Math.floor(width));
     this.svg.setAttribute('height', Math.floor(height));
     this.svg.setAttribute('x', left);
     this.svg.setAttribute('y', top);
 
+
     // resize the txts located at 4 corners
     d3.select(this.svg)
         .selectAll('text')
-        .attr('x', function(d, i) { 
-            return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; })
-        .attr('y', function(d, i) { 
-            return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN; })
-        .each(function(d, i) {
+        .attr('x', function (d, i) {
+            return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN;
+        })
+        .attr('y', function (d, i) {
+            return (i % 2 == 0) ? TEXT_MARGIN : height - TEXT_MARGIN;
+        })
+        .each(function (d, i) {
             d3.select(this).selectAll('tspan')
-            .attr('x', function(datum, j) {
-                return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN; });
+                .attr('x', function (datum, j) {
+                    return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN;
+                })
+                .attr('y', function (datum, j) {
+                    var txtspacing = parseFloat(d3.select('text').attr('font-size'));
+                    if (i % 2 == 0) {
+                        var texorigin = 1.2 * txtspacing;
+                        return (texorigin + datum.pos * txtspacing);
+                    } else {
+                        var texorigin = height + 0.2 * (-txtspacing);
+                        return (texorigin + datum.pos * (-txtspacing));
+                    }
+                })
         });
+    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [1, 32]
+    CTRL_SIZE = Math.min(Math.max((width + height) / 256, 1), 32); // if w=h=512, we get 4
 }
 
 Cell.prototype.mouseClickTicker = function() {

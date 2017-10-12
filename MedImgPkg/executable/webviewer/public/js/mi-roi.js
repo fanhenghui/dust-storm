@@ -1,10 +1,10 @@
 const MAIN_COLOR = 'red';
-const CTRL_COLOR = 'yellow';//'#DC143C'
-const CTRL_SIZE = 6;
+const CTRL_COLOR = '#DC143C';
 const HIGHLIGHT_COLOR = 'yellow';
-
 const APPEARING_TIME = 250; // 250 ms
 const FADING_TIME = 2000; // 2s
+
+var CTRL_SIZE = 4;
 
 function ROICircle(key, svg, cx, cy, r){
     this.svg = svg;
