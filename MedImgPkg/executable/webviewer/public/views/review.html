@@ -39,7 +39,6 @@
         .modal-backdrop {
             background: none;
         }
-
         .modal {
             overflow: hidden;
         }
@@ -63,7 +62,7 @@
 </head>
 
 <body onselectstart="return false">
-    <div id="myModal" class="modal fade">
+    <div id="modal-preset-vrt-browser" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -88,10 +87,10 @@
                     <div>
                         <table>
                             <tr>
-                                <td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="img-preset-vrt-cta">
                                     <img src="images/vrt-cta.jpg">
                                 </td>
-                                <td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="img-preset-vrt-lung-glass">
                                     <img src="images/vrt-lung-glass.jpg">
                                 </td>
                             </tr>
@@ -178,7 +177,7 @@
                         <br>
                         <div class="row clearfix">
                             <div class="col-md-12 column">
-                                <button class="btn btn-default" type="button" id="btn-vrt-browser" data-toggle="modal" data-target="#myModal"><em class="glyphicon glyphicon-align-left"></em>VRTBrowser</button>
+                                <button class="btn btn-default" type="button" id="btn-vrt-browser" data-toggle="modal" data-target="#modal-preset-vrt-browser"><em class="glyphicon glyphicon-align-left"></em>PresetVRT</button>
                             </div>
                         </div>
                         <br>

@@ -566,8 +566,7 @@ var maxCellID = -1;
         }
 
         var switchPresetWLFunc = function(obj) {
-            document.getElementById('btn-preset-wl').innerHTML = 'PresetWL ' + obj.innerHTML + '<span class="caret"></span>';
-            //send message to BE
+            document.getElementById('btn-preset-wl').innerHTML = obj.innerHTML + '<span class="caret"></span>';
             if (!socketClient.protocRoot) {
                 console.log('null protobuf.');
                 return;
@@ -594,6 +593,34 @@ var maxCellID = -1;
         document.getElementById('a-preset-wl-angio').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
+
+        $("#modal-preset-vrt-browser").draggable({
+            handle: ".modal-header"
+        });
+        
+        var switchVRTFunc = function(context) {
+            if (!socketClient.protocRoot) {
+                console.log('null protobuf.');
+                return;
+            }
+            var MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
+            if (!MsgStringType) {
+                console.log('get MsgMsgStringType type failed.');
+                return;
+            }
+            var msg = MsgStringType.create({context:context});
+            if (!msg) {
+                console.log('create switch vrt message failed.');
+                return;
+            }
+            var msgBuffer = MsgStringType.encode(msg).finish();
+            if (!msgBuffer) {
+                console.log('encode switch vrt message failed.');
+            }
+            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
+        }
+        document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
+        document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
 
         // register window quit linsener
         window.onbeforeunload = function(event) {
