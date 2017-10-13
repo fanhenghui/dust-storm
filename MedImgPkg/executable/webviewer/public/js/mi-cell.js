@@ -1,6 +1,6 @@
 //corner info marin
 const TEXT_MARGIN = 4;
-const DOUBLE_CLICK_INTERVAL = 300;
+const DOUBLE_CLICK_INTERVAL = 250;
 
 function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.cellName = cellName;
