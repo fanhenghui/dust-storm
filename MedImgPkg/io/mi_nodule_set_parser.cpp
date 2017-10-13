@@ -53,7 +53,8 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
     boost::split(infos, line, boost::is_any_of(","));
     const size_t nodule_file_type = infos.size();
 
-    if (nodule_file_type != 7 && nodule_file_type != 5) {
+    //TODO should double check table header
+    if (nodule_file_type != 7 && nodule_file_type != 5 && nodule_file_type != 6) {
         in.close();
         return IO_UNSUPPORTED_YET;
     }
@@ -105,6 +106,21 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
             diameter = str_num_converter.to_num(infos[4]);
             nodule_set->add_nodule(
                 VOISphere(Point3(pos_x, pos_y, pos_z), diameter, "W"));
+        } else if (6 == nodule_file_type) { //Mine nodule list file without type without nodule id
+            series_id = infos[0];
+            // Check series id
+            if (!_series_id.empty()) {
+                if (series_id != _series_id) {
+                    return IO_UNMATCHED_FILE;
+                }
+            }
+
+            pos_x = str_num_converter.to_num(infos[1]);
+            pos_y = str_num_converter.to_num(infos[2]);
+            pos_z = str_num_converter.to_num(infos[3]);
+            diameter = str_num_converter.to_num(infos[4])*2.0;
+            nodule_set->add_nodule(
+                VOISphere(Point3(pos_x, pos_y, pos_z), diameter, "unknown"));
         }
     }
 
