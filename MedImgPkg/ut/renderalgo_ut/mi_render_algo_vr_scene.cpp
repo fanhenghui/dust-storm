@@ -209,7 +209,7 @@ void Init() {
 #ifdef WIN32
     std::string color_opacity_xml = "../../../config/lut/3d/ct_lung_glass.xml";
 #else
-    std::string color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
+    std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
 #endif
 
     if (IO_SUCCESS !=

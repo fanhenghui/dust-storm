@@ -150,11 +150,12 @@ int OpInit::execute() {
         if (0 != RunLengthOperator::decode(rle_file, (unsigned char*)mask_data->get_pixel_pointer(), image_buffer_size)) {
             memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
             MaskLabelStore::instance()->fill_label(1);
+            volume_infos->cache_original_mask();
         } else {
             //TODO check mask label(or just set as 1)
             MaskLabelStore::instance()->fill_label(1);
-            MI_REVIEW_LOG(MI_DEBUG) << "read rle mask success.";
-            //FileUtil::write_raw("/home/wangrui22/data/rleunzip.raw" , mask_data->get_pixel_pointer() , image_buffer_size);
+            volume_infos->cache_original_mask();
+            MI_REVIEW_LOG(MI_DEBUG) << "read original rle mask success.";
         }
      }
     
@@ -192,7 +193,7 @@ int OpInit::execute() {
             mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
             mpr_scene->set_mask_mode(MASK_NONE);
             mpr_scene->set_interpolation_mode(LINEAR);
-            
+
             switch (direction) {
             case 0:
                 mpr_scene->place_mpr(SAGITTAL);

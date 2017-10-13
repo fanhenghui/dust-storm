@@ -237,6 +237,9 @@ void OBAnnotationSegment::recover_i(const AABBUI& aabb , unsigned char label)
 {
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
     unsigned char* mask_array = (unsigned char*)mask_data->get_pixel_pointer();
+    std::shared_ptr<ImageData> cache_original_mask = _volume_infos->get_cache_original_mask();
+    APPCOMMON_CHECK_NULL_EXCEPTION(cache_original_mask);
+    unsigned char* cache_original_mask_array = (unsigned char*)cache_original_mask->get_pixel_pointer();
     const unsigned int layer = mask_data->_dim[0]*mask_data->_dim[1];
 
 #ifndef _DEBUG
@@ -253,7 +256,7 @@ void OBAnnotationSegment::recover_i(const AABBUI& aabb , unsigned char label)
             for (unsigned int x = aabb._min[0] ; x < aabb._max[0] ; ++x) {
                 unsigned int idx = z*layer + y*mask_data->_dim[0] + x;
                 if (mask_array[idx] == label) {
-                    mask_array[idx] = 0;
+                    mask_array[idx] = cache_original_mask_array[idx];
                 }
             }
         }
@@ -271,12 +274,14 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
-    const DataType data_type = volume_data->_data_type;
+    std::shared_ptr<ImageData> cache_original_mask = _volume_infos->get_cache_original_mask();
+    APPCOMMON_CHECK_NULL_EXCEPTION(cache_original_mask);
 
     unsigned int begin[3] = {0,0,0};
     unsigned int end[3] = {0,0,0};
     ArithmeticUtils::get_valid_region(volume_data->_dim, ellipsoid, begin, end);
 
+    const DataType data_type = volume_data->_data_type;
     switch(data_type) {
     case SHORT: {
             //get threshold
@@ -293,7 +298,7 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
             cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             cd_analy.set_dim(volume_data->_dim);
             cd_analy.set_target_label(label);
-            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.set_roi(aabb._min, aabb._max, (unsigned char*)cache_original_mask->get_pixel_pointer());
             cd_analy.keep_major();
             break;
         }
@@ -312,7 +317,7 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
             cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             cd_analy.set_dim(volume_data->_dim);
             cd_analy.set_target_label(label);
-            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.set_roi(aabb._min, aabb._max, (unsigned char*)cache_original_mask->get_pixel_pointer());
             cd_analy.keep_major();
 
             break;

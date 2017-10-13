@@ -49,7 +49,7 @@ public:
         _target_label = label;
     }
 
-    void set_roi(const unsigned int (&min)[3] , const unsigned int (&max)[3]) {
+    void set_roi(const unsigned int (&min)[3] , const unsigned int (&max)[3], unsigned char* original_mask) {
         for (int i = 0 ; i < 3 ; ++i) {
             if (min[i] >= max[i]) {
                 MI_ARITHMETIC_LOG(MI_FATAL) << "invalid roi dimension in connected domain analysis." <<
@@ -64,7 +64,6 @@ public:
         }
 
         _roi_cache.reset(new unsigned char[_roi_dim[0]*_roi_dim[1]*_roi_dim[2]]);
-
         for (unsigned int z = 0  ; z < _roi_dim[2] ; ++z) {
             for (unsigned int y = 0 ; y < _roi_dim[1] ; ++y) {
                 int zz = z + _min[2];
@@ -73,12 +72,21 @@ public:
                        _mask_ref + zz * _dim[0]*_dim[1] + yy * _dim[0] + _min[0] , _roi_dim[0]);
             }
         }
-
         for (unsigned int i = 0; i < _roi_dim[0]*_roi_dim[1]*_roi_dim[2] ; ++i) {
             if (_roi_cache[i] == _target_label) {
                 _roi_cache[i] = 1;
             } else {
                 _roi_cache[i] = 0;
+            }
+        }
+
+        _roi_cache_original_mask.reset(new unsigned char[_roi_dim[0]*_roi_dim[1]*_roi_dim[2]]);
+        for (unsigned int z = 0  ; z < _roi_dim[2] ; ++z) {
+            for (unsigned int y = 0 ; y < _roi_dim[1] ; ++y) {
+                int zz = z + _min[2];
+                int yy = y + _min[1];
+                memcpy(_roi_cache_original_mask.get() + z * _roi_dim[0]*_roi_dim[1] + y * _roi_dim[0],
+                    original_mask + zz * _dim[0]*_dim[1] + yy * _dim[0] + _min[0] , _roi_dim[0]);
             }
         }
 
@@ -143,6 +151,7 @@ private:
     unsigned char* _mask_ref;
     unsigned char _target_label;
     std::unique_ptr<unsigned char[]> _roi_cache;
+    std::unique_ptr<unsigned char[]> _roi_cache_original_mask;
 };
 
 MED_IMG_END_NAMESPACE

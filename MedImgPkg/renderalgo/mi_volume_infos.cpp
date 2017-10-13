@@ -350,4 +350,17 @@ void VolumeInfos::refresh() {
     refresh_cache_mask_brick_info_i();
 }
 
+void VolumeInfos::cache_original_mask() {
+    if (nullptr == _mask_data) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "cache empty mask.";
+        return;
+    }
+    _cache_original_mask.reset(new ImageData());
+    _mask_data->deep_copy(_cache_original_mask.get());
+}
+
+std::shared_ptr<ImageData> VolumeInfos::get_cache_original_mask() {
+    return _cache_original_mask;
+}
+
 MED_IMG_END_NAMESPACE
