@@ -122,4 +122,65 @@ int FileUtil::write_raw(const std::string& path , void* buffer , unsigned int le
     return 0;
 }
 
+int FileUtil::read_raw(const std::string& path, void* buffer, unsigned int length) {
+    if (nullptr == buffer) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw input buffer is null.";
+        return -1;
+    }
+
+    if (path.empty()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw input path is empty.";
+    }
+
+    std::ifstream in(path.c_str() , std::ios::in | std::ios::binary);
+
+    if (!in.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw open file " << path << " failed.";
+        return -1;
+    }
+
+    in.seekg(0, std::ios::end);
+    unsigned int file_size = static_cast<unsigned int>(in.tellg());
+    if (file_size < length) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw input file " << path << 
+        " file size(" << file_size << ") less than input buffer length(" << length << ").";
+        in.close();
+        return -1;
+    }
+    if (file_size > length) {
+        MI_UTIL_LOG(MI_WARNING) << "FileUtil::read_raw input file " << path << 
+        " file size(" << file_size << ") large than input buffer length(" << length << ").";
+    }
+
+    in.seekg(0, std::ios::beg);
+    in.read((char*)(buffer), length);
+    in.close();
+
+    return 0;
+}
+
+int FileUtil::read_raw_ext(const std::string& path, char*& buffer, unsigned int& length) {
+    if (path.empty()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw input path is empty.";
+    }
+
+    std::ifstream in(path.c_str() , std::ios::in | std::ios::binary);
+
+    if (!in.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw open file " << path << " failed.";
+        return -1;
+    }
+
+    in.seekg(0, std::ios::end);
+    length = static_cast<unsigned int>(in.tellg());
+    char* buffer_ = new char[length];
+    buffer = buffer_;
+
+    in.seekg(0, std::ios::beg);
+    in.read(buffer_, length);
+    in.close();
+
+    return 0;
+}
+
 MED_IMG_END_NAMESPACE

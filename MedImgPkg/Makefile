@@ -19,6 +19,7 @@ subsystem:
 	$(MAKE) -C ./executable/reviewserver
 	$(MAKE) -C ./executable/dcmdbimporter
 	$(MAKE) -C ./executable/extractmask
+	$(MAKE) -C ./executable/compressmask
 
 PHONY.:clean
 clean:
@@ -38,4 +39,5 @@ clean:
 	$(MAKE) clean -C ./executable/reviewserver
 	$(MAKE) clean -C ./executable/dcmdbimporter
 	$(MAKE) clean -C ./executable/extractmask
+	$(MAKE) clean -C ./executable/compressmask
 	-rm -r bin
