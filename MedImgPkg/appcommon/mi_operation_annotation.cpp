@@ -128,7 +128,7 @@ int OpAnnotation::execute() {
         }
     } else if (ModelAnnotation::MODIFY_COMPLETED == anno_status) {
         VOISphere voi_latest = model->get_annotation(anno_id);
-        if (fabs(voi_latest.diameter) < 0.01f) {
+        if (fabs(voi_latest.diameter) < 0.1f) {
             const unsigned char label_deleted = model->get_label(anno_id);
             model->remove_annotation(anno_id);
             MaskLabelStore::instance()->recycle_label(label_deleted);

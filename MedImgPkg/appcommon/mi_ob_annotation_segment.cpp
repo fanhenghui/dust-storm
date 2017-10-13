@@ -48,15 +48,14 @@ void OBAnnotationSegment::set_vr_scenes(std::vector<std::shared_ptr<VRScene>> sc
 
 void OBAnnotationSegment::update(int code_id /*= 0*/) {
     APPCOMMON_CHECK_NULL_EXCEPTION(_volume_infos);
-
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     APPCOMMON_CHECK_NULL_EXCEPTION(volume_data);
-
     std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
     APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
-
     std::shared_ptr<ModelAnnotation> model = _model.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(model);
+    std::vector<std::string> processing_ids;
+    model->get_processing_cache(processing_ids);
 
     //update overlay mask mode
     if (ModelAnnotation::ADD == code_id || ModelAnnotation::DELETE == code_id) {
@@ -73,25 +72,14 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
     /// \ ADD
     if (ModelAnnotation::ADD == code_id) {
-        //get added annotations
-        const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
-        typedef std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator ConstVOIIter;
-        std::vector<ConstVOIIter> vois_add;
-        for (ConstVOIIter it = vois.begin() ; it != vois.end(); ++it) {
-            const std::string id = it->first;
-            if (_pre_vois.find(id) == _pre_vois.end()) {
-                vois_add.push_back(it);
-            }
-        }
-
         //add pre_vois and segment
         std::vector<unsigned char> add_labels;
-        for (auto it = vois_add.begin(); it != vois_add.end(); ++it) {
-            const std::string id = (*it)->first;
-            const VOISphere& voi = (*it)->second.voi;
-            const unsigned char label = (*it)->second.label;
+        for (auto it = processing_ids.begin(); it != processing_ids.end(); ++it) {
+            const std::string id = (*it);
+            const VOISphere voi = model->get_annotation(id);
+            const unsigned char label = model->get_label(id);
             add_labels.push_back(label);
-            if (voi.diameter >= 0.01f) {
+            if (voi.diameter >= 0.1f) {
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi);
                 AABBUI aabb;
                 get_aabb_i(ellipsoid, aabb);
@@ -117,7 +105,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             const std::string color_opacity_xml = "../config/lut/3d/ct_lung_nodule.xml";
             std::shared_ptr<ColorTransFunc> color;
             std::shared_ptr<OpacityTransFunc> opacity;
-            float ww, wl;
+            float ww(0), wl(0);
             RGBAUnit background;
             Material material;
             if (IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity, ww, wl, background, material)) {
@@ -143,22 +131,17 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         if (_pre_vois.empty()) {
             return;
         }
-        //get deleted annotations
-        const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
-        typedef std::map<std::string, OBAnnotationSegment::VOIUnit>::const_iterator ConstPreVOIIter;
-        std::vector<ConstPreVOIIter> vois_delete;
-        for (auto it = _pre_vois.begin() ; it != _pre_vois.end(); ++it) {
-            const std::string id = it->first;
-            if (vois.find(id) == vois.end()) {
-                vois_delete.push_back(it);
-            }
-        }
-
         //update pre_vois and recover segmentation
-        for (auto it = vois_delete.begin(); it != vois_delete.end(); ++it) {
-            const std::string id = (*it)->first;
-            const AABBUI& aabb = (*it)->second.aabb;
-            const unsigned char label = (*it)->second.label;
+        for (auto it = processing_ids.begin(); it != processing_ids.end(); ++it) {
+            const std::string id = *it;
+            auto pre = _pre_vois.find(id);
+            if (pre == _pre_vois.end()) {
+                MI_APPCOMMON_LOG(MI_ERROR) << "cant find prcessing id: " << id << " in previous vois.";
+                continue;
+            }
+            //recover
+            const AABBUI& aabb = pre->second.aabb;
+            const unsigned char label = pre->second.label;
             recover_i(aabb , label);
             _pre_vois.erase(*it);
         }
@@ -178,54 +161,36 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
     /// \Modify completed
     if (ModelAnnotation::MODIFY_COMPLETED == code_id) {
-        const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
-        typedef std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator ConstIter;
-        typedef std::map<std::string, OBAnnotationSegment::VOIUnit>::iterator PreVOIIter;
-
-        if(_pre_vois.size() != vois.size()) {
+        if(_pre_vois.size() != model->get_annotation_count()) {
             MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation cache.";
             return;
         }
-
-        //compare to find modified ones
-        std::vector<ConstIter> vois_modify;
-        std::vector<PreVOIIter> prevois_modify;
-        for (ConstIter it = vois.begin(); it != vois.end() ; ++it) {
-            const std::string id = it->first;
-            const VOISphere& voi = it->second.voi;
-            PreVOIIter it2 = _pre_vois.find(id);
-            if (it2 == _pre_vois.end()) {
-                MI_APPCOMMON_LOG(MI_ERROR) << "find modified voi " << id << " failed.";
-                return;
-            }
-            const VOISphere& prevoi = it2->second.voi;
-            if (voi != prevoi) {
-                vois_modify.push_back(it);
-                prevois_modify.push_back(it2);
-            }
-        }
-
         //modify segment
-        for (size_t i = 0; i < vois_modify.size(); ++i) {
-
-            const unsigned char label = vois_modify[i]->second.label;
-            const VOISphere voi = vois_modify[i]->second.voi;
+        for (auto it = processing_ids.begin(); it != processing_ids.end(); ++it) {
+            const std::string id = *it;
+            const unsigned char label = model->get_label(id);
+            const VOISphere voi = model->get_annotation(id);
+            auto pre = _pre_vois.find(id);
+            if (pre == _pre_vois.end()) {
+                MI_APPCOMMON_LOG(MI_ERROR) << "cant find prcessing id: " << id << " in previous vois.";
+                continue;
+            }
             //recover
-            recover_i(prevois_modify[i]->second.aabb , label);
+            recover_i(pre->second.aabb , label);
             //segment
             Ellipsoid ellipsoid = voi_patient_to_volume(voi);
             AABBUI aabb;
             get_aabb_i(ellipsoid, aabb);
             segment_i(ellipsoid , aabb , label);
 
-            prevois_modify[i]->second.voi = voi;
-            prevois_modify[i]->second.aabb = aabb;
+            pre->second.voi = voi;
+            pre->second.aabb = aabb;
 
-            for (auto it = _mpr_scenes.begin(); it != _mpr_scenes.end(); ++it) {
-                (*it)->set_dirty(true);
+            for (auto it2 = _mpr_scenes.begin(); it2 != _mpr_scenes.end(); ++it2) {
+                (*it2)->set_dirty(true);
             }
-            for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
-                (*it)->set_dirty(true);
+            for (auto it2 = _vr_scenes.begin(); it2 != _vr_scenes.end(); ++it2) {
+                (*it2)->set_dirty(true);
             }
         }
     }
