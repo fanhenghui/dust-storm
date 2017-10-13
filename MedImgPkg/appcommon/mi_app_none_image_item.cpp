@@ -319,7 +319,7 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
     }
 
     ss.str(std::string());
-    ss << std::setprecision(1) << std::fixed << "kvp: " << header->kvp;
+    ss << std::setprecision(0) << std::fixed << "kvp: " << header->kvp;
     this->add_info(NoneImgCornerInfos::RB, std::make_pair(1, ss.str()));
 
     _init = true;
