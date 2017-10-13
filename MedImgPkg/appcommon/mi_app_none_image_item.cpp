@@ -235,7 +235,7 @@ bool NoneImgCornerInfos::check_dirty() {
         } 
 
         int max_page = 0;
-        const int page = camera_cal->get_orthognal_mpr_page(ortho_camera, max_page);
+        const int page = camera_cal->get_orthogonal_mpr_page(ortho_camera, max_page);
         if(page != _mpr_page) {
             ++dirty_items;
             _mpr_page = page;

@@ -55,7 +55,7 @@ int OpMPRPaging::execute() {
     std::shared_ptr<VolumeInfos> volumeinfos = controller->get_volume_infos();
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>
                                           (mpr_scene->get_camera());
-    int cur_page = mpr_scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
+    int cur_page = mpr_scene->get_camera_calculator()->get_orthogonal_mpr_page(camera);
     mpr_scene->page(page_num);
     return 0;
 }
