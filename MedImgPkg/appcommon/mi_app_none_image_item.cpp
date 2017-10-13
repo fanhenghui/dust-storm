@@ -234,12 +234,13 @@ bool NoneImgCornerInfos::check_dirty() {
             this->add_info(NoneImgCornerInfos::LB, std::make_pair(1, ss.str()));
         } 
 
-        const int page = camera_cal->get_orthognal_mpr_page(ortho_camera);
+        int max_page = 0;
+        const int page = camera_cal->get_orthognal_mpr_page(ortho_camera, max_page);
         if(page != _mpr_page) {
             ++dirty_items;
             _mpr_page = page;
             std::stringstream ss;
-            ss << "Slice: " << _mpr_page;
+            ss << "Slice: " << _mpr_page << "/" << max_page;
             this->add_info(NoneImgCornerInfos::LB, std::make_pair(0, ss.str()));
             
         }

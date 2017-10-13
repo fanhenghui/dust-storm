@@ -111,6 +111,8 @@ public:
 
     int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> mpr_camera) const;
 
+    int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> mpr_camera, int& max_page) const;
+
     // MPR translate toward normal direction until MPR's plane is intersect with
     // input point
     void translate_mpr_to(std::shared_ptr<OrthoCamera> mpr_camera , const Point3& pt);
