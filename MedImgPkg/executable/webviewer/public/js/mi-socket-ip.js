@@ -1,1 +1,1 @@
-const SOCKET_IP = 'http://127.0.0.1:8000';
+const SOCKET_IP = 'http://192.168.199.107:8000';
