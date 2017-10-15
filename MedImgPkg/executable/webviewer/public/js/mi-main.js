@@ -594,8 +594,8 @@ var maxCellID = -1;
         document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
 
-        $("#modal-preset-vrt-browser").draggable({
-            handle: ".modal-header"
+        $('#modal-preset-vrt-browser').draggable({
+            handle: '.modal-header'
         });
         
         var switchVRTFunc = function(context) {
