@@ -27,7 +27,8 @@ public:
     void set_mpr_group_orthogonality(bool flag);//call when trigger on MPR rotation
     bool get_mpr_group_orthogonality() const;
 
-    void get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(&lines)[2], RGBUnit(&color)[2]);
+    void get_cross_line(const MPRScenePtr& target_mpr_scene, 
+        Line2D(&lines_ndc)[2], Point2& cross_ndc, Line2D(&lines_dc)[2], Point2& cross_dc, RGBUnit(&color)[2]);
     bool get_cross(const MPRScenePtr& target_mpr_scene, Point2& pt_dc);
     RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 

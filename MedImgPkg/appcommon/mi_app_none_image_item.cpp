@@ -399,17 +399,21 @@ void NoneImgCrosshair::update() {
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
     if (mpr_scene) {
         _colors.clear();
-        Line2D lines[2];
+        Line2D lines_ndc[2];
+        Line2D lines_dc[2];
+        Point2 pt_ndc;
+        Point2 pt_dc;
         RGBUnit colors[2];
-        model->get_cross_line(mpr_scene, lines, colors);
+        model->get_cross_line(mpr_scene, lines_ndc, pt_ndc, lines_dc, pt_dc, colors);
         if (!_init) {
             //first send message set color
             _colors.push_back(colors[0].to_hex());
             _colors.push_back(colors[1].to_hex());
             _init = true;
         }
-        _line0 = lines[0];
-        _line1 = lines[1];
+        _line0 = lines_dc[0];
+        _line1 = lines_dc[1];
+        _crosshair = pt_dc;
 
     } else {
         std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(_scene);

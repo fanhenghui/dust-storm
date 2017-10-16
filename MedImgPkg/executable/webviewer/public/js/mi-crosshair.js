@@ -488,15 +488,15 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
 
     var cx = msgCrosshair.cx;
     var cy = msgCrosshair.cy;
-    var para0 = {a:msgCrosshair.l0a, b:msgCrosshair.l0b, c:msgCrosshair.l0c};
-    var para1 = {a:msgCrosshair.l1a, b:msgCrosshair.l1b, c:msgCrosshair.l1c};
-    if (msgCrosshair.l0color) {
-        this.line00.stype('stroke', msgCrosshair.l0color);
-        this.line01.stype('stroke', msgCrosshair.l0color);
+    var para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
+    var para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
+    if (msgCrosshair.l0Color) {
+        this.line00.style('stroke', msgCrosshair.l0Color);
+        this.line01.style('stroke', msgCrosshair.l0Color);
     }
-    if (msgCrosshair.l1color) {
-        this.line10.stype('stroke', msgCrosshair.l1color);
-        this.line11.stype('stroke', msgCrosshair.l1color);
+    if (msgCrosshair.l1Color) {
+        this.line10.style('stroke', msgCrosshair.l1Color);
+        this.line11.style('stroke', msgCrosshair.l1Color);
     }
     this.setLine(cx, cy, para0, para1);
 }

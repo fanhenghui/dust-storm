@@ -40,8 +40,8 @@ void ModelCrosshair::set_mpr_scene(const ScanSliceType(&scan_type)[3],
     _location_contineous_w = _location_discrete_w;
 }
 
-void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(&lines)[2],
-                                    RGBUnit(&color)[2]) {
+void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(&lines_ndc)[2], Point2& cross_ndc, 
+                                    Line2D(&lines_dc)[2], Point2& cross_dc, RGBUnit(&color)[2]) {
     //1 get crossed MPR
     APPCOMMON_CHECK_NULL_EXCEPTION(target_mpr_scene);
     MPRScenePtr cross_scenes[2] = {nullptr, nullptr};
@@ -73,13 +73,28 @@ void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(
 
         if (IntersectionTest::plane_to_plane(p, plane_target, line_intersect)) {
             //project intersected line to screen
-            Point3 pt_screen = mat_vp.transform(line_intersect._pt);
-            lines[i]._pt = Point2(pt_screen.x, pt_screen.y);
+            Point3 pt_screen_ndc = mat_vp.transform(_location_contineous_w);
+            cross_ndc = Point2(pt_screen_ndc.x, pt_screen_ndc.y);
+            lines_ndc[i]._pt = cross_ndc;
             Vector3 vDir = mat_vp.get_inverse().get_transpose().transform(line_intersect._dir);
-            lines[i]._dir = Vector2(vDir.x, vDir.y).get_normalize();
+            lines_ndc[i]._dir = Vector2(vDir.x, vDir.y).get_normalize();
+
+            int width(0),height(0);
+            cross_scenes[i]->get_display_size(width, height);
+            int spill_tag = 0;
+            Point2 pt_screen_dc = ArithmeticUtils::ndc_to_dc(cross_ndc, width, height, spill_tag);
+            //TODO check spill_tag
+            cross_dc = pt_screen_dc;
+            lines_dc[i]._pt = pt_screen_dc;
+            lines_dc[i]._dir = Vector2(lines_ndc[i]._dir.x, -lines_ndc[i]._dir.y);
+            
+            
         } else {
-            lines[i]._pt = Point2::S_ZERO_POINT;
-            lines[i]._dir = Vector2(0, 0);
+            lines_ndc[i]._pt = Point2::S_ZERO_POINT;
+            lines_ndc[i]._dir = Vector2(0, 0);
+            lines_dc[i]._pt = Point2::S_ZERO_POINT;
+            lines_dc[i]._dir = Vector2(0, 0);
+            MI_APPCOMMON_LOG(MI_ERROR) << "get cross line failed.";
         }
     }
 }

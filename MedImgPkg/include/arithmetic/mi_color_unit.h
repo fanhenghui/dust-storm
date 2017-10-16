@@ -31,8 +31,12 @@ struct RGBUnit {
 
     std::string to_hex() const {
         std::stringstream ss;
-        ss << std::hex << ((int(r))<<16 | (int(g))<<8 | int(b));
-        return ss.str();
+        ss << "#" << std::hex << ((int(r))<<16 | (int(g))<<8 | int(b));
+        std::string hex = ss.str();
+        while (hex.size() < 7) {
+            hex.push_back('0');
+        }
+        return hex;
     }
 };
 
