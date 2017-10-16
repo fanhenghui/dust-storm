@@ -1,16 +1,9 @@
-const MAIN_COLOR = 'red';
-const CTRL_COLOR = '#DC143C';
-const HIGHLIGHT_COLOR = 'yellow';
-const APPEARING_TIME = 250; // 250 ms
-const FADING_TIME = 2000; // 2s
-
-var CTRL_SIZE = 4;
-
 function ROICircle(key, svg, cx, cy, r){
     this.svg = svg;
     this.cx = cx;
     this.cy = cy;
     this.r = r;
+
     this.roiMain = null;
     this.roiCtrlLT = null;
     this.roiCtrlLB = null;
@@ -28,6 +21,12 @@ function ROICircle(key, svg, cx, cy, r){
     this.keyCtrlRB = key+'-rb';
     this.keyCtrlMove = key+'-move';
     this.hovering = false;
+    this.ctrlSize = 4;
+
+    //adjust ctrl size
+    var width = parseFloat(d3.select(svg).attr('width'));
+    var height = parseFloat(d3.select(svg).attr('height'));
+    this.resize(width, height);
 
     var hoveringFunc = (function () {
         if (this.hovering == false) {
@@ -38,11 +37,11 @@ function ROICircle(key, svg, cx, cy, r){
             this.roiCtrlRB.style('cursor', 'move');
             this.roiCtrlMove.style('cursor', 'move');
 
-            this.roiCtrlLT.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
-            this.roiCtrlLB.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
-            this.roiCtrlRT.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
-            this.roiCtrlRB.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
-            this.roiCtrlMove.transition().duration(APPEARING_TIME).attr('r', CTRL_SIZE);
+            this.roiCtrlLT.transition().duration(ROICircle.ctrlAppearInverval).attr('r', this.ctrlSize);
+            this.roiCtrlLB.transition().duration(ROICircle.ctrlAppearInverval).attr('r', this.ctrlSize);
+            this.roiCtrlRT.transition().duration(ROICircle.ctrlAppearInverval).attr('r', this.ctrlSize);
+            this.roiCtrlRB.transition().duration(ROICircle.ctrlAppearInverval).attr('r', this.ctrlSize);
+            this.roiCtrlMove.transition().duration(ROICircle.ctrlAppearInverval).attr('r', this.ctrlSize);
 
             //this.roiMain.style('cursor', 'default');
             this.hovering = true;
@@ -57,11 +56,11 @@ function ROICircle(key, svg, cx, cy, r){
         this.roiCtrlRB.style('cursor', 'default');
         this.roiCtrlMove.style('cursor', 'default');
 
-        this.roiCtrlLT.transition().duration(FADING_TIME).attr('r', 0.0);
-        this.roiCtrlLB.transition().duration(FADING_TIME).attr('r', 0.0);
-        this.roiCtrlRT.transition().duration(FADING_TIME).attr('r', 0.0);
-        this.roiCtrlRB.transition().duration(FADING_TIME).attr('r', 0.0);
-        this.roiCtrlMove.transition().duration(FADING_TIME).attr('r', 0.0);
+        this.roiCtrlLT.transition().duration(ROICircle.ctrlFadeInverval).attr('r', 0.0);
+        this.roiCtrlLB.transition().duration(ROICircle.ctrlFadeInverval).attr('r', 0.0);
+        this.roiCtrlRT.transition().duration(ROICircle.ctrlFadeInverval).attr('r', 0.0);
+        this.roiCtrlRB.transition().duration(ROICircle.ctrlFadeInverval).attr('r', 0.0);
+        this.roiCtrlMove.transition().duration(ROICircle.ctrlFadeInverval).attr('r', 0.0);
 
         //this.roiMain.style("cursor", "default");
         this.hovering = false;
@@ -89,7 +88,7 @@ function ROICircle(key, svg, cx, cy, r){
         })
         // .style('fill', 'none')
         .style('fill-opacity', 0.0)
-        .style('stroke', MAIN_COLOR)
+        .style('stroke', ROICircle.mainColor)
         .style('stroke-opacity', 1.0)
         .style('stroke-width', 2)
         .on("mouseover", hoveringFunc)
@@ -102,8 +101,8 @@ function ROICircle(key, svg, cx, cy, r){
     }).enter().append('circle')
     .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
-    .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR)
+    .attr('r', this.ctrlSize)
+    .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     //.style('cursor', 'move');
@@ -114,8 +113,8 @@ function ROICircle(key, svg, cx, cy, r){
     }).enter().append('circle')
     .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
-    .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR)
+    .attr('r', this.ctrlSize)
+    .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('cursor', 'move');
@@ -126,8 +125,8 @@ function ROICircle(key, svg, cx, cy, r){
     }).enter().append('circle')
     .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
-    .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR)
+    .attr('r', this.ctrlSize)
+    .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('cursor', 'move');
@@ -138,8 +137,8 @@ function ROICircle(key, svg, cx, cy, r){
     }).enter().append('circle')
     .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
     .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
-    .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR)
+    .attr('r', this.ctrlSize)
+    .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('cursor', 'move');
@@ -151,12 +150,12 @@ function ROICircle(key, svg, cx, cy, r){
     }).enter().append('circle')
     .attr('cx', function(d) { return d.cx;})
     .attr('cy', function(d) { return d.cy;})
-    .attr('r', CTRL_SIZE)
-    .style('fill', CTRL_COLOR)
+    .attr('r', this.ctrlSize)
+    .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('fill-opacity', 0.0)
-    // .style('stroke', CTRL_COLOR)
+    // .style('stroke', ROICircle.ctrlColor)
     // .style('stroke-opacity', 1.0)
     // .style('stroke-width', 3);
     // .style('cursor', 'move');
@@ -190,6 +189,17 @@ function ROICircle(key, svg, cx, cy, r){
     this.roiCtrlLB.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
     this.roiCtrlRT.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
     this.roiCtrlRB.call(d3.drag().on('drag', dragCtrlStretch).on('end', dragEndCtrl));
+}
+
+ROICircle.mainColor = 'red';
+ROICircle.ctrlColor = '#DC143C';
+ROICircle.highlightColor = 'yellow';
+ROICircle.ctrlAppearInverval = 250;
+ROICircle.ctrlFadeInverval = 2000;
+
+ROICircle.prototype.resize = function(w, h) {
+    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [1, 6]
+    this.ctrlSize = Math.min(Math.max((w + h) / 500.0, 3.5), 6);
 }
 
 ROICircle.prototype.move = function(cx, cy) {

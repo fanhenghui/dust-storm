@@ -226,8 +226,10 @@ Cell.prototype.resize = function (width, height) {
                     }
                 })
         });
-    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [1, 6]
-    CTRL_SIZE = Math.min(Math.max((width + height) / 450, 3.5), 6); // linear
+    
+    for (var i = 0; i < this.rois.length; ++i) {
+        this.rois[i].resize(width, height);
+    }
 }
 
 Cell.prototype.mouseClickTicker = function() {
