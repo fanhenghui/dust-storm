@@ -80,7 +80,7 @@ void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(
             lines_ndc[i]._dir = Vector2(vDir.x, vDir.y).get_normalize();
 
             int width(0),height(0);
-            cross_scenes[i]->get_display_size(width, height);
+            target_mpr_scene->get_display_size(width, height);
             int spill_tag = 0;
             Point2 pt_screen_dc = ArithmeticUtils::ndc_to_dc(cross_ndc, width, height, spill_tag);
             //TODO check spill_tag

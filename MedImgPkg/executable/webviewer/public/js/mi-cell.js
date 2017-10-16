@@ -40,6 +40,7 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
 
     //crosshair
     this.crosshair = null;
+    this.borderColor = '#333333';
 }
 
 function refreshCanvas(canvas, img) {
@@ -191,6 +192,10 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         if (receivedMsg.crosshair) {
             if (this.crosshair) {
                 this.crosshair.parseNoneImg(receivedMsg.crosshair);
+                if (receivedMsg.crosshair.borderColor) {
+                    this.borderColor = receivedMsg.crosshair.borderColor;
+                    this.canvas.style.border = '3px solid ' + this.borderColor;
+                }
             }
         }
 

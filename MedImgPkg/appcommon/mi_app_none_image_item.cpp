@@ -372,9 +372,10 @@ void NoneImgCrosshair::fill_msg(MsgNoneImgCollection* msg) const {
     cross_hair->set_l1_b(b);
     cross_hair->set_l1_c(c);
 
-    if (_colors.size() == 2) {
+    if (_colors.size() == 3) {
         cross_hair->set_l0_color(_colors[0]);
         cross_hair->set_l1_color(_colors[1]);
+        cross_hair->set_border_color(_colors[2]);
     }
 }
 
@@ -383,11 +384,14 @@ bool NoneImgCrosshair::check_dirty() {
     std::shared_ptr<CameraBase> camera = _scene->get_camera();
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
     APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
-
-    if (_init && *ortho_camera == _pre_camera) {
+    int width(-1), height(-1);
+    _scene->get_display_size(width, height);
+    if (_init && *ortho_camera == _pre_camera && _pre_width == width && _pre_height == height) {
         return false;
     } else {
-        _pre_camera = *ortho_camera; 
+        _pre_camera = *ortho_camera;
+        _pre_width = width;
+        _pre_height = height;
         return true;
     }
 }
@@ -409,6 +413,7 @@ void NoneImgCrosshair::update() {
             //first send message set color
             _colors.push_back(colors[0].to_hex());
             _colors.push_back(colors[1].to_hex());
+            _colors.push_back(model->get_border_color(mpr_scene).to_hex());
             _init = true;
         }
         _line0 = lines_dc[0];

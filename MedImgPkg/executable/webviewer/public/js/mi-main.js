@@ -300,10 +300,10 @@ var maxCellID = -1;
         for (var i = 0; i < cells.length; ++i) {
             if (i == cellID) { 
                 cells[i].mouseFocus = true;
-                cellCanvases[i].style.border = '3px solid #333333';
+                cellCanvases[i].style.border = '3px solid ' + '#6A5ACD';
             } else {
                 cells[i].mouseFocus = false;
-                cellCanvases[i].style.border = '3px solid #F5F5F5';
+                cellCanvases[i].style.border = '3px solid ' + cells[i].borderColor;
             }
         }        
     }
