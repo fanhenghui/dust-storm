@@ -88,7 +88,7 @@ message MsgAnnotationListItem {
     required string id = 1; // id format: "time|num"
     required string info = 2; // nodule type
     required int32 row = 3; //row value
-    required int32 status = 4; //0 add; 1 delete; 2 modifying
+    required int32 status = 4; //0 add; 1 delete; 2 modifying; 3 modify completed ; 4 focus
     required float para0 = 5; //center x
     required float para1 = 6; //center y
     required float para2 = 7; //center z

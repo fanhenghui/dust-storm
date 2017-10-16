@@ -139,6 +139,11 @@ var maxCellID = -1;
                         var rowItem = annotationTable.insertRow(row + 1);
                         $(rowItem).click(function(event) {
                             $(this).addClass('success').siblings().removeClass('success');
+                            //send focus annotation message
+                            var anno_id = $(this).attr('id');
+                            if (anno_id) {
+                                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
+                            }
                         });
                         rowItem.setAttribute('id',id);
                         rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);

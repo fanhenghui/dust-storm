@@ -495,20 +495,24 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
         .style('stroke-opacity',1.0);
         this.line01.style('stroke', msgCrosshair.l0Color)
         .style('stroke-opacity',1.0);;
-        this.crossUp.style('stroke-opacity', 1.0);
-        this.crossDown.style('stroke-opacity', 1.0);
-        this.crossLeft.style('stroke-opacity', 1.0);
-        this.crossRight.style('stroke-opacity', 1.0);
+        //this.crossUp.style('stroke-opacity', 1.0);
+        //this.crossDown.style('stroke-opacity', 1.0);
+        //this.crossLeft.style('stroke-opacity', 1.0);
+        //this.crossRight.style('stroke-opacity', 1.0);
     }
     if (msgCrosshair.l1Color) {
         this.line10.style('stroke', msgCrosshair.l1Color)
         .style('stroke-opacity',1.0);
         this.line11.style('stroke', msgCrosshair.l1Color)
         .style('stroke-opacity',1.0);
-        this.crossUp.style('stroke-opacity', 1.0);
-        this.crossDown.style('stroke-opacity', 1.0);
-        this.crossLeft.style('stroke-opacity', 1.0);
-        this.crossRight.style('stroke-opacity', 1.0);
+        //this.crossUp.style('stroke-opacity', 1.0);
+        //this.crossDown.style('stroke-opacity', 1.0);
+        //this.crossLeft.style('stroke-opacity', 1.0);
+        //this.crossRight.style('stroke-opacity', 1.0);
     }
     this.setLine(cx, cy, para0, para1);
+}
+
+Crosshair.prototype.visible = function(flag) {
+    //TODO visibility
 }

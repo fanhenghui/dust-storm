@@ -61,6 +61,7 @@ const ANNOTATION_ADD = 0;
 const ANNOTATION_DELETE = 1;
 const ANNOTATION_MODIFYING = 2;
 const ANNOTATION_MODIFYCOMPLETED = 3;
+const ANNOTATION_FOCUS = 4;
 
 function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, socketClient) {
     if(!socketClient.protocRoot) {

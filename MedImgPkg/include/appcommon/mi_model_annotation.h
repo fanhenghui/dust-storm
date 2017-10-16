@@ -17,6 +17,7 @@ public:
         DELETE = 1, //delete one the annotation
         MODIFYING = 2, //modifying when mouse moving
         MODIFY_COMPLETED = 3, //modify completed when mouse release
+        FOCUS = 4, //focus certain voi in each scenes
     };
 
     struct AnnotationUnit {
