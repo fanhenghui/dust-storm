@@ -138,6 +138,8 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
         return false;
     }
+    //update mouse clock
+    this.mouseClock = curClock;
 
     //send msg to BE
     let annoID = cell.lastROI.key;

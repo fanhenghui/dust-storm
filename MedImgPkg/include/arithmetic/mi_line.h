@@ -17,6 +17,8 @@ public:
 public:
     Line2D();
     virtual ~Line2D();
+    //ax+by = c
+    void to_func(double& a, double& b, double& c) const;
 
     bool operator==(const Line2D& l) {
         return l._pt == _pt && l._dir == _dir;

@@ -23,7 +23,9 @@
 #include "appcommon/mi_operation_mpr_mask_overlay.h"
 #include "appcommon/mi_operation_switch_preset_windowing.h"
 #include "appcommon/mi_operation_switch_preset_vrt.h"
+#include "appcommon/mi_operation_locate.h"
 #include "appcommon/mi_model_annotation.h"
+#include "appcommon/mi_model_crosshair.h"
 
 #include "mi_cmd_handler_search_worklist.h"
 #include "mi_operation_init.h"
@@ -96,14 +98,19 @@ void ReviewController::register_command_handler_i() {
         OPERATION_ID_SWITCH_PRESET_WINDOWING, std::shared_ptr<OpSwitchPresetWindowing>(new OpSwitchPresetWindowing()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_SWITCH_PRESET_VRT, std::shared_ptr<OpSwitchPresetVRT>(new OpSwitchPresetVRT()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
         
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
 }
 
 void ReviewController::create_model_i() {
-    std::shared_ptr<ModelAnnotation> annotation(new ModelAnnotation());
-    this->add_model(MODEL_ID_ANNOTATION , annotation);
+    std::shared_ptr<ModelAnnotation> model_annotation(new ModelAnnotation());
+    this->add_model(MODEL_ID_ANNOTATION , model_annotation);
+
+    std::shared_ptr<ModelCrosshair> model_crosshair(new ModelCrosshair());
+    this->add_model(MODEL_ID_CROSSHAIR , model_crosshair);
 }
 
 

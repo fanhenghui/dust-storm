@@ -3,6 +3,7 @@
 
 #include "arithmetic/mi_arithmetic_export.h"
 #include <ostream>
+#include <string>
 #include "arithmetic/mi_vector4f.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -26,6 +27,12 @@ struct RGBUnit {
     friend std::ostream& operator << (std::ostream& strm , const RGBUnit& rgb) {
         strm << "( " << (int)rgb.r << " , " << (int)rgb.g << " , " << (int)rgb.b << " )";
         return strm;
+    }
+
+    std::string to_hex() const {
+        std::stringstream ss;
+        ss << std::hex << ((int(r))<<16 | (int(g))<<8 | int(b));
+        return ss.str();
     }
 };
 

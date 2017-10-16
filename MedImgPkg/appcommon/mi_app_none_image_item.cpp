@@ -12,6 +12,7 @@
 #include "renderalgo/mi_camera_calculator.h"
 
 #include "mi_model_annotation.h"
+#include "mi_model_crosshair.h"
 #include "mi_app_common_logger.h"
 #include "mi_message.pb.h"
 
@@ -355,5 +356,74 @@ bool NoneImgDirection::check_dirty() {
 void NoneImgDirection::update() {
     //TODO calculate infos
 }
+
+
+void NoneImgCrosshair::fill_msg(MsgNoneImgCollection* msg) const {
+    MsgCrosshair* cross_hair = msg->mutable_crosshair();
+    cross_hair->set_cx(_crosshair.x);
+    cross_hair->set_cy(_crosshair.y);
+    double a(0),b(0),c(0);
+    _line0.to_func(a,b,c);
+    cross_hair->set_l0_a(a);
+    cross_hair->set_l0_b(b);
+    cross_hair->set_l0_c(c);
+    _line1.to_func(a,b,c);
+    cross_hair->set_l1_a(a);
+    cross_hair->set_l1_b(b);
+    cross_hair->set_l1_c(c);
+
+    if (_colors.size() == 2) {
+        cross_hair->set_l0_color(_colors[0]);
+        cross_hair->set_l1_color(_colors[1]);
+    }
+}
+
+bool NoneImgCrosshair::check_dirty() {
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+
+    if (_init && *ortho_camera == _pre_camera) {
+        return false;
+    } else {
+        _pre_camera = *ortho_camera; 
+        return true;
+    }
+}
+
+void NoneImgCrosshair::update() {
+    std::shared_ptr<ModelCrosshair> model = _model.lock();
+    APPCOMMON_CHECK_NULL_EXCEPTION(model);
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
+    if (mpr_scene) {
+        _colors.clear();
+        Line2D lines[2];
+        RGBUnit colors[2];
+        model->get_cross_line(mpr_scene, lines, colors);
+        if (!_init) {
+            //first send message set color
+            _colors.push_back(colors[0].to_hex());
+            _colors.push_back(colors[1].to_hex());
+            _init = true;
+        }
+        _line0 = lines[0];
+        _line1 = lines[1];
+
+    } else {
+        std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(_scene);
+        if (!vr_scene) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "invalid sence. not vr or mpr.";
+            APPCOMMON_THROW_EXCEPTION("invalid sence. not vr or mpr.");
+        }
+
+        if (!_init) { _init = true;}
+
+        //TODO VR scene
+    }
+
+}
+
 
 MED_IMG_END_NAMESPACE

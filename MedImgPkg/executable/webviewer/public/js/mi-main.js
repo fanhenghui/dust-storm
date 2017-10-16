@@ -336,10 +336,14 @@ var maxCellID = -1;
         }
 
         //init default cell action
-        cells[0].activeAction(ACTION_ID_MPR_PAGING);
-        cells[1].activeAction(ACTION_ID_MPR_PAGING);
-        cells[2].activeAction(ACTION_ID_MPR_PAGING);
+        for (var i = 0; i < 3; ++i) {
+            cells[i].activeAction(ACTION_ID_MPR_PAGING);
+            //MPR add crosshair
+            cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient);
+        }
         cells[3].activeAction(ACTION_ID_ROTATE);
+
+
 
         //nofity BE
         var MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');

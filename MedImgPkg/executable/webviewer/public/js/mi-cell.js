@@ -37,6 +37,9 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     //annotation ROI
     this.rois = [];
     this.lastROI = null;
+
+    //crosshair
+    this.crosshair = null;
 }
 
 function refreshCanvas(canvas, img) {
@@ -71,7 +74,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 
     // sucessfully receive all none-image
     if (restDataLen <= 0) {
-        console.log('receive Nong Img Buffer.');
+        //console.log('receive Nong Img Buffer.');
         var MsgNoneImgCollection = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
         if (!MsgNoneImgCollection) {
             console.log('get MsgNoneImgCollection type failed.');
@@ -183,6 +186,14 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                 }
             }
         }
+
+        //TODO crosshair message
+        if (receivedMsg.crosshair) {
+            if (this.crosshair) {
+                this.crosshair.parseNoneImg(receivedMsg.crosshair);
+            }
+        }
+
     }
 }
 

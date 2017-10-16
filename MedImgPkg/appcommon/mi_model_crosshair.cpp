@@ -84,6 +84,19 @@ void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(
     }
 }
 
+bool ModelCrosshair::get_cross(const MPRScenePtr& target_mpr_scene, Point2& pt_dc) {
+    APPCOMMON_CHECK_NULL_EXCEPTION(target_mpr_scene);
+
+    std::shared_ptr<CameraBase> camera = target_mpr_scene->get_camera();
+    const Matrix4 matvp = camera->get_view_projection_matrix();
+    const Point3 pt_ndc = matvp.transform(_location_discrete_w);
+    int width(0), height(0);
+    target_mpr_scene->get_display_size(width, height);
+    int spill_tag(0);
+    pt_dc = ArithmeticUtils::ndc_to_dc(Point2(pt_ndc.x, pt_ndc.y), width, height, spill_tag);
+    return spill_tag == 0;
+}
+
 RGBUnit ModelCrosshair::get_border_color(MPRScenePtr target_mpr_scene) {
     for (int i = 0 ; i < 3 ; ++i) {
         if (_mpr_scenes[i] == target_mpr_scene) {

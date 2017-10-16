@@ -28,6 +28,7 @@ public:
     bool get_mpr_group_orthogonality() const;
 
     void get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(&lines)[2], RGBUnit(&color)[2]);
+    bool get_cross(const MPRScenePtr& target_mpr_scene, Point2& pt_dc);
     RGBUnit get_border_color(MPRScenePtr target_mpr_scene);
 
     Point3 get_cross_location_discrete_world() const;
