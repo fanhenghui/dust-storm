@@ -73,13 +73,13 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line0Color)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.line01 = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line0Color)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.line00CtrlMove = d3.select(this.svg)
     .append('line')
@@ -99,13 +99,13 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line1Color)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.line11 = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line1Color)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.line10CtrlMove = d3.select(this.svg)
     .append('line')
@@ -125,25 +125,25 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.crossDown = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.crossLeft = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.crossRight = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
-    .style('stroke-opacity', 1.0);
+    .style('stroke-opacity', 0.0);
 
     this.crossCtrlOverlay = d3.select(this.svg)
     .append('rect')
@@ -491,12 +491,24 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
     var para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
     var para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
     if (msgCrosshair.l0Color) {
-        this.line00.style('stroke', msgCrosshair.l0Color);
-        this.line01.style('stroke', msgCrosshair.l0Color);
+        this.line00.style('stroke', msgCrosshair.l0Color)
+        .style('stroke-opacity',1.0);
+        this.line01.style('stroke', msgCrosshair.l0Color)
+        .style('stroke-opacity',1.0);;
+        this.crossUp.style('stroke-opacity', 1.0);
+        this.crossDown.style('stroke-opacity', 1.0);
+        this.crossLeft.style('stroke-opacity', 1.0);
+        this.crossRight.style('stroke-opacity', 1.0);
     }
     if (msgCrosshair.l1Color) {
-        this.line10.style('stroke', msgCrosshair.l1Color);
-        this.line11.style('stroke', msgCrosshair.l1Color);
+        this.line10.style('stroke', msgCrosshair.l1Color)
+        .style('stroke-opacity',1.0);
+        this.line11.style('stroke', msgCrosshair.l1Color)
+        .style('stroke-opacity',1.0);
+        this.crossUp.style('stroke-opacity', 1.0);
+        this.crossDown.style('stroke-opacity', 1.0);
+        this.crossLeft.style('stroke-opacity', 1.0);
+        this.crossRight.style('stroke-opacity', 1.0);
     }
     this.setLine(cx, cy, para0, para1);
 }
