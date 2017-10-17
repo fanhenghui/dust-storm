@@ -65,9 +65,9 @@ void ReviewController::register_command_handler_i() {
         new CmdHandlerOperating(app_controller));
     _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, handler_operation);
 
-    std::shared_ptr<CmdHandlerMPRPlay> handler_mpr_play(
-        new CmdHandlerMPRPlay(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
+    // std::shared_ptr<CmdHandlerMPRPlay> handler_mpr_play(
+    //     new CmdHandlerMPRPlay(app_controller));
+    // _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
 
     std::shared_ptr<CmdHandlerVRPlay> handler_vr_play(
         new CmdHandlerVRPlay(app_controller));
