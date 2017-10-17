@@ -41,6 +41,20 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     //crosshair
     this.crosshair = null;
     this.borderColor = '#333333';
+
+    //mouse out event
+    $(this.svg).mouseleave((function() {
+        console.log('mouse out' + this.cellID);
+        if(this.mouseStatus == BTN_DOWN) {
+            //do mouse up logic
+            this.mouseStatus = BTN_UP;
+            this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, this.mousePre.x, this.mousePre.y, this);
+            //reset mouse
+            this.mouseBtn = BTN_NONE;
+            this.mousePre.x = 0;
+            this.mousePre.y = 0;
+        }
+    }).bind(this));
 }
 
 function refreshCanvas(canvas, img) {
@@ -203,7 +217,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         if (receivedMsg.hasOwnProperty('crosshair')) {
             if (this.crosshair) {
                 this.crosshair.parseNoneImg(receivedMsg.crosshair);
-                if (undefined != receivedMsg.crosshair.borderColor) {
+                if (receivedMsg.crosshair.borderColor) {
                     this.borderColor = receivedMsg.crosshair.borderColor;
                     this.canvas.style.border = '3px solid ' + this.borderColor;
                 }
