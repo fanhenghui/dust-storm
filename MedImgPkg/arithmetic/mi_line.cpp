@@ -7,8 +7,8 @@ Line2D::Line2D() {}
 Line2D::~Line2D() {}
 
 void Line2D::to_func(double& a, double& b, double& c) const{
-    a = _dir.x;
-    b = _dir.y;
+    a = _dir.y;
+    b = _dir.x;
     c = a*_pt.x + b*_pt.y;
 }
 

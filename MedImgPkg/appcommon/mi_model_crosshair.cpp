@@ -86,9 +86,7 @@ void ModelCrosshair::get_cross_line(const MPRScenePtr& target_mpr_scene, Line2D(
             //TODO check spill_tag
             cross_dc = pt_screen_dc;
             lines_dc[i]._pt = pt_screen_dc;
-            lines_dc[i]._dir = Vector2(lines_ndc[i]._dir.x, -lines_ndc[i]._dir.y);
-            
-            
+            lines_dc[i]._dir = Vector2(lines_ndc[i]._dir.x, -lines_ndc[i]._dir.y);    
         } else {
             lines_ndc[i]._pt = Point2::S_ZERO_POINT;
             lines_ndc[i]._dir = Vector2(0, 0);

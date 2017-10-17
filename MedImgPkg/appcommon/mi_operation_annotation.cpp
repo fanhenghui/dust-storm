@@ -154,7 +154,7 @@ int OpAnnotation::execute() {
         std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
         APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
         const Point3 voi_center_w = camera_cal->get_patient_to_world_matrix().transform(voi.center);
-        model_crosshair->locate(voi_center_w, false);
+        model_crosshair->locate(voi_center_w, true);
     }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpAnnotation.";
