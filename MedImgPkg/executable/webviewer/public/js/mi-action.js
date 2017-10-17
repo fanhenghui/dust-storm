@@ -127,7 +127,7 @@ ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cel
     sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r, this.socketClient);
 }
 
-ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell){
+ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell) {
     if(mouseStatus != BTN_DOWN) {
         return false;
     }
@@ -152,7 +152,11 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     return true;
 }
 
-ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell){
+ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell) {
+    if (null == cell.lastROI) {
+        return;
+    }
+
     //add shaped roi to roi arrays
     cell.rois.push(cell.lastROI);
     cell.lastROI = null;
