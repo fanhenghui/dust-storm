@@ -100,6 +100,7 @@ ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibi
     var roi = new ROICircle(id, svg, cx, cy, r);
     roi.visible(visibility);
     roi.setCtrlRadius(0.0);
+    roi.attachAnnotation(); // temporily placed here
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
         sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);

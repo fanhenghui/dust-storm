@@ -17,6 +17,7 @@ function ROICircle(key, svg, cx, cy, r){
     this.roiCtrlRT = null;
     this.roiCtrlRB = null;
     this.roiCtrlMove = null;
+    this.roiAnnotation = null;
     this.dragingCallback = null;
     this.dragEndCallback = null;
 
@@ -215,6 +216,11 @@ ROICircle.prototype.move = function(cx, cy) {
     this.roiCtrlMove
     .attr('cx', cx)
     .attr('cy', cy);
+
+    if (this.roiAnnotation != null)
+    {
+        this.roiAnnotation.updateAnnotationLayout();
+    }
 }
 
 ROICircle.prototype.stretch = function(r) {
@@ -239,6 +245,11 @@ ROICircle.prototype.stretch = function(r) {
     this.roiCtrlMove
     .attr('cx', cx)
     .attr('cy', cy);
+
+    if (this.roiAnnotation != null)
+    {
+        this.roiAnnotation.updateAnnotationLayout();
+    }
 }
 
 ROICircle.prototype.locate = function(cx, cy, r) {
@@ -265,6 +276,11 @@ ROICircle.prototype.locate = function(cx, cy, r) {
     this.roiCtrlMove
     .attr('cx', cx)
     .attr('cy', cy);
+
+    if (this.roiAnnotation != null)
+    {
+        this.roiAnnotation.updateAnnotationLayout();
+    }
 }
 
 ROICircle.prototype.visible = function(flag) {
@@ -280,6 +296,11 @@ ROICircle.prototype.visible = function(flag) {
     this.roiCtrlRT.style('display', vis);
     this.roiCtrlRB.style('display', vis);
     this.roiCtrlMove.style('display', vis);
+
+    if (this.roiAnnotation != null)
+    {
+        this.roiAnnotation.updateAnnotationLayout();
+    }
 }
 
 ROICircle.prototype.setCtrlRadius = function(radius) {
@@ -315,4 +336,182 @@ ROICircle.prototype.release = function() {
     .data(newData, function(d) {
         return d.key;
     }).exit().remove();
+}
+
+ROICircle.prototype.attachAnnotation = function() {
+    if (this.roiAnnotation == null)
+    {
+        this.roiAnnotation = new AnnotationText(this.key, this.svg, this.roiMain);
+        this.roiAnnotation.updateAnnotationLayout();
+    }
+}
+
+var SCALING = 1.5;
+// which mark (circle) on which svg (svg) am I (key) annotating to?
+function AnnotationText(key, svg, selectedCircle) {
+    this.svg = svg;
+    this.annotationKey = key + '-annotation';
+    this.src = selectedCircle;
+
+    this.content = null;
+    this.border = null;
+    this.arrow = null;
+
+    var src_x = parseFloat(this.src.attr('cx'));
+    var src_y = parseFloat(this.src.attr('cy'));
+    var src_r = parseFloat(this.src.attr('r'));
+    
+    // text drag listener
+    var preLoc = null;
+    dragListener = d3.drag()
+        .on("start", function (d) {
+            // it's important that we suppress the mouseover event on the node being dragged.
+            // Otherwise it will absorb the mouseover event and the underlying node will not detect it d3.select(this).attr('pointer-events', 'none');
+            d3.event.sourceEvent.stopPropagation();
+            preloc = {
+                x: d3.event.x,
+                y: d3.event.y
+            };
+        })
+        .on("drag", (function (d) {
+            var delta = {
+                x: d3.event.x - preloc.x,
+                y: d3.event.y - preloc.y
+            };
+            // update the text location
+            var newX = parseFloat(this.content.attr('x')) + delta.x;
+            var newY = parseFloat(this.content.attr('y')) + delta.y;
+            this.content.attr('x', newX).attr('y', newY);
+
+            // update the line (aka the arrow) location
+            var centerX = parseFloat(this.src.attr('cx'));
+            var centerY = parseFloat(this.src.attr('cy'));
+            var centerR = parseFloat(this.src.attr('r'));
+            var mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
+            if(mag < 0.01)
+            {
+                mag = 0.001;
+                newX = centerX + 0.01 * 0.707;
+                newY = centerY - 0.01 * 0.707;
+            }
+            this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
+                .attr('y1', centerY + centerR * (newY - centerY) / mag)
+                .attr('x2', newX)
+                .attr('y2', newY);
+
+            // record previous location
+            preloc.x = d3.event.x;
+            preloc.y = d3.event.y;
+        }).bind(this)).on("end", function (d) {
+            preloc = null;
+        });
+
+    this.content = d3.select(this.svg)
+        .selectAll('text')
+        .data(
+            [{
+                key: this.annotationKey,
+                content: 'test_text'
+            }],
+            function (d) {
+                return d.key;
+            })
+        .enter()
+        .append('text')
+        .attr('font-family', 'monospace')
+        .attr('font-size', '15px')
+        // .attr('class', 'no-select-text')
+        .attr('alignment-baseline', 'central')
+        .attr('text-anchor', 'start')
+        .attr('x', src_x + SCALING * src_r)
+        .attr('y', src_y - SCALING * src_r)
+        .attr('fill', 'red')
+        .attr('cursor', 'move')
+        .text(function (d) {
+            return d.content;
+        })
+        .call(dragListener);
+
+    this.arrow =
+        d3.select(this.svg)
+            .selectAll('line')
+            .data([{key: this.annotationKey}], function(d) { return d.key; })
+            .enter()
+            .append('line')
+            .attr('x1', src_x + 0.707 * src_r)
+            .attr('y1', src_y - 0.707 * src_r)
+            .attr('x2', this.content.attr('x'))
+            .attr('y2', this.content.attr('y'))
+            .attr('stroke-width', 2)
+            .attr('stroke', 'red')
+            .attr('stroke-dasharray', '5, 5');
+    
+    // var textWidth = this.content._groups[0][0].getComputedTextLength();
+    // var textHeight = parseFloat(this.content.attr('font-size'));
+    // this.border = d3.select(this.svg)
+    // .selectAll('rect')
+    // .data([{key: this.annotationKey}], function(d) { return d.key; })
+    // .enter()
+    // .append('rect')
+    // .attr('x', src_x + 2*src_r)
+    // .attr('y', src_y - 2*src_r-2)
+    // .attr('width', textWidth)
+    // .attr('height', textHeight+4)
+    // .style('fill-opacity', 0.0)
+    // .attr('stroke-width', 2)
+    // .attr('stroke', '#dcdcdc');
+}
+
+// change the location of arrow & text
+AnnotationText.prototype.updateAnnotationLayout = function () {
+
+    this.arrow.style('display', this.src.style('display'));
+    this.content.style('display', this.src.style('display'));
+
+    if (this.src.style('display') == 'inline') {
+        // if just moved it is trivial
+        // get the text location
+        var newX = parseFloat(this.content.attr('x'));
+        var newY = parseFloat(this.content.attr('y'));
+
+        var width = this.svg.getAttribute("width");
+        var height = this.svg.getAttribute("height");
+
+        var centerX = parseFloat(this.src.attr('cx'));
+        var centerY = parseFloat(this.src.attr('cy'));
+        var centerR = parseFloat(this.src.attr('r'));
+
+        // when we close to the border, reset the position
+        if (newX > 0.95 * width || newX < 0.05 * width || newY > 0.95 * height || newY < 0.05 * height) {
+            this.content
+                .attr('x', centerX + SCALING * centerR)
+                .attr('y', centerY - SCALING * centerR);
+            this.arrow
+                .attr('x1', centerX + 0.707 * centerR)
+                .attr('y1', centerY - 0.707 * centerR)
+                .attr('x2', this.content.attr('x'))
+                .attr('y2', this.content.attr('y'));
+        } else {
+            // update the line (aka the arrow) location
+            var mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
+            if(mag < 0.01) // to avoid division by 0
+            {
+                mag = 0.01;
+                newX = centerX + 0.01 * 0.707;
+                newY = centerY - 0.01 * 0.707;
+            }
+            if (mag < (SCALING * centerR)) // if text is inside the circle
+            {
+                newX = centerX + SCALING * centerR * (newX - centerX) / mag;
+                newY = centerY + SCALING * centerR * (newY - centerY) / mag;
+                mag = SCALING * centerR;
+                this.content.attr('x', newX).attr('y', newY);
+            }
+            this.arrow
+                .attr('x1', centerX + centerR * (newX - centerX) / mag)
+                .attr('y1', centerY + centerR * (newY - centerY) / mag)
+                .attr('x2', newX)
+                .attr('y2', newY);
+        }
+    }
 }
