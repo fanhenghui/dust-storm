@@ -323,6 +323,14 @@ void ModelCrosshair::reset() {
     //TODO
 }
 
+Point3 ModelCrosshair::get_cross_location_discrete_world() const {
+    return _location_discrete_w;
+}
+
+Point3 ModelCrosshair::get_cross_location_contineous_world() const {
+    return _location_contineous_w;
+}
+
 
 
 MED_IMG_END_NAMESPACE

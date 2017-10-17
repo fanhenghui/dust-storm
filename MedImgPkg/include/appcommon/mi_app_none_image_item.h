@@ -134,7 +134,7 @@ private:
 class ModelCrosshair;
 class NoneImgCrosshair : public INoneImg {
 public:
-    NoneImgCrosshair(): INoneImg(Crosshair), _init(false), _pre_width(-1), _pre_height(-1) {};
+    NoneImgCrosshair(): INoneImg(Crosshair), _init(false), _pre_crosshair_w(65535.0,65535.0,65535.0) {};
     virtual ~NoneImgCrosshair() {};
     virtual void fill_msg(MsgNoneImgCollection* msg) const;
     virtual bool check_dirty();
@@ -144,15 +144,16 @@ public:
 
 private:
     std::weak_ptr<ModelCrosshair> _model;
-    OrthoCamera _pre_camera;
-    int _pre_width;
-    int _pre_height;
 
     bool _init;
     Point2 _crosshair;
     Line2D _line0;
     Line2D _line1;
     mutable std::vector<std::string> _colors;
+
+    int _pre_width;
+    int _pre_height;
+    Point3 _pre_crosshair_w;
 };
 
 

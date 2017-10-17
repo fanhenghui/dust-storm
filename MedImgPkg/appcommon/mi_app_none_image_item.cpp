@@ -385,12 +385,14 @@ bool NoneImgCrosshair::check_dirty() {
     std::shared_ptr<CameraBase> camera = _scene->get_camera();
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
     APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+    std::shared_ptr<ModelCrosshair> model = _model.lock();
+    Point3 pt_crosshair = model->get_cross_location_contineous_world();
     int width(-1), height(-1);
     _scene->get_display_size(width, height);
-    if (_init && *ortho_camera == _pre_camera && _pre_width == width && _pre_height == height) {
+    if (_init && _pre_crosshair_w == pt_crosshair && _pre_width == width && _pre_height == height) {
         return false;
     } else {
-        _pre_camera = *ortho_camera;
+        _pre_crosshair_w = pt_crosshair;
         _pre_width = width;
         _pre_height = height;
         return true;

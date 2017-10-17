@@ -11,6 +11,8 @@
 #include "mi_app_controller.h"
 #include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
+#include "mi_model_crosshair.h"
+#include "mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -52,8 +54,19 @@ int OpMPRPaging::execute() {
     std::shared_ptr<VolumeInfos> volumeinfos = controller->get_volume_infos();
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>
                                           (mpr_scene->get_camera());
-    int cur_page = mpr_scene->get_camera_calculator()->get_orthogonal_mpr_page(camera);
-    mpr_scene->page(page_step);
+
+    std::shared_ptr<IModel> model_crosshair_i = controller->get_model(MODEL_ID_CROSSHAIR);
+    if (!model_crosshair_i) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "crosshair model null.";
+        return -1;
+    }
+    std::shared_ptr<ModelCrosshair> model_crosshair = std::dynamic_pointer_cast<ModelCrosshair>(model_crosshair_i);
+    if (!model_crosshair) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "error model id to acquire crosshair model.";
+        return -1;
+    }
+    
+    model_crosshair->page(mpr_scene, page_step);
     return 0;
 }
 
