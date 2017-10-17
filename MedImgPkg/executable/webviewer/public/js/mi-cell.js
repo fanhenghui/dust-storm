@@ -83,8 +83,19 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 
         //decode the byte array with protobuffer
         var noneImgBufView = new Uint8Array(noneImgBuf);
-        var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
-        if (receivedMsg.cornerInfos) {
+        try {
+            var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
+        } catch (e) {
+            if (e instanceof protobuf.util.ProtocolError) {
+                console.log('decode none image message failed.');
+                console.log('e.instance holds the so far decoded message with missing required fields');
+            } else {
+                console.log('decode none image message failed.');
+                console.log('wire format is invalid');
+            }
+            return;
+        }
+        if (receivedMsg.hasOwnProperty('cornerInfos')) {
             var txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
             var corners = txt.split('\n');
 
@@ -150,7 +161,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
             }
         }
         
-        if (receivedMsg.annotations) {
+        if (receivedMsg.hasOwnProperty('annotations')) {
             var annotations = receivedMsg.annotations.annotation;
             if (annotations) {
                 for (var i = 0; i < annotations.length; ++i) {
@@ -189,10 +200,10 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         }
 
         //TODO crosshair message
-        if (receivedMsg.crosshair) {
+        if (receivedMsg.hasOwnProperty('crosshair')) {
             if (this.crosshair) {
                 this.crosshair.parseNoneImg(receivedMsg.crosshair);
-                if (receivedMsg.crosshair.borderColor) {
+                if (undefined != receivedMsg.crosshair.borderColor) {
                     this.borderColor = receivedMsg.crosshair.borderColor;
                     this.canvas.style.border = '3px solid ' + this.borderColor;
                 }
