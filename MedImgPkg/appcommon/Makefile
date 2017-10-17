@@ -24,7 +24,8 @@ mi_cmd_handler_mpr_play.o mi_cmd_handler_vr_play.o \
 mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \
 mi_operation_windowing.o mi_operation_resize.o mi_operation_mpr_mask_overlay.o \
 mi_model_annotation.o mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_operation_annotation.o mi_ob_annotation_list.o \
-mi_operation_switch_preset_windowing.o mi_operation_switch_preset_vrt.o
+mi_operation_switch_preset_windowing.o mi_operation_switch_preset_vrt.o \
+mi_model_crosshair.o  mi_operation_locate.o
 
 PROTOC = mi_message.pb.o
 

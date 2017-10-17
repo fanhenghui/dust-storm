@@ -10,6 +10,7 @@
 #include "renderalgo/mi_volume_infos.h"
 
 #include "mi_model_annotation.h"
+#include "mi_model_crosshair.h"
 #include "mi_app_cell.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_controller.h"
@@ -73,7 +74,7 @@ int OpAnnotation::execute() {
 
     std::shared_ptr<IModel> model_i = controller->get_model(MODEL_ID_ANNOTATION);
     if (!model_i) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "annotation null.";
+        MI_APPCOMMON_LOG(MI_ERROR) << "annotation model null.";
         return -1;
     }
     std::shared_ptr<ModelAnnotation> model = std::dynamic_pointer_cast<ModelAnnotation>(model_i);
@@ -137,6 +138,23 @@ int OpAnnotation::execute() {
             model->set_changed();
             model->notify(ModelAnnotation::MODIFY_COMPLETED);
         }
+    } else if (ModelAnnotation::FOCUS == anno_status) {
+        std::shared_ptr<IModel> model_crosshair_i = controller->get_model(MODEL_ID_CROSSHAIR);
+        if (!model_crosshair_i) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "crosshair model null.";
+            return -1;
+        }
+        std::shared_ptr<ModelCrosshair> model_crosshair = std::dynamic_pointer_cast<ModelCrosshair>(model_crosshair_i);
+        if (!model_crosshair) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "error model id to acquire crosshair model.";
+            return -1;
+        }
+
+        const VOISphere voi = model->get_annotation(anno_id);
+        std::shared_ptr<CameraCalculator> camera_cal = mpr_scene->get_camera_calculator();
+        APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
+        const Point3 voi_center_w = camera_cal->get_patient_to_world_matrix().transform(voi.center);
+        model_crosshair->locate(voi_center_w, false);
     }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpAnnotation.";

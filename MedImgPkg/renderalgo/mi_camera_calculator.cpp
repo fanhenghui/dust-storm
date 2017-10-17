@@ -339,7 +339,7 @@ ScanSliceType CameraCalculator::check_scan_type(std::shared_ptr<OrthoCamera> cam
     return scan_type;
 }
 
-bool CameraCalculator::page_orthognal_mpr(
+bool CameraCalculator::page_orthogonal_mpr(
     std::shared_ptr<OrthoCamera> camera, int page_step , int& cur_page) const {
     double spacing_step = 0;
     ScanSliceType scan_type = check_scan_type(camera , spacing_step);
@@ -371,7 +371,7 @@ bool CameraCalculator::page_orthognal_mpr(
     }
 }
 
-bool CameraCalculator::page_orthognal_mpr_to(
+bool CameraCalculator::page_orthogonal_mpr_to(
     std::shared_ptr<OrthoCamera> camera, int page) const {
     double spacing_step = 0;
     ScanSliceType scan_type = check_scan_type(camera , spacing_step);
@@ -409,13 +409,18 @@ bool CameraCalculator::page_orthognal_mpr_to(
     }
 }
 
-int CameraCalculator::get_orthognal_mpr_page(
-    std::shared_ptr<OrthoCamera> camera) const {
+int CameraCalculator::get_orthogonal_mpr_page( std::shared_ptr<OrthoCamera> camera) const {
+    int max_page;
+    return get_orthogonal_mpr_page(camera, max_page);
+}
+
+int CameraCalculator::get_orthogonal_mpr_page(std::shared_ptr<OrthoCamera> camera, int& max_page) const {
     double spacing_step = 0;
-    ScanSliceType scan_type = check_scan_type(camera , spacing_step);
+    ScanSliceType scan_type = check_scan_type(camera , spacing_step);   
     if(scan_type == OBLIQUE){
         RENDERALGO_THROW_EXCEPTION("MPR is oblique!");
     }
+    max_page = get_page_maximum(scan_type);
     const Point3 look_at = camera->get_look_at();
     const Vector3 dir = camera->get_view_direction();
 

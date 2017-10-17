@@ -103,13 +103,15 @@ public:
     // Axial F->H
     // Sagittal R->L
     // Coronal A -> P
-    bool page_orthognal_mpr(std::shared_ptr<OrthoCamera> mpr_camera,
+    bool page_orthogonal_mpr(std::shared_ptr<OrthoCamera> mpr_camera,
                             int page_step , int& cur_page) const;
 
-    bool page_orthognal_mpr_to(std::shared_ptr<OrthoCamera> mpr_camera,
+    bool page_orthogonal_mpr_to(std::shared_ptr<OrthoCamera> mpr_camera,
                                int page) const;
 
-    int get_orthognal_mpr_page(std::shared_ptr<OrthoCamera> mpr_camera) const;
+    int get_orthogonal_mpr_page(std::shared_ptr<OrthoCamera> mpr_camera) const;
+
+    int get_orthogonal_mpr_page(std::shared_ptr<OrthoCamera> mpr_camera, int& max_page) const;
 
     // MPR translate toward normal direction until MPR's plane is intersect with
     // input point

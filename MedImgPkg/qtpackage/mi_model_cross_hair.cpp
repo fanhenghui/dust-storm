@@ -103,7 +103,7 @@ bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& target_mpr_scene, 
     }
 
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(target_mpr_scene->get_camera());
-    if( !_camera_calculator->page_orthognal_mpr_to(camera , page))
+    if( !_camera_calculator->page_orthogonal_mpr_to(camera , page))
     {
         return false;
     }
@@ -128,7 +128,7 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& target_mpr_scene , in
     //1 page target MPR
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>(target_mpr_scene->get_camera());
     int cur_page = 0;
-    if( !_camera_calculator->page_orthognal_mpr(camera , step , cur_page))
+    if( !_camera_calculator->page_orthogonal_mpr(camera , step , cur_page))
     {
         return false;
     }
@@ -186,7 +186,7 @@ bool CrosshairModel::locate(const std::shared_ptr<MPRScene>& target_mpr_scene , 
         _camera_calculator->translate_mpr_to(camera, _location_contineous_w);
 
         cross_scenes[i]->set_dirty(true);
-        int page = _camera_calculator->get_orthognal_mpr_page(camera);
+        int page = _camera_calculator->get_orthogonal_mpr_page(camera);
         _pages[aIdx[i]] = page;
     }
 
@@ -211,7 +211,7 @@ bool CrosshairModel::locate(const Point3& center_w , bool ignore_pan /*= true*/)
         _camera_calculator->translate_mpr_to(camera, _location_contineous_w);
 
         _mpr_scenes[i]->set_dirty(true);
-        int page = _camera_calculator->get_orthognal_mpr_page(camera);
+        int page = _camera_calculator->get_orthogonal_mpr_page(camera);
         _pages[i] = page;
     }
 

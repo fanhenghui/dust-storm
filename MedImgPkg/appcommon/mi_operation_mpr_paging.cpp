@@ -10,6 +10,9 @@
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
 #include "mi_message.pb.h"
+#include "mi_app_common_logger.h"
+#include "mi_model_crosshair.h"
+#include "mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -24,20 +27,16 @@ OpMPRPaging::~OpMPRPaging() {
 int OpMPRPaging::execute() {
     //Parse data
     const unsigned int cell_id = _header._cell_id;
-    int page_num = 1;
+    int page_step = 1;
 
     if (_buffer != nullptr) {
-        MsgPaging msg;
-        if (msg.ParseFromArray(_buffer , _header._data_len)) {
-            page_num = msg.page();
-            std::cout << "paging num : " << page_num << std::endl;
-        } else {
-            MsgMouse msg;
-            if (msg.ParseFromArray(_buffer , _header._data_len)) {
-                page_num = static_cast<int>(msg.cur().y() - msg.pre().y());
-                std::cout << "paging num : " << page_num << std::endl;
-            }
+        MsgMouse msg;
+        if (!msg.ParseFromArray(_buffer , _header._data_len)) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "parse mouse message failed in mpr paging.";
+            return -1;
         }
+        page_step = static_cast<int>(msg.cur().y() - msg.pre().y());
+        //MI_APPCOMMON_LOG(M/I_DEBUG) << "paging step : " << page_step;
     }
 
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -55,8 +54,19 @@ int OpMPRPaging::execute() {
     std::shared_ptr<VolumeInfos> volumeinfos = controller->get_volume_infos();
     std::shared_ptr<OrthoCamera> camera = std::dynamic_pointer_cast<OrthoCamera>
                                           (mpr_scene->get_camera());
-    int cur_page = mpr_scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
-    mpr_scene->page(page_num);
+
+    std::shared_ptr<IModel> model_crosshair_i = controller->get_model(MODEL_ID_CROSSHAIR);
+    if (!model_crosshair_i) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "crosshair model null.";
+        return -1;
+    }
+    std::shared_ptr<ModelCrosshair> model_crosshair = std::dynamic_pointer_cast<ModelCrosshair>(model_crosshair_i);
+    if (!model_crosshair) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "error model id to acquire crosshair model.";
+        return -1;
+    }
+    
+    model_crosshair->page(mpr_scene, page_step);
     return 0;
 }
 

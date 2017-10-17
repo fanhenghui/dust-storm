@@ -169,7 +169,7 @@ void Keyboard(unsigned char key, int x, int y) {
         std::shared_ptr<OrthoCamera> camera =
             std::dynamic_pointer_cast<OrthoCamera>(_scene->get_camera());
         int cur_page =
-            _scene->get_camera_calculator()->get_orthognal_mpr_page(camera);
+            _scene->get_camera_calculator()->get_orthogonal_mpr_page(camera);
         std::cout << "current page : " << cur_page << std::endl;
 
         if (cur_page >= _volume_data->_dim[2] - 2) {

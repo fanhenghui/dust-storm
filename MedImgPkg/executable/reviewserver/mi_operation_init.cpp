@@ -36,6 +36,7 @@
 #include "appcommon/mi_ob_annotation_list.h"
 #include "appcommon/mi_ob_annotation_segment.h"
 #include "appcommon/mi_ob_annotation_statistic.h"
+#include "appcommon/mi_model_crosshair.h"
 #include "appcommon/mi_app_common_define.h"
 
 #include "mi_review_config.h"
@@ -123,9 +124,13 @@ int OpInit::execute() {
     //anno_model->add_observer(ob_annotation_statistic);
     anno_model->add_observer(ob_annotation_list);
 
+    std::shared_ptr<IModel> crosshair_model_ = controller->get_model(MODEL_ID_CROSSHAIR);
+    std::shared_ptr<ModelCrosshair> crosshair_model = std::dynamic_pointer_cast<ModelCrosshair>(crosshair_model_);
+    REVIEW_CHECK_NULL_EXCEPTION(crosshair_model);
+
+    std::vector<ScanSliceType> mpr_scan_types;
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
-    std::vector<std::shared_ptr<AppNoneImage>> mpr_none_images;
 
     // create empty mask
     std::shared_ptr<ImageData> mask_data(new ImageData());
@@ -197,12 +202,15 @@ int OpInit::execute() {
             switch (direction) {
             case 0:
                 mpr_scene->place_mpr(SAGITTAL);
+                mpr_scan_types.push_back(SAGITTAL);
                 break;
             case 1:
                 mpr_scene->place_mpr(CORONAL);
+                mpr_scan_types.push_back(CORONAL);
                 break;
             default: // 2
                 mpr_scene->place_mpr(TRANSVERSE);
+                mpr_scan_types.push_back(TRANSVERSE);
                 break;
             }
 
@@ -210,13 +218,20 @@ int OpInit::execute() {
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(mpr_scene);
             none_image->add_none_image_item(noneimg_infos);
+            
             std::shared_ptr<NoneImgAnnotations> noneimg_annotations(new NoneImgAnnotations());
             noneimg_annotations->set_scene(mpr_scene);
-            std::shared_ptr<IModel> model_ =  controller->get_model(MODEL_ID_ANNOTATION);
-            std::shared_ptr<ModelAnnotation> model = std::dynamic_pointer_cast<ModelAnnotation>(model_);
-            noneimg_annotations->set_model(model);
+            std::shared_ptr<IModel> model_annotation_ =  controller->get_model(MODEL_ID_ANNOTATION);
+            std::shared_ptr<ModelAnnotation> model_annotation = std::dynamic_pointer_cast<ModelAnnotation>(model_annotation_);
+            noneimg_annotations->set_model(model_annotation);
             none_image->add_none_image_item(noneimg_annotations);
-            mpr_none_images.push_back(none_image);
+
+            std::shared_ptr<NoneImgCrosshair> noneimg_crosshair(new NoneImgCrosshair());
+            noneimg_crosshair->set_scene(mpr_scene);
+            std::shared_ptr<IModel> model_crosshair_ =  controller->get_model(MODEL_ID_CROSSHAIR);
+            std::shared_ptr<ModelCrosshair> model_crosshair = std::dynamic_pointer_cast<ModelCrosshair>(model_crosshair_);
+            noneimg_crosshair->set_model(model_crosshair);
+            none_image->add_none_image_item(noneimg_crosshair);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
             vr_scene->set_mask_label_level(L_32);
@@ -306,7 +321,7 @@ int OpInit::execute() {
                 std::stringstream ss;
                 ss << clock() << '|' << i; 
                 const std::string id = ss.str();
-                ids.push_back(id);
+                ids.push_back(id); 
                 unsigned char new_label = MaskLabelStore::instance()->acquire_label();
                 anno_model->add_annotation(vois[i], id, new_label);
             }
@@ -314,6 +329,31 @@ int OpInit::execute() {
             anno_model->notify(ModelAnnotation::ADD);
         }
     }
+
+    //crosshair model
+    if (mpr_scan_types.size() != 3) {
+        MI_REVIEW_LOG(MI_ERROR) << "not 3 MPR in init.";
+        REVIEW_THROW_EXCEPTION("not 3 MPR in init.");
+        return -1;
+    }
+
+    ScanSliceType types[3] = {mpr_scan_types[0], mpr_scan_types[1], mpr_scan_types[2]};
+    std::shared_ptr<MPRScene> scenes[3] = {mpr_scenes[0], mpr_scenes[1], mpr_scenes[2]};
+    RGBUnit colors[3];
+    static const RGBUnit COLOR_TRANSVERSE = RGBUnit(237, 25, 35);
+    static const RGBUnit COLOR_CORONAL = RGBUnit(255, 128, 0);
+    static const RGBUnit COLOR_SAGITTAL = RGBUnit(1, 255, 64);
+    for (int i = 0; i < 3; ++i) {
+        if (types[i] == TRANSVERSE) {
+            colors[i] = COLOR_TRANSVERSE;
+        } else if (types[i] == CORONAL) {
+            colors[i] = COLOR_CORONAL;
+        } else if (types[i] == SAGITTAL) {
+            colors[i] = COLOR_SAGITTAL;
+        }
+    }
+    crosshair_model->set_mpr_scene(types, scenes, colors);
+
     
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation.";
     return 0;

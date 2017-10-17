@@ -90,7 +90,7 @@ void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std
     //        thickness = volume_infos->get_volume()->_spacing[camera_cal->get_head_patient_axis_info().volume_coord / 2];
     //        std::shared_ptr<OrthoCamera> camera =
     //            std::dynamic_pointer_cast<OrthoCamera>(scene_base->get_camera());
-    //        slice_num = camera_cal->get_orthognal_mpr_page(camera) + 1;
+    //        slice_num = camera_cal->get_orthogonal_mpr_page(camera) + 1;
     //    }
     //}
     //if (slice_num != 0 && this->_pre_slice != slice_num)
@@ -146,7 +146,7 @@ void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std
         {
             std::shared_ptr<OrthoCamera> camera =
                 std::dynamic_pointer_cast<OrthoCamera>(mpr_scene->get_camera());
-            slice_num = mpr_scene->get_camera_calculator()->get_orthognal_mpr_page(camera) + 1;
+            slice_num = mpr_scene->get_camera_calculator()->get_orthogonal_mpr_page(camera) + 1;
         }
 
         if (wl_int == _pre_wl && ww_int == _pre_ww && slice_num == this->_pre_slice)
@@ -366,7 +366,7 @@ void GraphicItemCornersInfo::refresh_text_i()
         {
             std::shared_ptr<OrthoCamera> camera =
                 std::dynamic_pointer_cast<OrthoCamera>(scene_base->get_camera());
-            slice_num = mpr_scene->get_camera_calculator()->get_orthognal_mpr_page(camera) + 1;
+            slice_num = mpr_scene->get_camera_calculator()->get_orthogonal_mpr_page(camera) + 1;
             if (slice_num != 0)
             {
                 this->_pre_slice = slice_num;

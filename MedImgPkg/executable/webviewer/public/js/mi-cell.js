@@ -37,6 +37,23 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     //annotation ROI
     this.rois = [];
     this.lastROI = null;
+
+    //crosshair
+    this.crosshair = null;
+    this.borderColor = '#333333';
+
+    //mouse out event
+    $(this.svg).mouseleave((function() {
+        if(this.mouseStatus == BTN_DOWN) {
+            //do mouse up logic
+            this.mouseStatus = BTN_UP;
+            this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, this.mousePre.x, this.mousePre.y, this);
+            //reset mouse
+            this.mouseBtn = BTN_NONE;
+            this.mousePre.x = 0;
+            this.mousePre.y = 0;
+        }
+    }).bind(this));
 }
 
 function refreshCanvas(canvas, img) {
@@ -71,7 +88,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 
     // sucessfully receive all none-image
     if (restDataLen <= 0) {
-        console.log('receive Nong Img Buffer.');
+        //console.log('receive Nong Img Buffer.');
         var MsgNoneImgCollection = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
         if (!MsgNoneImgCollection) {
             console.log('get MsgNoneImgCollection type failed.');
@@ -79,8 +96,19 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 
         //decode the byte array with protobuffer
         var noneImgBufView = new Uint8Array(noneImgBuf);
-        var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
-        if (receivedMsg.cornerInfos) {
+        try {
+            var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
+        } catch (e) {
+            if (e instanceof protobuf.util.ProtocolError) {
+                console.log('decode none image message failed.');
+                console.log('e.instance holds the so far decoded message with missing required fields');
+            } else {
+                console.log('decode none image message failed.');
+                console.log('wire format is invalid');
+            }
+            return;
+        }
+        if (receivedMsg.hasOwnProperty('cornerInfos')) {
             var txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
             var corners = txt.split('\n');
 
@@ -146,7 +174,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
             }
         }
         
-        if (receivedMsg.annotations) {
+        if (receivedMsg.hasOwnProperty('annotations')) {
             var annotations = receivedMsg.annotations.annotation;
             if (annotations) {
                 for (var i = 0; i < annotations.length; ++i) {
@@ -183,6 +211,18 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                 }
             }
         }
+
+        //TODO crosshair message
+        if (receivedMsg.hasOwnProperty('crosshair')) {
+            if (this.crosshair) {
+                this.crosshair.parseNoneImg(receivedMsg.crosshair);
+                if (receivedMsg.crosshair.borderColor) {
+                    this.borderColor = receivedMsg.crosshair.borderColor;
+                    this.canvas.style.border = '3px solid ' + this.borderColor;
+                }
+            }
+        }
+
     }
 }
 
@@ -226,8 +266,10 @@ Cell.prototype.resize = function (width, height) {
                     }
                 })
         });
-    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [1, 6]
-    CTRL_SIZE = Math.min(Math.max((width + height) / 450, 3.5), 6); // linear
+    
+    for (var i = 0; i < this.rois.length; ++i) {
+        this.rois[i].resize(width, height);
+    }
 }
 
 Cell.prototype.mouseClickTicker = function() {

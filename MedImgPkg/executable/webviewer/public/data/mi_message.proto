@@ -15,15 +15,6 @@ message MsgPoint2 {
     required float y = 2;
 };
 
-message MsgPoint2Array {
-    required float x = 1;
-    required float y = 2;
-};
-
-message MsgPaging {
-    required int32 page = 1;
-};
-
 message MsgRotation {
     required float angle = 1;
     required float axis_x = 2;
@@ -88,7 +79,7 @@ message MsgAnnotationListItem {
     required string id = 1; // id format: "time|num"
     required string info = 2; // nodule type
     required int32 row = 3; //row value
-    required int32 status = 4; //0 add; 1 delete; 2 modifying
+    required int32 status = 4; //0 add; 1 delete; 2 modifying; 3 modify completed ; 4 focus
     required float para0 = 5; //center x
     required float para1 = 6; //center y
     required float para2 = 7; //center z
@@ -103,13 +94,28 @@ message MsgNoneImgDirection {
     required string info = 2;// left|right|top|bottom
 };
 
+message MsgCrosshair {
+    required float cx = 1;//crosshair
+    required float cy = 2;
+    required float l0_a = 3;// ax+by=c
+    required float l0_b = 4;
+    required float l0_c = 5;
+    required float l1_a = 6;
+    required float l1_b = 7;
+    required float l1_c = 8;
+    optional string l0_color = 9; //hex
+    optional string l1_color = 10;
+    optional string border_color = 11;
+};
+
 message MsgNoneImgCollection {
     optional MsgNoneImgCornerInfos corner_infos = 1;
     optional MsgNoneImgAnnotations annotations = 2;
-    optional MsgNoneImgDirection direction = 5;
+    optional MsgNoneImgDirection direction = 3;
+    optional MsgCrosshair crosshair = 4;
 };
 
 message MsgMPRMaskOverlay {
     required int32 flag = 1;
     required float opacity = 2;
-}
+};

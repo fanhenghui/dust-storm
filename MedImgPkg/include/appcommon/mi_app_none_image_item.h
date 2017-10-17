@@ -8,6 +8,8 @@
 #include "appcommon/mi_app_common_export.h"
 #include "arithmetic/mi_volume_statistician.h"
 #include "arithmetic/mi_ortho_camera.h"
+#include "arithmetic/mi_line.h"
+#include "arithmetic/mi_color_unit.h"
 #include "io/mi_voi.h"
 
 
@@ -20,6 +22,7 @@ enum NoneImageType {
     MPRPage = 2,
     Direction = 3,
     Annotation = 4,
+    Crosshair = 5,
 };
 class MsgNoneImgCollection;
 class SceneBase;
@@ -126,6 +129,31 @@ private:
     //left|right|top|bottom
     std::string _info;
     OrthoCamera _pre_camera;
+};
+
+class ModelCrosshair;
+class NoneImgCrosshair : public INoneImg {
+public:
+    NoneImgCrosshair(): INoneImg(Crosshair), _init(false), _pre_crosshair_w(65535.0,65535.0,65535.0) {};
+    virtual ~NoneImgCrosshair() {};
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
+
+    void set_model(std::shared_ptr<ModelCrosshair> model) {_model = model;};
+
+private:
+    std::weak_ptr<ModelCrosshair> _model;
+
+    bool _init;
+    Point2 _crosshair;
+    Line2D _line0;
+    Line2D _line1;
+    mutable std::vector<std::string> _colors;
+
+    int _pre_width;
+    int _pre_height;
+    Point3 _pre_crosshair_w;
 };
 
 

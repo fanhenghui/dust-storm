@@ -139,6 +139,11 @@ var maxCellID = -1;
                         var rowItem = annotationTable.insertRow(row + 1);
                         $(rowItem).click(function(event) {
                             $(this).addClass('success').siblings().removeClass('success');
+                            //send focus annotation message
+                            var anno_id = $(this).attr('id');
+                            if (anno_id) {
+                                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
+                            }
                         });
                         rowItem.setAttribute('id',id);
                         rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
@@ -300,10 +305,10 @@ var maxCellID = -1;
         for (var i = 0; i < cells.length; ++i) {
             if (i == cellID) { 
                 cells[i].mouseFocus = true;
-                cellCanvases[i].style.border = '3px solid #333333';
+                cellCanvases[i].style.border = '3px solid ' + '#6A5ACD';
             } else {
                 cells[i].mouseFocus = false;
-                cellCanvases[i].style.border = '3px solid #F5F5F5';
+                cellCanvases[i].style.border = '3px solid ' + cells[i].borderColor;
             }
         }        
     }
@@ -336,10 +341,14 @@ var maxCellID = -1;
         }
 
         //init default cell action
-        cells[0].activeAction(ACTION_ID_MPR_PAGING);
-        cells[1].activeAction(ACTION_ID_MPR_PAGING);
-        cells[2].activeAction(ACTION_ID_MPR_PAGING);
+        for (var i = 0; i < 3; ++i) {
+            cells[i].activeAction(ACTION_ID_MPR_PAGING);
+            //MPR add crosshair
+            cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient, 0);
+        }
         cells[3].activeAction(ACTION_ID_ROTATE);
+
+
 
         //nofity BE
         var MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
@@ -594,8 +603,8 @@ var maxCellID = -1;
         document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
 
-        $("#modal-preset-vrt-browser").draggable({
-            handle: ".modal-header"
+        $('#modal-preset-vrt-browser').draggable({
+            handle: '.modal-header'
         });
         
         var switchVRTFunc = function(context) {

@@ -13,11 +13,11 @@ class AppCommon_Export ModelAnnotation : public IModel {
 public:
     enum CodeID
     {
-        ADD = 0, //add one annotation by drawing a circle(sphere)
+        ADD = 0, //add one annotation by drawing a circle(sphere) or add annotations from csv file
         DELETE = 1, //delete one the annotation
         MODIFYING = 2, //modifying when mouse moving
         MODIFY_COMPLETED = 3, //modify completed when mouse release
-        //LOAD = 4, //load from DB, different with ADD
+        FOCUS = 4, //focus certain voi in each scenes
     };
 
     struct AnnotationUnit {
@@ -66,6 +66,9 @@ private:
     bool _visibility;
 
     std::vector<std::string> _cache_ids;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(ModelAnnotation);
 };
 
 MED_IMG_END_NAMESPACE
