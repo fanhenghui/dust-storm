@@ -80,88 +80,116 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, styl
 
 Crosshair.prototype.initMPRStyle = function() {
 //init
-    this.line00 = d3.select(this.svg)
+    this.line00 = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line00'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line0Color)
     .style('stroke-opacity', 0.0);
 
-    this.line01 = d3.select(this.svg)
+    this.line01 = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line01'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line0Color)
     .style('stroke-opacity', 0.0);
 
-    this.line00CtrlMove = d3.select(this.svg)
+    this.line00CtrlMove = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line00-ctrl-move'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineCtrlWidth)
     .style('stroke', this.line0Color)
     .style('stroke-opacity', 0.0)
     .style('cursor', 'move');
 
-    this.line01CtrlMove = d3.select(this.svg)
+    this.line01CtrlMove = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line01-ctrl-move'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineCtrlWidth)
     .style('stroke', this.line0Color)
     .style('stroke-opacity', 0.0)
     .style('cursor', 'move');
 
-    this.line10 = d3.select(this.svg)
+    this.line10 = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line10'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line1Color)
     .style('stroke-opacity', 0.0);
 
-    this.line11 = d3.select(this.svg)
+    this.line11 = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line11'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineWidth)
     .style('stroke', this.line1Color)
     .style('stroke-opacity', 0.0);
 
-    this.line10CtrlMove = d3.select(this.svg)
+    this.line10CtrlMove = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line10-ctrl-move'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineCtrlWidth)
     .style('stroke', this.line1Color)
     .style('stroke-opacity', 0.0)
     .style('cursor', 'move');
 
-    this.line11CtrlMove = d3.select(this.svg)
+    this.line11CtrlMove = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-line11-ctrl-move'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.lineCtrlWidth)
     .style('stroke', this.line1Color)
     .style('stroke-opacity', 0.0)
     .style('cursor', 'move');
 
-    this.crossUp = d3.select(this.svg)
+    this.crossUp = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-up'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
     .style('stroke-opacity', 0.0);
 
-    this.crossDown = d3.select(this.svg)
+    this.crossDown = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-down'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
     .style('stroke-opacity', 0.0);
 
-    this.crossLeft = d3.select(this.svg)
+    this.crossLeft = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-left'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
     .style('stroke-opacity', 0.0);
 
-    this.crossRight = d3.select(this.svg)
+    this.crossRight = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-right'}], function(d) {return d.key;})
+    .enter()
     .append('line')
     .style('stroke-width', this.crossWidth)
     .style('stroke', this.crossColor)
     .style('stroke-opacity', 0.0);
 
-    this.crossCtrlOverlay = d3.select(this.svg)
+    this.crossCtrlOverlay = d3.select(this.svg).selectAll('rect')
+    .data([{key: 'crosshair-cross-ctrl-overlay'}], function(d) {return d.key;})
+    .enter()
     .append('rect')
     .style('fill', 'white')
     .style('opacity', 0);
 
-    this.crossCtrl = d3.select(this.svg)
+    this.crossCtrl = d3.select(this.svg).selectAll('rect')
+    .data([{key: 'crosshair-cross-ctrl'}], function(d) {return d.key;})
+    .enter()
     .append('rect')
     .style('fill', 'white')
     .style('opacity', 0)
