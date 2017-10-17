@@ -44,7 +44,6 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
 
     //mouse out event
     $(this.svg).mouseleave((function() {
-        console.log('mouse out' + this.cellID);
         if(this.mouseStatus == BTN_DOWN) {
             //do mouse up logic
             this.mouseStatus = BTN_UP;
