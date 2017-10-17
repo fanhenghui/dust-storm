@@ -344,7 +344,7 @@ var maxCellID = -1;
         for (var i = 0; i < 3; ++i) {
             cells[i].activeAction(ACTION_ID_MPR_PAGING);
             //MPR add crosshair
-            cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient);
+            cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient, 0);
         }
         cells[3].activeAction(ACTION_ID_ROTATE);
 

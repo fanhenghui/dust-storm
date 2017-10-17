@@ -27,7 +27,7 @@ function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_LOCATE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
-function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
+function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, style) {
     this.svg = svg;
     this.cellID = cellID;
     this.cx = cx;
@@ -35,6 +35,8 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     this.line0Para = line0Para;//{a: b: c:} ax + by = c
     this.line1Para = line1Para;//{a: b: c:}
     this.socketClient = socketClient;
+
+    this.style = style; // 0 for MPR 1 for VR
 
     //main
     this.line00;
@@ -68,7 +70,16 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     //clock
     this.mouseClock = new Date().getTime();
 
-    //init
+    if (0 == style) {
+        this.initMPRStyle();
+    } else {
+        this.initMPRStyle();
+    }
+    
+}
+
+Crosshair.prototype.initMPRStyle = function() {
+//init
     this.line00 = d3.select(this.svg)
     .append('line')
     .style('stroke-width', this.lineWidth)
@@ -156,8 +167,7 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient) {
     .style('opacity', 0)
     .style('cursor', 'move');
 
-    this.setLine(cx, cy, line0Para, line1Para);
-
+    this.setLine(this.cx, this.cy, this.line0Para, this.line1Para);
 
     //drag crosshair
     this.crossCtrl.call(d3.drag().
