@@ -113,7 +113,7 @@ void ModelAnnotation::modify_intensity_info(const std::string& id, IntensityInfo
     auto it = _annotations.find(id);
     if (it != _annotations.end()) {
         it->second.intensity_info = info;
-        set_changed();
+        //set_changed();
     } else {
         MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
         APPCOMMON_THROW_EXCEPTION("get annotation failed!");

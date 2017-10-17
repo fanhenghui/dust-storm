@@ -115,13 +115,14 @@ int OpInit::execute() {
     std::shared_ptr<OBAnnotationSegment> ob_annotation_segment(new OBAnnotationSegment());
     ob_annotation_segment->set_model(anno_model);
     ob_annotation_segment->set_volume_infos(volume_infos);
-    // std::shared_ptr<OBAnnotationStatistic> ob_annotation_statistic(new OBAnnotationStatistic());
-    // ob_annotation_statistic->set_model(anno_model);
+    std::shared_ptr<OBAnnotationStatistic> ob_annotation_statistic(new OBAnnotationStatistic());
+    ob_annotation_statistic->set_model(anno_model);
+    ob_annotation_statistic->set_volume_infos(volume_infos);
     std::shared_ptr<OBAnnotationList> ob_annotation_list(new OBAnnotationList());
     ob_annotation_list->set_model(anno_model);
     ob_annotation_list->set_controller(controller);
     anno_model->add_observer(ob_annotation_segment);
-    //anno_model->add_observer(ob_annotation_statistic);
+    anno_model->add_observer(ob_annotation_statistic);
     anno_model->add_observer(ob_annotation_list);
 
     std::shared_ptr<IModel> crosshair_model_ = controller->get_model(MODEL_ID_CROSSHAIR);

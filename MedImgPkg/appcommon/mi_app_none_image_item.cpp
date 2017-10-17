@@ -44,9 +44,20 @@ void NoneImgAnnotations::fill_msg(MsgNoneImgCollection* msg) const {
         unit->set_para0(_annotations[i].para0);
         unit->set_para1(_annotations[i].para1);
         unit->set_para2(_annotations[i].para2);
+        unit->set_info(_annotations[i].info);
+        
         // MI_APPCOMMON_LOG(MI_DEBUG) << "in annotation fill msg. id: " << _annotations[i].id << " status: " <<
         // _annotations[i].status << " vis: " << _annotations[i].visibility << " p0: " << _annotations[i].para0 <<
         // " p1: " << _annotations[i].para1 << " p2: " << _annotations[i].para2;
+    }
+}
+
+namespace {
+    std::string intensity_info_to_str(const IntensityInfo& info ) {
+        std::stringstream ss;
+        ss << std::setprecision(3) << std::fixed << "min: " << info._min << " max: " << info._max << " mean: " << info._mean << "|" 
+        << "var: " << info._var << " std: " << info._std;
+        return ss.str(); 
     }
 }
 
@@ -95,6 +106,7 @@ bool  NoneImgAnnotations::check_dirty() {
             unit.para0 = 0;
             unit.para1 = 0;
             unit.para2 = 0;
+            unit.info = intensity_info_to_str(model->get_intensity_info(id));
             Circle circle;
             if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
                 unit.visibility = true;
@@ -121,6 +133,7 @@ bool  NoneImgAnnotations::check_dirty() {
             unit.para0 = 0;
             unit.para1 = 0;
             unit.para2 = 0;
+            unit.info = "";
             this->add_annotation(unit);
             //MI_APPCOMMON_LOG(MI_DEBUG) << "delete annotation: " << id;
         }

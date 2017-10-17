@@ -69,6 +69,7 @@ message MsgAnnotationUnit {
     required float para0 = 5; //center x
     required float para1 = 6; //center y
     required float para2 = 7; //radius
+    required string info = 8; //statistic info
 };
 
 message MsgNoneImgAnnotations {

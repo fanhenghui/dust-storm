@@ -56,6 +56,7 @@ public:
         float para0;//center x
         float para1;//center y
         float para2;//radius
+        std::string info;//statistic infos
     };
 
 public:
