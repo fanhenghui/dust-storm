@@ -152,7 +152,7 @@ private:
     Point2 _crosshair;
     Line2D _line0;
     Line2D _line1;
-    std::vector<std::string> _colors;
+    mutable std::vector<std::string> _colors;
 };
 
 

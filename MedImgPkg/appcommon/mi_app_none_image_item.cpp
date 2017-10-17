@@ -376,6 +376,7 @@ void NoneImgCrosshair::fill_msg(MsgNoneImgCollection* msg) const {
         cross_hair->set_l0_color(_colors[0]);
         cross_hair->set_l1_color(_colors[1]);
         cross_hair->set_border_color(_colors[2]);
+        _colors.clear();
     }
 }
 
@@ -402,7 +403,6 @@ void NoneImgCrosshair::update() {
     APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(_scene);
     if (mpr_scene) {
-        _colors.clear();
         Line2D lines_ndc[2];
         Line2D lines_dc[2];
         Point2 pt_ndc;
@@ -411,6 +411,7 @@ void NoneImgCrosshair::update() {
         model->get_cross_line(mpr_scene, lines_ndc, pt_ndc, lines_dc, pt_dc, colors);
         if (!_init) {
             //first send message set color
+            _colors.clear();
             _colors.push_back(colors[0].to_hex());
             _colors.push_back(colors[1].to_hex());
             _colors.push_back(model->get_border_color(mpr_scene).to_hex());
