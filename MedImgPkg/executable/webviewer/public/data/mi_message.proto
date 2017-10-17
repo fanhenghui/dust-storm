@@ -15,15 +15,6 @@ message MsgPoint2 {
     required float y = 2;
 };
 
-message MsgPoint2Array {
-    required float x = 1;
-    required float y = 2;
-};
-
-message MsgPaging {
-    required int32 page = 1;
-};
-
 message MsgRotation {
     required float angle = 1;
     required float axis_x = 2;
