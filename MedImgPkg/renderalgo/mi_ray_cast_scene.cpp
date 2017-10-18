@@ -218,14 +218,14 @@ void RayCastScene::render() {
     CHECK_GL_ERROR;
 
     // CHECK_GL_ERROR;
-    // {
-    //     if (_canvas->get_color_attach_texture(1)) {
-    //         std::stringstream ss;
-    //         ss << "/home/wangrui22/data/output_para_" << _width << "_" << _height << ".raw";
-    //         _canvas->debug_output_color1(ss.str());
-    //         _canvas->debug_output_color(ss.str() + "_color");
-    //     }
-    // }
+    {
+        if (_canvas->get_color_attach_texture(1)) {
+            std::stringstream ss;
+            ss << "/home/wangrui22/data/output_para_" << _width << "_" << _height << ".raw";
+            _canvas->debug_output_color1(ss.str());
+            _canvas->debug_output_color(ss.str() + "_color");
+        }
+    }
     // CHECK_GL_ERROR;
 
     // Test code

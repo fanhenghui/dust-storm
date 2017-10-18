@@ -73,10 +73,9 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, styl
 
     if (0 == style) {
         this.initMPRStyle();
-    } else {
-        this.initMPRStyle();
+    } else if (1 == style){
+        this.initVRStyle();
     }
-    
 }
 
 Crosshair.prototype.initVRStyle = function() {
@@ -117,17 +116,17 @@ Crosshair.prototype.initVRStyle = function() {
     .enter()
     .append('rect')
     .style('fill', 'white')
-    .style('opacity', 1.0);
+    .style('opacity', 0.0);
 
     this.crossCtrl = d3.select(this.svg).selectAll('rect')
     .data([{key: 'crosshair-cross-ctrl'}], function(d) {return d.key;})
     .enter()
     .append('rect')
     .style('fill', 'white')
-    .style('opacity', 1.0)
+    .style('opacity', 0.0)
     .style('cursor', 'move');
 
-    this.setLine(this.cx, this.cy, this.line0Para, this.line1Para);
+    this.setCross(this.cx, this.cy, this.line0Para, this.line1Para);
 
     //drag crosshair
     this.crossCtrl.call(d3.drag().
@@ -143,8 +142,11 @@ Crosshair.prototype.initVRStyle = function() {
         }
         //update mouse clock
         this.mouseClock = curClock;
+        
         //send message
-        this.sendMSG();
+        if (this.style == 0) {
+            this.sendMSG();    
+        }
     }).bind(this))
     .on('end', (function (d) {
         var x = d3.event.x;
@@ -415,27 +417,28 @@ function dot(a, b) {
     return a.x*b.x + a.y*b.y;
 }
 
-Crosshair.prototype.moveCrosshair = function(x , y) {
+Crosshair.prototype.moveCrosshair = function(x, y) {
     if (this.style == 0) {
-
+        var para = this.line0Para;
+        var ab = Math.sqrt(para.a*para.a + para.b*para.b);
+        var normx = para.a/ab;
+        var normy = para.b/ab;
+        var dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
+        var newc = (para.c/ab + dis)*ab;
+        var newpara0 = {a:para.a, b:para.b, c:newc };  
+    
+        para = this.line1Para;
+        ab = Math.sqrt(para.a*para.a + para.b*para.b);
+        normx = para.a/ab;
+        normy = para.b/ab;
+        dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
+        newc = (para.c/ab + dis)*ab;
+        var newpara1 = {a:para.a, b:para.b, c:newc };  
+    
+        this.setLine(x, y, newpara0, newpara1);
+    } else if (this.style == 1) {
+        this.setCross(x, y);
     }
-    var para = this.line0Para;
-    var ab = Math.sqrt(para.a*para.a + para.b*para.b);
-    var normx = para.a/ab;
-    var normy = para.b/ab;
-    var dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
-    var newc = (para.c/ab + dis)*ab;
-    var newpara0 = {a:para.a, b:para.b, c:newc };  
-
-    para = this.line1Para;
-    ab = Math.sqrt(para.a*para.a + para.b*para.b);
-    normx = para.a/ab;
-    normy = para.b/ab;
-    dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
-    newc = (para.c/ab + dis)*ab;
-    var newpara1 = {a:para.a, b:para.b, c:newc };  
-
-    this.setLine(x, y, newpara0, newpara1);
 }
 
 Crosshair.prototype.moveLine0 = function(x, y) {

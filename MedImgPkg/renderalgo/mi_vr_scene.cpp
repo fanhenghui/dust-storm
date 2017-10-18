@@ -169,17 +169,36 @@ bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {
     }
     const int x = int(pt_cross.x);
     const int y = int(pt_cross.y);
-    if (x < 0 || x > _width-1 || y > 0 || y < _height-1) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "input spill when get ray end.";
+    if (x < 0 || x > _width - 1 || y < 0 || y > _height - 1) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "input: " << x << " " << y << " pill when get ray end.";
         return false;
     }
 
     unsigned char pixel_value[3] = {0,0,0};
+    {
+        if (_canvas->get_color_attach_texture(1)) {
+            std::stringstream ss;
+            ss << "/home/wangrui22/data/output_para2_" << _width << "_" << _height << ".raw";
+            _canvas->debug_output_color1(ss.str());
+            _canvas->debug_output_color(ss.str() + "_color");
+        }
+    }
     ray_end_tex->bind();
-    ray_end_tex->read_pixels(GL_RGB, GL_UNSIGNED_BYTE, x, y, 1, 1, pixel_value);
+    // {
+    //     std::unique_ptr<unsigned char[]> color_array(new unsigned char[_width * _height * 3]);
+    //     ray_end_tex->download(GL_RGB, GL_UNSIGNED_BYTE,color_array.get());
+    //     std::stringstream ss;
+    //     ss << "/home/wangrui22/data/output_para1_" << _width << "_" << _height << ".raw";
+    //     std::ofstream out(ss.str(), std::ios::out | std::ios::binary);
+    //     if (out.is_open()) {
+    //         out.write((char*)color_array.get(), _width * _height * 3);
+    //     }
+    //     out.close();
+    // }
+    ray_end_tex->read_pixels(GL_RGB, GL_UNSIGNED_BYTE, x, _height - y -1, 1, 1, pixel_value);
     ray_end_tex->unbind();
-
-    if (pixel_value[0] == 0 && pixel_value[0] == 0 && pixel_value[0] == 0) {
+    MI_RENDERALGO_LOG(MI_DEBUG) << "ray end: " << pixel_value[0] << " " << pixel_value[1] << " " << pixel_value[2];
+    if (pixel_value[0] == 0 && pixel_value[1] == 0 && pixel_value[1] == 0) {
         return false;
     }
 
