@@ -64,6 +64,9 @@ void OBAnnotationStatistic::update(int code_id) {
     for (auto it = processing_ids.begin(); it != processing_ids.end() ; ++it) {
         const std::string id = *it;
         const VOISphere voi = model->get_annotation(id);
+        if (voi.diameter < 0.1f) {
+            continue;
+        }
         const unsigned char label = model->get_label(id);
 
         Ellipsoid ellipsoid;
@@ -93,7 +96,7 @@ void OBAnnotationStatistic::update(int code_id) {
                 sta.set_dim(volume_data->_dim);
                 sta.set_target_labels(std::vector<unsigned char>(1, label));
                 sta.get_intensity_analysis(ellipsoid, pixel_num , min , max , mean , var , std);
-                break;
+                break;  
             }
         default:
                 APPCOMMON_THROW_EXCEPTION("unsupported data type!");

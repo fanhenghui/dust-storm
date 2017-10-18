@@ -55,8 +55,7 @@ void NoneImgAnnotations::fill_msg(MsgNoneImgCollection* msg) const {
 namespace {
     std::string intensity_info_to_str(const IntensityInfo& info ) {
         std::stringstream ss;
-        ss << std::setprecision(3) << std::fixed << "min: " << info._min << " max: " << info._max << " mean: " << info._mean << "|" 
-        << "var: " << info._var << " std: " << info._std;
+        ss << std::setprecision(3) << std::fixed << "min: " << info._min << " max: " << info._max << "|" << "mean: " << info._mean << " std: " << info._std;
         return ss.str(); 
     }
 }
@@ -153,6 +152,7 @@ bool  NoneImgAnnotations::check_dirty() {
             unit.para0 = 0;
             unit.para1 = 0;
             unit.para2 = 0;
+            unit.info = intensity_info_to_str(model->get_intensity_info(id));
             Circle circle;
             if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
                 unit.visibility = true;
@@ -161,6 +161,36 @@ bool  NoneImgAnnotations::check_dirty() {
                 unit.para2 = circle._radius;
             }
             this->add_annotation(unit);
+        }
+    } else {
+        //MI_APPCOMMON_LOG(MI_DEBUG) << "check unchanged vois." ;
+        //check unchanged vois's info
+        for (auto it = unchanged_vois.begin(); it != unchanged_vois.end(); ++it) {
+            const std::string& id = (*it)->first;
+            auto it2 = _pre_vois.find(id);
+            if (!(it2->second.intensity_info == model->get_intensity_info(id))) {
+                voi_dirty = true;
+                //MI_APPCOMMON_LOG(MI_DEBUG) << "get info dirty:" << id;
+
+                const VOISphere& voi = (*it)->second.voi;
+                AnnotationUnit unit;
+                unit.type = 0;
+                unit.id = id;
+                unit.status = 2;//modifying
+                unit.visibility = false;
+                unit.para0 = 0;
+                unit.para1 = 0;
+                unit.para2 = 0;
+                unit.info = intensity_info_to_str(model->get_intensity_info(id));
+                Circle circle;
+                if( AnnotationCalculator::patient_sphere_to_dc_circle(voi, camera_cal, mpr_scene, circle) ) {
+                    unit.visibility = true;
+                    unit.para0 = circle._center.x;
+                    unit.para1 = circle._center.y;
+                    unit.para2 = circle._radius;
+                }
+                this->add_annotation(unit);
+            }
         }
     }
 
