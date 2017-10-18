@@ -6,7 +6,8 @@ void composite(vec3 sample_pos_volume, vec3 ray_dir, in out vec4 integral_color,
     sampler3D volume_sampler  , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub_data_offset,  vec3 sample_shift);
 
 vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
-    sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift, int ray_cast_step_code)
+    sampler3D volume_sampler, sampler3D mask_sampler,  vec3 sub_data_dim, vec3 sub_data_offset, vec3 sample_shift, 
+    int ray_cast_step_code, out vec3 ray_end)
 {
     if(0!= (ray_cast_step_code & 0x0001))//First sub data
     {
@@ -31,10 +32,20 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
         }
     }
 
-    //if(0!= (ray_cast_step_code & 0x0004))
-    //{
-    //    current_integral_color = clamp(current_integral_color, 0.0, 1.0);
-    //}
+    if(0!= (ray_cast_step_code & 0x0004))
+    {
+        if (current_integral_color.a < 0.01) 
+        {
+            ray_end = vec3(0,0,0);
+        } 
+        else 
+        {
+            ray_end = sample_pos;
+        }
+        
+        current_integral_color = clamp(current_integral_color, 0.0, 1.0);
+        current_integral_color.a = 1.0;        
+    }
 
     return current_integral_color;
 }

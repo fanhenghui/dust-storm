@@ -472,10 +472,11 @@ void NoneImgCrosshair::update() {
             MI_APPCOMMON_LOG(MI_ERROR) << "invalid sence. not vr or mpr.";
             APPCOMMON_THROW_EXCEPTION("invalid sence. not vr or mpr.");
         }
-
-        if (!_init) { _init = true;}
-
-        //TODO VR scene
+        Point2 pt_cross_dc = vr_scene->project_point_to_screen(_pre_crosshair_w);
+        if (!_init) { 
+            _init = true;
+        }
+        _crosshair = pt_cross_dc;
     }
 
 }

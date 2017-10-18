@@ -4,6 +4,8 @@
 
 #include "arithmetic/mi_arithmetic_utils.h"
 
+#include "glresource/mi_gl_texture_2d.h"
+
 #include "io/mi_image_data.h"
 
 #include "renderalgo/mi_camera_calculator.h"
@@ -12,6 +14,8 @@
 #include "renderalgo/mi_vr_entry_exit_points.h"
 
 #include "mi_volume_infos.h"
+#include "mi_ray_caster_canvas.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -42,6 +46,13 @@ VRScene::VRScene(int width, int height) : RayCastScene(width, height) {
 }
 
 VRScene::~VRScene() {}
+
+void VRScene::initialize() {
+    SceneBase::initialize();     
+
+    _canvas->initialize(true);
+    _entry_exit_points->initialize();
+}
 
 void VRScene::rotate(const Point2& pre_pt, const Point2& cur_pt) {
     if (pre_pt != cur_pt) {
@@ -141,14 +152,47 @@ void VRScene::pre_render_i() {
 
     if (_ray_caster->get_composite_mode() == COMPOSITE_DVR) {
         if (_ray_caster->get_mask_mode() == MASK_MULTI_LABEL) {
-            vr_entry_exit_points->set_brick_filter_item(BF_MASK |
-                    BF_WL);
+            vr_entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
         } else {
             vr_entry_exit_points->set_brick_filter_item(BF_WL);
         }
     } else {
         vr_entry_exit_points->set_brick_filter_item(BF_WL);
     }
+}
+
+bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {
+    GLTexture2DPtr ray_end_tex = _canvas->get_color_attach_texture(1);
+    if (!ray_end_tex) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "ray end texture is null.";
+        return false;
+    }
+    const int x = int(pt_cross.x);
+    const int y = int(pt_cross.y);
+    if (x < 0 || x > _width-1 || y > 0 || y < _height-1) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "input spill when get ray end.";
+        return false;
+    }
+
+    unsigned char pixel_value[3] = {0,0,0};
+    ray_end_tex->bind();
+    ray_end_tex->read_pixels(GL_RGB, GL_UNSIGNED_BYTE, x, y, 1, 1, pixel_value);
+    ray_end_tex->unbind();
+
+    if (pixel_value[0] == 0 && pixel_value[0] == 0 && pixel_value[0] == 0) {
+        return false;
+    }
+
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+    std::shared_ptr<ImageData> image_data = _volume_infos->get_volume();
+    RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
+    const double dims[3] = {(double)image_data->_dim[0], (double)image_data->_dim[1], (double)image_data->_dim[2]};
+    const Point3 pt_v(pixel_value[0]/dims[0], pixel_value[1]/dims[1], pixel_value[2]/dims[2]);
+    
+    RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
+    pt_ray_end_world = _camera_calculator->get_volume_to_world_matrix().transform(pt_v);
+
+    return true;
 }
 
 MED_IMG_END_NAMESPACE

@@ -17,6 +17,8 @@ public:
     VRScene(int width, int height);
     virtual ~VRScene();
 
+    virtual void initialize();
+
     virtual void rotate(const Point2& pre_pt, const Point2& cur_pt);
     virtual void zoom(const Point2& pre_pt, const Point2& cur_pt);
     virtual void pan(const Point2& pre_pt, const Point2& cur_pt);
@@ -35,6 +37,8 @@ public:
     void set_proxy_geometry(ProxyGeometry pg_type);
 
     virtual void set_visible_labels(std::vector<unsigned char> labels);
+
+    bool get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world);
 
 protected:
     virtual void pre_render_i();

@@ -8,14 +8,16 @@ uniform vec2 global_wl;
 
 float global_max_gray = -65535.0;
 float global_min_gray = 65535.0;
+float global_target_pos = vec3(0,0,0);
 
 void composite(vec3 sample_pos_volume, vec3 ray_dir, in out vec4 integral_color,
-    sampler3D volume_sampler  , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub_data_offset,  vec3 sample_shift);
+    sampler3D volume_sampler, sampler3D mask_sampler, vec3 sub_data_dim, vec3 sub_data_offset, vec3 sample_shift);
 
 void color_inverse(in out float gray);
 
 vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
-    sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift, int ray_cast_step_code)
+    sampler3D volume_sampler, sampler3D mask_sampler, vec3 sub_data_dim, vec3 sub_data_offset, vec3 sample_shift, 
+    int ray_cast_step_code, out vec3 ray_end)
 {
     if(0!= (ray_cast_step_code & 0x0001))//First sub data
     {
@@ -54,6 +56,7 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
 
         color_inverse(result_gray);
         current_integral_color = vec4(texture(pseudo_color, (result_gray*pseudo_color_slope + pseudo_color_intercept)).rgb, 1.0);
+        ray_end = global_target_pos;
     }
 
     return current_integral_color;

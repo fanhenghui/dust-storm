@@ -60,6 +60,7 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, styl
 
     //style
     this.lineWidth = 1.5;
+    this.crossWidth = 2;
     this.lineCtrlWidth = 5;
     this.line0Color ='red';
     this.line1Color = 'yellow';
@@ -78,8 +79,84 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, styl
     
 }
 
+Crosshair.prototype.initVRStyle = function() {
+    this.crossUp = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-up'}], function(d) {return d.key;})
+    .enter()
+    .append('line')
+    .style('stroke-width', this.crossWidth)
+    .style('stroke', this.crossColor)
+    .style('stroke-opacity', 1.0);
+
+    this.crossDown = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-down'}], function(d) {return d.key;})
+    .enter()
+    .append('line')
+    .style('stroke-width', this.crossWidth)
+    .style('stroke', this.crossColor)
+    .style('stroke-opacity', 1.0);
+
+    this.crossLeft = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-left'}], function(d) {return d.key;})
+    .enter()
+    .append('line')
+    .style('stroke-width', this.crossWidth)
+    .style('stroke', this.crossColor)
+    .style('stroke-opacity', 1.0);
+
+    this.crossRight = d3.select(this.svg).selectAll('line')
+    .data([{key: 'crosshair-cross-right'}], function(d) {return d.key;})
+    .enter()
+    .append('line')
+    .style('stroke-width', this.crossWidth)
+    .style('stroke', this.crossColor)
+    .style('stroke-opacity', 1.0);
+
+    this.crossCtrlOverlay = d3.select(this.svg).selectAll('rect')
+    .data([{key: 'crosshair-cross-ctrl-overlay'}], function(d) {return d.key;})
+    .enter()
+    .append('rect')
+    .style('fill', 'white')
+    .style('opacity', 1.0);
+
+    this.crossCtrl = d3.select(this.svg).selectAll('rect')
+    .data([{key: 'crosshair-cross-ctrl'}], function(d) {return d.key;})
+    .enter()
+    .append('rect')
+    .style('fill', 'white')
+    .style('opacity', 1.0)
+    .style('cursor', 'move');
+
+    this.setLine(this.cx, this.cy, this.line0Para, this.line1Para);
+
+    //drag crosshair
+    this.crossCtrl.call(d3.drag().
+    on('drag', (function (d) {
+        var x = d3.event.x;
+        var y = d3.event.y;
+        //calculate new line parameter
+        this.moveCrosshair(x,y);
+
+        var curClock = new Date().getTime();
+        if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
+            return;
+        }
+        //update mouse clock
+        this.mouseClock = curClock;
+        //send message
+        this.sendMSG();
+    }).bind(this))
+    .on('end', (function (d) {
+        var x = d3.event.x;
+        var y = d3.event.y;
+        //calculate new line parameter
+        this.moveCrosshair(x,y);
+        //send message
+        this.sendMSG();
+    }).bind(this)));
+}
+
 Crosshair.prototype.initMPRStyle = function() {
-//init
     this.line00 = d3.select(this.svg).selectAll('line')
     .data([{key: 'crosshair-line00'}], function(d) {return d.key;})
     .enter()
@@ -339,6 +416,9 @@ function dot(a, b) {
 }
 
 Crosshair.prototype.moveCrosshair = function(x , y) {
+    if (this.style == 0) {
+
+    }
     var para = this.line0Para;
     var ab = Math.sqrt(para.a*para.a + para.b*para.b);
     var normx = para.a/ab;
@@ -359,6 +439,9 @@ Crosshair.prototype.moveCrosshair = function(x , y) {
 }
 
 Crosshair.prototype.moveLine0 = function(x, y) {
+    if (this.style != 0) {
+        return;
+    }
     var para = this.line0Para;
     var ab = Math.sqrt(para.a*para.a + para.b*para.b);
     var normx = para.a/ab;
@@ -373,6 +456,9 @@ Crosshair.prototype.moveLine0 = function(x, y) {
 }
 
 Crosshair.prototype.moveLine1 = function(x, y) {
+    if (this.style != 0) {
+        return;
+    }
     var para = this.line1Para;
     var ab = Math.sqrt(para.a*para.a + para.b*para.b);
     var normx = para.a/ab;
@@ -420,6 +506,47 @@ Crosshair.prototype.calLine = function(cx, cy, para) {
     } else {
         return [res[0], p1, res[1], p0];
     }
+}
+
+Crosshair.prototype.setCross = function(cx, cy) {
+    this.cx = cx;
+    this.cy = cy;
+
+    this.crossLeft
+    .attr('x1', this.cx)
+    .attr('y1', this.cy)
+    .attr('x2', this.cx - this.crossSize/2)
+    .attr('y2', this.cy);
+
+    this.crossRight
+    .attr('x1', this.cx)
+    .attr('y1', this.cy)
+    .attr('x2', this.cx + this.crossSize/2)
+    .attr('y2', this.cy);
+
+    this.crossUp
+    .attr('x1', this.cx)
+    .attr('y1', this.cy)
+    .attr('x2', this.cx)
+    .attr('y2', this.cy - this.crossSize/2);
+
+    this.crossDown
+    .attr('x1', this.cx)
+    .attr('y1', this.cy)
+    .attr('x2', this.cx)
+    .attr('y2', this.cy + this.crossSize/2);
+
+    this.crossCtrlOverlay
+    .attr('x', cx - this.crossSize/2)
+    .attr('y', cy - this.crossSize/2)
+    .attr('width', this.crossSize)
+    .attr('height', this.crossSize);
+
+    this.crossCtrl
+    .attr('x', cx - this.crossCtrlSize/2)
+    .attr('y', cy - this.crossCtrlSize/2)
+    .attr('width', this.crossCtrlSize)
+    .attr('height', this.crossCtrlSize);
 }
 
 Crosshair.prototype.setLine = function(cx, cy, para0, para1) {
@@ -524,31 +651,47 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
         return;
     }
 
-    var cx = msgCrosshair.cx;
-    var cy = msgCrosshair.cy;
-    var para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
-    var para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
-    if (msgCrosshair.l0Color) {
-        this.line00.style('stroke', msgCrosshair.l0Color)
-        .style('stroke-opacity',1.0);
-        this.line01.style('stroke', msgCrosshair.l0Color)
-        .style('stroke-opacity',1.0);;
-        //this.crossUp.style('stroke-opacity', 1.0);
-        //this.crossDown.style('stroke-opacity', 1.0);
-        //this.crossLeft.style('stroke-opacity', 1.0);
-        //this.crossRight.style('stroke-opacity', 1.0);
-    }
-    if (msgCrosshair.l1Color) {
-        this.line10.style('stroke', msgCrosshair.l1Color)
-        .style('stroke-opacity',1.0);
-        this.line11.style('stroke', msgCrosshair.l1Color)
-        .style('stroke-opacity',1.0);
-        //this.crossUp.style('stroke-opacity', 1.0);
-        //this.crossDown.style('stroke-opacity', 1.0);
-        //this.crossLeft.style('stroke-opacity', 1.0);
-        //this.crossRight.style('stroke-opacity', 1.0);
-    }
-    this.setLine(cx, cy, para0, para1);
+    if (this.style == 0) {
+        var cx = msgCrosshair.cx;
+        var cy = msgCrosshair.cy;
+        var para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
+        var para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
+        if (msgCrosshair.l0Color) {
+            if (this.line00) {
+                this.line00.style('stroke', msgCrosshair.l0Color)
+                .style('stroke-opacity',1.0);
+            }
+    
+            if (this.line01) {
+                this.line01.style('stroke', msgCrosshair.l0Color)
+                .style('stroke-opacity',1.0);;
+            }
+    
+            //this.crossUp.style('stroke-opacity', 1.0);
+            //this.crossDown.style('stroke-opacity', 1.0);
+            //this.crossLeft.style('stroke-opacity', 1.0);
+            //this.crossRight.style('stroke-opacity', 1.0);
+        }
+        if (msgCrosshair.l1Color) {
+            if (this.line10) {
+                this.line10.style('stroke', msgCrosshair.l1Color)
+                .style('stroke-opacity',1.0);
+            }
+            if (this.line11) {
+                this.line11.style('stroke', msgCrosshair.l1Color)
+                .style('stroke-opacity',1.0);
+            }
+            //this.crossUp.style('stroke-opacity', 1.0);
+            //this.crossDown.style('stroke-opacity', 1.0);
+            //this.crossLeft.style('stroke-opacity', 1.0);
+            //this.crossRight.style('stroke-opacity', 1.0);
+        }
+        this.setLine(cx, cy, para0, para1);
+    } else if (this.style == 1) {
+        var cx = msgCrosshair.cx;
+        var cy = msgCrosshair.cy;
+        this.setCross(cx, cy);
+    }   
 }
 
 Crosshair.prototype.visible = function(flag) {

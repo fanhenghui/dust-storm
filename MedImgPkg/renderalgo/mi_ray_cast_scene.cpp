@@ -4,7 +4,7 @@
 #include "util/mi_file_util.h"
 
 #include "arithmetic/mi_ortho_camera.h"
-#include "arithmetic/mi_point2.h"
+#include "arithmetic/mi_arithmetic_utils.h"
 
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
@@ -74,9 +74,8 @@ RayCastScene::RayCastScene(int width, int height)
 RayCastScene::~RayCastScene() {}
 
 void RayCastScene::initialize() {
-    SceneBase::initialize();
+    SceneBase::initialize();     
 
-    // Canvas
     _canvas->initialize();
     _entry_exit_points->initialize();
 }
@@ -219,7 +218,14 @@ void RayCastScene::render() {
     CHECK_GL_ERROR;
 
     // CHECK_GL_ERROR;
-    //_canvas->debug_output_color("/home/wr/data/output.raw");
+    // {
+    //     if (_canvas->get_color_attach_texture(1)) {
+    //         std::stringstream ss;
+    //         ss << "/home/wangrui22/data/output_para_" << _width << "_" << _height << ".raw";
+    //         _canvas->debug_output_color1(ss.str());
+    //         _canvas->debug_output_color(ss.str() + "_color");
+    //     }
+    // }
     // CHECK_GL_ERROR;
 
     // Test code
@@ -531,6 +537,12 @@ std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const {
 
 std::shared_ptr<CameraCalculator> RayCastScene::get_camera_calculator() const {
     return _camera_calculator;
+}
+
+Point2 RayCastScene::project_point_to_screen(const Point3& pt) const {
+    const Matrix4 mat_vp = _camera->get_view_projection_matrix();
+    Point3 pt_ndc = mat_vp.transform(pt);
+    return ArithmeticUtils::ndc_to_dc(Point2(pt_ndc.x, pt_ndc.y), _width, _height);
 }
 
 MED_IMG_END_NAMESPACE
