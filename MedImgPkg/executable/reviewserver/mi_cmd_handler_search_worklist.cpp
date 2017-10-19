@@ -75,12 +75,32 @@ MsgWorklist* CmdHandlerSearchWorklist::createWorklist() {
 
     MsgWorklist* list = new MsgWorklist;
 
+    const static std::string UNKNOWN = "UNKNOWN";
     for (size_t i = 0; i < items.size() ; ++i) {
         MsgWorklistItem* item = list->add_items();
-        item->set_patient_id(items[i].patient_id);
-        item->set_patient_name(items[i].patient_name);
-        item->set_series_uid(items[i].series_id);
-        item->set_imaging_modality(items[i].modality);
+        if (items[i].patient_id.empty()) {
+            item->set_patient_id(UNKNOWN);
+        } else {
+            item->set_patient_id(items[i].patient_id);
+        }
+
+        if (items[i].patient_name.empty()) {
+            item->set_patient_name(UNKNOWN);
+        } else {
+            item->set_patient_name(items[i].patient_name);
+        }
+
+        if (items[i].series_id.empty()) {
+            item->set_series_uid(UNKNOWN);
+        } else {
+            item->set_series_uid(items[i].series_id);
+        }
+        
+        if (items[i].modality.empty()) {
+            item->set_imaging_modality(UNKNOWN);
+        } else {
+            item->set_imaging_modality(items[i].modality);
+        }      
     }
 
     return list;

@@ -1,44 +1,44 @@
-syntax="proto2";
+syntax = "proto3";
 
 package medical_imaging;
 
 message MsgFlag {
-    required int32 flag = 1; 
+    int32 flag = 1; 
 }
 
 message MsgString {
-    required string context = 1;
+    string context = 1;
 };
 
 message MsgPoint2 {
-    required float x = 1;
-    required float y = 2;
+    float x = 1;
+    float y = 2;
 };
 
 message MsgRotation {
-    required float angle = 1;
-    required float axis_x = 2;
-    required float axis_y = 3;
-    required float axis_z = 4;
+    float angle = 1;
+    float axis_x = 2;
+    float axis_y = 3;
+    float axis_z = 4;
 };
 
 message MsgMouse {
-    required MsgPoint2 pre = 1;
-    required MsgPoint2 cur = 2;
-    required int32 tag = 3;
+    MsgPoint2 pre = 1;
+    MsgPoint2 cur = 2;
+    int32 tag = 3;
 };
 
 message MsgCellInfo {
-    required int32 id = 1;
-    required int32 type = 2;
-    required int32 direction = 3;
-    required int32 width = 4;
-    required int32 height = 5;
+    int32 id = 1;
+    int32 type = 2;
+    int32 direction = 3;
+    int32 width = 4;
+    int32 height = 5;
 };
 
 message MsgInit {
-    required int32 pid = 1;
-    required string series_uid = 2;
+    int32 pid = 1;
+    string series_uid = 2;
     repeated MsgCellInfo cells = 3; 
 };
 
@@ -47,10 +47,10 @@ message MsgResize {
 };
 
 message MsgWorklistItem {
-    required string patient_name = 1;
-    required string patient_id = 2;
-    required string series_uid = 3;
-    required string imaging_modality = 4; 
+    string patient_name = 1;
+    string patient_id = 2;
+    string series_uid = 3;
+    string imaging_modality = 4; 
 };
 
 message MsgWorklist {
@@ -58,18 +58,18 @@ message MsgWorklist {
 };
 
 message MsgNoneImgCornerInfos {
-    required string infos = 1;
+    string infos = 1;
 };
 
 message MsgAnnotationUnit {
-    required int32 type = 1; //0 for circle ...
-    required string id = 2; // id format: "time|num"
-    required int32 status = 3; //0 add; 1 delete; 2 modifying; 3 modify_completed
-    required int32 visibility = 4; // visibility
-    required float para0 = 5; //center x
-    required float para1 = 6; //center y
-    required float para2 = 7; //radius
-    required string info = 8; //statistic info
+    int32 type = 1; //0 for circle ...
+    string id = 2; // id format: "time|num"
+    int32 status = 3; //0 add; 1 delete; 2 modifying; 3 modify_completed
+    int32 visibility = 4; // visibility
+    float para0 = 5; //center x
+    float para1 = 6; //center y
+    float para2 = 7; //radius
+    string info = 8; //statistic info
 };
 
 message MsgNoneImgAnnotations {
@@ -77,14 +77,14 @@ message MsgNoneImgAnnotations {
 };
 
 message MsgAnnotationListItem {
-    required string id = 1; // id format: "time|num"
-    required string info = 2; // nodule type
-    required int32 row = 3; //row value
-    required int32 status = 4; //0 add; 1 delete; 2 modifying; 3 modify completed ; 4 focus
-    required float para0 = 5; //center x
-    required float para1 = 6; //center y
-    required float para2 = 7; //center z
-    required float para3 = 8; //diameter
+    string id = 1; // id format: "time|num"
+    string info = 2; // nodule type
+    int32 row = 3; //row value
+    int32 status = 4; //0 add; 1 delete; 2 modifying; 3 modify completed ; 4 focus
+    float para0 = 5; //center x
+    float para1 = 6; //center y
+    float para2 = 7; //center z
+    float para3 = 8; //diameter
 };
 
 message MsgAnnotationList {
@@ -92,31 +92,31 @@ message MsgAnnotationList {
 };
 
 message MsgNoneImgDirection {
-    required string info = 2;// left|right|top|bottom
+    string info = 2;// left|right|top|bottom
 };
 
 message MsgCrosshair {
-    required float cx = 1;//crosshair
-    required float cy = 2;
-    required float l0_a = 3;// ax+by=c
-    required float l0_b = 4;
-    required float l0_c = 5;
-    required float l1_a = 6;
-    required float l1_b = 7;
-    required float l1_c = 8;
-    optional string l0_color = 9; //hex
-    optional string l1_color = 10;
-    optional string border_color = 11;
+    float cx = 1;//crosshair
+    float cy = 2;
+    float l0_a = 3;// ax+by=c
+    float l0_b = 4;
+    float l0_c = 5;
+    float l1_a = 6;
+    float l1_b = 7;
+    float l1_c = 8;
+    string l0_color = 9; //hex
+    string l1_color = 10;
+    string border_color = 11;
 };
 
 message MsgNoneImgCollection {
-    optional MsgNoneImgCornerInfos corner_infos = 1;
-    optional MsgNoneImgAnnotations annotations = 2;
-    optional MsgNoneImgDirection direction = 3;
-    optional MsgCrosshair crosshair = 4;
+    MsgNoneImgCornerInfos corner_infos = 1;
+    MsgNoneImgAnnotations annotations = 2;
+    MsgNoneImgDirection direction = 3;
+    MsgCrosshair crosshair = 4;
 };
 
 message MsgMPRMaskOverlay {
-    required int32 flag = 1;
-    required float opacity = 2;
+    int32 flag = 1;
+    float opacity = 2;
 };
