@@ -155,6 +155,7 @@ private:
     int _pre_width;
     int _pre_height;
     Point3 _pre_crosshair_w;
+    OrthoCamera _pre_camera;
 };
 
 

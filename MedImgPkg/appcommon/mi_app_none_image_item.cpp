@@ -432,12 +432,13 @@ bool NoneImgCrosshair::check_dirty() {
     Point3 pt_crosshair = model->get_cross_location_contineous_world();
     int width(-1), height(-1);
     _scene->get_display_size(width, height);
-    if (_init && _pre_crosshair_w == pt_crosshair && _pre_width == width && _pre_height == height) {
+    if (_init && _pre_crosshair_w == pt_crosshair && _pre_width == width && _pre_height == height && _pre_camera == *ortho_camera) {
         return false;
     } else {
         _pre_crosshair_w = pt_crosshair;
         _pre_width = width;
         _pre_height = height;
+        _pre_camera = *ortho_camera;
         return true;
     }
 }
