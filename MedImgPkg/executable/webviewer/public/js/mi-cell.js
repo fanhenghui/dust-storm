@@ -289,6 +289,59 @@ Cell.prototype.mouseClickTicker = function() {
     this.mouseClickTick = 0;
 }
 
+Cell.prototype.touchDown = function(event) {
+    var event = event || window.event;
+    event.preventDefault();
+
+    this.mouseStatus = BTN_DOWN;
+    this.mouseBtn = BTN_LEFT;
+    this.mouseClickTick += 1;//mouse click tick for check double click
+    if (!this.mouseFocus && this.mouseFocusEvent) {
+        this.mouseFocusEvent(this.cellID);
+    }
+
+    var x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
+    var y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
+    this.mousePre.x = x;
+    this.mousePre.y = y;
+
+    setTimeout((function(event) {
+        this.mouseClickTicker();
+    }).bind(this), DOUBLE_CLICK_INTERVAL);
+
+    this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+}
+
+Cell.prototype.touchMove = function (event) { 
+    var event = event || window.event;
+    event.preventDefault();
+
+    var x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
+    var y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
+
+    if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
+        //reset previous mouse position if move action done
+        this.mousePre.x = x;
+        this.mousePre.y = y;
+    }
+}
+
+Cell.prototype.touchUp = function(event) {
+    var event = event || window.event;
+    event.preventDefault();
+
+    this.mouseStatus = BTN_UP;
+    var x = event.changedTouches[0].clientX - this.svg.getBoundingClientRect().left;
+    var y = event.changedTouches[0].clientY - this.svg.getBoundingClientRect().top;
+
+    this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
+
+    //reset mouse status
+    this.mouseBtn = BTN_NONE;
+    this.mousePre.x = 0;
+    this.mousePre.y = 0;
+}
+
 Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
@@ -347,17 +400,30 @@ Cell.prototype.prepare = function() {
         var mouseDown_ = (function(event) {
             this.mouseDown(event);
         }).bind(this);
-        this.svg.addEventListener('mousedown', mouseDown_);
+        var touchDown_ = (function(event) {
+            this.touchDown(event);
+        }).bind(this);
+        this.svg.addEventListener('mousedown', mouseDown_, false);
+        this.svg.addEventListener('touchstart', touchDown_, false);
+
 
         var mouseMove_ = (function(event) {
             this.mouseMove(event);
         }).bind(this);
-        this.svg.addEventListener('mousemove', mouseMove_);
+        var touchMove_ = (function(event) {
+            this.touchMove(event);
+        }).bind(this);
+        this.svg.addEventListener('mousemove', mouseMove_, false);
+        this.svg.addEventListener('touchmove', touchMove_, false);
 
         var mouseUp_ = (function(event) {
             this.mouseUp(event);
         }).bind(this);
-        this.svg.addEventListener('mouseup', mouseUp_);
+        var touchUp_ = (function(event) {
+            this.touchUp(event);
+        }).bind(this);
+        this.svg.addEventListener('mouseup', mouseUp_, false);
+        this.svg.addEventListener('touchend', touchUp_, false);
 
         // add texts at four corners
         var width = this.canvas.width;
