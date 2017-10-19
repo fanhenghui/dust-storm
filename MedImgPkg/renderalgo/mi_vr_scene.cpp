@@ -237,7 +237,7 @@ bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {
     }
 
     const int x = int(pt_cross.x);
-    const int y = _height - 1 - int(pt_cross.y);
+    const int y = _height - 1 - int(pt_cross.y);//saved texture is flip z
     if (x < 0 || x > _width - 1 || y < 0 || y > _height - 1) {
         MI_RENDERALGO_LOG(MI_ERROR) << "input: " << x << " " << y << " pill when get ray end.";
         return false;
