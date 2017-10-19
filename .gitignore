@@ -311,6 +311,3 @@ be_path*
 
 #npm package version file
 package-lock.json
-
-#websocket ip
-mi-socket-ip.js
