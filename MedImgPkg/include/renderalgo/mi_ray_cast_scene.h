@@ -76,7 +76,7 @@ public:
 
     // Transfer function
     void set_pseudo_color(std::shared_ptr<ColorTransFunc> color);
-    void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
+    virtual void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
                            std::shared_ptr<OpacityTransFunc> opacity,
                            unsigned char label);
 

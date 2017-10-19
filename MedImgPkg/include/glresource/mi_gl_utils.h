@@ -69,6 +69,8 @@ public:
 
     static void set_pixel_pack_alignment(int i);
 
+    static void set_pixel_unpack_alignment(int i);
+
     static void log_gl_error(const std::string& err);
 
 private:

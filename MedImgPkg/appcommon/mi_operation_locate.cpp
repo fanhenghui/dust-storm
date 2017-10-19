@@ -121,11 +121,14 @@ int OpLocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene
     std::shared_ptr<ModelCrosshair> model = std::dynamic_pointer_cast<ModelCrosshair>(model_);
     APPCOMMON_CHECK_NULL_EXCEPTION(model);
 
-    //calculate cross world position
+    //cache ray end 
     gl_context->make_current(OPERATION_CONTEXT);
+    vr_scene->cache_ray_end();
+    gl_context->make_noncurrent();
+
+    //calculate cross world position
     Point3 pt_cross_w;
     const bool got_it = vr_scene->get_ray_end(pt_cross, pt_cross_w);
-    gl_context->make_noncurrent();
 
     if (got_it) {
         model->locate(pt_cross_w);
@@ -151,6 +154,4 @@ int OpLocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene
     return 0;
 }
 
-
 MED_IMG_END_NAMESPACE
-

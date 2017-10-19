@@ -37,6 +37,7 @@ function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, styl
     this.socketClient = socketClient;
 
     this.style = style; // 0 for MPR 1 for VR
+    this.crossContinuous = false;
 
     //main
     this.line00;
@@ -144,7 +145,7 @@ Crosshair.prototype.initVRStyle = function() {
         this.mouseClock = curClock;
         
         //send message
-        if (this.style == 0) {
+        if (this.crossContinuous) {
             this.sendMSG();    
         }
     }).bind(this))
@@ -290,8 +291,11 @@ Crosshair.prototype.initMPRStyle = function() {
         }
         //update mouse clock
         this.mouseClock = curClock;
+
         //send message
-        this.sendMSG();
+        if (this.crossContinuous) {
+            this.sendMSG();
+        }
     }).bind(this))
     .on('end', (function (d) {
         var x = d3.event.x;
@@ -667,7 +671,7 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
     
             if (this.line01) {
                 this.line01.style('stroke', msgCrosshair.l0Color)
-                .style('stroke-opacity',1.0);;
+                .style('stroke-opacity',1.0);
             }
     
             //this.crossUp.style('stroke-opacity', 1.0);
@@ -698,5 +702,32 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
 }
 
 Crosshair.prototype.visible = function(flag) {
-    //TODO visibility
+    if( flag == true) {
+        var vis = 'inline';
+    } else {
+        var vis = 'none';
+    }
+    if (this.style == 0) {
+        this.line00.style('display', vis);
+        this.line01.style('display', vis);
+        this.line00CtrlMove.style('display', vis);
+        this.line01CtrlMove.style('display', vis);
+        this.line10.style('display', vis);
+        this.line11.style('display', vis);
+        this.line10CtrlMove.style('display', vis);
+        this.line11CtrlMove.style('display', vis);
+        this.crossUp.style('display', vis);
+        this.crossDown.style('display', vis);
+        this.crossLeft.style('display', vis);
+        this.crossRight.style('display', vis);
+        this.crossCtrl.style('display', vis);
+        this.crossCtrlOverlay.style('display', vis);
+    } else if (this.style == 1) {
+        this.crossUp.style('display', vis);
+        this.crossDown.style('display', vis);
+        this.crossLeft.style('display', vis);
+        this.crossRight.style('display', vis);
+        this.crossCtrl.style('display', vis);
+        this.crossCtrlOverlay.style('display', vis);
+    }
 }
