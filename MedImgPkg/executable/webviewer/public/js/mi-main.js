@@ -604,6 +604,31 @@ var maxCellID = -1;
         document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
 
+        var crosshairContinuousCBox = document.getElementById('cbox-crosshair-continuous');
+        if (crosshairContinuousCBox) {
+            crosshairContinuousCBox.defaultChecked = false;
+            crosshairContinuousCBox.onclick = function(event) {
+                for (var i = 0; i< 4; ++i) {
+                    if (cells[i].crosshair){
+                        cells[i].crosshair.crossContinuous = crosshairContinuousCBox.checked;
+                    }
+                }
+            }
+        }
+
+        var crosshairVisibleCBox = document.getElementById('cbox-crosshair-visible');
+        if (crosshairVisibleCBox) {
+            crosshairVisibleCBox.defaultChecked = true;
+            crosshairVisibleCBox.onclick = function(event) {
+                for (var i = 0; i< 4; ++i) {
+                    if (cells[i].crosshair){
+                        cells[i].crosshair.visible(crosshairVisibleCBox.checked);
+                    }
+                }
+            }
+        }
+        
+
         $('#modal-preset-vrt-browser').draggable({
             handle: '.modal-header'
         });
