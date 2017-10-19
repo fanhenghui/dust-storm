@@ -144,9 +144,8 @@ void AppThreadModel::process_rendering() {
             std::deque<unsigned int> dirty_none_images;
             std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
+            _glcontext->make_current(RENDERING_CONTEXT);
             {
-                _glcontext->make_current(RENDERING_CONTEXT);
-
                 ///\ 1 render
                 boost::mutex::scoped_lock locker(_th_rendering->_mutex);
 
@@ -180,15 +179,14 @@ void AppThreadModel::process_rendering() {
                 // interrupt point
                 boost::this_thread::interruption_point();
                 _rendering = false;
-
-                /// \2 get image result to buffer
-                // download all dirty scene image to buffer
-                for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
-                    (*it)->download_image_buffer();
-                }
-
-                _glcontext->make_noncurrent();
             }
+
+            /// \2 get image result to buffer
+            // download all dirty scene image to buffer
+            for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
+                (*it)->download_image_buffer();
+            }
+            _glcontext->make_noncurrent();
 
             // tell sending the change and swap dirty scene image buffer
             {
