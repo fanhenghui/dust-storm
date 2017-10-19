@@ -39,7 +39,14 @@ void GLTexture2D::update(GLint xoffset, GLint yoffset, GLsizei width,
 
 void GLTexture2D::download(GLenum format, GLenum type, void* buffer,
                            GLint level /*= 0*/) const {
+    GLRESOURCE_CHECK_NULL_EXCEPTION(buffer);
     glGetTexImage(GL_TEXTURE_2D, level, format, type, buffer);
+}
+
+void GLTexture2D::read_pixels(GLenum format, GLenum type, GLint x, GLint y, 
+                 GLsizei width, GLsizei height, void* pixels) {
+    GLRESOURCE_CHECK_NULL_EXCEPTION(pixels);
+    glReadPixels(x, y, width, height, format, type, pixels);
 }
 
 GLsizei GLTexture2D::get_width() {

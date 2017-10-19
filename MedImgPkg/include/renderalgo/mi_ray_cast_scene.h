@@ -2,6 +2,8 @@
 #define MEDIMGRENDERALGO_RAY_CAST_SCENE_H
 
 #include "arithmetic/mi_vector2f.h"
+#include "arithmetic/mi_point2.h"
+#include "arithmetic/mi_point3.h"
 #include "renderalgo/mi_ray_caster_define.h"
 #include "renderalgo/mi_scene_base.h"
 #include <map>
@@ -74,9 +76,12 @@ public:
 
     // Transfer function
     void set_pseudo_color(std::shared_ptr<ColorTransFunc> color);
-    void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
+    virtual void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
                            std::shared_ptr<OpacityTransFunc> opacity,
                            unsigned char label);
+
+    //return dc coordinate
+    Point2 project_point_to_screen(const Point3& pt_w) const;
 
 protected:
     virtual void pre_render_i();

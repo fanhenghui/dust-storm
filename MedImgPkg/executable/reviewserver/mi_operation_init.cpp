@@ -293,6 +293,13 @@ int OpInit::execute() {
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(vr_scene);
             none_image->add_none_image_item(noneimg_infos);
+
+            std::shared_ptr<NoneImgCrosshair> noneimg_crosshair(new NoneImgCrosshair());
+            noneimg_crosshair->set_scene(vr_scene);
+            std::shared_ptr<IModel> model_crosshair_ =  controller->get_model(MODEL_ID_CROSSHAIR);
+            std::shared_ptr<ModelCrosshair> model_crosshair = std::dynamic_pointer_cast<ModelCrosshair>(model_crosshair_);
+            noneimg_crosshair->set_model(model_crosshair);
+            none_image->add_none_image_item(noneimg_crosshair);
         } else {
             MI_REVIEW_LOG(MI_FATAL) << "invalid cell type id: " << type_id;
             REVIEW_THROW_EXCEPTION("invalid cell type id!");

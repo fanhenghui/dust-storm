@@ -129,4 +129,8 @@ bool CameraBase::operator==(const CameraBase& camera) const {
     }
 }
 
+bool CameraBase::operator!=(const CameraBase& camera) const {
+    return !(*this == camera);
+}
+
 MED_IMG_END_NAMESPACE

@@ -108,4 +108,8 @@ bool OrthoCamera::operator==(const OrthoCamera& camera) const {
     }
 }
 
+bool OrthoCamera::operator!=(const OrthoCamera& camera) const {
+    return !(*this == camera);
+}
+
 MED_IMG_END_NAMESPACE

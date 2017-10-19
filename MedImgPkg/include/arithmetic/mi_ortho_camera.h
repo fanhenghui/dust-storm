@@ -36,6 +36,8 @@ public:
 
     bool operator==(const OrthoCamera& camera) const;
 
+    bool operator!=(const OrthoCamera& camera) const;
+
 protected:
     virtual void calculate_projection_matrix_i();
 

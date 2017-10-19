@@ -19,6 +19,7 @@ void composite(vec3 sample_pos, vec3 ray_dir, in out vec4 integral_color,
         { 
             global_min_gray  = gray;
             integral_color = vec4(gray,gray,gray,1.0);
+            global_target_pos = sample_pos;
         }
     }
 }

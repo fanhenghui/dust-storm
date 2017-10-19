@@ -145,8 +145,8 @@ void AppThreadModel::process_rendering() {
             std::deque<std::shared_ptr<SceneBase>> dirty_scenes;
 
             _glcontext->make_current(RENDERING_CONTEXT);
-            ///\ 1 render
             {
+                ///\ 1 render
                 boost::mutex::scoped_lock locker(_th_rendering->_mutex);
 
                 while (!_rendering) {
@@ -186,6 +186,7 @@ void AppThreadModel::process_rendering() {
             for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
                 (*it)->download_image_buffer();
             }
+            _glcontext->make_noncurrent();
 
             // tell sending the change and swap dirty scene image buffer
             {
@@ -202,8 +203,6 @@ void AppThreadModel::process_rendering() {
             }
             _sending = true;
             _th_sending->_condition.notify_one();
-
-            _glcontext->make_noncurrent();
         }
     } catch (const Exception& e) {
         MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();

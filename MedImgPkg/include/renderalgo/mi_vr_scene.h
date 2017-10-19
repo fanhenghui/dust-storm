@@ -17,6 +17,8 @@ public:
     VRScene(int width, int height);
     virtual ~VRScene();
 
+    virtual void initialize();
+
     virtual void rotate(const Point2& pre_pt, const Point2& cur_pt);
     virtual void zoom(const Point2& pre_pt, const Point2& cur_pt);
     virtual void pan(const Point2& pre_pt, const Point2& cur_pt);
@@ -25,6 +27,9 @@ public:
 
     virtual void set_window_level(float ww, float wl, unsigned char label);
     virtual void set_global_window_level(float ww, float wl);
+    virtual void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
+        std::shared_ptr<OpacityTransFunc> opacity,
+        unsigned char label);
 
     void set_bounding_box(const AABB& aabb);
 
@@ -36,10 +41,15 @@ public:
 
     virtual void set_visible_labels(std::vector<unsigned char> labels);
 
+    bool get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world);
+    void cache_ray_end();
+
 protected:
     virtual void pre_render_i();
 
 private:
+    struct RayEnd;
+    std::unique_ptr<RayEnd> _cache_ray_end;
 };
 
 MED_IMG_END_NAMESPACE

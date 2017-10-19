@@ -47,10 +47,14 @@ void RayCaster::render() {
 
         {
             CHECK_GL_ERROR;
-
             FBOStack fboStack;
             _canvas->get_fbo()->bind();
-            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            if (this->get_composite_mode() == COMPOSITE_DVR) {
+                GLenum buffers[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+                glDrawBuffers(2, buffers);
+            } else {
+                glDrawBuffer(GL_COLOR_ATTACHMENT0);    
+            }
 
             // Clear
             glClearColor(0, 0, 0, 0);

@@ -212,6 +212,10 @@ void GLUtils::set_pixel_pack_alignment(int i) {
     glPixelStorei(GL_PACK_ALIGNMENT, i);
 }
 
+void GLUtils::set_pixel_unpack_alignment(int i) {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, i);
+}
+
 void GLUtils::log_gl_error(const std::string& err)
 {
     MI_GLRESOURCE_LOG(MI_ERROR) << err;

@@ -1,6 +1,7 @@
 #version 430
 
 layout (location = 0) out vec4 oFragColor;
+layout (location = 1) out vec4 oFragPara;
 
 #define IMG_BINDING_ENTRY_POINTS  0
 #define IMG_BINDING_EXIT_POINTS  1
@@ -39,10 +40,11 @@ void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_rate, out float start
 //2 middle sub data step 
 //4 last sub data step
 vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
-    sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , vec3 sample_shift , int ray_cast_step_code);
+    sampler3D volume_sampler, sampler3D mask_sampler, vec3 sub_data_dim, vec3 sub_data_offset, vec3 sample_shift, 
+    int ray_cast_step_code, out vec3 ray_end);
 
 vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, vec4 integral_color,
-        sampler3D volume_sampler,  sampler3D mask_sampler,   vec3 sub_data_dim , vec3 sub_data_offset , int ray_cast_step_code);
+        sampler3D volume_sampler, sampler3D mask_sampler, vec3 sub_data_dim, vec3 sub_data_offset, int ray_cast_step_code);
 
 void main()
 {
@@ -50,7 +52,7 @@ void main()
     vec3 ray_dir_sample_rate = vec3(1,0,0);
     float end_step = 0;
     float start_step = 0;
-
+    vec3 ray_end = vec3(0,0,0);
     vec4 integral_color = vec4(0,0,0,0);
 
     preprocess(ray_start, ray_dir_sample_rate, start_step, end_step);
@@ -66,7 +68,8 @@ void main()
         volume_dim,
         vec3(0.0), 
         vec3(1.0)/volume_dim,
-        5);
+        5,
+        ray_end);
 
     oFragColor = mask_overlay(
         ray_start, 
@@ -80,4 +83,5 @@ void main()
         vec3(0.0),
         5);
 
+    oFragPara = vec4(ray_end/volume_dim,0.0);
 }

@@ -24,6 +24,9 @@ public:
     void download(GLenum format, GLenum type, void* buffer,
                   GLint level = 0) const;
 
+    void read_pixels(GLenum format, GLenum type, GLint x, GLint y, 
+                     GLsizei width, GLsizei height, void* pixels);
+
     GLsizei get_width();
 
     GLsizei get_height();

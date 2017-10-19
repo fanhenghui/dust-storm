@@ -211,7 +211,8 @@ void VolumeInfos::refresh_update_mask_i() {
         CHECK_GL_ERROR;
 
         unsigned int dim_brick[3];
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        GLUtils::set_pixel_pack_alignment(1);
+        GLUtils::set_pixel_unpack_alignment(1);
         _mask_textures[0]->bind();
 
         for (int i = 0; i < _mask_aabb_to_be_update.size(); ++i) {

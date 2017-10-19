@@ -51,6 +51,8 @@ public:
 
     bool operator==(const CameraBase& camera) const;
 
+    bool operator!=(const CameraBase& camera) const;
+
 protected:
     void calculate_view_matrix_i();
 

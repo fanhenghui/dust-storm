@@ -15,7 +15,7 @@ public:
 
     ~RayCasterCanvas();
 
-    void initialize();
+    void initialize(bool multi_color_attach = false);
 
     void set_display_size(int width, int height);
 
@@ -25,17 +25,21 @@ public:
 
     GLTexture2DPtr get_color_attach_texture();
 
+    GLTexture2DPtr get_color_attach_texture(int id);
+
     RGBAUnit* get_color_array();
 
     void update_color_array();
 
 public:
     void debug_output_color(const std::string& file_name);
+    void debug_output_color1(const std::string& file_name);
 
 protected:
 private:
     GLFBOPtr _gl_fbo;
     GLTexture2DPtr _color_attach_0; // For RGBA Color
+    GLTexture2DPtr _color_attach_1; // For VR post ray casting(EG: save ray stop position)
     GLTexture2DPtr _depth_attach;
     GLResourceShield _res_shield;
 
