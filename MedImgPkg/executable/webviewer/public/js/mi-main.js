@@ -64,8 +64,8 @@ var maxCellID = -1;
         var dstview = new Uint8Array(worklistBuffer);
         var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
         var cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
-        for (var i = cpSrc; i < dataLen; i++) {
-            dstview[i] = srcview[i];
+        for (var i = 0; i < dataLen; i++) {
+            dstview[i+cpSrc] = srcview[i];
         }
 
         if (restDataLen <= 0) {
@@ -112,8 +112,8 @@ var maxCellID = -1;
         var dstview = new Uint8Array(annotationListBuffer);
         var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
         var cpSrc = annotationListBuffer.byteLength - (dataLen + restDataLen);
-        for (var i = cpSrc; i < dataLen; i++) {
-            dstview[i] = srcview[i];
+        for (var i = 0; i < dataLen; i++) {
+            dstview[i+cpSrc] = srcview[i];
         }
 
         if (restDataLen <= 0) {

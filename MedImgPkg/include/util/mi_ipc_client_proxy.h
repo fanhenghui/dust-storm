@@ -32,6 +32,7 @@ private:
     std::map<unsigned int, std::shared_ptr<ICommandHandler>> _handlers;
 
     boost::mutex _mutex;
+    boost::mutex _mutex_send_data;
 };
 
 MED_IMG_END_NAMESPACE

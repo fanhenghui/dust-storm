@@ -17,10 +17,14 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
     var tcpPackageLen = tcpBuffer.byteLength;
 
     if (this.tcpPacketEnd == 0) {
-        if (tcpPackageLen < MSG_HEADER_LEN) {
+        if (tcpPackageLen < MSG_HEADER_LEN) { //incompleted Msg header
+            var dstBuffer = new Uint8Array(this.lastMsgHeader);
+            var srcBuffer = new Uint8Array(tcpBuffer)
+            for (var i = 0; i< tcpPackageLen; ++i) {
+                dstBuffer[i] = srcBuffer[i];
+            }
             this.tcpPacketEnd = 2;
             this.lastMsgHeaderLen = tcpPackageLen;
-            tcpBuffer.copy(this.lastMsgHeader, 0, 0);
             return;
         }
         var header = new Uint32Array(tcpBuffer, 0, 8);
@@ -60,15 +64,23 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
     } else if (this.tcpPacketEnd == 2) { // msg header for last msg header
         var lastRestHeaderLen = MSG_HEADER_LEN - this.lastMsgHeaderLen;
         if (tcpPackageLen < lastRestHeaderLen) { // msg header is not completed yet
+            var dstBuffer = new Uint8Array(this.lastMsgHeader);
+            var srcBuffer = new Uint8Array(tcpBuffer)
+            for (var i = 0 ; i< tcpPackageLen; ++i) {
+                dstBuffer[i+this.lastMsgHeaderLen] = srcBuffer[i];
+            }
             this.tcpPacketEnd = 2;
-            tcpBuffer.copy(this.lastMsgHeader, 0, lastRestHeaderLen, tcpPackageLen);
             this.lastMsgHeaderLen += tcpPackageLen;
             return;
         } else { // msg header is completed
-            this.tcpPacketEnd = 1;
-            tcpBuffer.copy(this.lastMsgHeader, 0, lastRestHeaderLen, lastRestHeaderLen);
-            var tcpBufferSub3 = tcpBuffer.slice(lastRestHeaderLen);
+            //fill header completed
+            var dstBuffer = new Uint8Array(this.lastMsgHeader);
+            var srcBuffer = new Uint8Array(tcpBuffer,0,lastRestHeaderLen);
+            for (var i = 0; i< lastRestHeaderLen; ++i) {
+                dstBuffer[i+this.lastMsgHeaderLen] = srcBuffer[i];
+            }
 
+            var tcpBufferSub3 = tcpBuffer.slice(lastRestHeaderLen);
             var header2 = new Uint32Array(this.lastMsgHeader, 0, 8);
             this.msgCmdID = header2[2];
             this.msgCellID = header2[3];

@@ -77,13 +77,13 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
 
 Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
     if (withHeader) {
-        noneImgBuf = new ArrayBuffer(dataLen + restDataLen);
+        this.noneImgBuf = new ArrayBuffer(dataLen + restDataLen);
     }
-    var dstRecord = new Uint8Array(noneImgBuf);
+    var dstRecord = new Uint8Array(this.noneImgBuf);
     var srcRecord = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-    var cpSrc = noneImgBuf.byteLength - (dataLen + restDataLen);
-    for (var i = cpSrc; i < dataLen; i++) {
-        dstRecord[i] = srcRecord[i];
+    var cpSrc = this.noneImgBuf.byteLength - (dataLen + restDataLen);
+    for (var i = 0; i < dataLen; i++) {
+        dstRecord[i+cpSrc] = srcRecord[i];
     }
 
     // sucessfully receive all none-image
@@ -95,7 +95,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         }
 
         //decode the byte array with protobuffer
-        var noneImgBufView = new Uint8Array(noneImgBuf);
+        var noneImgBufView = new Uint8Array(this.noneImgBuf);
         try {
             var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
         } catch (e) {
@@ -105,6 +105,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
             } else {
                 console.log('decode none image message failed.');
                 console.log('wire format is invalid');
+                console.log(this.noneImgBuf.byteLength);
             }
             return;
         }

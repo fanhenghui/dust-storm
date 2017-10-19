@@ -53,13 +53,13 @@ void IPCClientProxy::unregister_command_handler(unsigned int cmd_id) {
     boost::mutex::scoped_lock locker(_mutex);
 
     auto it = _handlers.find(cmd_id);
-
     if (it != _handlers.end()) {
         _handlers.erase(it);
     }
 }
 
 void IPCClientProxy::async_send_message(const IPCDataHeader& header , char* buffer) {
+    boost::mutex::scoped_lock locker(_mutex_send_data);
     _client->send_data(header , buffer);
 }
 
