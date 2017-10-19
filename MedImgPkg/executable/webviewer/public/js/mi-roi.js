@@ -10,7 +10,7 @@ function ROICircle(key, svg, cx, cy, r){
     this.roiCtrlRT = null;
     this.roiCtrlRB = null;
     this.roiCtrlMove = null;
-    this.roiAnnotation = null;
+    this.roiLabel = null;
     this.dragingCallback = null;
     this.dragEndCallback = null;
 
@@ -23,11 +23,12 @@ function ROICircle(key, svg, cx, cy, r){
     this.keyCtrlMove = key+'-move';
     this.hovering = false;
     this.ctrlSize = 4;
+    this.winSize = {width: 0, height: 0};
 
     //adjust ctrl size
     var width = parseFloat(d3.select(svg).attr('width'));
     var height = parseFloat(d3.select(svg).attr('height'));
-    this.resize(width, height);
+    this.adjustCircleRadius(width, height);
 
     var hoveringFunc = (function () {
         if (this.hovering == false) {
@@ -198,8 +199,8 @@ ROICircle.highlightColor = 'yellow';
 ROICircle.ctrlAppearInverval = 250;
 ROICircle.ctrlFadeInverval = 2000;
 
-ROICircle.prototype.resize = function(w, h) {
-    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [1, 6]
+ROICircle.prototype.adjustCircleRadius = function(w, h) {
+    // based on the size of cell-window, tune the ctrl circle radius, but still clamp to [3.5, 6]
     this.ctrlSize = Math.min(Math.max((w + h) / 500.0, 3.5), 6);
 }
 
@@ -227,9 +228,9 @@ ROICircle.prototype.move = function(cx, cy) {
     .attr('cx', cx)
     .attr('cy', cy);
 
-    if (this.roiAnnotation != null)
+    if (this.roiLabel != null)
     {
-        this.roiAnnotation.updateAnnotationLayout();
+        this.roiLabel.updateLayout();
     }
 }
 
@@ -256,9 +257,9 @@ ROICircle.prototype.stretch = function(r) {
     .attr('cx', cx)
     .attr('cy', cy);
 
-    if (this.roiAnnotation != null)
+    if (this.roiLabel != null)
     {
-        this.roiAnnotation.updateAnnotationLayout();
+        this.roiLabel.updateLayout();
     }
 }
 
@@ -287,9 +288,24 @@ ROICircle.prototype.locate = function(cx, cy, r) {
     .attr('cx', cx)
     .attr('cy', cy);
 
-    if (this.roiAnnotation != null)
+
+    if (this.roiLabel != null)
     {
-        this.roiAnnotation.updateAnnotationLayout();
+        var width = this.svg.getAttribute("width");
+        var height = this.svg.getAttribute("height");
+
+        if(this.winSize.width != width || this.winSize.height != height)
+        {
+            if(this.roiLabel.resetLayout())
+            {
+                this.winSize.width = width;
+                this.winSize.height = height;
+            }
+        }
+        else
+        {
+            this.roiLabel.updateLayout();
+        }
     }
 }
 
@@ -307,9 +323,16 @@ ROICircle.prototype.visible = function(flag) {
     this.roiCtrlRB.style('display', vis);
     this.roiCtrlMove.style('display', vis);
 
-    if (this.roiAnnotation != null)
+    if (this.roiLabel != null)
     {
-        this.roiAnnotation.updateAnnotationLayout();
+        this.roiLabel.updateLayout();
+    }
+}
+
+ROICircle.prototype.updateContent = function (contentStr) {
+    if(this.roiLabel != null)
+    {
+        this.roiLabel.updateContent(contentStr);
     }
 }
 
@@ -328,7 +351,7 @@ ROICircle.prototype.creating = function(x, y) {
     this.stretch(Math.floor(r));
 }
 
-ROICircle.prototype.release = function() {
+ROICircle.prototype.release = function () {
     var data = d3.select(this.svg).selectAll('circle').data();
     var newData = [];
     for (var i = 0; i < data.length; ++i) {
@@ -343,25 +366,35 @@ ROICircle.prototype.release = function() {
     }
 
     d3.select(this.svg).selectAll('circle')
-    .data(newData, function(d) {
-        return d.key;
-    }).exit().remove();
-}
-
-ROICircle.prototype.attachAnnotation = function() {
-    if (this.roiAnnotation == null)
+        .data(newData, function (d) {
+            return d.key;
+        }).exit().remove();
+    
+    if(this.roiLabel != null)
     {
-        this.roiAnnotation = new AnnotationText(this.key, this.svg, this.roiMain);
-        this.roiAnnotation.updateAnnotationLayout();
+        this.roiLabel.release();
     }
 }
 
-var SCALING = 1.5;
+ROICircle.prototype.addAnnotationLabel = function(str) {
+    if (this.roiLabel == null)
+    {
+        this.roiLabel = new AnnotationLabel(this.key, this.svg, this.roiMain, str);
+        this.roiLabel.resetLayout();
+    }
+}
+
+
+
+
+
+const SCALING = 1.5;
 // which mark (circle) on which svg (svg) am I (key) annotating to?
-function AnnotationText(key, svg, selectedCircle) {
+function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     this.svg = svg;
     this.annotationKey = key + '-annotation';
     this.src = selectedCircle;
+    this.contextFontSize = 11;
 
     this.content = null;
     this.border = null;
@@ -408,7 +441,8 @@ function AnnotationText(key, svg, selectedCircle) {
                 .attr('y1', centerY + centerR * (newY - centerY) / mag)
                 .attr('x2', newX)
                 .attr('y2', newY);
-
+            this.content.selectAll('tspan').attr('x', function(){return this.parentNode.getAttribute('x');})
+            
             // record previous location
             preloc.x = d3.event.x;
             preloc.y = d3.event.y;
@@ -421,7 +455,6 @@ function AnnotationText(key, svg, selectedCircle) {
         .data(
             [{
                 key: this.annotationKey,
-                content: 'test_text'
             }],
             function (d) {
                 return d.key;
@@ -429,23 +462,37 @@ function AnnotationText(key, svg, selectedCircle) {
         .enter()
         .append('text')
         .attr('font-family', 'monospace')
-        .attr('font-size', '15px')
+        .attr('font-size', this.contextFontSize)
         // .attr('class', 'no-select-text')
         .attr('alignment-baseline', 'central')
-        .attr('text-anchor', 'start')
+        .attr('text-anchor', 'start')   
         .attr('x', src_x + SCALING * src_r)
         .attr('y', src_y - SCALING * src_r)
         .attr('fill', 'red')
         .attr('cursor', 'move')
-        .text(function (d) {
-            return d.content;
-        })
         .call(dragListener);
+
+    if (contentStr != null && contentStr != '') {
+      var multiLine = contentStr.split('|');
+      var contentArray = [];
+      for (var i = 0; i < multiLine.length; ++i) {
+        contentArray.push(multiLine[i]);
+      }
+
+      this.content.selectAll('tspan')
+          .data(contentArray)
+          .enter()
+          .append('tspan')
+          .attr('x', function(d){return this.parentNode.getAttribute('x');})
+          .attr(
+              'dy', function(d, i) { return (i>0) * this.parentNode.getAttribute('font-size'); })
+          .text(function(d, i) { return d; })
+    }
 
     this.arrow =
         d3.select(this.svg)
             .selectAll('line')
-            .data([{key: this.annotationKey}], function(d) { return d.key; })
+            .data([{key: this.annotationKey}], function(d) { return d? d.key : null; })
             .enter()
             .append('line')
             .attr('x1', src_x + 0.707 * src_r)
@@ -473,55 +520,137 @@ function AnnotationText(key, svg, selectedCircle) {
 }
 
 // change the location of arrow & text
-AnnotationText.prototype.updateAnnotationLayout = function () {
+AnnotationLabel.prototype.updateLayout = function () {
 
     this.arrow.style('display', this.src.style('display'));
     this.content.style('display', this.src.style('display'));
 
-    if (this.src.style('display') == 'inline') {
+    if (this.content.style('display') != 'none') {
         // if just moved it is trivial
         // get the text location
         var newX = parseFloat(this.content.attr('x'));
         var newY = parseFloat(this.content.attr('y'));
 
-        var width = this.svg.getAttribute("width");
-        var height = this.svg.getAttribute("height");
+        var centerX = parseFloat(this.src.attr('cx'));
+        var centerY = parseFloat(this.src.attr('cy'));
+        var centerR = parseFloat(this.src.attr('r'));
+
+        // update the line (aka the arrow) location
+        var mag = Math.sqrt(
+            (newX - centerX) * (newX - centerX) +
+            (newY - centerY) * (newY - centerY));
+        if (mag < 0.01) // to avoid division by 0
+        {
+            mag = 0.01;
+            newX = centerX + 0.01 * 0.707;
+            newY = centerY - 0.01 * 0.707;
+        }
+        if (mag < (SCALING * centerR)) // if text is inside the circle
+        {
+            newX = centerX + SCALING * centerR * (newX - centerX) / mag;
+            newY = centerY + SCALING * centerR * (newY - centerY) / mag;
+            mag = SCALING * centerR;
+            this.content.attr('x', newX).attr('y', newY);
+        }
+        this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
+            .attr('y1', centerY + centerR * (newY - centerY) / mag)
+            .attr('x2', newX)
+            .attr('y2', newY);
+
+        this.content.selectAll('tspan').attr(
+            'x',
+            function () {
+                return this.parentNode.getAttribute('x');
+            });
+    }
+}
+
+AnnotationLabel.prototype.release = function () {
+    var key = this.annotationKey;
+    d3.select(this.svg).selectAll('text').filter(function (d) {
+        return d? d.key == key : false;
+    }).selectAll('tspan').remove();
+
+    d3.select(this.svg).selectAll('text').filter(function (d) {
+        return d? d.key == key : false;
+    }).remove();
+
+    d3.select(this.svg).selectAll('line').filter(function (d) {
+        return d ? d.key == key : false;
+    }).remove();
+}
+
+AnnotationLabel.prototype.updateContent = function (contentStr) {
+    if (contentStr == null || contentStr == '')
+        return;
+
+    var multiLine = contentStr.split('|');
+    var contentArray = [];
+    for (var i = 0; i < multiLine.length; ++i) {
+        contentArray.push(multiLine[i]);
+    }
+
+    var key = this.annotationKey;
+    d3.select(this.svg)
+        .selectAll('text')
+        .filter(function (d) {
+            return d ? d.key == key : false;
+        }).each(function (d) {
+            statisticTxt = d3.select(this).selectAll('tspan');
+            if (statisticTxt.empty()) {
+                statisticTxt.data(contentArray)
+                    .enter()
+                    .append('tspan')
+                    .attr('x', function (d) {
+                        return this.parentNode.getAttribute('x');
+                    })
+                    .attr('dy', function (d, i) {
+                        return (i > 0) * this.parentNode.getAttribute('font-size');
+                    })
+                    .text(function (d, i) {
+                        return d;
+                    });
+            } else {
+                statisticTxt.data(contentArray)
+                    .text(function (d, i) {
+                        return d;
+                    });
+            }
+        });
+}
+
+
+AnnotationLabel.prototype.resetLayout = function () {
+
+    this.arrow.style('display', this.src.style('display'));
+    this.content.style('display', this.src.style('display'));
+
+    if (this.content.style('display') != 'none')
+    {
+        var newX = parseFloat(this.content.attr('x'));
+        var newY = parseFloat(this.content.attr('y'));
 
         var centerX = parseFloat(this.src.attr('cx'));
         var centerY = parseFloat(this.src.attr('cy'));
         var centerR = parseFloat(this.src.attr('r'));
 
-        // when we close to the border, reset the position
-        if (newX > 0.95 * width || newX < 0.05 * width || newY > 0.95 * height || newY < 0.05 * height) {
-            this.content
-                .attr('x', centerX + SCALING * centerR)
-                .attr('y', centerY - SCALING * centerR);
-            this.arrow
-                .attr('x1', centerX + 0.707 * centerR)
-                .attr('y1', centerY - 0.707 * centerR)
-                .attr('x2', this.content.attr('x'))
-                .attr('y2', this.content.attr('y'));
-        } else {
-            // update the line (aka the arrow) location
-            var mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
-            if(mag < 0.01) // to avoid division by 0
-            {
-                mag = 0.01;
-                newX = centerX + 0.01 * 0.707;
-                newY = centerY - 0.01 * 0.707;
-            }
-            if (mag < (SCALING * centerR)) // if text is inside the circle
-            {
-                newX = centerX + SCALING * centerR * (newX - centerX) / mag;
-                newY = centerY + SCALING * centerR * (newY - centerY) / mag;
-                mag = SCALING * centerR;
-                this.content.attr('x', newX).attr('y', newY);
-            }
-            this.arrow
-                .attr('x1', centerX + centerR * (newX - centerX) / mag)
-                .attr('y1', centerY + centerR * (newY - centerY) / mag)
-                .attr('x2', newX)
-                .attr('y2', newY);
-        }
+        this.content
+            .attr('x', centerX + SCALING * centerR)
+            .attr('y', centerY - SCALING * centerR);
+        
+        this.arrow
+            .attr('x1', centerX + 0.707 * centerR)
+            .attr('y1', centerY - 0.707 * centerR)
+            .attr('x2', this.content.attr('x'))
+            .attr('y2', this.content.attr('y'));
+
+        this.content.selectAll('tspan').attr('x', function () {
+            return this.parentNode.getAttribute('x');
+        });
+        return 1;
+        // console.log(this.annotationKey + '  resetting');
+    }
+    else{
+        return 0;
     }
 }

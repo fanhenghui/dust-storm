@@ -185,28 +185,31 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     var cx = annoUnit.para0;
                     var cy = annoUnit.para1;
                     var r = annoUnit.para2;
+                    var content = annoUnit.info;
+                    // console.log('cellID:' + this.cellID + '  roi:' + id + '  ' + content);
                     switch (annoUnit.status) {
                         case 0: //add
-                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0)));
+                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), content));
                             break;
                         case 1: //delete
-                            for (var i = 0; i < this.rois.length; ++i) {
-                                if (this.rois[i].key == id) {
-                                    this.rois[i].release();
-                                    this.rois.splice(i, 1);
+                            for (var j = 0; j < this.rois.length; ++j) {
+                                if (this.rois[j].key == id) {
+                                    this.rois[j].release();
+                                    this.rois.splice(j, 1);
                                     break;
                                 }
                             }
                             break;
                         case 2: //modifying
-                            for (var i = 0; i < this.rois.length; ++i) {
-                                if (this.rois[i].key == id) {
-                                    this.rois[i].locate(cx, cy, r);
-                                    this.rois[i].visible(vis)
+                            for (var j = 0; j < this.rois.length; ++j) {
+                                if (this.rois[j].key == id) {
+                                    this.rois[j].locate(cx, cy, r);
+                                    this.rois[j].visible(vis);
+                                    this.rois[j].updateContent(content);
                                     break;
                                 }
                             }
-                            break;
+                        break;
                     }                    
                 }
             }
@@ -243,7 +246,9 @@ Cell.prototype.resize = function (width, height) {
 
     // resize the txts located at 4 corners
     d3.select(this.svg)
-        .selectAll('text')
+        .selectAll('text').filter(function(d){
+            return (d == 'LT' || d == 'LB' || d == 'RT' || d=='RB');
+         })
         .attr('x', function (d, i) {
             return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN;
         })
@@ -268,7 +273,7 @@ Cell.prototype.resize = function (width, height) {
         });
     
     for (var i = 0; i < this.rois.length; ++i) {
-        this.rois[i].resize(width, height);
+        this.rois[i].adjustCircleRadius(width, height);
     }
 }
 

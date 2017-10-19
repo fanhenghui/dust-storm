@@ -97,11 +97,11 @@ function ActionAnnotation(socketClient, cellID) {
     this.cellID = cellID;
 };
 
-ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility) {
+ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility, contentStr) {
     var roi = new ROICircle(id, svg, cx, cy, r);
     roi.visible(visibility);
     roi.setCtrlRadius(0.0);
-    roi.attachAnnotation(); // temporily placed here
+    roi.addAnnotationLabel(contentStr); // temporily placed here
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
         sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
