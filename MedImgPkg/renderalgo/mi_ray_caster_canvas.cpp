@@ -81,6 +81,9 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
         _res_shield.add_shield<GLFBO>(_gl_fbo);
         _res_shield.add_shield<GLTexture2D>(_color_attach_0);
         _res_shield.add_shield<GLTexture2D>(_depth_attach);
+        if(multi_color_attach) {
+            _res_shield.add_shield<GLTexture2D>(_color_attach_1);
+        }
     }
 }
 
