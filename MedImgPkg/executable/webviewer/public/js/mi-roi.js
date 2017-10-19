@@ -325,7 +325,7 @@ ROICircle.prototype.visible = function(flag) {
 
     if (this.roiLabel != null)
     {
-        this.roiLabel.updateLayout();
+        this.roiLabel.updateVisibility();
     }
 }
 
@@ -380,7 +380,6 @@ ROICircle.prototype.addAnnotationLabel = function(str) {
     if (this.roiLabel == null)
     {
         this.roiLabel = new AnnotationLabel(this.key, this.svg, this.roiMain, str);
-        this.roiLabel.resetLayout();
     }
 }
 
@@ -517,53 +516,11 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     // .style('fill-opacity', 0.0)
     // .attr('stroke-width', 2)
     // .attr('stroke', '#dcdcdc');
+
+    this.updateVisibility();
 }
 
-// change the location of arrow & text
-AnnotationLabel.prototype.updateLayout = function () {
 
-    this.arrow.style('display', this.src.style('display'));
-    this.content.style('display', this.src.style('display'));
-
-    if (this.content.style('display') != 'none') {
-        // if just moved it is trivial
-        // get the text location
-        var newX = parseFloat(this.content.attr('x'));
-        var newY = parseFloat(this.content.attr('y'));
-
-        var centerX = parseFloat(this.src.attr('cx'));
-        var centerY = parseFloat(this.src.attr('cy'));
-        var centerR = parseFloat(this.src.attr('r'));
-
-        // update the line (aka the arrow) location
-        var mag = Math.sqrt(
-            (newX - centerX) * (newX - centerX) +
-            (newY - centerY) * (newY - centerY));
-        if (mag < 0.01) // to avoid division by 0
-        {
-            mag = 0.01;
-            newX = centerX + 0.01 * 0.707;
-            newY = centerY - 0.01 * 0.707;
-        }
-        if (mag < (SCALING * centerR)) // if text is inside the circle
-        {
-            newX = centerX + SCALING * centerR * (newX - centerX) / mag;
-            newY = centerY + SCALING * centerR * (newY - centerY) / mag;
-            mag = SCALING * centerR;
-            this.content.attr('x', newX).attr('y', newY);
-        }
-        this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
-            .attr('y1', centerY + centerR * (newY - centerY) / mag)
-            .attr('x2', newX)
-            .attr('y2', newY);
-
-        this.content.selectAll('tspan').attr(
-            'x',
-            function () {
-                return this.parentNode.getAttribute('x');
-            });
-    }
-}
 
 AnnotationLabel.prototype.release = function () {
     var key = this.annotationKey;
@@ -619,12 +576,7 @@ AnnotationLabel.prototype.updateContent = function (contentStr) {
         });
 }
 
-
 AnnotationLabel.prototype.resetLayout = function () {
-
-    this.arrow.style('display', this.src.style('display'));
-    this.content.style('display', this.src.style('display'));
-
     if (this.content.style('display') != 'none')
     {
         var newX = parseFloat(this.content.attr('x'));
@@ -653,4 +605,52 @@ AnnotationLabel.prototype.resetLayout = function () {
     else{
         return 0;
     }
+}
+
+// change the location of arrow & text
+AnnotationLabel.prototype.updateLayout = function () {
+    if (this.content.style('display') != 'none') {
+        // if just moved it is trivial
+        // get the text location
+        var newX = parseFloat(this.content.attr('x'));
+        var newY = parseFloat(this.content.attr('y'));
+
+        var centerX = parseFloat(this.src.attr('cx'));
+        var centerY = parseFloat(this.src.attr('cy'));
+        var centerR = parseFloat(this.src.attr('r'));
+
+        // update the line (aka the arrow) location
+        var mag = Math.sqrt(
+            (newX - centerX) * (newX - centerX) +
+            (newY - centerY) * (newY - centerY));
+        if (mag < 0.01) // to avoid division by 0
+        {
+            mag = 0.01;
+            newX = centerX + 0.01 * 0.707;
+            newY = centerY - 0.01 * 0.707;
+        }
+        if (mag < (SCALING * centerR)) // if text is inside the circle
+        {
+            newX = centerX + SCALING * centerR * (newX - centerX) / mag;
+            newY = centerY + SCALING * centerR * (newY - centerY) / mag;
+            mag = SCALING * centerR;
+            this.content.attr('x', newX).attr('y', newY);
+        }
+        this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
+            .attr('y1', centerY + centerR * (newY - centerY) / mag)
+            .attr('x2', newX)
+            .attr('y2', newY);
+
+        this.content.selectAll('tspan').attr(
+            'x',
+            function () {
+                return this.parentNode.getAttribute('x');
+            });
+    }
+}
+
+AnnotationLabel.prototype.updateVisibility = function () {
+    this.arrow.style('display', this.src.style('display'));
+    this.content.style('display', this.src.style('display'));
+    this.resetLayout();
 }
