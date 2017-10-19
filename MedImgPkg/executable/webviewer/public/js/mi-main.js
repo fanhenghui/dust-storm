@@ -443,16 +443,16 @@ var maxCellID = -1;
         // register button event
         var searchWorklistBtn = document.getElementById('btn-search-worklist');
         if (searchWorklist) {
-            searchWorklistBtn.addEventListener('click', function(event) {
+            searchWorklistBtn.onclick = function(event) {
                 searchWorklist();
-            });
+            };
         } else {
             console.log('get searchBtn node failed.');
         }
         
         var loadSeriesBtn = document.getElementById('btn-load-series');
         if (loadSeriesBtn) {
-            loadSeriesBtn.addEventListener('click', function(event) {
+            loadSeriesBtn.onclick = function(event) {
                 var series = $('#table tbody tr.success td:nth-child(3)').html();
                 if (!series) {
                     alert('please choose one series.');
@@ -461,7 +461,7 @@ var maxCellID = -1;
                 document.getElementById('worklist-div').hidden = true;
                 document.getElementById('review-div').hidden = false;
                 loadSeries(series);
-            });
+            };
         } else {
             console.log('get loadBtn node failed.');
         }
@@ -470,19 +470,25 @@ var maxCellID = -1;
         if (comToolsDiv) {
             var comToolsBtns = comToolsDiv.getElementsByTagName('button');
             for (var i = 0; i < comToolsBtns.length; ++i) {
-                comToolsBtns[i].addEventListener('click', function(event) {
+                comToolsBtns[i].onclick = function(event) {
                     switchCommonTool(this.id);
-                });
+                };
             }
         } else {
             console.log('get common-tools failed.');
         }
+        var annotationTool = document.getElementById('common-tool-annotation');
+        if (annotationTool) {
+            annotationTool.onclick = function(event) {
+                switchCommonTool(this.id);
+            };
+        }
 
         var playVRBtn = document.getElementById('btn-play-vr');
         if (playVRBtn) {
-            playVRBtn.addEventListener('click', function() {
+            playVRBtn.onclick = function() {
                 playVR();
-            });
+            };
         } else {
             console.log('get btn-play-vr node failed.');
         }
@@ -491,7 +497,7 @@ var maxCellID = -1;
 
         var deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
         if (deleteAnnotationBtn) {
-            deleteAnnotationBtn.addEventListener('click', function(event) {
+            deleteAnnotationBtn.onclick = function(event) {
                 var choosedItem = $('#annotation-table tr.success');
                 if (choosedItem.length > 0) {
                     var id = choosedItem.attr('id')
@@ -500,7 +506,7 @@ var maxCellID = -1;
                     }
                 }
 
-            });
+            };
         }
 
         var mprMaskOverlayFunc = function(event) {
