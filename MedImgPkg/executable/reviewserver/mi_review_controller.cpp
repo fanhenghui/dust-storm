@@ -42,8 +42,6 @@ void ReviewController::initialize() {
     Configuration::instance()->set_processing_unit_type(GPU);
     // register command handler and operation
     register_command_handler_i();
-    // create model&observer
-    create_model_i();
 }
 
 void ReviewController::register_command_handler_i() {
@@ -103,14 +101,6 @@ void ReviewController::register_command_handler_i() {
         
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
-}
-
-void ReviewController::create_model_i() {
-    std::shared_ptr<ModelAnnotation> model_annotation(new ModelAnnotation());
-    this->add_model(MODEL_ID_ANNOTATION , model_annotation);
-
-    std::shared_ptr<ModelCrosshair> model_crosshair(new ModelCrosshair());
-    this->add_model(MODEL_ID_CROSSHAIR , model_crosshair);
 }
 
 

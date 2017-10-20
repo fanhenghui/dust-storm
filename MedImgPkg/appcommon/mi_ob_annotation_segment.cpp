@@ -21,6 +21,7 @@
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
+const std::string LUNG_NODULE_LUT_PATH = "../config/lut/3d/ct_lung_nodule.xml";
 
 OBAnnotationSegment::OBAnnotationSegment() {
 
@@ -102,14 +103,13 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         }
 
         if(!_vr_scenes.empty()) {
-            const std::string color_opacity_xml = "../config/lut/3d/ct_lung_nodule.xml";
             std::shared_ptr<ColorTransFunc> color;
             std::shared_ptr<OpacityTransFunc> opacity;
             float ww(0), wl(0);
             RGBAUnit background;
             Material material;
-            if (IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity, ww, wl, background, material)) {
-                MI_APPCOMMON_LOG(MI_ERROR) << "load lut: " << color_opacity_xml << " failed.";
+            if (IO_SUCCESS != TransferFuncLoader::load_color_opacity(LUNG_NODULE_LUT_PATH, color, opacity, ww, wl, background, material)) {
+                MI_APPCOMMON_LOG(MI_ERROR) << "load lut: " << LUNG_NODULE_LUT_PATH << " failed.";
             } else {
                 for (auto it = _vr_scenes.begin(); it != _vr_scenes.end(); ++it) {
                     std::vector<unsigned char> vis_labels = (*it)->get_visible_labels();

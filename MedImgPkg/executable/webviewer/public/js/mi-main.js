@@ -100,6 +100,46 @@ var maxCellID = -1;
         });
     }
 
+    function annoListDeleteRow(row) {
+        var annoTableRows = annotationTable.rows;
+        if (annoTableRows.length > row + 1) {
+            annotationTable.deleteRow(row + 1);
+        }
+    }
+
+    function annoListAddRow(row,id,cx,cy,cz,diameter,info) {
+        var rowItem = annotationTable.insertRow(row + 1);
+        $(rowItem).click(function(event) {
+            $(this).addClass('success').siblings().removeClass('success');
+            //send focus annotation message
+            var anno_id = $(this).attr('id');
+            if (anno_id) {
+                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
+            }
+        });
+        rowItem.setAttribute('id',id);
+        rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+        rowItem.insertCell(1).innerHTML = diameter.toFixed(2);
+        rowItem.insertCell(2).innerHTML = info;
+    }
+
+    function annoListModifyRow(row,cx,cy,cz,diameter,info) {
+        var annoTableRows = annotationTable.rows;
+        if (annoTableRows.length > row + 1) {
+            var annoCell = annoTableRows[row + 1].cells;
+            annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
+            annoCell[1].innerHTML = diameter.toFixed(2);  
+            annoCell[2].innerHTML = info;
+        }
+    }
+
+    function annoListClean() {
+        var annoTableRows = annotationTable.rows;
+        while (annoTableRows.length > 1) {
+            annotationTable.deleteRow(annoTableRows.length-1);
+        }
+    }
+
     function recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         if (!socketClient.protocRoot) {
             console.log('null protocbuf.');
@@ -124,8 +164,7 @@ var maxCellID = -1;
             var annotationListView = new Uint8Array(annotationListBuffer);
             var annotationList = MsgAnnotationListType.decode(annotationListView);
             if (annotationList) {
-                var listItems = annotationList.item;
-                for (var i = 0; i < listItems.length; ++i) {
+                var listItems = annotationList.item;for (var i = 0; i < listItems.length; ++i) {
                     var id = listItems[i].id;
                     var info = listItems[i].info;
                     var row = listItems[i].row;
@@ -136,32 +175,11 @@ var maxCellID = -1;
                     var diameter = listItems[i].para3;
 
                     if(status == 0) {//add
-                        var rowItem = annotationTable.insertRow(row + 1);
-                        $(rowItem).click(function(event) {
-                            $(this).addClass('success').siblings().removeClass('success');
-                            //send focus annotation message
-                            var anno_id = $(this).attr('id');
-                            if (anno_id) {
-                                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
-                            }
-                        });
-                        rowItem.setAttribute('id',id);
-                        rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-                        rowItem.insertCell(1).innerHTML = diameter.toFixed(2);
-                        rowItem.insertCell(2).innerHTML = info;
+                        annoListAddRow(row, id, cx, cy, cz, diameter, info);
                     } else if (status == 1) {// delete
-                        var annoTableRows = annotationTable.rows;
-                        if (annoTableRows.length > row + 1) {
-                            annotationTable.deleteRow(row + 1);
-                        }
+                        annoListDeleteRow(row);
                     } else if (status == 2) {// modifying
-                        var annoTableRows = annotationTable.rows;
-                        if (annoTableRows.length > row + 1) {
-                            var annoCell = annoTableRows[row + 1].cells;
-                            annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-                            annoCell[1].innerHTML = diameter.toFixed(2);  
-                            annoCell[2].innerHTML = info;
-                        }
+                        annoListModifyRow(row, cx, cy, cz, diameter, info);
                     }
 
                 }
@@ -313,6 +331,10 @@ var maxCellID = -1;
         }        
     }
 
+    function resetPanel() {
+        seriesUID = '';
+    }
+
     function loadSeries(series) {
         seriesUID = series;
         if (!socketClient) {
@@ -392,9 +414,10 @@ var maxCellID = -1;
                 }
                 break;
             case 'common-tool-rotate':
-                for (var i = 0; i < cells.length; ++i) {
-                    cells[i].activeAction(ACTION_ID_ROTATE);
-                }
+                cells[0].activeAction(ACTION_ID_MPR_PAGING);
+                cells[1].activeAction(ACTION_ID_MPR_PAGING);
+                cells[2].activeAction(ACTION_ID_MPR_PAGING);
+                cells[3].activeAction(ACTION_ID_ROTATE);
                 break;
             case 'common-tool-windowing':
                 for (var i = 0; i < cells.length; ++i) {
@@ -460,6 +483,7 @@ var maxCellID = -1;
                 }
                 document.getElementById('worklist-div').hidden = true;
                 document.getElementById('review-div').hidden = false;
+                annoListClean();
                 loadSeries(series);
             };
         } else {

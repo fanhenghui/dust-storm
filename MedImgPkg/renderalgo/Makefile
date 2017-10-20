@@ -34,8 +34,9 @@ TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
 EXPORT_HEADER = mi_render_algo_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_log -lmedimg_util -lmedimg_arithmetic -lmedimg_glresource -lmedimg_io \
--lboost_system -lboost_thread -lgpujpeg -lpugixml
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lGL -lGLEW \
+-lmedimg_log -lmedimg_util -lmedimg_arithmetic -lmedimg_glresource -lmedimg_io \
+-lgpujpeg -lpugixml 
 
 
 all: pre-build main-build

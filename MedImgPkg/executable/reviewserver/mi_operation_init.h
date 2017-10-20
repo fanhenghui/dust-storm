@@ -6,15 +6,18 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+class AppController;
+class MsgInit;
 class OpInit : public IOperation {
 public:
     OpInit();
     virtual ~OpInit();
-
     virtual int execute();
 
-protected:
 private:
+    int init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool& preprocessing_mask);
+    int init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask);
+    int init_model_i(std::shared_ptr<AppController> controller, MsgInit* msg_init);
 };
 
 MED_IMG_END_NAMESPACE

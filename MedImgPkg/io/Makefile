@@ -24,8 +24,8 @@ TARGET = $(BIN_DIR)/libmedimg_io.so
 
 EXPORT_HEADER = mi_io_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lmedimg_log -lmedimg_util -lmedimg_arithmetic -lboost_system -lboost_filesystem -lboost_thread -ljpeg \
--ldcmdata -ldcmimage -ldcmnet -loflog -lofstd -ldcmjpeg -lz
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lboost_filesystem -lboost_thread -ljpeg \
+-ldcmdata -ldcmimage -ldcmnet -loflog -lofstd -ldcmjpeg -lz -lmedimg_log -lmedimg_util -lmedimg_arithmetic
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
