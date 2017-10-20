@@ -45,15 +45,15 @@ public:
 
     ~GLResourceManagerContainer();
 
+    //gcc and msvc's template specialization are different.
+    //gcc : write out of class define(in cpp)
+    //msvc write in class(in h)
+#ifdef WIN32
     template <class ResourceType>
     std::shared_ptr<GLResourceManager<ResourceType>> get_resource_manager() {
         GLRESOURCE_THROW_EXCEPTION("get resource mananger failed!");
     }
 
-    //gcc and msvc's template specialization are different.
-    //gcc : write out of class define(in cpp)
-    //msvc write in class(in h)
-#ifdef WIN32
     template <>
     std::shared_ptr<GLResourceManager<GLProgram>>
         get_resource_manager<GLProgram>() {
@@ -104,6 +104,9 @@ public:
         get_resource_manager<GLTimeQuery>() {
             return _time_query_manager;
     };
+#else 
+    template <class ResourceType>
+    std::shared_ptr<GLResourceManager<ResourceType>> get_resource_manager();
 #endif
 
     GLProgramManagerPtr get_program_manager() const;
@@ -156,7 +159,8 @@ public:
     virtual bool shield(std::shared_ptr<GLObject> obj) = 0;
 };
 
-template <class ResourceType> class GLObjectShield : public GLObjectShieldBase {
+template <class ResourceType>
+class GLObjectShield : public GLObjectShieldBase {
 public:
     GLObjectShield(std::shared_ptr<ResourceType> obj) : _obj(obj) {};
 
@@ -188,7 +192,6 @@ public:
         for (auto it = _shields.begin(); it != _shields.end(); ++it) {
             delete *it;
         }
-
         _shields.clear();
     }
 
