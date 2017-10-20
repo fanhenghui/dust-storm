@@ -556,6 +556,15 @@ var maxCellID = -1;
             mprMaskOverlayOpacityRange.oninput = mprMaskOverlayFunc;
         }
 
+        var goBackImg = document.getElementById('img-go-back');
+        if(goBackImg)
+        {
+            goBackImg.onclick = function(event) {
+                document.getElementById('worklist-div').hidden = false;
+                document.getElementById('review-div').hidden = true;
+            }
+        }
+
         var layout1x1Btn = document.getElementById('btn-layout1x1');
         if (layout1x1Btn) {
             layout1x1Btn.onclick = function(event) {
@@ -633,7 +642,12 @@ var maxCellID = -1;
                 }
             }
         }
-        
+        // disable back button
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function() {
+          history.pushState(null, null, document.URL);
+        });
+
 
         $('#modal-preset-vrt-browser').draggable({
             handle: '.modal-header'
