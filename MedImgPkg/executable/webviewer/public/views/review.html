@@ -63,6 +63,9 @@
             padding: 15px;
             max-width: 750px;
         }
+        
+        fieldset{padding:.35em 0em .35em;margin:0 1px;border:1px solid silver}
+        legend{border:0;width:auto}
     </style>
     <script src="socket.io/socket.io.js"></script>
     <script src="js/bytebuffer.js"></script>
@@ -113,12 +116,10 @@
             </div>
         </div>
     </div>
-
     <div class="container-fluid" id="worklist-div">
-        <div style="display:none">
+        <div style="display:none" hidden="true">
             <p id="username"><%=username%></p>
         </div>
-
         <div clss="row">
             <div class="col-md-12 col-sm-12">
                 <h3 class="text-primary">
@@ -161,20 +162,26 @@
             </div>
         </div>
     </div>
-    <hr>
     <div class="container-fluid" hidden="false" id="review-div">
-        <!-- hidden="false" -->
         <div class="row clearfix">
-            <div class="col-md-12 col-sm-12 column">
-                <nav class="navbar navbar-default" role="navigation">
+            <div class="col-md-12 col-sm-12 column" id="navigator-div" style=" Background-color:WhiteSmoke">
+                <!-- <nav class="navbar navbar-default" role="navigation">
                     <div class="navbar-header" id="navigator-div">
                         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
                         <a class="navbar-brand" href="#">MED-REVIEW</a>
                     </div>
-                </nav>
+                </nav> -->
+                <ul class="nav nav-tabs">
+				<li class="active">
+					 <a href="">MED-REVIEW</a>
+				</li>
+			</ul>
+            </div>
+        </div>
                 <div class="row clearfix">
                     <div class="col-md-2 col-sm-2 column">
                         <div class="row clearfix">
+                            <fieldset>
                             <div class="col-md-12 col-sm-12 column">
                                 <button type = "button" class="btn btn-default" id="img-go-back">
                                 <span class="glyphicon glyphicon-retweet"></span>
@@ -186,13 +193,15 @@
                                 <span class="glyphicon glyphicon-th-large"></span>
                                 </button>
                             </div>
+                            </fieldset>
                         </div>
                         <br>
                         <div class="row clearfix">
+                            <fieldset>
                             <div class="col-md-12 col-sm-12 column">
-                                <button type="button" class="btn btn-default" id="btn-vrt-browser" data-toggle="modal" data-target="#modal-preset-vrt-browser">PresetVRT</button>
+                                <button type="button" class="btn btn-default" id="btn-vrt-browser" data-toggle="modal" data-target="#modal-preset-vrt-browser">VRT</button>
                                 <div class="btn-group">
-                                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="btn-preset-wl">PresetWL<span class="caret"></span></button>
+                                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" id="btn-preset-wl">WL<span class="caret"></span></button>
                                     <ul class="dropdown-menu">
                                         <li>
                                             <a href="#" id="a-preset-wl-abdomen">Abdomen</a>
@@ -215,9 +224,11 @@
                                     </ul>
                                 </div>
                             </div>
+                            </fieldset>
                         </div>
                         <br>
                         <div class="row clearfix">
+                            <fieldset>
                             <div class="col-md-12 col-sm-12 column">
                                 <div class="row clearfix pre-scrollable">
                                     <table class="table table-condensed table-hover table-bordered" id="annotation-table">
@@ -233,20 +244,23 @@
                                     </table>
                                 </div>
                                 <button class="btn btn-default" type="button" id="btn-delete-annotation"><span class="glyphicon glyphicon-trash"></span></button>
-                                <br><br>
-                                <input type="checkbox" id="cbox-overlay-annotation">Annotation Overlay<br>
+                                <input type="checkbox" id="cbox-overlay-annotation">Opacity<br>
                                 <input type="range" id="range-mpr-overlay-opacity">
                             </div>
+                            </fieldset>
                         </div>
                         <br>
                         <div class="row clearfix">
+                            <fieldset>
                             <div class="col-md-12 col-sm-12 column">
-                                <input type="checkbox" id="cbox-crosshair-continuous">Crosshair Continuous<br>
-                                <input type="checkbox" id="cbox-crosshair-visible">Crosshair Visible<br>
+                                <input type="checkbox" id="cbox-crosshair-continuous">Cross Continuous<br>
+                                <input type="checkbox" id="cbox-crosshair-visible">Cross Visible<br>
                             </div>
+                            </fieldset>
                         </div>
                         <br>
                         <div class="row clearfix">
+                            <fieldset>
                             <div class="col-md-12 col-sm-12 column">
                                 <div class="btn-group" id="common-tools">
                                     <button class="btn btn-default btn-primary" type="button" id="common-tool-arrow"><span class="glyphicon glyphicon-arrow-up"></span></button>
@@ -257,7 +271,7 @@
                                     <button class="btn btn-default" type="button" id="common-tool-annotation"><span class="glyphicon glyphicon-tag"></span></button>
                                 </div>
                             </div>
-
+                            </fieldset>
                         </div>
                         <br>
                         <!-- <div class="row clearfix">
@@ -265,7 +279,7 @@
                                 <button class="btn btn-play-vr" type="button" id="btn-play-vr"><em class="glyphicon glyphicon-align-left"></em>PlayVR</button>
                             </div>
                         </div> -->
-                        <p id="test-info">
+                        <p id="test-info" hidden="true">
                         </p>
 
                     </div>
@@ -296,8 +310,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        <!-- </div>
+    </div> -->
 </body>
 
 <script src="js/mi-define.js"></script>
