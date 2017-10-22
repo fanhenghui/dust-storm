@@ -345,6 +345,14 @@ var maxCellID = -1;
             console.log('null protocbuf.')
             return;
         }
+        //recover cell layout
+        document.getElementById('cell02-container').hidden = false;
+        document.getElementById('cell13-container').hidden = false;
+        document.getElementById('cell0-container').hidden = false;
+        document.getElementById('cell1-container').hidden = false;
+        document.getElementById('cell2-container').hidden = false;
+        document.getElementById('cell3-container').hidden = false;
+
         //release previous cells
         if (cells && cells.length != 0) {
             for (var i = 0; i < cells.length; i++) {
@@ -582,7 +590,7 @@ var maxCellID = -1;
             mprMaskOverlayOpacityRange.oninput = mprMaskOverlayFunc;
         }
 
-        var goBackImg = document.getElementById('img-go-back');
+        var goBackImg = document.getElementById('btn-back-worklist');
         if(goBackImg)
         {
             goBackImg.onclick = function(event) {
@@ -702,6 +710,13 @@ var maxCellID = -1;
         }
         document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
         document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
+
+        var loginBtn = document.getElementById('btn-login');
+        if (loginBtn) {
+            loginBtn.onclick = function(event) {
+                window.location.href = '/login';
+            }
+        }
 
         // register window quit linsener
         window.onbeforeunload = function(event) {
