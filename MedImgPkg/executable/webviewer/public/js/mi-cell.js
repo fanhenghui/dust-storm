@@ -56,6 +56,10 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     }).bind(this));
 }
 
+Cell.prototype.release = function() {
+    $(this.svg).empty();
+}
+
 function refreshCanvas(canvas, img) {
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 }

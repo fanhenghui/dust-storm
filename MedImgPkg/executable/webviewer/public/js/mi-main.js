@@ -345,6 +345,12 @@ var maxCellID = -1;
             console.log('null protocbuf.')
             return;
         }
+        //release previous cells
+        if (cells && cells.length != 0) {
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].release();
+            }    
+        }
 
         //create cells
         var cellSize = getProperCellSize();
@@ -495,18 +501,14 @@ var maxCellID = -1;
             var comToolsBtns = comToolsDiv.getElementsByTagName('button');
             for (var i = 0; i < comToolsBtns.length; ++i) {
                 comToolsBtns[i].onclick = function(event) {
+                    $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
                     switchCommonTool(this.id);
                 };
             }
         } else {
             console.log('get common-tools failed.');
         }
-        var annotationTool = document.getElementById('common-tool-annotation');
-        if (annotationTool) {
-            annotationTool.onclick = function(event) {
-                switchCommonTool(this.id);
-            };
-        }
+        $('#common-tool-arrow').addClass('btn-primary').siblings().removeClass('btn-primary');
 
         var playVRBtn = document.getElementById('btn-play-vr');
         if (playVRBtn) {
