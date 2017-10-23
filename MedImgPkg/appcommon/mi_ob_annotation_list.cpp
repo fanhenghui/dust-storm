@@ -70,7 +70,8 @@ void OBAnnotationList::update(int code_id) {
         }
         case ModelAnnotation::DELETE: {
             //get deleted voi
-            for (auto it = _pre_vois.begin(); it != _pre_vois.end(); ++it) {
+            for (auto it = _pre_vois.begin(); it != _pre_vois.end(); ) {
+                bool got_deleted = false;
                 for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
                     const std::string id = *it2;
                     if(it->first == id) {
@@ -87,8 +88,12 @@ void OBAnnotationList::update(int code_id) {
                         item->set_para3(voi.diameter);
     
                         it = _pre_vois.erase(it);
+                        got_deleted = true;
                         break;
                     }
+                }
+                if (!got_deleted) {
+                    ++it;
                 }
             }
             break;
@@ -137,7 +142,7 @@ void OBAnnotationList::update(int code_id) {
 
     header._data_len = static_cast<unsigned int>(buffer_size);
     controller->get_client_proxy()->async_send_message(header, buffer);
-
+    MI_APPCOMMON_LOG(MI_WARNING) << "ob annotation list send message done.";
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OBAnnotationList";
 }
 
