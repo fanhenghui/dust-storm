@@ -146,8 +146,7 @@ void Display() {
 #else
         // FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
 #endif
-        // std::cout << "compressing time : " << _scene->get_compressing_time() <<
-        // std::endl;
+        // std::cout << "compressing time : " << _scene->get_compressing_duration();
 
         // std::cout << "gl compressing time : " << _time_query2->end() <<
         // std::endl;

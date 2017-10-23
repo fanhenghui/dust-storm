@@ -277,8 +277,8 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-        _time_query->initialize();
-        _time_query->begin();
+        // _time_query->initialize();
+        // _time_query->begin();
         _scene->set_dirty(true);
 
         CHECK_GL_ERROR;
@@ -312,14 +312,14 @@ void Display() {
 #else
         FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
-        // MI_RENDERALGO_LOG(MI_TRACE) << "compressing time : " << _scene->get_compressing_time() <<
-        // std::endl;
+        MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
+        ", buffer size: " << buffer_size;
 
         // MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() <<
         // std::endl;
 
-        const double render_time  = _time_query->end();
-        MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;
+        // const double render_time  = _time_query->end();
+        // MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;
 
         glutSwapBuffers();
     } catch (Exception& e) {
@@ -378,6 +378,33 @@ void Keyboard(unsigned char key, int x, int y) {
 #endif
         break;
                }
+    case 'h' : {
+        static std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml"; 
+        if (color_opacity_xml == "../config/lut/3d/ct_cta.xml") {
+            color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
+        } else {
+            color_opacity_xml = "../config/lut/3d/ct_cta.xml";
+        }
+
+        std::shared_ptr<ColorTransFunc> color;
+        std::shared_ptr<OpacityTransFunc> opacity;
+        float ww, wl;
+        RGBAUnit background;
+        Material material;
+        if (IO_SUCCESS != TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity,
+                        ww, wl, background, material)) {
+            printf("load lut : %s failed.\n" , color_opacity_xml.c_str());
+        }
+    
+        _scene->set_color_opacity(color, opacity, 0);
+        _scene->set_ambient_color(1.0f, 1.0f, 1.0f, 0.28f);
+        _scene->set_material(material, 0);
+        _scene->set_window_level(ww, wl, 0);
+    
+        _scene->set_color_opacity(color, opacity, 1);
+        _scene->set_material(material, 1);
+        _scene->set_window_level(ww, wl, 1);
+    }
     default:
         break;
     }
@@ -413,6 +440,13 @@ void MouseClick(int button, int status, int x, int y) {
     } else if (_iButton == GLUT_MIDDLE_BUTTON) {
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
+    }
+
+    if (status == GLUT_DOWN) {
+        _scene->set_expected_fps(100);
+        _scene->set_downsample(true);
+    } else if (status == GLUT_UP) {
+        _scene->set_downsample(false);
     }
 
     _ptPre = Point2(x, y);
