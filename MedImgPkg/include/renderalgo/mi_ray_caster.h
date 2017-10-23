@@ -150,6 +150,12 @@ public:
     // Inner buffer
     std::shared_ptr<RayCasterInnerBuffer> get_inner_buffer();
 
+    void set_downsample(bool flag);
+    bool get_downsample() const;
+    void set_expected_fps(int fps);
+    int  get_expected_fps() const;
+    bool map_quarter_canvas() const;
+
 protected:
     // Input data
     std::shared_ptr<ImageData> _volume_data;
@@ -166,6 +172,7 @@ protected:
 
     // Data sample rate(DVR 0.5 , MIPs 1.0)
     float _sample_rate;
+    float _custom_sample_rate;
 
     // Global window level for MIPs mode
     float _global_ww;
@@ -215,6 +222,11 @@ protected:
 
     // Canvas for rendering
     std::shared_ptr<RayCasterCanvas> _canvas;
+
+    double _pre_rendering_duration;
+    bool _downsample;
+    int _expected_fps;
+    bool _map_quarter_canvas;
 
     // Test code for debug
     int _test_code;

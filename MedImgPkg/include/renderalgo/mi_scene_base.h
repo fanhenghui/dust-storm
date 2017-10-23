@@ -47,8 +47,9 @@ public:
     void set_dirty(bool flag);
     bool get_dirty() const;
 
-    void set_downsample(bool flag);
+    virtual void set_downsample(bool flag);
     bool get_downsample() const;
+
     void set_compress_hd_quality(int quality = 80);
     void set_compress_ld_quality(int quality = 15);
 

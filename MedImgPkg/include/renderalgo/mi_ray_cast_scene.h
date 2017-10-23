@@ -83,6 +83,11 @@ public:
     //return dc coordinate
     Point2 project_point_to_screen(const Point3& pt_w) const;
 
+    virtual void set_downsample(bool flag);
+
+    void set_expected_fps(int fps);
+    int get_expected_fps() const;
+
 protected:
     virtual void pre_render_i();
     void init_default_color_texture_i();

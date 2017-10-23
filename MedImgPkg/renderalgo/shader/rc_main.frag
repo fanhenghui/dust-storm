@@ -13,10 +13,17 @@ uniform vec3 volume_dim;
 uniform sampler3D volume_sampler;
 uniform sampler3D mask_sampler;
 uniform float sample_rate;
+uniform int quarter_canvas;
 
 void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_rate, out float start_step, out float end_step)
 {
-    ivec2 frag_coord = ivec2(gl_FragCoord.x, gl_FragCoord.y);
+    ivec2 frag_coord = ivec2(0,0);
+    if(quarter_canvas == 1) {
+        frag_coord = ivec2(gl_FragCoord.x*2, gl_FragCoord.y*2);
+    } else {
+        frag_coord = ivec2(gl_FragCoord.x, gl_FragCoord.y);
+    }
+     
     vec3 start_point = imageLoad(image_entry_points, frag_coord.xy).xyz;
     vec3 end_point = imageLoad(image_exit_points, frag_coord.xy).xyz;
 

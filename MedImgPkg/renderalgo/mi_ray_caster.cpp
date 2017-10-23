@@ -15,7 +15,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCaster::RayCaster()
-    : _inner_buffer(new RayCasterInnerBuffer()), _sample_rate(0.5f),
+    : _inner_buffer(new RayCasterInnerBuffer()), _sample_rate(0.5f), _custom_sample_rate(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f), _pseudo_color_array(nullptr),
       _pseudo_color_length(256), _ssd_gray(1.0f), _enable_jittering(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
@@ -24,7 +24,11 @@ RayCaster::RayCaster()
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
       _mask_overlay_mode(MASK_OVERLAY_DISABLE), _strategy(CPU_BASE),
       _test_code(0),
-      _mask_overlay_opacity(0.5f) {
+      _mask_overlay_opacity(0.5f),
+      _downsample(false), 
+      _expected_fps(30), 
+      _pre_rendering_duration(0),
+      _map_quarter_canvas(false) {
     _ambient_color[0] = 1.0f;
     _ambient_color[1] = 1.0f;
     _ambient_color[2] = 1.0f;
@@ -34,13 +38,15 @@ RayCaster::RayCaster()
 RayCaster::~RayCaster() {}
 
 void RayCaster::render() {
-    // clock_t t0 = clock();
+    
     if (CPU_BASE == _strategy) {
         if (!_ray_casting_cpu) {
             _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));
         }
-
+        // clock_t t0 = clock();
         _ray_casting_cpu->render();
+        // clock_t t1 = clock();
+        // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0) << "ms.";
     } else if (GPU_BASE == _strategy) {
         if (!_ray_casting_gpu) {
             _ray_casting_gpu.reset(new RayCastingGPU(shared_from_this()));
@@ -62,21 +68,47 @@ void RayCaster::render() {
             glClearDepth(1.0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            // downsample strategy
+            if (_downsample) {
+                const double para0 = 1.5;
+                const double para1 = 1.6;
+                if (_pre_rendering_duration > 0 ) {
+                    const double exp_fps = static_cast<double>(_expected_fps);
+                    const double pre_fps = 1000.0/_pre_rendering_duration;
+                    if (pre_fps < exp_fps) {
+                        if (pre_fps < exp_fps/para1) {
+                            if (_map_quarter_canvas) {
+                                _sample_rate = _sample_rate*para0;
+                            } else {
+                                _map_quarter_canvas = true;
+                            }
+                        } else {
+                            _sample_rate = _sample_rate*para0;
+                        }
+                    }
+                }
+            } else {
+                _map_quarter_canvas = false;
+                _sample_rate = _custom_sample_rate;
+            }
+
             // Viewport
-            // TODO auto downsample strategy
             int width, height;
             _canvas->get_display_size(width, height);
-            glViewport(0, 0, width, height);
-
+            if (_map_quarter_canvas) {
+                glViewport(0, 0, width/2, height/2);
+            } else {
+                glViewport(0, 0, width, height);
+            }
+            
             CHECK_GL_ERROR;
 
             _ray_casting_gpu->render();
 
-            MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _ray_casting_gpu->get_rendering_duration() << " ms.";
+            _pre_rendering_duration = _ray_casting_gpu->get_rendering_duration();
+            MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
         }
     }
-    // clock_t t1 = clock();
-    // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0) << "ms.";
 }
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {
@@ -121,6 +153,7 @@ std::shared_ptr<CameraCalculator> RayCaster::get_camera_calculator() const {
 
 void RayCaster::set_sample_rate(float sample_rate) {
     _sample_rate = sample_rate;
+    _custom_sample_rate = sample_rate;
 }
 
 void RayCaster::set_mask_label_level(LabelLevel label_level) {
@@ -323,6 +356,26 @@ void RayCaster::set_mask_overlay_opacity(float opacity) {
 
 float RayCaster::get_mask_overlay_opacity() const {
     return _mask_overlay_opacity;
+}
+
+void RayCaster::set_downsample(bool flag) {
+    _downsample = flag;
+}
+
+bool RayCaster::get_downsample() const {
+    return _downsample;
+}
+
+void RayCaster::set_expected_fps(int fps) {
+    _expected_fps = fps;
+}
+
+int RayCaster::get_expected_fps() const {
+    return _expected_fps;
+}
+
+bool RayCaster::map_quarter_canvas() const {
+    return _map_quarter_canvas;
 }
 
 MED_IMG_END_NAMESPACE

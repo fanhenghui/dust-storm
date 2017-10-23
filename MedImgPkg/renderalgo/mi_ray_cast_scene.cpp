@@ -198,16 +198,29 @@ void RayCastScene::render() {
     glEnable(GL_TEXTURE_2D);
     _canvas->get_color_attach_texture()->bind();
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 1.0);
-    glVertex2f(-1.0, -1.0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex2f(1.0, -1.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex2f(1.0, 1.0);
-    glTexCoord2f(0.0, 0.0);
-    glVertex2f(-1.0, 1.0);
-    glEnd();
+    if (_ray_caster->map_quarter_canvas()) {
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 0.5);
+        glVertex2f(-1.0, -1.0);
+        glTexCoord2f(0.5, 0.5);
+        glVertex2f(1.0, -1.0);
+        glTexCoord2f(0.5, 0.0);
+        glVertex2f(1.0, 1.0);
+        glTexCoord2f(0.0, 0.0);
+        glVertex2f(-1.0, 1.0);
+        glEnd();
+    } else {
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 1.0);
+        glVertex2f(-1.0, -1.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex2f(1.0, -1.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex2f(1.0, 1.0);
+        glTexCoord2f(0.0, 0.0);
+        glVertex2f(-1.0, 1.0);
+        glEnd();
+    }
 
     // CHECK_GL_ERROR;
     // glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
@@ -543,6 +556,18 @@ Point2 RayCastScene::project_point_to_screen(const Point3& pt) const {
     const Matrix4 mat_vp = _camera->get_view_projection_matrix();
     Point3 pt_ndc = mat_vp.transform(pt);
     return ArithmeticUtils::ndc_to_dc(Point2(pt_ndc.x, pt_ndc.y), _width, _height);
+}
+
+void RayCastScene::set_downsample(bool flag) {
+    _ray_caster->set_downsample(flag);
+}
+
+void RayCastScene::set_expected_fps(int fps) {
+    _ray_caster->set_expected_fps(fps);
+}
+
+int RayCastScene::get_expected_fps() const {
+    return _ray_caster->get_expected_fps();
 }
 
 MED_IMG_END_NAMESPACE
