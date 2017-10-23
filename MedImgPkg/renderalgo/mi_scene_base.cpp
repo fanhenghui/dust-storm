@@ -4,6 +4,7 @@
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_texture_cache.h"
 #include "glresource/mi_gl_utils.h"
+#include "glresource/mi_gl_time_query.h"
 #include "util/mi_file_util.h"
 
 // #include "libgpujpeg/gpujpeg_encoder.h"
@@ -20,13 +21,16 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _dirty = true;
     _name = "Scene";
     _front_buffer_id = 0;
+    _downsample = false;  
+    _compress_hd_quality = 80;
+    _compress_ld_quality  = 15;
 
 #ifndef WIN32
     // init gpujepg parameter
     _gpujpeg_encoder = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
-    //_gpujpeg_encoding_duration = 0;
+    _gpujpeg_encoding_duration = 0;
 #endif
 }
 
@@ -39,13 +43,16 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
     _dirty = true;
     _name = "Scene";
     _front_buffer_id = 0;
+    _downsample = false;
+    _compress_hd_quality = 80;
+    _compress_ld_quality  = 15;
 
 #ifndef WIN32
     // init gpujepg parameter
     _gpujpeg_encoder = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
-    //_gpujpeg_encoding_duration = 0;
+    _gpujpeg_encoding_duration = 0;
 #endif
 }
 
@@ -120,7 +127,7 @@ void SceneBase::initialize() {
 
         gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
         gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
-        //_gpujpeg_param.quality = 98;
+        _gpujpeg_param.quality = _compress_hd_quality;
 
         gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
         _gpujpeg_image_param.width = _width;
@@ -145,9 +152,16 @@ void SceneBase::initialize() {
         // cudaEventCreate(&_gpujpeg_encoding_stop);
 #endif
 
+        //time query
+        UIDType time_id = 0;
+        _gl_time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(time_id);
+        _gl_time_query->set_description("scene base time query");
+        _gl_time_query->initialize();
+
         _res_shield.add_shield<GLFBO>(_scene_fbo);
         _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
         _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
+        _res_shield.add_shield<GLTimeQuery>(_gl_time_query);
     }
 }
 
@@ -217,6 +231,8 @@ void SceneBase::pre_render_i() {
         _gpujpeg_image_param.color_space = GPUJPEG_RGB;
         _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
 
+        _gpujpeg_param.quality = this->get_downsample() ? _compress_ld_quality : _compress_hd_quality;
+
         // bind GL texture to cuda(by PBO)
         unsigned int tex_id = _scene_color_attach_0->get_id();
         _gpujpeg_texture =
@@ -254,6 +270,8 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
         //::glFinish();
         // cudaEventRecord(_gpujpeg_encoding_start,0);
         CHECK_GL_ERROR;
+
+        _gl_time_query->begin();
 
         int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input,
                                          &image_compressed, &image_compressed_size);
@@ -297,6 +315,7 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
                image_compressed, image_compressed_size);
         _image_buffer_size[1 - _front_buffer_id] = image_compressed_size;
 
+        _gpujpeg_encoding_duration = _gl_time_query->end();
         // FileUtil::write_raw("/home/wr/data/output_download.jpeg",_image_buffer[1
         // - _front_buffer_id].get() , image_compressed_size);
     }
@@ -330,9 +349,26 @@ void SceneBase::get_image_buffer(unsigned char*& buffer, int& size) {
     size = _image_buffer_size[_front_buffer_id];
 }
 
-// float SceneBase::get_compressing_time() const
-//{
-//    return _gpujpeg_encoding_duration;
-//}
+float SceneBase::get_compressing_duration() const
+{
+   return _gpujpeg_encoding_duration;
+}
+
+void SceneBase::set_downsample(bool flag) {
+    _gpujpeg_encoder_dirty = (_downsample != flag);
+    _downsample = flag;
+}
+
+bool SceneBase::get_downsample() const {
+    return _downsample;
+}
+
+void SceneBase::set_compress_hd_quality(int quality) {
+    _compress_hd_quality = quality;
+}
+
+void SceneBase::set_compress_ld_quality(int quality) {
+    _compress_ld_quality  = quality;
+}
 
 MED_IMG_END_NAMESPACE

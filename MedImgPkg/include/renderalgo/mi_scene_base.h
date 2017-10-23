@@ -42,10 +42,15 @@ public:
     void download_image_buffer(bool jpeg = true);
     void swap_image_buffer();
     void get_image_buffer(unsigned char*& buffer, int& size);
-    // float get_compressing_time() const;
+    float get_compressing_duration() const;
 
     void set_dirty(bool flag);
     bool get_dirty() const;
+
+    void set_downsample(bool flag);
+    bool get_downsample() const;
+    void set_compress_hd_quality(int quality = 80);
+    void set_compress_ld_quality(int quality = 15);
 
 protected:
     virtual void pre_render_i();
@@ -69,6 +74,10 @@ protected:
     boost::mutex _read_mutex;
     boost::mutex _write_mutex;
 
+    bool _downsample;
+    int _compress_hd_quality;
+    int _compress_ld_quality;
+
 #ifndef WIN32
     // GPU JPEG
     gpujpeg_parameters _gpujpeg_param;             // gpujpeg parameter
@@ -79,10 +88,12 @@ protected:
 
     //在OpenGL的环境下 cuda event
     //会收到OpenGL的影响,导致计算的encoding时间不对(需要在cudaevent之前加一个glfinish)
-    // float _gpujpeg_encoding_duration;
+    float _gpujpeg_encoding_duration;
     // cudaEvent_t _gpujpeg_encoding_start;
     // cudaEvent_t _gpujpeg_encoding_stop;
     bool _gpujpeg_encoder_dirty;
+
+    GLTimeQueryPtr _gl_time_query;
 #endif
 
 private:

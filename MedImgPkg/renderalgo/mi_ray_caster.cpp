@@ -10,6 +10,7 @@
 #include "mi_ray_caster_inner_buffer.h"
 #include "mi_ray_casting_cpu.h"
 #include "mi_ray_casting_gpu.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -62,6 +63,7 @@ void RayCaster::render() {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Viewport
+            // TODO auto downsample strategy
             int width, height;
             _canvas->get_display_size(width, height);
             glViewport(0, 0, width, height);
@@ -69,6 +71,8 @@ void RayCaster::render() {
             CHECK_GL_ERROR;
 
             _ray_casting_gpu->render();
+
+            MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _ray_casting_gpu->get_rendering_duration() << " ms.";
         }
     }
     // clock_t t1 = clock();

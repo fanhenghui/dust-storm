@@ -24,6 +24,7 @@
 #include "appcommon/mi_operation_switch_preset_windowing.h"
 #include "appcommon/mi_operation_switch_preset_vrt.h"
 #include "appcommon/mi_operation_locate.h"
+#include "appcommon/mi_operation_downsample.h"
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
 
@@ -98,6 +99,10 @@ void ReviewController::register_command_handler_i() {
         OPERATION_ID_SWITCH_PRESET_VRT, std::shared_ptr<OpSwitchPresetVRT>(new OpSwitchPresetVRT()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_DOWNSAMPLE, std::shared_ptr<OpDownsample>(new OpDownsample()));    
+
+        
         
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));

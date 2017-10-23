@@ -15,6 +15,7 @@ class GLBuffer;
 class GLVAO;
 class GLFBO;
 class GLProgram;
+class GLTimeQuery;
 
 typedef std::shared_ptr<GLTextureBase> GLTextureBasePtr;
 typedef std::shared_ptr<GLTexture1D> GLTexture1DPtr;
@@ -25,6 +26,7 @@ typedef std::shared_ptr<GLBuffer> GLBufferPtr;
 typedef std::shared_ptr<GLVAO> GLVAOPtr;
 typedef std::shared_ptr<GLFBO> GLFBOPtr;
 typedef std::shared_ptr<GLProgram> GLProgramPtr;
+typedef std::shared_ptr<GLTimeQuery> GLTimeQueryPtr;
 
 MED_IMG_END_NAMESPACE
 #endif

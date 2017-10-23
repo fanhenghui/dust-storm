@@ -15,6 +15,8 @@ public:
     RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingGPU();
 
+    double get_rendering_duration() const;
+
     void render();
 
 private:
@@ -39,8 +41,10 @@ private:
     GLVAOPtr _gl_vao;
     GLBufferPtr _gl_buffer_vertex;
     GLProgramPtr _gl_program;
+    GLTimeQueryPtr _gl_time_query;
     GLResourceShield _res_shield;
 
+    double _render_duration;
     // For Testing
     int _last_test_code;
 };

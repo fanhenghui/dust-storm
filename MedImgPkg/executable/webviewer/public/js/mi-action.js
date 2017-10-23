@@ -7,11 +7,34 @@ function ActionCommon(socketClient, cellID) {
     this.mouseClock = new Date().getTime();
 };
 
+function sendDownsampleMSG(cellID, flag, socketClient) {
+    if(!socketClient.protocRoot) {
+        console.log('null protocbuf.');
+        return;
+    }
+
+    var MsgFlag = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
+    if(!MsgFlag) {
+        console.log('get flag message type failed.');
+        return;
+    }
+    var msgFlag = MsgFlag.create({
+        flag: flag
+    });
+    if(!msgFlag) {
+        console.log('create flag message failed.');
+        return;
+    }
+    var msgBuffer = MsgFlag.encode(msgFlag).finish();
+    socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
+}
+
 ActionCommon.prototype.registerOpID = function(id) {
     this.opID = id;
 }
 
 ActionCommon.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
+    sendDownsampleMSG(this.cellID, 1, this.socketClient);
 }
 
 ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell){
@@ -51,7 +74,8 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
     return true;
 }
 
-ActionCommon.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell){
+ActionCommon.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell) {
+    sendDownsampleMSG(this.cellID, 0, this.socketClient);
 }
 
 /////////////////////////////////////////////////////////////

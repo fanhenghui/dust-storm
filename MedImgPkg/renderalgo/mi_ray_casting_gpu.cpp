@@ -4,6 +4,7 @@
 #include "glresource/mi_gl_program.h"
 #include "glresource/mi_gl_utils.h"
 #include "glresource/mi_gl_vao.h"
+#include "glresource/mi_gl_time_query.h"
 
 #include "mi_ray_caster.h"
 #include "mi_rc_step_base.h"
@@ -20,7 +21,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster)
-    : _ray_caster(ray_caster), _last_test_code(-1),
+    : _ray_caster(ray_caster), _last_test_code(-1), _render_duration(0), 
       _gl_act_tex_counter(new GLActiveTextureCounter()) {}
 
 RayCastingGPU::~RayCastingGPU() {}
@@ -29,6 +30,8 @@ void RayCastingGPU::render() {
     update_i();
 
     CHECK_GL_ERROR;
+
+    _gl_time_query->begin();
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -50,6 +53,8 @@ void RayCastingGPU::render() {
     _gl_vao->unbind();
     _gl_program->unbind();
     glPopAttrib();
+
+    _render_duration = _gl_time_query->end();
 
     CHECK_GL_ERROR;
 }
@@ -86,8 +91,14 @@ void RayCastingGPU::update_i() {
         _gl_vao->unbind();
         _gl_buffer_vertex->unbind();
 
+        //create time query
+        _gl_time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(uid);
+        _gl_time_query->set_description("ray casting GPU time query");
+        _gl_time_query->initialize();
+
         _res_shield.add_shield<GLVAO>(_gl_vao);
         _res_shield.add_shield<GLBuffer>(_gl_buffer_vertex);
+        _res_shield.add_shield<GLTimeQuery>(_gl_time_query);
     }
 
     CHECK_GL_ERROR;
@@ -217,6 +228,10 @@ void RayCastingGPU::update_i() {
 #undef STEP_PUSH_BACK
 
     CHECK_GL_ERROR;
+}
+
+double RayCastingGPU::get_rendering_duration() const {
+    return _render_duration;
 }
 
 MED_IMG_END_NAMESPACE
