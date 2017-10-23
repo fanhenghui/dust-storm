@@ -294,6 +294,10 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
             noneimg_crosshair->set_scene(mpr_scene);
             noneimg_crosshair->set_model(model_crosshair);
             none_image->add_none_image_item(noneimg_crosshair);
+
+            std::shared_ptr<NoneImgDirection> noneimg_direction(new NoneImgDirection());
+            noneimg_direction->set_scene(mpr_scene);
+            none_image->add_none_image_item(noneimg_direction);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
             vr_scene->set_mask_label_level(L_32);
