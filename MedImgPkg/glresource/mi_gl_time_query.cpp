@@ -1,4 +1,5 @@
 #include "mi_gl_time_query.h"
+#include "mi_gl_utils.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -48,11 +49,21 @@ double GLTimeQuery::end() {
 
     glEndQuery(GL_TIME_ELAPSED);
 
+    if (_is_first_query) { // remove gl error
+        glGetError();
+    }
+
     unsigned int done;
     glGetQueryObjectuiv(_query[1], GL_QUERY_RESULT_AVAILABLE, &done);
+
     unsigned int time;
     glGetQueryObjectuiv(_query[1], GL_QUERY_RESULT, &time);
     _time_elapsed = time / 1000000.0;
+
+    if (_is_first_query) { // remove gl error
+        glGetError();
+        _is_first_query = false;
+    }
 
     std::swap(_query[0], _query[1]);
 
