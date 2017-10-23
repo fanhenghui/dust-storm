@@ -559,6 +559,7 @@ Point2 RayCastScene::project_point_to_screen(const Point3& pt) const {
 }
 
 void RayCastScene::set_downsample(bool flag) {
+    SceneBase::set_downsample(flag);
     _ray_caster->set_downsample(flag);
 }
 
