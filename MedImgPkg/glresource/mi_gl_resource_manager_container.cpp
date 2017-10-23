@@ -153,6 +153,7 @@ std::shared_ptr<GLResourceManager<GLTimeQuery>>
     GLResourceManagerContainer::get_resource_manager<GLTimeQuery>() {
         return _time_query_manager;
 };
+
 #endif
 
 

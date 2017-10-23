@@ -11,15 +11,15 @@ subsystem:
 	$(MAKE) -C ./executable/shaderencoder
 	$(MAKE) -C ./renderalgo
 	$(MAKE) -C ./appcommon
+	$(MAKE) -C ./executable/reviewserver
+	$(MAKE) -C ./executable/dcmdbimporter
+	$(MAKE) -C ./executable/extractmask
+	$(MAKE) -C ./executable/compressmask
 	$(MAKE) -C ./ut/util_ut
 	$(MAKE) -C ./ut/glresource_ut
 	$(MAKE) -C ./ut/renderalgo_ut
 	$(MAKE) -C ./ut/io_ut
 	$(MAKE) -C ./ut/protocol_ut
-	$(MAKE) -C ./executable/reviewserver
-	$(MAKE) -C ./executable/dcmdbimporter
-	$(MAKE) -C ./executable/extractmask
-	$(MAKE) -C ./executable/compressmask
 
 PHONY.:clean
 clean:
@@ -31,13 +31,13 @@ clean:
 	$(MAKE) clean -C ./executable/shaderencoder
 	$(MAKE) clean -C ./renderalgo
 	$(MAKE) clean -C ./appcommon
+	$(MAKE) clean -C ./executable/reviewserver
+	$(MAKE) clean -C ./executable/dcmdbimporter
+	$(MAKE) clean -C ./executable/extractmask
+	$(MAKE) clean -C ./executable/compressmask
 	$(MAKE) clean -C ./ut/util_ut
 	$(MAKE) clean -C ./ut/glresource_ut
 	$(MAKE) clean -C ./ut/renderalgo_ut
 	$(MAKE) clean -C ./ut/io_ut
 	$(MAKE) clean -C ./ut/protocol_ut
-	$(MAKE) clean -C ./executable/reviewserver
-	$(MAKE) clean -C ./executable/dcmdbimporter
-	$(MAKE) clean -C ./executable/extractmask
-	$(MAKE) clean -C ./executable/compressmask
 	-rm -r bin

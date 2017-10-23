@@ -24,7 +24,7 @@ TARGET = $(BIN_DIR)/libmedimg_util.so
 EXPORT_HEADER = mi_util_export.h
 COMMON_HEADER = mi_ipc_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -lboost_system -lboost_filesystem -lboost_thread
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lmedimg_log
 
 $(TARGET): $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

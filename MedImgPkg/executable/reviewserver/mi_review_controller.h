@@ -19,7 +19,6 @@ public:
 
 private:
     void register_command_handler_i();
-    void create_model_i();
 private:
 };
 

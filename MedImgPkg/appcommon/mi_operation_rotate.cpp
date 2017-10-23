@@ -22,7 +22,6 @@ OpRotate::OpRotate() {}
 OpRotate::~OpRotate() {}
 
 int OpRotate::execute() {
-    try {
     const unsigned int cell_id = _header._cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -59,9 +58,6 @@ int OpRotate::execute() {
         }
     }
     return 0;
-}catch(...){
-    return -1;
-}
 }
 
 MED_IMG_END_NAMESPACE
