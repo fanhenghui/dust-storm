@@ -484,6 +484,7 @@ Cell.prototype.touchUp = function(event) {
 Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     this.mouseBtn = event.button;
+    console.log(this.mouseBtn);
     this.mouseClickTick += 1;//mouse click tick for check double click
     if (!this.mouseFocus && this.mouseFocusEvent) {
         this.mouseFocusEvent(this.cellID);
@@ -498,18 +499,30 @@ Cell.prototype.mouseDown = function(event) {
         this.mouseClickTicker();
     }).bind(this), DOUBLE_CLICK_INTERVAL);
 
-    this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+    if (this.mouseBtn == BTN_LEFT) {
+        this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+    } else {
+        this.mouseActionCommon.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
+    }
 }
 
 Cell.prototype.mouseMove = function (event) {    
     var x = event.clientX - this.svg.getBoundingClientRect().left;
     var y = event.clientY - this.svg.getBoundingClientRect().top;
 
-    if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
-        //reset previous mouse position if move action done
-        this.mousePre.x = x;
-        this.mousePre.y = y;
-    }
+    if (this.mouseBtn == BTN_LEFT) {
+        if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
+            //reset previous mouse position if move action done
+            this.mousePre.x = x;
+            this.mousePre.y = y;
+        }
+    } else {
+        if(this.mouseActionCommon.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
+            //reset previous mouse position if move action done
+            this.mousePre.x = x;
+            this.mousePre.y = y;
+        }
+    }    
 }
 
 Cell.prototype.mouseUp = function(event) {
@@ -517,7 +530,11 @@ Cell.prototype.mouseUp = function(event) {
     var x = event.clientX - this.svg.getBoundingClientRect().left;
     var y = event.clientY - this.svg.getBoundingClientRect().top;
 
-    this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
+    if (this.mouseBtn == BTN_LEFT) {
+        this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
+    } else {
+        this.mouseActionCommon.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
+    }
 
     //reset mouse status
     this.mouseBtn = BTN_NONE;
@@ -525,12 +542,12 @@ Cell.prototype.mouseUp = function(event) {
     this.mousePre.y = 0;
 }
 
-Cell.prototype.activeAction = function(id) {
-    if(id == ACTION_ID_MRP_ANNOTATION) {
+Cell.prototype.activeAction = function(left, right, mid) {
+    if(left == ACTION_ID_MRP_ANNOTATION) {
         this.mouseCurAction = this.mouseActionAnnotation;
     } else {
         this.mouseCurAction = this.mouseActionCommon;
-        this.mouseActionCommon.registerOpID(id);
+        this.mouseActionCommon.registerOpID(left, right, mid);
     }
 }
 

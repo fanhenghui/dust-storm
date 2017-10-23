@@ -5,6 +5,10 @@ function ActionCommon(socketClient, cellID) {
     this.socketClient = socketClient;
     this.cellID = cellID;
     this.mouseClock = new Date().getTime();
+    this.opID;
+    this.leftOpBtnID;
+    this.rightOpBtnID;
+    this.midOpBtnID;
 };
 
 function sendDownsampleMSG(cellID, flag, socketClient) {
@@ -29,8 +33,10 @@ function sendDownsampleMSG(cellID, flag, socketClient) {
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
-ActionCommon.prototype.registerOpID = function(id) {
-    this.opID = id;
+ActionCommon.prototype.registerOpID = function(left, right, mid) {
+    this.leftOpBtnID = left;
+    this.rightOpBtnID = right;
+    this.midOpBtnID = mid;
 }
 
 ActionCommon.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
@@ -69,7 +75,16 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         return;
     }
     var msgBuffer = MsgMouse.encode(msgMouse).finish();
-    this.socketClient.sendData(COMMAND_ID_FE_OPERATION, this.opID, this.cellID, msgBuffer.byteLength, msgBuffer);
+    var opID = this.leftOpBtnID;
+    if (mouseBtn == BTN_LEFT) {
+        opID = this.leftOpBtnID;
+    } else if (mouseBtn == BTN_RIGHT) {
+        opID = this.rightOpBtnID;
+    } else {
+        opID = this.midOpBtnID;
+    }
+
+    this.socketClient.sendData(COMMAND_ID_FE_OPERATION, opID, this.cellID, msgBuffer.byteLength, msgBuffer);
 
     return true;
 }
