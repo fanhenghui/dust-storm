@@ -108,6 +108,10 @@ var maxCellID = -1;
     }
 
     function annoListAddRow(row,id,cx,cy,cz,diameter,info) {
+        if (document.getElementById(id)) {
+            console.log('add repeated row');
+            return;
+        }
         var rowItem = annotationTable.insertRow(row + 1);
         $(rowItem).click(function(event) {
             $(this).addClass('success').siblings().removeClass('success');
