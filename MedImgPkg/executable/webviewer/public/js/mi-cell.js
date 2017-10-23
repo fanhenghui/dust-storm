@@ -1,6 +1,7 @@
 //corner info marin
 const TEXT_MARGIN = 4;
 const DOUBLE_CLICK_INTERVAL = 250;
+const COORDINATE_LABELS = ['L', 'R', 'H', 'F', 'P', 'A'];
 
 function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.cellName = cellName;
@@ -187,7 +188,6 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     var cy = annoUnit.para1;
                     var r = annoUnit.para2;
                     var content = annoUnit.info;
-                    // console.log('cellID:' + this.cellID + '  roi:' + id + '  ' + content);
                     switch (annoUnit.status) {
                         case 0: //add
                             this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), content));
@@ -227,6 +227,111 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
             }
         }
 
+        if (receivedMsg.hasOwnProperty('direction')) {
+            //console.log('cellID:' + this.cellID + '  ' + receivedMsg.direction.info);
+            var txt = receivedMsg.direction.info.split('|'); // format "A|P|H|F"
+            var keyTxtArray = [];
+            var directionKey = this.key + '-direction';
+            for(var i=0; i<txt.length; ++i)
+            {
+                keyTxtArray.push({key: directionKey, content: txt[i]});
+            }
+            var directionInfoTxt =
+                d3.select(this.svg).selectAll('text').filter(function (d) {
+                    return (d && d.key) ? d.key == directionKey : false;
+                });
+            var width = parseFloat(this.svg.getAttribute('width'));
+            var height = parseFloat(this.svg.getAttribute('height'));
+            if (directionInfoTxt.empty()) {
+                directionInfoTxt.data(keyTxtArray)
+                    .enter()
+                    .append('text')
+                    .attr('font-family', 'monospace')
+                    .attr('font-size', '15px')
+                    .attr('fill', 'red')
+                    .attr('fill', '#dcdcdc')
+                    .attr('class', 'no-select-text')
+                    .attr('alignment-baseline', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return 'central';
+                            case 1:
+                                return 'central';
+                            case 2:
+                                return 'hanging';
+                            case 3:
+                                return 'baseline';
+                        };
+                    })
+                    .attr('text-anchor', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return 'start';
+                            case 1:
+                                return 'end';
+                            case 2:
+                                return 'middle';
+                            case 3:
+                                return 'middle';
+                        };
+                    })
+                    .attr('x', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return 0;
+                            case 1:
+                                return width;
+                            case 2:
+                                return width*0.5;
+                            case 3:
+                                return width*0.5;
+                        };
+                    })
+                    .attr('y', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return height*0.5;
+                            case 1:
+                                return height*0.5;
+                            case 2:
+                                return 0;
+                            case 3:
+                                return height;
+                        };
+                    })
+                    .text(function (d) {
+                        return d.content;
+                    });
+            } else {
+                directionInfoTxt.data(keyTxtArray)
+                    .attr('x', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return 0;
+                            case 1:
+                                return width;
+                            case 2:
+                                return width * 0.5;
+                            case 3:
+                                return width * 0.5;
+                        };
+                    })
+                    .attr('y', function (d, i) {
+                        switch (i) {
+                            case 0:
+                                return height * 0.5;
+                            case 1:
+                                return height * 0.5;
+                            case 2:
+                                return 0;
+                            case 3:
+                                return height;
+                        };
+                    }).text(function (d) {
+                        return d.content;
+                    });
+            }
+        }
     }
 }
 
@@ -276,6 +381,36 @@ Cell.prototype.resize = function (width, height) {
     for (var i = 0; i < this.rois.length; ++i) {
         this.rois[i].adjustCircleRadius(width, height);
     }
+
+    // resize the direciton information
+    var directionKey = this.key + '-direction';
+    var directionInfoTxt =
+        d3.select(this.svg).selectAll('text').filter(function (d) {
+            return (d && d.key) ? d.key == directionKey : false;
+        }).attr('x', function (d, i) {
+            switch (i) {
+                case 0:
+                    return 0;
+                case 1:
+                    return width;
+                case 2:
+                    return width * 0.5;
+                case 3:
+                    return width * 0.5;
+            };
+        })
+        .attr('y', function (d, i) {
+            switch (i) {
+                case 0:
+                    return height * 0.5;
+                case 1:
+                    return height * 0.5;
+                case 2:
+                    return 0;
+                case 3:
+                    return height;
+            };
+        });
 }
 
 Cell.prototype.mouseClickTicker = function() {

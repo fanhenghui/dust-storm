@@ -378,6 +378,18 @@ void NoneImgCornerInfos::fill_msg(MsgNoneImgCollection* msg) const {
     }
 }
 
+
+
+static const std::string S_COORDINATE_LABELS[] = {"L", "R", "H", "F", "P", "A"};
+static const Vector3 S_COORDINATE_AXES[] = { 
+    Vector3(1.0, 0.0, 0.0), 
+    Vector3(-1.0, 0.0, 0.0),
+    Vector3(0.0, 0.0, 1.0),
+    Vector3(0.0, 0.0, -1.0),
+    Vector3(0.0, 1.0, 0.0),
+    Vector3(0.0, -1.0, 0.0)
+};
+
 void NoneImgDirection::fill_msg(MsgNoneImgCollection* msg) const {
     MsgNoneImgDirection* direction_msg = msg->mutable_direction();
     direction_msg->set_info(_info);
@@ -398,6 +410,43 @@ bool NoneImgDirection::check_dirty() {
 
 void NoneImgDirection::update() {
     //TODO calculate infos
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+    
+    Vector3 viewUp = ortho_camera->get_up_direction();
+    Vector3 viewToward = ortho_camera->get_view_direction();
+    Vector3 viewLeft = cross(viewUp, viewToward);
+
+    // find the axis with smallest angle with left
+    std::stringstream ss;
+    _info.clear();
+    for (int i=0; i<6; ++i)
+    {
+        if( (1.0 - viewLeft.dot_product(S_COORDINATE_AXES[i])) < 1e-6 )
+        {
+            ss << S_COORDINATE_LABELS[i].c_str() << "|";
+                        
+            int j = i%2==0 ? i+1 : i-1;
+            ss << S_COORDINATE_LABELS[j].c_str() << "|";
+            break;
+        }
+    }
+
+    // find the axis with smallest angle with up
+    for (int i=0; i<6; ++i)
+    {
+        if( (1.0 - viewUp.dot_product(S_COORDINATE_AXES[i])) < 1e-6 )
+        {
+            ss << S_COORDINATE_LABELS[i].c_str() << "|";
+                        
+            int j = i%2==0 ? i+1 : i-1;
+            ss << S_COORDINATE_LABELS[j].c_str();
+            break;
+        }
+    }
+    _info = ss.str();
 }
 
 
