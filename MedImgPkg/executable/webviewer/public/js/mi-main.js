@@ -222,6 +222,12 @@ var maxCellID = -1;
         var navigatorHeight = document.getElementById('navigator-div').offsetHeight;
         var w = (cellContainerW - 40) / 2;
         var h = (window.innerHeight - navigatorHeight - 25) / 2;
+        if (w%2 != 0) {
+            w += 1;
+        }
+        if (h%2 != 0) {
+            h += 1;
+        }
         return {
             width: w,
             height: h
