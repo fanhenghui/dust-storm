@@ -189,7 +189,11 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
         } else {
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             std::vector<std::string> ids;
+            const float possibility_threshold = ReviewConfig::instance()->get_nodule_possibility_threshold();
             for (size_t i = 0; i < vois.size(); ++i) {
+                if (vois[i].para0 < possibility_threshold) {
+                    continue;
+                }
                 std::stringstream ss;
                 ss << clock() << '|' << i; 
                 const std::string id = ss.str();
@@ -233,6 +237,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     std::vector<ScanSliceType> mpr_scan_types;
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
+    const int expected_fps = ReviewConfig::instance()->get_expected_fps();
     // create cells
     for (int i = 0; i < msg_init->cells_size(); ++i)
     {
@@ -248,10 +253,11 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
             std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
-            mpr_scene->set_mask_label_level(L_32);
+            mpr_scene->set_mask_label_level(L_64);
             mpr_scenes.push_back(mpr_scene);
             cell->set_scene(mpr_scene);
             mpr_scene->set_test_code(0);
+            mpr_scene->set_expected_fps(expected_fps);
             {
                 std::stringstream ss;
                 ss << "cell_" << cell_id;
@@ -300,10 +306,11 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
             none_image->add_none_image_item(noneimg_direction);
         } else if (type_id == 2) { // VR
             std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
-            vr_scene->set_mask_label_level(L_32);
+            vr_scene->set_mask_label_level(L_64);
             vr_scenes.push_back(vr_scene);
             cell->set_scene(vr_scene);
             vr_scene->set_test_code(0);
+            vr_scene->set_expected_fps(expected_fps);
             {
                 std::stringstream ss;
                 ss << "cell_" << cell_id;

@@ -10,13 +10,14 @@ struct VOISphere {
     Point3 center;
     double diameter;
     std::string name;
+    float para0;//ext parameter
 
-    VOISphere() : center(Point3::S_ZERO_POINT), diameter(0), name("") {}
+    VOISphere() : center(Point3::S_ZERO_POINT), diameter(0), name(""), para0(0) {}
 
-    VOISphere(const Point3& pt, double d) : center(pt), diameter(d), name("") {}
+    VOISphere(const Point3& pt, double d) : center(pt), diameter(d), name(""), para0(0) {}
 
     VOISphere(const Point3& pt, double d, const std::string& name)
-        : center(pt), diameter(d), name(name) {}
+        : center(pt), diameter(d), name(name), para0(0) {}
 
     bool operator==(const VOISphere& voi) const {
         return voi.center == center &&

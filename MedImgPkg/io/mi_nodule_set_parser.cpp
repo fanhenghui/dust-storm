@@ -90,8 +90,9 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
             pos_z = str_num_converter.to_num(infos[4]);
             diameter = str_num_converter.to_num(infos[5]);
             type = infos[6];
-            nodule_set->add_nodule(
-                VOISphere(Point3(pos_x, pos_y, pos_z), diameter, type));
+            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, type);
+            voi.para0 = 1.0f;
+            nodule_set->add_nodule(voi);
         } else if (5 == nodule_file_type) { // Luna nodule list file
             series_id = infos[0];
 
@@ -104,8 +105,9 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
             pos_y = str_num_converter.to_num(infos[2]);
             pos_z = str_num_converter.to_num(infos[3]);
             diameter = str_num_converter.to_num(infos[4]);
-            nodule_set->add_nodule(
-                VOISphere(Point3(pos_x, pos_y, pos_z), diameter, "W"));
+            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, "W");
+            voi.para0 = 1.0f;
+            nodule_set->add_nodule(voi);
         } else if (6 == nodule_file_type) { //Mine nodule list file without type without nodule id
             series_id = infos[0];
             // Check series id
@@ -119,8 +121,10 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
             pos_y = str_num_converter.to_num(infos[2]);
             pos_z = str_num_converter.to_num(infos[3]);
             diameter = str_num_converter.to_num(infos[4])*2.0;
-            nodule_set->add_nodule(
-                VOISphere(Point3(pos_x, pos_y, pos_z), diameter, "unknown"));
+            const float possibility = str_num_converter.to_num(infos[5]);
+            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, "unknown");
+            voi.para0 = possibility;
+            nodule_set->add_nodule(voi);
         }
     }
 

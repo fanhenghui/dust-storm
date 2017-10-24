@@ -16,6 +16,8 @@ public:
     std::string get_log_config_file() const;
     std::string get_test_data_root() const;
     std::string get_db_pwd() const;
+    int get_expected_fps() const;
+    float get_nodule_possibility_threshold() const;
 
 private:
     ReviewConfig();
@@ -25,6 +27,8 @@ private:
 private:
     std::string _test_data_root;
     std::string _db_wpd;
+    int _expected_fps;
+    float _nodule_p_th;
 };
 
 
