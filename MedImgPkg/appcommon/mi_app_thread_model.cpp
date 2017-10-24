@@ -265,11 +265,13 @@ void AppThreadModel::process_sending() {
                 MI_APPCOMMON_LOG(MI_TRACE) << "send image data length: " << buffer_size;
 
                 // Testing code write image to disk
-                //{
-                //    std::stringstream ss;
-                //    ss << "/home/wangrui22/data/img_buffer_cell_" << cell_id << ".jpeg";
-                //    FileUtil::write_raw(ss.str(), buffer, buffer_size);
-                //}
+                // {
+                //     int w,h;
+                //     scene->get_display_size(w,h);
+                //     std::stringstream ss;
+                //     ss << "/home/wangrui22/data/img_buffer_cell_" << cell_id << "_" << w << "_" << h <<".jpeg";
+                //     FileUtil::write_raw(ss.str(), buffer, buffer_size);
+                // }
 
                 _proxy->async_send_message(header, (char*)buffer);
             }
