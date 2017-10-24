@@ -220,8 +220,8 @@ var maxCellID = -1;
         var cellContainerW = document.getElementById('cell-container').offsetWidth;
         // var cellContainerH = document.getElementById('cell-container').offsetHeight;
         var navigatorHeight = document.getElementById('navigator-div').offsetHeight;
-        var w = (cellContainerW - 40) / 2;
-        var h = (window.innerHeight - navigatorHeight - 25) / 2;
+        var w = parseInt((cellContainerW - 40) / 2 + 0.5);
+        var h = parseInt((window.innerHeight - navigatorHeight - 25) / 2 + 0.5);
         if (w%2 != 0) {
             w += 1;
         }
