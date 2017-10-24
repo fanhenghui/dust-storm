@@ -30,6 +30,7 @@ public:
     int disconnect();
 
     int insert_item(const ImgItem& item);
+    int delete_item(const std::string& series_id);
 
     int get_series_path(const std::string& series_id , std::string& path ,
                         const std::string& tbl = std::string("img_tbl"));

@@ -251,4 +251,71 @@ int AppDB::insert_item(const ImgItem& item) {
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query inset item."; 
 }
 
+int AppDB::delete_item(const std::string& series_id) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query delete item."; 
+    if (nullptr == _connection) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "db connection is null.";
+        return -1;
+    }
+
+    // write to DB (find ; delete if exit ; insert)
+    try {
+        sql::Statement* stmt = _connection->createStatement();
+        delete stmt;
+        sql::PreparedStatement* pstmt = nullptr;
+        sql::ResultSet* res = nullptr;
+
+        // find
+        std::string sql_str;
+        {
+            std::stringstream ss;
+            ss << "SELECT * FROM img_tbl where series_id=\'" << series_id << "\';";
+            sql_str = ss.str();
+        }
+        pstmt = _connection->prepareStatement(sql_str.c_str());
+        res = pstmt->executeQuery();
+        delete pstmt;
+        pstmt = nullptr;
+
+        // delete if exit
+        if (res->next()) {
+            std::stringstream ss;
+            ss << "WARNING : already has the same series item : " << series_id
+               << " , use the new one replace it.\n";
+            delete res;
+            res = nullptr;
+
+            // delete old one
+            {
+                std::stringstream ss;
+                ss << "DELETE FROM img_tbl where series_id=\'" << series_id << "\';";
+                sql_str = ss.str();
+            }
+            sql::PreparedStatement* pstmt = _connection->prepareStatement(sql_str.c_str());
+            sql::ResultSet* res = pstmt->executeQuery();
+            delete pstmt;
+            pstmt = nullptr;
+            delete res;
+            res = nullptr;
+        } else {
+            pstmt = _connection->prepareStatement(sql_str.c_str());
+            res = pstmt->executeQuery();
+            delete pstmt;
+            pstmt = nullptr;
+            delete res;
+            res = nullptr;
+        }
+    } catch (const sql::SQLException& e) {
+        std::stringstream ss;
+        ss << "# ERR: " << e.what()
+        << " (MySQL error code: " << e.getErrorCode()
+        << ", SQLState: " << e.getSQLState() << " )";
+        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
+        // TODO recovery DB
+
+        return -1;
+    }
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query delete item."; 
+}
+
 MED_IMG_END_NAMESPACE
