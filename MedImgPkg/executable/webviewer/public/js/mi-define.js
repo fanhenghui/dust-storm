@@ -41,10 +41,10 @@ const ACTION_ID_MRP_ANNOTATION = OPERATION_ID_ANNOTATION;
 const PROTOBUF_BE_FE = './data/mi_message.proto';
 
 //mouse button type
-const BTN_NONE = -1;
-const BTN_LEFT = 0;
-const BTN_MIDDLE = 1;
-const BTN_RIGHT = 2;
+const BTN_NONE = 0;
+const BTN_LEFT = 1;
+const BTN_MIDDLE = 2;
+const BTN_RIGHT = 4;
 
 //mouse button status
 const BTN_DOWN = 0;

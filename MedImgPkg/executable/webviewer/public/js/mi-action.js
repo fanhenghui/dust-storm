@@ -33,10 +33,11 @@ function sendDownsampleMSG(cellID, flag, socketClient) {
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
-ActionCommon.prototype.registerOpID = function(left, right, mid) {
+ActionCommon.prototype.registerOpID = function(left, right, mid, hold) {
     this.leftOpBtnID = left;
     this.rightOpBtnID = right;
     this.midOpBtnID = mid;
+    this.hodlOpBtnID = hold;
 }
 
 ActionCommon.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
@@ -80,8 +81,12 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         opID = this.leftOpBtnID;
     } else if (mouseBtn == BTN_RIGHT) {
         opID = this.rightOpBtnID;
-    } else {
+    } else if (mouseBtn == BTN_MIDDLE){
         opID = this.midOpBtnID;
+    } else if (mouseBtn == (parseInt(BTN_LEFT) | parseInt(BTN_RIGHT)) ) {
+        opID = this.hodlOpBtnID;
+    } else {
+        return;
     }
 
     this.socketClient.sendData(COMMAND_ID_FE_OPERATION, opID, this.cellID, msgBuffer.byteLength, msgBuffer);

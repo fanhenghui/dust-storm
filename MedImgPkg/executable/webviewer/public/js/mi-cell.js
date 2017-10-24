@@ -1,6 +1,7 @@
 //corner info marin
 const TEXT_MARGIN = 4;
 const DOUBLE_CLICK_INTERVAL = 250;
+const HOLD_CLICK_INTERVAL = 100;
 const COORDINATE_LABELS = ['L', 'R', 'H', 'F', 'P', 'A'];
 
 function Cell(cellName, cellID, canvas, svg, socketClient) {
@@ -24,8 +25,10 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     //mouse event
     this.mouseBtn = BTN_NONE;
     this.mouseStatus = BTN_UP;
+    this.mouseCur = {x:0,y:0};//for mouse holder
     this.mousePre = {x:0,y:0};
     this.mouseClickTick = 0;
+    this.mouseHoldTick = BTN_NONE;
 
     //mouse action
     this.mouseCurAction = null;
@@ -481,11 +484,34 @@ Cell.prototype.touchUp = function(event) {
     this.mousePre.y = 0;
 }
 
+Cell.prototype.mouseHoldTicker = function() {
+    if (this.mouseHoldTick == BTN_LEFT) {
+        this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, this.mouseCur.x, this.mouseCur.y, this);
+    } else {
+        this.mouseActionCommon.mouseDown(this.mouseBtn, this.mouseStatus, this.mouseCur.x, this.mouseCur.y, this);
+    }
+    this.mouseBtn = this.mouseHoldTick;
+}
+
+function Pow(base, power) {
+    var number = base;
+    if(power == 1) return number;
+    if(power == 0) return 1;
+    for(var i = 2; i <= power; i++){
+      number = number * base;
+    }
+    return number;
+}
+
 Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
-    this.mouseBtn = event.button;
-    console.log(this.mouseBtn);
-    this.mouseClickTick += 1;//mouse click tick for check double click
+    //this.mouseBtn = event.button;
+    var btn = Pow(2,event.button);
+    if (btn == BTN_LEFT) {
+        this.mouseClickTick += 1;//left mouse click tick for check double click
+    }
+    this.mouseHoldTick |= btn;
+
     if (!this.mouseFocus && this.mouseFocusEvent) {
         this.mouseFocusEvent(this.cellID);
     }
@@ -494,16 +520,16 @@ Cell.prototype.mouseDown = function(event) {
     var y = event.clientY - this.svg.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
+    this.mouseCur.x = x;
+    this.mouseCur.y = y;
 
     setTimeout((function(event) {
         this.mouseClickTicker();
     }).bind(this), DOUBLE_CLICK_INTERVAL);
 
-    if (this.mouseBtn == BTN_LEFT) {
-        this.mouseCurAction.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
-    } else {
-        this.mouseActionCommon.mouseDown(this.mouseBtn, this.mouseStatus, x, y, this);
-    }
+    setTimeout((function(event) {
+        this.mouseHoldTicker();
+    }).bind(this), HOLD_CLICK_INTERVAL);
 }
 
 Cell.prototype.mouseMove = function (event) {    
@@ -538,16 +564,19 @@ Cell.prototype.mouseUp = function(event) {
 
     //reset mouse status
     this.mouseBtn = BTN_NONE;
+    this.mouseHoldTick = BTN_NONE;
     this.mousePre.x = 0;
     this.mousePre.y = 0;
+
+    console.log('mouse up');
 }
 
-Cell.prototype.activeAction = function(left, right, mid) {
+Cell.prototype.activeAction = function(left, right, mid, hold) {
     if(left == ACTION_ID_MRP_ANNOTATION) {
         this.mouseCurAction = this.mouseActionAnnotation;
     } else {
         this.mouseCurAction = this.mouseActionCommon;
-        this.mouseActionCommon.registerOpID(left, right, mid);
+        this.mouseActionCommon.registerOpID(left, right, mid, hold);
     }
 }
 

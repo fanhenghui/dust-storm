@@ -388,11 +388,11 @@ var maxCellID = -1;
 
         //init default cell action
         for (var i = 0; i < 3; ++i) {
-            cells[i].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+            cells[i].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
             //MPR add crosshair
             cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient, 0);
         }
-        cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+        cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
         cells[3].crosshair = new Crosshair(cellSVGs[3], 3, 0, 0,{a:0, b:0, c:0}, {a:0, b:0, c:0}, socketClient, 1);
 
 
@@ -422,36 +422,36 @@ var maxCellID = -1;
         document.getElementById('test-info').innerText = btnID;
         switch (btnID) {
             case 'common-tool-arrow':
-                cells[0].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[1].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[2].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                cells[0].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[1].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[2].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 break;
             case 'common-tool-zoom':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].activeAction(ACTION_ID_ZOOM, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                    cells[i].activeAction(ACTION_ID_ZOOM, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
             case 'common-tool-pan':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].activeAction(ACTION_ID_PAN, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                    cells[i].activeAction(ACTION_ID_PAN, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
             case 'common-tool-rotate':
-                cells[0].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[1].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[2].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                cells[0].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[1].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[2].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 break;
             case 'common-tool-windowing':
                 for (var i = 0; i < cells.length; ++i) {
-                    cells[i].activeAction(ACTION_ID_WINDOWING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                    cells[i].activeAction(ACTION_ID_WINDOWING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
             case 'common-tool-annotation':
-                cells[0].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[1].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
-                cells[2].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING);
+                cells[0].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[1].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
+                cells[2].activeAction(ACTION_ID_MRP_ANNOTATION, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 break;
             default:
                 // TODO ERR
