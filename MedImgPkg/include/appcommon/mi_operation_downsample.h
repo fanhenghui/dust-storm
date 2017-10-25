@@ -12,6 +12,10 @@ public:
     virtual ~OpDownsample();
 
     virtual int execute();
+
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpDownsample>(new OpDownsample());
+    }
 };
 MED_IMG_END_NAMESPACE
 

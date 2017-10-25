@@ -51,6 +51,9 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, ch
 
     header._data_len = size;
     controller->get_client_proxy()->async_send_message(header, data);
+    if (data != nullptr) {
+        delete [] data;
+    }
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT CmdHandler search worklist";
     return 0;

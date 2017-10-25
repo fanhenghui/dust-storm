@@ -29,7 +29,7 @@ OperationFactory::OperationFactory() {
 std::shared_ptr<IOperation> OperationFactory::get_operation(unsigned int id) {
     auto it = _ops.find(id);
     if (it != _ops.end()) {
-        return it->second;
+        return it->second->create();
     } else {
         return nullptr;
     }

@@ -142,6 +142,9 @@ void OBAnnotationList::update(int code_id) {
 
     header._data_len = static_cast<unsigned int>(buffer_size);
     controller->get_client_proxy()->async_send_message(header, buffer);
+    if (buffer != nullptr) {
+        delete [] buffer;
+    }
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OBAnnotationList";
 }
 

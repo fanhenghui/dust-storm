@@ -474,7 +474,9 @@ var maxCellID = -1;
 
     function prepare() {
         // disable the annoying context menu triggered by the right button
-        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.oncontextmenu = function(event) {
+            event.preventDefault();
+        }
         
         // Create cell object
         var cellContainer = document.getElementById('cell-container');
@@ -688,9 +690,9 @@ var maxCellID = -1;
         }
         // disable back button
         history.pushState(null, null, document.URL);
-        window.addEventListener('popstate', function() {
+        window.onpopstate =  function(event) {
           history.pushState(null, null, document.URL);
-        });
+        };
 
 
         $('#modal-preset-vrt-browser').draggable({

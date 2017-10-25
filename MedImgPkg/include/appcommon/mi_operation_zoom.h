@@ -13,6 +13,9 @@ public:
 
     virtual int execute();
 
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpZoom>(new OpZoom());
+    }
 protected:
 private:
 };

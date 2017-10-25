@@ -203,7 +203,7 @@ void Init() {
 
     std::shared_ptr<ColorTransFunc> color;
     std::shared_ptr<OpacityTransFunc> opacity;
-    float ww, wl;
+    float ww, wl;   
     RGBAUnit background;
     Material material;
 #ifdef WIN32
@@ -312,8 +312,8 @@ void Display() {
 #else
         FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
-        MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
-        ", buffer size: " << buffer_size;
+        // MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
+        // ", buffer size: " << buffer_size;
 
         // MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() <<
         // std::endl;
@@ -379,13 +379,25 @@ void Keyboard(unsigned char key, int x, int y) {
         break;
                }
     case 'h' : {
-        static std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml"; 
-        if (color_opacity_xml == "../config/lut/3d/ct_cta.xml") {
-            color_opacity_xml = "../config/lut/3d/ct_lung_glass.xml";
-        } else {
-            color_opacity_xml = "../config/lut/3d/ct_cta.xml";
+        static int lut_id = 0;
+        static const int LUT_NUM = 10;
+        static const std::string LUT_LIST[LUT_NUM] = {
+            "../config/lut/3d/ct_cta.xml",
+            "../config/lut/3d/ct_cta_1.xml",
+            "../config/lut/3d/ct_lung_glass.xml",
+            "../config/lut/3d/ct_calcification.xml",
+            "../config/lut/3d/ct_carotids.xml",
+            "../config/lut/3d/ct_clr_abd_aorta_1.xml",
+            "../config/lut/3d/ct_clr_abd_aorta_2.xml",
+            "../config/lut/3d/ct_clr_carotid_1.xml",
+            "../config/lut/3d/ct_clr_carotid_2.xml",
+            "../config/lut/3d/ct_color_vessel_gd.xml"   
+        };
+        lut_id += 1;
+        if (lut_id > LUT_NUM-1) {
+            lut_id = 0;
         }
-
+        const std::string color_opacity_xml = LUT_LIST[lut_id];
         std::shared_ptr<ColorTransFunc> color;
         std::shared_ptr<OpacityTransFunc> opacity;
         float ww, wl;
@@ -404,6 +416,7 @@ void Keyboard(unsigned char key, int x, int y) {
         _scene->set_color_opacity(color, opacity, 1);
         _scene->set_material(material, 1);
         _scene->set_window_level(ww, wl, 1);
+        break;
     }
     default:
         break;

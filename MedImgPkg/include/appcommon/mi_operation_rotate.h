@@ -13,6 +13,10 @@ public:
 
     virtual int execute();
 
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpRotate>(new OpRotate());
+    }
+
 protected:
 private:
 };

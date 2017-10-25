@@ -12,6 +12,10 @@ public:
     virtual ~OpAnnotation();
 
     virtual int execute();
+
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpAnnotation>(new OpAnnotation());
+    }
 };
 MED_IMG_END_NAMESPACE
 

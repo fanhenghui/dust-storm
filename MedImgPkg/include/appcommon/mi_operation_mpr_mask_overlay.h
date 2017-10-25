@@ -10,7 +10,12 @@ class AppCommon_Export OpMPRMaskOverlay : public IOperation {
 public:
     OpMPRMaskOverlay();
     virtual ~OpMPRMaskOverlay();
+
     virtual int execute();
+    
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpMPRMaskOverlay>(new OpMPRMaskOverlay());
+    }
 
 private:
 };

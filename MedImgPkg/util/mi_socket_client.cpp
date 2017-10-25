@@ -130,10 +130,6 @@ void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {
     //send header
     if (-1 == send(_fd_server , &dataheader , sizeof(dataheader) , 0)) {
         MI_UTIL_LOG(MI_WARNING) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
-        if (!buffer) {
-            delete [] buffer;
-            buffer = nullptr;
-        }
         return;
     }
 
@@ -141,17 +137,8 @@ void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {
     if (buffer != nullptr && dataheader._data_len > 0) {
         if (-1 == send(_fd_server , buffer , dataheader._data_len , 0)) {
             MI_UTIL_LOG(MI_WARNING) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
-            if (!buffer) {
-                delete [] buffer;
-                buffer = nullptr;
-            }
             return;
         }
-    }
-
-    if (!buffer) {
-        delete [] buffer;
-        buffer = nullptr;
     }
 }
 

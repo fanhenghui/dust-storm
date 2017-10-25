@@ -13,6 +13,10 @@ public:
 
     virtual int execute();
 
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpMPRPaging>(new OpMPRPaging());
+    }
+
 protected:
 private:
 };

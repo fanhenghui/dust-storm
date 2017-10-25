@@ -1,43 +1,37 @@
-<Lut name="CT_CTA">
+<Lut name="CT_CTA_1">
   <Color Interpolation="RGB">
     <Point>
-      <Index>187.01</Index>
-      <R>255</R>
-      <G>34</G>
-      <B>43</B>
+      <Index>89.2</Index>
+      <R>189</R>
+      <G>26</G>
+      <B>35</B>
     </Point>
     <Point>
-      <Index>187.012</Index>
-      <R>255</R>
-      <G>34</G>
-      <B>43</B>
+      <Index>89.2528163331703</Index>
+      <R>189</R>
+      <G>26</G>
+      <B>35</B>
     </Point>
     <Point>
-      <Index>190.687262451172</Index>
-      <R>255</R>
-      <G>34</G>
-      <B>43</B>
-    </Point>
-    <Point>
-      <Index>242.186</Index>
+      <Index>145.659212902987</Index>
       <R>255</R>
       <G>162</G>
-      <B>28</B>
+      <B>31</B>
     </Point>
     <Point>
-      <Index>469.225</Index>
+      <Index>377.769479891323</Index>
       <R>255</R>
       <G>255</G>
       <B>255</B>
     </Point>
     <Point>
-      <Index>1479.102</Index>
+      <Index>1410.20364360496</Index>
       <R>255</R>
       <G>255</G>
       <B>255</B>
     </Point>
     <Point>
-      <Index>2808.358</Index>
+      <Index>2769.15063093245</Index>
       <R>255</R>
       <G>255</G>
       <B>255</B>
@@ -45,37 +39,37 @@
   </Color>
   <Opacity>
     <Point>
-      <Index>187.01</Index>
+      <Index>89.2</Index>
       <A>0</A>
     </Point>
     <Point>
-      <Index>187.012</Index>
+      <Index>89.2528163331703</Index>
       <A>0.864756</A>
     </Point>
     <Point>
-      <Index>191.021</Index>
+      <Index>93.3513635446901</Index>
       <A>43.310169</A>
     </Point>
     <Point>
-      <Index>242.186</Index>
+      <Index>145.659212902987</Index>
       <A>107.235762</A>
     </Point>
     <Point>
-      <Index>469.225</Index>
+      <Index>377.769479891323</Index>
       <A>146.3498805</A>
     </Point>
     <Point>
-      <Index>1479.102</Index>
+      <Index>1410.20364360496</Index>
       <A>222.133305</A>
     </Point>
     <Point>
-      <Index>2808.358</Index>
+      <Index>2769.15063093245</Index>
       <A>224.6540565</A>
     </Point>
   </Opacity>
   <WindowLevel>
-    <Width>2621.346</Width>
-    <Level>1497.685</Level>
+    <Width>2679.89781459928</Width>
+    <Level>1429.20172363281</Level>
   </WindowLevel>
   <Background>
     <R>0</R>
@@ -94,7 +88,7 @@
       <R>255</R>
       <G>255</G>
       <B>255</B>
-      <Factor>0.72</Factor>
+      <Factor>0.5</Factor>
       <Shininess>2</Shininess>
     </SpecularColor>
   </Material>

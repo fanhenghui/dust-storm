@@ -1,61 +1,61 @@
 <Lut name="CT_LUNG_GLASS">
 		<Color Interpolation="RGB">
-			<point>
-				<index>-735</index>
+			<Point>
+				<Index>-735</Index>
 				<R>57</R>
 				<G>158</G>
 				<B>206</B>
-			</point>
-			<point>
-				<index>-626</index>
+			</Point>
+			<Point>
+				<Index>-626</Index>
 				<R>170</R>
 				<G>214</G>
 				<B>234</B>
-			</point>
-			<point>
-			<index>-552</index>
+			</Point>
+			<Point>
+			<Index>-552</Index>
 				<R>244</R>
 				<G>250</G>
 				<B>253</B>
-			</point>
-			<point>
-				<index>-429</index>
+			</Point>
+			<Point>
+				<Index>-429</Index>
 				<R>255</R>
 				<G>255</G>
 				<B>255</B>
-			</point>
-			<point>
-				<index>-373</index>
+			</Point>
+			<Point>
+				<Index>-373</Index>
 				<R>62</R>
 				<G>160</G>
 				<B>208</B>
-			</point>
+			</Point>
 		</Color>
 		<Opacity>
-			<point>
-				<index>-735</index>
-				<A>0.0</A>
-			</point>
-			<point>
-				<index>-626</index>
-				<A>12</A>
-			</point>
-			<point>
-				<index>-552</index>
-				<A>15</A>
-			</point>
-			<point>
-		    <index>-429</index>
-				<A>15</A>
-			</point>
-		    <point>
-		    <index>-373</index>
+			<Point>
+				<Index>-735</Index>
 				<A>0</A>
-			</point>
+			</Point>
+			<Point>
+				<Index>-626</Index>
+				<A>12</A>
+			</Point>
+			<Point>
+				<Index>-552</Index>
+				<A>15</A>
+			</Point>
+			<Point>
+		    <Index>-429</Index>
+				<A>15</A>
+			</Point>
+		    <Point>
+		    <Index>-373</Index>
+				<A>0</A>
+			</Point>
 		</Opacity>
 		<WindowLevel>
-			<width>362</width>
-			<level>-554</level>
+			<Width>362</Width>
+			<Level>-554</Level>
 		</WindowLevel>
 		<Background>
 		<R>0</R>
@@ -75,7 +75,7 @@
 		<G>255</G>
 		<B>255</B>
 		<Factor>0.5</Factor>
-		<Shininess>8.0</Shininess>
+		<Shininess>8</Shininess>
 	  </SpecularColor>
    </Material>
 </Lut>
