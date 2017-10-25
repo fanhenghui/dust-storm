@@ -50,6 +50,8 @@ public:
         }
     }
 
+    virtual std::shared_ptr<IOperation> create() = 0;
+
 protected:
     OpDataHeader _header;
     char* _buffer;
@@ -58,6 +60,10 @@ protected:
 private:
     DISALLOW_COPY_AND_ASSIGN(IOperation);
 };
+
+// #define CREATE_MY_OP(arg) virtual std::shared_ptr<IOperation> create() { \
+//     std::shared_ptr<IOperation> op(new #arg); \
+//     return op;}
 
 MED_IMG_END_NAMESPACE
 #endif

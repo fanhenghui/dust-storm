@@ -14,6 +14,10 @@ public:
     virtual ~OpInit();
     virtual int execute();
 
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<OpInit>(new OpInit());
+    }
+
 private:
     int init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool& preprocessing_mask);
     int init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask);
