@@ -421,14 +421,14 @@ Cell.prototype.resize = function (width, height) {
 }
 
 Cell.prototype.mouseClickTicker = function() {
-    if (this.mouseClickTick >= 2) {
+    var clickTick = this.mouseClickTick;
+    this.mouseClickTick = 0;//reset tick
+    if (clickTick >= 2) {
         //double click event
         if (this.mouseDoubleClickEvent) {
             this.mouseDoubleClickEvent(this.cellID);
         }
     }
-    //reset tick
-    this.mouseClickTick = 0;
 }
 
 Cell.prototype.touchDown = function(event) {
@@ -567,8 +567,6 @@ Cell.prototype.mouseUp = function(event) {
     this.mouseHoldTick = BTN_NONE;
     this.mousePre.x = 0;
     this.mousePre.y = 0;
-
-    console.log('mouse up');
 }
 
 Cell.prototype.activeAction = function(left, right, mid, hold) {
@@ -582,33 +580,26 @@ Cell.prototype.activeAction = function(left, right, mid, hold) {
 
 Cell.prototype.prepare = function() {
     if(this.svg != null) {
-        var mouseDown_ = (function(event) {
+        this.svg.onmousedown = (function(event) {
             this.mouseDown(event);
         }).bind(this);
-        var touchDown_ = (function(event) {
+        this.svg.ontouchstart = (function(event) {
             this.touchDown(event);
         }).bind(this);
-        this.svg.addEventListener('mousedown', mouseDown_, false);
-        this.svg.addEventListener('touchstart', touchDown_, false);
 
-
-        var mouseMove_ = (function(event) {
+        this.svg.onmousemove = (function(event) {
             this.mouseMove(event);
         }).bind(this);
-        var touchMove_ = (function(event) {
+        this.svg.ontouchmove = (function(event) {
             this.touchMove(event);
-        }).bind(this);
-        this.svg.addEventListener('mousemove', mouseMove_, false);
-        this.svg.addEventListener('touchmove', touchMove_, false);
+        }).bind(this)
 
-        var mouseUp_ = (function(event) {
+        this.svg.onmouseup = (function(event) {
             this.mouseUp(event);
         }).bind(this);
-        var touchUp_ = (function(event) {
+        this.svg.ontouchend = (function(event) {
             this.touchUp(event);
         }).bind(this);
-        this.svg.addEventListener('mouseup', mouseUp_, false);
-        this.svg.addEventListener('touchend', touchUp_, false);
 
         // add texts at four corners
         var width = this.canvas.width;
