@@ -307,6 +307,9 @@ void AppThreadModel::process_sending() {
                 header._data_len = static_cast<unsigned int>(buffer_size);
                 MI_APPCOMMON_LOG(MI_TRACE) << "send none image data length: " << buffer_size;
                 _proxy->async_send_message(header, buffer);
+                if (nullptr != buffer) {
+                    delete [] buffer;
+                }
             }
 
             // interrupt point
