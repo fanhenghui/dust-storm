@@ -723,6 +723,94 @@ var maxCellID = -1;
         document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
         document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
 
+        ///For testing
+        const TEST_INTERVAL = MOUSE_MSG_INTERVAL;
+        function LeftMove(cellID, moveBack, moveX, step) {
+            var x = moveBack ? 200 - step : 200 + step;
+            if (moveX) {
+                cells[cellID].mouseBtn = BTN_LEFT;
+                cells[cellID].mouseStatus = BTN_DOWN;
+                cells[cellID].mouseActionCommon.mouseDown(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseMove(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, x, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseUp(cells[cellID].mouseBtn, cells[cellID].mouseStatus, x, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseBtn = BTN_NONE;
+                cells[cellID].mouseStatus = BTN_UP;
+            } else {
+                cells[cellID].mouseBtn = BTN_LEFT;
+                cells[cellID].mouseStatus = BTN_DOWN;
+                cells[cellID].mouseActionCommon.mouseDown(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseMove(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, x, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseUp(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, x, 200, 200, cells[cellID]);
+                cells[cellID].mouseBtn = BTN_NONE;
+                cells[cellID].mouseStatus = BTN_UP;
+            }
+        };
+
+        const ROLL_INTERVAL = 200;
+        tik = 0;
+        roolStatus = false;
+        function LeftMoveRoll(cellID, moveX, step) {
+            tik += 1;
+            if (tik > ROLL_INTERVAL) {
+                tik = 0;
+                roolStatus = !roolStatus;
+            }
+
+            if (roolStatus) {
+                LeftMove(cellID, false, moveX, step);
+            } else {
+                LeftMove(cellID, true, moveX, step);
+            }
+        }
+
+        testBtnStatus0 = false;
+        testBtnFunc0 = null;
+        var testBtn = document.getElementById('btn-test-0');
+        if (testBtn) {
+            testBtn.onclick = function(event) {
+                if (!testBtnStatus0) {
+                    testBtnStatus0 = true;
+                    $('#btn-test-0').addClass('btn-primary');
+                    if (testBtnFunc0 == null) {
+                        testBtnFunc0 = setInterval(function() {
+                            LeftMoveRoll(0, false, 2);
+                        }, TEST_INTERVAL);
+                    }
+                } else {
+                    $('#btn-test-0').removeClass('btn-primary');
+                    testBtnStatus0 = false;
+                    if (testBtnFunc0) {
+                        clearInterval(testBtnFunc0);
+                        testBtnFunc0 = null;
+                    }
+                }
+            };
+        }
+
+        testBtnStatus1 = false;
+        testBtnFunc1 = null;
+        var testBtn1 = document.getElementById('btn-test-1');
+        if (testBtn1) {
+            testBtn1.onclick = function(event) {
+                if (!testBtnStatus1) {
+                    testBtnStatus1 = true;
+                    $('#btn-test-1').addClass('btn-primary');
+                    if (testBtnFunc1 == null) {
+                        testBtnFunc1 = setInterval(function() {
+                            LeftMove(3, false, true, 8);
+                        }, TEST_INTERVAL);
+                    }
+                } else {
+                    $('#btn-test-1').removeClass('btn-primary');
+                    testBtnStatus1 = false;
+                    if (testBtnFunc1) {
+                        clearInterval(testBtnFunc1);
+                        testBtnFunc1 = null;
+                    }
+                }
+            };
+        }
+
         var loginBtn = document.getElementById('btn-login');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
