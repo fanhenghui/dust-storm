@@ -19,7 +19,7 @@ var maxCellID = -1;
 
 (function() {
     function getUserID(userName) {
-        return userName + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
+        return userName + '|' + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
     }
 
     function login() {
@@ -721,13 +721,19 @@ var maxCellID = -1;
         document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
         document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
 
-        var loginBtn = document.getElementById('btn-login');
+        var loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
                 window.location.href = '/login';
             }
         }
-
+        loginBtn = document.getElementById('btn-login-1');
+        if (loginBtn) {
+            loginBtn.onclick = function(event) {
+                window.location.href = '/login';
+            }
+        }
+        
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();
