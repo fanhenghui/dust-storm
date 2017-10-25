@@ -10,6 +10,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./public/routes/index');
+global.userList = require('./public/routes/loggedUserList');
 //var log4js = require('./public/log/log').log4js();
 
 // log4js.configure({

@@ -68,6 +68,8 @@ var disconnectBE = function(userid) {
         delete onlineBEHBClock[userid];
     }
     onlineCount--;
+    var userName = userid.split('|', 1);
+    global.userList.removeLoggedUser(userName[0]);
     console.log(userid + ' disconnecting success.');
 
     //wait for kill worker

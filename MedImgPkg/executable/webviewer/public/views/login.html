@@ -71,7 +71,8 @@
 					}
 				},
 				error: function(data,status){ 
-					if(status == 'error'){ 
+					if(status == 'error'){
+						alert(data.responseText);
 						location.href = 'login';
 					}
 				}
