@@ -36,7 +36,7 @@ TransferFuncLoader::load_pseudo_color(const std::string& xml,
     std::string name = root.attribute("name").as_string();
     color->set_name(name);
 
-    pugi::xpath_node_set points = root.select_nodes("point");
+    pugi::xpath_node_set points = root.select_nodes("Point");
     const size_t pt_num = points.size();
 
     if (pt_num < 2) {
@@ -47,7 +47,7 @@ TransferFuncLoader::load_pseudo_color(const std::string& xml,
 
     for (auto it = points.begin(); it != points.end(); ++it) {
         pugi::xml_node node = (*it).node();
-        pugi::xml_node idx_node = node.child("index");
+        pugi::xml_node idx_node = node.child("Index");
         pugi::xml_node r_node = node.child("R");
         pugi::xml_node g_node = node.child("G");
         pugi::xml_node b_node = node.child("B");
@@ -107,7 +107,7 @@ IOStatus TransferFuncLoader::load_color_opacity(
         color->set_color_type(RGB, HSV);
     }
 
-    pugi::xpath_node_set points = color_node.select_nodes("point");
+    pugi::xpath_node_set points = color_node.select_nodes("Point");
     size_t pt_num = points.size();
 
     if (pt_num < 2) {
@@ -118,7 +118,7 @@ IOStatus TransferFuncLoader::load_color_opacity(
 
     for (auto it = points.begin(); it != points.end(); ++it) {
         pugi::xml_node node = (*it).node();
-        pugi::xml_node idx_node = node.child("index");
+        pugi::xml_node idx_node = node.child("Index");
         pugi::xml_node r_node = node.child("R");
         pugi::xml_node g_node = node.child("G");
         pugi::xml_node b_node = node.child("B");
@@ -143,7 +143,7 @@ IOStatus TransferFuncLoader::load_color_opacity(
         return IO_DATA_DAMAGE;
     }
 
-    points = opacity_node.select_nodes("point");
+    points = opacity_node.select_nodes("Point");
     pt_num = points.size();
 
     if (pt_num < 2) {
@@ -152,7 +152,7 @@ IOStatus TransferFuncLoader::load_color_opacity(
 
     for (auto it = points.begin(); it != points.end(); ++it) {
         pugi::xml_node node = (*it).node();
-        pugi::xml_node idx_node = node.child("index");
+        pugi::xml_node idx_node = node.child("Index");
         pugi::xml_node a_node = node.child("A");
 
         if (idx_node.empty() || a_node.empty()) {
@@ -172,8 +172,8 @@ IOStatus TransferFuncLoader::load_color_opacity(
         return IO_DATA_DAMAGE;
     }
 
-    pugi::xml_node width_node = wl_node.child("width");
-    pugi::xml_node level_node = wl_node.child("level");
+    pugi::xml_node width_node = wl_node.child("Width");
+    pugi::xml_node level_node = wl_node.child("Level");
 
     if (width_node.empty() || level_node.empty()) {
         return IO_DATA_DAMAGE;
