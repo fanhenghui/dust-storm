@@ -26,7 +26,7 @@ int OpDownsample::execute() {
     }
 
     const bool flag = msg.flag() == 1;
-
+    msg.Clear();
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 

@@ -48,7 +48,9 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
         data = nullptr;
         buffer_size = 0;
         return nullptr; 
+        msg.Clear();
     } else {
+        msg.Clear();
         return data;
     }
 }

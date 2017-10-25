@@ -81,11 +81,11 @@ protected:
 
 #ifndef WIN32
     // GPU JPEG
-    gpujpeg_parameters _gpujpeg_param;             // gpujpeg parameter
-    gpujpeg_image_parameters _gpujpeg_image_param; // image parameter
-    gpujpeg_opengl_texture* _gpujpeg_texture;      // input gpujpeg texture
-    gpujpeg_encoder* _gpujpeg_encoder;             // jpeg encoder
-    gpujpeg_encoder_input _gpujpeg_encoder_input;  // jpeg encoding input
+    struct gpujpeg_parameters _gpujpeg_param;             // gpujpeg parameter
+    struct gpujpeg_image_parameters _gpujpeg_image_param; // image parameter
+    struct gpujpeg_opengl_texture* _gpujpeg_texture;      // input gpujpeg texture
+    struct gpujpeg_encoder* _gpujpeg_encoder;             // jpeg encoder
+    struct gpujpeg_encoder_input _gpujpeg_encoder_input;  // jpeg encoding input
 
     //在OpenGL的环境下 cuda event
     //会收到OpenGL的影响,导致计算的encoding时间不对(需要在cudaevent之前加一个glfinish)

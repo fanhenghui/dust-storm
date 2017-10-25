@@ -21,10 +21,10 @@ OpMPRPaging::OpMPRPaging() {
 }
 
 OpMPRPaging::~OpMPRPaging() {
-
 }
 
 int OpMPRPaging::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpMPRPaging";
     //Parse data
     const unsigned int cell_id = _header._cell_id;
     int page_step = 1;
@@ -36,6 +36,7 @@ int OpMPRPaging::execute() {
             return -1;
         }
         page_step = static_cast<int>(msg.cur().y() - msg.pre().y());
+        msg.Clear();
         //MI_APPCOMMON_LOG(M/I_DEBUG) << "paging step : " << page_step;
     }
 
@@ -67,6 +68,8 @@ int OpMPRPaging::execute() {
     }
     
     model_crosshair->page(mpr_scene, page_step);
+
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpMPRPaging";
     return 0;
 }
 

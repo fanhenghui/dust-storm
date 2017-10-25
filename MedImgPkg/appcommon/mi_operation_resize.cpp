@@ -27,6 +27,7 @@ int OpResize::execute() {
     if (!msg.ParseFromArray(_buffer, _header._data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse resize message failed!");
     }
+    msg.Clear();
 
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);

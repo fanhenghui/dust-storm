@@ -31,6 +31,8 @@ int OpMPRMaskOverlay::execute() {
     }
     const int flag = msg.flag();
     const float opacity = msg.opacity();
+    msg.Clear();
+    
     const MaskOverlayMode mask_overlay_mode = flag != 0 ? MASK_OVERLAY_ENABLE : MASK_OVERLAY_DISABLE;
 
     std::shared_ptr<AppController> controller = _controller.lock();

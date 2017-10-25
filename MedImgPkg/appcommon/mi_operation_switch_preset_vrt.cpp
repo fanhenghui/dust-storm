@@ -27,6 +27,8 @@ int OpSwitchPresetVRT::execute() {
     }
 
     const std::string context = msg.context();
+    msg.Clear();
+    
     static const int S_PRESET_VRT_NUM = 2;
     static const std::string S_PRESET_VRT_NAME[S_PRESET_VRT_NUM]= {
         "cta",

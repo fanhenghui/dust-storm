@@ -15,8 +15,7 @@ INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/renderalgo
 BIN_DIR = $(ROOT)/bin
 
-#CUDA_INCLUDE_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/include
-#CUDA_LIB_DIR = /usr/local/cuda-8.0/targets/x86_64-linux/lib/
+CUDA_INCLUDE_DIR = /usr/local/cuda-8.0/include
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
@@ -33,7 +32,7 @@ mi_annotation_calculator.o
 TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
 EXPORT_HEADER = mi_render_algo_export.h
-ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
+ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR) -I$(CUDA_INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lGL -lGLEW \
 -lmedimg_log -lmedimg_util -lmedimg_arithmetic -lmedimg_glresource -lmedimg_io \
 -lgpujpeg -lpugixml 

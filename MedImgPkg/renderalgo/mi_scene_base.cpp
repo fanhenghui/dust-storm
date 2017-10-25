@@ -7,7 +7,8 @@
 #include "glresource/mi_gl_time_query.h"
 #include "util/mi_file_util.h"
 
-// #include "libgpujpeg/gpujpeg_encoder.h"
+
+#include "libgpujpeg/gpujpeg_encoder_internal.h"
 // #include "libgpujpeg/gpujpeg_encoder_internal.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -221,29 +222,27 @@ bool SceneBase::get_dirty() const {
 void SceneBase::pre_render_i() {
 #ifndef WIN32
     if (_gpujpeg_encoder && _gpujpeg_encoder_dirty) {
-        gpujpeg_encoder_destroy(_gpujpeg_encoder);
-        _gpujpeg_encoder = nullptr;
+        _gpujpeg_encoder->coder.param_image.width = _width;
+        _gpujpeg_encoder->coder.param_image.height = _height;
+        _gpujpeg_encoder->coder.param.quality = this->get_downsample() ? _compress_ld_quality : _compress_hd_quality;
 
-        gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
-        _gpujpeg_image_param.width = _width;
-        _gpujpeg_image_param.height = _height;
-        _gpujpeg_image_param.comp_count = 3;
-        _gpujpeg_image_param.color_space = GPUJPEG_RGB;
-        _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+        // gpujpeg_encoder_destroy(_gpujpeg_encoder);
+        // _gpujpeg_encoder = nullptr;
 
-        _gpujpeg_param.quality = this->get_downsample() ? _compress_ld_quality : _compress_hd_quality;
+        // gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
+        // _gpujpeg_image_param.width = _width;
+        // _gpujpeg_image_param.height = _height;
+        // _gpujpeg_image_param.comp_count = 3;
+        // _gpujpeg_image_param.color_space = GPUJPEG_RGB;
+        // _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
 
-        // bind GL texture to cuda(by PBO)
-        unsigned int tex_id = _scene_color_attach_0->get_id();
-        _gpujpeg_texture =
-            gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
-        // create encoder
-        _gpujpeg_encoder =
-            gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
-        // set texture as input
-        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input,
-                                          _gpujpeg_texture);
+        // _gpujpeg_param.quality = this->get_downsample() ? _compress_ld_quality : _compress_hd_quality;
+
+        // _gpujpeg_encoder = gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
+        // RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+        // // set texture as input
+        // gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input,
+        //                                   _gpujpeg_texture);
 
         _gpujpeg_encoder_dirty = false;
     }

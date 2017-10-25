@@ -88,6 +88,7 @@ int OpInit::execute() {
         return -1;
     }
 
+    msg_init.Clear();
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation.";
     return 0;
 }
