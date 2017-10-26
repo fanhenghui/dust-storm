@@ -52,6 +52,26 @@ var maxCellID = -1;
         }
     }
 
+    var heartbeatCount = 1;
+    var lastheartbearCount = 0;
+    const HEARTBEAT_INTERVAL = 5 * 1000 + 1000;
+    function keepHeartbeat() {
+        socketClient.heartbeat();
+        heartbeatCount += 1;
+    }
+    function checkHeartbeat() {
+        if (!revcBEReady) {
+            return;
+        }
+        if (heartbeatCount - lastheartbearCount > 0) {
+            lastheartbearCount = heartbeatCount;
+        } else {
+            //return to login
+            console.log('heart dead. return to login.');
+            window.location.href = '/login';
+        }
+    }
+
     function recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         if (!socketClient.protocRoot) {
             console.log('null protocbuf.');
@@ -206,7 +226,7 @@ var maxCellID = -1;
                 recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_HEARTBEAT:
-                socketClient.heartbeat();
+                keepHeartbeat();
                 break;
             case COMMAND_ID_BE_SEND_ANNOTATION_LIST:
                 recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
@@ -834,6 +854,11 @@ var maxCellID = -1;
         };
         var username = document.getElementById('username').innerHTML;
         login();
+
+        //trigger on heartbeat
+        var checkHeartbearFunc = setInterval(function() {
+            checkHeartbeat();
+        }, HEARTBEAT_INTERVAL);
     }
 
     prepare();

@@ -227,7 +227,7 @@ module.exports = {
                 if (onlineFETic[obj.userid] > TIC_LIMIT) {
                     onlineFETic[obj.userid] = 0;
                 }
-                console.log('server receive FE heart beat for user: ' + obj.username + ' ' + onlineFETic[obj.userid]);
+                //console.log('server receive FE heart beat for user: ' + obj.username + ' ' + onlineFETic[obj.userid]);
             }
         });
 
