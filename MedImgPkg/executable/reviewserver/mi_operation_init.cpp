@@ -414,6 +414,7 @@ int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
     controller->add_model(MODEL_ID_CROSSHAIR , model_crosshair);
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
+    return 0;
 }
 
 MED_IMG_END_NAMESPACE
