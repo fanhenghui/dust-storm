@@ -98,7 +98,9 @@ router.route('/review').get(function(req, res) {
     }
   else {
     console.log('login name is : ', req.session.user.name);
-    res.render('review',{username: req.session.user.name});  // go directly to review page
+    var ip = require('./server-ip.js').serverip;
+    //send user name and server ip
+    res.render('review',{username: req.session.user.name, serverip: ip});  // go directly to review page
   }
 });
 module.exports = router;
