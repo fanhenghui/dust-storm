@@ -69,6 +69,7 @@ app.use('/', routes);
 
 //app.use(log4js.connectLogger(this.logger('normal') , {level:'auto', format:':method :url '}));
 //connect to web socket
+io.set('log level',0);//好像没有设置成功
 io.on('connection', require('./public/be/be_proxy').onIOSocketConnect);
 
 //process quit callback

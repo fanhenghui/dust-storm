@@ -678,6 +678,7 @@ var maxCellID = -1;
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
         }
+
         document.getElementById('a-preset-wl-abdomen').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-lung').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-brain').onclick = function(event) {switchPresetWLFunc(this);return false;}
@@ -740,8 +741,21 @@ var maxCellID = -1;
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
         }
-        document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
-        document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
+
+        var presetVRTTable = document.getElementById('table-preset-vrt');
+        if (presetVRTTable) {
+            var vrtRows = presetVRTTable.rows;
+            for (var i = 0; i < vrtRows.length; ++i) {
+                vrtCells = vrtRows[i].cells;
+                for (var j = 0; j < vrtCells.length; ++j) {
+                    vrtCells[j].onclick = (function() {
+                        switchVRTFunc($(this).attr('id'));
+                    }).bind(vrtCells[j]);    
+                }
+            }
+        }
+        // document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('ct_cta');}
+        // document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('ct_lung_glass');}
 
         ///For testing
         const TEST_INTERVAL = MOUSE_MSG_INTERVAL;

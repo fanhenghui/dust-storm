@@ -29,14 +29,36 @@ int OpSwitchPresetVRT::execute() {
     const std::string context = msg.context();
     msg.Clear();
     
-    static const int S_PRESET_VRT_NUM = 2;
+    static const int S_PRESET_VRT_NUM = 13;
     static const std::string S_PRESET_VRT_NAME[S_PRESET_VRT_NUM]= {
-        "cta",
-        "lung-glass",
+        "ct_calcification",
+        "ct_carotids",
+        "ct_clr_abd_aorta_1",
+        "ct_clr_abd_aorta_2",
+        "ct_clr_carotid_1",
+        "ct_clr_carotid_2",
+        "ct_color_vessel_gd",
+        "ct_cta",
+        "ct_cta_1",
+        "ct_lung_glass",
+        "ct_lung_glass_2",
+        "ct_lung_bw",
+        "ct_lung_2"
     };
     static const std::string S_PRESET_VRT_PATH[S_PRESET_VRT_NUM] = {
+        "../config/lut/3d/ct_calcification.xml",
+        "../config/lut/3d/ct_carotids.xml",
+        "../config/lut/3d/ct_clr_abd_aorta_1.xml",
+        "../config/lut/3d/ct_clr_abd_aorta_2.xml",
+        "../config/lut/3d/ct_clr_carotid_1.xml",
+        "../config/lut/3d/ct_clr_carotid_2.xml",
+        "../config/lut/3d/ct_color_vessel_gd.xml",
         "../config/lut/3d/ct_cta.xml",
+        "../config/lut/3d/ct_cta_1.xml",
         "../config/lut/3d/ct_lung_glass.xml",
+        "../config/lut/3d/ct_lung_glass_2.xml",
+        "../config/lut/3d/ct_lung_bw.xml",
+        "../config/lut/3d/ct_lung_2.xml"
     };
 
     std::string target;
