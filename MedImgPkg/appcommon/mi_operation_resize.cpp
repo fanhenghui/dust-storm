@@ -41,6 +41,7 @@ int OpResize::execute() {
         APPCOMMON_CHECK_NULL_EXCEPTION(cell);
         std::shared_ptr<SceneBase> scene = cell->get_scene();
         scene->set_display_size(width, height);
+        scene->set_downsample(false);
 
         MI_APPCOMMON_LOG(MI_INFO) << "resize cell (id: " << cell_id << " width: " << width << " height: " << height << ")";
     }
