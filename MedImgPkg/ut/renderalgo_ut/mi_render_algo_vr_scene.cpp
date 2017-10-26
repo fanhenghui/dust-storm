@@ -271,9 +271,13 @@ void Display() {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        std::shared_ptr<CameraBase> camera = _scene->get_camera();
-        Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
-        camera->rotate(q);
+        // static bool ds = false;
+        // ds = !ds;
+        // _scene->set_downsample(ds);
+
+        // std::shared_ptr<CameraBase> camera = _scene->get_camera();
+        // Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
+        // camera->rotate(q);
 
         CHECK_GL_ERROR;
 
@@ -380,11 +384,12 @@ void Keyboard(unsigned char key, int x, int y) {
                }
     case 'h' : {
         static int lut_id = 0;
-        static const int LUT_NUM = 10;
+        static const int LUT_NUM = 11;
         static const std::string LUT_LIST[LUT_NUM] = {
             "../config/lut/3d/ct_cta.xml",
             "../config/lut/3d/ct_cta_1.xml",
             "../config/lut/3d/ct_lung_glass.xml",
+            "../config/lut/3d/ct_lung_glass_2.xml",
             "../config/lut/3d/ct_calcification.xml",
             "../config/lut/3d/ct_carotids.xml",
             "../config/lut/3d/ct_clr_abd_aorta_1.xml",

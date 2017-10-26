@@ -234,7 +234,7 @@ module.exports = {
         socket.on('data', function(obj) {
             //FE发来的TCP 粘包问题是在BE端解决(UNIX socket 可以控制每次recv的字节数，因此可以天然解决粘包问题)
             userid = obj.userid;
-            console.log('socket on data , userid : ' + userid);
+            //console.log('socket on data , userid : ' + userid);
             if (!onlineLocalIPC.hasOwnProperty(userid)) {
                 console.log('socket on data , ERROR IPC');
                 return;
