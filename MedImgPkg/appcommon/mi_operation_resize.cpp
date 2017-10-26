@@ -27,7 +27,6 @@ int OpResize::execute() {
     if (!msg.ParseFromArray(_buffer, _header._data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse resize message failed!");
     }
-    msg.Clear();
 
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -45,6 +44,7 @@ int OpResize::execute() {
 
         MI_APPCOMMON_LOG(MI_INFO) << "resize cell (id: " << cell_id << " width: " << width << " height: " << height << ")";
     }
+    msg.Clear();
 
     return 0;
 }
