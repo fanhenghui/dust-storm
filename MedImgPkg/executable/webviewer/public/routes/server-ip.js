@@ -1,4 +1,4 @@
 
 module.exports = {
-    serverip:'http://192.168.199.107:8000'
+    serverip:'http://127.0.0.1:8000'
 }
