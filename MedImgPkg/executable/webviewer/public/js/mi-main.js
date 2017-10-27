@@ -1,4 +1,5 @@
 var socket = null;
+var serverIP = '';
 var seriesUID = '';
 var cellCanvases = null;
 var cellSVGs = null;
@@ -23,7 +24,7 @@ var maxCellID = -1;
     }
 
     function login() {
-        socket = io.connect(SOCKET_IP);
+        socket = io.connect(serverIP);
         if (!socket) {
             console.log('connect server failed.');
             alert('connect server failed.');
@@ -867,6 +868,8 @@ var maxCellID = -1;
             resize()
         };
         var username = document.getElementById('username').innerHTML;
+        serverIP = document.getElementById('serverip').innerHTML;
+        console.log('server ip: ' + serverIP);
         login();
 
         //trigger on heartbeat
