@@ -12,7 +12,6 @@
 
 #include "arithmetic/mi_connected_domain_analysis.h"
 #include "arithmetic/mi_segment_threshold.h"
-#include "arithmetic/mi_connected_domain_analysis.h"
 #include "arithmetic/mi_morphology.h"
 
 using namespace medical_imaging;
@@ -48,7 +47,7 @@ int convert_volume_8(
 
 int main(int argc , char* argv[]) {
 
-    const std::string root = "E:/data/MyData/demo/lung1/";
+    const std::string root = "/home/wangrui22/data/demo/lungs2/orig/1.3.6.1.4.1.14519.5.2.1.6279.6001.188059920088313909273628445208/";
     std::vector<std::string> files;
     std::set<std::string> dcm_postfix;
     dcm_postfix.insert(".dcm");
@@ -79,7 +78,7 @@ int main(int argc , char* argv[]) {
         convert_volume_8(data , dim , _volume_data->_intercept , _volume_data->_slope , ww , wl , data_8);
     }
 
-    FileUtil::write_raw("D:/temp/data_8.raw" , data_8 , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/data_8.raw" , data_8 , dim[0]*dim[1]*dim[2]);
     printf("16->8 done.\n");
 
     memset(mask , 0 , dim[0]*dim[1]*dim[2]);
@@ -101,7 +100,7 @@ int main(int argc , char* argv[]) {
     }
 
     printf("segmentation done.\n");
-    FileUtil::write_raw("D:/temp/mask.raw" , mask , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/mask.raw" , mask , dim[0]*dim[1]*dim[2]);
 
     Morphology mor;
     mor.erose(mask, dim[0], dim[1], dim[2], 1);
@@ -114,18 +113,18 @@ int main(int argc , char* argv[]) {
     mor.dilate(mask, dim[0], dim[1], dim[2], 1);
 
     printf("morphology done.\n");
-    FileUtil::write_raw("D:/temp/mask_mor.raw" , mask , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/mask_mor.raw" , mask , dim[0]*dim[1]*dim[2]);
 
     ConnectedDomainAnalysis conn;
     conn.set_dim(dim);
     conn.set_mask_ref(mask);
     conn.set_target_label(1);
     unsigned int begin[3] ={0,0,0};
-    conn.set_roi(begin , dim);
+    conn.set_roi(begin, dim,  mask);
     conn.keep_major();
 
     printf("keep major connected domain done.\n");
-    FileUtil::write_raw("D:/temp/mask_major.raw" , mask , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/mask_major.raw" , mask , dim[0]*dim[1]*dim[2]);
 
 
     mor.dilate(mask, dim[0], dim[1], dim[2], 1);
@@ -140,7 +139,7 @@ int main(int argc , char* argv[]) {
     mor.erose(mask, dim[0], dim[1], dim[2], 1);
 
     printf("morphology major domain done.\n");
-    FileUtil::write_raw("D:/temp/mask_major_mor.raw" , mask , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/mask_major_mor.raw" , mask , dim[0]*dim[1]*dim[2]);
 
     //std::fstream in("D:/temp/mask_major_mor.raw" , std::ios::binary | std::ios::in);
     //in.read((char*)mask , dim[0]*dim[1]*dim[2]);
@@ -232,7 +231,7 @@ int main(int argc , char* argv[]) {
     }
 
     printf("scan to fill done.\n");
-    FileUtil::write_raw("D:/temp/mask_major_mor_fill.raw" , mask , dim[0]*dim[1]*dim[2]);
+    FileUtil::write_raw("/home/wangrui22/data/demo/lungs2/mask_major_mor_fill.raw" , mask , dim[0]*dim[1]*dim[2]);
 
     return 0;
 }
