@@ -301,7 +301,7 @@ void AppThreadModel::process_sending() {
                 int buffer_size = 0;
                 char* buffer = none_image->serialize_dirty(buffer_size);
                 if (nullptr == buffer || buffer_size == 0) {
-                    MI_APPCOMMON_LOG(MI_WARNING) << "dirty none image has no serialized dirty buffer.";
+                    //MI_APPCOMMON_LOG(MI_WARNING) << "dirty none image has no serialized dirty buffer.";
                     continue;
                 }
                 header._data_len = static_cast<unsigned int>(buffer_size);
