@@ -41,6 +41,9 @@ int CmdHandlerOperating::handle_command(const IPCDataHeader& ipcheader , char* b
         controller->get_thread_model()->push_operation(op);
     } else {
         MI_APPCOMMON_LOG(MI_ERROR) << "cant find operation: " << op_id;
+        if (nullptr != buffer) {
+            delete [] buffer;
+        }
     }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT operation cmd handler.";

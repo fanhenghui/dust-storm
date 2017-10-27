@@ -137,9 +137,11 @@ void OBAnnotationList::update(int code_id) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialized annotation list msg buffer failed.";
         delete [] buffer;
         buffer = nullptr;
+        msg.Clear();
         return;
     }
-
+    msg.Clear();
+    
     header._data_len = static_cast<unsigned int>(buffer_size);
     controller->get_client_proxy()->async_send_message(header, buffer);
     if (buffer != nullptr) {

@@ -72,6 +72,9 @@ int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {
     if (it != _handlers.end() && it->second) {
         return it->second->handle_command(header , buffer);
     } else {
+        if (nullptr != buffer ) {
+            delete [] buffer;
+        }
         MI_UTIL_LOG(MI_WARNING) << "cant find handler to process ipc data. header detail : " << STREAM_IPCHEADER_INFO(header);
         return -1;
     }

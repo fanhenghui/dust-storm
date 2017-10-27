@@ -25,6 +25,8 @@ int OpSwitchPresetWindowing::execute() {
     }
 
     const std::string context = msg.context();
+    msg.Clear();
+    
     static const int S_PRESET_WL_NUM = 6;
     static const std::string S_PRESET_WL_NAME[S_PRESET_WL_NUM]= {
         "Abdomen",

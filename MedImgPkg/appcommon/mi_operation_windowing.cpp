@@ -31,7 +31,8 @@ int OpWindowing::execute() {
     const float pre_y = msg.pre().y();
     const float cur_x = msg.cur().x();
     const float cur_y = msg.cur().y();
-
+    msg.Clear();
+    
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 

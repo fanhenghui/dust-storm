@@ -271,9 +271,13 @@ void Display() {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //std::shared_ptr<CameraBase> camera = _scene->get_camera();
-        //Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
-        //camera->rotate(q);
+        // static bool ds = false;
+        // ds = !ds;
+        // _scene->set_downsample(ds);
+
+        // std::shared_ptr<CameraBase> camera = _scene->get_camera();
+        // Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
+        // camera->rotate(q);
 
         CHECK_GL_ERROR;
 
@@ -294,7 +298,7 @@ void Display() {
         //_time_query2->begin();
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
-        _scene->download_image_buffer();
+        //_scene->download_image_buffer();
 
         CHECK_GL_ERROR;
         _scene->swap_image_buffer();
@@ -310,7 +314,7 @@ void Display() {
 #ifdef WIN32
         FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
-        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+        //FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
         // MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
         // ", buffer size: " << buffer_size;
@@ -380,11 +384,12 @@ void Keyboard(unsigned char key, int x, int y) {
                }
     case 'h' : {
         static int lut_id = 0;
-        static const int LUT_NUM = 10;
+        static const int LUT_NUM = 11;
         static const std::string LUT_LIST[LUT_NUM] = {
             "../config/lut/3d/ct_cta.xml",
             "../config/lut/3d/ct_cta_1.xml",
             "../config/lut/3d/ct_lung_glass.xml",
+            "../config/lut/3d/ct_lung_glass_2.xml",
             "../config/lut/3d/ct_calcification.xml",
             "../config/lut/3d/ct_carotids.xml",
             "../config/lut/3d/ct_clr_abd_aorta_1.xml",
@@ -437,7 +442,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {

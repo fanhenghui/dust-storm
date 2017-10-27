@@ -38,7 +38,7 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
 
     buffer_size = msg.ByteSize();
     if(buffer_size == 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: byte length is 0.";
+        //MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: byte length is 0.";
         return nullptr;
     }
     char* data = new char[buffer_size];
@@ -48,7 +48,9 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
         data = nullptr;
         buffer_size = 0;
         return nullptr; 
+        msg.Clear();
     } else {
+        msg.Clear();
         return data;
     }
 }

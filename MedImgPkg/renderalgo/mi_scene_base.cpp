@@ -7,8 +7,9 @@
 #include "glresource/mi_gl_time_query.h"
 #include "util/mi_file_util.h"
 
-// #include "libgpujpeg/gpujpeg_encoder.h"
-// #include "libgpujpeg/gpujpeg_encoder_internal.h"
+#ifndef WIN32
+#include "libgpujpeg/gpujpeg_encoder_internal.h"
+#endif
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -27,7 +28,8 @@ SceneBase::SceneBase() : _width(128), _height(128) {
 
 #ifndef WIN32
     // init gpujepg parameter
-    _gpujpeg_encoder = nullptr;
+    _gpujpeg_encoder_hd = nullptr;
+    _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
     _gpujpeg_encoding_duration = 0;
@@ -49,7 +51,8 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
 
 #ifndef WIN32
     // init gpujepg parameter
-    _gpujpeg_encoder = nullptr;
+    _gpujpeg_encoder_hd = nullptr;
+    _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
     _gpujpeg_encoding_duration = 0;
@@ -121,32 +124,38 @@ void SceneBase::initialize() {
         CHECK_GL_ERROR;
 
 #ifndef WIN32
-        // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in
-        // multi-scene)
+        // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in multi-scene)
         gpujpeg_init_device(0, 0);
 
-        gpujpeg_set_default_parameters(&_gpujpeg_param);        //默认参数
-        gpujpeg_parameters_chroma_subsampling(&_gpujpeg_param); //默认采样参数;
-        _gpujpeg_param.quality = _compress_hd_quality;
+        gpujpeg_parameters gpujpeg_param_hd;
+        gpujpeg_set_default_parameters(&gpujpeg_param_hd);        //默认参数
+        gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_hd); //默认采样参数;
+        gpujpeg_param_hd.quality = _compress_hd_quality;
 
-        gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
-        _gpujpeg_image_param.width = _width;
-        _gpujpeg_image_param.height = _height;
-        _gpujpeg_image_param.comp_count = 3;
-        _gpujpeg_image_param.color_space = GPUJPEG_RGB;
-        _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+        gpujpeg_parameters gpujpeg_param_ld;
+        gpujpeg_set_default_parameters(&gpujpeg_param_ld);        //默认参数
+        gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_ld); //默认采样参数;
+        gpujpeg_param_ld.quality = _compress_ld_quality;
+
+        gpujpeg_image_parameters gpujpeg_image_param;
+        gpujpeg_image_set_default_parameters(&gpujpeg_image_param);
+        gpujpeg_image_param.width = _width;
+        gpujpeg_image_param.height = _height;
+        gpujpeg_image_param.comp_count = 3;
+        gpujpeg_image_param.color_space = GPUJPEG_RGB;
+        gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
 
         // bind GL texture to cuda(by PBO)
         unsigned int tex_id = _scene_color_attach_0->get_id();
-        _gpujpeg_texture =
-            gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
+        _gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
         // create encoder
-        _gpujpeg_encoder =
-            gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+        _gpujpeg_encoder_hd = gpujpeg_encoder_create(&gpujpeg_param_hd, &gpujpeg_image_param);
+        _gpujpeg_encoder_ld = gpujpeg_encoder_create(&gpujpeg_param_ld, &gpujpeg_image_param);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder_hd);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder_ld);
         // set texture as input
-        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input,
-                                          _gpujpeg_texture);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_hd, _gpujpeg_texture);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_ld, _gpujpeg_texture);
 
         // cudaEventCreate(&_gpujpeg_encoding_start);
         // cudaEventCreate(&_gpujpeg_encoding_stop);
@@ -190,8 +199,6 @@ void SceneBase::set_display_size(int width, int height) {
         GL_UNSIGNED_SHORT, nullptr);
 
 #ifndef WIN32
-    _gpujpeg_image_param.width = _width;
-    _gpujpeg_image_param.height = _height;
     _gpujpeg_encoder_dirty = true;
 #endif
     set_dirty(true);
@@ -220,30 +227,51 @@ bool SceneBase::get_dirty() const {
 
 void SceneBase::pre_render_i() {
 #ifndef WIN32
-    if (_gpujpeg_encoder && _gpujpeg_encoder_dirty) {
-        gpujpeg_encoder_destroy(_gpujpeg_encoder);
-        _gpujpeg_encoder = nullptr;
+    if (_gpujpeg_encoder_hd && _gpujpeg_encoder_dirty) {
+        //release previous
+        gpujpeg_opengl_texture_unregister(_gpujpeg_texture);
+        _gpujpeg_texture = nullptr;
+        gpujpeg_encoder_destroy(_gpujpeg_encoder_hd);
+        gpujpeg_encoder_destroy(_gpujpeg_encoder_ld);
+        _gpujpeg_encoder_hd = nullptr;
+        _gpujpeg_encoder_ld = nullptr;
 
-        gpujpeg_image_set_default_parameters(&_gpujpeg_image_param);
-        _gpujpeg_image_param.width = _width;
-        _gpujpeg_image_param.height = _height;
-        _gpujpeg_image_param.comp_count = 3;
-        _gpujpeg_image_param.color_space = GPUJPEG_RGB;
-        _gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+        //create new encoder
+        gpujpeg_parameters gpujpeg_param_hd;
+        gpujpeg_set_default_parameters(&gpujpeg_param_hd);        //默认参数
+        gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_hd); //默认采样参数;
+        gpujpeg_param_hd.quality = _compress_hd_quality;
 
-        _gpujpeg_param.quality = this->get_downsample() ? _compress_ld_quality : _compress_hd_quality;
+        gpujpeg_parameters gpujpeg_param_ld;
+        gpujpeg_set_default_parameters(&gpujpeg_param_ld);        //默认参数
+        gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_ld); //默认采样参数;
+        gpujpeg_param_ld.quality = _compress_ld_quality;
+
+        gpujpeg_image_parameters gpujpeg_image_param;
+        gpujpeg_image_set_default_parameters(&gpujpeg_image_param);
+        gpujpeg_image_param.width = _width;
+        gpujpeg_image_param.height = _height;
+        gpujpeg_image_param.comp_count = 3;
+        gpujpeg_image_param.color_space = GPUJPEG_RGB;
+        gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
+        _gpujpeg_encoder_hd = gpujpeg_encoder_create(&gpujpeg_param_hd, &gpujpeg_image_param);
+        _gpujpeg_encoder_ld = gpujpeg_encoder_create(&gpujpeg_param_ld, &gpujpeg_image_param);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder_hd);
+        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder_ld);
+
+        // set texture as input
+        gpujpeg_image_destroy(_gpujpeg_encoder_input_hd.image);
+        gpujpeg_image_destroy(_gpujpeg_encoder_input_ld.image);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_hd, _gpujpeg_texture);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_ld, _gpujpeg_texture);
 
         // bind GL texture to cuda(by PBO)
         unsigned int tex_id = _scene_color_attach_0->get_id();
-        _gpujpeg_texture =
-            gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
-        // create encoder
-        _gpujpeg_encoder =
-            gpujpeg_encoder_create(&_gpujpeg_param, &_gpujpeg_image_param);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_gpujpeg_encoder);
+        _gpujpeg_texture = gpujpeg_opengl_texture_register(tex_id, GPUJPEG_OPENGL_TEXTURE_READ);
         // set texture as input
-        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input,
-                                          _gpujpeg_texture);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_hd, _gpujpeg_texture);
+        gpujpeg_encoder_input_set_texture(&_gpujpeg_encoder_input_ld, _gpujpeg_texture);
 
         _gpujpeg_encoder_dirty = false;
     }
@@ -273,8 +301,14 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
 
         _gl_time_query->begin();
 
-        int err = gpujpeg_encoder_encode(_gpujpeg_encoder, &_gpujpeg_encoder_input,
-                                         &image_compressed, &image_compressed_size);
+        int err = 0;
+        if (_downsample) {
+            err = gpujpeg_encoder_encode(_gpujpeg_encoder_ld, &_gpujpeg_encoder_input_ld,
+                &image_compressed, &image_compressed_size);
+        } else {
+            err = gpujpeg_encoder_encode(_gpujpeg_encoder_hd, &_gpujpeg_encoder_input_hd,
+                &image_compressed, &image_compressed_size);
+        }
 
         CHECK_GL_ERROR;
 
@@ -355,7 +389,6 @@ float SceneBase::get_compressing_duration() const
 }
 
 void SceneBase::set_downsample(bool flag) {
-    _gpujpeg_encoder_dirty = (_downsample != flag);
     _downsample = flag;
 }
 

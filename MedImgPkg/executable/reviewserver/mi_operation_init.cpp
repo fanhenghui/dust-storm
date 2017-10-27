@@ -88,6 +88,7 @@ int OpInit::execute() {
         return -1;
     }
 
+    msg_init.Clear();
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation.";
     return 0;
 }
@@ -168,7 +169,12 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
         }
         preprocessing_mask = true;
     } else {
-        //TODO do preprocessing
+        //TODO TMP set all mask pixel to 1 (replaced by preprocessing algorithm later)
+        unsigned char* mask_raw = (unsigned char*)mask_data->get_pixel_pointer();
+        memset(mask_raw, 1 , image_buffer_size);
+        MaskLabelStore::instance()->fill_label(1);
+        volume_infos->cache_original_mask();
+        preprocessing_mask = true;
     }
 
     controller->set_volume_infos(volume_infos);
@@ -418,6 +424,7 @@ int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
     controller->add_model(MODEL_ID_CROSSHAIR , model_crosshair);
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
+    return 0;
 }
 
 MED_IMG_END_NAMESPACE

@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "util/mi_ipc_common.h"
+#include "appcommon/mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -25,6 +26,7 @@ public:
 
     virtual ~IOperation() {
         if (nullptr != _buffer) {
+            MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete [] _buffer;
             _buffer = nullptr;
         }
@@ -45,6 +47,7 @@ public:
 
     void reset() {
         if (nullptr != _buffer) {
+            MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete[] _buffer;
             _buffer = nullptr;
         }

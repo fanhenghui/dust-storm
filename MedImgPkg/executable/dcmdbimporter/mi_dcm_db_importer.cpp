@@ -395,11 +395,11 @@ int main(int argc, char* argv[]) {
                    items[i].modality.c_str());
         }
 
-        std::string path;
+        // std::string path;
 
-        if (0 == data_base.get_series_path(items[0].series_id, path)) {
-            printf("get items 0 path : %s\n", path.c_str());
-        }
+        // if (0 == data_base.get_series_path(items[0].series_id, path)) {
+        //     printf("get items 0 path : %s\n", path.c_str());
+        // }
     } else {
         LOG_OUT("ERROR : get all item failed.\n");
     }

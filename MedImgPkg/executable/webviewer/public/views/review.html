@@ -98,13 +98,33 @@
                         </ul>
                     </div>
                     <div>
-                        <table>
+                        <table id ="table-preset-vrt">
                             <tr>
-                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="img-preset-vrt-cta">
-                                    <img src="images/vrt-cta.jpg">
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_lung_glass">
+                                    <img src="images/vrt_ct_lung_glass.jpeg">
                                 </td>
-                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="img-preset-vrt-lung-glass">
-                                    <img src="images/vrt-lung-glass.jpg">
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_lung_bw">
+                                    <img src="images/vrt_ct_lung_bw.jpeg">
+                                </td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_lung_glass_2">
+                                    <img src="images/vrt_ct_lung_glass_2.jpeg">
+                                </td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_calcification">
+                                    <img src="images/vrt_ct_calcification.jpeg">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_cta">
+                                    <img src="images/vrt_ct_cta.jpeg">
+                                </td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_clr_abd_aorta_1">
+                                    <img src="images/vrt_ct_clr_abd_aorta_1.jpeg">
+                                </td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_clr_carotid_1">
+                                    <img src="images/vrt_ct_clr_carotid_1.jpeg">
+                                </td>
+                                <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_carotids">
+                                    <img src="images/vrt_ct_carotids.jpeg">
                                 </td>
                             </tr>
                         </table>
@@ -116,9 +136,18 @@
             </div>
         </div>
     </div>
+        <div id="modal-loading-progress" class="modal fade">
+
+        </div>
+    <div>
+        
+    </div>
     <div class="container-fluid" id="worklist-div">
         <div style="display:none" hidden="true">
             <p id="username"><%=username%></p>
+        </div>
+        <div style="display:none" hidden="true">
+            <p id="serverip"><%=serverip%></p>
         </div>
         <div clss="row">
             <div class="col-md-12 col-sm-12">
@@ -281,6 +310,14 @@
                             </fieldset>
                         </div>
                         <br>
+                        <div class="row clearfix">
+                            <fieldset>
+                                <div class="col-md-12 col-sm-12 column">
+                                    <button class="btn btn-default" type="button" id="btn-test-0"><span class="glyphicon glyphicon-random"></span></button>
+                                    <button class="btn btn-default" type="button" id="btn-test-1"><span class="glyphicon glyphicon-random"></span></button>
+                                </div>
+                            </fieldset>
+                        </div>
                         <!-- <div class="row clearfix">
                             <div class="col-md-12 col-sm-12 column">
                                 <button class="btn btn-play-vr" type="button" id="btn-play-vr"><em class="glyphicon glyphicon-align-left"></em>PlayVR</button>
@@ -322,7 +359,6 @@
 </body>
 
 <script src="js/mi-define.js"></script>
-<script src="js/mi-socket-ip.js"></script>
 <script src="js/mi-socket-client.js"></script>
 <script src="js/mi-action.js"></script>
 <script src="js/mi-roi.js"></script>

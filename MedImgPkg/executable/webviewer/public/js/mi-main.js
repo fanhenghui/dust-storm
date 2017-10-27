@@ -1,4 +1,5 @@
 var socket = null;
+var serverIP = '';
 var seriesUID = '';
 var cellCanvases = null;
 var cellSVGs = null;
@@ -23,7 +24,7 @@ var maxCellID = -1;
     }
 
     function login() {
-        socket = io.connect(SOCKET_IP);
+        socket = io.connect(serverIP);
         if (!socket) {
             console.log('connect server failed.');
             alert('connect server failed.');
@@ -49,6 +50,26 @@ var maxCellID = -1;
         if (socket != null) {
             socket.emit('disconnect', {userid: socket.userID,username: socket.userName});
             location.reload();
+        }
+    }
+
+    var heartbeatCount = 1;
+    var lastheartbearCount = 0;
+    const HEARTBEAT_INTERVAL = 5 * 1000 + 1000;
+    function keepHeartbeat() {
+        socketClient.heartbeat();
+        heartbeatCount += 1;
+    }
+    function checkHeartbeat() {
+        if (!revcBEReady) {
+            return;
+        }
+        if (heartbeatCount - lastheartbearCount > 0) {
+            lastheartbearCount = heartbeatCount;
+        } else {
+            //return to login
+            console.log('heart dead. return to login.');
+            window.location.href = '/login';
         }
     }
 
@@ -206,7 +227,7 @@ var maxCellID = -1;
                 recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_BE_HEARTBEAT:
-                socketClient.heartbeat();
+                keepHeartbeat();
                 break;
             case COMMAND_ID_BE_SEND_ANNOTATION_LIST:
                 recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
@@ -660,6 +681,7 @@ var maxCellID = -1;
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
         }
+
         document.getElementById('a-preset-wl-abdomen').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-lung').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-brain').onclick = function(event) {switchPresetWLFunc(this);return false;}
@@ -722,9 +744,111 @@ var maxCellID = -1;
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
         }
-        document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('cta');}
-        document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('lung-glass');}
 
+        var presetVRTTable = document.getElementById('table-preset-vrt');
+        if (presetVRTTable) {
+            var vrtRows = presetVRTTable.rows;
+            for (var i = 0; i < vrtRows.length; ++i) {
+                vrtCells = vrtRows[i].cells;
+                for (var j = 0; j < vrtCells.length; ++j) {
+                    vrtCells[j].onclick = (function() {
+                        switchVRTFunc($(this).attr('id'));
+                    }).bind(vrtCells[j]);    
+                }
+            }
+        }
+        // document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('ct_cta');}
+        // document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('ct_lung_glass');}
+
+        ///For testing
+        const TEST_INTERVAL = MOUSE_MSG_INTERVAL;
+        function LeftMove(cellID, moveBack, moveX, step) {
+            var x = moveBack ? 200 - step : 200 + step;
+            if (moveX) {
+                cells[cellID].mouseBtn = BTN_LEFT;
+                cells[cellID].mouseStatus = BTN_DOWN;
+                cells[cellID].mouseActionCommon.mouseDown(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseMove(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, x, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseUp(cells[cellID].mouseBtn, cells[cellID].mouseStatus, x, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseBtn = BTN_NONE;
+                cells[cellID].mouseStatus = BTN_UP;
+            } else {
+                cells[cellID].mouseBtn = BTN_LEFT;
+                cells[cellID].mouseStatus = BTN_DOWN;
+                cells[cellID].mouseActionCommon.mouseDown(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, 200, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseMove(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, 200, 200, x, cells[cellID]);
+                cells[cellID].mouseActionCommon.mouseUp(cells[cellID].mouseBtn, cells[cellID].mouseStatus, 200, x, 200, 200, cells[cellID]);
+                cells[cellID].mouseBtn = BTN_NONE;
+                cells[cellID].mouseStatus = BTN_UP;
+            }
+        };
+
+        const ROLL_INTERVAL = 200;
+        tik = 0;
+        roolStatus = false;
+        function LeftMoveRoll(cellID, moveX, step) {
+            tik += 1;
+            if (tik > ROLL_INTERVAL) {
+                tik = 0;
+                roolStatus = !roolStatus;
+            }
+
+            if (roolStatus) {
+                LeftMove(cellID, false, moveX, step);
+            } else {
+                LeftMove(cellID, true, moveX, step);
+            }
+        }
+
+        testBtnStatus0 = false;
+        testBtnFunc0 = null;
+        var testBtn = document.getElementById('btn-test-0');
+        if (testBtn) {
+            testBtn.onclick = function(event) {
+                if (!testBtnStatus0) {
+                    testBtnStatus0 = true;
+                    $('#btn-test-0').addClass('btn-primary');
+                    if (testBtnFunc0 == null) {
+                        testBtnFunc0 = setInterval(function() {
+                            LeftMoveRoll(0, false, 2);
+                        }, TEST_INTERVAL);
+                    }
+                } else {
+                    $('#btn-test-0').removeClass('btn-primary');
+                    testBtnStatus0 = false;
+                    if (testBtnFunc0) {
+                        clearInterval(testBtnFunc0);
+                        testBtnFunc0 = null;
+                    }
+                }
+            };
+        }
+
+        testBtnStatus1 = false;
+        testBtnFunc1 = null;
+        var testBtn1 = document.getElementById('btn-test-1');
+        if (testBtn1) {
+            testBtn1.onclick = function(event) {
+                if (!testBtnStatus1) {
+                    testBtnStatus1 = true;
+                    $('#btn-test-1').addClass('btn-primary');
+                    if (testBtnFunc1 == null) {
+                        testBtnFunc1 = setInterval(function() {
+                            LeftMove(3, false, true, 8);
+                        }, TEST_INTERVAL);
+                    }
+                } else {
+                    $('#btn-test-1').removeClass('btn-primary');
+                    testBtnStatus1 = false;
+                    if (testBtnFunc1) {
+                        clearInterval(testBtnFunc1);
+                        testBtnFunc1 = null;
+                    }
+                }
+            };
+        }
+
+        var loginBtn = document.getElementById('btn-login');
         var loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
@@ -746,7 +870,14 @@ var maxCellID = -1;
             resize()
         };
         var username = document.getElementById('username').innerHTML;
+        serverIP = document.getElementById('serverip').innerHTML;
+        console.log('server ip: ' + serverIP);
         login();
+
+        //trigger on heartbeat
+        var checkHeartbearFunc = setInterval(function() {
+            checkHeartbeat();
+        }, HEARTBEAT_INTERVAL);
     }
 
     prepare();

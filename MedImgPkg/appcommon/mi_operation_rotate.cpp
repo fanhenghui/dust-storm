@@ -22,6 +22,7 @@ OpRotate::OpRotate() {}
 OpRotate::~OpRotate() {}
 
 int OpRotate::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpRotate.";
     const unsigned int cell_id = _header._cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -40,6 +41,7 @@ int OpRotate::execute() {
         const float pre_y = msg.pre().y();
         const float cur_x = msg.cur().x();
         const float cur_y = msg.cur().y();
+        msg.Clear();
     
         scene->rotate(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
     } else {
@@ -56,7 +58,10 @@ int OpRotate::execute() {
         } else {
             APPCOMMON_THROW_EXCEPTION("parser rotation message failed!");
         }
+        msg.Clear();
     }
+    
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpRotate";
     return 0;
 }
 

@@ -49,6 +49,7 @@ int OpLocate::execute() {
     //const float l0_b = msgCrosshair.l0_b();
     //const float l1_a = msgCrosshair.l1_a();
     //const float l1_b = msgCrosshair.l1_b();
+    msgCrosshair.Clear();
     const Point2 pt_cross(cx, cy);
 
     std::shared_ptr<AppController> controller = _controller.lock();
