@@ -452,11 +452,9 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     this.content = d3.select(this.svg)
         .selectAll('text')
         .data(
-            [{
-                key: this.annotationKey,
-            }],
+            [{ key: this.annotationKey, }],
             function (d) {
-                return d.key;
+                return d? d.key : null;
             })
         .enter()
         .append('text')
