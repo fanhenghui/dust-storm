@@ -23,6 +23,7 @@ enum NoneImageType {
     Direction = 3,
     Annotation = 4,
     Crosshair = 5,
+    Frustum = 6,
 };
 class MsgNoneImgCollection;
 class SceneBase;
@@ -130,6 +131,23 @@ private:
     //left|right|top|bottom
     std::string _info;
     OrthoCamera _pre_camera;
+};
+
+class NoneImgFrustum : public INoneImg {
+public:
+    NoneImgFrustum():INoneImg(Frustum), _frustum_width(0.0), _frustum_height(0.0), _screen_width(0), _screen_height(0){};
+    ~NoneImgFrustum() {};
+
+    virtual void fill_msg(MsgNoneImgCollection* msg) const;
+    virtual bool check_dirty();
+    virtual void update();
+
+private:
+    double _frustum_width;
+    double _frustum_height;
+
+    int _screen_width;
+    int _screen_height;
 };
 
 class ModelCrosshair;

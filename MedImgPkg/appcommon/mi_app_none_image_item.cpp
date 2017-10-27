@@ -449,6 +449,48 @@ void NoneImgDirection::update() {
     _info = ss.str();
 }
 
+bool NoneImgFrustum::check_dirty() {
+    APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    int width=0, height=0;
+    _scene->get_display_size(width, height);
+    std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+
+    const Matrix4 mat_p = ortho_camera->get_projection_matrix();
+    if ((2.0 / mat_p[0][0]) == _frustum_width && (2.0 / mat_p[1][1]) == _frustum_height && 
+        _screen_width == width && _screen_height == height) {
+      return false;
+    } else {
+      _frustum_width = 2.0 / mat_p[0][0];
+      _frustum_height = 2.0 / mat_p[1][1];
+      _screen_width = width;
+      _screen_height = height;
+      return true;
+    }
+}
+
+void NoneImgFrustum::update() {
+    // APPCOMMON_CHECK_NULL_EXCEPTION(_scene);
+    // int width=0, height=0;
+    // _scene->get_display_size(width, height);
+    // std::shared_ptr<CameraBase> camera = _scene->get_camera();
+    // std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
+    // APPCOMMON_CHECK_NULL_EXCEPTION(ortho_camera);
+
+    // const Matrix4 mat_p = ortho_camera->get_projection_matrix();
+    // _frustum_width = 2.0/mat_p[0][0];
+    // _frustum_height = 2.0/mat_p[1][1];
+    // _screen_width = width;
+    // _screen_height = height;
+}
+
+void NoneImgFrustum::fill_msg(MsgNoneImgCollection* msg) const {
+    MsgFrustum* frustum_msg = msg->mutable_frustum();
+    frustum_msg->set_width(_frustum_width);
+    frustum_msg->set_height(_frustum_height);
+}
+
 
 void NoneImgCrosshair::fill_msg(MsgNoneImgCollection* msg) const {
     MsgCrosshair* cross_hair = msg->mutable_crosshair();

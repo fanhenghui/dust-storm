@@ -391,6 +391,8 @@ var maxCellID = -1;
             cells[i].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
             //MPR add crosshair
             cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient, 0);
+            //MPR add ruler
+            cells[i].ruler = new VerticalRuler(cellSVGs[i], i);
         }
         cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
         cells[3].crosshair = new Crosshair(cellSVGs[3], 3, 0, 0,{a:0, b:0, c:0}, {a:0, b:0, c:0}, socketClient, 1);

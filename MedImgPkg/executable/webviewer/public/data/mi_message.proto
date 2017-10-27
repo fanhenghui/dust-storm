@@ -109,11 +109,17 @@ message MsgCrosshair {
     string border_color = 11;
 };
 
+message MsgFrustum {
+    float width = 1;
+    float height = 2;
+};
+
 message MsgNoneImgCollection {
     MsgNoneImgCornerInfos corner_infos = 1;
     MsgNoneImgAnnotations annotations = 2;
     MsgNoneImgDirection direction = 3;
     MsgCrosshair crosshair = 4;
+    MsgFrustum frustum = 5;
 };
 
 message MsgMPRMaskOverlay {

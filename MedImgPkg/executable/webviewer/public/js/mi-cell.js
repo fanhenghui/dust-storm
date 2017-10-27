@@ -46,6 +46,8 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     this.crosshair = null;
     this.borderColor = '#333333';
 
+    this.ruler = null;
+
     //mouse out event
     $(this.svg).mouseleave((function() {
         if(this.mouseStatus == BTN_DOWN) {
@@ -255,7 +257,6 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     .append('text')
                     .attr('font-family', 'monospace')
                     .attr('font-size', '15px')
-                    .attr('fill', 'red')
                     .attr('fill', '#dcdcdc')
                     .attr('class', 'no-select-text')
                     .attr('alignment-baseline', function (d, i) {
@@ -337,6 +338,13 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     }).text(function (d) {
                         return d.content;
                     });
+            }
+        }
+
+        // frustum information to adapt vertical ruler
+        if (receivedMsg.hasOwnProperty('frustum')) {
+            if (this.ruler) {
+                this.ruler.updateRuler(receivedMsg.frustum.height);
             }
         }
     }
