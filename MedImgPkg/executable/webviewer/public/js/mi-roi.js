@@ -304,7 +304,7 @@ ROICircle.prototype.locate = function(cx, cy, r) {
 }
 
 ROICircle.prototype.visible = function(flag) {
-    let vis = 'inline';
+    let vis = 'none';
     if( flag == true) {
         vis = 'inline';
     } else {

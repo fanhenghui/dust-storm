@@ -6,12 +6,12 @@ function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
         return;
     }
 
-    var MsgCrosshair = socketClient.protocRoot.lookup('medical_imaging.MsgCrosshair');
+    let MsgCrosshair = socketClient.protocRoot.lookup('medical_imaging.MsgCrosshair');
     if(!MsgCrosshair) {
         console.log('get crosshair message type failed.');
         return;
     }
-    var msgCrosshair = MsgCrosshair.create({
+    let msgCrosshair = MsgCrosshair.create({
         cx: cx,
         cy: cy,
         l0a: line0Para.a,
@@ -23,7 +23,7 @@ function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
         console.log('create crosshair message failed.');
         return;
     }
-    var msgBuffer = MsgCrosshair.encode(msgCrosshair).finish();
+    let msgBuffer = MsgCrosshair.encode(msgCrosshair).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_LOCATE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
@@ -132,12 +132,12 @@ Crosshair.prototype.initVRStyle = function() {
     //drag crosshair
     this.crossCtrl.call(d3.drag().
     on('drag', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveCrosshair(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -150,8 +150,8 @@ Crosshair.prototype.initVRStyle = function() {
         }
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveCrosshair(x,y);
         //send message
@@ -280,12 +280,12 @@ Crosshair.prototype.initMPRStyle = function() {
     //drag crosshair
     this.crossCtrl.call(d3.drag().
     on('drag', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveCrosshair(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -298,8 +298,8 @@ Crosshair.prototype.initMPRStyle = function() {
         }
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveCrosshair(x,y);
         //send message
@@ -308,12 +308,12 @@ Crosshair.prototype.initMPRStyle = function() {
 
     this.line00CtrlMove.call(d3.drag()
     .on('drag', (function(d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine0(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -324,8 +324,8 @@ Crosshair.prototype.initMPRStyle = function() {
 
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine0(x,y);
         //send message
@@ -334,12 +334,12 @@ Crosshair.prototype.initMPRStyle = function() {
 
     this.line01CtrlMove.call(d3.drag()
     .on('drag', (function(d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine0(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -350,8 +350,8 @@ Crosshair.prototype.initMPRStyle = function() {
 
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine0(x,y);
         //send message
@@ -361,12 +361,12 @@ Crosshair.prototype.initMPRStyle = function() {
 
     this.line10CtrlMove.call(d3.drag()
     .on('drag', (function(d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine1(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -377,8 +377,8 @@ Crosshair.prototype.initMPRStyle = function() {
 
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine1(x,y);
         //send message
@@ -387,12 +387,12 @@ Crosshair.prototype.initMPRStyle = function() {
 
     this.line11CtrlMove.call(d3.drag()
     .on('drag', (function(d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine1(x,y);
 
-        var curClock = new Date().getTime();
+        let curClock = new Date().getTime();
         if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
             return;
         }
@@ -403,8 +403,8 @@ Crosshair.prototype.initMPRStyle = function() {
 
     }).bind(this))
     .on('end', (function (d) {
-        var x = d3.event.x;
-        var y = d3.event.y;
+        let x = d3.event.x;
+        let y = d3.event.y;
         //calculate new line parameter
         this.moveLine1(x,y);
         //send message
@@ -423,13 +423,13 @@ function dot(a, b) {
 
 Crosshair.prototype.moveCrosshair = function(x, y) {
     if (this.style == 0) {
-        var para = this.line0Para;
-        var ab = Math.sqrt(para.a*para.a + para.b*para.b);
-        var normx = para.a/ab;
-        var normy = para.b/ab;
-        var dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
-        var newc = (para.c/ab + dis)*ab;
-        var newpara0 = {a:para.a, b:para.b, c:newc };  
+        let para = this.line0Para;
+        let ab = Math.sqrt(para.a*para.a + para.b*para.b);
+        let normx = para.a/ab;
+        let normy = para.b/ab;
+        let dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
+        let newc = (para.c/ab + dis)*ab;
+        let newpara0 = {a:para.a, b:para.b, c:newc };  
     
         para = this.line1Para;
         ab = Math.sqrt(para.a*para.a + para.b*para.b);
@@ -437,7 +437,7 @@ Crosshair.prototype.moveCrosshair = function(x, y) {
         normy = para.b/ab;
         dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
         newc = (para.c/ab + dis)*ab;
-        var newpara1 = {a:para.a, b:para.b, c:newc };  
+        let newpara1 = {a:para.a, b:para.b, c:newc };  
     
         this.setLine(x, y, newpara0, newpara1);
     } else if (this.style == 1) {
@@ -449,15 +449,15 @@ Crosshair.prototype.moveLine0 = function(x, y) {
     if (this.style != 0) {
         return;
     }
-    var para = this.line0Para;
-    var ab = Math.sqrt(para.a*para.a + para.b*para.b);
-    var normx = para.a/ab;
-    var normy = para.b/ab;
-    var dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
-    var newcx = this.cx + dis*normx;
-    var newcy = this.cy + dis*normy;
-    var newc = (para.c/ab + dis)*ab;
-    var newpara = {a:para.a, b:para.b, c:newc};  
+    let para = this.line0Para;
+    let ab = Math.sqrt(para.a*para.a + para.b*para.b);
+    let normx = para.a/ab;
+    let normy = para.b/ab;
+    let dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
+    let newcx = this.cx + dis*normx;
+    let newcy = this.cy + dis*normy;
+    let newc = (para.c/ab + dis)*ab;
+    let newpara = {a:para.a, b:para.b, c:newc};  
 
     this.setLine(newcx, newcy, newpara, this.line1Para);
 }
@@ -466,47 +466,47 @@ Crosshair.prototype.moveLine1 = function(x, y) {
     if (this.style != 0) {
         return;
     }
-    var para = this.line1Para;
-    var ab = Math.sqrt(para.a*para.a + para.b*para.b);
-    var normx = para.a/ab;
-    var normy = para.b/ab;
-    var dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
-    var newcx = this.cx + dis*normx;
-    var newcy = this.cy + dis*normy;
-    var newc = (para.c/ab + dis)*ab;
-    var newpara = {a:para.a, b:para.b, c:newc};  
+    let para = this.line1Para;
+    let ab = Math.sqrt(para.a*para.a + para.b*para.b);
+    let normx = para.a/ab;
+    let normy = para.b/ab;
+    let dis = dot({x:x-this.cx, y:y-this.cy}, {x:normx, y:normy});
+    let newcx = this.cx + dis*normx;
+    let newcy = this.cy + dis*normy;
+    let newc = (para.c/ab + dis)*ab;
+    let newpara = {a:para.a, b:para.b, c:newc};  
 
     this.setLine(newcx, newcy, this.line0Para, newpara);
 }
 
 Crosshair.prototype.calLine = function(cx, cy, para) {
-    var width = $(this.svg).attr('width');
-    var height = $(this.svg).attr('height');
+    const width = $(this.svg).attr('width');
+    const height = $(this.svg).attr('height');
 
     //cross 4 border
     //TODO a b == 0
-    var res = [];
-    var x0 = 0;
-    var y0 = (para.c - para.a * x0) / para.b;
+    let res = [];
+    let x0 = 0;
+    let y0 = (para.c - para.a * x0) / para.b;
     if (y0 >= 0 && y0 <= height - 1) { res.push({x:x0, y:y0});}
-    var x1 = width - 1;
-    var y1 = (para.c - para.a * x1) / para.b;
+    let x1 = width - 1;
+    let y1 = (para.c - para.a * x1) / para.b;
     if (y1 >= 0 && y1 <= height - 1) { res.push({x:x1, y:y1});}
-    var y2 = 0;
-    var x2 = (para.c - para.b * y2) / para.a;
+    let y2 = 0;
+    let x2 = (para.c - para.b * y2) / para.a;
     if (x2 >= 0 && x2 <= width - 1) { res.push({x:x2, y:y2});}
-    var y3 = height - 1;
-    var x3 = (para.c - para.b * y3) / para.a;
+    let y3 = height - 1;
+    let x3 = (para.c - para.b * y3) / para.a;
     if (x3 >= 0 && x3 <= width - 1) { res.push({x:x3, y:y3});}
     if (res.length != 2)  {
         return [{x:0, y:0}, {x:0,y:0}, {x:0, y:0}, {x:0,y:0}];
     }
 
-    var ab = Math.sqrt(para.a*para.a + para.b*para.b);
-    var dx = para.b/ab;
-    var dy = para.a/ab;
-    var p0 = {x:cx - this.crossSize*dx, y:cy - this.crossSize*dy};
-    var p1 = {x:cx + this.crossSize*dx, y:cy + this.crossSize*dy};
+    let ab = Math.sqrt(para.a*para.a + para.b*para.b);
+    let dx = para.b/ab;
+    let dy = para.a/ab;
+    let p0 = {x:cx - this.crossSize*dx, y:cy - this.crossSize*dy};
+    let p1 = {x:cx + this.crossSize*dx, y:cy + this.crossSize*dy};
 
     if (distance(res[0], p0) <= distance(res[0], {x:this.cx, y:this.cy})) {
         return [res[0], p0, res[1], p1];
@@ -562,7 +562,7 @@ Crosshair.prototype.setLine = function(cx, cy, para0, para1) {
     this.line0Para = para0;//{a: b: c:} ax + by = c
     this.line1Para = para1;
 
-    var l0 = this.calLine(this.cx, this.cy, this.line0Para);
+    let l0 = this.calLine(this.cx, this.cy, this.line0Para);
     this.line00
     .attr('x1', l0[0].x)
     .attr('y1', l0[0].y)
@@ -587,7 +587,7 @@ Crosshair.prototype.setLine = function(cx, cy, para0, para1) {
     .attr('x2', l0[3].x)
     .attr('y2', l0[3].y);
 
-    var l1 = this.calLine(this.cx, this.cy, this.line1Para);
+    let l1 = this.calLine(this.cx, this.cy, this.line1Para);
     this.line10
     .attr('x1', l1[0].x)
     .attr('y1', l1[0].y)
@@ -659,10 +659,10 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
     }
 
     if (this.style == 0) {
-        var cx = msgCrosshair.cx;
-        var cy = msgCrosshair.cy;
-        var para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
-        var para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
+        let cx = msgCrosshair.cx;
+        let cy = msgCrosshair.cy;
+        let para0 = {a:msgCrosshair.l0A, b:msgCrosshair.l0B, c:msgCrosshair.l0C};
+        let para1 = {a:msgCrosshair.l1A, b:msgCrosshair.l1B, c:msgCrosshair.l1C};
         if (msgCrosshair.l0Color) {
             if (this.line00) {
                 this.line00.style('stroke', msgCrosshair.l0Color)
@@ -695,17 +695,18 @@ Crosshair.prototype.parseNoneImg = function (msgCrosshair) {
         }
         this.setLine(cx, cy, para0, para1);
     } else if (this.style == 1) {
-        var cx = msgCrosshair.cx;
-        var cy = msgCrosshair.cy;
+        let cx = msgCrosshair.cx;
+        let cy = msgCrosshair.cy;
         this.setCross(cx, cy);
     }   
 }
 
 Crosshair.prototype.visible = function(flag) {
+    let vis = 'none';
     if( flag == true) {
-        var vis = 'inline';
+        vis = 'inline';
     } else {
-        var vis = 'none';
+        vis = 'none';
     }
     if (this.style == 0) {
         this.line00.style('display', vis);
