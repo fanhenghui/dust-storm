@@ -26,11 +26,11 @@ function ROICircle(key, svg, cx, cy, r){
     this.winSize = {width: 0, height: 0};
 
     //adjust ctrl size
-    var width = parseFloat(d3.select(svg).attr('width'));
-    var height = parseFloat(d3.select(svg).attr('height'));
+    const width = parseFloat(d3.select(svg).attr('width'));
+    const height = parseFloat(d3.select(svg).attr('height'));
     this.adjustCircleRadius(width, height);
 
-    var hoveringFunc = (function () {
+    let hoveringFunc = (function () {
         if (this.hovering == false) {
             //each of the five circle is visible/draggble
             this.roiCtrlLT.style('cursor', 'move');
@@ -50,7 +50,7 @@ function ROICircle(key, svg, cx, cy, r){
         }
     }).bind(this);
 
-    var hoveringDoneFunc = (function () {
+    let hoveringDoneFunc = (function () {
         //each of the five circle is invisible none-draggble
         this.roiCtrlLT.style('cursor', 'default');
         this.roiCtrlLB.style('cursor', 'default');
@@ -163,7 +163,7 @@ function ROICircle(key, svg, cx, cy, r){
     // .style('cursor', 'move');
 
     //dragger
-    var dragEndCtrl = (function (d) {
+    let dragEndCtrl = (function (d) {
         if (this.dragEndCallback) {
             return this.dragEndCallback(this.cx, this.cy, this.r, this.key);
         }
@@ -176,7 +176,7 @@ function ROICircle(key, svg, cx, cy, r){
         }
     }).bind(this)).on('end', dragEndCtrl));
 
-    var dragCtrlStretch = (function (d) {
+    let dragCtrlStretch = (function (d) {
         let cx = this.roiMain.attr('cx');
         let cy = this.roiMain.attr('cy');
         let r = Math.sqrt((d3.event.x - cx) * (d3.event.x - cx) + (d3.event.y - cy) * (d3.event.y - cy));
@@ -288,32 +288,27 @@ ROICircle.prototype.locate = function(cx, cy, r) {
     .attr('cx', cx)
     .attr('cy', cy);
 
+    if (this.roiLabel != null) {
+        const width = this.svg.getAttribute("width");
+        const height = this.svg.getAttribute("height");
 
-    if (this.roiLabel != null)
-    {
-        var width = this.svg.getAttribute("width");
-        var height = this.svg.getAttribute("height");
-
-        if(this.winSize.width != width || this.winSize.height != height)
-        {
-            if(this.roiLabel.resetLayout())
-            {
+        if(this.winSize.width != width || this.winSize.height != height) {
+            if(this.roiLabel.resetLayout()) {
                 this.winSize.width = width;
                 this.winSize.height = height;
             }
-        }
-        else
-        {
+        } else {
             this.roiLabel.updateLayout();
         }
     }
 }
 
 ROICircle.prototype.visible = function(flag) {
+    let vis = 'inline';
     if( flag == true) {
-        var vis = 'inline';
+        vis = 'inline';
     } else {
-        var vis = 'none';
+        vis = 'none';
     }
 
     this.roiMain.style('display', vis);
@@ -323,15 +318,13 @@ ROICircle.prototype.visible = function(flag) {
     this.roiCtrlRB.style('display', vis);
     this.roiCtrlMove.style('display', vis);
 
-    if (this.roiLabel != null)
-    {
+    if (this.roiLabel != null) {
         this.roiLabel.updateVisibility();
     }
 }
 
 ROICircle.prototype.updateContent = function (contentStr) {
-    if(this.roiLabel != null)
-    {
+    if(this.roiLabel != null) {
         this.roiLabel.updateContent(contentStr);
     }
 }
@@ -352,9 +345,9 @@ ROICircle.prototype.creating = function(x, y) {
 }
 
 ROICircle.prototype.release = function () {
-    var data = d3.select(this.svg).selectAll('circle').data();
-    var newData = [];
-    for (var i = 0; i < data.length; ++i) {
+    let data = d3.select(this.svg).selectAll('circle').data();
+    let newData = [];
+    for (let i = 0; i < data.length; ++i) {
         if (data[i].key != this.keyMain &&
             data[i].key != this.keyCtrlLB &&
             data[i].key != this.keyCtrlLT &&
@@ -370,8 +363,7 @@ ROICircle.prototype.release = function () {
             return d.key;
         }).exit().remove();
     
-    if(this.roiLabel != null)
-    {
+    if(this.roiLabel != null) {
         this.roiLabel.release();
     }
 }
@@ -382,10 +374,6 @@ ROICircle.prototype.addAnnotationLabel = function(str) {
         this.roiLabel = new AnnotationLabel(this.key, this.svg, this.roiMain, str);
     }
 }
-
-
-
-
 
 const SCALING = 1.5;
 // which mark (circle) on which svg (svg) am I (key) annotating to?
@@ -399,12 +387,11 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     this.border = null;
     this.arrow = null;
 
-    var src_x = parseFloat(this.src.attr('cx'));
-    var src_y = parseFloat(this.src.attr('cy'));
-    var src_r = parseFloat(this.src.attr('r'));
+    const src_x = parseFloat(this.src.attr('cx'));
+    const src_y = parseFloat(this.src.attr('cy'));
+    const src_r = parseFloat(this.src.attr('r'));
     
     // text drag listener
-    var preLoc = null;
     dragListener = d3.drag()
         .on("start", function (d) {
             // it's important that we suppress the mouseover event on the node being dragged.
@@ -416,22 +403,21 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
             };
         })
         .on("drag", (function (d) {
-            var delta = {
+            const delta = {
                 x: d3.event.x - preloc.x,
                 y: d3.event.y - preloc.y
             };
             // update the text location
-            var newX = parseFloat(this.content.attr('x')) + delta.x;
-            var newY = parseFloat(this.content.attr('y')) + delta.y;
+            let newX = parseFloat(this.content.attr('x')) + delta.x;
+            let newY = parseFloat(this.content.attr('y')) + delta.y;
             this.content.attr('x', newX).attr('y', newY);
 
             // update the line (aka the arrow) location
-            var centerX = parseFloat(this.src.attr('cx'));
-            var centerY = parseFloat(this.src.attr('cy'));
-            var centerR = parseFloat(this.src.attr('r'));
-            var mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
-            if(mag < 0.01)
-            {
+            const centerX = parseFloat(this.src.attr('cx'));
+            const centerY = parseFloat(this.src.attr('cy'));
+            const centerR = parseFloat(this.src.attr('r'));
+            let mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
+            if(mag < 0.01) {
                 mag = 0.001;
                 newX = centerX + 0.01 * 0.707;
                 newY = centerY - 0.01 * 0.707;
@@ -470,9 +456,9 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
         .call(dragListener);
 
     if (contentStr != null && contentStr != '') {
-      var multiLine = contentStr.split('|');
-      var contentArray = [];
-      for (var i = 0; i < multiLine.length; ++i) {
+      const multiLine = contentStr.split('|');
+      let contentArray = [];
+      for (let i = 0; i < multiLine.length; ++i) {
         contentArray.push(multiLine[i]);
       }
 
@@ -500,8 +486,8 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
             .attr('stroke', 'red')
             .attr('stroke-dasharray', '5, 5');
     
-    // var textWidth = this.content._groups[0][0].getComputedTextLength();
-    // var textHeight = parseFloat(this.content.attr('font-size'));
+    // let textWidth = this.content._groups[0][0].getComputedTextLength();
+    // let textHeight = parseFloat(this.content.attr('font-size'));
     // this.border = d3.select(this.svg)
     // .selectAll('rect')
     // .data([{key: this.annotationKey}], function(d) { return d.key; })
@@ -521,7 +507,7 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
 
 
 AnnotationLabel.prototype.release = function () {
-    var key = this.annotationKey;
+    const key = this.annotationKey;
     d3.select(this.svg).selectAll('text').filter(function (d) {
         return d? d.key == key : false;
     }).selectAll('tspan').remove();
@@ -539,13 +525,13 @@ AnnotationLabel.prototype.updateContent = function (contentStr) {
     if (contentStr == null || contentStr == '')
         return;
 
-    var multiLine = contentStr.split('|');
-    var contentArray = [];
-    for (var i = 0; i < multiLine.length; ++i) {
+    const multiLine = contentStr.split('|');
+    let contentArray = [];
+    for (let i = 0; i < multiLine.length; ++i) {
         contentArray.push(multiLine[i]);
     }
 
-    var key = this.annotationKey;
+    const key = this.annotationKey;
     d3.select(this.svg)
         .selectAll('text')
         .filter(function (d) {
@@ -575,14 +561,13 @@ AnnotationLabel.prototype.updateContent = function (contentStr) {
 }
 
 AnnotationLabel.prototype.resetLayout = function () {
-    if (this.content.style('display') != 'none')
-    {
-        var newX = parseFloat(this.content.attr('x'));
-        var newY = parseFloat(this.content.attr('y'));
+    if (this.content.style('display') != 'none') {
+        let newX = parseFloat(this.content.attr('x'));
+        let newY = parseFloat(this.content.attr('y'));
 
-        var centerX = parseFloat(this.src.attr('cx'));
-        var centerY = parseFloat(this.src.attr('cy'));
-        var centerR = parseFloat(this.src.attr('r'));
+        const centerX = parseFloat(this.src.attr('cx'));
+        const centerY = parseFloat(this.src.attr('cy'));
+        const centerR = parseFloat(this.src.attr('r'));
 
         this.content
             .attr('x', centerX + SCALING * centerR)
@@ -610,25 +595,25 @@ AnnotationLabel.prototype.updateLayout = function () {
     if (this.content.style('display') != 'none') {
         // if just moved it is trivial
         // get the text location
-        var newX = parseFloat(this.content.attr('x'));
-        var newY = parseFloat(this.content.attr('y'));
+        let newX = parseFloat(this.content.attr('x'));
+        let newY = parseFloat(this.content.attr('y'));
 
-        var centerX = parseFloat(this.src.attr('cx'));
-        var centerY = parseFloat(this.src.attr('cy'));
-        var centerR = parseFloat(this.src.attr('r'));
+        const centerX = parseFloat(this.src.attr('cx'));
+        const centerY = parseFloat(this.src.attr('cy'));
+        const centerR = parseFloat(this.src.attr('r'));
 
         // update the line (aka the arrow) location
-        var mag = Math.sqrt(
+        let mag = Math.sqrt(
             (newX - centerX) * (newX - centerX) +
             (newY - centerY) * (newY - centerY));
-        if (mag < 0.01) // to avoid division by 0
-        {
+        if (mag < 0.01) { 
+            // to avoid division by 0
             mag = 0.01;
             newX = centerX + 0.01 * 0.707;
             newY = centerY - 0.01 * 0.707;
         }
-        if (mag < (SCALING * centerR)) // if text is inside the circle
-        {
+        if (mag < (SCALING * centerR)){
+            // if text is inside the circle
             newX = centerX + SCALING * centerR * (newX - centerX) / mag;
             newY = centerY + SCALING * centerR * (newY - centerY) / mag;
             mag = SCALING * centerR;
