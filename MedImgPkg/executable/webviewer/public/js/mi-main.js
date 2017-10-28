@@ -1,24 +1,25 @@
-var socket = null;
-var serverIP = '';
-var seriesUID = '';
-var cellCanvases = null;
-var cellSVGs = null;
-var cells = null;
-var protocRoot = null;
-var worklistBuffer = null;
-var socketClient = null;
-var revcBEReady = false;
-
-var annotationListBuffer = null;
-var annotationTable = null;
-
-//layout parameter
-const LAYOUT_1X1 = '1x1';
-const LAYOUT_2X2 = '2x2';
-var layoutStatus = LAYOUT_2X2;
-var maxCellID = -1;
 
 (function() {
+    let socket = null;
+    let serverIP = '';
+    let seriesUID = '';
+    let cellCanvases = null;
+    let cellSVGs = null;
+    let cells = null;
+    let protocRoot = null;
+    let worklistBuffer = null;
+    let socketClient = null;
+    let revcBEReady = false;
+    
+    let annotationListBuffer = null;
+    let annotationTable = null;
+    
+    //layout parameter
+    const LAYOUT_1X1 = '1x1';
+    const LAYOUT_2X2 = '2x2';
+    let layoutStatus = LAYOUT_2X2;
+    let maxCellID = -1;
+
     function getUserID(userName) {
         return userName + '|' + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
     }
@@ -53,8 +54,8 @@ var maxCellID = -1;
         }
     }
 
-    var heartbeatCount = 1;
-    var lastheartbearCount = 0;
+    let heartbeatCount = 1;
+    let lastheartbearCount = 0;
     const HEARTBEAT_INTERVAL = 5 * 1000 + 1000;
     function keepHeartbeat() {
         socketClient.heartbeat();
@@ -82,32 +83,32 @@ var maxCellID = -1;
             worklistBuffer = new ArrayBuffer(dataLen + restDataLen);
         }
 
-        var dstview = new Uint8Array(worklistBuffer);
-        var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        var cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
-        for (var i = 0; i < dataLen; i++) {
+        let dstview = new Uint8Array(worklistBuffer);
+        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+        let cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
+        for (let i = 0; i < dataLen; i++) {
             dstview[i+cpSrc] = srcview[i];
         }
 
         if (restDataLen <= 0) {
             console.log('recv worklist.');
-            var MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
+            let MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
             if (!MsgWorklistType) {
                 console.log('get worklist message type failed.');
             }
-            var worklistView = new Uint8Array(worklistBuffer);
-            var message = MsgWorklistType.decode(worklistView);
-            var obj = MsgWorklistType.toObject(message, {
+            let worklistView = new Uint8Array(worklistBuffer);
+            let message = MsgWorklistType.decode(worklistView);
+            let obj = MsgWorklistType.toObject(message, {
                 patient_name: String,
                 patient_id: String,
                 series_uid: String,
                 imaging_modality: String
             }).items;
-            var tbody = document.getElementById('worklist');
+            let tbody = document.getElementById('worklist');
             tbody.innerHTML = '';
-            for (var i = 0; i < obj.length; i++) {
-                var tr = '<tr>';
-                for (var propt in obj[i]) {
+            for (let i = 0; i < obj.length; i++) {
+                let tr = '<tr>';
+                for (let propt in obj[i]) {
                     tr += '<td>' + obj[i][propt] + '</td>';
                 }
                 tr += '</tr>';
@@ -122,7 +123,7 @@ var maxCellID = -1;
     }
 
     function annoListDeleteRow(row) {
-        var annoTableRows = annotationTable.rows;
+        let annoTableRows = annotationTable.rows;
         if (annoTableRows.length > row + 1) {
             annotationTable.deleteRow(row + 1);
         }
@@ -133,11 +134,11 @@ var maxCellID = -1;
             console.log('add repeated row');
             return;
         }
-        var rowItem = annotationTable.insertRow(row + 1);
+        let rowItem = annotationTable.insertRow(row + 1);
         $(rowItem).click(function(event) {
             $(this).addClass('success').siblings().removeClass('success');
             //send focus annotation message
-            var anno_id = $(this).attr('id');
+            let anno_id = $(this).attr('id');
             if (anno_id) {
                 sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
             }
@@ -149,9 +150,9 @@ var maxCellID = -1;
     }
 
     function annoListModifyRow(row,cx,cy,cz,diameter,info) {
-        var annoTableRows = annotationTable.rows;
+        let annoTableRows = annotationTable.rows;
         if (annoTableRows.length > row + 1) {
-            var annoCell = annoTableRows[row + 1].cells;
+            let annoCell = annoTableRows[row + 1].cells;
             annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
             annoCell[1].innerHTML = diameter.toFixed(2);  
             annoCell[2].innerHTML = info;
@@ -159,7 +160,7 @@ var maxCellID = -1;
     }
 
     function annoListClean() {
-        var annoTableRows = annotationTable.rows;
+        let annoTableRows = annotationTable.rows;
         while (annoTableRows.length > 1) {
             annotationTable.deleteRow(annoTableRows.length-1);
         }
@@ -174,30 +175,30 @@ var maxCellID = -1;
             annotationListBuffer = new ArrayBuffer(dataLen + restDataLen);
         }
 
-        var dstview = new Uint8Array(annotationListBuffer);
-        var srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        var cpSrc = annotationListBuffer.byteLength - (dataLen + restDataLen);
-        for (var i = 0; i < dataLen; i++) {
+        let dstview = new Uint8Array(annotationListBuffer);
+        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+        let cpSrc = annotationListBuffer.byteLength - (dataLen + restDataLen);
+        for (let i = 0; i < dataLen; i++) {
             dstview[i+cpSrc] = srcview[i];
         }
 
         if (restDataLen <= 0) {
-            var MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationList');
+            let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationList');
             if (!MsgAnnotationListType) {
                 console.log('get annotation list message type failed.');
             }
-            var annotationListView = new Uint8Array(annotationListBuffer);
-            var annotationList = MsgAnnotationListType.decode(annotationListView);
+            let annotationListView = new Uint8Array(annotationListBuffer);
+            let annotationList = MsgAnnotationListType.decode(annotationListView);
             if (annotationList) {
-                var listItems = annotationList.item;for (var i = 0; i < listItems.length; ++i) {
-                    var id = listItems[i].id;
-                    var info = listItems[i].info;
-                    var row = listItems[i].row;
-                    var status = listItems[i].status;
-                    var cx = listItems[i].para0;
-                    var cy = listItems[i].para1;
-                    var cz = listItems[i].para2;
-                    var diameter = listItems[i].para3;
+                let listItems = annotationList.item;for (let i = 0; i < listItems.length; ++i) {
+                    let id = listItems[i].id;
+                    let info = listItems[i].info;
+                    let row = listItems[i].row;
+                    let status = listItems[i].status;
+                    let cx = listItems[i].para0;
+                    let cy = listItems[i].para1;
+                    let cz = listItems[i].para2;
+                    let diameter = listItems[i].para3;
 
                     if(status == 0) {//add
                         annoListAddRow(row, id, cx, cy, cz, diameter, info);
@@ -238,11 +239,11 @@ var maxCellID = -1;
     }
 
     function getProperCellSize() {
-        var cellContainerW = document.getElementById('cell-container').offsetWidth;
-        // var cellContainerH = document.getElementById('cell-container').offsetHeight;
-        var navigatorHeight = document.getElementById('navigator-div').offsetHeight;
-        var w = parseInt((cellContainerW - 40) / 2 + 0.5);
-        var h = parseInt((window.innerHeight - navigatorHeight - 25) / 2 + 0.5);
+        let cellContainerW = document.getElementById('cell-container').offsetWidth;
+        // let cellContainerH = document.getElementById('cell-container').offsetHeight;
+        let navigatorHeight = document.getElementById('navigator-div').offsetHeight;
+        let w = parseInt((cellContainerW - 40) / 2 + 0.5);
+        let h = parseInt((window.innerHeight - navigatorHeight - 25) / 2 + 0.5);
         if (w%2 != 0) {
             w += 1;
         }
@@ -266,20 +267,20 @@ var maxCellID = -1;
             console.log('null protocbuf.')
             return;
         }
-        var cellSize = getProperCellSize();
-        var w = cellSize.width;
-        var h = cellSize.height;
-        for (var i = 0; i < cells.length; i++) {
+        let cellSize = getProperCellSize();
+        let w = cellSize.width;
+        let h = cellSize.height;
+        for (let i = 0; i < cells.length; i++) {
             cells[i].resize(w, h);
         }
 
-        var MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
-        var msgResize = MsgResize.create();
+        let MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
+        let msgResize = MsgResize.create();
         msgResize.cells.push({id: 0, type: 1, direction: 0, width: w, height: h});
         msgResize.cells.push({id: 1, type: 1, direction: 1, width: w, height: h});
         msgResize.cells.push({id: 2, type: 1, direction: 2, width: w, height: h});
         msgResize.cells.push({id: 3, type: 2, direction: 0, width: w, height: h});
-        var msgBuffer = MsgResize.encode(msgResize).finish();
+        let msgBuffer = MsgResize.encode(msgResize).finish();
         socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
     }
 
@@ -296,10 +297,10 @@ var maxCellID = -1;
         }
         cells[cellID].resize(w, h);
 
-        var MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
-        var msgResize = MsgResize.create();
+        let MsgResize = socketClient.protocRoot.lookup('medical_imaging.MsgResize');
+        let msgResize = MsgResize.create();
         msgResize.cells.push({id: cellID, type: 1, direction: 0, width: w, height: h});
-        var msgBuffer = MsgResize.encode(msgResize).finish();
+        let msgBuffer = MsgResize.encode(msgResize).finish();
         socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
     }
 
@@ -316,7 +317,7 @@ var maxCellID = -1;
             document.getElementById('cell2-container').hidden = false;
             document.getElementById('cell3-container').hidden = false;
             
-            var cellSize = getProperCellSize();
+            let cellSize = getProperCellSize();
             resizeCell(maxCellID, cellSize.width, cellSize.height);
             maxCellID = -1;
             layoutStatus = LAYOUT_2X2;
@@ -343,7 +344,7 @@ var maxCellID = -1;
                     document.getElementById('cell3-container').hidden = false;
                     break;
             }
-            var cellSize = getProperCellSize();
+            let cellSize = getProperCellSize();
             resizeCell(cellID, cellSize.width*2, cellSize.height*2);
             maxCellID = cellID;
             layoutStatus = LAYOUT_1X1;
@@ -351,7 +352,7 @@ var maxCellID = -1;
     }
 
     function focusCell(cellID) {
-        for (var i = 0; i < cells.length; ++i) {
+        for (let i = 0; i < cells.length; ++i) {
             if (i == cellID) { 
                 cells[i].mouseFocus = true;
                 cellCanvases[i].style.border = '3px solid ' + '#6A5ACD';
@@ -386,20 +387,20 @@ var maxCellID = -1;
 
         //release previous cells
         if (cells && cells.length != 0) {
-            for (var i = 0; i < cells.length; i++) {
+            for (let i = 0; i < cells.length; i++) {
                 cells[i].release();
             }    
         }
 
         //create cells
-        var cellSize = getProperCellSize();
-        var w = cellSize.width;
-        var h = cellSize.height;
+        let cellSize = getProperCellSize();
+        let w = cellSize.width;
+        let h = cellSize.height;
         cells = [null, null, null, null];
-        for (var i = 0; i < 4; i++) {
-            var cellName = 'cell_' + i;
-            var canvas = cellCanvases[i];
-            var svg = cellSVGs[i];
+        for (let i = 0; i < 4; i++) {
+            let cellName = 'cell_' + i;
+            let canvas = cellCanvases[i];
+            let svg = cellSVGs[i];
             cells[i] = new Cell(cellName, i, canvas, svg, socketClient);
             cells[i].resize(cellSize.width, cellSize.height);
             cells[i].prepare();
@@ -408,7 +409,7 @@ var maxCellID = -1;
         }
 
         //init default cell action
-        for (var i = 0; i < 3; ++i) {
+        for (let i = 0; i < 3; ++i) {
             cells[i].activeAction(ACTION_ID_MPR_PAGING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
             //MPR add crosshair
             cells[i].crosshair = new Crosshair(cellSVGs[i], i, w/2, h/2,{a:2/w, b:0, c:1}, {a:0, b:2/h, c:1}, socketClient, 0);
@@ -421,12 +422,12 @@ var maxCellID = -1;
 
 
         //nofity BE
-        var MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
+        let MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
         if (!MsgInit) {
             console.log('get init message type failed.');
             return;
         }
-        var msgInit = MsgInit.create();
+        let msgInit = MsgInit.create();
         if (!msgInit) {
             console.log('create init message failed.');
             return;
@@ -437,7 +438,7 @@ var maxCellID = -1;
         msgInit.cells.push({id: 1, type: 1, direction: 1, width: w, height: h});
         msgInit.cells.push({id: 2, type: 1, direction: 2, width: w, height: h});
         msgInit.cells.push({id: 3, type: 2, direction: 0, width: w, height: h});
-        var msgBuffer = MsgInit.encode(msgInit).finish();
+        let msgBuffer = MsgInit.encode(msgInit).finish();
         socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_INIT, 0, msgBuffer.byteLength, msgBuffer);
     }
 
@@ -451,12 +452,12 @@ var maxCellID = -1;
                 cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 break;
             case 'common-tool-zoom':
-                for (var i = 0; i < cells.length; ++i) {
+                for (let i = 0; i < cells.length; ++i) {
                     cells[i].activeAction(ACTION_ID_ZOOM, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
             case 'common-tool-pan':
-                for (var i = 0; i < cells.length; ++i) {
+                for (let i = 0; i < cells.length; ++i) {
                     cells[i].activeAction(ACTION_ID_PAN, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
@@ -467,7 +468,7 @@ var maxCellID = -1;
                 cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 break;
             case 'common-tool-windowing':
-                for (var i = 0; i < cells.length; ++i) {
+                for (let i = 0; i < cells.length; ++i) {
                     cells[i].activeAction(ACTION_ID_WINDOWING, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
                 }
                 break;
@@ -502,7 +503,7 @@ var maxCellID = -1;
         }
         
         // Create cell object
-        var cellContainer = document.getElementById('cell-container');
+        let cellContainer = document.getElementById('cell-container');
         cellCanvases = [
             document.getElementById('canvas0'), document.getElementById('canvas1'),
             document.getElementById('canvas2'), document.getElementById('canvas3')
@@ -513,7 +514,7 @@ var maxCellID = -1;
         ];
 
         // register button event
-        var searchWorklistBtn = document.getElementById('btn-search-worklist');
+        let searchWorklistBtn = document.getElementById('btn-search-worklist');
         if (searchWorklist) {
             searchWorklistBtn.onclick = function(event) {
                 searchWorklist();
@@ -522,10 +523,10 @@ var maxCellID = -1;
             console.log('get searchBtn node failed.');
         }
         
-        var loadSeriesBtn = document.getElementById('btn-load-series');
+        let loadSeriesBtn = document.getElementById('btn-load-series');
         if (loadSeriesBtn) {
             loadSeriesBtn.onclick = function(event) {
-                var series = $('#table tbody tr.success td:nth-child(3)').html();
+                let series = $('#table tbody tr.success td:nth-child(3)').html();
                 if (!series) {
                     alert('please choose one series.');
                     reutrn;
@@ -539,10 +540,10 @@ var maxCellID = -1;
             console.log('get loadBtn node failed.');
         }
 
-        var comToolsDiv = document.getElementById('common-tools');
+        let comToolsDiv = document.getElementById('common-tools');
         if (comToolsDiv) {
-            var comToolsBtns = comToolsDiv.getElementsByTagName('button');
-            for (var i = 0; i < comToolsBtns.length; ++i) {
+            let comToolsBtns = comToolsDiv.getElementsByTagName('button');
+            for (let i = 0; i < comToolsBtns.length; ++i) {
                 comToolsBtns[i].onclick = function(event) {
                     $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
                     switchCommonTool(this.id);
@@ -553,7 +554,7 @@ var maxCellID = -1;
         }
         $('#common-tool-arrow').addClass('btn-primary').siblings().removeClass('btn-primary');
 
-        var playVRBtn = document.getElementById('btn-play-vr');
+        let playVRBtn = document.getElementById('btn-play-vr');
         if (playVRBtn) {
             playVRBtn.onclick = function() {
                 playVR();
@@ -564,12 +565,12 @@ var maxCellID = -1;
 
         annotationTable = document.getElementById("annotation-table");
 
-        var deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
+        let deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
         if (deleteAnnotationBtn) {
             deleteAnnotationBtn.onclick = function(event) {
-                var choosedItem = $('#annotation-table tr.success');
+                let choosedItem = $('#annotation-table tr.success');
                 if (choosedItem.length > 0) {
-                    var id = choosedItem.attr('id')
+                    let id = choosedItem.attr('id')
                     if (id) {
                         sendAnnotationMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
                     }
@@ -578,12 +579,12 @@ var maxCellID = -1;
             };
         }
 
-        var mprMaskOverlayFunc = function(event) {
-            var flag = 1;
+        let mprMaskOverlayFunc = function(event) {
+            let flag = 1;
             if( document.getElementById('cbox-overlay-annotation') ) {
                 flag = document.getElementById('cbox-overlay-annotation').checked ? 1 : 0;
             }
-            var opacity = 0.5;
+            let opacity = 0.5;
             if (document.getElementById('range-mpr-overlay-opacity')) {
                 opacity = document.getElementById('range-mpr-overlay-opacity').value;
             } 
@@ -592,30 +593,30 @@ var maxCellID = -1;
                 console.log('null protobuf.');
                 return;
             }
-            var MsgMPRMaskOverlayType = socketClient.protocRoot.lookup('medical_imaging.MsgMPRMaskOverlay');
+            let MsgMPRMaskOverlayType = socketClient.protocRoot.lookup('medical_imaging.MsgMPRMaskOverlay');
             if (!MsgMPRMaskOverlayType) {
                 console.log('get MsgMPRMaskOverlay type failed.');
                 return;
             }
-            var msg = MsgMPRMaskOverlayType.create({flag:flag, opacity:opacity});
+            let msg = MsgMPRMaskOverlayType.create({flag:flag, opacity:opacity});
             if (!msg) {
                 console.log('create mpr mask overlay message failed.');
                 return;
             }
-            var msgBuffer = MsgMPRMaskOverlayType.encode(msg).finish();
+            let msgBuffer = MsgMPRMaskOverlayType.encode(msg).finish();
             if (!msgBuffer) {
                 console.log('encode mpr mask overlay message failed.');
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
         }
 
-        var annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
+        let annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
         if (annotationOverlayCBox) {
             annotationOverlayCBox.defaultChecked = true;
             annotationOverlayCBox.onclick = mprMaskOverlayFunc;
         }
 
-        var mprMaskOverlayOpacityRange = document.getElementById('range-mpr-overlay-opacity');
+        let mprMaskOverlayOpacityRange = document.getElementById('range-mpr-overlay-opacity');
         if (mprMaskOverlayOpacityRange) {
             mprMaskOverlayOpacityRange.max = 1;
             mprMaskOverlayOpacityRange.min = 0;
@@ -625,7 +626,7 @@ var maxCellID = -1;
             mprMaskOverlayOpacityRange.oninput = mprMaskOverlayFunc;
         }
 
-        var goBackImg = document.getElementById('btn-back-worklist');
+        let goBackImg = document.getElementById('btn-back-worklist');
         if(goBackImg)
         {
             goBackImg.onclick = function(event) {
@@ -634,12 +635,12 @@ var maxCellID = -1;
             }
         }
 
-        var layout1x1Btn = document.getElementById('btn-layout1x1');
+        let layout1x1Btn = document.getElementById('btn-layout1x1');
         if (layout1x1Btn) {
             layout1x1Btn.onclick = function(event) {
                 if (layoutStatus == LAYOUT_2X2) {
-                    var focusCellID = 0;
-                    for (var i = 0; i< cells.length; ++i) {
+                    let focusCellID = 0;
+                    for (let i = 0; i< cells.length; ++i) {
                         if (cells[i].mouseFocus) {
                             focusCellID = i;
                             break;
@@ -650,7 +651,7 @@ var maxCellID = -1;
             }
         }
 
-        var layout2x2Btn = document.getElementById('btn-layout2x2');
+        let layout2x2Btn = document.getElementById('btn-layout2x2');
         if (layout2x2Btn) {
             layout2x2Btn.onclick = function(event) {
                 if (layoutStatus == LAYOUT_1X1 && maxCellID != -1) {
@@ -659,23 +660,23 @@ var maxCellID = -1;
             }
         }
 
-        var switchPresetWLFunc = function(obj) {
+        let switchPresetWLFunc = function(obj) {
             document.getElementById('btn-preset-wl').innerHTML = obj.innerHTML + '<span class="caret"></span>';
             if (!socketClient.protocRoot) {
                 console.log('null protobuf.');
                 return;
             }
-            var MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
+            let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
             if (!MsgStringType) {
                 console.log('get MsgMsgStringType type failed.');
                 return;
             }
-            var msg = MsgStringType.create({context:obj.innerHTML});
+            let msg = MsgStringType.create({context:obj.innerHTML});
             if (!msg) {
                 console.log('create switch preset WL message failed.');
                 return;
             }
-            var msgBuffer = MsgStringType.encode(msg).finish();
+            let msgBuffer = MsgStringType.encode(msg).finish();
             if (!msgBuffer) {
                 console.log('encode switch preset WL message failed.');
             }
@@ -689,11 +690,11 @@ var maxCellID = -1;
         document.getElementById('a-preset-wl-bone').onclick = function(event) {switchPresetWLFunc(this);return false;}
         document.getElementById('a-preset-wl-chest').onclick = function(event) {switchPresetWLFunc(this);return false;}
 
-        var crosshairContinuousCBox = document.getElementById('cbox-crosshair-continuous');
+        let crosshairContinuousCBox = document.getElementById('cbox-crosshair-continuous');
         if (crosshairContinuousCBox) {
             crosshairContinuousCBox.defaultChecked = false;
             crosshairContinuousCBox.onclick = function(event) {
-                for (var i = 0; i< 4; ++i) {
+                for (let i = 0; i< 4; ++i) {
                     if (cells[i].crosshair){
                         cells[i].crosshair.crossContinuous = crosshairContinuousCBox.checked;
                     }
@@ -701,11 +702,11 @@ var maxCellID = -1;
             }
         }
 
-        var crosshairVisibleCBox = document.getElementById('cbox-crosshair-visible');
+        let crosshairVisibleCBox = document.getElementById('cbox-crosshair-visible');
         if (crosshairVisibleCBox) {
             crosshairVisibleCBox.defaultChecked = true;
             crosshairVisibleCBox.onclick = function(event) {
-                for (var i = 0; i< 4; ++i) {
+                for (let i = 0; i< 4; ++i) {
                     if (cells[i].crosshair){
                         cells[i].crosshair.visible(crosshairVisibleCBox.checked);
                     }
@@ -723,34 +724,34 @@ var maxCellID = -1;
             handle: '.modal-header'
         });
         
-        var switchVRTFunc = function(context) {
+        let switchVRTFunc = function(context) {
             if (!socketClient.protocRoot) {
                 console.log('null protobuf.');
                 return;
             }
-            var MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
+            let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
             if (!MsgStringType) {
                 console.log('get MsgMsgStringType type failed.');
                 return;
             }
-            var msg = MsgStringType.create({context:context});
+            let msg = MsgStringType.create({context:context});
             if (!msg) {
                 console.log('create switch vrt message failed.');
                 return;
             }
-            var msgBuffer = MsgStringType.encode(msg).finish();
+            let msgBuffer = MsgStringType.encode(msg).finish();
             if (!msgBuffer) {
                 console.log('encode switch vrt message failed.');
             }
             socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
         }
 
-        var presetVRTTable = document.getElementById('table-preset-vrt');
+        let presetVRTTable = document.getElementById('table-preset-vrt');
         if (presetVRTTable) {
-            var vrtRows = presetVRTTable.rows;
-            for (var i = 0; i < vrtRows.length; ++i) {
+            let vrtRows = presetVRTTable.rows;
+            for (let i = 0; i < vrtRows.length; ++i) {
                 vrtCells = vrtRows[i].cells;
-                for (var j = 0; j < vrtCells.length; ++j) {
+                for (let j = 0; j < vrtCells.length; ++j) {
                     vrtCells[j].onclick = (function() {
                         switchVRTFunc($(this).attr('id'));
                     }).bind(vrtCells[j]);    
@@ -763,7 +764,7 @@ var maxCellID = -1;
         ///For testing
         const TEST_INTERVAL = MOUSE_MSG_INTERVAL;
         function LeftMove(cellID, moveBack, moveX, step) {
-            var x = moveBack ? 200 - step : 200 + step;
+            let x = moveBack ? 200 - step : 200 + step;
             if (moveX) {
                 cells[cellID].mouseBtn = BTN_LEFT;
                 cells[cellID].mouseStatus = BTN_DOWN;
@@ -802,7 +803,7 @@ var maxCellID = -1;
 
         testBtnStatus0 = false;
         testBtnFunc0 = null;
-        var testBtn = document.getElementById('btn-test-0');
+        let testBtn = document.getElementById('btn-test-0');
         if (testBtn) {
             testBtn.onclick = function(event) {
                 if (!testBtnStatus0) {
@@ -826,7 +827,7 @@ var maxCellID = -1;
 
         testBtnStatus1 = false;
         testBtnFunc1 = null;
-        var testBtn1 = document.getElementById('btn-test-1');
+        let testBtn1 = document.getElementById('btn-test-1');
         if (testBtn1) {
             testBtn1.onclick = function(event) {
                 if (!testBtnStatus1) {
@@ -848,8 +849,7 @@ var maxCellID = -1;
             };
         }
 
-        var loginBtn = document.getElementById('btn-login');
-        var loginBtn = document.getElementById('btn-login-0');
+        let loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
                 window.location.href = '/login';
@@ -869,13 +869,13 @@ var maxCellID = -1;
         window.onresize = function() {
             resize()
         };
-        var username = document.getElementById('username').innerHTML;
+        let username = document.getElementById('username').innerHTML;
         serverIP = document.getElementById('serverip').innerHTML;
         console.log('server ip: ' + serverIP);
         login();
 
         //trigger on heartbeat
-        var checkHeartbearFunc = setInterval(function() {
+        let checkHeartbearFunc = setInterval(function() {
             checkHeartbeat();
         }, HEARTBEAT_INTERVAL);
     }
