@@ -14,24 +14,24 @@ function SocketClient(socket) {
 
 //Handler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader)
 SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
-    var tcpPackageLen = tcpBuffer.byteLength;
+    const tcpPackageLen = tcpBuffer.byteLength;
 
     if (this.tcpPacketEnd == 0) {
         if (tcpPackageLen < MSG_HEADER_LEN) { //incompleted Msg header
-            var dstBuffer = new Uint8Array(this.lastMsgHeader);
-            var srcBuffer = new Uint8Array(tcpBuffer)
-            for (var i = 0; i< tcpPackageLen; ++i) {
+            let dstBuffer = new Uint8Array(this.lastMsgHeader);
+            let srcBuffer = new Uint8Array(tcpBuffer)
+            for (let i = 0; i< tcpPackageLen; ++i) {
                 dstBuffer[i] = srcBuffer[i];
             }
             this.tcpPacketEnd = 2;
             this.lastMsgHeaderLen = tcpPackageLen;
             return;
         }
-        var header = new Uint32Array(tcpBuffer, 0, 8);
+        let header = new Uint32Array(tcpBuffer, 0, 8);
         this.msgCmdID = header[2];
         this.msgCellID = header[3];
         this.msgOpID = header[4];
-        var lastMsgDatalen = header[7];
+        const lastMsgDatalen = header[7];
 
         if (tcpPackageLen - MSG_HEADER_LEN == lastMsgDatalen) { // completed one Msg
             msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, lastMsgDatalen, 0, true);
@@ -42,7 +42,7 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
         } else { // this buffer carry next Msg process current one
             msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, MSG_HEADER_LEN, lastMsgDatalen, 0, true);
             // recursion process rest
-            var tcpBufferSub = tcpBuffer.slice(lastMsgDatalen + MSG_HEADER_LEN);
+            let tcpBufferSub = tcpBuffer.slice(lastMsgDatalen + MSG_HEADER_LEN);
             this.tcpPacketEnd = 0;
             this.recvData(tcpBufferSub, msgHandler);
         }
@@ -56,17 +56,17 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
             msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, 0, tcpPackageLen, this.msgRestDataLen, false);
         } else { // this buffer carry next Msg
             msgHandler(this.msgCmdID, this.msgCellID, this.msgOpID, tcpBuffer, 0, this.msgRestDataLen, 0, false);
-            var tcpBufferSub2 = tcpBuffer.slice(this.msgRestDataLen);
+            let tcpBufferSub2 = tcpBuffer.slice(this.msgRestDataLen);
             this.msgRestDataLen = 0;
             this.tcpPacketEnd = 0;
             this.recvData(tcpBufferSub2, msgHandler);
         }
     } else if (this.tcpPacketEnd == 2) { // msg header for last msg header
-        var lastRestHeaderLen = MSG_HEADER_LEN - this.lastMsgHeaderLen;
+        const lastRestHeaderLen = MSG_HEADER_LEN - this.lastMsgHeaderLen;
         if (tcpPackageLen < lastRestHeaderLen) { // msg header is not completed yet
-            var dstBuffer = new Uint8Array(this.lastMsgHeader);
-            var srcBuffer = new Uint8Array(tcpBuffer)
-            for (var i = 0 ; i< tcpPackageLen; ++i) {
+            let dstBuffer = new Uint8Array(this.lastMsgHeader);
+            let srcBuffer = new Uint8Array(tcpBuffer)
+            for (let i = 0 ; i< tcpPackageLen; ++i) {
                 dstBuffer[i+this.lastMsgHeaderLen] = srcBuffer[i];
             }
             this.tcpPacketEnd = 2;
@@ -74,14 +74,14 @@ SocketClient.prototype.recvData = function(tcpBuffer, msgHandler) {
             return;
         } else { // msg header is completed
             //fill header completed
-            var dstBuffer = new Uint8Array(this.lastMsgHeader);
-            var srcBuffer = new Uint8Array(tcpBuffer,0,lastRestHeaderLen);
-            for (var i = 0; i< lastRestHeaderLen; ++i) {
+            let dstBuffer = new Uint8Array(this.lastMsgHeader);
+            let srcBuffer = new Uint8Array(tcpBuffer,0,lastRestHeaderLen);
+            for (let i = 0; i< lastRestHeaderLen; ++i) {
                 dstBuffer[i+this.lastMsgHeaderLen] = srcBuffer[i];
             }
 
-            var tcpBufferSub3 = tcpBuffer.slice(lastRestHeaderLen);
-            var header2 = new Uint32Array(this.lastMsgHeader, 0, 8);
+            let tcpBufferSub3 = tcpBuffer.slice(lastRestHeaderLen);
+            let header2 = new Uint32Array(this.lastMsgHeader, 0, 8);
             this.msgCmdID = header2[2];
             this.msgCellID = header2[3];
             this.msgOpID = header2[4];
@@ -151,7 +151,7 @@ SocketClient.prototype.heartbeat = function() {
 //load protoc
 SocketClient.prototype.loadProtoc = function(protoFile) {
     //load protocbuf file
-    var loadProtoc_ = (function(err, root) {
+    let loadProtoc_ = (function(err, root) {
         if (err) {
             console.log('load proto failed!');
         } else {
