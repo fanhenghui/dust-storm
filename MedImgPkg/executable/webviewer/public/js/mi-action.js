@@ -17,19 +17,19 @@ function sendDownsampleMSG(cellID, flag, socketClient) {
         return;
     }
 
-    var MsgFlag = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
+    let MsgFlag = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
     if(!MsgFlag) {
         console.log('get flag message type failed.');
         return;
     }
-    var msgFlag = MsgFlag.create({
+    let msgFlag = MsgFlag.create({
         flag: flag
     });
     if(!msgFlag) {
         console.log('create flag message failed.');
         return;
     }
-    var msgBuffer = MsgFlag.encode(msgFlag).finish();
+    let msgBuffer = MsgFlag.encode(msgFlag).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
@@ -49,7 +49,7 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         return false;
     }
 
-    var curClock = new Date().getTime();
+    let curClock = new Date().getTime();
     if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
         return false;
     }
@@ -61,12 +61,12 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         console.log('null protocbuf.');
         return;
     }
-    var MsgMouse = this.socketClient.protocRoot.lookup('medical_imaging.MsgMouse');
+    let MsgMouse = this.socketClient.protocRoot.lookup('medical_imaging.MsgMouse');
     if(!MsgMouse) {
         console.log('get mouse message type failed.');
         return;
     }
-    var msgMouse = MsgMouse.create({
+    let msgMouse = MsgMouse.create({
       pre: {x: preX, y: preY},
       cur: {x: x, y: y},
       tag: 0
@@ -75,8 +75,8 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         console.log('create mouse message failed.');
         return;
     }
-    var msgBuffer = MsgMouse.encode(msgMouse).finish();
-    var opID = this.leftOpBtnID;
+    let msgBuffer = MsgMouse.encode(msgMouse).finish();
+    let opID = this.leftOpBtnID;
     if (mouseBtn == BTN_LEFT) {
         opID = this.leftOpBtnID;
     } else if (mouseBtn == BTN_RIGHT) {
@@ -113,12 +113,12 @@ function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0,
         return;
     }
 
-    var MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
+    let MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
     if(!MsgAnnotationUnit) {
         console.log('get annotation unit message type failed.');
         return;
     }
-    var msgAnnoUnit = MsgAnnotationUnit.create({
+    let msgAnnoUnit = MsgAnnotationUnit.create({
         type: annoType,
         id: annoID,
         status: annoStatus,
@@ -131,7 +131,7 @@ function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0,
         console.log('create annotation unit message failed.');
         return;
     }
-    var msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
+    let msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
     socketClient.sendData(COMMAND_ID_FE_OPERATION, ACTION_ID_MRP_ANNOTATION, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
@@ -142,7 +142,7 @@ function ActionAnnotation(socketClient, cellID) {
 };
 
 ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility, contentStr) {
-    var roi = new ROICircle(id, svg, cx, cy, r);
+    let roi = new ROICircle(id, svg, cx, cy, r);
     roi.visible(visibility);
     roi.setCtrlRadius(0.0);
     roi.addAnnotationLabel(contentStr); // temporily placed here
@@ -180,7 +180,7 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     //ROI shaping by mouse moving(directly)
     cell.lastROI.creating(x, y);
 
-    var curClock = new Date().getTime();
+    let curClock = new Date().getTime();
     if (Math.abs(this.mouseClock - curClock) < MOUSE_MSG_INTERVAL) {
         return false;
     }
