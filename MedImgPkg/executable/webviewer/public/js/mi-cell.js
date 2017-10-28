@@ -74,7 +74,7 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
     if (withHeader) {
         this.jpegStr = '';
     } 
-    var imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+    let imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
     this.jpegStr += String.fromCharCode.apply(null, imgBuffer);
     if(restDataLen <= 0) {
         this.jpegImg.src =  'data:image/jpg;base64,' + btoa(this.jpegStr);
@@ -89,25 +89,26 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
     if (withHeader) {
         this.noneImgBuf = new ArrayBuffer(dataLen + restDataLen);
     }
-    var dstRecord = new Uint8Array(this.noneImgBuf);
-    var srcRecord = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-    var cpSrc = this.noneImgBuf.byteLength - (dataLen + restDataLen);
-    for (var i = 0; i < dataLen; i++) {
+    let dstRecord = new Uint8Array(this.noneImgBuf);
+    let srcRecord = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+    let cpSrc = this.noneImgBuf.byteLength - (dataLen + restDataLen);
+    for (let i = 0; i < dataLen; i++) {
         dstRecord[i+cpSrc] = srcRecord[i];
     }
 
     // sucessfully receive all none-image
     if (restDataLen <= 0) {
         //console.log('receive Nong Img Buffer.');
-        var MsgNoneImgCollection = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
+        let MsgNoneImgCollection = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
         if (!MsgNoneImgCollection) {
             console.log('get MsgNoneImgCollection type failed.');
         }
 
         //decode the byte array with protobuffer
-        var noneImgBufView = new Uint8Array(this.noneImgBuf);
+        let noneImgBufView = new Uint8Array(this.noneImgBuf);
+        let receivedMsg = null;
         try {
-            var receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
+            receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
         } catch (e) {
             if (e instanceof protobuf.util.ProtocolError) {
                 console.log('decode none image message failed.');
@@ -120,46 +121,49 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
             return;
         }
         if (receivedMsg.hasOwnProperty('cornerInfos')) {
-            var txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
-            var corners = txt.split('\n');
+            let txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
+            let corners = txt.split('\n');
 
             // for each corner
             // 'length-1': avoid the last empty string "" after '\n'
-            for (var i = 0; i < (corners.length - 1); ++i) {
-                var oneCornerInfo = corners[i].split('|');
+            for (let i = 0; i < (corners.length - 1); ++i) {
+                let oneCornerInfo = corners[i].split('|');
                 let cornerTag = oneCornerInfo[0];
-                var infoContext = [];
-                for (var j = 1; j < oneCornerInfo.length; ++j) {
-                    var info = oneCornerInfo[j].split(',');
+                let infoContext = [];
+                for (let j = 1; j < oneCornerInfo.length; ++j) {
+                    let info = oneCornerInfo[j].split(',');
                     infoContext.push({pos:info[0], context:info[1]});
                 }
                 
-                var svgText = d3.select(this.svg).select('#' + cornerTag);
+                let svgText = d3.select(this.svg).select('#' + cornerTag);
+                let xpos = null;
+                let txtspacing = null;
+                let texorigin = null;
                 switch(cornerTag) {
                     case 'LT':
-                    var xpos = TEXT_MARGIN;
-                    var txtspacing = parseFloat(svgText.attr('font-size'));
-                    var texorigin = 1.2*txtspacing;
-                    break;
+                        xpos = TEXT_MARGIN;
+                        txtspacing = parseFloat(svgText.attr('font-size'));
+                        texorigin = 1.2*txtspacing;
+                        break;
                     case 'RT':
-                    var xpos = this.canvas.width - TEXT_MARGIN;
-                    var txtspacing = parseFloat(svgText.attr('font-size'));
-                    var texorigin = 1.2*txtspacing;
-                    break;
+                        xpos = this.canvas.width - TEXT_MARGIN;
+                        txtspacing = parseFloat(svgText.attr('font-size'));
+                        texorigin = 1.2*txtspacing;
+                        break;
                     
                     case 'LB':
-                    var xpos = TEXT_MARGIN;
-                    var txtspacing = -parseFloat(svgText.attr('font-size'));
-                    var texorigin = this.canvas.height + 0.2*txtspacing;
-                    break;
+                        xpos = TEXT_MARGIN;
+                        txtspacing = -parseFloat(svgText.attr('font-size'));
+                        texorigin = this.canvas.height + 0.2*txtspacing;
+                        break;
                     case 'RB':
-                    var xpos = this.canvas.width - TEXT_MARGIN;
-                    var txtspacing = -parseFloat(svgText.attr('font-size'));
-                    var texorigin = this.canvas.height + 0.2*txtspacing;
-                    break;
+                        xpos = this.canvas.width - TEXT_MARGIN;
+                        txtspacing = -parseFloat(svgText.attr('font-size'));
+                        texorigin = this.canvas.height + 0.2*txtspacing;
+                        break;
                 }                
 
-                var tspans = svgText.selectAll('tspan');
+                let tspans = svgText.selectAll('tspan');
                 if(tspans.empty())
                 {
                     tspans.data(infoContext).enter()
@@ -186,23 +190,23 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
         }
         
         if (receivedMsg.hasOwnProperty('annotations')) {
-            var annotations = receivedMsg.annotations.annotation;
+            let annotations = receivedMsg.annotations.annotation;
             if (annotations) {
-                for (var i = 0; i < annotations.length; ++i) {
-                    var annoUnit = annotations[i];
-                    var id = annoUnit.id;
-                    var status = annoUnit.status;
-                    var vis = annoUnit.visibility;
-                    var cx = annoUnit.para0;
-                    var cy = annoUnit.para1;
-                    var r = annoUnit.para2;
-                    var content = annoUnit.info;
+                for (let i = 0; i < annotations.length; ++i) {
+                    let annoUnit = annotations[i];
+                    let id = annoUnit.id;
+                    let status = annoUnit.status;
+                    let vis = annoUnit.visibility;
+                    let cx = annoUnit.para0;
+                    let cy = annoUnit.para1;
+                    let r = annoUnit.para2;
+                    let content = annoUnit.info;
                     switch (annoUnit.status) {
                         case 0: //add
                             this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), content));
                             break;
                         case 1: //delete
-                            for (var j = 0; j < this.rois.length; ++j) {
+                            for (let j = 0; j < this.rois.length; ++j) {
                                 if (this.rois[j].key == id) {
                                     this.rois[j].release();
                                     this.rois.splice(j, 1);
@@ -211,7 +215,7 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                             }
                             break;
                         case 2: //modifying
-                            for (var j = 0; j < this.rois.length; ++j) {
+                            for (let j = 0; j < this.rois.length; ++j) {
                                 if (this.rois[j].key == id) {
                                     this.rois[j].locate(cx, cy, r);
                                     this.rois[j].visible(vis);
@@ -238,19 +242,19 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
 
         if (receivedMsg.hasOwnProperty('direction')) {
             //console.log('cellID:' + this.cellID + '  ' + receivedMsg.direction.info);
-            var txt = receivedMsg.direction.info.split('|'); // format "A|P|H|F"
-            var keyTxtArray = [];
-            var directionKey = this.key + '-direction';
-            for(var i=0; i<txt.length; ++i)
+            let txt = receivedMsg.direction.info.split('|'); // format "A|P|H|F"
+            let keyTxtArray = [];
+            let directionKey = this.key + '-direction';
+            for(let i=0; i<txt.length; ++i)
             {
                 keyTxtArray.push({key: directionKey, content: txt[i]});
             }
-            var directionInfoTxt =
+            let directionInfoTxt =
                 d3.select(this.svg).selectAll('text').filter(function (d) {
                     return (d && d.key) ? d.key == directionKey : false;
                 });
-            var width = parseFloat(this.svg.getAttribute('width'));
-            var height = parseFloat(this.svg.getAttribute('height'));
+            let width = parseFloat(this.svg.getAttribute('width'));
+            let height = parseFloat(this.svg.getAttribute('height'));
             if (directionInfoTxt.empty()) {
                 directionInfoTxt.data(keyTxtArray)
                     .enter()
@@ -355,9 +359,9 @@ Cell.prototype.resize = function (width, height) {
     //send msg to notigy BE resize will be call in main
     this.canvas.width = Math.floor(width);
     this.canvas.height = Math.floor(height);
-    var top = this.canvas.offsetTop;
-    var left = this.canvas.offsetLeft;
-    var viewBox = left.toString() + ' ' + top + ' ' + Math.floor(width) + ' ' + Math.floor(height);
+    let top = this.canvas.offsetTop;
+    let left = this.canvas.offsetLeft;
+    let viewBox = left.toString() + ' ' + top + ' ' + Math.floor(width) + ' ' + Math.floor(height);
     this.svg.setAttribute('viewBox', viewBox);
     this.svg.setAttribute('width', Math.floor(width));
     this.svg.setAttribute('height', Math.floor(height));
@@ -382,24 +386,24 @@ Cell.prototype.resize = function (width, height) {
                     return (i < 2) ? TEXT_MARGIN : width - TEXT_MARGIN;
                 })
                 .attr('y', function (datum, j) {
-                    var txtspacing = parseFloat(d3.select('text').attr('font-size'));
+                    let txtspacing = parseFloat(d3.select('text').attr('font-size'));
                     if (i % 2 == 0) {
-                        var texorigin = 1.2 * txtspacing;
+                        let texorigin = 1.2 * txtspacing;
                         return (texorigin + datum.pos * txtspacing);
                     } else {
-                        var texorigin = height + 0.2 * (-txtspacing);
+                        let texorigin = height + 0.2 * (-txtspacing);
                         return (texorigin + datum.pos * (-txtspacing));
                     }
                 })
         });
     
-    for (var i = 0; i < this.rois.length; ++i) {
+    for (let i = 0; i < this.rois.length; ++i) {
         this.rois[i].adjustCircleRadius(width, height);
     }
 
     // resize the direciton information
-    var directionKey = this.key + '-direction';
-    var directionInfoTxt =
+    let directionKey = this.key + '-direction';
+    let directionInfoTxt =
         d3.select(this.svg).selectAll('text').filter(function (d) {
             return (d && d.key) ? d.key == directionKey : false;
         }).attr('x', function (d, i) {
@@ -429,7 +433,7 @@ Cell.prototype.resize = function (width, height) {
 }
 
 Cell.prototype.mouseClickTicker = function() {
-    var clickTick = this.mouseClickTick;
+    let clickTick = this.mouseClickTick;
     this.mouseClickTick = 0;//reset tick
     if (clickTick >= 2) {
         //double click event
@@ -440,7 +444,7 @@ Cell.prototype.mouseClickTicker = function() {
 }
 
 Cell.prototype.touchDown = function(event) {
-    var event = event || window.event;
+    let event = event || window.event;
     event.preventDefault();
 
     this.mouseStatus = BTN_DOWN;
@@ -450,8 +454,8 @@ Cell.prototype.touchDown = function(event) {
         this.mouseFocusEvent(this.cellID);
     }
 
-    var x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
-    var y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
+    let x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
+    let y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
 
@@ -463,11 +467,11 @@ Cell.prototype.touchDown = function(event) {
 }
 
 Cell.prototype.touchMove = function (event) { 
-    var event = event || window.event;
+    let event = event || window.event;
     event.preventDefault();
 
-    var x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
-    var y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
+    let x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
+    let y = event.touches[0].clientY - this.svg.getBoundingClientRect().top;
 
     if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
         //reset previous mouse position if move action done
@@ -477,12 +481,12 @@ Cell.prototype.touchMove = function (event) {
 }
 
 Cell.prototype.touchUp = function(event) {
-    var event = event || window.event;
+    let event = event || window.event;
     event.preventDefault();
 
     this.mouseStatus = BTN_UP;
-    var x = event.changedTouches[0].clientX - this.svg.getBoundingClientRect().left;
-    var y = event.changedTouches[0].clientY - this.svg.getBoundingClientRect().top;
+    let x = event.changedTouches[0].clientX - this.svg.getBoundingClientRect().left;
+    let y = event.changedTouches[0].clientY - this.svg.getBoundingClientRect().top;
 
     this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
 
@@ -502,10 +506,10 @@ Cell.prototype.mouseHoldTicker = function() {
 }
 
 function Pow(base, power) {
-    var number = base;
+    let number = base;
     if(power == 1) return number;
     if(power == 0) return 1;
-    for(var i = 2; i <= power; i++){
+    for(let i = 2; i <= power; i++){
       number = number * base;
     }
     return number;
@@ -514,7 +518,7 @@ function Pow(base, power) {
 Cell.prototype.mouseDown = function(event) {
     this.mouseStatus = BTN_DOWN;
     //this.mouseBtn = event.button;
-    var btn = Pow(2,event.button);
+    let btn = Pow(2,event.button);
     if (btn == BTN_LEFT) {
         this.mouseClickTick += 1;//left mouse click tick for check double click
     }
@@ -524,8 +528,8 @@ Cell.prototype.mouseDown = function(event) {
         this.mouseFocusEvent(this.cellID);
     }
 
-    var x = event.clientX - this.svg.getBoundingClientRect().left;
-    var y = event.clientY - this.svg.getBoundingClientRect().top;
+    let x = event.clientX - this.svg.getBoundingClientRect().left;
+    let y = event.clientY - this.svg.getBoundingClientRect().top;
     this.mousePre.x = x;
     this.mousePre.y = y;
     this.mouseCur.x = x;
@@ -541,8 +545,8 @@ Cell.prototype.mouseDown = function(event) {
 }
 
 Cell.prototype.mouseMove = function (event) {    
-    var x = event.clientX - this.svg.getBoundingClientRect().left;
-    var y = event.clientY - this.svg.getBoundingClientRect().top;
+    let x = event.clientX - this.svg.getBoundingClientRect().left;
+    let y = event.clientY - this.svg.getBoundingClientRect().top;
 
     if (this.mouseBtn == BTN_LEFT) {
         if(this.mouseCurAction.mouseMove(this.mouseBtn, this.mouseStatus, x, y, this.mousePre.x, this.mousePre.y, this)) {
@@ -561,8 +565,8 @@ Cell.prototype.mouseMove = function (event) {
 
 Cell.prototype.mouseUp = function(event) {
     this.mouseStatus = BTN_UP;
-    var x = event.clientX - this.svg.getBoundingClientRect().left;
-    var y = event.clientY - this.svg.getBoundingClientRect().top;
+    let x = event.clientX - this.svg.getBoundingClientRect().left;
+    let y = event.clientY - this.svg.getBoundingClientRect().top;
 
     if (this.mouseBtn == BTN_LEFT) {
         this.mouseCurAction.mouseUp(this.mouseBtn, this.mouseStatus, x, y, this);
@@ -610,8 +614,8 @@ Cell.prototype.prepare = function() {
         }).bind(this);
 
         // add texts at four corners
-        var width = this.canvas.width;
-        var height = this.canvas.height;
+        let width = this.canvas.width;
+        let height = this.canvas.height;
         d3.select(this.svg)
             .selectAll('text')
             .data(['LT', 'LB', 'RT', 'RB'])
