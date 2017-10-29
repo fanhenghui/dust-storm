@@ -19,6 +19,7 @@ class OrthoCameraInteractor;
 class OrthoCamera;
 class ColorTransFunc;
 class OpacityTransFunc;
+class GraphicObjectNavigator;
 
 class RenderAlgo_Export RayCastScene : public SceneBase {
 public:
@@ -112,6 +113,9 @@ protected:
     // constant
     GLTexture1DPtr _pseudo_color_texture;
     GLTexture1DArrayPtr _color_opacity_texture_array;
+
+    //graphic object
+    std::shared_ptr<GraphicObjectNavigator> _go_navigator;
 };
 
 MED_IMG_END_NAMESPACE

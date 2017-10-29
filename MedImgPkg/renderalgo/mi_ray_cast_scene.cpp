@@ -26,6 +26,7 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_volume_infos.h"
 #include "mi_brick_pool.h"
+#include "mi_graphic_object_navigator.h"
 
 #include "mi_render_algo_logger.h"
 
@@ -48,6 +49,8 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
     }
 
     init_default_color_texture_i();
+
+    _go_navigator.reset(new GraphicObjectNavigator());
 }
 
 RayCastScene::RayCastScene(int width, int height)
@@ -69,6 +72,8 @@ RayCastScene::RayCastScene(int width, int height)
     }
 
     init_default_color_texture_i();
+
+    _go_navigator.reset(new GraphicObjectNavigator());
 }
 
 RayCastScene::~RayCastScene() {}
@@ -78,6 +83,7 @@ void RayCastScene::initialize() {
 
     _canvas->initialize();
     _entry_exit_points->initialize();
+    _go_navigator->initialize();
 }
 
 void RayCastScene::set_display_size(int width, int height) {
@@ -197,7 +203,6 @@ void RayCastScene::render() {
 
     glEnable(GL_TEXTURE_2D);
     _canvas->get_color_attach_texture()->bind();
-
     if (_ray_caster->map_quarter_canvas()) {
         glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.5);
@@ -221,6 +226,10 @@ void RayCastScene::render() {
         glVertex2f(-1.0, 1.0);
         glEnd();
     }
+    _canvas->get_color_attach_texture()->unbind();
+
+    //render navigator
+    _go_navigator->render();
 
     // CHECK_GL_ERROR;
     // glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!

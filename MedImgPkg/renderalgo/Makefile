@@ -27,7 +27,7 @@ mi_ray_caster_canvas.o mi_ray_caster_inner_buffer.o mi_ray_caster.o mi_ray_casti
 mi_rc_step_color_inverse.o mi_rc_step_composite.o mi_rc_step_main.o mi_rc_step_mask_overlay.o \
 mi_rc_step_mask_sampler.o mi_rc_step_ray_casting.o mi_rc_step_shading.o mi_rc_step_utils.o mi_rc_step_volume_sampler.o \
 mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o mi_vr_scene.o \
-mi_annotation_calculator.o
+mi_annotation_calculator.o mi_graphic_object_navigator.o
 
 TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
@@ -61,7 +61,8 @@ mi_camera_calculator.o mi_camera_interactor.o mi_volume_infos.o mi_mpr_entry_exi
 	$(CC) -c -fPIC $(CFLAGS) mi_mpr_scene.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_ray_cast_scene.o: $(EXPORT_HEADER) mi_ray_cast_scene.h mi_ray_cast_scene.cpp mi_scene_base.o \
-mi_camera_calculator.o mi_camera_interactor.o mi_volume_infos.o mi_entry_exit_points.o mi_ray_caster.o mi_ray_caster_canvas.o
+mi_camera_calculator.o mi_camera_interactor.o mi_volume_infos.o mi_entry_exit_points.o mi_ray_caster.o \
+mi_ray_caster_canvas.o mi_graphic_object_navigator.o
 	$(CC) -c -fPIC $(CFLAGS) mi_ray_cast_scene.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_scene_base.o: $(EXPORT_HEADER) mi_scene_base.h mi_scene_base.cpp
@@ -169,6 +170,10 @@ mi_brick_info_calculator.o: $(EXPORT_HEADER) mi_brick_info_calculator.h mi_brick
 
 mi_mask_label_store.o: $(EXPORT_HEADER) mi_mask_label_store.h mi_mask_label_store.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_mask_label_store.cpp $(ADDITINAL_INCLUDE_DIR)	
+
+mi_graphic_object_navigator.o: $(EXPORT_HEADER) mi_graphic_object_navigator.h mi_graphic_object_navigator.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_graphic_object_navigator.cpp $(ADDITINAL_INCLUDE_DIR)	
+
 
 .PHONY : clean
 clean:
