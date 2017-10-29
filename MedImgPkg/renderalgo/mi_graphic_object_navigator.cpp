@@ -38,10 +38,20 @@ void GraphicObjectNavigator::render(int code) {
 
     glViewport(_x, _y, _width, _height);
 
-    // OrthoCamera camera;
-    // if (_camera) {   
-    //     Vector3 view =  _camera->get_view_direction();
-    // }
+    OrthoCamera camera;
+    if (_camera) {   
+        Vector3 view =  _camera->get_view_direction();
+        Vector3 up = _camera->get_up_direction();
+        //ray casting result mapping flip vertically in scene
+        view.z = -view.z;
+        up.z = -up.z;
+        camera.set_look_at(Point3::S_ZERO_POINT);
+        const double dis = 100;
+        Point3 eye = Point3::S_ZERO_POINT - view*dis;
+        camera.set_eye(eye);
+        camera.set_up_direction(up);
+        camera.set_ortho(-1,1,-1,1,0,dis*2);
+    }
 
     glPushMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -52,12 +62,47 @@ void GraphicObjectNavigator::render(int code) {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glColor3f(1.0,1.0,0);
-    float w = 0.8f;
+    float w = 0.6f;
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glBegin(GL_QUADS);
-    glVertex3f(-w, -w ,0);
-    glVertex3f(w, -w ,0);
-    glVertex3f(w, w ,0);
-    glVertex3f(-w, w ,0);
+
+    //patient coordinate
+    //top 
+    glVertex3f(-w, -w, w);
+    glVertex3f(w, -w, w);
+    glVertex3f(w, w, w);
+    glVertex3f(-w, w, w);
+
+    //bottom
+    glVertex3f(-w, -w, -w);
+    glVertex3f(-w, w, -w);
+    glVertex3f(w, w, -w);
+    glVertex3f(w, -w, -w);
+    
+    //left
+    glVertex3f(-w, -w, -w);
+    glVertex3f(-w, -w, w);
+    glVertex3f(-w, w, w);
+    glVertex3f(-w, w, -w);
+
+    //right 
+    glVertex3f(w, -w, -w);
+    glVertex3f(w, w, -w);
+    glVertex3f(w, w, w);
+    glVertex3f(w, -w, w);
+
+    //posterior
+    glVertex3f(-w, w, -w);
+    glVertex3f(-w, w, w);
+    glVertex3f(w, w, w);
+    glVertex3f(w, w, -w);
+
+    //anterior
+    glVertex3f(-w, -w, -w);
+    glVertex3f(w, -w, -w);
+    glVertex3f(w, -w, w);
+    glVertex3f(-w, -w, w);
+    
     glEnd();  
 
     glPopMatrix();

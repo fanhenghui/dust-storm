@@ -51,6 +51,9 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
     init_default_color_texture_i();
 
     _go_navigator.reset(new GraphicObjectNavigator());
+    _go_navigator->set_scene_display_size(_width,_height);
+    const int min_size = int((std::min)(_width, _height)/4.5);
+    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
 
 RayCastScene::RayCastScene(int width, int height)
@@ -74,6 +77,9 @@ RayCastScene::RayCastScene(int width, int height)
     init_default_color_texture_i();
 
     _go_navigator.reset(new GraphicObjectNavigator());
+    _go_navigator->set_scene_display_size(_width,_height);
+    const int min_size = int((std::min)(_width, _height)/4.5);
+    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
 
 RayCastScene::~RayCastScene() {}
@@ -91,6 +97,10 @@ void RayCastScene::set_display_size(int width, int height) {
     _canvas->set_display_size(width, height);
     _entry_exit_points->set_display_size(width, height);
     _camera_interactor->resize(width, height);
+
+    _go_navigator->set_scene_display_size(_width,_height);
+    const int min_size = int((std::min)(_width, _height)/4.5);
+    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
 
 void RayCastScene::pre_render_i() {
@@ -112,6 +122,8 @@ void RayCastScene::pre_render_i() {
     // scene base prerender to recreate jpeg encoder(this must be call after gl
     // resource update)
     SceneBase::pre_render_i();
+
+    _go_navigator->set_camera(_camera);
 }
 
 void RayCastScene::init_default_color_texture_i() {
@@ -319,6 +331,9 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
             _ray_caster->set_volume_data_texture(volume_infos->get_volume_texture());
             _ray_caster->set_mask_data_texture(volume_infos->get_mask_texture());
         }
+
+        _go_navigator->set_volume_info(volume_infos);
+
 
         set_dirty(true);
     } catch (const Exception& e) {

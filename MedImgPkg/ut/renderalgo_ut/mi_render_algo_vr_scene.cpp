@@ -64,6 +64,7 @@ int _height = 618;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
+bool _pan_status = false;
 
 int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
@@ -423,6 +424,10 @@ void Keyboard(unsigned char key, int x, int y) {
         _scene->set_window_level(ww, wl, 1);
         break;
     }
+    case 'p' : {
+        _pan_status = !_pan_status;
+        break;
+    }
     default:
         break;
     }
@@ -483,14 +488,17 @@ void MouseMotion(int x, int y) {
         _scene->rotate(_ptPre, cur_pt);
 
     } else if (_iButton == GLUT_MIDDLE_BUTTON) {
-        //_scene->pan(_ptPre , cur_pt);
-        _ww += (x - (int)_ptPre.x);
-        _wl += ((int)_ptPre.y - y);
-        _ww = _ww < 0 ? 1 : _ww;
-        //_scene->set_global_window_level(_ww, _wl);
-        //_scene->set_window_level(_ww, _wl, 0);
-        _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
-        MI_RENDERALGO_LOG(MI_DEBUG) << "wl : " << _ww << " " << _wl << std::endl;
+        if (_pan_status) {
+            _scene->pan(_ptPre , cur_pt);
+        } else {
+            _ww += (x - (int)_ptPre.x);
+            _wl += ((int)_ptPre.y - y);
+            _ww = _ww < 0 ? 1 : _ww;
+            //_scene->set_global_window_level(_ww, _wl);
+            //_scene->set_window_level(_ww, _wl, 0);
+            _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
+            MI_RENDERALGO_LOG(MI_DEBUG) << "wl : " << _ww << " " << _wl << std::endl;
+        }
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
         _scene->zoom(_ptPre, cur_pt);
