@@ -51,7 +51,6 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
     init_default_color_texture_i();
 
     _go_navigator.reset(new GraphicObjectNavigator());
-    _go_navigator->set_scene_display_size(_width,_height);
     const int min_size = int((std::min)(_width, _height)/4.5);
     _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
@@ -77,7 +76,6 @@ RayCastScene::RayCastScene(int width, int height)
     init_default_color_texture_i();
 
     _go_navigator.reset(new GraphicObjectNavigator());
-    _go_navigator->set_scene_display_size(_width,_height);
     const int min_size = int((std::min)(_width, _height)/4.5);
     _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
@@ -98,7 +96,6 @@ void RayCastScene::set_display_size(int width, int height) {
     _entry_exit_points->set_display_size(width, height);
     _camera_interactor->resize(width, height);
 
-    _go_navigator->set_scene_display_size(_width,_height);
     const int min_size = int((std::min)(_width, _height)/4.5);
     _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
 }
@@ -160,8 +157,7 @@ void RayCastScene::init_default_color_texture_i() {
                 "color opacity texture array");
 
             const int tex_num = 8; // default mask level
-            unsigned char* rgba =
-                new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
+            unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
             memset(rgba, 0, S_TRANSFER_FUNC_WIDTH * tex_num * 4);
 
             GLTextureCache::instance()->cache_load(

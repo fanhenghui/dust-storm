@@ -1,16 +1,20 @@
 #include "mi_graphic_object_navigator.h"
-#include "glresource/mi_gl_utils.h"
+
+#include "util/mi_file_util.h"
 #include "arithmetic/mi_ortho_camera.h"
+#include "glresource/mi_gl_utils.h"
+#include "glresource/mi_gl_texture_2d.h"
+#include "glresource/mi_gl_texture_cache.h"
+
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-GraphicObjectNavigator::GraphicObjectNavigator() {
-    _s_width = 512;
-    _s_height = 512;
-    _width = _s_width/5;
-    _height = _s_height/5;
-    _x = _s_width - _width;
-    _y = _s_height - _height;
+GraphicObjectNavigator::GraphicObjectNavigator() : _has_init(false) {
+    _width = 100;
+    _height = 100;
+    _x = 512 - _width - 20;
+    _y = 512 - _height - 20;
 }
 
 GraphicObjectNavigator::~GraphicObjectNavigator() {
@@ -18,12 +22,22 @@ GraphicObjectNavigator::~GraphicObjectNavigator() {
 }
 
 void GraphicObjectNavigator::initialize() {
-    //TODO load tex mapping    
-}
-
-void GraphicObjectNavigator::set_scene_display_size(int width, int height) {
-    _s_width = width;
-    _s_height = height;
+    if(!_has_init) {
+        const std::string navi_img_file("../config/navi_384_256_3.raw");
+        const unsigned int img_size = 384*256*3;
+        unsigned char* img_buffer = new unsigned char[img_size];
+        if( 0 != FileUtil::read_raw(navi_img_file, img_buffer, img_size) ) {
+            MI_RENDERALGO_LOG(MI_FATAL) << "load navigator image failed.";
+        } else {
+            UIDType uid = 0;
+            _navi_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+            _navi_tex->set_description("navigator texture");
+            _res_shield.add_shield<GLTexture2D>(_navi_tex);
+            GLTextureCache::instance()->cache_load(GL_TEXTURE_2D, _navi_tex, GL_CLAMP_TO_BORDER, 
+                GL_LINEAR, GL_RGB8, 384, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);
+        }
+        _has_init = false;
+    }
 }
 
 void GraphicObjectNavigator::set_navi_position(int x, int y, int width, int height) {
@@ -34,13 +48,13 @@ void GraphicObjectNavigator::set_navi_position(int x, int y, int width, int heig
 }
 
 void GraphicObjectNavigator::render(int code) {
-    CHECK_GL_ERROR;
-
-    glViewport(_x, _y, _width, _height);
+    if (_navi_tex == nullptr) {
+        return;
+    }
 
     OrthoCamera camera;
     if (_camera) {   
-        Vector3 view =  _camera->get_view_direction();
+        Vector3 view = _camera->get_view_direction();
         Vector3 up = _camera->get_up_direction();
         //ray casting result mapping flip vertically in scene
         view.z = -view.z;
@@ -53,6 +67,8 @@ void GraphicObjectNavigator::render(int code) {
         camera.set_ortho(-1,1,-1,1,0,dis*2);
     }
 
+    CHECK_GL_ERROR;
+    glViewport(_x, _y, _width, _height);
     glPushMatrix();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -63,23 +79,35 @@ void GraphicObjectNavigator::render(int code) {
 
     glColor3f(1.0,1.0,0);
     float w = 0.6f;
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_TEXTURE_2D);
+    _navi_tex->bind();
     glBegin(GL_QUADS);
 
+    const float x_step = 0.33333f;
+    const float y_step = 0.5f;
     //patient coordinate
-    //top 
+    //head 
+    glTexCoord2f(x_step*2.0f, y_step);
     glVertex3f(-w, -w, w);
+    glTexCoord2f(x_step*3.0f, y_step);
     glVertex3f(w, -w, w);
+    glTexCoord2f(x_step*3.0f, 0);
     glVertex3f(w, w, w);
+    glTexCoord2f(x_step*2.0f, 0);
     glVertex3f(-w, w, w);
 
-    //bottom
+    //foot
+    glTexCoord2f(x_step*2.0f, y_step*2.0f);
     glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step*3.0f, y_step*2.0f);
     glVertex3f(-w, w, -w);
+    glTexCoord2f(x_step*3.0f, y_step);
     glVertex3f(w, w, -w);
+    glTexCoord2f(x_step*2.0f, y_step);
     glVertex3f(w, -w, -w);
     
     //left
+    //glTexCoord2f(x_step*2.0f, y_step*2.0f);
     glVertex3f(-w, -w, -w);
     glVertex3f(-w, -w, w);
     glVertex3f(-w, w, w);
@@ -105,6 +133,7 @@ void GraphicObjectNavigator::render(int code) {
     
     glEnd();  
 
+    _navi_tex->unbind();
     glPopMatrix();
     glPopAttrib();
 

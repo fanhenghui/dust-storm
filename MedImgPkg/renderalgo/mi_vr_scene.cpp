@@ -17,6 +17,7 @@
 #include "mi_volume_infos.h"
 #include "mi_ray_caster_canvas.h"
 #include "mi_render_algo_logger.h"
+#include "mi_graphic_object_navigator.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -79,6 +80,7 @@ void VRScene::initialize() {
 
     _canvas->initialize(true);
     _entry_exit_points->initialize();
+    _go_navigator->initialize();
 }
 
 void VRScene::rotate(const Point2& pre_pt, const Point2& cur_pt) {

@@ -13,15 +13,12 @@ public:
 
     virtual void initialize();
     virtual void render(int code = 0);
-    void set_scene_display_size(int width, int height);
     void set_navi_position(int x, int y, int width, int height);
 
 private:
-    GLTexture2DPtr _tex_map;
+    GLTexture2DPtr _navi_tex;
     GLResourceShield _res_shield;
-    GLVAOPtr _vao;
-    int _s_width;
-    int _s_height;
+    bool _has_init;
     int _x;
     int _y;
     int _width;
