@@ -8,7 +8,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class JpegParser {
 public:
-    static IO_Export void write_to_jpeg(std::string& file, char* img_buf , int width , int height);
+    static IO_Export void write_to_jpeg(const std::string& file, char* img_buf , int width , int height);
 
 protected:
 private:

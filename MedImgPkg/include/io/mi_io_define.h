@@ -22,6 +22,7 @@ enum IOStatus {
     IO_UNMATCHED_FILE,
     IO_ENCRYPT_FAILED,
     IO_DECRYPT_FAILED,
+    IO_NOT_ENOUGH_MEMORY,
 };
 
 enum ExportDicomDataType {

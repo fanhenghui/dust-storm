@@ -10,7 +10,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-void JpegParser::write_to_jpeg(std::string& file, char* img_buf , int width , int height) {
+void JpegParser::write_to_jpeg(const std::string& file, char* img_buf , int width , int height) {
     FILE* outfile = fopen(file.c_str(), "wb");
 
     struct jpeg_compress_struct cinfo;
