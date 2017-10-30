@@ -2,6 +2,16 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', function (req, res, next) {
+  // useless code cookies 已经以session的形式发送了
+  // if (req.cookies.isVisit) {
+  //   console.log('welcome back.');
+  //   console.log(req.cookies);
+  // } else {
+  //   let cookieName = require('./server-ip.js').serverip + new Date().getTime();
+  //   res.cookie('isVisit', 1, {maxAge: 60 * 1000});
+  //   res.cookie('name', cookieName);
+  //   console.log("welcome.");
+  // }
   res.render('index', {
     title: 'Web-based Medical Viewer from Baidu'
   }); // 到达此路径则渲染index文件，并传出title值供 index.html使用
