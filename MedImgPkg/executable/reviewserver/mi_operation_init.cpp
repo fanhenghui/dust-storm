@@ -327,6 +327,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
                 ss << "cell_" << cell_id;
                 vr_scene->set_name(ss.str());
             }
+            vr_scene->set_navigator_visibility(true);
             vr_scene->set_volume_infos(volume_infos);
             vr_scene->set_sample_rate(1.0);
             vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
