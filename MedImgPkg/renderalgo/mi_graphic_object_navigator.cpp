@@ -36,7 +36,7 @@ void GraphicObjectNavigator::initialize() {
             GLTextureCache::instance()->cache_load(GL_TEXTURE_2D, _navi_tex, GL_CLAMP_TO_BORDER, 
                 GL_LINEAR, GL_RGB8, 384, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);
         }
-        _has_init = false;
+        _has_init = true;
     }
 }
 
@@ -56,11 +56,8 @@ void GraphicObjectNavigator::render(int code) {
     if (_camera) {   
         Vector3 view = _camera->get_view_direction();
         Vector3 up = _camera->get_up_direction();
-        //ray casting result mapping flip vertically in scene
-        view.z = -view.z;
-        up.z = -up.z;
         camera.set_look_at(Point3::S_ZERO_POINT);
-        const double dis = 100;
+        const double dis = 1;
         Point3 eye = Point3::S_ZERO_POINT - view*dis;
         camera.set_eye(eye);
         camera.set_up_direction(up);
@@ -76,9 +73,11 @@ void GraphicObjectNavigator::render(int code) {
     glLoadMatrixd(camera.get_view_projection_matrix()._m);
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glDepthFunc(GL_LEQUAL);
 
-    glColor3f(1.0,1.0,0);
-    float w = 0.6f;
+    const float w = 0.6f;
     glEnable(GL_TEXTURE_2D);
     _navi_tex->bind();
     glBegin(GL_QUADS);
@@ -99,36 +98,51 @@ void GraphicObjectNavigator::render(int code) {
     //foot
     glTexCoord2f(x_step*2.0f, y_step*2.0f);
     glVertex3f(-w, -w, -w);
-    glTexCoord2f(x_step*3.0f, y_step*2.0f);
+    glTexCoord2f(x_step*2.0f, y_step);
     glVertex3f(-w, w, -w);
     glTexCoord2f(x_step*3.0f, y_step);
     glVertex3f(w, w, -w);
-    glTexCoord2f(x_step*2.0f, y_step);
+    glTexCoord2f(x_step*3.0f, y_step*2.0f);
     glVertex3f(w, -w, -w);
     
     //left
-    //glTexCoord2f(x_step*2.0f, y_step*2.0f);
+    glTexCoord2f(x_step, 0);
     glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step, y_step);
     glVertex3f(-w, -w, w);
+    glTexCoord2f(0, y_step);
     glVertex3f(-w, w, w);
+    glTexCoord2f(0, 0);
     glVertex3f(-w, w, -w);
 
-    //right 
+    //right
+    glTexCoord2f(0, y_step);
     glVertex3f(w, -w, -w);
+    glTexCoord2f(x_step, y_step);
     glVertex3f(w, w, -w);
+    glTexCoord2f(x_step, y_step*2);
     glVertex3f(w, w, w);
+    glTexCoord2f(0, y_step*2);
     glVertex3f(w, -w, w);
 
     //posterior
+    glTexCoord2f(x_step*2.0, 0);
     glVertex3f(-w, w, -w);
+    glTexCoord2f(x_step*2.0, y_step);
     glVertex3f(-w, w, w);
+    glTexCoord2f(x_step, y_step);
     glVertex3f(w, w, w);
+    glTexCoord2f(x_step, 0);
     glVertex3f(w, w, -w);
 
     //anterior
+    glTexCoord2f(x_step, y_step);
     glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step*2.0, y_step);
     glVertex3f(w, -w, -w);
+    glTexCoord2f(x_step*2.0, y_step*2.0);
     glVertex3f(w, -w, w);
+    glTexCoord2f(x_step, y_step*2.0);
     glVertex3f(-w, -w, w);
     
     glEnd();  

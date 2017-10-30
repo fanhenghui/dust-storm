@@ -106,7 +106,7 @@ void RayCaster::render() {
             _ray_casting_gpu->render();
 
             _pre_rendering_duration = _ray_casting_gpu->get_rendering_duration();
-            MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
+            //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
         }
     }
 }

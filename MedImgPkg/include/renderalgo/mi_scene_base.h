@@ -61,6 +61,7 @@ protected:
 
     GLFBOPtr _scene_fbo;
     GLTexture2DPtr _scene_color_attach_0;
+    GLTexture2DPtr _scene_color_attach_1;//for fliping verticalily
     GLTexture2DPtr _scene_depth_attach;
     GLResourceShield _res_shield;
 

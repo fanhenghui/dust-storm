@@ -80,7 +80,7 @@ void VRScene::initialize() {
 
     _canvas->initialize(true);
     _entry_exit_points->initialize();
-    _go_navigator->initialize();
+    _navigator->initialize();
 }
 
 void VRScene::rotate(const Point2& pre_pt, const Point2& cur_pt) {

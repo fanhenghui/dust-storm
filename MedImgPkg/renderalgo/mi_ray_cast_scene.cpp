@@ -50,9 +50,13 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
 
     init_default_color_texture_i();
 
-    _go_navigator.reset(new GraphicObjectNavigator());
-    const int min_size = int((std::min)(_width, _height)/4.5);
-    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
+    _navigator_margin[0] = 20;
+    _navigator_margin[1] = 20;
+    _navigator_window_ratio = 4.5f;
+    _navigator_vis = false;
+    _navigator.reset(new GraphicObjectNavigator());
+    const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
+    _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
 
 RayCastScene::RayCastScene(int width, int height)
@@ -75,9 +79,13 @@ RayCastScene::RayCastScene(int width, int height)
 
     init_default_color_texture_i();
 
-    _go_navigator.reset(new GraphicObjectNavigator());
-    const int min_size = int((std::min)(_width, _height)/4.5);
-    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
+    _navigator_margin[0] = 20;
+    _navigator_margin[1] = 20;
+    _navigator_window_ratio = 4.5f;
+    _navigator_vis = false;
+    _navigator.reset(new GraphicObjectNavigator());
+    const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
+    _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
 
 RayCastScene::~RayCastScene() {}
@@ -87,7 +95,7 @@ void RayCastScene::initialize() {
 
     _canvas->initialize();
     _entry_exit_points->initialize();
-    _go_navigator->initialize();
+    _navigator->initialize();
 }
 
 void RayCastScene::set_display_size(int width, int height) {
@@ -96,8 +104,8 @@ void RayCastScene::set_display_size(int width, int height) {
     _entry_exit_points->set_display_size(width, height);
     _camera_interactor->resize(width, height);
 
-    const int min_size = int((std::min)(_width, _height)/4.5);
-    _go_navigator->set_navi_position(_width - min_size - 20, _height - min_size - 20 , min_size, min_size);
+    const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
+    _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
 
 void RayCastScene::pre_render_i() {
@@ -120,7 +128,7 @@ void RayCastScene::pre_render_i() {
     // resource update)
     SceneBase::pre_render_i();
 
-    _go_navigator->set_camera(_camera);
+    _navigator->set_camera(_camera);
 }
 
 void RayCastScene::init_default_color_texture_i() {
@@ -191,9 +199,10 @@ void RayCastScene::render() {
     // 1 Ray casting
     // glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    glViewport(0, 0, _width, _height);
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // glViewport(0, 0, _width, _height);
+    // glClearColor(0, 0, 0, 0);
+    // glClearDepth(1.0);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     _entry_exit_points->calculate_entry_exit_points();
 
@@ -207,43 +216,80 @@ void RayCastScene::render() {
     glViewport(0, 0, _width, _height);
 
     _scene_fbo->bind();
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glDrawBuffer(GL_COLOR_ATTACHMENT1);
+    
+    glViewport(0, 0, _width, _height);
+    glClearColor(0, 0, 0, 0);
+    glClearDepth(1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_TEXTURE_2D);
     _canvas->get_color_attach_texture()->bind();
     if (_ray_caster->map_quarter_canvas()) {
+        // glBegin(GL_QUADS);
+        // glTexCoord2f(0.0, 0.5);
+        // glVertex2f(-1.0, -1.0);
+        // glTexCoord2f(0.5, 0.5);
+        // glVertex2f(1.0, -1.0);
+        // glTexCoord2f(0.5, 0.0);
+        // glVertex2f(1.0, 1.0);
+        // glTexCoord2f(0.0, 0.0);
+        // glVertex2f(-1.0, 1.0);
+        // glEnd();
+
         glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.5);
-        glVertex2f(-1.0, -1.0);
-        glTexCoord2f(0.5, 0.5);
-        glVertex2f(1.0, -1.0);
-        glTexCoord2f(0.5, 0.0);
-        glVertex2f(1.0, 1.0);
         glTexCoord2f(0.0, 0.0);
+        glVertex2f(-1.0, -1.0);
+        glTexCoord2f(0.5, 0.0);
+        glVertex2f(1.0, -1.0);
+        glTexCoord2f(0.5, 0.5);
+        glVertex2f(1.0, 1.0);
+        glTexCoord2f(0.0, 0.5);
         glVertex2f(-1.0, 1.0);
         glEnd();
     } else {
+        // glBegin(GL_QUADS);
+        // glTexCoord2f(0.0, 1.0);
+        // glVertex2f(-1.0, -1.0);
+        // glTexCoord2f(1.0, 1.0);
+        // glVertex2f(1.0, -1.0);
+        // glTexCoord2f(1.0, 0.0);
+        // glVertex2f(1.0, 1.0);
+        // glTexCoord2f(0.0, 0.0);
+        // glVertex2f(-1.0, 1.0);
+        // glEnd();
+
         glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 1.0);
-        glVertex2f(-1.0, -1.0);
-        glTexCoord2f(1.0, 1.0);
-        glVertex2f(1.0, -1.0);
-        glTexCoord2f(1.0, 0.0);
-        glVertex2f(1.0, 1.0);
         glTexCoord2f(0.0, 0.0);
+        glVertex2f(-1.0, -1.0);
+        glTexCoord2f(1.0, 0.0);
+        glVertex2f(1.0, -1.0);
+        glTexCoord2f(1.0, 1.0);
+        glVertex2f(1.0, 1.0);
+        glTexCoord2f(0.0, 1.0);
         glVertex2f(-1.0, 1.0);
         glEnd();
     }
     _canvas->get_color_attach_texture()->unbind();
 
     //render navigator
-    _go_navigator->render();
+    if (_navigator_vis) {
+        _navigator->render();
+    }
 
     // CHECK_GL_ERROR;
     // glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
     // CHECK_GL_ERROR;
 
     _scene_fbo->unbind();
+
+    //flip vertically for download
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _scene_fbo->get_id());
+    glReadBuffer(GL_COLOR_ATTACHMENT1);
+    glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     CHECK_GL_ERROR;
 
@@ -281,6 +327,7 @@ void RayCastScene::render() {
     //         3);
     //     #endif
     // }
+
 
     set_dirty(false);
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT ray cast scene render.";
@@ -328,7 +375,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
             _ray_caster->set_mask_data_texture(volume_infos->get_mask_texture());
         }
 
-        _go_navigator->set_volume_info(volume_infos);
+        _navigator->set_volume_info(volume_infos);
 
 
         set_dirty(true);
@@ -589,6 +636,16 @@ void RayCastScene::set_expected_fps(int fps) {
 
 int RayCastScene::get_expected_fps() const {
     return _ray_caster->get_expected_fps();
+}
+
+void RayCastScene::set_navigator_visibility(bool flag) {
+    _navigator_vis = flag;
+}
+
+void RayCastScene::set_navigator_para(int x_margin, int y_margin, float ratio) {
+    _navigator_margin[0] = x_margin;
+    _navigator_margin[1] = y_margin;
+    _navigator_window_ratio = ratio;
 }
 
 MED_IMG_END_NAMESPACE

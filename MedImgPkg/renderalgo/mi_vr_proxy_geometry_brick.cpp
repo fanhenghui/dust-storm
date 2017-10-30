@@ -122,6 +122,10 @@ void ProxyGeometryBrick::calculate_entry_exit_points() {
 
     entry_exit_points->_gl_fbo->bind();
 
+    int width(0), height(0);
+    entry_exit_points->get_display_size(width, height);
+    glViewport(0, 0, width, height);
+
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     _gl_vao->bind();

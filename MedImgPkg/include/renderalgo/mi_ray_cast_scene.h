@@ -89,6 +89,12 @@ public:
     void set_expected_fps(int fps);
     int get_expected_fps() const;
 
+    //navigator window size : navi_size = min(scene_width, scene_height)/ratio
+    //navigator viewport (scene_x - margin_x - navi_size, margin_y, navi_size, navi_size)  
+    //default x/y margin(20), default ratio (4.5)
+    void set_navigator_visibility(bool flag);
+    void set_navigator_para(int x_margin, int y_margin, float ratio);
+
 protected:
     virtual void pre_render_i();
     void init_default_color_texture_i();
@@ -115,7 +121,10 @@ protected:
     GLTexture1DArrayPtr _color_opacity_texture_array;
 
     //graphic object
-    std::shared_ptr<GraphicObjectNavigator> _go_navigator;
+    std::shared_ptr<GraphicObjectNavigator> _navigator;
+    bool _navigator_vis;
+    int  _navigator_margin[2];
+    float  _navigator_window_ratio;
 };
 
 MED_IMG_END_NAMESPACE

@@ -101,6 +101,18 @@ void SceneBase::initialize() {
         _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGB,
                                     GL_UNSIGNED_BYTE, nullptr);
 
+
+        _scene_color_attach_1 = GLResourceManagerContainer::instance()
+                                ->get_texture_2d_manager()
+                                ->create_object(texture_color_id);
+        _scene_color_attach_1->set_description("scene base color attachment 1 <flip verticalily>");
+        _scene_color_attach_1->initialize();
+        _scene_color_attach_1->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+        _scene_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB,
+                                    GL_UNSIGNED_BYTE, nullptr);
+
         UIDType depth_color_id = 0;
         _scene_depth_attach = GLResourceManagerContainer::instance()
                               ->get_texture_2d_manager()
@@ -117,6 +129,7 @@ void SceneBase::initialize() {
         _scene_fbo->bind();
 
         _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _scene_color_attach_0);
+        _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _scene_color_attach_1);
         _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT, _scene_depth_attach);
 
         _scene_fbo->unbind();
@@ -169,6 +182,7 @@ void SceneBase::initialize() {
 
         _res_shield.add_shield<GLFBO>(_scene_fbo);
         _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
+        _res_shield.add_shield<GLTexture2D>(_scene_color_attach_1);
         _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
         _res_shield.add_shield<GLTimeQuery>(_gl_time_query);
     }
@@ -191,6 +205,10 @@ void SceneBase::set_display_size(int width, int height) {
 
     GLTextureCache::instance()->cache_load(
         GL_TEXTURE_2D, _scene_color_attach_0, GL_CLAMP_TO_EDGE, GL_LINEAR,
+        GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+    GLTextureCache::instance()->cache_load(
+        GL_TEXTURE_2D, _scene_color_attach_1, GL_CLAMP_TO_EDGE, GL_LINEAR,
         GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     GLTextureCache::instance()->cache_load(

@@ -173,7 +173,7 @@ void Init() {
     //_scene->set_proxy_geometry(PG_CUBE);
     _scene->set_proxy_geometry(PG_BRICKS);
     _scene->set_test_code(_iTestCode);
-    //_scene->initialize();
+    _scene->set_navigator_visibility(true);
 
     // Time query
     UIDType uid = 0;
@@ -299,7 +299,7 @@ void Display() {
         //_time_query2->begin();
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
-        //_scene->download_image_buffer();
+        _scene->download_image_buffer();
 
         CHECK_GL_ERROR;
         _scene->swap_image_buffer();
@@ -315,7 +315,7 @@ void Display() {
 #ifdef WIN32
         FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
-        //FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
 #endif
         // MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
         // ", buffer size: " << buffer_size;
@@ -447,7 +447,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
