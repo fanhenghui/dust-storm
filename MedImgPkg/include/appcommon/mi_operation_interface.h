@@ -26,7 +26,7 @@ public:
 
     virtual ~IOperation() {
         if (nullptr != _buffer) {
-            MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
+            //MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete [] _buffer;
             _buffer = nullptr;
         }
@@ -47,7 +47,7 @@ public:
 
     void reset() {
         if (nullptr != _buffer) {
-            MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
+            //MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete[] _buffer;
             _buffer = nullptr;
         }
