@@ -97,7 +97,7 @@ public:
         double len = std::sqrt(x * x + y * y);
 
         if (len < DOUBLE_EPSILON) {
-            LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
+            //LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
             return;
         }
 
@@ -110,7 +110,7 @@ public:
         double len = std::sqrt(x * x + y * y);
 
         if (len < DOUBLE_EPSILON) {
-            LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
+            //LoggerUtil::log(MI_WARNING , "Arithmetic" , "vector3's magnitude is 0 ! Get normalize failed.");
             return *this;
         }
 
