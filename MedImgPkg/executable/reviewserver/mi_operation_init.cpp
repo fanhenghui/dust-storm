@@ -50,7 +50,7 @@ MED_IMG_BEGIN_NAMESPACE
 const float DEFAULT_WW = 1500;
 const float DEFAULT_WL = -400;
 const std::string LUNG_NODULE_LUT_PATH = "../config/lut/3d/ct_lung_nodule.xml";
-const std::string LUNG_LUT_PATH = "../config/lut/3d/ct_lung_glass.xml";
+const std::string LUNG_LUT_PATH = "../config/lut/3d/ct_cta.xml";
 const RGBUnit COLOR_TRANSVERSE = RGBUnit(237, 25, 35);
 const RGBUnit COLOR_CORONAL = RGBUnit(255, 128, 0);
 const RGBUnit COLOR_SAGITTAL = RGBUnit(1, 255, 64);
