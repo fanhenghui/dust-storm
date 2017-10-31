@@ -20,8 +20,6 @@
 
 using namespace medical_imaging;
 
-
-
 int ut_ct_table_removal(int argc, char* argv[]) {
     if (argc < 2) {
         return -1;
@@ -58,7 +56,7 @@ int ut_ct_table_removal(int argc, char* argv[]) {
         removal.set_max_scalar(volume_data->get_max_scalar());
         removal.set_image_orientation(volume_data->_image_orientation);
         removal.set_intercept(volume_data->_intercept);
-        removal.set_intercept(volume_data->_slope);
+        removal.set_slope(volume_data->_slope);
         removal.remove();
         {
             std::stringstream ss;
@@ -83,7 +81,7 @@ int ut_ct_table_removal(int argc, char* argv[]) {
         removal.set_max_scalar(volume_data->get_max_scalar());
         removal.set_image_orientation(volume_data->_image_orientation);
         removal.set_intercept(volume_data->_intercept);
-        removal.set_intercept(volume_data->_slope);
+        removal.set_slope(volume_data->_slope);
         removal.remove();
         {
             std::stringstream ss;
