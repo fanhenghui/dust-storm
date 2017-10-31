@@ -139,6 +139,7 @@ function ActionAnnotation(socketClient, cellID) {
     this.socketClient = socketClient;
     this.mouseClock = new Date().getTime();
     this.cellID = cellID;
+    this.upCallback = null;
 };
 
 ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility, contentStr) {
@@ -213,5 +214,9 @@ ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell)
     let cy = roi.cy;
     let r = roi.r;
     sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
+
+    if(this.upCallback) {
+        this.upCallback();
+    }
 }
 

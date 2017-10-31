@@ -406,6 +406,11 @@
             cells[i].prepare();
             cells[i].mouseDoubleClickEvent = changeLayout;
             cells[i].mouseFocusEvent = focusCell;
+            cells[i].mouseActionAnnotation.upCallback = function() {
+                let btnArrow = document.getElementById('common-tool-arrow');
+                $(btnArrow).addClass('btn-primary').siblings().removeClass('btn-primary');
+                switchCommonTool('common-tool-arrow');
+            };
         }
 
         //init default cell action
