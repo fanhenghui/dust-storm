@@ -56,7 +56,7 @@
 
     let heartbeatCount = 1;
     let lastheartbearCount = 0;
-    const HEARTBEAT_INTERVAL = 5 * 1000 + 1000;
+    const HEARTBEAT_INTERVAL = 12 * 1000; // 11s
     function keepHeartbeat() {
         socketClient.heartbeat();
         heartbeatCount += 1;
