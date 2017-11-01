@@ -110,7 +110,7 @@ router.route('/review').get(function(req, res) {
     console.log('login name is : ', req.session.user.name);
     var ip = require('./server-ip.js').serverip;
     //send user name and server ip
-    res.render('review',{username: req.session.user.name, serverip: ip});  // go directly to review page
+    res.render('review',{username: req.session.user.name, serverip: ip + ':' + global.appPort});  // go directly to review page
   }
 });
 module.exports = router;

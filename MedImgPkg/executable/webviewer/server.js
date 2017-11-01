@@ -36,6 +36,11 @@ global.userList = require('./public/routes/logged-user-list');
 //     default: { appenders: [ 'out', 'app' ], level: 'debug' }
 //   }
 // });
+global.appPort = 8000;
+if (process.argv.length == 3)  {
+    global.appPort = process.argv[2];
+}
+console.log('webviewer port : ' + appPort);
 
 global.dbHandel = require('./public/database/dbhandel');
 global.db = mongoose.connect('mongodb://localhost:27017/nodedb');
@@ -86,7 +91,7 @@ process.on('SIGINT', function(err) {
     process.exit(2);
 });
 
-var server = http.listen(8000, function() {
+var server = http.listen(global.appPort, function() {
     var address = server.address();
     console.log('address is ', util.inspect(address));
 });
