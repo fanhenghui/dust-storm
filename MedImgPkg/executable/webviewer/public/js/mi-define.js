@@ -51,4 +51,4 @@ const BTN_DOWN = 0;
 const BTN_UP = 1;
 
 //mouse message interval
-const MOUSE_MSG_INTERVAL = 10;
+const MOUSE_MSG_INTERVAL = 40;
