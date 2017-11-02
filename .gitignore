@@ -302,7 +302,6 @@ mi_shader_collection.h
 .vscode/
 
 #User Config File
-configure.txt
 be_path*
 
 #ProtocolBuffer Auto-gen

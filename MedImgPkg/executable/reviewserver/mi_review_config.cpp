@@ -13,7 +13,7 @@ boost::mutex ReviewConfig::_mutex;
 ReviewConfig::ReviewConfig() {
     _expected_fps = 30;
     _nodule_p_th = 0.97f;
-    std::ifstream in("../config/configure.txt");
+    std::ifstream in("../config/app_config");
 
     if (!in.is_open()) {
         MI_REVIEW_LOG(MI_ERROR) << "can't open configure file.";

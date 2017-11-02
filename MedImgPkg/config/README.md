@@ -1,5 +1,5 @@
 # configure file specification  
-## configure.txt  
+## app_config  
 - ProcessingUnit = GPU/CPU  
 - NoduleOutput = TEXT/RSA < *Hidden configure item* >
 - LastOpenDirection = "" 

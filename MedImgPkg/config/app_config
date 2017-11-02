@@ -1,0 +1,18 @@
+TestDataRoot = /home/wangrui22/data
+DBPWD = 123456
+
+PresetCTAbdomenWW = 400
+PresetCTAbdomenWL = 60
+PresetCTLungsWW = 1500
+PresetCTLungsWL = -400
+PresetCTBrainWW = 80
+PresetCTBrainWL = 40
+PresetCTAngioWW = 600
+PresetCTAngioWL = 300
+PresetCTBoneWW = 1500
+PresetCTBoneWL = 300
+PresetCTChestWW = 400
+PresetCTChestWL = 40
+
+ExpectedFPS = 30
+PossibilityThreshold = 0.97

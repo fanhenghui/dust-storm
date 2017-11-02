@@ -101,7 +101,7 @@ static const std::string S_NODULE_TYPE_DESCRIPTION[NODULE_TYPE_NUM] =
     "Non-nodule"
 };
 
-const std::string CONFIG_FILE = "./config/configure.txt";
+const std::string CONFIG_FILE = "./config/app_config";
 
 NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags),

@@ -25,7 +25,7 @@ int pacs_ut(int argc, char* argv[]) {
     PACSCommunicator test;
 
     if (test.initialize(
-                "../config/pacs_config.txt")) // alternative:test.initialize("SelfSCU",
+                "../config/pacs_config")) // alternative:test.initialize("SelfSCU",
         // 11115, "172.20.70.27", 11112,
         // "DCM4CHEE");
     {

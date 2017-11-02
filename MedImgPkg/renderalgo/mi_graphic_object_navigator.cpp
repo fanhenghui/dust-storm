@@ -23,7 +23,7 @@ GraphicObjectNavigator::~GraphicObjectNavigator() {
 
 void GraphicObjectNavigator::initialize() {
     if(!_has_init) {
-        const std::string navi_img_file("../config/navi_384_256_3.raw");
+        const std::string navi_img_file("../config/resource/navi_384_256_3.raw");
         const unsigned int img_size = 384*256*3;
         unsigned char* img_buffer = new unsigned char[img_size];
         if( 0 != FileUtil::read_raw(navi_img_file, img_buffer, img_size) ) {
