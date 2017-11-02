@@ -69,9 +69,8 @@ var disconnectBE = function(userid) {
     }
     onlineCount--;
     var userName = userid.split('|', 1);
-    global.userList.removeLoggedUser(userName[0]);
     console.log(userid + ' disconnecting success.');
-
+    //TODO clean user login
     //wait for kill worker
     setTimeout(function() {
         if (onlineLogicProcess.hasOwnProperty(userid)) {

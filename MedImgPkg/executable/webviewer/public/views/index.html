@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
+  
+<head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/css/style.css' />
     <style type="text/css">
-	a{margin-left: 20px; text-decoration: none;}
-	a:hover{text-decoration: underline;}
+        a {
+            margin-left: 20px;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <img src="/images/header.png" alt="medical picture">
-    <h1>Welcome to <%= title %></h1>    
-    <p><a href="/login"> 登录 </a>
-      <a href="/register" hidden= "true"> 注册</a>
+    <h1>Welcome to<%= title %>
+    </h1>
+    <p>
+      <a href="/login"> 登录 </a>
+      <a href="/register"> 注册</a>
     </p>
-  </body>
+</body>
+
 </html>
