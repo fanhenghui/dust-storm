@@ -8,9 +8,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
-class MsgWorklist;
-class MsgWorklistItem;
-class CmdHandlerSearchWorklist : public ICommandHandler {
+class AppCommon_Export CmdHandlerSearchWorklist : public ICommandHandler {
 public:
     CmdHandlerSearchWorklist(std::shared_ptr<AppController> controller);
     virtual ~CmdHandlerSearchWorklist();
@@ -18,11 +16,9 @@ public:
     virtual int handle_command(const IPCDataHeader& datahaeder, char* buffer);
 
 private:
-    MsgWorklist* createWorklist();
-
-private:
     std::weak_ptr<AppController> _controller;
 };
+
 MED_IMG_END_NAMESPACE
 
 #endif

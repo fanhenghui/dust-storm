@@ -26,10 +26,11 @@
 #include "renderalgo/mi_transfer_function_loader.h"
 #include "renderalgo/mi_mask_label_store.h"
 
-#include "appcommon//mi_app_thread_model.h"
+#include "appcommon/mi_app_thread_model.h"
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_database.h"
+#include "appcommon/mi_app_cache_db.h"
+#include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_none_image.h"
 #include "appcommon/mi_model_annotation.h"
@@ -40,7 +41,7 @@
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_common_util.h"
 
-#include "mi_review_config.h"
+#include "appcommon/mi_app_config.h"
 #include "mi_review_logger.h"
 
 #include <time.h>
@@ -99,20 +100,22 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     // get series path from img cache db
     const std::string series_uid = msg_init->series_uid();
     MI_REVIEW_LOG(MI_TRACE) << "try to get series from local img cache db. series id: " << series_uid;
-    AppDB db;
-    const std::string db_wpd = ReviewConfig::instance()->get_db_pwd();
-    if (0 != db.connect("root", "127.0.0.1:3306", db_wpd.c_str(), "med_img_cache_db")) {
-        MI_REVIEW_LOG(MI_ERROR) << "connect to local img cache db failed.";
+    std::string db_ip_port,db_user,db_pwd,db_name;
+    AppConfig::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name);
+    CacheDB cache_db;
+    if( 0 != cache_db.connect(db_user, db_ip_port, db_pwd, db_name)) {
+        MI_REVIEW_LOG(MI_FATAL) << "connect Cache DB failed.";
         return -1;
     }
 
-    std::string data_path;
-    if (0 != db.get_series_path(series_uid, data_path)) {
+    CacheDB::ImgItem item;
+    if (0 != cache_db.get_item(series_uid, item)) {
         MI_REVIEW_LOG(MI_ERROR) << "get series: " << series_uid << " 's path failed.";
         return -1;
     }
-    MI_REVIEW_LOG(MI_TRACE) << "get series from local img cache db success. data path: " << data_path; 
-    const std::string series_path(data_path);
+    const std::string series_path = item.path;
+    MI_REVIEW_LOG(MI_TRACE) << "get series from local img cache db success. data path: " << series_path; 
+    
 
     //get dcm files
     std::vector<std::string> dcm_files;
@@ -195,7 +198,7 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
         } else {
             const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
             std::vector<std::string> ids;
-            const float possibility_threshold = ReviewConfig::instance()->get_nodule_possibility_threshold();
+            const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();
             for (size_t i = 0; i < vois.size(); ++i) {
                 if (vois[i].para0 < possibility_threshold) {
                     continue;
@@ -243,7 +246,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     std::vector<ScanSliceType> mpr_scan_types;
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
-    const int expected_fps = ReviewConfig::instance()->get_expected_fps();
+    const int expected_fps = AppConfig::instance()->get_expected_fps();
     // create cells
     for (int i = 0; i < msg_init->cells_size(); ++i)
     {

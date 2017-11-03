@@ -15,21 +15,12 @@
 
 #include "boost/filesystem.hpp"
 
-// mysql begin
-// #include "cppconn/driver.h"
-// #include "cppconn/exception.h"
-// #include "cppconn/prepared_statement.h"
-// #include "cppconn/resultset.h"
-// #include "cppconn/sqlstring.h"
-// #include "cppconn/statement.h"
-// #include "mysql_connection.h"
-// mysql end
-
 #ifndef WIN32
 #include <dlfcn.h>
 #endif
 
-#include "appcommon/mi_app_database.h"
+#include "appcommon/mi_app_db.h"
+#include "appcommon/mi_app_cache_db.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
@@ -37,9 +28,22 @@
 
 using namespace medical_imaging;
 
-AppDB data_base;
+static const std::string CACHE_DB_NAMA = "med_img_cache_db";
+static const std::string DB_NAME = "med_img_db";
+int _db_type = 0;//0 for db 1 for cache_db
+
+static std::shared_ptr<MySQLDB> _db;
+
+struct DcmItem {
+    std::string series_id;
+    std::string study_id;
+    std::string patient_name;
+    std::string patient_id;
+    std::string modality;
+};
 
 static std::ofstream out_log;
+
 class LogSheild {
 public:
     LogSheild() {
@@ -57,15 +61,20 @@ public:
   std::cout << info;                                                           \
   out_log << info;
 
-int connect_db(const std::string& user, const std::string& ip_port,
-               const std::string& pwd, const std::string& db) {
-    return data_base.connect(user, ip_port, pwd, db);
+int connect_db(const std::string& user, const std::string& ip_port, const std::string& pwd, const std::string& db) {
+    if (0 == _db_type) {
+        _db.reset(new DB());
+        _db->connect(user, ip_port, pwd, db);
+    } else {
+        _db.reset(new CacheDB());
+        _db->connect(user, ip_port, pwd, db);   
+    }
 }
 
-int parse_root(
+int parse_root_dcm(
     std::string& root,
     std::map<std::string, std::vector<std::string>>& study_series_col,
-    std::map<std::string, ImgItem>& series_info_map,
+    std::map<std::string, DcmItem>& series_info_map,
     std::map<std::string, std::vector<std::string>>& series_col) {
     std::vector<std::string> files;
     std::set<std::string> postfix;
@@ -93,7 +102,7 @@ int parse_root(
                 loader.check_series_uid(files[i], study_id, series_id, patient_name,
                                         patient_id, modality)) {
             if (series_info_map.find(series_id) == series_info_map.end()) {
-                ImgItem info;
+                DcmItem info;
                 info.series_id = series_id;
                 info.study_id = study_id;
                 info.patient_name = patient_name;
@@ -135,7 +144,8 @@ int parse_root(
     return 0;
 }
 
-int copy_file(const std::string& src, const std::string& dst) {
+int copy_file(const std::string& src, const std::string& dst, float& size_mb) {
+    size_mb = 0;
     if (src.empty()) {
         LOG_OUT("ERROR : src path is empty.");
         return -1;
@@ -165,8 +175,13 @@ int copy_file(const std::string& src, const std::string& dst) {
         return -1;
     }
 
+    // cal size
+    in.seekg(0, std::ios::end);
+    size_mb = static_cast<float>(in.tellg())/1024.0/1024.0;
+    in.seekg(0, std::ios::beg);
     // copy
     out << in.rdbuf();
+
 
     in.close();
     out.close();
@@ -174,7 +189,7 @@ int copy_file(const std::string& src, const std::string& dst) {
     return 0;
 }
 
-int create_folder(
+int create_dcm_folder(
     std::string map_path,
     std::map<std::string, std::vector<std::string>>& study_series_col) {
     for (auto study = study_series_col.begin(); study != study_series_col.end();
@@ -198,37 +213,102 @@ int create_folder(
     return 0;
 }
 
-int import_one_series(const std::string& map_path, ImgItem& series_info,
+int import_one_series_cache(const std::string& map_path, DcmItem& series_info,
                       const std::string& series,
                       const std::vector<std::string>& files) {
     // copy src file to dst map
     const std::string series_dst =
         map_path + "/" + series_info.study_id + "/" + series;
-    series_info.path = series_dst;
+    CacheDB::ImgItem item;
+    item.path = series_dst;
+    item.series_id = series_info.series_id;
+    item.modality = series_info.modality;
+    item.patient_id = series_info.patient_id;
+    item.patient_name = series_info.patient_name;
+    float size_mb = 0;
 
     for (size_t i = 0; i < files.size(); i++) {
         boost::filesystem::path p(files[i].c_str());
         std::string base_name = p.filename().string();
         const std::string file_dst = series_dst + "/" + base_name;
-
-        if (0 != copy_file(files[i], file_dst)) {
+        float size_slice = 0;
+        if (0 != copy_file(files[i], file_dst, size_slice)) {
             std::stringstream ss;
             ss << "copy file " << base_name << " failed.\n";
             LOG_OUT(ss.str());
             return -1;
         }
+        size_mb += size_slice;
     }
+    item.size_mb = size_mb;
 
-    return data_base.insert_item(series_info);
+    std::shared_ptr<CacheDB> db = std::dynamic_pointer_cast<CacheDB>(_db);
+
+    return db->insert_item(item);
 };
 
-int import_db(std::string map_path,
-              std::map<std::string, ImgItem>& series_info_map,
+int import_cache_db(std::string map_path,
+              std::map<std::string, DcmItem>& series_info_map,
               std::map<std::string, std::vector<std::string>>& series_col) {
 
     for (auto it = series_col.begin(); it != series_col.end(); it++) {
         const std::string series = it->first;
-        ImgItem& series_info = series_info_map[series];
+        DcmItem& series_info = series_info_map[series];
+
+        if (-1 == import_one_series_cache(map_path, series_info, series, it->second)) {
+            std::stringstream ss;
+            ss << "ERROR : import series " << series << "failed, skip it.\n";
+            LOG_OUT(ss.str());
+        } else {
+            std::stringstream ss;
+            ss << "import series : " << series << " done.\n";
+            LOG_OUT(ss.str());
+        }
+    }
+
+    return 0;
+}
+
+int import_one_series(const std::string& map_path, DcmItem& series_info,
+                      const std::string& series,
+                      const std::vector<std::string>& files) {
+    // copy src file to dst map
+    const std::string series_dst =
+        map_path + "/" + series_info.study_id + "/" + series;
+    DB::ImgItem item;
+    item.dcm_path = series_dst;
+    item.series_id = series_info.series_id;
+    item.modality = series_info.modality;
+    item.patient_id = series_info.patient_id;
+    item.patient_name = series_info.patient_name;
+    float size_mb = 0;
+
+    for (size_t i = 0; i < files.size(); i++) {
+        boost::filesystem::path p(files[i].c_str());
+        std::string base_name = p.filename().string();
+        const std::string file_dst = series_dst + "/" + base_name;
+        float size_slice = 0;
+        if (0 != copy_file(files[i], file_dst, size_slice)) {
+            std::stringstream ss;
+            ss << "copy file " << base_name << " failed.\n";
+            LOG_OUT(ss.str());
+            return -1;
+        }
+        size_mb += size_slice;
+    }
+
+    std::shared_ptr<DB> db = std::dynamic_pointer_cast<DB>(_db);
+
+    return db->insert_dcm_item(item);
+};
+
+int import_db(std::string map_path,
+              std::map<std::string, DcmItem>& series_info_map,
+              std::map<std::string, std::vector<std::string>>& series_col) {
+
+    for (auto it = series_col.begin(); it != series_col.end(); it++) {
+        const std::string series = it->first;
+        DcmItem& series_info = series_info_map[series];
 
         if (-1 == import_one_series(map_path, series_info, series, it->second)) {
             std::stringstream ss;
@@ -273,7 +353,7 @@ void print_h() {
     printf("DICOM DB importer:\n");
     printf("\t-u : mysql login in user {root}.\n");
     printf("\t-i : mysql login in ip&port {127.0.0.1:3306}.\n");
-    printf("\t-d : DB name {med_img_cache_db}.\n");
+    printf("\t-d : DB name {med_img_cache_db & med_img_db}.\n");
     printf("\t-r : import data root.\n");
     printf("\t-m : DB map path.\n");
     printf("\t-h : help.\n");
@@ -359,50 +439,85 @@ int main(int argc, char* argv[]) {
         pwd.push_back(c);
     }
 
-    std::map<std::string, std::vector<std::string>> study_series_col;
-    std::map<std::string, ImgItem> series_info_map;
-    std::map<std::string, std::vector<std::string>> series_col;
-
-    if (0 != parse_root(root, study_series_col, series_info_map, series_col)) {
-        LOG_OUT("ERROR : parse root failed.");
-        return -1;
+    if(db == CACHE_DB_NAMA) {
+        _db_type = 1;
+    } else {
+        _db_type = 0;
     }
-
-    if (0 != create_folder(map_path, study_series_col)) {
-        LOG_OUT("ERROR : create folder failed.");
-        return -1;
-    }
-
-    if (0 != connect_db(user, "tcp://" + ip, pwd, db)) {
+    if (0 != connect_db(user, ip, pwd, db)) {
         LOG_OUT("ERROR : connect DB failed.");
         return -1;
     }
 
-    if (0 != import_db(map_path, series_info_map, series_col)) {
-        LOG_OUT("ERROR : import DB failed.");
-        return -1;
+    if (_db_type == 1) {
+        std::map<std::string, std::vector<std::string>> study_series_col;
+        std::map<std::string, DcmItem> series_info_map;
+        std::map<std::string, std::vector<std::string>> series_col;
+
+        if (0 != parse_root_dcm(root, study_series_col, series_info_map, series_col)) {
+            LOG_OUT("ERROR : parse root failed.");
+            return -1;
+        }
+    
+        if (0 != create_dcm_folder(map_path, study_series_col)) {
+            LOG_OUT("ERROR : create folder failed.");
+            return -1;
+        }
+
+    
+        if (0 != import_cache_db(map_path, series_info_map, series_col)) {
+            LOG_OUT("ERROR : import DB failed.");
+            return -1;
+        }
+    } else {
+        std::map<std::string, std::vector<std::string>> study_series_col;
+        std::map<std::string, DcmItem> series_info_map;
+        std::map<std::string, std::vector<std::string>> series_col;
+
+        //dcm
+        if (0 != parse_root_dcm(root, study_series_col, series_info_map, series_col)) {
+            LOG_OUT("ERROR : parse root failed.");
+            return -1;
+        }
+        if (0 != create_dcm_folder(map_path, study_series_col)) {
+            LOG_OUT("ERROR : create folder failed.");
+            return -1;
+        }    
+        if (0 != import_db(map_path, series_info_map, series_col)) {
+            LOG_OUT("ERROR : import DB failed.");
+            return -1;
+        }
+
+        //mask
+        //preprocess mask(series.ppm.rle)
+        //lung mask(series.aim.rle)
+        
+        //annotation file
+        //AI annotation series.ai.dcsv
+        //usr annotation series.usr.usr_name.dcsv
     }
 
     // test
-    std::vector<ImgItem> items;
+    // std::vector<DcmItem> items;
 
-    if (0 == data_base.get_all_item(items)) {
-        for (size_t i = 0; i < items.size(); ++i) {
-            printf("series : %s ; study : %s ; patient_name : % s ; patient_id : %s "
-                   "; modality : % s\n",
-                   items[i].series_id.c_str(), items[i].study_id.c_str(),
-                   items[i].patient_name.c_str(), items[i].patient_id.c_str(),
-                   items[i].modality.c_str());
-        }
+    // if (0 == data_base.get_all_item(items)) {
+    //     for (size_t i = 0; i < items.size(); ++i) {
+    //         printf("series : %s ; study : %s ; patient_name : % s ; patient_id : %s "
+    //                "; modality : % s\n",
+    //                items[i].series_id.c_str(), items[i].study_id.c_str(),
+    //                items[i].patient_name.c_str(), items[i].patient_id.c_str(),
+    //                items[i].modality.c_str());
+    //     }
 
-        // std::string path;
+    //     // std::string path;
 
-        // if (0 == data_base.get_series_path(items[0].series_id, path)) {
-        //     printf("get items 0 path : %s\n", path.c_str());
-        // }
-    } else {
-        LOG_OUT("ERROR : get all item failed.\n");
-    }
-
+    //     // if (0 == data_base.get_series_path(items[0].series_id, path)) {
+    //     //     printf("get items 0 path : %s\n", path.c_str());
+    //     // }
+    // } else {
+    //     LOG_OUT("ERROR : get all item failed.\n");
+    // }
+    _db->disconnect();
+    LOG_OUT("import DB done.");
     return 0;
 }

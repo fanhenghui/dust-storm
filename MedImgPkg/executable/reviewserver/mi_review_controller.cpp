@@ -27,8 +27,8 @@
 #include "appcommon/mi_operation_downsample.h"
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
+#include "appcommon/mi_cmd_handler_search_worklist.h"
 
-#include "mi_cmd_handler_search_worklist.h"
 #include "mi_operation_init.h"
 
 MED_IMG_BEGIN_NAMESPACE

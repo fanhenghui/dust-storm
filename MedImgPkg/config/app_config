@@ -1,5 +1,14 @@
 TestDataRoot = /home/wangrui22/data
-DBPWD = 123456
+
+RemoteDBIP = 172.23.236.219
+RemoteDBPort = 3306
+RemoteDBUser = root
+RemoteDBPWD = 123456
+
+CacheDBIP = 127.0.0.1
+CacheDBPort = 3306
+CacheDBUser = root
+CacheDBPWD = 123456
 
 PresetCTAbdomenWW = 400
 PresetCTAbdomenWL = 60
