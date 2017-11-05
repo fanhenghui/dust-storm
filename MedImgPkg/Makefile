@@ -43,3 +43,21 @@ clean:
 	$(MAKE) clean -C ./ut/io_ut
 	$(MAKE) clean -C ./ut/protocol_ut
 	-rm -r bin
+
+ip = 127.0.0.1
+des
+PHONY.:install
+install: 
+	echo install path : $(DESTDIR)
+	echo ip: $(ip)
+	#create main direction
+	test -d '$(DESTDIR)/med_img' || mkdir '$(DESTDIR)/med_img'
+	#create bin direction
+	test -d '$(DESTDIR)/med_img/bin' || mkdir '$(DESTDIR)/med_img/bin'
+	#create webviewer direction
+	test -d '$(DESTDIR)/med_img/webviewer' || mkdir ''
+	cd -
+	cp ./bin/*.so $(DESTDIR)/med_img/bin
+	cp ./bin/*ut $(DESTDIR)/med_img/bin
+	cp ./bin/review_server $(DESTDIR)/med_img/bin
+	cp -r ./config $(DESTDIR)/med_img/
