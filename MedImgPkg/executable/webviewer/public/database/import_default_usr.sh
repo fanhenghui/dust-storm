@@ -11,6 +11,7 @@ delete from usr where name='usr7';
 delete from usr where name='usr8';
 delete from usr where name='usr9';
 delete from usr where name='usr10';
+delete from usr where name='wr';
 insert into usr(name,role,password) value('usr0',0,'1');
 insert into usr(name,role,password) value('usr1',0,'1');
 insert into usr(name,role,password) value('usr2',0,'1');
@@ -22,5 +23,6 @@ insert into usr(name,role,password) value('usr7',0,'1');
 insert into usr(name,role,password) value('usr8',0,'1');
 insert into usr(name,role,password) value('usr9',0,'1');
 insert into usr(name,role,password) value('usr10',0,'1');
+insert into usr(name,role,password) value('wr',0,'1');
 select * from usr;
 "
