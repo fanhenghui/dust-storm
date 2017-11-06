@@ -13,6 +13,9 @@
 	</style>
 </head>
 <body screen_capture_injected="true">
+	<div style="display:none" hidden="true">
+        <p id="subpage"><%=subpage%></p>
+    </div>
 	<div class="container">
 		<form class="col-sm-offset-4 col-sm-4 form-horizontal" role="form" method="post" onsubmit="return false">
 			<fieldset>
@@ -63,11 +66,13 @@
 	<script type="text/javascript">
 	$(function(){ 
 		$("#login").click(function(){ 
-			location.href = 'login';
+			let subpage = document.getElementById('subpage').innerHTML;
+			location.href = subpage+'/login';
 		});
 		$("#register").click(function(){ 
 			var username = $("#username").val();
 			var password = $("#password").val();
+			let subpage = document.getElementById('subpage').innerHTML;
 			var passwordConfirm = $("#password-confirm").val();
 			if(password !== passwordConfirm){ 
 				$("#password").css("border","1px solid red");
@@ -75,18 +80,18 @@
 			}else if(password === passwordConfirm){
 			var data = {"uname":username,"upwd":password};
 			$.ajax({ 
-				url: '/register',
+				url: subpage+'/register',
 				type: 'post',
 				data: data,
 				success: function(data,status){ 
 					if(status == 'success'){ 
-						location.href = 'login';
+						location.href = subpage+'/login';
 					}
 				},
 				error: function(data,status){ 
 					if(status == 'error'){
 						alert(data.responseText);
-						location.href = 'register';
+						location.href = subpage+'/register';
 					}
 				}
 			}); 

@@ -11,6 +11,9 @@
 	</style>
 </head>
 <body screen_capture_injected="true">
+	<div style="display:none" hidden="true">
+        <p id="subpage"><%=subpage%></p>
+    </div>
 	<div class="container">
 		<form class="col-sm-offset-4 col-sm-4 form-horizontal" role="form" method="post" onsubmit="return false">
 			<fieldset>
@@ -39,8 +42,8 @@
 				<div class="form-group">
 						<button type="submit" class="btn btn-primary btn-block" id="login0">登录</button>
 				</div>
-				<div class="form-group" hidden= "true">
-						<button type="button" class="btn btn-info col-sm-2 col-sm-offset-10" id="register0">注册</button>
+				<div class="form-group">
+						<button type="button" class="btn btn-primary btn-block" id="register0">注册</button>
 				</div>
 				</div>
 				</div>
@@ -58,20 +61,21 @@
 		$("#login0").click(function(){ 
 			var username = $("#username").val();
 			var password = $("#password").val();
+			let subpage = document.getElementById('subpage').innerHTML;
 			var data = {"uname":username,"upwd":password};
 			$.ajax({ 
-				url:'/login',
+				url: subpage + '/login',
 				type:'post',
 				data: data,
 				success: function(data,status){ 
 					if(status == 'success'){ 
-						location.href = 'review';
+						location.href = subpage + '/review';
 					}
 				},
 				error: function(data,status){ 
 					if(status == 'error'){
 						alert(data.responseText);
-						location.href = 'login';
+						location.href = subpage + '/login';
 					}
 				}
 			});

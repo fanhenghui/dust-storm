@@ -70,7 +70,8 @@
         } else {
             //return to login
             console.log('heart dead. return to login.');
-            window.location.href = '/login';
+            let subpage = document.getElementById('subpage').innerHTML;
+            window.location.href = subpage + '/login';
         }
     }
 
@@ -857,13 +858,15 @@
         let loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
-                window.location.href = '/login';
+                let subpage = document.getElementById('subpage').innerHTML;
+                window.location.href = subpage+'/login';
             }
         }
         loginBtn = document.getElementById('btn-login-1');
         if (loginBtn) {
             loginBtn.onclick = function(event) {
-                window.location.href = '/login';
+                let subpage = document.getElementById('subpage').innerHTML;
+                window.location.href = subpage+'/login';
             }
         }
         

@@ -185,9 +185,16 @@ module.exports = {
             var review_server_path;
             fs.readFile(__dirname + '/be_path', function(err, data) {
                 if (err) {
+                    console.log('null be path!');
                     throw err;
                 }
-                review_server_path = data.toString();
+                //read line 0 as be path
+                var lines = data.toString().split('\n');
+                if (lines.length == 0) {
+                    console.log('read be path fiailed!');
+                    throw('read be path fiailed!');
+                }
+                review_server_path = lines[0];
                 console.log('app path : ' + review_server_path);
 
                 /// run process

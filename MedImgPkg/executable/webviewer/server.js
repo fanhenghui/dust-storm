@@ -7,16 +7,23 @@ var session = require('express-session');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var routes = require('./public/routes/index');
 
 global.appPort = 8000;
 if (process.argv.length == 3)  {
     global.appPort = process.argv[2];
 }
+
+global.subPage = '';
+if (process.argv.length == 4) {
+    global.appPort = process.argv[2];
+    global.subPage = process.argv[3];
+}
 console.log('webviewer port : ' + appPort);
+console.log('webviewer subpage : ' + subPage);
 
 global.dbHandel = require('./public/database/db-handel');
 
+var routes = require('./public/routes/index');
 // use session for login
 app.use(session({
     secret: 'secret',
@@ -33,7 +40,7 @@ app.use(cookieParser());
 app.use(require('express').static(__dirname + '/public'));
 
 // how to render template files
-app.set('views', path.join(__dirname, '/public/views'));
+app.set('views', path.join(__dirname, '/public' + global.subPage + '/views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.use('/', routes);

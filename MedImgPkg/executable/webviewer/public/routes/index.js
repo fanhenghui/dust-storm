@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function(req, res, next) {
+
+router.get(global.subPage + '/', function(req, res, next) {
     // useless code cookies 已经以session的形式发送了
     // if (req.cookies.isVisit) {
     //   console.log('welcome back.');
@@ -12,12 +13,15 @@ router.get('/', function(req, res, next) {
     //   res.cookie('name', cookieName);
     //   console.log("welcome.");
     // }
-    res.render('index', {
-        title: 'Web-based Medical Viewer from Baidu'
-    }); // 到达此路径则渲染index文件，并传出title值供 index.html使用
+    // res.render('index', {
+    //     subpage: global.subPage,
+    //     title: 'Web-based Medical Viewer from Baidu'
+    // }); // 到达此路径则渲染index文件，并传出title值供 index.html使用
+    res.redirect('login');
 });
-router.route('/login').get(function(req, res) { // 到达此路径则渲染login文件，并传出title值供 login.html使用
+router.route(global.subPage+'/login').get(function(req, res) { // 到达此路径则渲染login文件，并传出title值供 login.html使用
     res.render('login', {
+        subpage: global.subPage,
         title: 'User Login'
     });
 }).post(function(req, res) {
@@ -41,8 +45,9 @@ router.route('/login').get(function(req, res) { // 到达此路径则渲染login
     });
 });
 
-router.route('/register').get(function(req, res) {
+router.route(global.subPage+'/register').get(function(req, res) {
     res.render('register', {
+        subpage: global.subPage,
         title: 'User register'
     });
 }).post(function(req, res) {
@@ -63,10 +68,10 @@ router.route('/register').get(function(req, res) {
     });
 });
 
-router.get('/home', function(req, res) {
+router.get(global.subPage+'/home', function(req, res) {
     if (!req.session.user) { //到达/home路径首先判断是否已经登录
         req.session.error = '请先登录'
-        res.redirect('/login'); //未登录则重定向到 /login 路径
+        res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
     }
     res.render(
         'home', {
@@ -75,22 +80,23 @@ router.get('/home', function(req, res) {
         }); //已登录则渲染home页面
 });
 
-router.get('/logout', function(req, res) { // 到达 /logout 路径则登出
+router.get(global.subPage+'/logout', function(req, res) { // 到达 /logout 路径则登出
     // session中user,error对象置空，并重定向到根路径
     req.session.user = null;
     req.session.error = null;
-    res.redirect('/');
+    res.redirect(global.subPage+'/login');
 });
 
-router.route('/review').get(function(req, res) {
+router.route(global.subPage+'/review').get(function(req, res) {
     if (!req.session.user) { //到达/home路径首先判断是否已经登录
         req.session.error = '请先登录'
-        res.redirect('/login'); //未登录则重定向到 /login 路径
+        res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
     } else {
         console.log('login name is : ', req.session.user.name);
         var ip = require('./server-ip.js').serverip;
         //send user name and server ip
         res.render('review', {
+            subpage: global.subPage,
             username: req.session.user.name,
             serverip: ip + ':' + global.appPort
         }); // go directly to review page
