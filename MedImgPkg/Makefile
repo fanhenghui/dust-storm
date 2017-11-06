@@ -45,7 +45,7 @@ clean:
 	-rm -r bin
 
 ip = 127.0.0.1
-des
+
 PHONY.:install
 install: 
 	echo install path : $(DESTDIR)
@@ -55,9 +55,32 @@ install:
 	#create bin direction
 	test -d '$(DESTDIR)/med_img/bin' || mkdir '$(DESTDIR)/med_img/bin'
 	#create webviewer direction
-	test -d '$(DESTDIR)/med_img/webviewer' || mkdir ''
-	cd -
+	test -d '$(DESTDIR)/med_img/webviewer/public/medical_web' || mkdir -p '$(DESTDIR)/med_img/webviewer/public/medical_web'
+
+	#cp app server
 	cp ./bin/*.so $(DESTDIR)/med_img/bin
 	cp ./bin/*ut $(DESTDIR)/med_img/bin
 	cp ./bin/review_server $(DESTDIR)/med_img/bin
 	cp -r ./config $(DESTDIR)/med_img/
+	#cp web module
+	cp -r ./executable/webviewer/node_modules  $(DESTDIR)/med_img/webviewer/node_modules
+	cp ./executable/webviewer/install_npm.sh  $(DESTDIR)/med_img/webviewer/install_npm.sh
+	cp ./executable/webviewer/nginx.conf  $(DESTDIR)/med_img/webviewer/nginx.conf
+	cp ./executable/webviewer/package-lock.json  $(DESTDIR)/med_img/webviewer/package-lock.json
+	#cp web server
+	cp ./executable/webviewer/server.js  $(DESTDIR)/med_img/webviewer/server.js
+	cp -r ./executable/webviewer/public/routes  $(DESTDIR)/med_img/webviewer/public/
+	cp -r ./executable/webviewer/public/database  $(DESTDIR)/med_img/webviewer/public/
+	cp -r ./executable/webviewer/public/be  $(DESTDIR)/med_img/webviewer/public/
+	#cp web FE
+	cp -r ./executable/webviewer/public/css  $(DESTDIR)/med_img/webviewer/public/medical_web
+	cp -r ./executable/webviewer/public/data  $(DESTDIR)/med_img/webviewer/public/medical_web
+	cp -r ./executable/webviewer/public/fonts  $(DESTDIR)/med_img/webviewer/public/medical_web
+	cp -r ./executable/webviewer/public/images  $(DESTDIR)/med_img/webviewer/public/medical_web
+	cp -r ./executable/webviewer/public/js  $(DESTDIR)/med_img/webviewer/public/medical_web
+	cp -r ./executable/webviewer/public/views  $(DESTDIR)/med_img/webviewer/public/medical_web
+	
+	#install app server path
+	echo $(DESTDIR)/med_img/bin/review_server > $(DESTDIR)/med_img/webviewer/public/be/be_path
+
+	echo install done
