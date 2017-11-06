@@ -44,6 +44,8 @@ AppConfig::AppConfig() {
             _db_user = context;
         } else if (tag == "RemoteDBPWD") {
             _db_pwd = context;
+        } else if (tag == "RemoteDBName") {
+            _db_name = context;
         } else if (tag == "CacheDBIP") {
             _cache_db_ip = context;
         } else if (tag == "CacheDBPort") {
@@ -52,6 +54,8 @@ AppConfig::AppConfig() {
             _cache_db_user = context;
         } else if (tag == "CacheDBPWD") {
             _cache_db_pwd = context;
+        } else if (tag == "CacheDBName") {
+            _cache_db_name = context;
         } 
     }
 }
@@ -86,14 +90,14 @@ void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::
     ip_port = _cache_db_ip + ":" + _cache_db_port;
     user = _cache_db_user;
     pwd = _cache_db_pwd;
-    db_name = "med_img_cache_db";
+    db_name = _cache_db_name;
 }
 
 void AppConfig::get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) {
     ip_port = _db_ip  + ":" + _db_port;
     user = _db_user;
     pwd = _db_pwd; 
-    db_name = "med_img_db";
+    db_name = _db_name;
 }
 
 int AppConfig::get_expected_fps() const {
