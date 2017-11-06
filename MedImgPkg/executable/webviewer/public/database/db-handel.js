@@ -1,5 +1,4 @@
 var mySQL = require('mysql');
-var dbAdd = require("./db-address");
 var fs = require('fs');
 
 function getRemoteDBAddr() {
