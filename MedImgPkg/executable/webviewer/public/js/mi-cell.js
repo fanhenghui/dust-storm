@@ -444,7 +444,7 @@ Cell.prototype.mouseClickTicker = function() {
 }
 
 Cell.prototype.touchDown = function(event) {
-    let event = event || window.event;
+    event = event || window.event;
     event.preventDefault();
 
     this.mouseStatus = BTN_DOWN;
@@ -467,7 +467,7 @@ Cell.prototype.touchDown = function(event) {
 }
 
 Cell.prototype.touchMove = function (event) { 
-    let event = event || window.event;
+    event = event || window.event;
     event.preventDefault();
 
     let x = event.touches[0].clientX - this.svg.getBoundingClientRect().left;
@@ -481,7 +481,7 @@ Cell.prototype.touchMove = function (event) {
 }
 
 Cell.prototype.touchUp = function(event) {
-    let event = event || window.event;
+    event = event || window.event;
     event.preventDefault();
 
     this.mouseStatus = BTN_UP;
