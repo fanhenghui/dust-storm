@@ -44,8 +44,7 @@ clean:
 	$(MAKE) clean -C ./ut/protocol_ut
 	-rm -r bin
 
-ip = 127.0.0.1
-
+DESTDIR = /usr/local
 PHONY.:install
 install: 
 	echo install path : $(DESTDIR)
@@ -58,9 +57,7 @@ install:
 	test -d '$(DESTDIR)/med_img/webviewer/public/medical_web' || mkdir -p '$(DESTDIR)/med_img/webviewer/public/medical_web'
 
 	#cp app server
-	cp ./bin/*.so $(DESTDIR)/med_img/bin
-	cp ./bin/*ut $(DESTDIR)/med_img/bin
-	cp ./bin/review_server $(DESTDIR)/med_img/bin
+	cp -r ./bin/* $(DESTDIR)/med_img/bin
 	cp -r ./config $(DESTDIR)/med_img/
 	#cp web module
 	cp -r ./executable/webviewer/node_modules  $(DESTDIR)/med_img/webviewer/node_modules
@@ -82,5 +79,7 @@ install:
 	
 	#install app server path
 	echo $(DESTDIR)/med_img/bin/review_server > $(DESTDIR)/med_img/webviewer/public/be/be_path
-
+	#install application config path
+	test -d '$(DESTDIR)/med_img/webviewer/public/config' || mkdir -p '$(DESTDIR)/med_img/webviewer/public/config'
+	echo $(DESTDIR)/med_img/config/app_config > $(DESTDIR)/med_img/webviewer/public/config/config_path
 	echo install done

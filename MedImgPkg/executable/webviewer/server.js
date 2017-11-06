@@ -7,6 +7,7 @@ var session = require('express-session');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 
 global.appPort = 8000;
 if (process.argv.length == 3)  {
@@ -21,6 +22,15 @@ if (process.argv.length == 4) {
 console.log('webviewer port : ' + appPort);
 console.log('webviewer subpage : ' + subPage);
 
+//get config path
+var confitPathFile = path.join(__dirname,'public','config','config_path');
+var configPathData = fs.readFileSync(confitPathFile);
+var linesConfigPath = configPathData.toString().split('\n');
+if (linesConfigPath.length == 0) {
+    console.log('get config path failed!');
+    throw('get config path failed!');
+}
+global.configPath = linesConfigPath[0];
 global.dbHandel = require('./public/database/db-handel');
 
 var routes = require('./public/routes/index');

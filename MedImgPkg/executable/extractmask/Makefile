@@ -14,7 +14,7 @@ BIN_DIR = $(ROOT)/bin
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 OBJS = mi_extract_mask.o mi_extract_mask_vis.o mi_main.o
-TARGET = $(BIN_DIR)/extract_mask
+TARGET = $(BIN_DIR)/extractmask
 
 COMMON_HEADER = mi_extract_mask_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) 

@@ -1,18 +1,9 @@
 var express = require('express');
+var fs = require('fs');
 var router = express.Router();
 
 
 router.get(global.subPage + '/', function(req, res, next) {
-    // useless code cookies 已经以session的形式发送了
-    // if (req.cookies.isVisit) {
-    //   console.log('welcome back.');
-    //   console.log(req.cookies);
-    // } else {
-    //   let cookieName = require('./server-ip.js').serverip + new Date().getTime();
-    //   res.cookie('isVisit', 1, {maxAge: 60 * 1000});
-    //   res.cookie('name', cookieName);
-    //   console.log("welcome.");
-    // }
     // res.render('index', {
     //     subpage: global.subPage,
     //     title: 'Web-based Medical Viewer from Baidu'
@@ -93,13 +84,32 @@ router.route(global.subPage+'/review').get(function(req, res) {
         res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
     } else {
         console.log('login name is : ', req.session.user.name);
-        var ip = require('./server-ip.js').serverip;
-        //send user name and server ip
-        res.render('review', {
-            subpage: global.subPage,
-            username: req.session.user.name,
-            serverip: ip + ':' + global.appPort
-        }); // go directly to review page
+
+        fs.readFile(global.configPath, function(err, data) {
+            if (err) {
+                req.session.error = '服务器错误';
+                res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
+            }
+            else {
+                let ip = 'http://127.0.0.1';
+                let configStr = data.toString();
+                let configLines = configStr.split('\n');
+                for (let i = 0; i< configLines.length; ++i) {
+                    let items = configLines[i].split(' ');
+                    if (items.length == 3 && items[0] == 'LocalHostIP') {
+                        ip = 'http://' + items[2];
+                        break;
+                    }
+                }
+                console.log('localhost host is : ', ip + ':' + global.appPort);
+                //send user name and server ip
+                res.render('review', {
+                    subpage: global.subPage,
+                    username: req.session.user.name,
+                    serverip: ip + ':' + global.appPort
+                }); // go directly to review page
+            }
+        });        
     }
 });
 module.exports = router;
