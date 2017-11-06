@@ -35,12 +35,14 @@ private:
     std::string _db_port;
     std::string _db_user;
     std::string _db_pwd;
+    std::string _db_name;
 
     //cache DB info
     std::string _cache_db_ip;
     std::string _cache_db_port;
     std::string _cache_db_user;
     std::string _cache_db_pwd;
+    std::string _cache_db_name;
 
     int _expected_fps;
 };
