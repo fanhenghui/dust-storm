@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <netinet/in.h>
+#include <netdb.h> 
 
 #include <iostream>
 
@@ -16,12 +18,16 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-SocketClient::SocketClient(): _path(""), _fd_server(-1) {
+SocketClient::SocketClient(SocketType type /*= UNIX*/): 
+    _path(""), _fd_server(-1), _socket_type(type), _alive(true) {
 
 }
 
 SocketClient::~SocketClient() {
-
+    if(_fd_server != -1) {
+        close(_fd_server);
+        _fd_server = -1;
+    }
 }
 
 void SocketClient::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler) {
@@ -41,45 +47,105 @@ void SocketClient::set_path(const std::string& path) {
     _path = path;
 }
 
+void SocketClient::set_server_address(const std::string& ip, const std::string& port) {
+    _server_ip = ip;
+    _server_port = port;
+}
+
+void SocketClient::get_server_address(std::string& ip, std::string& port) const {
+    ip = _server_ip;
+    port = _server_port;
+}
+
 void SocketClient::run() {
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
 
-    const int fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
-    if (fd_s == -1) {
-        MI_UTIL_LOG(MI_FATAL) << "SocketClient create socket failed.";
-        UTIL_THROW_EXCEPTION("create socket failed.");
-    }
-
-    struct sockaddr_un remote;
-    remote.sun_family = AF_UNIX;
-    for (size_t i = 0; i < _path.size(); ++i) {
-        remote.sun_path[i] = _path[i];
-    }
-
-    socklen_t len = sizeof(remote);
-
-    ///\connect 100 times once per second
-    int connect_status = -1;
-
-    for (int i = 0; i < _reconnect_times; ++i) {
-        connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
-
-        if (connect_status != -1) {
-            break;
+    //create scoket
+    int fd_s = -1;
+    if (UNIX == _socket_type) {
+        fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
+        if (fd_s == -1) {
+            MI_UTIL_LOG(MI_FATAL) << "SocketClient create UNIX socket failed.";
+            UTIL_THROW_EXCEPTION("create UNIX socket failed.");
         }
-        MI_UTIL_LOG(MI_INFO) << "trying connect to server times(once per second): " << i;
-        sleep(1);
-    }
+    
+        struct sockaddr_un remote;
+        bzero((char*)(&remote), sizeof(remote));
+        remote.sun_family = AF_UNIX;
+        for (size_t i = 0; i < _path.size(); ++i) {
+            remote.sun_path[i] = _path[i];
+        }
+    
+        socklen_t len = sizeof(remote);
+        ///\connect 100 times once per second
+        int connect_status = -1;
+    
+        for (int i = 0; i < _reconnect_times; ++i) {
+            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
+    
+            if (connect_status != -1) {
+                break;
+            }
+            MI_UTIL_LOG(MI_INFO) << "trying connect to server times(once per second): " << i;
+            sleep(1);
+        }
+    
+        if (connect_status == -1) {
+            MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
+            UTIL_THROW_EXCEPTION("connect server failed.");
+        }
+        MI_UTIL_LOG(MI_INFO) << "UNIX socket connect success.\n";
+    } else if (INET == _socket_type) {
+        if (_server_ip.empty()) {
+            MI_UTIL_LOG(MI_FATAL) << "SocketServer IP is empty.";
+            UTIL_THROW_EXCEPTION("socket server IP is empty.");
+        }
 
-    if (connect_status == -1) {
-        MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
-        UTIL_THROW_EXCEPTION("connect server failed.");
-    }
+        if (_server_port.empty()) {
+            MI_UTIL_LOG(MI_FATAL) << "SocketServer port is empty.";
+            UTIL_THROW_EXCEPTION("socket server port is empty.");
+        }
 
+        fd_s = socket(AF_INET, SOCK_STREAM, 0);
+        if (fd_s == -1) {
+            MI_UTIL_LOG(MI_FATAL) << "SocketClient create INET socket failed.";
+            UTIL_THROW_EXCEPTION("create INET socket failed.");
+        }
+
+        struct sockaddr_in remote;
+        bzero((char*)(&remote), sizeof(remote));
+        remote.sin_family = AF_INET;
+        remote.sin_port = htons(atoi(_server_port.c_str()));
+        memcpy((char*)(&remote.sin_addr.s_addr), _server_ip.c_str(), _server_ip.size());
+
+        socklen_t len = sizeof(remote);
+
+        ///\connect 100 times once per second
+        int connect_status = -1;
+    
+        for (int i = 0; i < _reconnect_times; ++i) {
+            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
+    
+            if (connect_status != -1) {
+                break;
+            }
+            MI_UTIL_LOG(MI_INFO) << "trying connect to server times(once per second): " << i;
+            sleep(1);
+        }
+    
+        if (connect_status == -1) {
+            MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
+            UTIL_THROW_EXCEPTION("connect server failed.");
+        }
+        MI_UTIL_LOG(MI_INFO) << "INET socket connect success.\n";
+    }
+    
     _fd_server = fd_s;
 
     while (true) {
-
+        if (!_alive) {
+            break;
+        }
         IPCDataHeader header;
         char* buffer = nullptr;
 
@@ -115,7 +181,15 @@ void SocketClient::run() {
             MI_UTIL_LOG(MI_FATAL) << "handle command error(skip and continue): " << e.what();
         }
     }
+
+    //close socket
+    close(_fd_server);
+    _fd_server = -1;
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running end.";
+}
+
+void SocketClient::stop() {
+    _alive = false;
 }
 
 void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {

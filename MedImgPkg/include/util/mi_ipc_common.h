@@ -7,9 +7,14 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+enum SocketType {
+    INET,
+    UNIX,//just for linux
+};
+
 struct IPCDataHeader { //32 byte
-    unsigned int _sender;//sender pid
-    unsigned int _receiver;//receiver pid
+    unsigned int _sender;//sender pid or socket id ... 
+    unsigned int _receiver;//receiver pid or socket id ...
     unsigned int _msg_id;//message ID : thus command ID
     unsigned int _msg_info0;//message info : thus cell ID
     unsigned int _msg_info1;//message info : thus operation ID
