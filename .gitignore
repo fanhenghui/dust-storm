@@ -307,3 +307,6 @@ be_path*
 #ProtocolBuffer Auto-gen
 *.pb.cc
 *.pb.h
+
+#bower components
+bower_components/
