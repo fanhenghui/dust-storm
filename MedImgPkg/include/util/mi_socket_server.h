@@ -1,6 +1,8 @@
 #ifndef MEDIMGUTIL_MI_SOCKET_SERVER_H
 #define MEDIMGUTIL_MI_SOCKET_SERVER_H
 
+#ifndef WIN32
+
 #include "util/mi_util_export.h"
 
 #include <string>
@@ -13,6 +15,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+class SocketList;
 class SocketServer {
 public:
     SocketServer(SocketType type = UNIX);
@@ -34,8 +37,8 @@ public:
     void run();
     void stop();
 
-
-protected:
+private:
+    void send_data_i();
 private:
     //address for AF_UNIX
     std::string _path;
@@ -46,11 +49,15 @@ private:
 
     std::shared_ptr<IPCDataRecvHandler> _handler;
     int _fd_server;
-    int _max_clients;
+    int _max_clients; // TODO add client limit
 
     SocketType _socket_type;
     bool _alive;
 
+    //client socket fd
+    std::shared_ptr<SocketList> _client_sockets;
+
+    //package to be sending to client
     struct Package {
         IPCDataHeader header;
         char* buffer;
@@ -67,10 +74,13 @@ private:
     typedef std::deque<Package*> PackageStore;
     std::map<int , PackageStore> _client_pkg_store;
 
+    boost::mutex _mutex;
+
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketServer);
 };
 
 MED_IMG_END_NAMESPACE
 
+#endif
 #endif

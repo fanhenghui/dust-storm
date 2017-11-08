@@ -19,14 +19,14 @@
 MED_IMG_BEGIN_NAMESPACE
 
 SocketClient::SocketClient(SocketType type /*= UNIX*/): 
-    _path(""), _fd_server(-1), _socket_type(type), _alive(true) {
+    _path(""), _fd_server(0), _socket_type(type), _alive(true) {
 
 }
 
 SocketClient::~SocketClient() {
-    if(_fd_server != -1) {
+    if(_fd_server != 0) {
         close(_fd_server);
-        _fd_server = -1;
+        _fd_server = 0;
     }
 }
 
@@ -61,10 +61,10 @@ void SocketClient::run() {
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
 
     //create scoket
-    int fd_s = -1;
+    int fd_s = 0;
     if (UNIX == _socket_type) {
         fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
-        if (fd_s == -1) {
+        if (fd_s == 0) {
             MI_UTIL_LOG(MI_FATAL) << "SocketClient create UNIX socket failed.";
             UTIL_THROW_EXCEPTION("create UNIX socket failed.");
         }
@@ -107,7 +107,7 @@ void SocketClient::run() {
         }
 
         fd_s = socket(AF_INET, SOCK_STREAM, 0);
-        if (fd_s == -1) {
+        if (fd_s == 0) {
             MI_UTIL_LOG(MI_FATAL) << "SocketClient create INET socket failed.";
             UTIL_THROW_EXCEPTION("create INET socket failed.");
         }
@@ -149,7 +149,7 @@ void SocketClient::run() {
         IPCDataHeader header;
         char* buffer = nullptr;
 
-        if (-1 == recv(_fd_server, &header, sizeof(header) , 0)) {
+        if (recv(_fd_server, &header, sizeof(header) , 0) <= 0) {
             MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
             continue;
         }
@@ -157,10 +157,10 @@ void SocketClient::run() {
         MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
 
         if (header._data_len <= 0) {
-            MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
+            //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
         } else {
             buffer = new char[header._data_len];
-            if (-1 == recv(_fd_server, buffer, header._data_len, 0)) {
+            if (recv(_fd_server, buffer, header._data_len, 0) <= 0) {
                 MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
                 continue;
             }
@@ -203,14 +203,14 @@ void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {
 
     //send header
     if (-1 == send(_fd_server , &dataheader , sizeof(dataheader) , 0)) {
-        MI_UTIL_LOG(MI_WARNING) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
+        MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
         return;
     }
 
     //send context
     if (buffer != nullptr && dataheader._data_len > 0) {
         if (-1 == send(_fd_server , buffer , dataheader._data_len , 0)) {
-            MI_UTIL_LOG(MI_WARNING) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
+            MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
             return;
         }
     }
