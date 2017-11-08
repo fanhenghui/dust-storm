@@ -25,7 +25,8 @@
     }
 
     function login() {
-        socket = io.connect(serverIP);
+        //socket = io.connect(serverIP); 内网可以这样写
+        socket = io();
         if (!socket) {
             console.log('connect server failed.');
             alert('connect server failed.');
