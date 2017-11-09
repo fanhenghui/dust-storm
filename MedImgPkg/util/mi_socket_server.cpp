@@ -149,6 +149,7 @@ void SocketServer::run() {
             MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
             continue;
         } else if (activity == 0) {
+            //timeout
             MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
             continue;
         } 
@@ -309,24 +310,24 @@ int SocketServer::send() {
     try_pop_front_package_i();
 
     //this thread send data to clients
-    fd_set fdreads;
+    fd_set fdwrites;
     if(_client_sockets->get_socket_count() == 0) {
         return 0;
     }
 
-    FD_ZERO(&fdreads);
-    int max_fd = _client_sockets->make_fd(&fdreads);
-    const int activity = select(max_fd+1, &fdreads, NULL, NULL, NULL);
+    FD_ZERO(&fdwrites);
+    int max_fd = _client_sockets->make_fd(&fdwrites);
+    const int activity = select(max_fd+1, NULL, &fdwrites, NULL, NULL);
 
     if (activity < 0 && (errno != EINTR)) {
         //error
         MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
         return activity;
-    } else {
+    } else if (activity == 0) {
         //timeout
-        MI_UTIL_LOG(MI_TRACE) << "socket read fd_set select timeout.";
+        MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
         return activity;
-    }
+    } 
 
     const std::set<int>& client_sockets = _client_sockets->get_sockets();
     for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
@@ -338,7 +339,7 @@ int SocketServer::send() {
             port = 0;
         }
 
-        if (FD_ISSET(cs, &fdreads)) {
+        if (FD_ISSET(cs, &fdwrites)) {
             //check package
             Package* pkg_send = nullptr;
             {
