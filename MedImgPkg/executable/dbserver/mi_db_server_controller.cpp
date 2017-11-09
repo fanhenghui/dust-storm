@@ -5,9 +5,11 @@
 #include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_config.h"
+#include "appcommon/mi_operation_factory.h"
 
 #include "mi_db_server_thread_model.h"
 #include "mi_db_cmd_handler_operating.h"
+#include "mi_db_operation_query_dicom.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
@@ -27,6 +29,9 @@ void DBServerController::initialize() {
     //register cmd handler
     _server_proxy->register_command_handler(COMMAND_ID_FE_OPERATION, 
         std::shared_ptr<CmdHandlerDBOperating>(new CmdHandlerDBOperating(shared_from_this())));
+    //register operation
+    OperationFactory::instance()->register_operation(OPERATION_ID_QUERY_DICOM, 
+        std::shared_ptr<DBOpQueryDCM>(new DBOpQueryDCM()));
     //connect db
     std::string ip_port,user,pwd,db_name;
     AppConfig::instance()->get_db_info(ip_port, user, pwd, db_name);

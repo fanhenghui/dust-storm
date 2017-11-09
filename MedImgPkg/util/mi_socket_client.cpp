@@ -116,15 +116,19 @@ void SocketClient::run() {
         bzero((char*)(&remote), sizeof(remote));
         remote.sin_family = AF_INET;
         remote.sin_port = htons(atoi(_server_port.c_str()));
-        memcpy((char*)(&remote.sin_addr.s_addr), _server_ip.c_str(), _server_ip.size());
-
+        struct hostent *server = gethostbyname(_server_ip.c_str());
+        if (server == NULL) {
+            MI_UTIL_LOG(MI_FATAL) << "socket client no such hostname.";
+            UTIL_THROW_EXCEPTION("socket client no such hostname.");
+        }
+        bcopy((char *)server->h_addr, (char *)&remote.sin_addr.s_addr, server->h_length);
         socklen_t len = sizeof(remote);
 
         ///\connect 100 times once per second
         int connect_status = -1;
     
         for (int i = 0; i < _reconnect_times; ++i) {
-            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
+            connect_status = connect(fd_s, (struct sockaddr*)(&remote), len);
     
             if (connect_status != -1) {
                 break;
@@ -276,7 +280,12 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
         bzero((char*)(&remote), sizeof(remote));
         remote.sin_family = AF_INET;
         remote.sin_port = htons(atoi(_server_port.c_str()));
-        memcpy((char*)(&remote.sin_addr.s_addr), _server_ip.c_str(), _server_ip.size());
+        struct hostent *server = gethostbyname(_server_ip.c_str());
+        if (server == NULL) {
+            MI_UTIL_LOG(MI_FATAL) << "socket client no such hostname.";
+            UTIL_THROW_EXCEPTION("socket client no such hostname.");
+        }
+        bcopy((char *)server->h_addr, (char *)&remote.sin_addr.s_addr, server->h_length);
 
         socklen_t len = sizeof(remote);
 

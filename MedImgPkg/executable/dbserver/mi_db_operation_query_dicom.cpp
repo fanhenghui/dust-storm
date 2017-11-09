@@ -4,8 +4,8 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "appcommon/mi_app_db.h"
-#include "appcommon/mi_message.pb.h"
 
+#include "mi_message.pb.h"
 #include "mi_db_server_controller.h"
 
 
@@ -42,6 +42,7 @@ int DBOpQueryDCM::execute() {
         //return to client error
     } else {
         const std::string path = item.dcm_path;
+        MI_DBSERVER_LOG(MI_DEBUG) << "series: " << series_id << ". path: " << item.dcm_path;
         std::set<std::string> postfix;
         postfix.insert(".dcm");
         std::vector<std::string> files;
@@ -53,7 +54,7 @@ int DBOpQueryDCM::execute() {
             for (auto it = files.begin(); it != files.end(); ++it) {
                 char* buffer = nullptr;
                 unsigned int size = 0;
-                if(0 != FileUtil::read_raw(*it, buffer, size) ) {
+                if(0 != FileUtil::read_raw_ext(*it, buffer, size) ) {
                     
                 } else {
                     IPCDataHeader header;

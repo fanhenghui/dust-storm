@@ -13,7 +13,6 @@ int main(int argc , char* argv[]) {
     try {
         const std::string log_config_file = AppConfig::instance()->get_log_config_file();
         Logger::instance()->bind_config_file(log_config_file);
-        std::string path = (argc == 2) ? argv[1] : "";
 
         Logger::instance()->set_file_name_format("logs/mi-db-%Y-%m-%d_%H-%M-%S.%N.log");
         Logger::instance()->set_file_direction("");

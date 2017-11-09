@@ -19,7 +19,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 SocketServer::SocketServer(SocketType type):
-    _socket_type(type), _fd_server(0), _alive(true), _server_port(""), 
+    _socket_type(type), _fd_server(0), _alive(true), _server_port("8888"), 
     _max_clients(30), _client_sockets(new SocketList()) {
 }
 
@@ -101,11 +101,11 @@ void SocketServer::run() {
 
         //set master socket to allow multiple connections , 
 	    //this is just a good habit, it will work without this
-        int opt = 1;
-        if(setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) { 
-		    MI_UTIL_LOG(MI_FATAL) << "SocketServer set UNIX socket option failed.";
-            UTIL_THROW_EXCEPTION("set UNIX socket option failed.");
-	    } 
+        // int opt = 1;
+        // if(setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) { 
+		//     MI_UTIL_LOG(MI_FATAL) << "SocketServer set UNIX socket option failed.";
+        //     UTIL_THROW_EXCEPTION("set UNIX socket option failed.");
+	    // } 
 
         struct sockaddr_in serv_addr_inet;
         bzero((char*)(&serv_addr_inet), sizeof(serv_addr_inet));
@@ -122,7 +122,7 @@ void SocketServer::run() {
     _fd_server = fd_s;
 
     //try to specify maximum of 3 pending connections for the master socket 
-	if (listen(_fd_server, 3) < 0) { 
+	if (listen(_fd_server, 20) < 0) { 
 		MI_UTIL_LOG(MI_FATAL) << "SocketServer listen failed.";
         UTIL_THROW_EXCEPTION("socket listen failed.");
     } 
@@ -138,17 +138,22 @@ void SocketServer::run() {
         int max_fd = _client_sockets->make_fd(&fdreads);
         FD_SET(_fd_server, &fdreads);
         max_fd = (std::max)(max_fd, _fd_server);
+
+        struct timeval timeout;
+        timeout.tv_sec = 10;
+        timeout.tv_usec = 500000;
         const int activity = select(max_fd+1, &fdreads, NULL, NULL, NULL);
-        
+        //const int activity = 1;
         if (activity < 0 && (errno != EINTR)) {
             //error
             MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
             continue;
-        } else {
-            //timeout
-            MI_UTIL_LOG(MI_TRACE) << "socket read fd_set select timeout.";
+        } else if (activity == 0) {
+            MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
             continue;
-        }
+        } 
+
+        MI_UTIL_LOG(MI_DEBUG) << "in logic.";
 
         //accept client socket
         if (FD_ISSET(_fd_server, &fdreads)) {
@@ -231,7 +236,7 @@ void SocketServer::run() {
                     //MI_UTIL_LOG(MI_TRACE) << "server received data buffer length less than 0.";
                 } else {
                     char* buffer = new char[header._data_len]; 
-                    err = recv(_fd_server, buffer, header._data_len, 0);
+                    err = recv(cs, buffer, header._data_len, 0);
                     if (err == 0) {
                         //client disconnect
                           if (UNIX == _socket_type) {
