@@ -240,14 +240,14 @@ void SocketServer::run() {
                     err = recv(cs, buffer, header._data_len, 0);
                     if (err == 0) {
                         //client disconnect
-                          if (UNIX == _socket_type) {
+                        if (UNIX == _socket_type) {
                             MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << addr << " disconnect.";
                             MI_UTIL_LOG(MI_WARNING) << "client unix socket send data damaged.";
                         } else if(INET == _socket_type) {
                             MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " disconnect.";
                             MI_UTIL_LOG(MI_WARNING) << "client inet socket send data damaged.";
                         }
-                        //close socket
+                        //close socket 
                         close(cs);
                         _client_sockets->remove_socket(cs);
                         this->clear_package_i(cs);
@@ -321,11 +321,11 @@ int SocketServer::send() {
 
     if (activity < 0 && (errno != EINTR)) {
         //error
-        MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
+        MI_UTIL_LOG(MI_ERROR) << "socket write fd_set select faild.";
         return activity;
     } else if (activity == 0) {
         //timeout
-        MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
+        MI_UTIL_LOG(MI_DEBUG) << "socket write fd_set select timeout.";
         return activity;
     } 
 
