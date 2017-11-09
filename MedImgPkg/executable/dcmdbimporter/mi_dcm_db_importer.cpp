@@ -324,6 +324,98 @@ int import_db(std::string map_path,
     return 0;
 }
 
+int import_rle(std::string root) {
+    std::set<std::string> postfix;
+    postfix.insert(".rle");
+    std::vector<std::string> files;
+    FileUtil::get_all_file_recursion(root, postfix, files);
+    if (files.empty()) {
+        std::stringstream ss;
+        ss << "find no rle files.\n";
+        LOG_OUT(ss.str());
+        return -1;
+    }
+
+    std::shared_ptr<DB> db = std::dynamic_pointer_cast<DB>(_db);
+
+    for (auto it = files.begin(); it != files.end(); ++it) {
+        std::string file = *it;
+        boost::filesystem::path path(*it);
+        const std::string base_name = path.filename().string();
+        int idx = base_name.size()-1;
+        std::string series_id;
+        for(idx = base_name.size()-1; idx >=0 ; --idx) {
+            if (base_name[idx] == '.') {
+                series_id = base_name.substr(0,idx);
+                break;
+            }    
+        }
+        //move file to path
+        DB::ImgItem item;
+        if(0 == db->get_dcm_item(series_id, item) ) {
+            const std::string dcm_path = item.dcm_path;
+            float mb_size = 0;
+            copy_file(file, dcm_path+"/" + base_name, mb_size);
+            db->update_preprocess_mask(series_id, dcm_path+"/" + base_name);
+            std::stringstream ss;
+            ss << "update preprocessing mask file: " << base_name << ".\n";
+            LOG_OUT(ss.str());
+        } else {
+            std::stringstream ss;
+            ss << "cant find series: " << series_id << " in db.\n";
+            LOG_OUT(ss.str());
+        }
+    }
+
+    return 0;
+}
+
+int import_csv(std::string root) {
+    std::set<std::string> postfix;
+    postfix.insert(".csv");
+    std::vector<std::string> files;
+    FileUtil::get_all_file_recursion(root, postfix, files);
+    if (files.empty()) {
+        std::stringstream ss;
+        ss << "find no rle files.\n";
+        LOG_OUT(ss.str());
+        return -1;
+    }
+
+    std::shared_ptr<DB> db = std::dynamic_pointer_cast<DB>(_db);
+
+    for (auto it = files.begin(); it != files.end(); ++it) {
+        std::string file = *it;
+        boost::filesystem::path path(*it);
+        const std::string base_name = path.filename().string();
+        int idx = base_name.size()-1;
+        std::string series_id;
+        for(idx = base_name.size()-1; idx >=0 ; --idx) {
+            if (base_name[idx] == '.') {
+                series_id = base_name.substr(0,idx);
+                break;
+            }    
+        }
+        //move file to path
+        DB::ImgItem item;
+        if(0 == db->get_dcm_item(series_id, item) ) {
+            const std::string dcm_path = item.dcm_path;
+            float mb_size = 0;
+            copy_file(file, dcm_path+"/" + base_name, mb_size);
+            db->update_ai_annotation(series_id, dcm_path+"/" + base_name);
+            std::stringstream ss;
+            ss << "update AI annotation file: " << base_name << ".\n";
+            LOG_OUT(ss.str());
+        } else {
+            std::stringstream ss;
+            ss << "cant find series: " << series_id << " in db.\n";
+            LOG_OUT(ss.str());
+        }
+    }
+
+    return 0;
+}
+
 int getch() {
     struct termios tm, tm_old;
     int fd = 0;
@@ -368,9 +460,11 @@ int main(int argc, char* argv[]) {
     std::string root;
     std::string ip = "127.0.0.1";
     std::string map_path;
+    bool is_rle = true;
+    bool is_csv = true;
     int ch;
 
-    while ((ch = getopt(argc, argv, "hu:p:d:r:i:m:")) != -1) {
+    while ((ch = getopt(argc, argv, "cahu:p:d:r:i:m:")) != -1) {
         switch (ch) {
         case 'u':
             user = std::string(optarg);
@@ -395,6 +489,14 @@ int main(int argc, char* argv[]) {
         case 'h':
             print_h();
             return 0;
+            break;
+
+        case 'c':
+            is_rle = true;
+            break;
+
+        case 'a':
+            is_csv = true;
             break;
 
         default:
@@ -486,6 +588,15 @@ int main(int argc, char* argv[]) {
         if (0 != import_db(map_path, series_info_map, series_col)) {
             LOG_OUT("ERROR : import DB failed.");
             return -1;
+        }
+
+        if (is_rle) {
+            //import rle
+            import_rle(root);
+        }
+
+        if (is_csv) {
+            import_csv(root);
         }
 
         //mask
