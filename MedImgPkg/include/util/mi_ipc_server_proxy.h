@@ -1,5 +1,5 @@
-#ifndef MEDIMGUTIL_MI_IPC_CLIENT_PROXY_H
-#define MEDIMGUTIL_MI_IPC_CLIENT_PROXY_H
+#ifndef MEDIMGUTIL_MI_IPC_SERVER_PROXY_H
+#define MEDIMGUTIL_MI_IPC_SERVER_PROXY_H
 
 #include "util/mi_util_export.h"
 #include <memory>
@@ -12,14 +12,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class SocketClient;
-class IPCClientProxy : public boost::noncopyable {
+class SocketServer;
+class IPCServerProxy : public boost::noncopyable {
 public:
-    IPCClientProxy(SocketType type = UNIX);
-    ~IPCClientProxy();
+    IPCServerProxy(SocketType type = UNIX);
+    ~IPCServerProxy();
 
-    void set_path(const std::string& path);
     void run();
+    void send();
+    void stop();
     void register_command_handler(unsigned int cmd_id,
                                   std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);
@@ -28,13 +29,13 @@ public:
 
 protected:
 private:
-    std::unique_ptr<SocketClient> _client;
+    std::unique_ptr<SocketServer> _server;
     std::map<unsigned int, std::shared_ptr<ICommandHandler>> _handlers;
 
     boost::mutex _mutex;
     boost::mutex _mutex_send_data;
 private:
-    DISALLOW_COPY_AND_ASSIGN(IPCClientProxy);
+    DISALLOW_COPY_AND_ASSIGN(IPCServerProxy);
 };
 
 MED_IMG_END_NAMESPACE

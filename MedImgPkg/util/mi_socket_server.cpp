@@ -34,6 +34,14 @@ void SocketServer::set_max_client(int max_clients) {
     _max_clients = max_clients;
 }
 
+void SocketServer::set_path(const std::string& path) {
+    _path = path;
+}
+
+std::string SocketServer::get_path() const {
+    return _path;
+}
+
 void SocketServer::set_server_address(const std::string& port) {
     _server_port = port;
 }
@@ -193,6 +201,7 @@ void SocketServer::run() {
                 //reveive dataheader
                 IPCDataHeader header;
                 int err = recv(cs, &header, sizeof(header), 0);
+                header._receiver = cs;//very important
                 if (err == 0) {
                     //client disconnect
                     if (UNIX == _socket_type) {
@@ -202,6 +211,7 @@ void SocketServer::run() {
                     }
                     close(cs);
                     _client_sockets->remove_socket(cs);
+                    this->clear_package_i(cs);
                     continue;    
                 } else if (err < 0) {
                     //recv failed
@@ -212,6 +222,7 @@ void SocketServer::run() {
                     }
                     close(cs);
                     _client_sockets->remove_socket(cs);
+                    this->clear_package_i(cs);
                     continue;  
                 }
 
@@ -233,6 +244,7 @@ void SocketServer::run() {
                         //close socket
                         close(cs);
                         _client_sockets->remove_socket(cs);
+                        this->clear_package_i(cs);
                         continue;
                     } else if (err < 0) {
                         //recv failed
@@ -243,6 +255,7 @@ void SocketServer::run() {
                         }
                         close(cs);
                         _client_sockets->remove_socket(cs);
+                        this->clear_package_i(cs);
                         continue;  
                     }
 
@@ -264,6 +277,10 @@ void SocketServer::run() {
         }
     }
 
+    //close socket
+    close(_fd_server);
+    _fd_server = 0;
+    
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketServer run.";
 }
 
@@ -272,90 +289,146 @@ void SocketServer::stop() {
     _alive = false;
 }
 
-void SocketServer::send_data(const IPCDataHeader& dataheader , char* buffer) {
-    //this thread gather package to be sending
-    boost::mutex::scoped_lock locker(_mutex);
-    Package *pkg = new Package(dataheader, buffer);
-    int client_socket_fd = (int)(dataheader._receiver);
-    auto client_store = _client_pkg_store.find(client_socket_fd);
-    if (client_store == _client_pkg_store.end()) {
-        PackageStore pkg_store;
-        pkg_store.push_back(pkg);
-        _client_pkg_store.insert(std::make_pair(client_socket_fd, pkg_store));
-    } else {
-        client_store->second.push_back(pkg);
-    }
+void SocketServer::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler) {
+    _handler = handler;
 }
 
-void SocketServer::send_data_i() {
-    //TODO add condition when has socket client to awake this thread
+void SocketServer::send_data(const IPCDataHeader& dataheader , char* buffer) {
+    //this thread gather package to be sending
+    Package *pkg = new Package(dataheader, buffer);
+    const int client_socket_fd = (int)(dataheader._receiver);
+    push_back_package_i(client_socket_fd, pkg);
+}
+
+int SocketServer::send() {
+    try_pop_front_package_i();
 
     //this thread send data to clients
     fd_set fdreads;
-    while(true) {
-        if (!_alive) {
-            break;
+    if(_client_sockets->get_socket_count() == 0) {
+        return 0;
+    }
+
+    FD_ZERO(&fdreads);
+    int max_fd = _client_sockets->make_fd(&fdreads);
+    const int activity = select(max_fd+1, &fdreads, NULL, NULL, NULL);
+
+    if (activity < 0 && (errno != EINTR)) {
+        //error
+        MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
+        return activity;
+    } else {
+        //timeout
+        MI_UTIL_LOG(MI_TRACE) << "socket read fd_set select timeout.";
+        return activity;
+    }
+
+    const std::set<int>& client_sockets = _client_sockets->get_sockets();
+    for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
+        const int cs = *it;
+        std::string addr;
+        int port(0);
+        if (0 != _client_sockets->get_socket_addr(cs, addr, port)) {
+            addr = "unknown";
+            port = 0;
         }
 
-        if(_client_sockets->get_socket_count() == 0) {
-            continue;
-        }
-
-        FD_ZERO(&fdreads);
-        int max_fd = _client_sockets->make_fd(&fdreads);
-        const int activity = select(max_fd+1, &fdreads, NULL, NULL, NULL);
-
-        if (activity < 0 && (errno != EINTR)) {
-            //error
-            MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
-            continue;
-        } else {
-            //timeout
-            MI_UTIL_LOG(MI_TRACE) << "socket read fd_set select timeout.";
-            continue;
-        }
-
-        const std::set<int>& client_sockets = _client_sockets->get_sockets();
-        for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
-            const int cs = *it;
-            std::string addr;
-            int port(0);
-            if (0 != _client_sockets->get_socket_addr(cs, addr, port)) {
-                addr = "unknown";
-                port = 0;
+        if (FD_ISSET(cs, &fdreads)) {
+            //check package
+            Package* pkg_send = nullptr;
+            {
+                boost::mutex::scoped_lock locker(_mutex_package);
+                auto client_store = _client_pkg_store.find(cs);
+                if (client_store == _client_pkg_store.end()) {
+                    continue;
+                } 
+                if (client_store->second.size() == 0) {
+                    continue;
+                }
+                pkg_send = client_store->second.front();
+                client_store->second.pop_front();
             }
 
-            if (FD_ISSET(cs, &fdreads)) {
-                //check package
-                Package* pkg_send = nullptr;
-                {
-                    boost::mutex::scoped_lock locker(_mutex);
-                    auto client_store = _client_pkg_store.find(cs);
-                    if (client_store == _client_pkg_store.end()) {
-                        continue;
-                    } 
-                    if (client_store->second.size() == 0) {
-                        continue;
-                    }
-                    pkg_send = client_store->second.front();
-                    client_store->second.pop_front();
+            //check close
+            if (-1 == _client_sockets->check_socket(cs)) {
+                //socket has been close
+                //drop package 
+                if (nullptr != pkg_send) {
+                    delete pkg_send;
+                    pkg_send = nullptr;
                 }
+                continue;
+            }
+            if (-1 == ::send(cs, &(pkg_send->header), sizeof(pkg_send->header), 0)) {
+                MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " 
+                << STREAM_IPCHEADER_INFO(pkg_send->header);
+                continue;
+            }
 
-                if (-1 == send(cs, &(pkg_send->header), sizeof(pkg_send->header), 0)) {
-                    MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " 
+            if (nullptr != pkg_send->buffer && pkg_send->header._data_len > 0) {
+                if (-1 == ::send(cs , pkg_send->buffer , pkg_send->header._data_len , 0)) {
+                    MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
                     << STREAM_IPCHEADER_INFO(pkg_send->header);
-                    return;
                 }
+            }
+        }            
+    }
 
-                if (nullptr != pkg_send->buffer && pkg_send->header._data_len > 0) {
-                    if (-1 == send(cs , pkg_send->buffer , pkg_send->header._data_len , 0)) {
-                        MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
-                        << STREAM_IPCHEADER_INFO(pkg_send->header);
-                    }
-                }
-            }            
+    return 0;
+}
+
+void SocketServer::push_back_package_i(int socket_fd, Package* pkg) {
+    boost::mutex::scoped_lock locker(_mutex_package);
+    auto client_store = _client_pkg_store.find(socket_fd);
+    if (client_store == _client_pkg_store.end()) {
+        PackageStore pkg_store;
+        pkg_store.push_back(pkg);
+        _client_pkg_store.insert(std::make_pair(socket_fd, pkg_store));
+    } else {
+        client_store->second.push_back(pkg);
+    }
+    _condition_empty_package.notify_one();
+}
+
+SocketServer::Package* SocketServer::pop_front_package_i(int socket_fd) {
+    boost::mutex::scoped_lock locker(_mutex_package);
+    auto client_store = _client_pkg_store.find(socket_fd);
+    if (client_store == _client_pkg_store.end()) {
+        return nullptr;
+    } 
+    if (client_store->second.size() == 0) {
+        return nullptr;
+    }
+    Package* pkg = client_store->second.front();
+    client_store->second.pop_front();
+    return pkg;
+}
+
+void SocketServer::clear_package_i(int socket_fd) {
+    PackageStore old_package_store;
+    {
+        boost::mutex::scoped_lock locker(_mutex_package);
+        auto client_store = _client_pkg_store.find(socket_fd);
+        if (client_store != _client_pkg_store.end()) {
+            old_package_store = client_store->second;
+            _client_pkg_store.erase(client_store);
+        }   
+    }
+
+    while (old_package_store.empty()) {
+        Package* pkg = old_package_store.front();
+        if (nullptr != pkg) {
+            delete pkg;
+            pkg = nullptr; 
         }
+        old_package_store.pop_front();
+    }
+}
 
+void SocketServer::try_pop_front_package_i() {
+    boost::mutex::scoped_lock locker(_mutex_package);
+    while(_client_pkg_store.empty()) {
+        _condition_empty_package.wait(_mutex_package);
     }
 }
 

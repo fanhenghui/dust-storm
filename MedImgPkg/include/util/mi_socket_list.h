@@ -31,6 +31,11 @@ public:
         return static_cast<int>(_sockets.size());
     }
 
+    int check_socket(int socket) {
+        boost::mutex::scoped_lock locker(_mutex);
+        return _sockets.find(socket) != _sockets.end() ? 0 : -1;
+    }
+
     int insert_socket(int socket, const std::string addr, int port = 0) {
         boost::mutex::scoped_lock locker(_mutex);
         auto it = _sockets.find(socket);

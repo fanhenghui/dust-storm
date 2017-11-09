@@ -1,13 +1,13 @@
 #ifndef WIN32
-#include "mi_ipc_client_proxy.h"
-#include "mi_socket_client.h"
+#include "mi_ipc_server_proxy.h"
+#include "mi_socket_server.h"
 #include "mi_util_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 class IPCDataRecvHandlerExt : public IPCDataRecvHandler {
 public:
-    IPCDataRecvHandlerExt(IPCClientProxy* proxy) : _proxy(proxy) {
+    IPCDataRecvHandlerExt(IPCServerProxy* proxy) : _proxy(proxy) {
     };
 
     virtual ~IPCDataRecvHandlerExt() {
@@ -23,33 +23,37 @@ public:
     }
 protected:
 private:
-    IPCClientProxy* _proxy;
+    IPCServerProxy* _proxy;
 };
 
-IPCClientProxy::IPCClientProxy(SocketType type): _client(new SocketClient(type)) {
+IPCServerProxy::IPCServerProxy(SocketType type): _server(new SocketServer(type)) {
     std::shared_ptr<IPCDataRecvHandlerExt> recv_handler(new IPCDataRecvHandlerExt(this));
-    _client->register_revc_handler(recv_handler);
+    _server->register_revc_handler(recv_handler);
 }
 
-IPCClientProxy::~IPCClientProxy() {
+IPCServerProxy::~IPCServerProxy() {
 
 }
 
-void IPCClientProxy::set_path(const std::string& path) {
-    _client->set_path(path);
+void IPCServerProxy::run() {
+    _server->run();
 }
 
-void IPCClientProxy::run() {
-    _client->run();
+void IPCServerProxy::send() {
+    _server->send();
 }
 
-void IPCClientProxy::register_command_handler(unsigned int cmd_id ,
+void IPCServerProxy::stop() {
+    _server->stop();
+}
+
+void IPCServerProxy::register_command_handler(unsigned int cmd_id ,
         std::shared_ptr<ICommandHandler> handler) {
     boost::mutex::scoped_lock locker(_mutex);
     _handlers[cmd_id] = handler;
 }
 
-void IPCClientProxy::unregister_command_handler(unsigned int cmd_id) {
+void IPCServerProxy::unregister_command_handler(unsigned int cmd_id) {
     boost::mutex::scoped_lock locker(_mutex);
 
     auto it = _handlers.find(cmd_id);
@@ -58,12 +62,12 @@ void IPCClientProxy::unregister_command_handler(unsigned int cmd_id) {
     }
 }
 
-void IPCClientProxy::async_send_message(const IPCDataHeader& header , char* buffer) {
+void IPCServerProxy::async_send_message(const IPCDataHeader& header , char* buffer) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
-    _client->send_data(header , buffer);
+    _server->send_data(header , buffer);
 }
 
-int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {
+int IPCServerProxy::handle_command(const IPCDataHeader& header , char* buffer) {
     boost::mutex::scoped_lock locker(_mutex);
 
     const unsigned int cmd_id = header._msg_id;

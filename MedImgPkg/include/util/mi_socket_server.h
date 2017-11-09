@@ -8,8 +8,9 @@
 #include <string>
 #include <deque>
 #include <map>
-#include "boost/thread/thread.hpp"
-#include "boost/thread/mutex.hpp"
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "util/mi_ipc_common.h"
 
@@ -36,9 +37,14 @@ public:
 
     void run();
     void stop();
-
+    int send();
 private:
-    void send_data_i();
+    struct Package;
+    
+    Package* pop_front_package_i(int socket_fd);
+    void try_pop_front_package_i();
+    void push_back_package_i(int socket_fd, Package* pkg);
+    void clear_package_i(int socket_fd);
 private:
     //address for AF_UNIX
     std::string _path;
@@ -74,7 +80,10 @@ private:
     typedef std::deque<Package*> PackageStore;
     std::map<int , PackageStore> _client_pkg_store;
 
-    boost::mutex _mutex;
+    boost::mutex _mutex_package;
+    boost::condition _condition_empty_package;
+    
+    
 
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketServer);

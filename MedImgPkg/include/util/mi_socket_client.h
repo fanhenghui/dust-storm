@@ -31,6 +31,9 @@ public:
     void run();
     void stop();
 
+    int post(const IPCDataHeader& post_header , char* post_data, 
+              IPCDataHeader& result_header , char*& result_data);
+
 protected:
 private:
     SocketType _socket_type;
