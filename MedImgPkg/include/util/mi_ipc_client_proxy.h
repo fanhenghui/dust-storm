@@ -20,10 +20,9 @@ public:
 
     void set_path(const std::string& path);
     void run();
-    void register_command_handler(unsigned int cmd_id,
-                                  std::shared_ptr<ICommandHandler> handler);
+    void register_command_handler(unsigned int cmd_id, std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);
-    void async_send_message(const IPCDataHeader& header, char* buffer);
+    void sync_send_data(const IPCDataHeader& header, char* buffer);
     int handle_command(const IPCDataHeader& header, char* buffer);
 
 protected:

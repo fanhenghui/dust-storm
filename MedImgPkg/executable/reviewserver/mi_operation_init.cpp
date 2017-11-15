@@ -65,7 +65,7 @@ int OpInit::execute() {
 
     REVIEW_CHECK_NULL_EXCEPTION(_buffer);
     MsgInit msg_init;
-    if (!msg_init.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msg_init.ParseFromArray(_buffer, _header.data_len)) {
         MI_REVIEW_LOG(MI_ERROR) << "parse init message failed.";
         return -1;
     }

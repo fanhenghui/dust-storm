@@ -308,11 +308,11 @@ void GraphicItemVOI::update(std::vector<QGraphicsItem*>& to_be_add , std::vector
 
             //info
             IntensityInfo info = _model->get_intensity_info(voi_id[i]);
-            std::string context = std::string("min : ")  + str_num_converter.to_string_decimal(info._min , 3) +
-                std::string(" max : ")  + str_num_converter.to_string_decimal(info._max , 3) + std::string("\n") +
-                std::string("mean : ")  + str_num_converter.to_string_decimal(info._mean , 3) + 
-                std::string(" std : ")  + str_num_converter.to_string_decimal(info._std, 3) + std::string("\n"); /*+
-                std::string("pixel num : ")  + str_num_converter.to_string_decimal(static_cast<double>(info._num),0);*/
+            std::string context = std::string("min : ")  + str_num_converter.to_string_decimal(info.min , 3) +
+                std::string(" max : ")  + str_num_converter.to_string_decimal(info.max , 3) + std::string("\n") +
+                std::string("mean : ")  + str_num_converter.to_string_decimal(info.mean , 3) + 
+                std::string(" std : ")  + str_num_converter.to_string_decimal(info.std, 3) + std::string("\n"); /*+
+                std::string("pixel num : ")  + str_num_converter.to_string_decimal(static_cast<double>(info.num),0);*/
             (*item_info)->setPlainText(context.c_str());
 
             const float sphere_w = (*item_sphere)->rect().width();

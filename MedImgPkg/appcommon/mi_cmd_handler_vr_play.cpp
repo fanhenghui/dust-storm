@@ -43,14 +43,14 @@ int CmdHandlerVRPlay::handle_command(const IPCDataHeader& ipcheader , char* buff
     }
 
 
-    const unsigned int cell_id = ipcheader._msg_info0;
-    const unsigned int op_id = ipcheader._msg_info1;
+    const unsigned int cell_id = ipcheader.msg_info0;
+    const unsigned int op_id = ipcheader.msg_info1;
     OpDataHeader op_header;
-    op_header._cell_id = cell_id;
-    op_header._op_id = OPERATION_ID_ROTATE;
-    op_header._data_type = ipcheader._data_type;
-    op_header._big_end = ipcheader._big_end;
-    op_header._data_len = ipcheader._data_len;
+    op_header.cell_id = cell_id;
+    op_header.op_id = OPERATION_ID_ROTATE;
+    op_header.data_type = ipcheader.data_type;
+    op_header.big_end = ipcheader.big_end;
+    op_header.data_len = ipcheader.data_len;
 
     boost::thread th(boost::bind(&CmdHandlerVRPlay::logic_i , this , boost::ref(op_header) , buffer));
     th.detach();
@@ -86,7 +86,7 @@ void CmdHandlerVRPlay::logic_i(OpDataHeader& op_header, char* buffer) {
             printf("serialize rotation msg failed!\n");
             return;
         }
-        op_header._data_len = msg.ByteSize();
+        op_header.data_len = msg.ByteSize();
         if (op) {
             op->reset();
             op->set_data(op_header , buffer_rotation);

@@ -26,12 +26,12 @@ OpMPRPaging::~OpMPRPaging() {
 int OpMPRPaging::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpMPRPaging";
     //Parse data
-    const unsigned int cell_id = _header._cell_id;
+    const unsigned int cell_id = _header.cell_id;
     int page_step = 1;
 
     if (_buffer != nullptr) {
         MsgMouse msg;
-        if (!msg.ParseFromArray(_buffer , _header._data_len)) {
+        if (!msg.ParseFromArray(_buffer , _header.data_len)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "parse mouse message failed in mpr paging.";
             return -1;
         }

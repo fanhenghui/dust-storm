@@ -123,7 +123,7 @@ void display() {
 
             for (auto it = (_vis_nodules[reader]).begin()  ; it != (_vis_nodules[reader]).end() ; ++it) {
                 Nodule& nodule = *it;
-                std::vector<Point3>& pts = nodule._points;
+                std::vector<Point3>& pts = nodule.points;
                 int i = 0;
 
                 for (; i < pts.size() ; ++i) {

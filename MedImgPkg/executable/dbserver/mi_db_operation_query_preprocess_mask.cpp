@@ -24,7 +24,7 @@ int DBOpQueryPreprocessMask::execute() {
 
     MsgString msg;
 
-    if (!msg.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
     }
 
@@ -49,12 +49,16 @@ int DBOpQueryPreprocessMask::execute() {
             
         } else {
             IPCDataHeader header;
-            header._receiver = _receiver;
-            header._data_len = size;
+            header.receiver = _receiver;
+            header.data_len = size;
             //TODO client cmd handler
             //header._msg_id = ;
             //header._msg_info1 = ;
-            server_proxy->async_send_message(header, buffer);
+            IPCPackage* package = new IPCPackage(header, buffer);
+            if (0 != server_proxy->async_send_data(package)) {
+                delete package;
+                package = nullptr;
+            }
         }
     }
 

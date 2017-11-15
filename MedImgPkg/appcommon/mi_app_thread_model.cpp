@@ -20,9 +20,9 @@
 MED_IMG_BEGIN_NAMESPACE
 
 struct AppThreadModel::InnerThreadData {
-    boost::thread _th;
-    boost::mutex _mutex;
-    boost::condition _condition;
+    boost::thread th;
+    boost::mutex mutex;
+    boost::condition condition;
 };
 
 struct AppThreadModel::InnerQueue {
@@ -69,13 +69,13 @@ void AppThreadModel::pop_operation(std::shared_ptr<IOperation>* op) {
 
 void AppThreadModel::start() {
     try {
-        _th_operating->_th =
+        _th_operating->th =
             boost::thread(boost::bind(&AppThreadModel::process_operating, this));
 
-        _th_sending->_th =
+        _th_sending->th =
             boost::thread(boost::bind(&AppThreadModel::process_sending, this));
 
-        _th_rendering->_th =
+        _th_rendering->th =
             boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
     } catch (...) {
         MI_APPCOMMON_LOG(MI_FATAL) << "app thread model start failed.";
@@ -84,18 +84,18 @@ void AppThreadModel::start() {
 }
 
 void AppThreadModel::stop() {
-    _th_rendering->_th.interrupt();
-    _th_rendering->_condition.notify_one();
+    _th_rendering->th.interrupt();
+    _th_rendering->condition.notify_one();
 
-    _th_sending->_th.interrupt();
-    _th_sending->_condition.notify_one();
+    _th_sending->th.interrupt();
+    _th_sending->condition.notify_one();
 
-    _th_operating->_th.interrupt();
-    _th_operating->_condition.notify_one();
+    _th_operating->th.interrupt();
+    _th_operating->condition.notify_one();
 
-    _th_rendering->_th.join();
-    _th_sending->_th.join();
-    _th_operating->_th.join();
+    _th_rendering->th.join();
+    _th_sending->th.join();
+    _th_operating->th.join();
 
     _op_queue->_msg_queue.deactivate();
 }
@@ -106,7 +106,7 @@ void AppThreadModel::process_operating() {
             std::shared_ptr<IOperation> op;
             this->pop_operation(&op);
 
-            boost::mutex::scoped_lock locker(_th_rendering->_mutex);
+            boost::mutex::scoped_lock locker(_th_rendering->mutex);
 
             try {
                 int err = op->execute();
@@ -126,7 +126,7 @@ void AppThreadModel::process_operating() {
             // interrupt point
             boost::this_thread::interruption_point();
             _rendering = true;
-            _th_rendering->_condition.notify_one();
+            _th_rendering->condition.notify_one();
         }
     }  catch (boost::thread_interrupted& e) {
         MI_APPCOMMON_LOG(MI_INFO) << "operating thread is interrupted.";;
@@ -147,10 +147,10 @@ void AppThreadModel::process_rendering() {
             _glcontext->make_current(RENDERING_CONTEXT);
             {
                 ///\ 1 render
-                boost::mutex::scoped_lock locker(_th_rendering->_mutex);
+                boost::mutex::scoped_lock locker(_th_rendering->mutex);
 
                 while (!_rendering) {
-                    _th_rendering->_condition.wait(_th_rendering->_mutex);
+                    _th_rendering->condition.wait(_th_rendering->mutex);
                 }
 
                 // render all dirty cells
@@ -202,7 +202,7 @@ void AppThreadModel::process_rendering() {
                 _dirty_none_images = dirty_none_images;
             }
             _sending = true;
-            _th_sending->_condition.notify_one();
+            _th_sending->condition.notify_one();
         }
     } catch (const Exception& e) {
         MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
@@ -222,10 +222,10 @@ void AppThreadModel::process_sending() {
     try {
         while (true) {
             ///\ sending image to fe by pic proxy
-            boost::mutex::scoped_lock locker(_th_sending->_mutex);
+            boost::mutex::scoped_lock locker(_th_sending->mutex);
 
             while (!_sending) {
-                _th_sending->_condition.wait(_th_sending->_mutex);
+                _th_sending->condition.wait(_th_sending->mutex);
             }
 
             std::shared_ptr<AppController> controller = _controller.lock();
@@ -248,19 +248,19 @@ void AppThreadModel::process_sending() {
                 scene->get_display_size(width, height);
 
                 IPCDataHeader header;
-                header._sender = static_cast<unsigned int>(controller->get_local_pid());
-                header._receiver = static_cast<unsigned int>(controller->get_server_pid());
-                header._msg_id = COMMAND_ID_BE_SEND_IMAGE;
-                header._msg_info0 = cell_id;
-                header._msg_info1 = 0;
-                header._data_type = 0;
-                header._big_end = 0;
+                header.sender = static_cast<unsigned int>(controller->get_local_pid());
+                header.receiver = static_cast<unsigned int>(controller->get_server_pid());
+                header.msg_id = COMMAND_ID_BE_SEND_IMAGE;
+                header.msg_info0 = cell_id;
+                header.msg_info1 = 0;
+                header.data_type = 0;
+                header.big_end = 0;
 
                 unsigned char* buffer = nullptr;
                 int buffer_size = 0;
                 scene->get_image_buffer(buffer, buffer_size);
                 APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
-                header._data_len = static_cast<unsigned int>(buffer_size);
+                header.data_len = static_cast<unsigned int>(buffer_size);
 
                 MI_APPCOMMON_LOG(MI_TRACE) << "send image data length: " << buffer_size;
 
@@ -273,7 +273,7 @@ void AppThreadModel::process_sending() {
                 //     FileUtil::write_raw(ss.str(), buffer, buffer_size);
                 // }
 
-                _proxy->async_send_message(header, (char*)buffer);
+                _proxy->sync_send_data(header, (char*)buffer);
             }
 
             // get dirty cells to be sending
@@ -290,13 +290,13 @@ void AppThreadModel::process_sending() {
                 APPCOMMON_CHECK_NULL_EXCEPTION(none_image);
 
                 IPCDataHeader header;
-                header._sender = static_cast<unsigned int>(controller->get_local_pid());
-                header._receiver = static_cast<unsigned int>(controller->get_server_pid());
-                header._msg_id = COMMAND_ID_BE_SEND_NONE_IMAGE;
-                header._msg_info0 = cell_id;
-                header._msg_info1 = 0;
-                header._data_type = 0;
-                header._big_end = 0;
+                header.sender = static_cast<unsigned int>(controller->get_local_pid());
+                header.receiver = static_cast<unsigned int>(controller->get_server_pid());
+                header.msg_id = COMMAND_ID_BE_SEND_NONE_IMAGE;
+                header.msg_info0 = cell_id;
+                header.msg_info1 = 0;
+                header.data_type = 0;
+                header.big_end = 0;
 
                 int buffer_size = 0;
                 char* buffer = none_image->serialize_dirty(buffer_size);
@@ -304,9 +304,9 @@ void AppThreadModel::process_sending() {
                     //MI_APPCOMMON_LOG(MI_WARNING) << "dirty none image has no serialized dirty buffer.";
                     continue;
                 }
-                header._data_len = static_cast<unsigned int>(buffer_size);
+                header.data_len = static_cast<unsigned int>(buffer_size);
                 MI_APPCOMMON_LOG(MI_TRACE) << "send none image data length: " << buffer_size;
-                _proxy->async_send_message(header, buffer);
+                _proxy->sync_send_data(header, buffer);
                 if (nullptr != buffer) {
                     delete [] buffer;
                 }

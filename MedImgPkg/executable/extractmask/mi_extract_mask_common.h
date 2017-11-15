@@ -10,9 +10,8 @@ using namespace medical_imaging;
 struct Nodule {
     int type;//0 for unblinded-nodule ; 1 for non-nodule
     std::string name;
-    std::vector<Point3>
-    _points;//if size is 1:  for nodule means diameter < 3mm , for non-nodule means diameter > 3mm
-    AABBI _aabb;
+    std::vector<Point3> points;//if size is 1:  for nodule means diameter < 3mm , for non-nodule means diameter > 3mm
+    AABBI aabb;
     int flag;//for indicate this nodule has been extracted : -1 under custom's confidence(skip) ; 0 not-anaylisis others  ; others makslabel
 
     Nodule(): type(0), flag(0) {

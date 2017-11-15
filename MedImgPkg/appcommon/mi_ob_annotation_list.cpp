@@ -39,13 +39,13 @@ void OBAnnotationList::update(int code_id) {
 
     //send annotation list changed message(3D)
     IPCDataHeader header;
-    header._sender = static_cast<unsigned int>(controller->get_local_pid());
-    header._receiver = static_cast<unsigned int>(controller->get_server_pid());
-    header._msg_id = COMMAND_ID_BE_SEND_ANNOTATION_LIST;
-    header._msg_info0 = 0;
-    header._msg_info1 = 0;
-    header._data_type = 1;
-    header._big_end = 0;
+    header.sender = static_cast<unsigned int>(controller->get_local_pid());
+    header.receiver = static_cast<unsigned int>(controller->get_server_pid());
+    header.msg_id = COMMAND_ID_BE_SEND_ANNOTATION_LIST;
+    header.msg_info0 = 0;
+    header.msg_info1 = 0;
+    header.data_type = 1;
+    header.big_end = 0;
 
     MsgAnnotationList msg;
     switch (code_id) {
@@ -142,8 +142,8 @@ void OBAnnotationList::update(int code_id) {
     }
     msg.Clear();
     
-    header._data_len = static_cast<unsigned int>(buffer_size);
-    controller->get_client_proxy()->async_send_message(header, buffer);
+    header.data_len = static_cast<unsigned int>(buffer_size);
+    controller->get_client_proxy()->sync_send_data(header, buffer);
     if (buffer != nullptr) {
         delete [] buffer;
     }

@@ -161,11 +161,11 @@ void SocketClient::run() {
         
         MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
 
-        if (header._data_len <= 0) {
+        if (header.data_len <= 0) {
             //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
         } else {
-            buffer = new char[header._data_len];
-            if (recv(_fd_server, buffer, header._data_len, 0) <= 0) {
+            buffer = new char[header.data_len];
+            if (recv(_fd_server, buffer, header.data_len, 0) <= 0) {
                 MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
                 continue;
             }
@@ -197,7 +197,7 @@ void SocketClient::stop() {
     _alive = false;
 }
 
-void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {
+void SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer) {
 
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " sending data: " << STREAM_IPCHEADER_INFO(dataheader);
     if (-1 == _fd_server) {
@@ -213,8 +213,8 @@ void SocketClient::send_data(const IPCDataHeader& dataheader , char* buffer) {
     }
 
     //send context
-    if (buffer != nullptr && dataheader._data_len > 0) {
-        if (-1 == send(_fd_server , buffer , dataheader._data_len , 0)) {
+    if (buffer != nullptr && dataheader.data_len > 0) {
+        if (-1 == send(_fd_server , buffer , dataheader.data_len , 0)) {
             MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
             return;
         }
@@ -319,8 +319,8 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
     }
 
     //send context
-    if (post_data != nullptr && post_header._data_len > 0) {
-        if (-1 == send(_fd_server , post_data , post_header._data_len , 0)) {
+    if (post_data != nullptr && post_header.data_len > 0) {
+        if (-1 == send(_fd_server , post_data , post_header.data_len , 0)) {
             MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(post_header);
             return -1;
         }
@@ -335,11 +335,11 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
     
     MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(result_header);   
 
-    if (result_header._data_len <= 0) {
+    if (result_header.data_len <= 0) {
         //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
     } else {
-        result_data = new char[result_header._data_len];
-        if (recv(_fd_server, result_data, result_header._data_len, 0) <= 0) {
+        result_data = new char[result_header.data_len];
+        if (recv(_fd_server, result_data, result_header.data_len, 0) <= 0) {
             MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
             return -1;
         }

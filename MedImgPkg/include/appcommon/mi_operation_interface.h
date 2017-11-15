@@ -10,11 +10,11 @@
 MED_IMG_BEGIN_NAMESPACE
 
 struct OpDataHeader {
-    unsigned int _cell_id;   //
-    unsigned int _op_id;     // operation id
-    unsigned int _data_type; // 0 raw_data 1 protocol buffer
-    unsigned int _big_end;   // 0 small end 1 big_end
-    unsigned int _data_len;  // data length
+    unsigned int cell_id;   //
+    unsigned int op_id;     // operation id
+    unsigned int data_type; // 0 raw_data 1 protocol buffer
+    unsigned int big_end;   // 0 small end 1 big_end
+    unsigned int data_len;  // data length
 };
 
 class AppController;

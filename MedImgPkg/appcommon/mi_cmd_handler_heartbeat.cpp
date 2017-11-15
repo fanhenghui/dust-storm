@@ -23,10 +23,10 @@ int CmdHandlerHeartbeat::handle_command(const IPCDataHeader &ipcheader, char *bu
     }
     
     IPCDataHeader header;
-    header._msg_id = COMMAND_ID_BE_HEARTBEAT;
+    header.msg_id = COMMAND_ID_BE_HEARTBEAT;
 
     MI_APPCOMMON_LOG(MI_INFO) << "BE reveive heartbeat.";
-    controller->get_client_proxy()->async_send_message(header, nullptr);
+    controller->get_client_proxy()->sync_send_data(header, nullptr);
 
     return 0;
 }

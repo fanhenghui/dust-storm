@@ -55,7 +55,7 @@ void NoneImgAnnotations::fill_msg(MsgNoneImgCollection* msg) const {
 namespace {
     std::string intensity_info_to_str(const IntensityInfo& info ) {
         std::stringstream ss;
-        ss << std::setprecision(3) << std::fixed << "min: " << info._min << " max: " << info._max << "|" << "mean: " << info._mean << " std: " << info._std;
+        ss << std::setprecision(3) << std::fixed << "min: " << info.min << " max: " << info.max << "|" << "mean: " << info.mean << " std: " << info.std;
         return ss.str(); 
     }
 }

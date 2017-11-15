@@ -76,10 +76,10 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, ch
     worklist.Clear();
 
     IPCDataHeader header;
-    header._sender = static_cast<unsigned int>(controller->get_local_pid());
-    header._receiver = static_cast<unsigned int>(controller->get_server_pid());
-    header._msg_id = COMMAND_ID_BE_SEND_WORKLIST;
-    header._data_type = 1; // protocol buffer
+    header.sender = static_cast<unsigned int>(controller->get_local_pid());
+    header.receiver = static_cast<unsigned int>(controller->get_server_pid());
+    header.msg_id = COMMAND_ID_BE_SEND_WORKLIST;
+    header.data_type = 1; // protocol buffer
 
     if (!res) {
         size = 0;
@@ -87,8 +87,8 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, ch
         data = nullptr;
     }
 
-    header._data_len = size;
-    controller->get_client_proxy()->async_send_message(header, data);
+    header.data_len = size;
+    controller->get_client_proxy()->sync_send_data(header, data);
     if (data != nullptr) {
         delete [] data;
     }

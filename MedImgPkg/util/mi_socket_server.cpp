@@ -205,7 +205,7 @@ void SocketServer::run() {
                 //reveive dataheader
                 IPCDataHeader header;
                 int err = recv(cs, &header, sizeof(header), 0);
-                header._receiver = cs;//very important
+                header.receiver = cs;//very important
                 if (err == 0) {
                     //client disconnect
                     if (UNIX == _socket_type) {
@@ -233,11 +233,11 @@ void SocketServer::run() {
                 }
 
                 //receive data buffer
-                if (header._data_len <= 0) {
+                if (header.data_len <= 0) {
                     //MI_UTIL_LOG(MI_TRACE) << "server received data buffer length less than 0.";
                 } else {
-                    char* buffer = new char[header._data_len]; 
-                    err = recv(cs, buffer, header._data_len, 0);
+                    char* buffer = new char[header.data_len]; 
+                    err = recv(cs, buffer, header.data_len, 0);
                     if (err == 0) {
                         //client disconnect
                         if (UNIX == _socket_type) {
@@ -268,7 +268,7 @@ void SocketServer::run() {
                     }
 
                     //add client socket fd to header
-                    header._receiver = (unsigned int)cs;
+                    header.receiver = (unsigned int)cs;
 
                     try {
                         if (_handler) {
@@ -301,24 +301,18 @@ void SocketServer::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> han
     _handler = handler;
 }
 
-void SocketServer::send_data(const IPCDataHeader& dataheader , char* buffer) {
+int SocketServer::async_send_data(IPCPackage* package) {
     //this thread gather package to be sending
     MI_UTIL_LOG(MI_DEBUG) << "in socket server send data.";
-    const int client_socket_fd = (int)(dataheader._receiver);
+    const int client_socket_fd = (int)(package->header.receiver);
     if (-1 == _client_sockets->check_socket(client_socket_fd)) {
-        //TODO this logic here good ???
-        if (buffer != nullptr) {
-            delete [] buffer;
-            buffer = nullptr;
-        }
         MI_UTIL_LOG(MI_DEBUG) << "send data failed, invalid socket : "  << client_socket_fd;
+        return -1;
     } else {
-        Package *pkg = new Package(dataheader, buffer); 
-        push_back_package_i(client_socket_fd, pkg);
+        push_back_package_i(client_socket_fd, package);
         MI_UTIL_LOG(MI_DEBUG) << "send data success, socket : "  << client_socket_fd;
+        return 0;
     }
-    
-    
 }
 
 int SocketServer::send() {
@@ -356,7 +350,7 @@ int SocketServer::send() {
 
         if (FD_ISSET(cs, &fdwrites)) {
             //check package
-            Package* pkg_send = pop_front_package_i(cs);
+            IPCPackage* pkg_send = pop_front_package_i(cs);
             if(nullptr == pkg_send) {
                 //pop empty package
                 continue;
@@ -380,8 +374,8 @@ int SocketServer::send() {
                 MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header.";
             }
 
-            if (nullptr != pkg_send->buffer && pkg_send->header._data_len > 0) {
-                if (-1 == ::send(cs , pkg_send->buffer , pkg_send->header._data_len , 0)) {
+            if (nullptr != pkg_send->buffer && pkg_send->header.data_len > 0) {
+                if (-1 == ::send(cs , pkg_send->buffer , pkg_send->header.data_len , 0)) {
                     MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
                     << STREAM_IPCHEADER_INFO(pkg_send->header);
                 } else {
@@ -394,7 +388,7 @@ int SocketServer::send() {
     return 0;
 }
 
-void SocketServer::push_back_package_i(int socket_fd, Package* pkg) {
+void SocketServer::push_back_package_i(int socket_fd, IPCPackage* pkg) {
     boost::mutex::scoped_lock locker(_mutex_package);
     auto client_store = _client_pkg_store.find(socket_fd);
     if (client_store == _client_pkg_store.end()) {
@@ -409,7 +403,7 @@ void SocketServer::push_back_package_i(int socket_fd, Package* pkg) {
     MI_UTIL_LOG(MI_DEBUG) << "in socket server push back package: " << client_store->second.size();
 }
 
-SocketServer::Package* SocketServer::pop_front_package_i(int socket_fd) {
+IPCPackage* SocketServer::pop_front_package_i(int socket_fd) {
     boost::mutex::scoped_lock locker(_mutex_package);
     auto client_store = _client_pkg_store.find(socket_fd);
     if (client_store == _client_pkg_store.end()) {
@@ -418,7 +412,7 @@ SocketServer::Package* SocketServer::pop_front_package_i(int socket_fd) {
     if (client_store->second.size() == 0) {
         return nullptr;
     }
-    Package* pkg = client_store->second.front();
+    IPCPackage* pkg = client_store->second.front();
     client_store->second.pop_front();
     MI_UTIL_LOG(MI_DEBUG) << "in socket server pop back package: " << client_store->second.size();
     return pkg;
@@ -441,7 +435,7 @@ void SocketServer::clear_package_i(int socket_fd) {
     MI_UTIL_LOG(MI_DEBUG) << "package store size tmp: " << old_package_store.size();
     int i = 0;
     while (!old_package_store.empty()) {
-        Package* pkg = old_package_store.front();
+        IPCPackage* pkg = old_package_store.front();
         if (nullptr != pkg) {
             delete pkg;
             pkg = nullptr; 

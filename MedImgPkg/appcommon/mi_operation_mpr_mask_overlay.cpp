@@ -19,13 +19,13 @@ OpMPRMaskOverlay::~OpMPRMaskOverlay() {
 
 int OpMPRMaskOverlay::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpMPRMaskOverlay.";
-    if (_buffer == nullptr || _header._data_len < 0) {
+    if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted mask overlay message.";
         return -1;
     }
 
     MsgMPRMaskOverlay msg;
-    if (!msg.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse MPR mask overlay message failed.";
         return -1;
     }

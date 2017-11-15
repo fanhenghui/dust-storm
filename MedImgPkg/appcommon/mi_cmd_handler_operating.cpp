@@ -24,14 +24,14 @@ int CmdHandlerOperating::handle_command(const IPCDataHeader& ipcheader , char* b
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
     }
 
-    const unsigned int cell_id = ipcheader._msg_info0;
-    const unsigned int op_id = ipcheader._msg_info1;
+    const unsigned int cell_id = ipcheader.msg_info0;
+    const unsigned int op_id = ipcheader.msg_info1;
     OpDataHeader op_header;
-    op_header._cell_id = cell_id;
-    op_header._op_id = op_id;
-    op_header._data_type = ipcheader._data_type;
-    op_header._big_end = ipcheader._big_end;
-    op_header._data_len = ipcheader._data_len;
+    op_header.cell_id = cell_id;
+    op_header.op_id = op_id;
+    op_header.data_type = ipcheader.data_type;
+    op_header.big_end = ipcheader.big_end;
+    op_header.data_len = ipcheader.data_len;
 
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
     if (op) {

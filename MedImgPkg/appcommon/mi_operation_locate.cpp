@@ -32,13 +32,13 @@ OpLocate::OpLocate() {}
 OpLocate::~OpLocate() {}
 
 int OpLocate::execute() {
-    if (_buffer == nullptr || _header._data_len < 0) {
+    if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted locate message.";
         return -1;
     }
 
     MsgCrosshair msgCrosshair;
-    if (!msgCrosshair.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msgCrosshair.ParseFromArray(_buffer, _header.data_len)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse crosshair message failed.";
         return -1;
     }
@@ -54,7 +54,7 @@ int OpLocate::execute() {
 
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
-    const unsigned int cell_id = _header._cell_id;
+    const unsigned int cell_id = _header.cell_id;
     std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
     APPCOMMON_CHECK_NULL_EXCEPTION(cell);
     std::shared_ptr<SceneBase> scene = cell->get_scene();

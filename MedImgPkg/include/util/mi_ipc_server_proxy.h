@@ -24,7 +24,7 @@ public:
     void register_command_handler(unsigned int cmd_id,
                                   std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);
-    void async_send_message(const IPCDataHeader& header, char* buffer);
+    int async_send_data(IPCPackage* package);
     int handle_command(const IPCDataHeader& header, char* buffer);
 
 protected:

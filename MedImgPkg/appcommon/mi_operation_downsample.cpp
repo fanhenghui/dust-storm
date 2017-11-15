@@ -18,10 +18,10 @@ OpDownsample::~OpDownsample() {}
 int OpDownsample::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpDownsample.";
 
-    const unsigned int cell_id = _header._cell_id;
+    const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
     MsgFlag msg;
-    if (!msg.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
     }
 

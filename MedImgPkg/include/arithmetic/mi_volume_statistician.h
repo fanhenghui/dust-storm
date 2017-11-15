@@ -8,19 +8,19 @@
 MED_IMG_BEGIN_NAMESPACE
 
 struct IntensityInfo {
-    unsigned int _num;
-    double _min;
-    double _max;
-    double _mean;
-    double _var;
-    double _std;
+    unsigned int num;
+    double min;
+    double max;
+    double mean;
+    double var;
+    double std;
 
-    IntensityInfo() : _num(0), _min(0), _max(0), _mean(0), _var(0), _std(0) {};
+    IntensityInfo() : num(0), min(0), max(0), mean(0), var(0), std(0) {};
 
     IntensityInfo(unsigned int num0, double min0, double max0, double mean0,
                   double var0, double std0)
-        : _num(num0), _min(min0), _max(max0), _mean(mean0), _var(var0),
-          _std(std0) {};
+        : num(num0), min(min0), max(max0), mean(mean0), var(var0),
+          std(std0) {};
 };
 
 bool Arithmetic_Export operator==(const IntensityInfo& l,

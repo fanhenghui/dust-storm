@@ -201,7 +201,7 @@ int get_nodule_set(const std::string& xml_file, std::vector<std::vector<Nodule>>
 
                     const double pos_x = str_to_num.to_num(x_node.child_value());
                     const double pos_y = str_to_num.to_num(y_node.child_value());
-                    nodule._points.push_back(Point3(pos_x , pos_y , pos_z));
+                    nodule.points.push_back(Point3(pos_x , pos_y , pos_z));
                 }
             }
 
@@ -251,7 +251,7 @@ int get_nodule_set(const std::string& xml_file, std::vector<std::vector<Nodule>>
 
             const double pos_x = str_to_num.to_num(x_node.child_value());
             const double pos_y = str_to_num.to_num(y_node.child_value());
-            nodule._points.push_back(Point3(pos_x , pos_y , pos_z));
+            nodule.points.push_back(Point3(pos_x , pos_y , pos_z));
 
             nodules_perreader.push_back(nodule);
         }
@@ -295,7 +295,7 @@ int resample_z_backup(std::vector<std::vector<Nodule>>& nodules ,
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader) {
         for (auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it) {
             Nodule& nodule = *it;
-            std::vector<Point3>& pts = nodule._points;
+            std::vector<Point3>& pts = nodule.points;
 
 
             for (int  i = 0 ; i < pts.size() ; ++i) {
@@ -362,7 +362,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules ,
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader) {
         for (auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it) {
             Nodule& nodule = *it;
-            std::vector<Point3>& pts = nodule._points;
+            std::vector<Point3>& pts = nodule.points;
 
             for (int  i = 0 ; i < pts.size() ; ++i) {
                 double slice = pts[i].z;
@@ -432,22 +432,22 @@ void cal_nodule_aabb(std::vector <std::vector<Nodule>>& nodules) {
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader) {
         for (auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it) {
             Nodule& nodule = *it;
-            const std::vector<Point3>& pts = nodule._points;
+            const std::vector<Point3>& pts = nodule.points;
 
-            nodule._aabb._min[0] = static_cast<int>(pts[0].x);
-            nodule._aabb._min[1] = static_cast<int>(pts[0].y);
-            nodule._aabb._min[2] = static_cast<int>(pts[0].z);
+            nodule.aabb._min[0] = static_cast<int>(pts[0].x);
+            nodule.aabb._min[1] = static_cast<int>(pts[0].y);
+            nodule.aabb._min[2] = static_cast<int>(pts[0].z);
 
-            nodule._aabb._max[0]  = nodule._aabb._min[0];
-            nodule._aabb._max[1]  = nodule._aabb._min[1];
-            nodule._aabb._max[2]  = nodule._aabb._min[2];
+            nodule.aabb._max[0]  = nodule.aabb._min[0];
+            nodule.aabb._max[1]  = nodule.aabb._min[1];
+            nodule.aabb._max[2]  = nodule.aabb._min[2];
 
             for (int i = 1 ; i < pts.size() ; ++i) {
                 int tmp[3] = { static_cast< int>(pts[i].x) , static_cast<int>(pts[i].y), static_cast<int>(pts[i].z)};
 
                 for (int  j = 0 ; j < 3 ; ++j) {
-                    nodule._aabb._min[j] = nodule._aabb._min[j] > tmp[j] ? tmp[j] : nodule._aabb._min[j];
-                    nodule._aabb._max[j] = nodule._aabb._max[j] < tmp[j] ? tmp[j] : nodule._aabb._max[j];
+                    nodule.aabb._min[j] = nodule.aabb._min[j] > tmp[j] ? tmp[j] : nodule.aabb._min[j];
+                    nodule.aabb._max[j] = nodule.aabb._max[j] < tmp[j] ? tmp[j] : nodule.aabb._max[j];
                 }
             }
         }
@@ -460,7 +460,7 @@ void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader 
     same_nodules.clear();
     reader_id.clear();
 
-    const int v_target = target._aabb.volume();
+    const int v_target = target.aabb.volume();
 
     int cur_readid = 0;
 
@@ -476,7 +476,7 @@ void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader 
         for (auto it2 = (*it).begin()  ; it2 != (*it).end() ; ++it2) {
             Nodule& nodule = *it2;
 
-            if (nodule.type != 0 || nodule._points.size() < 2) {
+            if (nodule.type != 0 || nodule.points.size() < 2) {
                 continue;
             }
 
@@ -486,8 +486,8 @@ void get_same_region_nodules(std::vector <std::vector<Nodule>>::iterator reader 
 
             AABBI inter;
 
-            if (IntersectionTest::aabb_to_aabb(nodule._aabb , target._aabb , inter)) {
-                const int v = nodule._aabb.volume();
+            if (IntersectionTest::aabb_to_aabb(nodule.aabb , target.aabb , inter)) {
+                const int v = nodule.aabb.volume();
                 const int inter_v = inter.volume();
                 const float inter_p = static_cast<float>(inter_v) / ((v + v_target) * 0.5f);
 
@@ -562,7 +562,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader) {
         for (auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it) {
             Nodule& nodule = *it;
-            std::vector<Point3>& pts = nodule._points;
+            std::vector<Point3>& pts = nodule.points;
 
             if (pts.size() <= 1) { //TODO skip nodule < 3mm and non-nodule
                 continue;
@@ -608,7 +608,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                 //save_mask( mask , "D:/temp/0.raw" ,false);
 
                 for (int k = 0 ; k < same_nodules.size() ; ++k) {
-                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->_points;
+                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->points;
                     scan_contour_to_mask(pts_same_nodule , mask_reader[reader_id[k]], label);
 
                     //StrNumConverter<int> conv;
@@ -617,10 +617,10 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
 
                 //extracted label from label to interlabel(label + confidence)
                 unsigned char inter_label = label + cur_confidence;
-                AABBI max_region = nodule._aabb;
+                AABBI max_region = nodule.aabb;
 
                 for (int k = 0 ; k < same_nodules.size() ; ++k) {
-                    AABBI sub_regio = same_nodules[k]->_aabb;
+                    AABBI sub_regio = same_nodules[k]->aabb;
 
                     for (int k2 = 0  ; k2 < 3 ; ++k2) {
                         max_region._min[k2] = max_region._min[k2] > sub_regio._min[k2] ?
@@ -664,7 +664,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                 scan_contour_to_mask(pts , mask, label);
 
                 for (int k = 0 ; k < same_nodules.size() ; ++k) {
-                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->_points;
+                    std::vector<Point3>& pts_same_nodule = same_nodules[k]->points;
                     scan_contour_to_mask(pts_same_nodule , mask, label);
                 }
             } else {

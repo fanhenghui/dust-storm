@@ -7,6 +7,7 @@
 #include "util/mi_util_export.h"
 
 #include <string>
+#include <vector>
 
 #include "util/mi_ipc_common.h"
 
@@ -26,13 +27,13 @@ public:
     void get_server_address(std::string& ipv4, std::string& port) const;
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
-    void send_data(const IPCDataHeader& dataheader , char* buffer);
+    void sync_send_data(const IPCDataHeader& dataheader, char* buffer);
 
     void run();
     void stop();
 
-    int post(const IPCDataHeader& post_header , char* post_data, 
-              IPCDataHeader& result_header , char*& result_data);
+    int post(const IPCDataHeader& post_header, char* post_data, IPCDataHeader& result_header, char*& result_data);
+    int post(const std::vector<IPCPackage>& pacakges);
 
 protected:
 private:

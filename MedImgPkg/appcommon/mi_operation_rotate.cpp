@@ -23,7 +23,7 @@ OpRotate::~OpRotate() {}
 
 int OpRotate::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpRotate.";
-    const unsigned int cell_id = _header._cell_id;
+    const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -36,7 +36,7 @@ int OpRotate::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(scene);
 
     MsgMouse msg;
-    if (msg.ParseFromArray(_buffer, _header._data_len)) {
+    if (msg.ParseFromArray(_buffer, _header.data_len)) {
         const float pre_x = msg.pre().x();
         const float pre_y = msg.pre().y();
         const float cur_x = msg.cur().x();
@@ -47,7 +47,7 @@ int OpRotate::execute() {
     } else {
         //second change to parse to rotation message
         MsgRotation msg;    
-        if(msg.ParseFromArray(_buffer , _header._data_len)) {
+        if(msg.ParseFromArray(_buffer , _header.data_len)) {
             const double angle = static_cast<double>(msg.angle());
             const double axis_x = static_cast<double>(msg.axis_x());
             const double axis_y = static_cast<double>(msg.axis_y());

@@ -34,9 +34,9 @@ public:
         float x;//corss X
         float dx;//edge's slope_r : delta_x / delta_y
         int ymax;//edge's top y
-        Edge* _next;
+        Edge* next;
 
-        Edge(): x(0), dx(0), ymax(0), _next(nullptr) {
+        Edge(): x(0), dx(0), ymax(0), next(nullptr) {
 
         }
     };
@@ -80,11 +80,11 @@ public:
 
             Edge* cur_edge = net[pt0.y];
 
-            while (cur_edge->_next != nullptr) {
-                cur_edge = cur_edge->_next;
+            while (cur_edge->next != nullptr) {
+                cur_edge = cur_edge->next;
             }
 
-            cur_edge->_next = new_edge;
+            cur_edge->next = new_edge;
         }
 
         //last point connect with the first
@@ -101,11 +101,11 @@ public:
 
                 Edge* cur_edge = net[pt0.y];
 
-                while (cur_edge->_next != nullptr) {
-                    cur_edge = cur_edge->_next;
+                while (cur_edge->next != nullptr) {
+                    cur_edge = cur_edge->next;
                 }
 
-                cur_edge->_next = new_edge;
+                cur_edge->next = new_edge;
             }
 
 
@@ -119,7 +119,7 @@ public:
         }
 
         for (int i = 0 ; i < height ; ++i) {
-            Edge* net_edge = net[i]->_next;
+            Edge* net_edge = net[i]->next;
 
             while (nullptr != net_edge) { //inset net to aet
                 const int ymin = i;
@@ -136,41 +136,41 @@ public:
                     //add to AET (sort by x)
                     Edge* aet_edge = aet[j];
 
-                    if (nullptr == aet_edge->_next) { //add  firstly
-                        aet_edge->_next = new_edge;
+                    if (nullptr == aet_edge->next) { //add  firstly
+                        aet_edge->next = new_edge;
                     } else {
                         Edge* pre = aet_edge;
-                        aet_edge = aet_edge->_next;
+                        aet_edge = aet_edge->next;
 
                         while (nullptr != aet_edge && aet_edge->x < new_edge->x) {
                             pre = aet_edge;
-                            aet_edge = aet_edge->_next;
+                            aet_edge = aet_edge->next;
                         }
 
-                        pre->_next = new_edge;
-                        new_edge->_next = aet_edge;
+                        pre->next = new_edge;
+                        new_edge->next = aet_edge;
                     }
                 }
 
-                net_edge = net_edge->_next;
+                net_edge = net_edge->next;
             }
         }
 
         //3 fill between 2 point
         for (int i = 0 ; i < height ; ++i) {
-            Edge* aet_edge = aet[i]->_next;
+            Edge* aet_edge = aet[i]->next;
 
             if (nullptr == aet_edge) {
                 continue;
             }
 
             while (nullptr != aet_edge) {
-                if (nullptr == aet_edge->_next) {
+                if (nullptr == aet_edge->next) {
                     break;
                 }
 
                 float x0 = aet_edge->x;
-                float x1 = aet_edge->_next->x;
+                float x1 = aet_edge->next->x;
 
                 int x00 = static_cast<int>(x0);
                 int x11 = static_cast<int>(x1);
@@ -179,7 +179,7 @@ public:
                     img[i * width  + x ] = label;
                 }
 
-                aet_edge = aet_edge->_next->_next;
+                aet_edge = aet_edge->next->next;
             }
         }
 
@@ -189,7 +189,7 @@ public:
 
             while (nullptr == edge) {
                 Edge* to_be_delete = edge;
-                edge = edge->_next;
+                edge = edge->next;
                 delete to_be_delete;
             }
 
@@ -197,7 +197,7 @@ public:
 
             while (nullptr == edge) {
                 Edge* to_be_delete = edge;
-                edge = edge->_next;
+                edge = edge->next;
                 delete to_be_delete;
             }
         }
@@ -241,11 +241,11 @@ public:
 
             Edge* cur_edge = net[pt0.y];
 
-            while (cur_edge->_next != nullptr) {
-                cur_edge = cur_edge->_next;
+            while (cur_edge->next != nullptr) {
+                cur_edge = cur_edge->next;
             }
 
-            cur_edge->_next = new_edge;
+            cur_edge->next = new_edge;
         }
 
         //last point connect with the first
@@ -262,11 +262,11 @@ public:
 
                 Edge* cur_edge = net[pt0.y];
 
-                while (cur_edge->_next != nullptr) {
-                    cur_edge = cur_edge->_next;
+                while (cur_edge->next != nullptr) {
+                    cur_edge = cur_edge->next;
                 }
 
-                cur_edge->_next = new_edge;
+                cur_edge->next = new_edge;
             }
 
 
@@ -280,7 +280,7 @@ public:
         }
 
         for (int i = 0 ; i < height ; ++i) {
-            Edge* net_edge = net[i]->_next;
+            Edge* net_edge = net[i]->next;
 
             while (nullptr != net_edge) { //inset net to aet
                 const int ymin = i;
@@ -297,41 +297,41 @@ public:
                     //add to AET (sort by x)
                     Edge* aet_edge = aet[j];
 
-                    if (nullptr == aet_edge->_next) { //add  firstly
-                        aet_edge->_next = new_edge;
+                    if (nullptr == aet_edge->next) { //add  firstly
+                        aet_edge->next = new_edge;
                     } else {
                         Edge* pre = aet_edge;
-                        aet_edge = aet_edge->_next;
+                        aet_edge = aet_edge->next;
 
                         while (nullptr != aet_edge && aet_edge->x < new_edge->x) {
                             pre = aet_edge;
-                            aet_edge = aet_edge->_next;
+                            aet_edge = aet_edge->next;
                         }
 
-                        pre->_next = new_edge;
-                        new_edge->_next = aet_edge;
+                        pre->next = new_edge;
+                        new_edge->next = aet_edge;
                     }
                 }
 
-                net_edge = net_edge->_next;
+                net_edge = net_edge->next;
             }
         }
 
         //3 fill between 2 point
         for (int i = 0 ; i < height ; ++i) {
-            Edge* aet_edge = aet[i]->_next;
+            Edge* aet_edge = aet[i]->next;
 
             if (nullptr == aet_edge) {
                 continue;
             }
 
             while (nullptr != aet_edge) {
-                if (nullptr == aet_edge->_next) {
+                if (nullptr == aet_edge->next) {
                     break;
                 }
 
                 float x0 = aet_edge->x;
-                float x1 = aet_edge->_next->x;
+                float x1 = aet_edge->next->x;
 
                 int x00 = static_cast<int>(x0);
                 int x11 = static_cast<int>(x1);
@@ -341,7 +341,7 @@ public:
                     //img[i*width  + x ] = label;
                 }
 
-                aet_edge = aet_edge->_next->_next;
+                aet_edge = aet_edge->next->next;
             }
         }
 
@@ -351,7 +351,7 @@ public:
 
             while (nullptr == edge) {
                 Edge* to_be_delete = edge;
-                edge = edge->_next;
+                edge = edge->next;
                 delete to_be_delete;
             }
 
@@ -359,7 +359,7 @@ public:
 
             while (nullptr == edge) {
                 Edge* to_be_delete = edge;
-                edge = edge->_next;
+                edge = edge->next;
                 delete to_be_delete;
             }
         }

@@ -62,15 +62,15 @@ void IPCServerProxy::unregister_command_handler(unsigned int cmd_id) {
     }
 }
 
-void IPCServerProxy::async_send_message(const IPCDataHeader& header , char* buffer) {
+int IPCServerProxy::async_send_data(IPCPackage* package) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
-    _server->send_data(header , buffer);
+    return _server->async_send_data(package);
 }
 
 int IPCServerProxy::handle_command(const IPCDataHeader& header , char* buffer) {
     boost::mutex::scoped_lock locker(_mutex);
 
-    const unsigned int cmd_id = header._msg_id;
+    const unsigned int cmd_id = header.msg_id;
     auto it = _handlers.find(cmd_id);
 
     if (it != _handlers.end() && it->second) {

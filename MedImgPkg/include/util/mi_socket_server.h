@@ -33,17 +33,15 @@ public:
     void get_server_address(std::string& port) const;
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
-    void send_data(const IPCDataHeader& dataheader , char* buffer);
+    int async_send_data(IPCPackage* package);//return 0:success; -1:client disconnect 
 
     void run();
     void stop();
-    int send();
+    int  send();
 private:
-    struct Package;
-    
-    Package* pop_front_package_i(int socket_fd);
+    IPCPackage* pop_front_package_i(int socket_fd);
     void try_pop_front_package_i();
-    void push_back_package_i(int socket_fd, Package* pkg);
+    void push_back_package_i(int socket_fd, IPCPackage* pkg);
     void clear_package_i(int socket_fd);
 private:
     //address for AF_UNIX
@@ -64,21 +62,7 @@ private:
     std::shared_ptr<SocketList> _client_sockets;
 
     //package to be sending to client
-    struct Package {
-        IPCDataHeader header;
-        char* buffer;
-
-        Package(): buffer(nullptr) {};
-        Package(const IPCDataHeader&header_, char* buffer_):
-            header(header_),buffer(buffer_) {};
-        ~Package() {
-            if (nullptr !=  buffer) {
-                delete [] buffer;
-                buffer = nullptr;
-            }
-        };
-    };
-    typedef std::deque<Package*> PackageStore;
+    typedef std::deque<IPCPackage*> PackageStore;
     std::map<int , PackageStore> _client_pkg_store;
 
     boost::mutex _mutex_package;

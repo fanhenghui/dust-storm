@@ -27,10 +27,10 @@ int CmdHandlerFEReady::handle_command(const IPCDataHeader& ipcheader, char* buff
     }
 
     IPCDataHeader header;
-    header._msg_id = COMMAND_ID_BE_READY;
+    header.msg_id = COMMAND_ID_BE_READY;
 
     MI_APPCOMMON_LOG(MI_INFO) << "sending ready to FE.";
-    controller->get_client_proxy()->async_send_message(header, nullptr);
+    controller->get_client_proxy()->sync_send_data(header, nullptr);
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT ready cmd handler.";
     return 0;
 }

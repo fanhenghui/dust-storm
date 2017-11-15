@@ -27,13 +27,13 @@ OpAnnotation::~OpAnnotation() {}
 
 int OpAnnotation::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpAnnotation.";
-    if (_buffer == nullptr || _header._data_len < 0) {
+    if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation message.";
         return -1;
     }
 
     MsgAnnotationUnit msgAnnotation;
-    if (!msgAnnotation.ParseFromArray(_buffer, _header._data_len)) {
+    if (!msgAnnotation.ParseFromArray(_buffer, _header.data_len)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse annotation message failed.";
         return -1;
     }
@@ -53,7 +53,7 @@ int OpAnnotation::execute() {
     std::shared_ptr<CameraCalculator> camera_cal = volumeinfos->get_camera_calculator();
     APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
 
-    const unsigned int cell_id = _header._cell_id;
+    const unsigned int cell_id = _header.cell_id;
     std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
     APPCOMMON_CHECK_NULL_EXCEPTION(cell);
     std::shared_ptr<SceneBase> scene = cell->get_scene();
