@@ -15,13 +15,13 @@ public:
         _db_server_controller = controller;
     }
 
-    void set_receiver(int receiver) {
+    void set_receiver(unsigned int receiver) {
         _receiver = receiver;
-    }
+    }    
 
 protected:
     std::weak_ptr<DBServerController> _db_server_controller;
-    int _receiver;
+    unsigned int _receiver;
 };
 
 MED_IMG_END_NAMESPACE

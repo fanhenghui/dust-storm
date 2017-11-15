@@ -39,10 +39,10 @@ public:
     void stop();
     int  send();
 private:
-    IPCPackage* pop_front_package_i(int socket_fd);
+    IPCPackage* pop_front_package_i(unsigned int socket_list_id);
     void try_pop_front_package_i();
-    void push_back_package_i(int socket_fd, IPCPackage* pkg);
-    void clear_package_i(int socket_fd);
+    void push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg);
+    void clear_package_i(unsigned int socket_list_id);
 private:
     //address for AF_UNIX
     std::string _path;
@@ -63,13 +63,11 @@ private:
 
     //package to be sending to client
     typedef std::deque<IPCPackage*> PackageStore;
-    std::map<int , PackageStore> _client_pkg_store;
+    std::map<unsigned int , PackageStore> _client_pkg_store;
 
     boost::mutex _mutex_package;
     boost::condition _condition_empty_package;
     
-    
-
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketServer);
 };

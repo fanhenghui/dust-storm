@@ -16,8 +16,8 @@ struct IPCDataHeader { //32 byte
     unsigned int sender;//sender pid or socket id ... 
     unsigned int receiver;//receiver pid or socket id ...
     unsigned int msg_id;//message ID : thus command ID
-    unsigned int msg_info0;//message info : thus cell ID
-    unsigned int msg_info1;//message info : thus operation ID
+    unsigned int msg_info0;//message info : client cell ID, client socket time 
+    unsigned int msg_info1;//message info : client operation ID
     unsigned int data_type;//0 raw_data 1 protocol buffer
     unsigned int big_end;//0 small end 1 big_end
     unsigned int data_len;//data length

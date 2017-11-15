@@ -52,6 +52,7 @@ void DBServerThreadModel::process_operating_i() {
 
         try {
             op->execute();
+            op->reset();//release ipc data
         } catch(const Exception& e) {
             MI_DBSERVER_LOG(MI_ERROR) << "op execute failed.";
         }

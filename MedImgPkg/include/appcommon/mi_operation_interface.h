@@ -15,6 +15,7 @@ struct OpDataHeader {
     unsigned int data_type; // 0 raw_data 1 protocol buffer
     unsigned int big_end;   // 0 small end 1 big_end
     unsigned int data_len;  // data length
+    unsigned int reserved;  // reserved attribute
 };
 
 class AppController;

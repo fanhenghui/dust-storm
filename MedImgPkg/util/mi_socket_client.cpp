@@ -326,6 +326,8 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
         }
     }
 
+    MI_UTIL_LOG(MI_INFO) << "socket client post send header done.\n";
+
     //receive a result
     result_data = nullptr;
     if (recv(_fd_server, &result_header, sizeof(result_header) , 0) <= 0) {
@@ -344,6 +346,8 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
             return -1;
         }
     }
+
+    MI_UTIL_LOG(MI_INFO) << "socket client post send data done.\n";
 
     //close socket
     close(_fd_server);

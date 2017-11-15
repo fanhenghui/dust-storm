@@ -30,7 +30,7 @@ int CmdHandlerDBOperating::handle_command(const IPCDataHeader& ipcheader , char*
     op_header.big_end = ipcheader.big_end;
     op_header.data_len = ipcheader.data_len;
 
-    const int receiver = ipcheader.receiver;
+    const unsigned int receiver = ipcheader.receiver;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
     std::shared_ptr<DBOperation> op2 = std::dynamic_pointer_cast<DBOperation>(op);
     if (nullptr == op2) {

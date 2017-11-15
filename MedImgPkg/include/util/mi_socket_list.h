@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/select.h>
+#include <time.h>
 
 #include <set>
 
@@ -20,66 +21,74 @@ MED_IMG_BEGIN_NAMESPACE
 
 class SocketList {
 public:
-    
+    struct SocketInfo {
+        int socket;
+        unsigned int time;
+        std::string host;// ip for inet; path for unix
+        int port;// port for inet
+    };
 
-    SocketList() {}
+    SocketList():_cur_id(0) {}
 
     ~SocketList() {}
 
     int get_socket_count() {
         boost::mutex::scoped_lock locker(_mutex);
-        return static_cast<int>(_sockets.size());
+        return static_cast<int>(_socket_infos.size());
     }
 
-    int check_socket(int socket) {
+    int check_socket(unsigned int id) {
         boost::mutex::scoped_lock locker(_mutex);
-        return _sockets.find(socket) != _sockets.end() ? 0 : -1;
+        return _socket_infos.find(id) != _socket_infos.end() ? 0 : -1;
     }
 
-    int insert_socket(int socket, const std::string addr, int port = 0) {
+    int insert_socket(int socket, const std::string host, int port = 0) {
         boost::mutex::scoped_lock locker(_mutex);
+        const unsigned int id = acquire_id_i();
+        const unsigned int cur_time = (unsigned int)(time(NULL));
         auto it = _sockets.find(socket);
         if (it != _sockets.end()) {
             MI_UTIL_LOG(MI_ERROR) << "insert the existed socket: " << socket;
             return -1;
         } else {
             _sockets.insert(socket);
-            SocketAddr socket_addr;
-            socket_addr.addr = addr;
-            socket_addr.port = port;
-            _sockets_addr[socket] = socket_addr;
+            SocketInfo socket_info;
+            socket_info.host = host;
+            socket_info.port = port;
+            socket_info.socket = socket;
+            socket_info.time = cur_time;
+            _socket_infos[id] = socket_info;
             return 0;
         }
     }
 
-    int remove_socket(int socket) {
+    int remove_socket(unsigned int id) {
         boost::mutex::scoped_lock locker(_mutex);
-        MI_UTIL_LOG(MI_INFO) << "try remove socket: " << socket;
-        auto it_addr = _sockets_addr.find(socket);
-        if (it_addr != _sockets_addr.end()) {
-            _sockets_addr.erase(it_addr);
+        MI_UTIL_LOG(MI_INFO) << "try remove socket id: " << id;
+        auto it_info = _socket_infos.find(id);
+        if (it_info != _socket_infos.end()) {
+            const int socket = it_info->second.socket;
+            auto it_socket = _sockets.find(socket);
+            if (it_socket != _sockets.end()) {
+                _sockets.erase(it_socket);
+            }
+            _socket_infos.erase(it_info);
         }
-
-        auto it = _sockets.find(socket);
-        if (it != _sockets.end()) {
-            _sockets.erase(it);
-            MI_UTIL_LOG(MI_INFO) << "remove socket: " << socket << " success";
-            return 0;
-        } else {
-            MI_UTIL_LOG(MI_ERROR) << "remove the non-existed socket: " << socket;
-            return -1;
-        }
-        
+        return 0;
     }
 
-    const std::set<int> get_sockets() const {
-        return _sockets;
+    const std::map<unsigned int, SocketList::SocketInfo>& get_socket_infos() const {
+        boost::mutex::scoped_lock locker(_mutex);
+        return _socket_infos;
     }
 
-    int get_socket_addr(int socket, std::string& addr, int& port) {
-        auto it = _sockets_addr.find(socket);
-        if (it != _sockets_addr.end()) {
-            addr = it->second.addr;
+    int get_socket_info(unsigned int id , int& socket, unsigned int& time, std::string& host, int& port) {
+        boost::mutex::scoped_lock locker(_mutex);
+        auto it = _socket_infos.find(socket);
+        if (it != _socket_infos.end()) {
+            socket = it->second.socket;
+            time = it->second.time;
+            host = it->second.host;
             port = it->second.port;
             return 0;
         } else {
@@ -98,14 +107,21 @@ public:
         return max_fd;
     }
 
+    unsigned int reset_list() {
+        boost::mutex::scoped_lock locker(_mutex);
+        _cur_id = 0;
+    }
+
 private:
-    std::set<int> _sockets;
-    struct SocketAddr {
-        std::string addr;// ip for inet; path for unix
-        int port;// port for inet
-    };
-    std::map<int, SocketAddr> _sockets_addr;
-    boost::mutex _mutex;
+    unsigned int acquire_id_i() {
+        return _cur_id++;
+    }
+
+private:
+    std::set<int> _sockets;//for check
+    std::map<unsigned int, SocketInfo> _socket_infos;
+    unsigned int _cur_id;
+    mutable boost::mutex _mutex;
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketList);
 };

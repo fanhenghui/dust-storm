@@ -142,6 +142,7 @@ void SocketServer::run() {
         struct timeval timeout;
         timeout.tv_sec = 10;
         timeout.tv_usec = 500000;
+        //TODO set timeout
         const int activity = select(max_fd+1, &fdreads, NULL, NULL, NULL);
         //const int activity = 1;
         if (activity < 0 && (errno != EINTR)) {
@@ -191,44 +192,47 @@ void SocketServer::run() {
         }
 
         //recv client socket
-        const std::set<int>& client_sockets = _client_sockets->get_sockets(); 
-        for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
-            const int cs = *it;
-            std::string addr;
-            int port(0);
-            if (0 != _client_sockets->get_socket_addr(cs, addr, port)) {
-                addr = "unknown";
-                port = 0;
-            }
+        const std::map<unsigned int, SocketList::SocketInfo> client_socket_infos  = _client_sockets->get_socket_infos(); 
+        for (auto it = client_socket_infos.begin(); it != client_socket_infos.end(); ++it) {
+            const unsigned int socket_id = it->first;
+            const int socket = it->second.socket;
+            const std::string host = it->second.host;
+            const int port = it->second.port;
+            const unsigned int time = it->second.time;
 
-            if (FD_ISSET(cs, &fdreads)) {
+            if (FD_ISSET(socket, &fdreads)) {
                 //reveive dataheader
                 IPCDataHeader header;
-                int err = recv(cs, &header, sizeof(header), 0);
-                header.receiver = cs;//very important
+                int err = recv(socket, &header, sizeof(header), 0);
+
+                //add client socket id/created_time to header
+                //thus operation will get which socket to interact
+                header.receiver = socket_id;//client socket id
+                header.msg_info0 = time;//client socket created time
+
                 if (err == 0) {
                     //client disconnect
                     if (UNIX == _socket_type) {
-                        MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << addr << " disconnect.";
+                        MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << host << " disconnect.";
                     } else if(INET == _socket_type) {
-                        MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " disconnect.";
+                        MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " disconnect.";
                     }
                     MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err 0.";
-                    close(cs);
-                    _client_sockets->remove_socket(cs);
-                    this->clear_package_i(cs);
+                    close(socket);
+                    _client_sockets->remove_socket(socket_id);
+                    this->clear_package_i(socket_id);
                     continue;    
                 } else if (err < 0) {
                     //recv failed
                     if (UNIX == _socket_type) {
-                        MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << addr << " recv failed.";
+                        MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << host << " recv failed.";
                     } else if(INET == _socket_type) {
-                        MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " recv failed.";
+                        MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " recv failed.";
                     }
                     MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err" << err;
-                    close(cs);
-                    _client_sockets->remove_socket(cs);
-                    this->clear_package_i(cs);
+                    close(socket);
+                    _client_sockets->remove_socket(socket_id);
+                    this->clear_package_i(socket_id);
                     continue;  
                 }
 
@@ -237,38 +241,42 @@ void SocketServer::run() {
                     //MI_UTIL_LOG(MI_TRACE) << "server received data buffer length less than 0.";
                 } else {
                     char* buffer = new char[header.data_len]; 
-                    err = recv(cs, buffer, header.data_len, 0);
+                    err = recv(socket, buffer, header.data_len, 0);
                     if (err == 0) {
                         //client disconnect
                         if (UNIX == _socket_type) {
-                            MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << addr << " disconnect.";
+                            MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << host << " disconnect.";
                             MI_UTIL_LOG(MI_WARNING) << "client unix socket send data damaged.";
                         } else if(INET == _socket_type) {
-                            MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " disconnect.";
+                            MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " disconnect.";
                             MI_UTIL_LOG(MI_WARNING) << "client inet socket send data damaged.";
                         }
+
                         //close socket 
                         MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err 0.";
-                        close(cs);
-                        _client_sockets->remove_socket(cs);
-                        this->clear_package_i(cs);
+                        delete [] buffer;
+                        buffer = nullptr;
+                        close(socket);
+                        _client_sockets->remove_socket(socket_id);
+                        this->clear_package_i(socket_id);
                         continue;
                     } else if (err < 0) {
                         //recv failed
                         if (UNIX == _socket_type) {
-                            MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << addr << " recv failed.";
+                            MI_UTIL_LOG(MI_INFO) << "client unix socket path:" << host << " recv failed.";
                         } else if(INET == _socket_type) {
-                            MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " recv failed.";
+                            MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " recv failed.";
                         }
+
+                        //close socket 
                         MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err" << err;
-                        close(cs);
-                        _client_sockets->remove_socket(cs);
-                        this->clear_package_i(cs);
+                        delete [] buffer;
+                        buffer = nullptr;
+                        close(socket);
+                        _client_sockets->remove_socket(socket_id);
+                        this->clear_package_i(socket_id);
                         continue;  
                     }
-
-                    //add client socket fd to header
-                    header.receiver = (unsigned int)cs;
 
                     try {
                         if (_handler) {
@@ -303,19 +311,19 @@ void SocketServer::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> han
 
 int SocketServer::async_send_data(IPCPackage* package) {
     //this thread gather package to be sending
-    MI_UTIL_LOG(MI_DEBUG) << "in socket server send data.";
-    const int client_socket_fd = (int)(package->header.receiver);
-    if (-1 == _client_sockets->check_socket(client_socket_fd)) {
-        MI_UTIL_LOG(MI_DEBUG) << "send data failed, invalid socket : "  << client_socket_fd;
+    const unsigned int socket_list_id = package->header.receiver;
+    if (-1 == _client_sockets->check_socket(socket_list_id)) {
+        MI_UTIL_LOG(MI_DEBUG) << "async send data failed, invalid socket list id : "  << socket_list_id;
         return -1;
     } else {
-        push_back_package_i(client_socket_fd, package);
-        MI_UTIL_LOG(MI_DEBUG) << "send data success, socket : "  << client_socket_fd;
+        push_back_package_i(socket_list_id, package);
+        MI_UTIL_LOG(MI_DEBUG) << "async send data success, socket list id : "  << socket_list_id;
         return 0;
     }
 }
 
 int SocketServer::send() {
+    MI_UTIL_LOG(MI_INFO) << "in send";
     try_pop_front_package_i();
 
     //this thread send data to clients
@@ -326,6 +334,10 @@ int SocketServer::send() {
 
     FD_ZERO(&fdwrites);
     int max_fd = _client_sockets->make_fd(&fdwrites);
+    if (max_fd == 0) { //double check
+        return 0;
+    }
+    //TODO set timeout
     const int activity = select(max_fd+1, NULL, &fdwrites, NULL, NULL);
 
     if (activity < 0 && (errno != EINTR)) {
@@ -338,64 +350,69 @@ int SocketServer::send() {
         return activity;
     } 
 
-    const std::set<int>& client_sockets = _client_sockets->get_sockets();
-    for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
-        const int cs = *it;
-        std::string addr;
-        int port(0);
-        if (0 != _client_sockets->get_socket_addr(cs, addr, port)) {
-            addr = "unknown";
-            port = 0;
-        }
+    MI_UTIL_LOG(MI_INFO) << "after send slect.";
 
-        if (FD_ISSET(cs, &fdwrites)) {
+    const std::map<unsigned int, SocketList::SocketInfo> client_socket_infos = _client_sockets->get_socket_infos();
+    for (auto it = client_socket_infos.begin(); it != client_socket_infos.end(); ++it) {
+        const unsigned int socket_id = it->first;
+        const int socket = it->second.socket;
+        const std::string host = it->second.host;
+        //const int port = it->second.port;
+        //const unsigned int time = it->second.time;
+
+        if (FD_ISSET(socket, &fdwrites)) {
             //check package
-            IPCPackage* pkg_send = pop_front_package_i(cs);
+            IPCPackage* pkg_send = pop_front_package_i(socket_id);
             if(nullptr == pkg_send) {
                 //pop empty package
                 continue;
             }
 
-            //check close
-            if (-1 == _client_sockets->check_socket(cs)) {
+            //check valid each client socket (may remove in recv(cmd_handler) thread)
+            if (-1 == _client_sockets->check_socket(socket_id)) {
                 //socket has been close
                 //drop package 
-                if (nullptr != pkg_send) {
-                    delete pkg_send;
-                    pkg_send = nullptr;
-                }
+                delete pkg_send;
+                pkg_send = nullptr;
                 continue;
             }
-            if (-1 == ::send(cs, &(pkg_send->header), sizeof(pkg_send->header), 0)) {
+
+            if (-1 == ::send(socket, &(pkg_send->header), sizeof(pkg_send->header), 0)) {
                 MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " 
                 << STREAM_IPCHEADER_INFO(pkg_send->header);
+
+                delete pkg_send;
+                pkg_send = nullptr;
                 continue;
             } else {
                 MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header.";
             }
 
             if (nullptr != pkg_send->buffer && pkg_send->header.data_len > 0) {
-                if (-1 == ::send(cs , pkg_send->buffer , pkg_send->header.data_len , 0)) {
+                if (-1 == ::send(socket , pkg_send->buffer , pkg_send->header.data_len , 0)) {
                     MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
-                    << STREAM_IPCHEADER_INFO(pkg_send->header);
+                    << STREAM_IPCHEADER_INFO(pkg_send->header);        
                 } else {
                    MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data.";
                 }
             }
+
+            delete pkg_send;
+            pkg_send = nullptr;
         }            
     }
 
     return 0;
 }
 
-void SocketServer::push_back_package_i(int socket_fd, IPCPackage* pkg) {
+void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg) {
     boost::mutex::scoped_lock locker(_mutex_package);
-    auto client_store = _client_pkg_store.find(socket_fd);
+    auto client_store = _client_pkg_store.find(socket_list_id);
     if (client_store == _client_pkg_store.end()) {
         PackageStore pkg_store;
         pkg_store.push_back(pkg);
-        _client_pkg_store.insert(std::make_pair(socket_fd, pkg_store));
-        client_store = _client_pkg_store.find(socket_fd);
+        _client_pkg_store.insert(std::make_pair(socket_list_id, pkg_store));
+        client_store = _client_pkg_store.find(socket_list_id);
     } else {
         client_store->second.push_back(pkg);
     }
@@ -403,9 +420,9 @@ void SocketServer::push_back_package_i(int socket_fd, IPCPackage* pkg) {
     MI_UTIL_LOG(MI_DEBUG) << "in socket server push back package: " << client_store->second.size();
 }
 
-IPCPackage* SocketServer::pop_front_package_i(int socket_fd) {
+IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
     boost::mutex::scoped_lock locker(_mutex_package);
-    auto client_store = _client_pkg_store.find(socket_fd);
+    auto client_store = _client_pkg_store.find(socket_list_id);
     if (client_store == _client_pkg_store.end()) {
         return nullptr;
     } 
@@ -418,12 +435,12 @@ IPCPackage* SocketServer::pop_front_package_i(int socket_fd) {
     return pkg;
 }
 
-void SocketServer::clear_package_i(int socket_fd) {
+void SocketServer::clear_package_i(unsigned int socket_list_id) {
     MI_UTIL_LOG(MI_INFO) << "try clear package.";
     PackageStore old_package_store;
     {
         boost::mutex::scoped_lock locker(_mutex_package);
-        auto client_store = _client_pkg_store.find(socket_fd);
+        auto client_store = _client_pkg_store.find(socket_list_id);
         if (client_store != _client_pkg_store.end()) {
             MI_UTIL_LOG(MI_DEBUG) << "package store size: " << client_store->second.size();
             old_package_store = client_store->second;
@@ -431,9 +448,7 @@ void SocketServer::clear_package_i(int socket_fd) {
         }   
     }
 
-    MI_UTIL_LOG(MI_INFO) << "remove package.";
     MI_UTIL_LOG(MI_DEBUG) << "package store size tmp: " << old_package_store.size();
-    int i = 0;
     while (!old_package_store.empty()) {
         IPCPackage* pkg = old_package_store.front();
         if (nullptr != pkg) {
@@ -441,9 +456,7 @@ void SocketServer::clear_package_i(int socket_fd) {
             pkg = nullptr; 
         }
         old_package_store.pop_front();
-        ++i;
     }
-    MI_UTIL_LOG(MI_DEBUG) << "in while : " << i;
     MI_UTIL_LOG(MI_INFO) << "clear package success.";
 }
 
