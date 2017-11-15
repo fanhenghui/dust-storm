@@ -19,11 +19,16 @@ public:
     ~IPCClientProxy();
 
     void set_path(const std::string& path);
+    void set_server_address(const std::string& ipv4, const std::string& port);
+
     void run();
+
     void register_command_handler(unsigned int cmd_id, std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);
-    void sync_send_data(const IPCDataHeader& header, char* buffer);
     int handle_command(const IPCDataHeader& header, char* buffer);
+
+    void sync_send_data(const IPCDataHeader& header, char* buffer);
+    int sync_post(const std::vector<IPCPackage*>& packages);
 
 protected:
 private:

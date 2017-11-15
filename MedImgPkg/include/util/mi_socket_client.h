@@ -32,10 +32,11 @@ public:
     void run();
     void stop();
 
-    int post(const IPCDataHeader& post_header, char* post_data, IPCDataHeader& result_header, char*& result_data);
-    int post(const std::vector<IPCPackage>& pacakges);
+    int sync_post(const IPCDataHeader& post_header, char* post_data, IPCDataHeader& result_header, char*& result_data);
+    int sync_post(const std::vector<IPCPackage*>& packages);
 
-protected:
+private:
+    void connect_i();
 private:
     SocketType _socket_type;
     

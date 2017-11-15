@@ -4,6 +4,7 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "appcommon/mi_app_db.h"
+#include "appcommon/mi_app_common_define.h"
 
 #include "mi_message.pb.h"
 #include "mi_db_server_controller.h"
@@ -61,7 +62,7 @@ int DBOpQueryDCM::execute() {
                     header.receiver = _receiver;
                     header.data_len = size;
                     //TODO client cmd handler
-                    //header._msg_id = ;
+                    header.msg_id = COMMAND_ID_BE_RECEIVE_DICOM_SERIES;
                     //header._msg_info1 = ;
                     MI_DBSERVER_LOG(MI_DEBUG) << "dcm file: " << *it; 
                     IPCPackage* package = new IPCPackage(header, buffer);

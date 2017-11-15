@@ -57,10 +57,7 @@ void SocketClient::get_server_address(std::string& ip, std::string& port) const 
     port = _server_port;
 }
 
-void SocketClient::run() {
-    MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
-
-    //create scoket
+void SocketClient::connect_i() {
     int fd_s = 0;
     if (UNIX == _socket_type) {
         fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
@@ -145,6 +142,12 @@ void SocketClient::run() {
     }
     
     _fd_server = fd_s;
+}
+
+void SocketClient::run() {
+    MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
+
+    connect_i();
 
     while (true) {
         if (!_alive) {
@@ -167,6 +170,8 @@ void SocketClient::run() {
             buffer = new char[header.data_len];
             if (recv(_fd_server, buffer, header.data_len, 0) <= 0) {
                 MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
+                delete [] buffer;
+                buffer = nullptr;
                 continue;
             }
         }
@@ -221,95 +226,10 @@ void SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer
     }
 }
 
-int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDataHeader& result_header , char*& result_data)  {
-    MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
+int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, IPCDataHeader& result_header , char*& result_data)  {
+    MI_UTIL_LOG(MI_TRACE) << "IN SocketClient post.";
 
-    //create scoket
-    int fd_s = 0;
-    if (UNIX == _socket_type) {
-        fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
-        if (fd_s == 0) {
-            MI_UTIL_LOG(MI_FATAL) << "SocketClient create UNIX socket failed.";
-            UTIL_THROW_EXCEPTION("create UNIX socket failed.");
-        }
-    
-        struct sockaddr_un remote;
-        bzero((char*)(&remote), sizeof(remote));
-        remote.sun_family = AF_UNIX;
-        for (size_t i = 0; i < _path.size(); ++i) {
-            remote.sun_path[i] = _path[i];
-        }
-    
-        socklen_t len = sizeof(remote);
-        ///\connect 100 times once per second
-        int connect_status = -1;
-    
-        for (int i = 0; i < _reconnect_times; ++i) {
-            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
-    
-            if (connect_status != -1) {
-                break;
-            }
-            MI_UTIL_LOG(MI_INFO) << "trying connect to server times(once per second): " << i;
-            sleep(1);
-        }
-    
-        if (connect_status == -1) {
-            MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
-            UTIL_THROW_EXCEPTION("connect server failed.");
-        }
-        MI_UTIL_LOG(MI_INFO) << "UNIX socket connect success.\n";
-    } else if (INET == _socket_type) {
-        if (_server_ip.empty()) {
-            MI_UTIL_LOG(MI_FATAL) << "SocketServer IP is empty.";
-            UTIL_THROW_EXCEPTION("socket server IP is empty.");
-        }
-
-        if (_server_port.empty()) {
-            MI_UTIL_LOG(MI_FATAL) << "SocketServer port is empty.";
-            UTIL_THROW_EXCEPTION("socket server port is empty.");
-        }
-
-        fd_s = socket(AF_INET, SOCK_STREAM, 0);
-        if (fd_s == 0) {
-            MI_UTIL_LOG(MI_FATAL) << "SocketClient create INET socket failed.";
-            UTIL_THROW_EXCEPTION("create INET socket failed.");
-        }
-
-        struct sockaddr_in remote;
-        bzero((char*)(&remote), sizeof(remote));
-        remote.sin_family = AF_INET;
-        remote.sin_port = htons(atoi(_server_port.c_str()));
-        struct hostent *server = gethostbyname(_server_ip.c_str());
-        if (server == NULL) {
-            MI_UTIL_LOG(MI_FATAL) << "socket client no such hostname.";
-            UTIL_THROW_EXCEPTION("socket client no such hostname.");
-        }
-        bcopy((char *)server->h_addr, (char *)&remote.sin_addr.s_addr, server->h_length);
-
-        socklen_t len = sizeof(remote);
-
-        ///\connect 100 times once per second
-        int connect_status = -1;
-    
-        for (int i = 0; i < _reconnect_times; ++i) {
-            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
-    
-            if (connect_status != -1) {
-                break;
-            }
-            MI_UTIL_LOG(MI_INFO) << "trying connect to server times(once per second): " << i;
-            sleep(1);
-        }
-    
-        if (connect_status == -1) {
-            MI_UTIL_LOG(MI_FATAL) << "connect server failed.";
-            UTIL_THROW_EXCEPTION("connect server failed.");
-        }
-        MI_UTIL_LOG(MI_INFO) << "INET socket connect success.\n";
-    }
-    
-    _fd_server = fd_s;
+    connect_i();
 
     //send a message
     //send header
@@ -352,7 +272,91 @@ int SocketClient::post(const IPCDataHeader& post_header , char* post_data, IPCDa
     //close socket
     close(_fd_server);
     _fd_server = 0;
-    MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running end.";
+
+    MI_UTIL_LOG(MI_TRACE) << "OUT SocketClient post.";;
+
+    return 0;
+}
+
+int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
+    MI_UTIL_LOG(MI_TRACE) << "IN SocketClient post.";
+
+    connect_i();
+
+    //send messages 
+    //send header
+
+    for(auto it = packages.begin(); it != packages.end() ; ++it) {
+        IPCPackage *pkg = *it;
+        const IPCDataHeader& post_header = pkg->header;
+        char* post_data = pkg->buffer;
+
+        //send header
+        if (-1 == send(_fd_server , &post_header , sizeof(post_header) , 0)) {
+            MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(post_header);
+            return -1;
+        }
+
+        //send context
+        if (post_data != nullptr && post_header.data_len > 0) {
+            if (-1 == send(_fd_server , post_data , post_header.data_len , 0)) {
+                MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(post_header);
+                return -1;
+            }
+        }
+    }
+    
+    MI_UTIL_LOG(MI_INFO) << "socket client post send header done.\n";
+
+    while (true) {
+        if (!_alive) {
+            break;
+        }
+
+        //receive a result
+        IPCDataHeader result_header;
+        char* result_data = nullptr;
+        if (recv(_fd_server, &result_header, sizeof(result_header) , 0) <= 0) {
+            MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
+            return -1;
+        }
+        
+        MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(result_header);   
+
+        if (result_header.data_len <= 0) {
+            //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
+        } else {
+            result_data = new char[result_header.data_len];
+            if (recv(_fd_server, result_data, result_header.data_len, 0) <= 0) {
+                MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
+                delete [] result_data;
+                return -1;
+            }
+        }
+
+        try {
+            if (_handler) {
+                const int err = _handler->handle(result_header, result_data);
+                if (err == CLIENT_QUIT_ID) {
+                    break;
+                }
+            } else {
+                MI_UTIL_LOG(MI_WARNING) << "client handler to process received data is null.";
+            }
+
+        } catch (const Exception& e) {
+            //Ignore error to keep connecting
+            MI_UTIL_LOG(MI_FATAL) << "handle command error(skip and continue): " << e.what();
+            return -1;
+        }
+    }
+
+    //close socket
+    close(_fd_server);
+    _fd_server = 0;
+    MI_UTIL_LOG(MI_INFO) << "socket client post send data done.\n";
+
+    MI_UTIL_LOG(MI_TRACE) << "OUT SocketClient post.";;
 
     return 0;
 }

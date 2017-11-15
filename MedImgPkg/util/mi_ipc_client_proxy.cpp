@@ -39,6 +39,10 @@ void IPCClientProxy::set_path(const std::string& path) {
     _client->set_path(path);
 }
 
+void IPCClientProxy::set_server_address(const std::string& ipv4, const std::string& port) {
+    _client->set_server_address(ipv4, port);
+}
+
 void IPCClientProxy::run() {
     _client->run();
 }
@@ -78,6 +82,11 @@ int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {
         MI_UTIL_LOG(MI_WARNING) << "cant find handler to process ipc data. header detail : " << STREAM_IPCHEADER_INFO(header);
         return -1;
     }
+}
+
+int IPCClientProxy::sync_post(const std::vector<IPCPackage*>& packages) {
+    boost::mutex::scoped_lock locker(_mutex_send_data);
+    _client->sync_post(packages);
 }
 
 MED_IMG_END_NAMESPACE
