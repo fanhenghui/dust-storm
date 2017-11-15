@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fstream>
 #include "log/mi_logger.h"
 #include "util/mi_socket_client.h"
 #include "util/mi_ipc_common.h"
@@ -28,6 +29,12 @@ int main(int argc , char* argv[]) {
 
         if(0 == client.post(post_header, post_data, result_header, result_data) ) {
             std::cout << "get data.";
+            //write to disk
+            std::fstream out("/home/wangrui22/data/tmp.dcm", std::ios::out | std::ios::binary);
+            if (out.is_open()) {
+                out.write(result_data, result_header._data_len);
+                out.close();
+            }
         }
     }
     

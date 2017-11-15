@@ -154,8 +154,6 @@ void SocketServer::run() {
             continue;
         } 
 
-        MI_UTIL_LOG(MI_DEBUG) << "in logic.";
-
         //accept client socket
         if (FD_ISSET(_fd_server, &fdreads)) {
             int new_client_socket = 0;
@@ -193,7 +191,7 @@ void SocketServer::run() {
         }
 
         //recv client socket
-        const std::set<int>& client_sockets = _client_sockets->get_sockets();
+        const std::set<int>& client_sockets = _client_sockets->get_sockets(); 
         for (auto it = client_sockets.begin(); it != client_sockets.end(); ++it) {
             const int cs = *it;
             std::string addr;
@@ -215,6 +213,7 @@ void SocketServer::run() {
                     } else if(INET == _socket_type) {
                         MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " disconnect.";
                     }
+                    MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err 0.";
                     close(cs);
                     _client_sockets->remove_socket(cs);
                     this->clear_package_i(cs);
@@ -226,6 +225,7 @@ void SocketServer::run() {
                     } else if(INET == _socket_type) {
                         MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " recv failed.";
                     }
+                    MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err" << err;
                     close(cs);
                     _client_sockets->remove_socket(cs);
                     this->clear_package_i(cs);
@@ -248,6 +248,7 @@ void SocketServer::run() {
                             MI_UTIL_LOG(MI_WARNING) << "client inet socket send data damaged.";
                         }
                         //close socket 
+                        MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err 0.";
                         close(cs);
                         _client_sockets->remove_socket(cs);
                         this->clear_package_i(cs);
@@ -259,6 +260,7 @@ void SocketServer::run() {
                         } else if(INET == _socket_type) {
                             MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << addr << ":" << port << " recv failed.";
                         }
+                        MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err" << err;
                         close(cs);
                         _client_sockets->remove_socket(cs);
                         this->clear_package_i(cs);
@@ -301,9 +303,22 @@ void SocketServer::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> han
 
 void SocketServer::send_data(const IPCDataHeader& dataheader , char* buffer) {
     //this thread gather package to be sending
-    Package *pkg = new Package(dataheader, buffer);
+    MI_UTIL_LOG(MI_DEBUG) << "in socket server send data.";
     const int client_socket_fd = (int)(dataheader._receiver);
-    push_back_package_i(client_socket_fd, pkg);
+    if (-1 == _client_sockets->check_socket(client_socket_fd)) {
+        //TODO this logic here good ???
+        if (buffer != nullptr) {
+            delete [] buffer;
+            buffer = nullptr;
+        }
+        MI_UTIL_LOG(MI_DEBUG) << "send data failed, invalid socket : "  << client_socket_fd;
+    } else {
+        Package *pkg = new Package(dataheader, buffer); 
+        push_back_package_i(client_socket_fd, pkg);
+        MI_UTIL_LOG(MI_DEBUG) << "send data success, socket : "  << client_socket_fd;
+    }
+    
+    
 }
 
 int SocketServer::send() {
@@ -341,18 +356,10 @@ int SocketServer::send() {
 
         if (FD_ISSET(cs, &fdwrites)) {
             //check package
-            Package* pkg_send = nullptr;
-            {
-                boost::mutex::scoped_lock locker(_mutex_package);
-                auto client_store = _client_pkg_store.find(cs);
-                if (client_store == _client_pkg_store.end()) {
-                    continue;
-                } 
-                if (client_store->second.size() == 0) {
-                    continue;
-                }
-                pkg_send = client_store->second.front();
-                client_store->second.pop_front();
+            Package* pkg_send = pop_front_package_i(cs);
+            if(nullptr == pkg_send) {
+                //pop empty package
+                continue;
             }
 
             //check close
@@ -369,12 +376,16 @@ int SocketServer::send() {
                 MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " 
                 << STREAM_IPCHEADER_INFO(pkg_send->header);
                 continue;
+            } else {
+                MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header.";
             }
 
             if (nullptr != pkg_send->buffer && pkg_send->header._data_len > 0) {
                 if (-1 == ::send(cs , pkg_send->buffer , pkg_send->header._data_len , 0)) {
                     MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
                     << STREAM_IPCHEADER_INFO(pkg_send->header);
+                } else {
+                   MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data.";
                 }
             }
         }            
@@ -390,10 +401,12 @@ void SocketServer::push_back_package_i(int socket_fd, Package* pkg) {
         PackageStore pkg_store;
         pkg_store.push_back(pkg);
         _client_pkg_store.insert(std::make_pair(socket_fd, pkg_store));
+        client_store = _client_pkg_store.find(socket_fd);
     } else {
         client_store->second.push_back(pkg);
     }
     _condition_empty_package.notify_one();
+    MI_UTIL_LOG(MI_DEBUG) << "in socket server push back package: " << client_store->second.size();
 }
 
 SocketServer::Package* SocketServer::pop_front_package_i(int socket_fd) {
@@ -407,28 +420,37 @@ SocketServer::Package* SocketServer::pop_front_package_i(int socket_fd) {
     }
     Package* pkg = client_store->second.front();
     client_store->second.pop_front();
+    MI_UTIL_LOG(MI_DEBUG) << "in socket server pop back package: " << client_store->second.size();
     return pkg;
 }
 
 void SocketServer::clear_package_i(int socket_fd) {
+    MI_UTIL_LOG(MI_INFO) << "try clear package.";
     PackageStore old_package_store;
     {
         boost::mutex::scoped_lock locker(_mutex_package);
         auto client_store = _client_pkg_store.find(socket_fd);
         if (client_store != _client_pkg_store.end()) {
+            MI_UTIL_LOG(MI_DEBUG) << "package store size: " << client_store->second.size();
             old_package_store = client_store->second;
             _client_pkg_store.erase(client_store);
         }   
     }
 
-    while (old_package_store.empty()) {
+    MI_UTIL_LOG(MI_INFO) << "remove package.";
+    MI_UTIL_LOG(MI_DEBUG) << "package store size tmp: " << old_package_store.size();
+    int i = 0;
+    while (!old_package_store.empty()) {
         Package* pkg = old_package_store.front();
         if (nullptr != pkg) {
             delete pkg;
             pkg = nullptr; 
         }
         old_package_store.pop_front();
+        ++i;
     }
+    MI_UTIL_LOG(MI_DEBUG) << "in while : " << i;
+    MI_UTIL_LOG(MI_INFO) << "clear package success.";
 }
 
 void SocketServer::try_pop_front_package_i() {

@@ -70,12 +70,13 @@ private:
 
         Package(): buffer(nullptr) {};
         Package(const IPCDataHeader&header_, char* buffer_):
-            header(header_),buffer(buffer_) {}
+            header(header_),buffer(buffer_) {};
         ~Package() {
             if (nullptr !=  buffer) {
                 delete [] buffer;
+                buffer = nullptr;
             }
-        }
+        };
     };
     typedef std::deque<Package*> PackageStore;
     std::map<int , PackageStore> _client_pkg_store;

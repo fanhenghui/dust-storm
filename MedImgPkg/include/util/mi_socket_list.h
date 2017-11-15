@@ -54,6 +54,7 @@ public:
 
     int remove_socket(int socket) {
         boost::mutex::scoped_lock locker(_mutex);
+        MI_UTIL_LOG(MI_INFO) << "try remove socket: " << socket;
         auto it_addr = _sockets_addr.find(socket);
         if (it_addr != _sockets_addr.end()) {
             _sockets_addr.erase(it_addr);
@@ -61,12 +62,14 @@ public:
 
         auto it = _sockets.find(socket);
         if (it != _sockets.end()) {
+            _sockets.erase(it);
+            MI_UTIL_LOG(MI_INFO) << "remove socket: " << socket << " success";
+            return 0;
+        } else {
             MI_UTIL_LOG(MI_ERROR) << "remove the non-existed socket: " << socket;
             return -1;
-        } else {
-            _sockets.erase(it);
-            return 0;
         }
+        
     }
 
     const std::set<int> get_sockets() const {
