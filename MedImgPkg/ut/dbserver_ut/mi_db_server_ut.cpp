@@ -8,7 +8,7 @@
 #include "io/mi_dicom_loader.h"
 #include "appcommon/mi_app_config.h"
 #include "appcommon/mi_app_common_define.h"
-#include "mi_message.pb.h"
+#include "appcommon/mi_message.pb.h"
 
 using namespace medical_imaging;
 

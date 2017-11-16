@@ -1,1 +1,0 @@
-protoc --proto_path=../webviewer/public/data/ --cpp_out=./ ../webviewer/public/data/mi_message.proto

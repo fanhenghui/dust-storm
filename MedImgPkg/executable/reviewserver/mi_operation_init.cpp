@@ -1,5 +1,5 @@
 #include "mi_operation_init.h"
-#include "mi_message.pb.h"
+#include "appcommon/mi_message.pb.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"

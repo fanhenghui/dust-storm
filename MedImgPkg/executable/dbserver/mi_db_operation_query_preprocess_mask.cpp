@@ -4,10 +4,9 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "appcommon/mi_app_db.h"
+#include "appcommon/mi_message.pb.h"
 
-#include "mi_message.pb.h"
 #include "mi_db_server_controller.h"
-
 
 MED_IMG_BEGIN_NAMESPACE
 

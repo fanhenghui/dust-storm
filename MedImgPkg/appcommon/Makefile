@@ -47,7 +47,7 @@ main-build: $(TARGET)
 $(TARGET): $(PROTOC) $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(PROTOC) $(ADDITIANL_DEPENDENCIES)
 
-$(PROTOC): mi_message.pb.h mi_message.pb.cc 
+$(PROTOC): mi_message.pb.cc
 	$(CC) -c -fPIC $(CFLAGS) mi_message.pb.cc $(ADDITINAL_INCLUDE_DIR)
 
 $(OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
@@ -57,3 +57,4 @@ $(OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
 clean:
 	-rm *.o $(TARGET)
 	-rm *.pb.cc *.pb.h
+	-rm ../include/appcommon/mi_message.pb.h 
