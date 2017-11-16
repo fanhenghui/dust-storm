@@ -36,28 +36,33 @@ int DBOpQueryPreprocessMask::execute() {
     std::shared_ptr<DB> db = controller->get_db();
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy();
 
+    const unsigned int receiver = _header.receiver;
     DB::ImgItem item;
     if(0 != db->get_dcm_item(series_id, item) ) {
-        //return to client error
-    } else {
-        const std::string path = item.preprocess_mask_path;
-        MI_DBSERVER_LOG(MI_DEBUG) << "preprocess mask path: " << path;
-        char* buffer = nullptr;
-        unsigned int size = 0;
-        if(0 != FileUtil::read_raw_ext(path, buffer, size) ) {
-            
-        } else {
-            IPCDataHeader header;
-            header.receiver = _header.receiver;
-            header.data_len = size;
-            header.msg_id = COMMAND_ID_DB_SEND_PREPROCESS_MASK;
-            IPCPackage* package = new IPCPackage(header, buffer);
-            if (0 != server_proxy->async_send_data(package)) {
-                delete package;
-                package = nullptr;
-                MI_DBSERVER_LOG(MI_WARNING) << "send dcm to client failed.(client disconnected)";
-            }
-        }
+        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series item not existed.");
+        return -1;
+    }
+
+    if (item.preprocess_mask_path.empty()) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM preprocessing mask path null.");
+        return -1;
+    }
+    MI_DBSERVER_LOG(MI_DEBUG) << "preprocess mask path: " << item.preprocess_mask_path;
+    char* buffer = nullptr;
+    unsigned int size = 0;
+    if(0 != FileUtil::read_raw_ext(item.preprocess_mask_path, buffer, size) ) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "preprocess mask file not existed.");
+        return -1; 
+    }
+    IPCDataHeader header;
+    header.receiver = _header.receiver;
+    header.data_len = size;
+    header.msg_id = COMMAND_ID_DB_SEND_PREPROCESS_MASK;
+    IPCPackage* package = new IPCPackage(header, buffer);
+    if (0 != server_proxy->async_send_data(package)) {
+        delete package;
+        package = nullptr;
+        MI_DBSERVER_LOG(MI_WARNING) << "send dcm to client failed.(client disconnected)";
     }
 
     return 0;

@@ -126,3 +126,17 @@ message MsgMPRMaskOverlay {
     int32 flag = 1;
     float opacity = 2;
 };
+
+//for db server to be server
+message MsgAnnotationUnitDB {
+    float x = 1; //center x
+    float y = 2; //center y
+    float z = 3; //center z
+    float r = 4; //diameter 
+    float p = 5; //probability
+};
+
+message MsgAnnotationCollectionDB {
+    string series_uid = 1;
+    repeated MsgAnnotationUnitDB annotation = 2;
+};

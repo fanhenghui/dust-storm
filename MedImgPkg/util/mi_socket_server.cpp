@@ -222,7 +222,7 @@ int SocketServer::recv() {
         return -1;
     } else if (activity == 0) {
         //timeout
-        MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
+        //MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
         return -1;
     } 
 
@@ -346,7 +346,6 @@ int SocketServer::async_send_data(IPCPackage* package) {
 }
 
 int SocketServer::send() {
-    MI_UTIL_LOG(MI_INFO) << "in send";
     try_pop_front_package_i();
 
     //this thread send data to clients
@@ -371,9 +370,7 @@ int SocketServer::send() {
         //timeout
         MI_UTIL_LOG(MI_DEBUG) << "socket write fd_set select timeout.";
         return activity;
-    } 
-
-    MI_UTIL_LOG(MI_INFO) << "after send slect.";
+    }
 
     const std::map<unsigned int, SocketList::SocketInfo> client_socket_infos = _client_sockets->get_socket_infos();
     for (auto it = client_socket_infos.begin(); it != client_socket_infos.end(); ++it) {
@@ -408,8 +405,8 @@ int SocketServer::send() {
                 pkg_send = nullptr;
                 continue;
             } else {
-                MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header. msg id: " << 
-                pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
+                // MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header. msg id: " << 
+                // pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
             }
 
             if (nullptr != pkg_send->buffer && pkg_send->header.data_len > 0) {
@@ -418,6 +415,8 @@ int SocketServer::send() {
                     << STREAM_IPCHEADER_INFO(pkg_send->header);        
                 } else {
                    //MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data.";
+                   MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data . msg id: " << 
+                   pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
                 }
             }
 

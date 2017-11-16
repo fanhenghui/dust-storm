@@ -10,6 +10,8 @@
 #include "mi_db_server_thread_model.h"
 #include "mi_db_cmd_handler_operating.h"
 #include "mi_db_operation_query_dicom.h"
+#include "mi_db_operation_query_ai_annotation.h"
+#include "mi_db_operation_query_preprocess_mask.h"
 #include "mi_db_operation_query_end.h"
 
 
@@ -33,6 +35,10 @@ void DBServerController::initialize() {
     //register operation
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_QUERY_DICOM, 
         std::shared_ptr<DBOpQueryDICOM>(new DBOpQueryDICOM()));
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_QUERY_AI_ANNOTATION, 
+        std::shared_ptr<DBOpQueryAIAnnotation>(new DBOpQueryAIAnnotation()));
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_QUERY_PREPROCESS_MASK, 
+        std::shared_ptr<DBOpQueryPreprocessMask>(new DBOpQueryPreprocessMask()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_QUERY_END, 
         std::shared_ptr<DBOpQueryEnd>(new DBOpQueryEnd()));
     //connect db

@@ -20,7 +20,7 @@ GOOGLE_INCLUDE_DIR = /usr/local/include/google/
 VPATH = $(INCLUDE_ROOT_DIR)
 
 OBJS = mi_db_cmd_handler_operating.o mi_db_server_thread_model.o mi_db_operation_query_dicom.o \
-mi_db_operation_query_end.o mi_db_server_controller.o
+mi_db_operation_query_end.o mi_db_operation_query_preprocess_mask.o mi_db_operation_query_ai_annotation.o mi_db_server_controller.o
 
 TARGET = $(BIN_DIR)/dbserver
 

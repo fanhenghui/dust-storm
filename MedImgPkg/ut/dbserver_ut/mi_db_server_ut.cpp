@@ -5,15 +5,17 @@
 #include "util/mi_socket_client.h"
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_ipc_common.h"
+#include "util/mi_memory_shield.h"
 #include "io/mi_dicom_loader.h"
 #include "appcommon/mi_app_config.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_message.pb.h"
 
 using namespace medical_imaging;
-
-class CmdHandlerSendDICOMSeries : public ICommandHandler {
+class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MemShield shield(buffer);
+
         //just write to disk
         static int id = 0;
         const std::string file_root = "/home/wangrui22/data/test/";
@@ -31,14 +33,78 @@ class CmdHandlerSendDICOMSeries : public ICommandHandler {
         if (end_tag == 0) {
 
         }
+
         return 0;
     };
 };
 
-class CmdHandlerBEEnd : public ICommandHandler {
+class CmdHandlerDBSendAIAnnotation : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
-        MI_LOG(MI_INFO) << "[DB UT] " << "in BE end cmd handler.\n";
+        MemShield shield(buffer);
+        //just write to disk
+        if (nullptr == buffer) {
+            MI_LOG(MI_INFO) << "[DB UT] " << "DB send AI annotation buffer null.";
+            return -1;
+        }
+        MsgAnnotationCollectionDB msgAnnos;
+        if (!msgAnnos.ParseFromArray(buffer,dataheader.data_len)) {
+            MI_LOG(MI_INFO) << "[DB UT] " << "parse AI annotation buffer failed.";
+            return -1;
+        }
+
+        MI_LOG(MI_INFO) << "[DB UT] " << "AI annotation series: " << msgAnnos.series_uid();
+        for (int i = 0; i < msgAnnos.annotation_size(); ++i) {
+            const MsgAnnotationUnitDB& anno = msgAnnos.annotation(i);
+            MI_LOG(MI_INFO) << "[DB UT] " << "(" << anno.x() << "," << anno.y() << "," << anno.z() << ") " 
+            << anno.r() << ", " << anno.p();
+        }
+        msgAnnos.Clear();
+        return 0;
+    };
+};
+
+class CmdHandlerDBSendPreprocessMask : public ICommandHandler {
+    virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MemShield shield(buffer);
+        if (nullptr == buffer) {
+            MI_LOG(MI_INFO) << "[DB UT] " << "DB send preprocess mask buffer null.";
+            return -1;
+        }
+        //just write to disk
+        const std::string file_path = "/home/wangrui22/data/test/mask.rle";
+        std::fstream out(file_path, std::ios::out | std::ios::binary);
+        if (out.is_open()) {
+            out.write(buffer, dataheader.data_len);
+            out.close();
+        }
+        return 0;
+    };
+};
+
+class CmdHandlerDBSendEnd : public ICommandHandler {
+    virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MI_LOG(MI_INFO) << "[DB UT] " << "in BE end cmd handler.";
         return CLIENT_QUIT_ID; 
+    };
+};
+
+class CmdHandlerDBSendError : public ICommandHandler {
+    virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        if (nullptr == buffer) {
+            MI_LOG(MI_ERROR) << "[DB UT] " << "DB server error has no message.";
+            return -1;
+        }
+        MsgString msgErr;
+        if(!msgErr.ParseFromArray(buffer, dataheader.data_len)) {
+            MI_LOG(MI_ERROR) << "[DB UT] " << "DB server error has no message.";
+            return -1;
+        } else {
+            const std::string err = msgErr.context();
+            msgErr.Clear();
+            MI_LOG(MI_ERROR) << "[DB UT] " << "DB server error message: " << err;
+        }
+
+        return 0; 
     };
 };
 
@@ -54,7 +120,7 @@ IPCPackage* create_query_dicom_message() {
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
-        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.\n";
+        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
         return nullptr;
     }
     post_header.data_len = post_size;
@@ -73,7 +139,7 @@ IPCPackage* create_query_preprocess_mask_message() {
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
-        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.\n";
+        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
         return nullptr;
     }
     post_header.data_len = post_size;
@@ -92,7 +158,7 @@ IPCPackage* create_query_ai_annotation_message() {
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
-        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.\n";
+        MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
         return nullptr;
     }
     post_header.data_len = post_size;
@@ -116,18 +182,27 @@ int main(int argc , char* argv[]) {
     IPCClientProxy client_proxy(INET);
     client_proxy.set_server_address("127.0.0.1","8888");
     client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
-    std::shared_ptr<CmdHandlerSendDICOMSeries>(new CmdHandlerSendDICOMSeries()));
+    std::shared_ptr<CmdHandlerDBSendDICOMSeries>(new CmdHandlerDBSendDICOMSeries()));
+    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    std::shared_ptr<CmdHandlerDBSendPreprocessMask>(new CmdHandlerDBSendPreprocessMask()));
+    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    std::shared_ptr<CmdHandlerDBSendAIAnnotation>(new CmdHandlerDBSendAIAnnotation()));
+    
     client_proxy.register_command_handler(COMMAND_ID_DB_SEND_END, 
-    std::shared_ptr<CmdHandlerBEEnd>(new CmdHandlerBEEnd()));
+    std::shared_ptr<CmdHandlerDBSendEnd>(new CmdHandlerDBSendEnd()));
+    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    std::shared_ptr<CmdHandlerDBSendError>(new CmdHandlerDBSendError()));
     
     std::vector<IPCPackage*> packages;
     packages.push_back(create_query_dicom_message());
+    packages.push_back(create_query_preprocess_mask_message());
+    packages.push_back(create_query_ai_annotation_message());
     packages.push_back(create_query_end_message());
 
     if(0 == client_proxy.sync_post(packages) ) {
-        std::cout << "sync post success.\n";
+        MI_LOG(MI_INFO) << "[DB UT] "  << "sync post success.";
     } else {
-        std::cout << "sync post failed.\n";
+        MI_LOG(MI_ERROR) << "[DB UT] "  << "sync post failed.";
     }
     
     return 0;
