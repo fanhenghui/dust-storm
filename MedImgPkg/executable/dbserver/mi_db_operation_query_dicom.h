@@ -5,15 +5,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpQueryDCM: public DBOperation {
+class DBOpQueryDICOM: public DBOperation {
 public:
-    DBOpQueryDCM();
-    virtual ~DBOpQueryDCM();
+    DBOpQueryDICOM();
+    virtual ~DBOpQueryDICOM();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpQueryDCM>(new DBOpQueryDCM());
+        return std::shared_ptr<DBOpQueryDICOM>(new DBOpQueryDICOM());
     }
 };
 

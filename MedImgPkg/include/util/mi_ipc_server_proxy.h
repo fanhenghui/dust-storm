@@ -20,6 +20,7 @@ public:
 
     void run();
     void send();
+    void recv();
     void stop();
     void register_command_handler(unsigned int cmd_id,
                                   std::shared_ptr<ICommandHandler> handler);

@@ -26,6 +26,8 @@ void DBServerThreadModel::start() {
     _op_msg_queue.activate();
     _thread_operating = boost::thread(boost::bind(&DBServerThreadModel::process_operating_i, this));
     _thread_sending = boost::thread(boost::bind(&DBServerThreadModel::process_sending_i, this));
+    _thread_recving = boost::thread(boost::bind(&DBServerThreadModel::process_recving_i, this));
+    
 }
 
 void DBServerThreadModel::stop() {
@@ -34,11 +36,21 @@ void DBServerThreadModel::stop() {
     _thread_sending.join();
     _thread_operating.interrupt();
     _thread_operating.join();
+    _thread_recving.interrupt();
+    _thread_recving.join();
 }
 
 void DBServerThreadModel::process_sending_i() {
     while(true) {
         _server_proxy->send();
+
+        boost::this_thread::interruption_point();
+    }
+}
+
+void DBServerThreadModel::process_recving_i() {
+    while(true) {
+        _server_proxy->recv();
 
         boost::this_thread::interruption_point();
     }

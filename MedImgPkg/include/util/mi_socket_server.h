@@ -37,6 +37,7 @@ public:
 
     void run();
     void stop();
+    int  recv();
     int  send();
 private:
     IPCPackage* pop_front_package_i(unsigned int socket_list_id);

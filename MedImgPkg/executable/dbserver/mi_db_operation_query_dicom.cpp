@@ -12,15 +12,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpQueryDCM::DBOpQueryDCM() {
+DBOpQueryDICOM::DBOpQueryDICOM() {
 
 }
 
-DBOpQueryDCM::~DBOpQueryDCM() {
+DBOpQueryDICOM::~DBOpQueryDICOM() {
 
 }
 
-int DBOpQueryDCM::execute() {
+int DBOpQueryDICOM::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
@@ -61,8 +61,7 @@ int DBOpQueryDCM::execute() {
                     IPCDataHeader header;
                     header.receiver = _header.receiver;
                     header.data_len = size;
-                    //TODO client cmd handler
-                    header.msg_id = COMMAND_ID_BE_RECEIVE_DICOM_SERIES;
+                    header.msg_id = COMMAND_ID_DB_SEND_DICOM_SERIES;
                     header.msg_info2 = i==files.size()-1 ? 1:0;
                     header.msg_info3 = files.size();
                     IPCPackage* package = new IPCPackage(header, buffer);

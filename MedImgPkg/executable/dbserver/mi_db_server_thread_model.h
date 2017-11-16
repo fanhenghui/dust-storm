@@ -30,6 +30,7 @@ public:
 
 private:
     void process_sending_i();
+    void process_recving_i();
     void process_operating_i();
 
 private:
@@ -39,6 +40,7 @@ private:
     MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue;
 
     boost::thread _thread_sending;
+    boost::thread _thread_recving;
     boost::thread _thread_operating;    
 };
 

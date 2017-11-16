@@ -99,7 +99,7 @@ public:
     int make_fd(fd_set* fds) {
         boost::mutex::scoped_lock locker(_mutex);
         FD_ZERO(fds);
-        int max_fd = -1;
+        int max_fd = 0;
         for (auto it = _sockets.begin(); it != _sockets.end(); ++it) {
             max_fd = (*it) > max_fd ? (*it) : max_fd;
             FD_SET((*it), fds);

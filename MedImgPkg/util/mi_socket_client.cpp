@@ -286,6 +286,7 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
     //send messages 
     //send header
 
+    MI_UTIL_LOG(MI_INFO) << "sync post package number: " << packages.size();
     for(auto it = packages.begin(); it != packages.end() ; ++it) {
         IPCPackage *pkg = *it;
         const IPCDataHeader& post_header = pkg->header;
@@ -304,6 +305,8 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
                 return -1;
             }
         }
+
+        MI_UTIL_LOG(MI_INFO) << "socket client post msg: " << post_header.msg_id << ", op id: " << post_header.msg_info1;
     }
     
     MI_UTIL_LOG(MI_INFO) << "socket client post send header done.\n";

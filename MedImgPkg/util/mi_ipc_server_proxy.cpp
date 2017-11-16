@@ -43,6 +43,10 @@ void IPCServerProxy::send() {
     _server->send();
 }
 
+void IPCServerProxy::recv() {
+    _server->recv();
+}
+
 void IPCServerProxy::stop() {
     _server->stop();
 }
