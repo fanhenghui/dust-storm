@@ -18,22 +18,22 @@ struct IPCDataHeader { //32 byte
     unsigned int msg_id;//message ID : thus command ID
     unsigned int msg_info0;//message info : client cell ID, client socket time 
     unsigned int msg_info1;//message info : client operation ID
-    unsigned int data_type;//0 raw_data 1 protocol buffer
-    unsigned int big_end;//0 small end 1 big_end
+    unsigned int msg_info2;//message info : reserved sequenced msg end tag(EG: send n slice dicom series. 0~n-2:0 n-1:1)
+    unsigned int msg_info3;//message info : reserved
     unsigned int data_len;//data length
 
     IPCDataHeader():
         sender(0), receiver(0), msg_id(0), msg_info0(0),
-        msg_info1(0), data_type(0), big_end(0), data_len(0) {
+        msg_info1(0), msg_info2(0), msg_info3(0), data_len(0) {
     }
 };
 #define STREAM_IPCHEADER_INFO(header) "sender: " << header.sender << \
     "; receiver: " << header.receiver << \
     "; cmd id: " << header.msg_id << \
-    "; cell id: " << header.msg_info0 << \
-    "; op id: " << header.msg_info1 << \
-    "; data type: " << header.data_type << \
-    "; big end: " << header.big_end << \
+    "; msg info0(cell id): " << header.msg_info0 << \
+    "; msg info1(op id): " << header.msg_info1 << \
+    "; msg info2(end tag): " << header.msg_info2 << \
+    "; msg info3(reserved): " << header.msg_info3 << \
     "; data len: " << header.data_len
 
 struct IPCPackage {
@@ -67,7 +67,7 @@ class ICommandHandler {
 public:
     ICommandHandler() {};
     virtual ~ICommandHandler() {};
-    virtual int handle_command(const IPCDataHeader& datahaeder , char* buffer) = 0;
+    virtual int handle_command(const IPCDataHeader& dataheader , char* buffer) = 0;
 protected:
 private:
 };

@@ -12,7 +12,7 @@
 using namespace medical_imaging;
 
 class CmdHandlerReceiveDICOMSeries : public ICommandHandler {
-    virtual int handle_command(const IPCDataHeader& datahaeder , char* buffer) {
+    virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
         //just write to disk
         static int id = 0;
         const std::string file_root = "/home/wangrui22/data/test/";
@@ -20,10 +20,17 @@ class CmdHandlerReceiveDICOMSeries : public ICommandHandler {
         ss << file_root << "DICOM_" << id++ << ".dcm";
         std::fstream out(ss.str(), std::ios::out | std::ios::binary);
         if (out.is_open()) {
-            out.write(buffer, datahaeder.data_len);
+            out.write(buffer, dataheader.data_len);
             out.close();
         }
-        return 0;
+
+        unsigned int end_tag = dataheader.msg_info2;
+        unsigned int dicom_slice = dataheader.msg_info3;
+        if (end_tag == 0) {
+            return 0;
+        } else {
+           return CLIENT_QUIT_ID; 
+        }
     };
 };
 
@@ -37,8 +44,6 @@ int main(int argc , char* argv[]) {
 
     IPCDataHeader post_header;
     char* post_data = nullptr;
-    IPCDataHeader result_header;
-    char* result_data = nullptr;
 
     post_header.msg_id = COMMAND_ID_FE_OPERATION;
     post_header.msg_info1 = OPERATION_ID_QUERY_DICOM;
@@ -48,12 +53,14 @@ int main(int argc , char* argv[]) {
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
-        post_header.data_len = post_size;
         std::cout << "serialize message failed.\n";
         return -1;
     }
+    post_header.data_len = post_size;
 
-    packages.push_back(new IPCPackage(post_header,result_data));
+    //shutdown message
+
+    packages.push_back(new IPCPackage(post_header,post_data));
 
     if(0 == client_proxy.sync_post(packages) ) {
         std::cout << "sync post success.\n";

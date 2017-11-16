@@ -49,7 +49,7 @@ int DBOpQueryPreprocessMask::execute() {
             
         } else {
             IPCDataHeader header;
-            header.receiver = _receiver;
+            header.receiver = _header.receiver;
             header.data_len = size;
             //TODO client cmd handler
             //header._msg_id = ;

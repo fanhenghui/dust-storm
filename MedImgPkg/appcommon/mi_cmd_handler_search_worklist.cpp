@@ -20,7 +20,7 @@ CmdHandlerSearchWorklist::CmdHandlerSearchWorklist(std::shared_ptr<AppController
 
 CmdHandlerSearchWorklist::~CmdHandlerSearchWorklist() {}
 
-int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, char* buffer) {
+int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& dataheader, char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN CmdHandler search worklist";
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -79,7 +79,7 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& datahaeder, ch
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
     header.msg_id = COMMAND_ID_BE_SEND_WORKLIST;
-    header.data_type = 1; // protocol buffer
+    header.msg_info2 = 1; // protocol buffer
 
     if (!res) {
         size = 0;

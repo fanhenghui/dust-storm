@@ -17,7 +17,7 @@ public:
 
     virtual ~CmdHandlerDBOperating();
 
-    virtual int handle_command(const IPCDataHeader& datahaeder , char* buffer);
+    virtual int handle_command(const IPCDataHeader& dataheader , char* buffer);
 
 private:
     std::weak_ptr<DBServerController> _controller;

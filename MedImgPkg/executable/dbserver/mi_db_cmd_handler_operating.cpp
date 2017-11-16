@@ -26,11 +26,10 @@ int CmdHandlerDBOperating::handle_command(const IPCDataHeader& ipcheader , char*
     const unsigned int op_id = ipcheader.msg_info1;
     OpDataHeader op_header;
     op_header.op_id = op_id;
-    op_header.data_type = ipcheader.data_type;
-    op_header.big_end = ipcheader.big_end;
+    op_header.end_tag = ipcheader.msg_info2;
     op_header.data_len = ipcheader.data_len;
+    op_header.receiver = ipcheader.receiver;
 
-    const unsigned int receiver = ipcheader.receiver;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
     std::shared_ptr<DBOperation> op2 = std::dynamic_pointer_cast<DBOperation>(op);
     if (nullptr == op2) {
@@ -40,7 +39,6 @@ int CmdHandlerDBOperating::handle_command(const IPCDataHeader& ipcheader , char*
     if (op2) {
         op2->reset();
         op2->set_data(op_header , buffer);
-        op2->set_receiver(receiver);
         op2->set_db_server_controller(controller);
         controller->get_thread_model()->push_operation(op2);
     } else {

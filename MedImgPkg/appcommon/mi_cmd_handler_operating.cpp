@@ -29,9 +29,9 @@ int CmdHandlerOperating::handle_command(const IPCDataHeader& ipcheader , char* b
     OpDataHeader op_header;
     op_header.cell_id = cell_id;
     op_header.op_id = op_id;
-    op_header.data_type = ipcheader.data_type;
-    op_header.big_end = ipcheader.big_end;
+    op_header.end_tag = ipcheader.msg_info2;
     op_header.data_len = ipcheader.data_len;
+    op_header.receiver = ipcheader.receiver;
 
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
     if (op) {

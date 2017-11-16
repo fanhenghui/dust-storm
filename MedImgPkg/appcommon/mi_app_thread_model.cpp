@@ -253,8 +253,8 @@ void AppThreadModel::process_sending() {
                 header.msg_id = COMMAND_ID_BE_SEND_IMAGE;
                 header.msg_info0 = cell_id;
                 header.msg_info1 = 0;
-                header.data_type = 0;
-                header.big_end = 0;
+                header.msg_info2 = 0;
+                header.msg_info3 = 0;
 
                 unsigned char* buffer = nullptr;
                 int buffer_size = 0;
@@ -295,8 +295,8 @@ void AppThreadModel::process_sending() {
                 header.msg_id = COMMAND_ID_BE_SEND_NONE_IMAGE;
                 header.msg_info0 = cell_id;
                 header.msg_info1 = 0;
-                header.data_type = 0;
-                header.big_end = 0;
+                header.msg_info2 = 0;
+                header.msg_info3 = 0;
 
                 int buffer_size = 0;
                 char* buffer = none_image->serialize_dirty(buffer_size);

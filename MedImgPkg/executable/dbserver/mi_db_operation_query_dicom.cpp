@@ -52,19 +52,19 @@ int DBOpQueryDCM::execute() {
             //TODO error
         } else {
             //batch read file(Don't need to use mutl-thread)
-            for (auto it = files.begin(); it != files.end(); ++it) {
+            for (size_t i = 0; i < files.size(); ++i) {
                 char* buffer = nullptr;
                 unsigned int size = 0;
-                if(0 != FileUtil::read_raw_ext(*it, buffer, size) ) {
+                if(0 != FileUtil::read_raw_ext(files[i], buffer, size) ) {
                     
                 } else {
                     IPCDataHeader header;
-                    header.receiver = _receiver;
+                    header.receiver = _header.receiver;
                     header.data_len = size;
                     //TODO client cmd handler
                     header.msg_id = COMMAND_ID_BE_RECEIVE_DICOM_SERIES;
-                    //header._msg_info1 = ;
-                    MI_DBSERVER_LOG(MI_DEBUG) << "dcm file: " << *it; 
+                    header.msg_info2 = i==files.size()-1 ? 1:0;
+                    header.msg_info3 = files.size();
                     IPCPackage* package = new IPCPackage(header, buffer);
                     if(0 != server_proxy->async_send_data(package) ){
                         delete package;

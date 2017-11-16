@@ -15,7 +15,7 @@ public:
 
     virtual ~CmdHandlerVRPlay();
 
-    virtual int handle_command(const IPCDataHeader& datahaeder, char* buffer);
+    virtual int handle_command(const IPCDataHeader& dataheader, char* buffer);
 
 private:
     void logic_i(OpDataHeader& op_header, char* buffer);

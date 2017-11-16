@@ -236,6 +236,8 @@ void SocketServer::run() {
                     continue;  
                 }
 
+                MI_UTIL_LOG(MI_INFO) << "receive client :" << socket << " data header. data length: " << header.data_len;
+
                 //receive data buffer
                 if (header.data_len <= 0) {
                     //MI_UTIL_LOG(MI_TRACE) << "server received data buffer length less than 0.";
@@ -277,6 +279,8 @@ void SocketServer::run() {
                         this->clear_package_i(socket_id);
                         continue;  
                     }
+
+                    MI_UTIL_LOG(MI_INFO) << "receive client :" << socket << "data.";
 
                     try {
                         if (_handler) {
@@ -427,6 +431,7 @@ IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
         return nullptr;
     } 
     if (client_store->second.size() == 0) {
+        _client_pkg_store.erase(client_store);//clean empty sotre
         return nullptr;
     }
     IPCPackage* pkg = client_store->second.front();

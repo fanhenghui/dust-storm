@@ -47,10 +47,10 @@ int CmdHandlerVRPlay::handle_command(const IPCDataHeader& ipcheader , char* buff
     const unsigned int op_id = ipcheader.msg_info1;
     OpDataHeader op_header;
     op_header.cell_id = cell_id;
-    op_header.op_id = OPERATION_ID_ROTATE;
-    op_header.data_type = ipcheader.data_type;
-    op_header.big_end = ipcheader.big_end;
+    op_header.op_id = op_id;
+    op_header.end_tag = ipcheader.msg_info2;
     op_header.data_len = ipcheader.data_len;
+    op_header.receiver = ipcheader.receiver;
 
     boost::thread th(boost::bind(&CmdHandlerVRPlay::logic_i , this , boost::ref(op_header) , buffer));
     th.detach();

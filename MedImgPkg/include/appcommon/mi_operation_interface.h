@@ -12,10 +12,12 @@ MED_IMG_BEGIN_NAMESPACE
 struct OpDataHeader {
     unsigned int cell_id;   //
     unsigned int op_id;     // operation id
-    unsigned int data_type; // 0 raw_data 1 protocol buffer
-    unsigned int big_end;   // 0 small end 1 big_end
     unsigned int data_len;  // data length
-    unsigned int reserved;  // reserved attribute
+    unsigned int end_tag;   // sequenced message end tag:0 for in the process 1 for the last message
+    unsigned int receiver;  //receiver pid or socket id ...
+
+    OpDataHeader():cell_id(0),op_id(0),data_len(0),end_tag(0),receiver(0)
+    {}
 };
 
 class AppController;

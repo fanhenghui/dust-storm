@@ -8,20 +8,15 @@ MED_IMG_BEGIN_NAMESPACE
 class DBServerController;
 class DBOperation : public IOperation {
 public:
-    DBOperation():_receiver(0) {}
+    DBOperation() {}
     virtual ~DBOperation() {}
 
     void set_db_server_controller(std::shared_ptr<DBServerController> controller) {
         _db_server_controller = controller;
-    }
-
-    void set_receiver(unsigned int receiver) {
-        _receiver = receiver;
-    }    
+    } 
 
 protected:
     std::weak_ptr<DBServerController> _db_server_controller;
-    unsigned int _receiver;
 };
 
 MED_IMG_END_NAMESPACE
