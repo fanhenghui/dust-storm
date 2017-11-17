@@ -57,6 +57,7 @@ int DBOpQueryDICOM::execute() {
         SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series file disk empty.");
         return -1;
     }
+    //TODO sort files
 
     //batch read file(Don't need to use mutl-thread)
     for (size_t i = 0; i < files.size(); ++i) {

@@ -19,16 +19,33 @@ MED_IMG_BEGIN_NAMESPACE
 class ImageData;
 class ImageDataHeader;
 class ProgressModel;
-
 class DICOMLoader {
+public:
+    struct DCMSliceBuffer {
+        char* buffer;
+        unsigned int size;
+        bool ref;
+        DCMSliceBuffer(char* buffer_, int size_, bool ref_=false):
+            buffer(buffer_),size(size_),ref(ref_) {}
+        ~DCMSliceBuffer() {
+            if (!ref && buffer) {
+                delete [] buffer;
+                buffer = nullptr;
+            }
+        }
+    };
 public:
     IO_Export DICOMLoader();
 
     IO_Export ~DICOMLoader();
 
     // files will removal invalid file and keep majority series
-    IO_Export IOStatus
-    load_series(std::vector<std::string>& files_in_out,
+    IO_Export IOStatus load_series(std::vector<std::string>& files_in_out,
+                std::shared_ptr<ImageData>& image_data,
+                std::shared_ptr<ImageDataHeader>& img_data_header);
+
+    
+    IO_Export IOStatus load_series(std::vector<DCMSliceBuffer*>& buffers,
                 std::shared_ptr<ImageData>& image_data,
                 std::shared_ptr<ImageDataHeader>& img_data_header);
 

@@ -9,6 +9,8 @@
 #include "dcmtk/dcmdata/dctk.h"
 #include "dcmtk/dcmimgle/dcmimage.h"
 #include "dcmtk/dcmjpeg/djdecode.h"
+#include "dcmtk/dcmdata/dcistrma.h"
+#include "dcmtk/dcmdata/dcistrmb.h"
 
 #include "util/mi_model_progress.h"
 #include "mi_io_logger.h"
@@ -114,11 +116,103 @@ IOStatus DICOMLoader::check_series_uid(
     return IO_SUCCESS;
 }
 
-IOStatus
-DICOMLoader::load_series(std::vector<std::string>& files,
+IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceBuffer*>& buffers,
+                std::shared_ptr<ImageData>& image_data,
+                std::shared_ptr<ImageDataHeader>& img_data_header) {
+    MI_IO_LOG(MI_TRACE) << "IN load_series.";
+    if (buffers.empty()) {
+        set_progress_i(100);
+        return IO_EMPTY_INPUT;
+    }
+
+    const unsigned int uiSliceCount = static_cast<unsigned int>(buffers.size());
+    DcmFileFormatSet data_format_set;
+
+    //////////////////////////////////////////////////////////////////////////
+    // 1 load series
+    for (auto it = buffers.begin(); it != buffers.end(); ++it) {
+        DCMSliceBuffer* slice_buffer = *it;
+        DcmInputBufferStream* dcm_buffer_stream = new DcmInputBufferStream();
+        dcm_buffer_stream->setBuffer(slice_buffer->buffer, slice_buffer->size);
+        dcm_buffer_stream->setEos();
+        DcmDataset* dataset = new DcmDataset();
+        OFCondition status = dataset->read(*dcm_buffer_stream, EXS_LittleEndianImplicit);
+
+        if (status.bad()) {
+            set_progress_i(100);
+            return IO_FILE_OPEN_FAILED;
+        }
+
+        DcmFileFormatPtr file_format(new DcmFileFormat(dataset,false));
+        data_format_set.push_back(file_format);
+    }
+
+    add_progress_i(2);
+
+    //TODO add  data check
+    //////////////////////////////////////////////////////////////////////////
+    // 2 Data check
+    // IOStatus checking_status = data_check_i(files, data_format_set);
+
+    // if (IO_SUCCESS != checking_status) {
+    //     set_progress_i(100);
+    //     return checking_status;
+    // }
+
+    if (uiSliceCount <
+            16) { //不支持少于16张的数据进行三维可视化 // TODO 这一步在这里做不太合适
+        set_progress_i(100);
+        return IO_UNSUPPORTED_YET;
+    }
+
+    add_progress_i(3);
+
+    //////////////////////////////////////////////////////////////////////////
+    // 3 Sort series
+    IOStatus sort_status = sort_series_i(data_format_set);
+
+    if (IO_SUCCESS != sort_status) {
+        set_progress_i(100);
+        return sort_status;
+    }
+
+    add_progress_i(4);
+
+    //////////////////////////////////////////////////////////////////////////
+    // 4 Construct image data header
+    img_data_header.reset(new ImageDataHeader());
+    IOStatus data_heading_status =
+        construct_data_header_i(data_format_set, img_data_header);
+
+    if (IO_SUCCESS != data_heading_status) {
+        set_progress_i(100);
+        img_data_header.reset();
+        return data_heading_status;
+    }
+
+    add_progress_i(10);
+
+    //////////////////////////////////////////////////////////////////////////
+    // 5 Construct image data
+    image_data.reset(new ImageData());
+    IOStatus data_imaging_status =
+        construct_image_data_i(data_format_set, img_data_header, image_data);
+
+    if (IO_SUCCESS != data_imaging_status) {
+        set_progress_i(100);
+        img_data_header.reset();
+        image_data.reset();
+        return data_imaging_status;
+    }
+
+    set_progress_i(100);
+    MI_IO_LOG(MI_TRACE) << "OUT load_series.";
+    return IO_SUCCESS;
+}
+
+IOStatus DICOMLoader::load_series(std::vector<std::string>& files,
                          std::shared_ptr<ImageData>& image_data,
-                         std::shared_ptr<ImageDataHeader>& img_data_header) 
-{
+                         std::shared_ptr<ImageDataHeader>& img_data_header) {
     MI_IO_LOG(MI_TRACE) << "IN load_series.";
     if (files.empty()) {
         set_progress_i(100);

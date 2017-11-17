@@ -20,7 +20,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 SocketServer::SocketServer(SocketType type):
     _socket_type(type), _fd_server(0), _alive(true), _server_port("8888"), 
-    _max_clients(30), _client_sockets(new SocketList()) {
+    _max_clients(30), _client_sockets(new SocketList()),_package_cache_capcity(1024.0f*10.0f),_package_cache_size(0.0f) {
 }
 
 SocketServer::~SocketServer() {
@@ -430,6 +430,10 @@ int SocketServer::send() {
 
 void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg) {
     boost::mutex::scoped_lock locker(_mutex_package);
+    while (package_cache_full(pkg)) {
+        _condition_full_package.wait(_mutex_package);
+    }
+
     auto client_store = _client_pkg_store.find(socket_list_id);
     if (client_store == _client_pkg_store.end()) {
         PackageStore pkg_store;
@@ -440,7 +444,6 @@ void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* 
         client_store->second.push_back(pkg);
     }
     _condition_empty_package.notify_one();
-    //MI_UTIL_LOG(MI_DEBUG) << "in socket server push back package: " << client_store->second.size();
 }
 
 IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
@@ -455,7 +458,9 @@ IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
     }
     IPCPackage* pkg = client_store->second.front();
     client_store->second.pop_front();
-    //MI_UTIL_LOG(MI_DEBUG) << "in socket server pop back package: " << client_store->second.size();
+
+    _package_cache_size -= byte_to_mb(pkg);
+    _condition_full_package.notify_one();
     return pkg;
 }
 
@@ -491,5 +496,25 @@ void SocketServer::try_pop_front_package_i() {
     }
 }
 
+SocketServer::ServerStatus SocketServer::get_current_status() {
+    ServerStatus status;
+    {
+        boost::mutex::scoped_lock locker(_mutex_package);
+        for (auto it = _client_pkg_store.begin(); it != _client_pkg_store.end(); ++it) {
+            status.packages.insert(std::make_pair(it->first,it->second.size()));          
+        }
+        status.cur_client = _client_sockets->get_socket_count();
+        status.package_cache_size = _package_cache_size;
+    }
+    status.package_cache_capcity = _package_cache_capcity;
+    if (_socket_type == UNIX) {
+        status.socket_type = "UNIX";
+        status.host = _path;
+    } else if(_socket_type == INET) {
+        status.socket_type = "INET";
+        status.host = "localhost::" + _server_port;
+    }
+    return status;
+}
 
 MED_IMG_END_NAMESPACE

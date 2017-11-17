@@ -34,16 +34,35 @@ public:
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
     int async_send_data(IPCPackage* package);//return 0:success; -1:client disconnect 
+    int set_package_cache_capcity(float capcity_mb);//default 1024.0f*10.0f 10GB
 
     void run();
     void stop();
     int  recv();
     int  send();
+
+    struct ServerStatus {
+        std::string socket_type;//UNIX/INET
+        std::string host;
+        int cur_client;
+        int package_cache_capcity;
+        int package_cache_size;
+        std::map<unsigned int, size_t> packages;//client ID, package to be send
+    };
+    ServerStatus get_current_status();
 private:
     IPCPackage* pop_front_package_i(unsigned int socket_list_id);
     void try_pop_front_package_i();
     void push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg);
     void clear_package_i(unsigned int socket_list_id);
+
+    inline float byte_to_mb(IPCPackage* pkg) {
+        const static float val = 1.0f / 1024.0f / 1024.0f;
+        return pkg == nullptr ? 0 : pkg->header.data_len * val;
+    }
+    inline bool package_cache_full(IPCPackage* pkg_to_be_push) {
+        return (_package_cache_size + byte_to_mb(pkg_to_be_push)) >= _package_cache_capcity;
+    } 
 private:
     //address for AF_UNIX
     std::string _path;
@@ -68,6 +87,9 @@ private:
 
     boost::mutex _mutex_package;
     boost::condition _condition_empty_package;
+    boost::condition _condition_full_package;
+    float _package_cache_capcity;
+    float _package_cache_size;
     
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketServer);

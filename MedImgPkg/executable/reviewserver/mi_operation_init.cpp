@@ -3,6 +3,7 @@
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_ipc_server_proxy.h"
 
 #include "arithmetic/mi_run_length_operator.h"
 
@@ -95,7 +96,6 @@ int OpInit::execute() {
 }
 
 int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool& preprocessing_mask) {
-    MI_REVIEW_LOG(MI_TRACE) << "IN init operation: data.";
     // load data
     // get series path from img cache db
     const std::string series_uid = msg_init->series_uid();
@@ -109,14 +109,35 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     }
 
     CacheDB::ImgItem item;
-    if (0 != cache_db.get_item(series_uid, item)) {
-        MI_REVIEW_LOG(MI_ERROR) << "get series: " << series_uid << " 's path failed.";
-        return -1;
+    bool data_in_cache = false;
+    if (0 == cache_db.get_item(series_uid, item)) {
+        MI_REVIEW_LOG(MI_INFO) << "hit dcm in cache db.";
+        const int err = load_dcm_from_cache_db(controller, msg_init, item.path);
+        if(-1 == err ) {
+            //load series failed
+            return -1;
+        } else if (-1 == err) {
+            //DB has damaged cache series
+            //load from remote to update cache
+            data_in_cache = false;
+        } else {
+            data_in_cache = true;
+        }
     }
-    const std::string series_path = item.path;
-    MI_REVIEW_LOG(MI_TRACE) << "get series from local img cache db success. data path: " << series_path; 
-    
 
+    return query_from_remote_db(controller, msg_init, data_in_cache, preprocessing_mask);
+}
+
+int OpInit::load_dcm_from_cache_db(std::shared_ptr<AppController> controller, MsgInit* msg_init, const std::string& local_dcm_path) {
+    MI_REVIEW_LOG(MI_TRACE) << "IN load dcm from cache db.";
+    if (local_dcm_path.empty()) {
+        MI_REVIEW_LOG(MI_ERROR) << "series path null in cache db.";
+        return -2;
+    }
+
+    const std::string series_path = local_dcm_path;
+    const std::string series_uid = msg_init->series_uid();
+    
     //get dcm files
     std::vector<std::string> dcm_files;
     std::set<std::string> postfix;
@@ -124,7 +145,7 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     FileUtil::get_all_file_recursion(series_path, postfix, dcm_files);
     if (dcm_files.empty()) {
         MI_REVIEW_LOG(MI_ERROR) << "series path has no DICOM(.dcm) files.";
-        return -1;
+        return -2;
     }
 
     //load DICOM
@@ -133,7 +154,7 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     DICOMLoader loader;
     IOStatus status = loader.load_series(dcm_files, img_data, data_header);
     if (status != IO_SUCCESS) {
-        MI_REVIEW_LOG(MI_ERROR) << "load series :" << series_uid << " failed.";
+        MI_REVIEW_LOG(MI_FATAL) << "load series :" << series_uid << " failed.";
         return -1;
     }
 
@@ -150,72 +171,79 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     mask_data->mem_allocate();
     volume_infos->set_mask(mask_data);
 
-    // serach preprocessing mask(rle)
-    const unsigned int image_buffer_size = mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2];
-    std::set<std::string> mask_postfix;
-    mask_postfix.insert(".rle");
-    std::vector<std::string> mask_file;
-    FileUtil::get_all_file_recursion(series_path, mask_postfix, mask_file);
-    preprocessing_mask = false;
-    if (!mask_file.empty()) {
-        const std::string rle_file = mask_file[0];
-        if (0 != RunLengthOperator::decode(rle_file, (unsigned char*)mask_data->get_pixel_pointer(), image_buffer_size)) {
-            //TODO do preprocessing
-            memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
-            MaskLabelStore::instance()->fill_label(1);
-            volume_infos->cache_original_mask();
-        } else {
-            //TODO check mask label(or just set as 1)
-            MaskLabelStore::instance()->fill_label(1);
-            volume_infos->cache_original_mask();
-            MI_REVIEW_LOG(MI_DEBUG) << "read original rle mask success.";
-        }
-        preprocessing_mask = true;
-    } else {
-        //TODO TMP set all mask pixel to 1 (replaced by preprocessing algorithm later)
-        unsigned char* mask_raw = (unsigned char*)mask_data->get_pixel_pointer();
-        memset(mask_raw, 1 , image_buffer_size);
-        MaskLabelStore::instance()->fill_label(1);
-        volume_infos->cache_original_mask();
-        preprocessing_mask = true;
-    }
-
     controller->set_volume_infos(volume_infos);
 
-    //load annotation file
-    std::set<std::string> annotation_postfix;
-    annotation_postfix.insert(".csv");
-    std::vector<std::string> annotation_file;
-    FileUtil::get_all_file_recursion(series_path, annotation_postfix, annotation_file);
-    if (!annotation_file.empty()) {
-        std::shared_ptr<ModelAnnotation> model_annotation = AppCommonUtil::get_model_annotation(controller);
-        REVIEW_CHECK_NULL_EXCEPTION(model_annotation);
-
-        NoduleSetParser parser;
-        std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-        if (IO_SUCCESS != parser.load_as_csv(annotation_file[0], nodule_set) ) {
-            MI_REVIEW_LOG(MI_ERROR) << "load annotation file: " << annotation_file[0] << " faild.";
-        } else {
-            const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
-            std::vector<std::string> ids;
-            const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();
-            for (size_t i = 0; i < vois.size(); ++i) {
-                if (vois[i].para0 < possibility_threshold) {
-                    continue;
-                }
-                std::stringstream ss;
-                ss << clock() << '|' << i; 
-                const std::string id = ss.str();
-                ids.push_back(id); 
-                unsigned char new_label = MaskLabelStore::instance()->acquire_label();
-                model_annotation->add_annotation(vois[i], id, new_label);
-            }
-            model_annotation->set_processing_cache(ids);
-        }
-    }
-
-    MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: data.";
+    MI_REVIEW_LOG(MI_TRACE) << "OUT load dcm from cache db.";
     return 0;
+}
+
+int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool data_in_cache, bool& preprocessing_mask) {
+
+    
+    //  // serach preprocessing mask(rle)
+    // const unsigned int image_buffer_size = mask_data->_dim[0]*mask_data->_dim[1]*mask_data->_dim[2];
+    // std::set<std::string> mask_postfix;
+    // mask_postfix.insert(".rle");
+    // std::vector<std::string> mask_file;
+    // FileUtil::get_all_file_recursion(series_path, mask_postfix, mask_file);
+    // preprocessing_mask = false;
+    // if (!mask_file.empty()) {
+    //     const std::string rle_file = mask_file[0];
+    //     if (0 != RunLengthOperator::decode(rle_file, (unsigned char*)mask_data->get_pixel_pointer(), image_buffer_size)) {
+    //         //TODO do preprocessing
+    //         memset((char*)mask_data->get_pixel_pointer(), 1, image_buffer_size);
+    //         MaskLabelStore::instance()->fill_label(1);
+    //         volume_infos->cache_original_mask();
+    //     } else {
+    //         //TODO check mask label(or just set as 1)
+    //         MaskLabelStore::instance()->fill_label(1);
+    //         volume_infos->cache_original_mask();
+    //         MI_REVIEW_LOG(MI_DEBUG) << "read original rle mask success.";
+    //     }
+    //     preprocessing_mask = true;
+    // } else {
+    //     //TODO TMP set all mask pixel to 1 (replaced by preprocessing algorithm later)
+    //     unsigned char* mask_raw = (unsigned char*)mask_data->get_pixel_pointer();
+    //     memset(mask_raw, 1 , image_buffer_size);
+    //     MaskLabelStore::instance()->fill_label(1);
+    //     volume_infos->cache_original_mask();
+    //     preprocessing_mask = true;
+    // }
+
+    // controller->set_volume_infos(volume_infos);
+
+    // //load annotation file
+    // std::set<std::string> annotation_postfix;
+    // annotation_postfix.insert(".csv");
+    // std::vector<std::string> annotation_file;
+    // FileUtil::get_all_file_recursion(series_path, annotation_postfix, annotation_file);
+    // if (!annotation_file.empty()) {
+    //     std::shared_ptr<ModelAnnotation> model_annotation = AppCommonUtil::get_model_annotation(controller);
+    //     REVIEW_CHECK_NULL_EXCEPTION(model_annotation);
+
+    //     NoduleSetParser parser;
+    //     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
+    //     if (IO_SUCCESS != parser.load_as_csv(annotation_file[0], nodule_set) ) {
+    //         MI_REVIEW_LOG(MI_ERROR) << "load annotation file: " << annotation_file[0] << " faild.";
+    //     } else {
+    //         const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
+    //         std::vector<std::string> ids;
+    //         const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();
+    //         for (size_t i = 0; i < vois.size(); ++i) {
+    //             if (vois[i].para0 < possibility_threshold) {
+    //                 continue;
+    //             }
+    //             std::stringstream ss;
+    //             ss << clock() << '|' << i; 
+    //             const std::string id = ss.str();
+    //             ids.push_back(id); 
+    //             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
+    //             model_annotation->add_annotation(vois[i], id, new_label);
+    //         }
+    //         model_annotation->set_processing_cache(ids);
+    //     }
+    // }
+
 }
 
 int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask) {
@@ -430,5 +458,7 @@ int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
     return 0;
 }
+
+
 
 MED_IMG_END_NAMESPACE
