@@ -296,6 +296,7 @@ int import_one_series(const std::string& map_path, DcmItem& series_info,
         }
         size_mb += size_slice;
     }
+    item.size_mb = size_mb;
 
     std::shared_ptr<DB> db = std::dynamic_pointer_cast<DB>(_db);
 
