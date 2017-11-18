@@ -19,13 +19,16 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 OBJS = mi_app_cache_db.o mi_app_db.o mi_app_config.o mi_app_cell.o mi_operation_factory.o mi_app_none_image_item.o mi_app_none_image.o \
 mi_app_controller.o mi_app_thread_model.o \
-mi_model_crosshair.o mi_model_annotation.o mi_app_common_util.o \
+mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_app_common_util.o \
 mi_cmd_handler_operating.o mi_cmd_handler_heartbeat.o mi_cmd_handler_fe_ready.o mi_cmd_handler_shutdown.o mi_cmd_handler_search_worklist.o \
 mi_cmd_handler_mpr_play.o mi_cmd_handler_vr_play.o \
 mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \
 mi_operation_windowing.o mi_operation_resize.o mi_operation_mpr_mask_overlay.o \
 mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_operation_annotation.o mi_ob_annotation_list.o \
-mi_operation_switch_preset_windowing.o mi_operation_switch_preset_vrt.o mi_operation_locate.o mi_operation_downsample.o
+mi_operation_switch_preset_windowing.o mi_operation_switch_preset_vrt.o mi_operation_locate.o mi_operation_downsample.o \
+mi_cmd_handler_recv_dbs_error.o mi_cmd_handler_recv_dbs_ai_annotation.o \
+mi_cmd_handler_recv_dbs_end_signal.o mi_cmd_handler_recv_dbs_preprocess_mask.o \
+mi_cmd_handler_recv_dbs_dicom_series.o
 
 PROTOC = mi_message.pb.o
 

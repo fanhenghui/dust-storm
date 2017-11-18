@@ -55,7 +55,18 @@ public:
                                         std::string& study_uid,
                                         std::string& series_uid);
 
+    IO_Export IOStatus check_series_uid(const DCMSliceStream* stream,
+                                        std::string& study_uid,
+                                        std::string& series_uid);
+
     IO_Export IOStatus check_series_uid(const std::string& file,
+                                        std::string& study_uid,
+                                        std::string& series_uid,
+                                        std::string& patient_name,
+                                        std::string& patient_id,
+                                        std::string& modality);
+
+    IO_Export IOStatus check_series_uid(const DCMSliceStream* stream,
                                         std::string& study_uid,
                                         std::string& series_uid,
                                         std::string& patient_name,

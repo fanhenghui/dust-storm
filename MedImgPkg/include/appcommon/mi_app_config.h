@@ -16,8 +16,9 @@ public:
     std::string get_log_config_file() const;
     std::string get_test_data_root() const;
 
-    void get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name);
+    void get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path);
     void get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name);
+    void get_db_server_host(std::string& ip, std::string& port);
 
     int get_expected_fps() const;
     float get_nodule_possibility_threshold() const;
@@ -37,12 +38,16 @@ private:
     std::string _db_pwd;
     std::string _db_name;
 
+    //DB server (ip is the same with DB)
+    std::string _db_server_port;
+
     //cache DB info
     std::string _cache_db_ip;
     std::string _cache_db_port;
     std::string _cache_db_user;
     std::string _cache_db_pwd;
     std::string _cache_db_name;
+    std::string _cache_db_path;
 
     int _expected_fps;
 };

@@ -61,6 +61,49 @@ IOStatus DICOMLoader::check_series_uid(const std::string& file,
     return IO_SUCCESS;
 }
 
+IOStatus DICOMLoader::check_series_uid(const DCMSliceStream* stream,
+                                       std::string& study_uid,
+                                       std::string& series_uid) {
+    if (nullptr == stream) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmInputBufferStream dcm_buffer_stream;
+    dcm_buffer_stream.setBuffer(stream->buffer, stream->size);
+    dcm_buffer_stream.setEos();
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->read(dcm_buffer_stream);
+
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_StudyInstanceUID, context);
+
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    study_uid = std::string(context.c_str());
+
+    status = data_set->findAndGetOFString(DCM_SeriesInstanceUID, context);
+
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    series_uid = std::string(context.c_str());
+
+    return IO_SUCCESS;
+}
+
 IOStatus DICOMLoader::check_series_uid(
     const std::string& file, std::string& study_uid, std::string& series_uid,
     std::string& patient_name, std::string& patient_id, std::string& modality) {
@@ -70,6 +113,65 @@ IOStatus DICOMLoader::check_series_uid(
 
     DcmFileFormatPtr file_format(new DcmFileFormat());
     OFCondition status = file_format->loadFile(file.c_str());
+
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_StudyInstanceUID, context);
+
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    study_uid = std::string(context.c_str());
+
+    status = data_set->findAndGetOFString(DCM_SeriesInstanceUID, context);
+
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    series_uid = std::string(context.c_str());
+
+    status = data_set->findAndGetOFString(DCM_Modality, context);
+
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    modality = std::string(context.c_str());
+
+    // name & id may be null
+    status = data_set->findAndGetOFString(DCM_PatientName, context);
+    patient_name = std::string(context.c_str());
+
+    status = data_set->findAndGetOFString(DCM_PatientID, context);
+    patient_id = std::string(context.c_str());
+
+    return IO_SUCCESS;
+}
+
+IOStatus DICOMLoader::check_series_uid(
+    const DCMSliceStream* stream, std::string& study_uid, std::string& series_uid,
+    std::string& patient_name, std::string& patient_id, std::string& modality) {
+
+    if (nullptr == stream) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmInputBufferStream dcm_buffer_stream;
+    dcm_buffer_stream.setBuffer(stream->buffer, stream->size);
+    dcm_buffer_stream.setEos();
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->read(dcm_buffer_stream);
 
     if (status.bad()) {
         return IO_FILE_OPEN_FAILED;
@@ -748,8 +850,6 @@ IOStatus DICOMLoader::construct_image_data_i(
         static_cast<unsigned int>(file_format_set.size());
     DcmFileFormatPtr file_format_first = file_format_set[0];
     DcmDataset* data_set_first = file_format_first->getDataset();
-    DcmFileFormatPtr pFileLast = file_format_set[slice_count - 1];
-    DcmDataset* pImgLast = pFileLast->getDataset();
 
     // Intercept and slope
     get_intercept_i(data_set_first, image_data->_intercept);

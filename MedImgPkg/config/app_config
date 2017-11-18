@@ -1,18 +1,21 @@
 TestDataRoot = /home/wangrui22/data
 
-RemoteDBIP = 172.23.237.53
+RemoteDBIP = 192.168.199.107
 RemoteDBPort = 3306
 RemoteDBUser = root
 RemoteDBPWD = 123456
 RemoteDBName = med_img_db
+
+DBServerPort = 8888
 
 CacheDBIP = 127.0.0.1
 CacheDBPort = 3306
 CacheDBUser = root
 CacheDBPWD = 123456
 CacheDBName = med_img_cache_db
+CacheDBPath = /home/wangrui22/med_img_cache_db
 
-LocalHostIP = 172.23.237.53
+LocalHostIP = 192.168.199.107
 
 PresetCTAbdomenWW = 400
 PresetCTAbdomenWL = 60

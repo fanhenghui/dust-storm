@@ -14,6 +14,7 @@
 using namespace medical_imaging;
 class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MI_LOG(MI_INFO) << "[DB UT] " << "IN DICOM series handler.";
         MemShield shield(buffer);
 
         //just write to disk
@@ -40,6 +41,7 @@ class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
 
 class CmdHandlerDBSendAIAnnotation : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MI_LOG(MI_INFO) << "[DB UT] " << "IN AI annotation handler.";
         MemShield shield(buffer);
         //just write to disk
         if (nullptr == buffer) {
@@ -65,6 +67,7 @@ class CmdHandlerDBSendAIAnnotation : public ICommandHandler {
 
 class CmdHandlerDBSendPreprocessMask : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MI_LOG(MI_INFO) << "[DB UT] " << "IN preprocess mask handler.";
         MemShield shield(buffer);
         if (nullptr == buffer) {
             MI_LOG(MI_INFO) << "[DB UT] " << "DB send preprocess mask buffer null.";
@@ -90,6 +93,7 @@ class CmdHandlerDBSendEnd : public ICommandHandler {
 
 class CmdHandlerDBSendError : public ICommandHandler {
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer) {
+        MI_LOG(MI_INFO) << "[DB UT] " << "IN Error handler.";
         if (nullptr == buffer) {
             MI_LOG(MI_ERROR) << "[DB UT] " << "DB server error has no message.";
             return -1;
@@ -108,6 +112,7 @@ class CmdHandlerDBSendError : public ICommandHandler {
     };
 };
 
+const static std::string series_id = "1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405";
 IPCPackage* create_query_dicom_message() {
     IPCDataHeader post_header;
     char* post_data = nullptr;
@@ -116,7 +121,7 @@ IPCPackage* create_query_dicom_message() {
     post_header.msg_info1 = OPERATION_ID_DB_QUERY_DICOM;
 
     MsgString msgSeries;
-    msgSeries.set_context("1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405");
+    msgSeries.set_context(series_id);
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
@@ -135,7 +140,7 @@ IPCPackage* create_query_preprocess_mask_message() {
     post_header.msg_info1 = OPERATION_ID_DB_QUERY_PREPROCESS_MASK;
 
     MsgString msgSeries;
-    msgSeries.set_context("1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405");
+    msgSeries.set_context(series_id);
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
@@ -154,7 +159,7 @@ IPCPackage* create_query_ai_annotation_message() {
     post_header.msg_info1 = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
 
     MsgString msgSeries;
-    msgSeries.set_context("1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405");
+    msgSeries.set_context(series_id);
     int post_size = msgSeries.ByteSize();
     post_data = new char[post_size];
     if (!msgSeries.SerializeToArray(post_data, post_size)) {
