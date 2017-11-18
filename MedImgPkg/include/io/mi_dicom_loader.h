@@ -21,13 +21,13 @@ class ImageDataHeader;
 class ProgressModel;
 class DICOMLoader {
 public:
-    struct DCMSliceBuffer {
+    struct DCMSliceStream {
         char* buffer;
         unsigned int size;
         bool ref;
-        DCMSliceBuffer(char* buffer_, int size_, bool ref_=false):
+        DCMSliceStream(char* buffer_, int size_, bool ref_=false):
             buffer(buffer_),size(size_),ref(ref_) {}
-        ~DCMSliceBuffer() {
+        ~DCMSliceStream() {
             if (!ref && buffer) {
                 delete [] buffer;
                 buffer = nullptr;
@@ -45,7 +45,7 @@ public:
                 std::shared_ptr<ImageDataHeader>& img_data_header);
 
     
-    IO_Export IOStatus load_series(std::vector<DCMSliceBuffer*>& buffers,
+    IO_Export IOStatus load_series(std::vector<DCMSliceStream*>& buffers,
                 std::shared_ptr<ImageData>& image_data,
                 std::shared_ptr<ImageDataHeader>& img_data_header);
 

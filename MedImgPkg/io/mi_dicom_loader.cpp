@@ -116,7 +116,7 @@ IOStatus DICOMLoader::check_series_uid(
     return IO_SUCCESS;
 }
 
-IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceBuffer*>& buffers,
+IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffers,
                 std::shared_ptr<ImageData>& image_data,
                 std::shared_ptr<ImageDataHeader>& img_data_header) {
     MI_IO_LOG(MI_TRACE) << "IN load_series.";
@@ -131,19 +131,18 @@ IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceBuffer*>& buffer
     //////////////////////////////////////////////////////////////////////////
     // 1 load series
     for (auto it = buffers.begin(); it != buffers.end(); ++it) {
-        DCMSliceBuffer* slice_buffer = *it;
-        DcmInputBufferStream* dcm_buffer_stream = new DcmInputBufferStream();
-        dcm_buffer_stream->setBuffer(slice_buffer->buffer, slice_buffer->size);
-        dcm_buffer_stream->setEos();
-        DcmDataset* dataset = new DcmDataset();
-        OFCondition status = dataset->read(*dcm_buffer_stream, EXS_LittleEndianImplicit);
+        DCMSliceStream* slice_buffer = *it;
+        DcmInputBufferStream dcm_buffer_stream;
+        dcm_buffer_stream.setBuffer(slice_buffer->buffer, slice_buffer->size);
+        dcm_buffer_stream.setEos();
+        DcmFileFormatPtr file_format(new DcmFileFormat());
+        OFCondition status = file_format->read(dcm_buffer_stream);
 
         if (status.bad()) {
             set_progress_i(100);
             return IO_FILE_OPEN_FAILED;
         }
 
-        DcmFileFormatPtr file_format(new DcmFileFormat(dataset,false));
         data_format_set.push_back(file_format);
     }
 
