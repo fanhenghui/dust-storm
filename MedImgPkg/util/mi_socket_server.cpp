@@ -443,6 +443,7 @@ void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* 
     } else {
         client_store->second.push_back(pkg);
     }
+    _package_cache_size += byte_to_mb(pkg);
     _condition_empty_package.notify_one();
 }
 
