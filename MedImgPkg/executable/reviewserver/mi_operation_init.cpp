@@ -122,11 +122,12 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_
         if(-1 == err ) {
             //load series failed
             return -1;
-        } else if (-1 == err) {
+        } else if (-2 == err) {
             //DB has damaged cache series
             //load from remote to update cache
             data_in_cache = false;
         } else {
+            MI_REVIEW_LOG(MI_INFO) << "load series from cache db success.";
             data_in_cache = true;
         }
     }
@@ -218,8 +219,11 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     IPCClientProxy client_proxy(INET);
     client_proxy.set_server_address(dbs_ip,dbs_port);
 
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
-    std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
+    if (!data_in_cache) {
+        client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+        std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
+    }
+    
     client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
     std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(controller)));
     client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
@@ -231,7 +235,9 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(controller)));
 
     std::vector<IPCPackage*> packages;
-    packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_DICOM, series_uid));
+    if (!data_in_cache) {
+        packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_DICOM, series_uid));
+    }
     packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_PREPROCESS_MASK, series_uid));
     packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_AI_ANNOTATION, series_uid));
     packages.push_back(create_query_end_msg_package());

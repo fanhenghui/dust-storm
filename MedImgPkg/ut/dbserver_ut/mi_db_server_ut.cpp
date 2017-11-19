@@ -7,6 +7,7 @@
 #include "util/mi_ipc_common.h"
 #include "util/mi_memory_shield.h"
 #include "io/mi_dicom_loader.h"
+#include "arithmetic/mi_run_length_operator.h"
 #include "appcommon/mi_app_config.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_message.pb.h"
@@ -74,11 +75,17 @@ class CmdHandlerDBSendPreprocessMask : public ICommandHandler {
             return -1;
         }
         //just write to disk
-        const std::string file_path = "/home/wangrui22/data/test/mask.rle";
+        const std::string file_path = "/home/wangrui22/data/test/1.rle";
         std::fstream out(file_path, std::ios::out | std::ios::binary);
         if (out.is_open()) {
             out.write(buffer, dataheader.data_len);
             out.close();
+        }
+
+        unsigned char* buffer2 = new unsigned char[512*512*312];
+        if (0 != RunLengthOperator::decode(file_path,buffer2,512*512*312)) {
+            MI_LOG(MI_INFO) << "[DB UT] " << "decode rle failed.";
+            return -1;
         }
         return 0;
     };

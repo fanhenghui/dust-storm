@@ -57,7 +57,7 @@ int CmdHandlerRecvDBSPreprocessMask::handle_command(const IPCDataHeader& ipchead
         return -1;
     }
 
-    if(!RunLengthOperator::decode((unsigned int*)buffer, ipcheader.data_len, (unsigned char*)mask->get_pixel_pointer(), mask->get_data_size())) {
+    if(!RunLengthOperator::decode((unsigned int*)buffer, ipcheader.data_len/sizeof(unsigned int), (unsigned char*)mask->get_pixel_pointer(), mask->get_data_size())) {
         model_dbs_status->set_error_info("decode IPC buffer failed when recv dbs preprocess mask");
         return -1;
     } else {
