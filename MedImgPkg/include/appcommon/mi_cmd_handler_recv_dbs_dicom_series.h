@@ -47,6 +47,7 @@ private:
     std::string _patient_name;
     std::string _patient_id;
     std::string _modality;
+    float _size_mb;
 };
 
 MED_IMG_END_NAMESPACE

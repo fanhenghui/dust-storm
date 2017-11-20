@@ -29,12 +29,19 @@ MED_IMG_BEGIN_NAMESPACE
 CmdHandlerRecvDBSDCMSeries::CmdHandlerRecvDBSDCMSeries(std::shared_ptr<AppController> controller):
     _controller(controller),_cur_recv_slice(0),_cur_save_slice(0),_total_slice(0),
     _th_running(false),_err_tag(false),_series_id(""),_study_id(""),_series_path(""),
-    _patient_name(""),_patient_id(""),_modality("") {
+    _patient_name(""),_patient_id(""),_modality(""),_size_mb(0) {
 
 }
 
 CmdHandlerRecvDBSDCMSeries::~CmdHandlerRecvDBSDCMSeries() {
     _th_cache_db.join();
+    //remove package
+    for (auto it = _dcm_streams_store.begin(); it != _dcm_streams_store.end(); ++it) {
+        DICOMLoader::DCMSliceStream* stream = *it;
+        delete stream;
+        stream = nullptr;
+    }
+    _dcm_streams_store.clear();
 }
 
 int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
@@ -105,6 +112,8 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
                 volume_infos->set_mask(mask_data);
             
                 controller->set_volume_infos(volume_infos);
+
+                MI_APPCOMMON_LOG(MI_INFO) << "load DBS DICOM stream success.";
             }
         }
         MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
@@ -161,7 +170,8 @@ void CmdHandlerRecvDBSDCMSeries::update_cache_db_i() {
 
             //create direction
             const std::string study_path = path + "/" + _study_id;
-            const std::string series_path = path + "/" + _series_id;
+            const std::string series_path = path + "/" + _study_id + "/" +_series_id;
+            _series_path = series_path;
 #ifdef WIN32
             //TODO check and create direction use windows os function
 #else
@@ -189,6 +199,7 @@ void CmdHandlerRecvDBSDCMSeries::update_cache_db_i() {
         }
 
         ++_cur_save_slice;
+        _size_mb +=  dcm_stream->size/1024.0/1024.0;
 
         //add a column to DB
         if (_cur_save_slice == _total_slice) {
@@ -206,9 +217,13 @@ void CmdHandlerRecvDBSDCMSeries::update_cache_db_i() {
             img_item.patient_id = _patient_id;
             img_item.modality = _modality;
             img_item.path = _series_path;
+            img_item.size_mb = _size_mb;
             if(cache_db.insert_item(img_item)){
                 MI_APPCOMMON_LOG(MI_ERROR) << "insert item to cache DB failed.";
             }
+            MI_APPCOMMON_LOG(MI_INFO) << "insert new DICOM item: " << _series_id << " to cache DB sucess.";
+
+            //TODO check Cache DB memory status, and remove oldest cache
             break;
         }
     }
