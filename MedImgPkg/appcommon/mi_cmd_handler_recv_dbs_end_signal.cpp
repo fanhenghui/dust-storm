@@ -27,7 +27,7 @@ int CmdHandlerRecvDBSEndSignal::handle_command(const IPCDataHeader& ipcheader , 
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<ModelDBSStatus> model_dbs_status = AppCommonUtil::get_model_dbs_status(controller);
     APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
-    model_dbs_status->reset();
+    model_dbs_status->set_success();
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
     return CLIENT_QUIT_ID;

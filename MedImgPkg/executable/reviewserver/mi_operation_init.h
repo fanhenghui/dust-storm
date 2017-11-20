@@ -19,7 +19,7 @@ public:
     }
 
 private:
-    int init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool& preprocessing_mask);
+    int init_data_i(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask);
     int init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask);
     int init_model_i(std::shared_ptr<AppController> controller, MsgInit* msg_init);
 

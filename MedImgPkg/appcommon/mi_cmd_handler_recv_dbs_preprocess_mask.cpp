@@ -19,7 +19,6 @@
 #include "mi_app_common_util.h"
 #include "mi_model_dbs_status.h"
 
-
 MED_IMG_BEGIN_NAMESPACE
 
 CmdHandlerRecvDBSPreprocessMask::CmdHandlerRecvDBSPreprocessMask(std::shared_ptr<AppController> controller):
@@ -44,7 +43,7 @@ int CmdHandlerRecvDBSPreprocessMask::handle_command(const IPCDataHeader& ipchead
     std::shared_ptr<VolumeInfos> volume_infos = controller->get_volume_infos();
     if (nullptr == volume_infos) {
         model_dbs_status->set_error_info("volume info is null when recv dbs preprocess mask");
-        return -1;
+        return -1;//TODO 需要兼容DB没有预处理mask的情况？ 暂时不return CLIENT_QUIT_ID， 以下类似
     }
     std::shared_ptr<ImageData> mask = volume_infos->get_mask();
     if (nullptr == mask) {
@@ -57,18 +56,21 @@ int CmdHandlerRecvDBSPreprocessMask::handle_command(const IPCDataHeader& ipchead
         return -1;
     }
 
-    if(!RunLengthOperator::decode((unsigned int*)buffer, ipcheader.data_len/sizeof(unsigned int), (unsigned char*)mask->get_pixel_pointer(), mask->get_data_size())) {
-        model_dbs_status->set_error_info("decode IPC buffer failed when recv dbs preprocess mask");
-        return -1;
-    } else {
+    const unsigned int volume_size = mask->get_data_size();
+    if(0 == RunLengthOperator::decode((unsigned int*)buffer,ipcheader.data_len/sizeof(unsigned int), (unsigned char*)mask->get_pixel_pointer(), volume_size)) {
         MaskLabelStore::instance()->fill_label(1);
         volume_infos->cache_original_mask();
-        MI_APPCOMMON_LOG(MI_INFO) << "decode preprocess mask success.";
+        MI_APPCOMMON_LOG(MI_INFO) << "decode DBS compressed preprocess mask success.";
+    } else {
+        model_dbs_status->set_error_info("decode IPC buffer failed when recv dbs preprocess mask");
+        return -1; 
     }
+
+    //set preprocess mask tag
+    model_dbs_status->set_preprocess_mask();
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
     return 0;
 }
-
 
 MED_IMG_END_NAMESPACE

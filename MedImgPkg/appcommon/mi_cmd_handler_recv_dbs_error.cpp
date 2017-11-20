@@ -32,7 +32,7 @@ int CmdHandlerRecvDBSError::handle_command(const IPCDataHeader& ipcheader , char
     MsgString msg;
     if (!msg.ParseFromArray(buffer, ipcheader.data_len)) {
         model_dbs_status->set_error_info("parse recv dbs error message failed.");
-        return -1; 
+        return CLIENT_QUIT_ID; 
     }
 
     const std::string err_msg = msg.context();

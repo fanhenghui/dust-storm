@@ -128,35 +128,32 @@ void SocketServer::run() {
     } 
     
     //accept client
-    //fd_set fdreads;
+    fd_set fdreads;
     while (true) {
         if(!_alive) {
             break;
         }
 
-        // FD_ZERO(&fdreads);
-        // FD_SET(_fd_server, &fdreads);
+        FD_ZERO(&fdreads);
+        FD_SET(_fd_server, &fdreads);
 
-        // struct timeval timeout;
-        // timeout.tv_sec = 10;
-        // timeout.tv_usec = 500000;
-        // //TODO set timeout
-        // MI_UTIL_LOG(MI_INFO) << "IN socket server accept select.";
-        // const int activity = select(_fd_server+1, &fdreads, NULL, NULL, NULL);
-        // MI_UTIL_LOG(MI_INFO) << "OUT socket server accept select.";
-        // //const int activity = 1;
-        // if (activity < 0 && (errno != EINTR)) {
-        //     //error
-        //     MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
-        //     continue;
-        // } else if (activity == 0) {
-        //     //timeout
-        //     MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
-        //     continue;
-        // } 
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 500000;
+        const int activity = select(_fd_server+1, &fdreads, NULL, NULL, &timeout);
+        //const int activity = 1;
+        if (activity < 0 && (errno != EINTR)) {
+            //error
+            MI_UTIL_LOG(MI_ERROR) << "socket read fd_set select faild.";
+            continue;
+        } else if (activity == 0) {
+            //timeout
+            //MI_UTIL_LOG(MI_DEBUG) << "socket read fd_set select timeout.";
+            continue;
+        } 
 
         //accept client socket
-        //if (FD_ISSET(_fd_server, &fdreads)) {
+        if (FD_ISSET(_fd_server, &fdreads)) {
             int new_client_socket = 0;
             socklen_t addr_len = 0;
             if (UNIX == _socket_type) {
@@ -189,7 +186,7 @@ void SocketServer::run() {
                     }
                 }
             }           
-        //}
+        }
     }
 
     //close socket
@@ -497,7 +494,7 @@ void SocketServer::try_pop_front_package_i() {
     }
 }
 
-SocketServer::ServerStatus SocketServer::get_current_status() {
+ServerStatus SocketServer::get_current_status() {
     ServerStatus status;
     {
         boost::mutex::scoped_lock locker(_mutex_package);

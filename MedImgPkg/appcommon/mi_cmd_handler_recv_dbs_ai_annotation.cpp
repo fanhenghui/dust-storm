@@ -47,7 +47,7 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
     MsgAnnotationCollectionDB msgAnnos;
     if (!msgAnnos.ParseFromArray(buffer,ipcheader.data_len)) {
         model_dbs_status->set_error_info("parse recv dbs AI annotation message failed.");
-        return -1;
+        return CLIENT_QUIT_ID;
     }
     
     std::vector<std::string> ids;
@@ -64,6 +64,9 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
         ss << clock() << '|' << i; 
         const std::string id = ss.str();
         ids.push_back(id);
+
+        MI_APPCOMMON_LOG(MI_INFO) << "anno item: (" << anno.x() << "," << anno.y() << "," << anno.z() << ") " 
+            << anno.r() << ", " << anno.p();
 
         unsigned char new_label = MaskLabelStore::instance()->acquire_label();
         model_annotation->add_annotation(voi, id, new_label);

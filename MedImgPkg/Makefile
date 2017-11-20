@@ -17,6 +17,7 @@ subsystem:
 	$(MAKE) -C ./executable/extractmask
 	$(MAKE) -C ./executable/compressmask
 	$(MAKE) -C ./ut/dbserver_ut
+	$(MAKE) -C ./ut/appcommon_ut
 	$(MAKE) -C ./ut/util_ut
 	$(MAKE) -C ./ut/algorithm_ut
 	$(MAKE) -C ./ut/glresource_ut
@@ -40,6 +41,7 @@ clean:
 	$(MAKE) clean -C ./executable/extractmask
 	$(MAKE) clean -C ./executable/compressmask
 	$(MAKE) clean -C ./ut/dbserver_ut
+	$(MAKE) clean -C ./ut/appcommon_ut
 	$(MAKE) clean -C ./ut/util_ut
 	$(MAKE) clean -C ./ut/algorithm_ut
 	$(MAKE) clean -C ./ut/glresource_ut

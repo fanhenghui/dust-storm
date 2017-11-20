@@ -57,7 +57,6 @@ MED_IMG_BEGIN_NAMESPACE
 
 const float DEFAULT_WW = 1500;
 const float DEFAULT_WL = -400;
-const std::string LUNG_NODULE_LUT_PATH = "../config/lut/3d/ct_lung_nodule.xml";
 const std::string LUNG_LUT_PATH = "../config/lut/3d/ct_cta.xml";
 const RGBUnit COLOR_TRANSVERSE = RGBUnit(237, 25, 35);
 const RGBUnit COLOR_CORONAL = RGBUnit(255, 128, 0);
@@ -86,7 +85,7 @@ int OpInit::execute() {
     }
 
     bool preprocessing_mask = false;
-    if (0 != init_data_i(controller, &msg_init, preprocessing_mask)) {
+    if (0 != init_data_i(controller, msg_init.series_uid(), preprocessing_mask)) {
         MI_REVIEW_LOG(MI_FATAL) << "init data failed.";
         return -1;
     }
@@ -101,10 +100,9 @@ int OpInit::execute() {
     return 0;
 }
 
-int OpInit::init_data_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool& preprocessing_mask) {
+int OpInit::init_data_i(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask) {
     // load data
     // get series path from img cache db
-    const std::string series_uid = msg_init->series_uid();
     MI_REVIEW_LOG(MI_TRACE) << "try to get series from local img cache db. series id: " << series_uid;
     std::string db_ip_port,db_user,db_pwd,db_name,db_path;
     AppConfig::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name,db_path);
@@ -216,6 +214,12 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
         return -1;
     }
 
+    //use DBS status model to record query situation
+    std::shared_ptr<IModel> model = controller->get_model(MODEL_ID_DBS_STATUS);
+    std::shared_ptr<ModelDBSStatus> model_dbs_status = std::dynamic_pointer_cast<ModelDBSStatus>(model);
+    REVIEW_CHECK_NULL_EXCEPTION(model_dbs_status);
+    model_dbs_status->reset();
+
     IPCClientProxy client_proxy(INET);
     client_proxy.set_server_address(dbs_ip,dbs_port);
 
@@ -248,14 +252,18 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     }
 
     //check errors
-    std::shared_ptr<IModel> model = controller->get_model(MODEL_ID_DBS_STATUS);
-    std::shared_ptr<ModelDBSStatus> model_dbs_status = std::dynamic_pointer_cast<ModelDBSStatus>(model);
-    REVIEW_CHECK_NULL_EXCEPTION(model_dbs_status);
-    std::string dbs_err = model_dbs_status->get_error_info();
-    if (dbs_err != "") {
+    if (!model_dbs_status->success()) {
+        std::string dbs_err = model_dbs_status->get_error_info();
         MI_REVIEW_LOG(MI_FATAL) << "query from db server failed: " << dbs_err;
         return -1;
+    } else {
+        MI_REVIEW_LOG(MI_INFO) << "query from db server success";
     }
+
+    //check preprocess mask tag
+    preprocessing_mask = model_dbs_status->has_preprocess_mask();
+    
+    return 0;
 }
 
 int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask) {
@@ -473,7 +481,5 @@ int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
     return 0;
 }
-
-
 
 MED_IMG_END_NAMESPACE

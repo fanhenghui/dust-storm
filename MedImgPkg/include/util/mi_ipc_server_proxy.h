@@ -26,6 +26,7 @@ public:
                                   std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);
     int async_send_data(IPCPackage* package);
+    ServerStatus get_current_status();
     int handle_command(const IPCDataHeader& header, char* buffer);
 
 protected:

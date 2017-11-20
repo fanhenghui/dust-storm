@@ -157,8 +157,9 @@ void SocketClient::run() {
         IPCDataHeader header;
         char* buffer = nullptr;
 
-        if (recv(_fd_server, &header, sizeof(header) , 0) <= 0) {
-            MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
+        //header is just 32 byte,use MSG_WAITALL to force client socket to return untill recv all header buffer(32byte)
+        if (recv(_fd_server, &header, sizeof(header) , MSG_WAITALL) <= 0) {
+            MI_UTIL_LOG(MI_ERROR) << "client receive data header failed.";
             continue;
         }
         
@@ -168,11 +169,19 @@ void SocketClient::run() {
             //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
         } else {
             buffer = new char[header.data_len];
-            if (recv(_fd_server, buffer, header.data_len, 0) <= 0) {
-                MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
-                delete [] buffer;
-                buffer = nullptr;
-                continue;
+            int cur_size = 0;
+            int accum_size = 0;
+            int try_size = header.data_len;
+            while (accum_size < header.data_len) {
+                cur_size = recv(_fd_server, buffer+accum_size, try_size, 0);
+                if (cur_size < 0) {
+                    MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
+                    delete [] buffer;
+                    buffer = nullptr;
+                    continue;
+                }
+                accum_size += cur_size;
+                try_size -= cur_size;
             }
         }
 
@@ -232,7 +241,7 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
     connect_i();
 
     //send a message
-    //send header
+    //send header 
     if (-1 == send(_fd_server , &post_header , sizeof(post_header) , 0)) {
         MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(post_header);
         return -1;
@@ -250,9 +259,10 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
 
     //receive a result
     result_data = nullptr;
-    if (recv(_fd_server, &result_header, sizeof(result_header) , 0) <= 0) {
-        MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
-        return 0;
+    //header is just 32 byte,use MSG_WAITALL to force client socket to return untill recv all header buffer(32byte)
+    if (recv(_fd_server, &result_header, sizeof(result_header) , MSG_WAITALL) <= 0) {
+        MI_UTIL_LOG(MI_ERROR) << "client receive data header failed.";
+        return -1;
     }
     
     MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(result_header);   
@@ -261,9 +271,18 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
         //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
     } else {
         result_data = new char[result_header.data_len];
-        if (recv(_fd_server, result_data, result_header.data_len, 0) <= 0) {
-            MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
-            return -1;
+        int cur_size = 0;
+        int accum_size = 0;
+        int try_size = result_header.data_len;
+        while (accum_size < result_header.data_len) {
+            cur_size = recv(_fd_server, result_data+accum_size, try_size, 0);
+            if (cur_size < 0) {
+                MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
+                delete [] result_data;
+                return -1;
+            }
+            accum_size += cur_size;
+            try_size -= cur_size;
         }
     }
 
@@ -319,8 +338,9 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
         //receive a result
         IPCDataHeader result_header;
         char* result_data = nullptr;
-        if (recv(_fd_server, &result_header, sizeof(result_header) , 0) <= 0) {
-            MI_UTIL_LOG(MI_WARNING) << "client receive data header failed.";
+        //header is just 32 byte,use MSG_WAITALL to force client socket to return untill recv all header buffer(32byte) 
+        if (recv(_fd_server, &result_header, sizeof(result_header) , MSG_WAITALL) <= 0) {
+            MI_UTIL_LOG(MI_ERROR) << "client receive data header failed.";
             return -1;
         }
         
@@ -330,10 +350,18 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
             //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
         } else {
             result_data = new char[result_header.data_len];
-            if (recv(_fd_server, result_data, result_header.data_len, 0) <= 0) {
-                MI_UTIL_LOG(MI_WARNING) << "client receive data buffer failed.";
-                delete [] result_data;
-                return -1;
+            int cur_size = 0;
+            int accum_size = 0;
+            int try_size = result_header.data_len;
+            while (accum_size < result_header.data_len) {
+                cur_size = recv(_fd_server, result_data+accum_size, try_size, 0);
+                if (cur_size < 0) {
+                    MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
+                    delete [] result_data;
+                    return -1;
+                }
+                accum_size += cur_size;
+                try_size -= cur_size;
             }
         }
 

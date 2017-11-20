@@ -11,7 +11,7 @@ DBServerThreadModel::DBServerThreadModel() {
 }
 
 DBServerThreadModel::~DBServerThreadModel() {
-
+    _thread_in.join();
 }
 
 void DBServerThreadModel::set_server_proxy(std::shared_ptr<IPCServerProxy> proxy) {
@@ -27,7 +27,7 @@ void DBServerThreadModel::start() {
     _thread_operating = boost::thread(boost::bind(&DBServerThreadModel::process_operating_i, this));
     _thread_sending = boost::thread(boost::bind(&DBServerThreadModel::process_sending_i, this));
     _thread_recving = boost::thread(boost::bind(&DBServerThreadModel::process_recving_i, this));
-    
+    _thread_in = boost::thread(boost::bind(&DBServerThreadModel::process_in_i, this));
 }
 
 void DBServerThreadModel::stop() {
@@ -57,7 +57,6 @@ void DBServerThreadModel::process_recving_i() {
 }
 
 void DBServerThreadModel::process_operating_i() {
-
     while(true) {
         std::shared_ptr<DBOperation> op;
         _op_msg_queue.pop(&op);
@@ -70,6 +69,26 @@ void DBServerThreadModel::process_operating_i() {
         }
 
         boost::this_thread::interruption_point();
+    }
+}
+
+void DBServerThreadModel::process_in_i() {
+    std::string msg;
+    while(std::cin >> msg) {
+        if(msg == "shutdown") {
+            //quit signal
+            _server_proxy->stop();
+            this->stop();
+            break;
+        } else if (msg == "status") {
+            //server current status
+            ServerStatus status = _server_proxy->get_current_status();
+            MI_DBSERVER_LOG(MI_INFO) << "{server host:" << status.host <<
+            ", type:" << status.socket_type << ", client num:" << status.cur_client << 
+            ", pkg capcity:" << status.package_cache_capcity << ", pkg size:" << status.package_cache_size; 
+        } else {
+            MI_DBSERVER_LOG(MI_DEBUG) << "invalid msg."; 
+        }
     }
 }
 

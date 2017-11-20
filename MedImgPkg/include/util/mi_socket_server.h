@@ -40,15 +40,7 @@ public:
     void stop();
     int  recv();
     int  send();
-
-    struct ServerStatus {
-        std::string socket_type;//UNIX/INET
-        std::string host;
-        int cur_client;
-        int package_cache_capcity;
-        int package_cache_size;
-        std::map<unsigned int, size_t> packages;//client ID, package to be send
-    };
+    
     ServerStatus get_current_status();
 private:
     IPCPackage* pop_front_package_i(unsigned int socket_list_id);

@@ -54,6 +54,7 @@ int DBOpQueryPreprocessMask::execute() {
         SEND_ERROR_TO_BE(server_proxy, receiver, "preprocess mask file not existed.");
         return -1; 
     }
+
     IPCDataHeader header;
     header.receiver = _header.receiver;
     header.data_len = size;

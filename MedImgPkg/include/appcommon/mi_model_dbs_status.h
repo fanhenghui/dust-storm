@@ -9,15 +9,27 @@ MED_IMG_BEGIN_NAMESPACE
 
 class AppCommon_Export ModelDBSStatus : public IModel {
 public:
-    ModelDBSStatus() {}
+    ModelDBSStatus();
     virtual ~ ModelDBSStatus() {}
 
     void reset();
+
+    //success tag
+    bool success();
+    void set_success();
+
+    //error msg
     void set_error_info(const std::string& err);
     std::string get_error_info() const;
 
+    //preprocess mask query 
+    bool has_preprocess_mask();
+    void set_preprocess_mask();
+
 private:
+    bool _success;
     std::string _err_info;
+    bool _has_preprocess_mask;
 private:
     DISALLOW_COPY_AND_ASSIGN(ModelDBSStatus);
 };

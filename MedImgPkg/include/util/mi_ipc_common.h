@@ -4,6 +4,7 @@
 #include "util/mi_util_export.h"
 
 #include <memory>
+#include <map>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -52,6 +53,15 @@ struct IPCPackage {
             }
         }
     }
+};
+
+struct ServerStatus {
+    std::string socket_type;//UNIX/INET
+    std::string host;
+    int cur_client;
+    int package_cache_capcity;
+    int package_cache_size;
+    std::map<unsigned int, size_t> packages;//client ID, package to be send
 };
 
 class IPCDataRecvHandler {

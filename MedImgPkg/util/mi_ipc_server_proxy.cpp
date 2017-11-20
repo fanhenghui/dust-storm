@@ -88,6 +88,10 @@ int IPCServerProxy::handle_command(const IPCDataHeader& header , char* buffer) {
     }
 }
 
+ServerStatus IPCServerProxy::get_current_status() {
+    return _server->get_current_status();
+}
+
 MED_IMG_END_NAMESPACE
 
 #endif

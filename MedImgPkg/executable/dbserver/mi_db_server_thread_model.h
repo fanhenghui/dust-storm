@@ -32,6 +32,7 @@ private:
     void process_sending_i();
     void process_recving_i();
     void process_operating_i();
+    void process_in_i();
 
 private:
     std::weak_ptr<DBServerController> _controller;
@@ -42,6 +43,7 @@ private:
     boost::thread _thread_sending;
     boost::thread _thread_recving;
     boost::thread _thread_operating;    
+    boost::thread _thread_in;    
 };
 
 MED_IMG_END_NAMESPACE
