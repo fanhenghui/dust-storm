@@ -6,7 +6,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 std::vector<unsigned int> RunLengthOperator::encode(const unsigned char* mask_array_pointer,
-        const size_t total_number_of_voxels) {
+        const unsigned int total_number_of_voxels) {
     std::vector<unsigned int> result;
 
     if (mask_array_pointer != nullptr) {
@@ -14,7 +14,7 @@ std::vector<unsigned int> RunLengthOperator::encode(const unsigned char* mask_ar
         unsigned int cnt = 1;
         unsigned char val = mask_array_pointer[0];
 
-        for (int voxel = 1; voxel < total_number_of_voxels; ++voxel) {
+        for (unsigned int voxel = 1; voxel < total_number_of_voxels; ++voxel) {
             if (val == mask_array_pointer[voxel]) {
                 ++cnt;
             } else {

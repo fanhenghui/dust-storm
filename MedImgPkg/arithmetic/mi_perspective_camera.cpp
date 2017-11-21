@@ -76,12 +76,10 @@ void PerspectiveCamera::calculate_projection_matrix_i() {
     }
 }
 
-void PerspectiveCamera::zoom(double rate) {
-    rate;
+void PerspectiveCamera::zoom(double) {
 }
 
-void PerspectiveCamera::pan(const Vector2& pan) {
-    pan;
+void PerspectiveCamera::pan(const Vector2& ) {
 }
 
 double PerspectiveCamera::get_near_clip_distance() const {

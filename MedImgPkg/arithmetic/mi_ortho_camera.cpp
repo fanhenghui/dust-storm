@@ -3,15 +3,15 @@
 MED_IMG_BEGIN_NAMESPACE
 
 OrthoCamera::OrthoCamera()
-    : CameraBase(), _is_proj_mat_cal(false), _left(0), _right(0), _bottom(0),
-      _top(0), _near(0), _far(0), _zoom_factor(1.0) {
+    : CameraBase(), _left(0), _right(0), _bottom(0),
+      _top(0), _near(0), _far(0) ,_is_proj_mat_cal(false), _zoom_factor(1.0){
     _mat_projection = Matrix4::S_IDENTITY_MATRIX;
 }
 
 OrthoCamera::OrthoCamera(double left, double right, double bottom, double top,
                          double near, double far)
     : CameraBase(), _left(left), _right(right), _bottom(bottom), _top(top),
-      _near(near), _far(far), _is_proj_mat_cal(false) {
+      _near(near), _far(far), _is_proj_mat_cal(false), _zoom_factor(1.0) {
     _mat_projection = Matrix4::S_IDENTITY_MATRIX;
 }
 

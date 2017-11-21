@@ -10,7 +10,7 @@ MED_IMG_BEGIN_NAMESPACE
 class Arithmetic_Export Rectangle : public IShape {
 public:
     //////////////////////////////////////////////////////////////////////////
-    /// \
+    //
     //   pt[3]-----------------------------------   pt[2]
     //           |     *                                              |
     //           |              *                                     |

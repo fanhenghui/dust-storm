@@ -23,6 +23,7 @@ public:
         strm << "AABB : [ " << aabb._min.x << " " << aabb._min.y << " " << aabb._min.z
         << " ] , [" << aabb._max.x << " " << aabb._max.y << " " << aabb._max.z
         << " ]";
+        return strm;
     }
 };
 
@@ -45,6 +46,7 @@ public:
         strm << "AABBUI : [ " << aabb._min[0] << " " << aabb._min[1] << " " << aabb._min[2]
         << " ] , [" << aabb._max[0] << " " << aabb._max[1] << " " << aabb._max[2]
         << " ]";
+        return strm;
     }
 };
 
@@ -67,6 +69,7 @@ public:
         strm << "AABBI : [ " << aabb._min[0] << " " << aabb._min[1] << " " << aabb._min[2]
         << " ] , [" << aabb._max[0] << " " << aabb._max[1] << " " << aabb._max[2]
         << " ]";
+        return strm;
     }
 };
 

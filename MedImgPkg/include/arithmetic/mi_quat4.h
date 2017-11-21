@@ -14,7 +14,7 @@ public:
 public:
     ~Quat4() {}
 
-    Quat4() : w(0), x(1), y(0), z(0) {}
+    Quat4() :x(1), y(0), z(0), w(0), m_bNorm(false) {}
 
     Quat4(double angle, const Vector3& axis)
         : w(std::cos(angle / 2)), m_bNorm(true) {
@@ -33,7 +33,7 @@ public:
     }
 
     Quat4(const Quat4& quat)
-        : w(quat.w), x(quat.x), y(quat.y), z(quat.z), m_bNorm(quat.m_bNorm) {}
+        : x(quat.x), y(quat.y), z(quat.z), w(quat.w), m_bNorm(quat.m_bNorm) {}
 
     inline Quat4 operator-() const {
         Quat4 quat;
