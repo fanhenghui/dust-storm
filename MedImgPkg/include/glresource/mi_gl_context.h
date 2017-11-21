@@ -1,8 +1,7 @@
-#ifndef MEDIMGRESOURCE_GL_CONTEXT_H_
-#define MEDIMGRESOURCE_GL_CONTEXT_H_
+#ifndef MEDIMGRESOURCE_GL_CONTEXT_H
+#define MEDIMGRESOURCE_GL_CONTEXT_H
 
 #include "GL/glew.h"
-#include "boost/thread/mutex.hpp"
 #include "glresource/mi_gl_object.h"
 #include <map>
 
@@ -57,8 +56,6 @@ private:
     Display* _dpy;
     XVisualInfo* _vis;
     Window _win;
-    boost::mutex
-    _ctx_mutex; // TODO add mutex context in command handler and operation
 };
 
 #endif

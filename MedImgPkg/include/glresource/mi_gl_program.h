@@ -13,8 +13,8 @@ struct GLShaderInfo {
 
     GLShaderInfo(GLenum shader_type, const char* shader_context,
                  const std::string& shader_name)
-        : shader_id(0), type(shader_type), context(shader_context),
-          shader_name(shader_name) {}
+        : type(shader_type), context(shader_context),
+          shader_name(shader_name),shader_id(0) {}
 };
 
 class GLResource_Export GLProgram : public GLObject {

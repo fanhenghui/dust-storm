@@ -49,8 +49,9 @@ GLResourceManagerContainer::GLResourceManagerContainer()
       _texture_1d_manager(new GLTexture1DManager()),
       _texture_2d_manager(new GLTexture2DManager()),
       _texture_3d_manager(new GLTexture3DManager()),
-      _vao_manager(new GLVAOManager()), _fbo_manager(new GLFBOManager()),
       _texture_1d_array_manager(new GLTexture1DArrayManager()),
+      _vao_manager(new GLVAOManager()),
+      _fbo_manager(new GLFBOManager()),
       _context_manager(new GLContextManager()),
       _time_query_manager(new GLTimeQueryManager()) {}
 

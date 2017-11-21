@@ -30,7 +30,7 @@ void MSGLContext::create_shared_context(int id) {}
 #else
 
 XGLContext::XGLContext(UIDType uid)
-    : GLObject(uid), _dpy(nullptr), _vis(nullptr), _ctx(NULL),
+    : GLObject(uid), _ctx(NULL), _dpy(nullptr), _vis(nullptr),
       _win((Window)NULL) {}
 
 XGLContext::~XGLContext() {}
