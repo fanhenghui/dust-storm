@@ -64,10 +64,10 @@ public:
 int connect_db(const std::string& user, const std::string& ip_port, const std::string& pwd, const std::string& db) {
     if (0 == _db_type) {
         _db.reset(new DB());
-        _db->connect(user, ip_port, pwd, db);
+        return _db->connect(user, ip_port, pwd, db);
     } else {
         _db.reset(new CacheDB());
-        _db->connect(user, ip_port, pwd, db);   
+        return _db->connect(user, ip_port, pwd, db);   
     }
 }
 
