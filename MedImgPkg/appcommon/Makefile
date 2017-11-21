@@ -15,6 +15,8 @@ INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/appcommon
 BIN_DIR = $(ROOT)/bin
 
+LOCAL_LIB_DIR = /usr/local/lib
+
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 OBJS = mi_app_cache_db.o mi_app_db.o mi_app_config.o mi_app_cell.o mi_operation_factory.o mi_app_none_image_item.o mi_app_none_image.o \
@@ -36,7 +38,7 @@ TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
 EXPORT_HEADER = mi_app_common_export.h mi_app_common_define.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lGL -lGLEW \
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lGL -lGLEW \
 -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_renderalgo \
 -lmysqlcppconn -lprotobuf
 

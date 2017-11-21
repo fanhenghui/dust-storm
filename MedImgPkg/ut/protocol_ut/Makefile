@@ -11,13 +11,15 @@ ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 BIN_DIR = $(ROOT)/bin
 
+LOCAL_LIB_DIR = /usr/local/lib
+
 VPATH = $(INCLUDE_ROOT_DIR) $(GOOGLE_DIR)
 
 OBJS = mi_message.pb.o mi_protocol_ut.o
 TARGET = $(BIN_DIR)/medimg_protocol_ut
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lprotobuf
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lprotobuf
 
 all: pre-build main-build
 pre-build:
