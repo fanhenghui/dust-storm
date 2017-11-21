@@ -27,7 +27,7 @@ ADDITIANL_DEPENDENCIES = -lpthread -lboost_system -lboost_filesystem -lboost_thr
 $(TARGET): $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 $(OBJS):%.o:%.cpp %.h
-	$(CC) -c -fPIC $(CFLAGS) $< -o $@ $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

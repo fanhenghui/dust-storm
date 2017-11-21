@@ -56,18 +56,17 @@ private:
         return (_package_cache_size + byte_to_mb(pkg_to_be_push)) >= _package_cache_capcity;
     } 
 private:
+    SocketType _socket_type;
+
     //address for AF_UNIX
     std::string _path;
     //address for AF_INET
     std::string _server_port;
 
-    //std::vector<int> _socket_client;
-
     std::shared_ptr<IPCDataRecvHandler> _handler;
     int _fd_server;
     int _max_clients; // TODO add client limit
-
-    SocketType _socket_type;
+    
     bool _alive;
 
     //client socket fd

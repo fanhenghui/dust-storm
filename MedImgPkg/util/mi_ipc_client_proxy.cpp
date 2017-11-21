@@ -86,7 +86,7 @@ int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {
 
 int IPCClientProxy::sync_post(const std::vector<IPCPackage*>& packages) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
-    _client->sync_post(packages);
+    return _client->sync_post(packages);
 }
 
 MED_IMG_END_NAMESPACE

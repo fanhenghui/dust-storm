@@ -19,7 +19,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 SocketClient::SocketClient(SocketType type /*= UNIX*/): 
-    _path(""), _fd_server(0), _socket_type(type), _alive(true) {
+    _socket_type(type),_path(""),_server_ip("127.0.0.1"),_server_port("8888"), _fd_server(0), _alive(true) {
 
 }
 
@@ -171,8 +171,8 @@ void SocketClient::run() {
             buffer = new char[header.data_len];
             int cur_size = 0;
             int accum_size = 0;
-            int try_size = header.data_len;
-            while (accum_size < header.data_len) {
+            int try_size = (int)header.data_len;
+            while (accum_size < (int)header.data_len) {
                 cur_size = recv(_fd_server, buffer+accum_size, try_size, 0);
                 if (cur_size < 0) {
                     MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
@@ -273,8 +273,8 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
         result_data = new char[result_header.data_len];
         int cur_size = 0;
         int accum_size = 0;
-        int try_size = result_header.data_len;
-        while (accum_size < result_header.data_len) {
+        int try_size = (int)result_header.data_len;
+        while (accum_size < (int)result_header.data_len) {
             cur_size = recv(_fd_server, result_data+accum_size, try_size, 0);
             if (cur_size < 0) {
                 MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
@@ -352,8 +352,8 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
             result_data = new char[result_header.data_len];
             int cur_size = 0;
             int accum_size = 0;
-            int try_size = result_header.data_len;
-            while (accum_size < result_header.data_len) {
+            int try_size = (int)result_header.data_len;
+            while (accum_size < (int)result_header.data_len) {
                 cur_size = recv(_fd_server, result_data+accum_size, try_size, 0);
                 if (cur_size < 0) {
                     MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";

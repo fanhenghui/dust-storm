@@ -28,7 +28,7 @@ public:
         int port;// port for inet
     };
 
-    SocketList():_cur_id(0) {}
+    SocketList():_cur_id(1) {}
 
     ~SocketList() {}
 
@@ -107,13 +107,11 @@ public:
         return max_fd;
     }
 
-    unsigned int reset_list() {
-        boost::mutex::scoped_lock locker(_mutex);
-        _cur_id = 0;
-    }
-
 private:
     unsigned int acquire_id_i() {
+        if (_cur_id > std::numeric_limits<unsigned int>::max()-255) {
+            _cur_id = 0;
+        }
         return _cur_id++;
     }
 
