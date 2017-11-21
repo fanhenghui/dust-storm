@@ -4,7 +4,6 @@
 #include "util/mi_util_export.h"
 #include <memory>
 
-#include "boost/noncopyable.hpp"
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/thread.hpp"
 
@@ -13,7 +12,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class SocketServer;
-class IPCServerProxy : public boost::noncopyable {
+class IPCServerProxy {
 public:
     IPCServerProxy(SocketType type = UNIX);
     ~IPCServerProxy();
