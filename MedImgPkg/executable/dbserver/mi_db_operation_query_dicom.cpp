@@ -8,6 +8,7 @@
 #include "appcommon/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
+#include <time.h>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -16,14 +17,14 @@ DBOpQueryDICOM::DBOpQueryDICOM() {
 }
 
 DBOpQueryDICOM::~DBOpQueryDICOM() {
-
+    
 }
 
 int DBOpQueryDICOM::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
+    clock_t _start = clock();
 
     MsgString msg;
-
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
     }
@@ -47,7 +48,7 @@ int DBOpQueryDICOM::execute() {
         SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series path null.");
         return -1;
     }
-    MI_DBSERVER_LOG(MI_DEBUG) << "series: " << series_id << ". path: " << item.dcm_path;
+    //MI_DBSERVER_LOG(MI_DEBUG) << "series: " << series_id << ". path: " << item.dcm_path;
 
     std::set<std::string> postfix;
     postfix.insert(".dcm");
@@ -82,6 +83,8 @@ int DBOpQueryDICOM::execute() {
             break;
         }
     }
+    clock_t _end = clock();
+    MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_id << ", slice:" << files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "ms}.";
 
     return 0;
 }

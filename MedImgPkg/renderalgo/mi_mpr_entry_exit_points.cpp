@@ -103,7 +103,7 @@ void MPREntryExitPoints::calculate_entry_exit_points() {
         cal_entry_exit_points_gpu_i();
     }
     // clock_t t1 = clock();
-    // MI_RENDERALGO_LOG(MI_DEBUG) << "Calculate entry exit points cost : " << double(t1 - t0);
+    // MI_RENDERALGO_LOG(MI_DEBUG) << "Calculate entry exit points cost : " << double(t1 - t0)/CLOCKS_PER_SEC;
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT calculate MPR entry exit points.";
 }
 

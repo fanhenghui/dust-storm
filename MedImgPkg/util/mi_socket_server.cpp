@@ -411,9 +411,8 @@ int SocketServer::send() {
                     MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " 
                     << STREAM_IPCHEADER_INFO(pkg_send->header);        
                 } else {
-                   //MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data.";
-                   MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data . msg id: " << 
-                   pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
+                   //MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data . msg id: " << 
+                   //pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
                 }
             }
 

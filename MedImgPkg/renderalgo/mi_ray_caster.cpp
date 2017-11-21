@@ -46,7 +46,7 @@ void RayCaster::render() {
         // clock_t t0 = clock();
         _ray_casting_cpu->render();
         // clock_t t1 = clock();
-        // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0) << "ms.";
+        // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0)/CLOCKS_PER_SEC << "ms.";
     } else if (GPU_BASE == _strategy) {
         if (!_ray_casting_gpu) {
             _ray_casting_gpu.reset(new RayCastingGPU(shared_from_this()));

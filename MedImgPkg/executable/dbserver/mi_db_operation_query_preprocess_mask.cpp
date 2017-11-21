@@ -47,7 +47,7 @@ int DBOpQueryPreprocessMask::execute() {
         SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM preprocessing mask path null.");
         return -1;
     }
-    MI_DBSERVER_LOG(MI_DEBUG) << "preprocess mask path: " << item.preprocess_mask_path;
+    //MI_DBSERVER_LOG(MI_DEBUG) << "preprocess mask path: " << item.preprocess_mask_path;
     char* buffer = nullptr;
     unsigned int size = 0;
     if(0 != FileUtil::read_raw_ext(item.preprocess_mask_path, buffer, size) ) {
