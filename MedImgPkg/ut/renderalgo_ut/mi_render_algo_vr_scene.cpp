@@ -100,7 +100,7 @@ void Init() {
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
-    IOStatus status = loader.load_series(files, _volume_data, _data_header);
+    loader.load_series(files, _volume_data, _data_header);
     const unsigned int data_len = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
     printf("spacing : %lf %lf %lf \n" , _volume_data->_spacing[0] , _volume_data->_spacing[1] , _volume_data->_spacing[2]);
 
@@ -364,7 +364,7 @@ void Keyboard(unsigned char key, int x, int y) {
     }
     case 'a' : {
             _act_label_idx += 1;
-            if (_act_label_idx > _vis_labels.size() - 1) {
+            if (_act_label_idx > (int)_vis_labels.size() - 1) {
                 _act_label_idx = 0;
             }
             unsigned char act_label = _vis_labels[_act_label_idx];

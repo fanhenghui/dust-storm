@@ -64,7 +64,7 @@ public:
             net[i] = new Edge();//initialize head
         }
 
-        for (int i = 0 ; i < pts.size() - 1 ; ++i) {
+        for (size_t i = 0 ; i < pts.size() - 1 ; ++i) {
             const bool comp = pts[i].y < pts[i + 1].y;
             const Pt2& pt0 = comp ? pts[i] : pts[i + 1];
             const Pt2& pt1 = comp ? pts[i + 1] : pts[i];

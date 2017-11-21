@@ -1,5 +1,5 @@
 ver = debug
-CC  = g++ -std=c++11 -Wall 
+CC  = g++ -std=c++11 -Wall -Wno-unused-function
 
 ifeq ($(ver) , release)
 CFLAGS += -O3

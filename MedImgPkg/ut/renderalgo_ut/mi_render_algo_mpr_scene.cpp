@@ -72,7 +72,7 @@ void Init() {
 
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
-    IOStatus status = loader.load_series(files, _volume_data, _data_header);
+    loader.load_series(files, _volume_data, _data_header);
 
     _volumeinfos.reset(new VolumeInfos());
     _volumeinfos->set_data_header(_data_header);
@@ -171,7 +171,7 @@ void Keyboard(unsigned char key, int x, int y) {
             _scene->get_camera_calculator()->get_orthogonal_mpr_page(camera);
         std::cout << "current page : " << cur_page << std::endl;
 
-        if (cur_page >= _volume_data->_dim[2] - 2) {
+        if (cur_page >= (int)_volume_data->_dim[2] - 2) {
             _scene->page_to(1);
         } else {
             _scene->page(1);

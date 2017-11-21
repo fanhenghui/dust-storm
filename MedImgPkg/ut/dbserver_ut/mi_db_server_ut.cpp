@@ -29,12 +29,12 @@ class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
             out.close();
         }
 
-        unsigned int end_tag = dataheader.msg_info2;
-        unsigned int dicom_slice = dataheader.msg_info3;
+        // unsigned int end_tag = dataheader.msg_info2;
+        // unsigned int dicom_slice = dataheader.msg_info3;
 
-        if (end_tag == 0) {
+        // if (end_tag == 0) {
 
-        }
+        // }
 
         return 0;
     };

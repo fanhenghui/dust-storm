@@ -1,10 +1,10 @@
 ver = debug
-CC  = g++ -std=c++11 -Wall 
+CC  = g++ -std=c++11 -Wall -Wno-unused-function
 
 ifeq ($(ver) , release)
-CFLAGS += -O3
+CFLAGS += -O3 -fopenmp
 else
-CFLAGS += -g
+CFLAGS += -g -fopenmp
 endif
 
 DEFS = -DBOOST_LOG_DYN_LINK

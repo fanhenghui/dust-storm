@@ -2,7 +2,7 @@ template<typename T>
 void convert_16_to_8(T* data,  const unsigned int (&dim)[3] , 
                     float ww , float wl , unsigned char* data_8) { 
     const float wl_min = wl - ww*0.5f;
-    for (int i = 0 ; i < dim[0]*dim[1]*dim[2] ; ++i)
+    for (unsigned int i = 0 ; i < dim[0]*dim[1]*dim[2] ; ++i)
     {
         float v = (float)(data[i]);
         v = (v - wl_min)/ww;
@@ -21,8 +21,8 @@ void CTTableRemoval<T>::remove() {
 
     const unsigned int volume_size = _dim[0]*_dim[1]*_dim[2];
     const unsigned int img_size = _dim[0]*_dim[1];
-    const int w = _dim[0];
-    const int h = _dim[1];
+    const unsigned int w = _dim[0];
+    const unsigned int h = _dim[1];
 
     //1 convert to 8bit
     const float WW_BONE = 1500;
@@ -38,12 +38,12 @@ void CTTableRemoval<T>::remove() {
     
     //2 smmoth filter (basic gaussian)
     std::unique_ptr<unsigned char[]> data_8_img(new unsigned char[w*h]);
-    for (int z = 0 ; z < _dim[2] ; ++z) {
+    for (unsigned int z = 0 ; z < _dim[2] ; ++z) {
         unsigned char* cur_data = data_8 + z*w*h;
         unsigned char v00,v01,v02,v10,v11,v12,v20,v21,v22;
 
-        for (int y = 1; y< h-1; ++y) {
-            for (int x = 1; x < w-1; ++x) {
+        for (unsigned int y = 1; y< h-1; ++y) {
+            for (unsigned int x = 1; x < w-1; ++x) {
                 v00 = cur_data[(y-1)*w + (x-1)];
                 v01 = cur_data[(y-1)*w + (x)];
                 v02 = cur_data[(y-1)*w + (x+1)];
@@ -64,8 +64,8 @@ void CTTableRemoval<T>::remove() {
             }
         }
         //4 border
-        for (int x = 1; x < w-1; ++x) {
-            int y = 0;
+        for (unsigned int x = 1; x < w-1; ++x) {
+            unsigned int y = 0;
             v10 = cur_data[(y)*w + (x-1)];
             v11 = cur_data[(y)*w + (x)];
             v12 = cur_data[(y)*w + (x+1)];
@@ -86,8 +86,8 @@ void CTTableRemoval<T>::remove() {
             data_8_img.get()[(y)*w + (x)] = (unsigned char)v;
         }
 
-        for (int x = 1; x < w-1; ++x) {
-            int y = h-1;
+        for (unsigned int x = 1; x < w-1; ++x) {
+            unsigned int y = h-1;
             v00 = cur_data[(y-1)*w + (x-1)];
             v01 = cur_data[(y-1)*w + (x)];
             v02 = cur_data[(y-1)*w + (x+1)];
@@ -108,8 +108,8 @@ void CTTableRemoval<T>::remove() {
             data_8_img.get()[(y)*w + (x)] = (unsigned char)v;
         }
 
-        for (int y = 1; y < h-1; ++y) {            
-            int x = 0;
+        for (unsigned int y = 1; y < h-1; ++y) {            
+            unsigned int x = 0;
             v01 = cur_data[(y-1)*w + (x)];
             v02 = cur_data[(y-1)*w + (x+1)];
             
@@ -131,8 +131,8 @@ void CTTableRemoval<T>::remove() {
             data_8_img.get()[(y)*w + (x)] = (unsigned char)v;
         }
 
-        for (int y = 1; y < h-1; ++y) {   
-            int x = w-1;
+        for (unsigned int y = 1; y < h-1; ++y) {   
+            unsigned int x = w-1;
             v00 = cur_data[(y-1)*w + (x-1)];
             v01 = cur_data[(y-1)*w + (x)];
 
@@ -156,8 +156,8 @@ void CTTableRemoval<T>::remove() {
 
         //four corner
         {
-            int x = 0;
-            int y = 0;
+            unsigned int x = 0;
+            unsigned int y = 0;
             v11 = cur_data[(y)*w + (x)];
 
             v00 = v11;
@@ -180,8 +180,8 @@ void CTTableRemoval<T>::remove() {
         }
 
         {
-            int x = 0;
-            int y = h-1;
+            unsigned int x = 0;
+            unsigned int y = h-1;
             v11 = cur_data[(y)*w + (x)];
 
             v00 = v11;
@@ -205,8 +205,8 @@ void CTTableRemoval<T>::remove() {
         }
 
         {
-            int x = w-1;
-            int y = 0;
+            unsigned int x = w-1;
+            unsigned int y = 0;
             v11 = cur_data[(y)*w + (x)];
 
             v00 = v11;
@@ -230,8 +230,8 @@ void CTTableRemoval<T>::remove() {
         }
 
         {
-            int x = w-1;
-            int y = h-1;
+            unsigned int x = w-1;
+            unsigned int y = h-1;
             v11 = cur_data[(y)*w + (x)];
 
             v00 = cur_data[(y-1)*w + (x-1)];
@@ -269,9 +269,9 @@ void CTTableRemoval<T>::remove() {
     th = th > 1 ? 1:th;
     unsigned char th_8 = (unsigned char)(th*255.0f);
     MI_ARITHMETIC_LOG(MI_DEBUG) << "body threshold in 8: " << (int)th_8; 
-    for (int z = 0 ; z < _dim[2] ; ++z) {
-        const int w = _dim[0];
-        const int h = _dim[1];
+    for (unsigned int z = 0 ; z < _dim[2] ; ++z) {
+        const unsigned int w = _dim[0];
+        const unsigned int h = _dim[1];
         unsigned char* cur_data = data_8 + z*w*h;
         SegmentThreshold<unsigned char> seg;
         unsigned int dim2[3] = {w,h,1};
@@ -309,14 +309,14 @@ void CTTableRemoval<T>::remove() {
     while(!seeds.empty()) {
         unsigned int idx = seeds.top();
         seeds.pop();
-        int z = idx / (img_size);
-        int y = (idx - z*img_size)/_dim[0];
-        int x = idx - z*img_size - y*_dim[0];
+        unsigned int z = idx / (img_size);
+        unsigned int y = (idx - z*img_size)/_dim[0];
+        unsigned int x = idx - z*img_size - y*_dim[0];
 
         //get 27 neighbour
-        const int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
-        const int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
-        const int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
+        const unsigned int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
+        const unsigned int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
+        const unsigned int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
         for (unsigned int zz = z - 1 < 0 ? 0 : z - 1 ; zz < zzz ; ++zz) {
             for (unsigned int yy = y - 1 < 0 ? 0 : y - 1; yy < yyy ; ++yy) {
                 for (unsigned int xx = x - 1 < 0 ? 0 : x - 1; xx < xxx ; ++xx) {
@@ -365,10 +365,10 @@ void CTTableRemoval<T>::remove() {
         std::unique_ptr<unsigned char[]> data_8_img_s(new unsigned char[dim_s[0]*dim_s[1]]);
         
         //6.1 find bed seed (TODO use hough transform to check line seed)
-        const int line_pixel_p = int(0.7*dim_s[1]);
-        const int search_step = 2;
-        int search_x_begin = dim_s[0] - 1 - 5+ search_step;
-        int search_x_end = dim_s[0] -1 + search_step;
+        const unsigned int line_pixel_p = (unsigned int)(0.7*dim_s[1]);
+        const unsigned int search_step = 2;
+        unsigned int search_x_begin = dim_s[0] - 1 - 5+ search_step;
+        unsigned int search_x_end = dim_s[0] -1 + search_step;
         std::stack<unsigned int> line_seeds;
         do {
             search_x_begin -= search_step;
@@ -415,14 +415,14 @@ void CTTableRemoval<T>::remove() {
         while(!line_seeds.empty()) {
             unsigned int idx = line_seeds.top();
             line_seeds.pop();
-            int z = idx / (img_size);
-            int y = (idx - z*img_size)/_dim[0];
-            int x = idx - z*img_size - y*_dim[0];
+            unsigned int z = idx / (img_size);
+            unsigned int y = (idx - z*img_size)/_dim[0];
+            unsigned int x = idx - z*img_size - y*_dim[0];
 
             //get 27 neighbour
-            const int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
-            const int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
-            const int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
+            const unsigned int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
+            const unsigned int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
+            const unsigned int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
             for (unsigned int zz = z - 1 < 0 ? 0 : z - 1 ; zz < zzz ; ++zz) {
                 for (unsigned int yy = y - 1 < 0 ? 0 : y - 1; yy < yyy ; ++yy) {
                     for (unsigned int xx = x - 1 < 0 ? 0 : x - 1; xx < xxx ; ++xx) {
@@ -466,20 +466,20 @@ void CTTableRemoval<T>::remove() {
 
     if (way == 0) {
         //in volume center to find seed in rect
-        int rect_size = 1;
-        int rect_step = 3;
-        int c_x = _dim[0]/2;
-        int c_y = _dim[1]/2;
-        int c_z = _dim[2]/2;
+        unsigned int rect_size = 1;
+        unsigned int rect_step = 3;
+        unsigned int c_x = _dim[0]/2;
+        unsigned int c_y = _dim[1]/2;
+        unsigned int c_z = _dim[2]/2;
         std::stack<unsigned int> body_seeds;
         do {
             rect_size += rect_step;
-            int x_begin = c_x - rect_size;
-            int x_end = c_x + rect_size;
-            int y_begin = c_y - rect_size;
-            int y_end = c_y + rect_size;
-            int z_begin = c_z - rect_size;
-            int z_end = c_z + rect_size;
+            unsigned int x_begin = c_x - rect_size;
+            unsigned int x_end = c_x + rect_size;
+            unsigned int y_begin = c_y - rect_size;
+            unsigned int y_end = c_y + rect_size;
+            unsigned int z_begin = c_z - rect_size;
+            unsigned int z_end = c_z + rect_size;
             if (x_begin < 0 || y_begin < 0 || z_begin < 0 ||
                 x_end > _dim[0]-1 || y_end > _dim[1]-1 || z_end > _dim[2]-1) {
                 break;
@@ -510,14 +510,14 @@ void CTTableRemoval<T>::remove() {
         while(!body_seeds.empty()) {
             unsigned int idx = body_seeds.top();
             body_seeds.pop();
-            int z = idx / (img_size);
-            int y = (idx - z*img_size)/_dim[0];
-            int x = idx - z*img_size - y*_dim[0];
+            unsigned int z = idx / (img_size);
+            unsigned int y = (idx - z*img_size)/_dim[0];
+            unsigned int x = idx - z*img_size - y*_dim[0];
 
             //get 27 neighbour
-            const int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
-            const int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
-            const int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
+            const unsigned int zzz = z + 2 > _dim[2] ? _dim[2] : z + 2;
+            const unsigned int yyy = y + 2 > _dim[1] ? _dim[1] : y + 2;
+            const unsigned int xxx = x + 2 > _dim[0] ? _dim[0] : x + 2;
             for (unsigned int zz = z - 1 < 0 ? 0 : z - 1 ; zz < zzz ; ++zz) {
                 for (unsigned int yy = y - 1 < 0 ? 0 : y - 1; yy < yyy ; ++yy) {
                     for (unsigned int xx = x - 1 < 0 ? 0 : x - 1; xx < xxx ; ++xx) {

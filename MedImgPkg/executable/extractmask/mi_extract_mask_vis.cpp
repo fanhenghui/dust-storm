@@ -116,16 +116,16 @@ void display() {
             Vector3(0.0, 0.0, 1.0)
         };
 
-        for (int reader = 0; reader < _vis_nodules.size() ; ++reader) {
-            if (_cur_reader != 4 && reader != _cur_reader) {
+        for (size_t reader = 0; reader < _vis_nodules.size() ; ++reader) {
+            if (_cur_reader != 4 && (int)reader != _cur_reader) {
                 continue;
             }
 
             for (auto it = (_vis_nodules[reader]).begin()  ; it != (_vis_nodules[reader]).end() ; ++it) {
                 Nodule& nodule = *it;
                 std::vector<Point3>& pts = nodule.points;
-                int i = 0;
 
+                size_t i = 0;
                 for (; i < pts.size() ; ++i) {
                     if (pts[i].z == _cur_z) {
                         break;
@@ -136,7 +136,7 @@ void display() {
                     glColor3d(colors[reader].x , colors[reader].y , colors[reader].z);
                     glBegin(GL_LINE_STRIP);
 
-                    for (int j = i ; j < pts.size() ; ++j) {
+                    for (size_t j = i ; j < pts.size() ; ++j) {
                         if (pts[j].z != _cur_z) {
                             break;
                         }

@@ -268,7 +268,7 @@ int resample_z_backup(std::vector<std::vector<Nodule>>& nodules ,
                       std::shared_ptr<ImageDataHeader>& header , bool save_slice_location_less) {
     std::vector<double> slice_location;
 
-    for (int i = 0 ; i < header->image_position.size() ; ++i) {
+    for (size_t i = 0 ; i < header->image_position.size() ; ++i) {
         slice_location.push_back(header->image_position[i].z);
     }
 
@@ -280,31 +280,19 @@ int resample_z_backup(std::vector<std::vector<Nodule>>& nodules ,
                   std::greater<double>());//slice location from max to min
     }
 
-
-    double delta = 0;
-
-    for (int i = 1; i < slice_location.size() ; ++i) {
-        if (fabs(slice_location[i] - slice_location[i - 1]) > LOCATION_EPSILON) {
-            delta = slice_location[i] - slice_location[i - 1];
-        }
-    }
-
-    const double slice0 = slice_location[0];
-
-
     for (auto itreader = nodules.begin() ; itreader != nodules.end() ; ++itreader) {
         for (auto it = (*itreader).begin()  ; it != (*itreader).end() ; ++it) {
             Nodule& nodule = *it;
             std::vector<Point3>& pts = nodule.points;
 
 
-            for (int  i = 0 ; i < pts.size() ; ++i) {
+            for (size_t  i = 0 ; i < pts.size() ; ++i) {
                 const double slice = pts[i].z;
 
                 double min_error = std::numeric_limits<double>::max();
                 int min_id = 0;
 
-                for (int j = 0 ; j < slice_location.size() ; ++j) {
+                for (size_t j = 0 ; j < slice_location.size() ; ++j) {
                     double err = fabs(slice_location[j] - slice);
 
                     if (err < min_error) {
@@ -346,7 +334,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules ,
 
     double delta = 0;
 
-    for (int i = 1; i < slice_location.size() ; ++i) {
+    for (size_t i = 1; i < slice_location.size() ; ++i) {
         if (fabs(slice_location[i] - slice_location[i - 1]) > LOCATION_EPSILON) {
             delta = slice_location[i] - slice_location[i - 1];
         }
@@ -364,12 +352,12 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules ,
             Nodule& nodule = *it;
             std::vector<Point3>& pts = nodule.points;
 
-            for (int  i = 0 ; i < pts.size() ; ++i) {
+            for (size_t i = 0; i < pts.size() ; ++i) {
                 double slice = pts[i].z;
                 double delta_slice = slice - slice0;
                 int tmp_idx = static_cast<int>(delta_slice / delta);
 
-                if (tmp_idx > slice_location.size()) {
+                if (tmp_idx > (int)slice_location.size()) {
                     LOG_OUT("find slice lotation failed!\n");
                     return -1;
                 }
@@ -379,7 +367,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules ,
                     goto FIND_LOCATION;
                 } else if (slice_location[tmp_idx] - slice < 0) {
                     if (save_slice_location_less) {
-                        for (int j = tmp_idx ; j < slice_location.size() ; ++j) {
+                        for (size_t j = tmp_idx ; j < slice_location.size() ; ++j) {
                             if (fabs(slice_location[j] - slice) < LOCATION_EPSILON) {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -405,7 +393,7 @@ int resample_z(std::vector<std::vector<Nodule>>& nodules ,
                             }
                         }
                     } else {
-                        for (int j = tmp_idx ; j < slice_location.size() ; ++j) {
+                        for (size_t j = tmp_idx ; j < slice_location.size() ; ++j) {
                             if (fabs(slice_location[j] - slice) < LOCATION_EPSILON) {
                                 pts[i].z = static_cast<double>(j);
                                 goto FIND_LOCATION;
@@ -442,7 +430,7 @@ void cal_nodule_aabb(std::vector <std::vector<Nodule>>& nodules) {
             nodule.aabb._max[1]  = nodule.aabb._min[1];
             nodule.aabb._max[2]  = nodule.aabb._min[2];
 
-            for (int i = 1 ; i < pts.size() ; ++i) {
+            for (size_t i = 1 ; i < pts.size() ; ++i) {
                 int tmp[3] = { static_cast< int>(pts[i].x) , static_cast<int>(pts[i].y), static_cast<int>(pts[i].z)};
 
                 for (int  j = 0 ; j < 3 ; ++j) {
@@ -517,7 +505,7 @@ void scan_contour_to_mask(std::vector<Point3>& pts , std::shared_ptr<ImageData> 
     int current_z = 0;
     std::vector<PT2> current_contour;
 
-    for (int i = 0 ; i < pts.size() ; ++i) {
+    for (int i = 0 ; i < (int)pts.size() ; ++i) {
         if (begin) {
             current_z = static_cast<int>(pts[i].z);
             current_contour.push_back(PT2(static_cast<int>(pts[i].x) , static_cast<int>(pts[i].y)));
@@ -550,7 +538,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
     mask_reader.resize(nodules.size());
     mask_reader[0] = mask;
 
-    for (int i = 1; i < nodules.size() ; ++i) {
+    for (size_t i = 1; i < nodules.size() ; ++i) {
         mask_reader[i] = std::shared_ptr<ImageData>(new ImageData);
         mask->shallow_copy(mask_reader[i].get());
         mask_reader[i]->mem_allocate();
@@ -586,7 +574,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
             if (cur_confidence < confidence) {
                 nodule.flag = -1;//not satisify confidence
 
-                for (int k = 0 ; k < same_nodules.size() ; ++k) {
+                for (size_t k = 0 ; k < same_nodules.size() ; ++k) {
                     same_nodules[k]->flag = -1;
                 }
 
@@ -596,7 +584,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
             //set flags
             nodule.flag = label;
 
-            for (int k = 0 ; k < same_nodules.size() ; ++k) {
+            for (size_t k = 0 ; k < same_nodules.size() ; ++k) {
                 same_nodules[k]->flag = label;
             }
 
@@ -607,7 +595,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
 
                 //save_mask( mask , "D:/temp/0.raw" ,false);
 
-                for (int k = 0 ; k < same_nodules.size() ; ++k) {
+                for (size_t k = 0 ; k < same_nodules.size() ; ++k) {
                     std::vector<Point3>& pts_same_nodule = same_nodules[k]->points;
                     scan_contour_to_mask(pts_same_nodule , mask_reader[reader_id[k]], label);
 
@@ -616,13 +604,13 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                 }
 
                 //extracted label from label to interlabel(label + confidence)
-                unsigned char inter_label = label + cur_confidence;
+                //unsigned char inter_label = label + cur_confidence;
                 AABBI max_region = nodule.aabb;
 
-                for (int k = 0 ; k < same_nodules.size() ; ++k) {
+                for (size_t k = 0 ; k < same_nodules.size() ; ++k) {
                     AABBI sub_regio = same_nodules[k]->aabb;
 
-                    for (int k2 = 0  ; k2 < 3 ; ++k2) {
+                    for (size_t k2 = 0  ; k2 < 3 ; ++k2) {
                         max_region._min[k2] = max_region._min[k2] > sub_regio._min[k2] ?
                                               sub_regio._min[k2] : max_region._min[k2];
 
@@ -642,7 +630,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
                             if (mask_data[idx] == label) {
                                 int cur_inter = 1;
 
-                                for (int k = 0 ; k < reader_id.size() ; ++k) {
+                                for (size_t k = 0 ; k < reader_id.size() ; ++k) {
                                     unsigned char* mask_other = (unsigned char*)mask_reader[k]->get_pixel_pointer();
 
                                     if (mask_other[idx] == label) {
@@ -663,7 +651,7 @@ int contour_to_mask(std::vector <std::vector<Nodule>>& nodules , std::shared_ptr
             } else if (setlogic == 1) { //union
                 scan_contour_to_mask(pts , mask, label);
 
-                for (int k = 0 ; k < same_nodules.size() ; ++k) {
+                for (size_t k = 0 ; k < same_nodules.size() ; ++k) {
                     std::vector<Point3>& pts_same_nodule = same_nodules[k]->points;
                     scan_contour_to_mask(pts_same_nodule , mask, label);
                 }
@@ -826,11 +814,11 @@ void produce_test_jpeg(std::shared_ptr<ImageData> img , std::shared_ptr<ImageDat
                        const std::string& base_name) {
     #pragma omp parallel for
 
-    for (int i = 0; i < img->_dim[2] ; ++i) {
+    for (unsigned int i = 0; i < img->_dim[2] ; ++i) {
         unsigned char* raw_mask = (unsigned char*)mask->get_pixel_pointer();
         bool got_it = false;
 
-        for (int j = 0; j < img->_dim[0]*img->_dim[1] ; ++j) {
+        for (unsigned int j = 0; j < img->_dim[0]*img->_dim[1] ; ++j) {
             if (raw_mask[j + i * img->_dim[0]*img->_dim[1]] != 0) {
                 got_it = true;
                 break;

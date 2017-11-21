@@ -50,17 +50,17 @@ void SegmentThreshold<T>::segment(T threshold) {
 #pragma omp parallel for
 #endif
 
-    for (int z = 0; z < this->_dim[2]; ++z) {
+    for (unsigned int z = 0; z < this->_dim[2]; ++z) {
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
 
-        for (int y = 0; y < this->_dim[1]; ++y) {
+        for (unsigned int y = 0; y < this->_dim[1]; ++y) {
 #ifndef _DEBUG
 #pragma omp parallel for
 #endif
 
-            for (int x = 0; x < this->_dim[0]; ++x) {
+            for (unsigned int x = 0; x < this->_dim[0]; ++x) {
                 unsigned int idx = z * layer + y * this->_dim[0] + x;
                 T tmp = this->_data_ref[idx];
 
