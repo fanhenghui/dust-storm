@@ -19,7 +19,6 @@ OpResize::OpResize() {}
 OpResize::~OpResize() {}
 
 int OpResize::execute() {
-    const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgResize msg;
@@ -31,9 +30,9 @@ int OpResize::execute() {
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
-    for (size_t i = 0; i < msg.cells_size(); i++) {
+    for (int i = 0; i < msg.cells_size(); i++) {
         const MsgCellInfo& cell_info = msg.cells(i);
-        const int cell_id = cell_info.id();
+        const unsigned int cell_id = (unsigned int)cell_info.id();
         const int width = cell_info.width();
         const int height = cell_info.height();
 

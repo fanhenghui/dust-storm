@@ -30,9 +30,9 @@ struct AppThreadModel::InnerQueue {
 };
 
 AppThreadModel::AppThreadModel()
-    : _rendering(false), _sending(false), _th_rendering(new InnerThreadData()),
-      _th_sending(new InnerThreadData()), _th_operating(new InnerThreadData()),
-      _op_queue(new InnerQueue()) {
+    :  _th_operating(new InnerThreadData()), _th_rendering(new InnerThreadData()),
+       _th_sending(new InnerThreadData()), _op_queue(new InnerQueue()),
+       _rendering(false), _sending(false)  {
     // Creare gl context
     UIDType uid(0);
     _glcontext = GLResourceManagerContainer::instance()

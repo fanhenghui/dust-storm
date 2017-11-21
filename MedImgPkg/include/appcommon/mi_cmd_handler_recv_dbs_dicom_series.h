@@ -34,7 +34,6 @@ private:
 
     std::vector<DICOMLoader::DCMSliceStream*> _dcm_streams_store;
     std::deque<DICOMLoader::DCMSliceStream*> _dcm_streams_queue;
-    std::string _dcm_root;
     int _cur_recv_slice;
     int _cur_save_slice;
     int _total_slice;

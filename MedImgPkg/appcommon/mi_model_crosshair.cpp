@@ -13,7 +13,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-ModelCrosshair::ModelCrosshair(): _visible(true), _orthogonal(true) {
+ModelCrosshair::ModelCrosshair(): _orthogonal(true),_visible(true) {
     _pages[0] = 1;
     _pages[1] = 1;
     _pages[2] = 1;

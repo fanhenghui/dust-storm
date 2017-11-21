@@ -37,7 +37,7 @@ int OpAnnotation::execute() {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse annotation message failed.";
         return -1;
     }
-    const int anno_type = msgAnnotation.type();
+    //const int anno_type = msgAnnotation.type();
     const std::string anno_id = msgAnnotation.id();
     //MI_APPCOMMON_LOG(MI_DEBUG) << "annotation ID: " << anno_id;
     const int anno_status = msgAnnotation.status();

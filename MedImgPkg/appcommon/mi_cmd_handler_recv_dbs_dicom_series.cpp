@@ -27,8 +27,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 CmdHandlerRecvDBSDCMSeries::CmdHandlerRecvDBSDCMSeries(std::shared_ptr<AppController> controller):
-    _controller(controller),_cur_recv_slice(0),_cur_save_slice(0),_total_slice(0),
-    _th_running(false),_err_tag(false),_series_id(""),_study_id(""),_series_path(""),
+    _controller(controller),_th_running(false),_cur_recv_slice(0),_cur_save_slice(0),_total_slice(0),
+    _err_tag(false),_series_id(""),_study_id(""),_series_path(""),
     _patient_name(""),_patient_id(""),_modality(""),_size_mb(0) {
 
 }
@@ -54,7 +54,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
         APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
 
         const unsigned int end_tag = ipcheader.msg_info2;
-        const unsigned int dcm_slice_sum = ipcheader.msg_info3;
+        const int dcm_slice_sum = (int)ipcheader.msg_info3;
 
         //trigger a thread to write to cache DB
         if (!_th_running) {

@@ -67,9 +67,10 @@ private:
     DISALLOW_COPY_AND_ASSIGN(IOperation);
 };
 
-// #define CREATE_MY_OP(arg) virtual std::shared_ptr<IOperation> create() { \
-//     std::shared_ptr<IOperation> op(new #arg); \
-//     return op;}
+/* #define CREATE_MY_OP(arg) virtual std::shared_ptr<IOperation> create() { \
+     std::shared_ptr<IOperation> op(new #arg); \
+     return op;}
+*/
 
 MED_IMG_END_NAMESPACE
 #endif

@@ -18,7 +18,6 @@ OpSwitchPresetVRT::~OpSwitchPresetVRT() {}
 
 int OpSwitchPresetVRT::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpSwitchPresetVRT.";
-    const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;

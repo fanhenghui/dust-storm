@@ -161,7 +161,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
     /// \Modify completed
     if (ModelAnnotation::MODIFY_COMPLETED == code_id) {
-        if(_pre_vois.size() != model->get_annotation_count()) {
+        if((int)_pre_vois.size() != model->get_annotation_count()) {
             MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation cache.";
             return;
         }
@@ -351,7 +351,7 @@ void OBAnnotationSegment::update_aabb_i(const AABBUI& aabb)
         for (unsigned int y = 0 ; y < dim_brick[1] ; ++y) {
             int zz = z+aabb._min[2];
             int yy = y+aabb._min[1];
-            memcpy(mask_updated + z*dim_brick[0]*dim_brick[1] + y*dim_brick[0],
+            memcpy(mask_updated + z*layer_brick + y*dim_brick[0],
                 mask_array + zz*layer_whole + yy*mask_data->_dim[0] + aabb._min[0]  ,dim_brick[0]);
         }
     }

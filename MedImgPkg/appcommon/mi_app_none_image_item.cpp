@@ -74,7 +74,6 @@ bool  NoneImgAnnotations::check_dirty() {
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
     const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
     typedef std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator VOIConstIter;
-    typedef std::map<std::string, NoneImgAnnotations::VOIUnit>::iterator PreVOIConstIter;
 
     //TODO intensity info
 

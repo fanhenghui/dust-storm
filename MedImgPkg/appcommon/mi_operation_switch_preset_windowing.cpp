@@ -16,7 +16,6 @@ OpSwitchPresetWindowing::~OpSwitchPresetWindowing() {}
 
 int OpSwitchPresetWindowing::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpSwitchPresetWindowing.";
-    const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
