@@ -22,6 +22,8 @@ public:
     void recycle_label(unsigned char label);
     void recycle_labels(std::vector<unsigned char> labels);
 
+    void reset_labels();
+
 private:
     unsigned char _label_store[255];
     boost::mutex _mutex;

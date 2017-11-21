@@ -69,7 +69,7 @@ void MaskLabelStore::fill_labels(std::vector<unsigned char> labels) {
     boost::unique_lock<boost::mutex> locker(_mutex);
     for (auto it = labels.begin(); it != labels.end(); ++it) {
         _label_store[*it] = 1;
-    }
+}
 }
 
 void MaskLabelStore::recycle_label(unsigned char label) {
@@ -85,6 +85,10 @@ void MaskLabelStore::recycle_labels(std::vector<unsigned char> labels) {
 }
 
 MaskLabelStore::MaskLabelStore() {
+    memset(_label_store, 0, 255);
+}
+
+void MaskLabelStore::reset_labels() {
     memset(_label_store, 0, 255);
 }
 

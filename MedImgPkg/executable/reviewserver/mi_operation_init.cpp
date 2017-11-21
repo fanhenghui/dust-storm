@@ -101,7 +101,9 @@ int OpInit::execute() {
 }
 
 int OpInit::init_data_i(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask) {
-    // load data
+    // reset mask label store
+    MaskLabelStore::instance()->reset_labels();
+    
     // get series path from img cache db
     MI_REVIEW_LOG(MI_TRACE) << "try to get series from local img cache db. series id: " << series_uid;
     std::string db_ip_port,db_user,db_pwd,db_name,db_path;
