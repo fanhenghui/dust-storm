@@ -24,7 +24,7 @@ MED_IMG_BEGIN_NAMESPACE
 #ifndef SEND_ERROR_TO_BE
 #define SEND_ERROR_TO_BE(server_proxy, receiver, err)                   \
 if (nullptr != server_proxy && !std::string(err).empty()) {             \
-    MsgString msgErr;                                                   \  
+    MsgString msgErr;                                                   \
     msgErr.set_context(err);                                            \
     const int buffer_size = msgErr.ByteSize();                          \
     if (buffer_size > 0) {                                              \
