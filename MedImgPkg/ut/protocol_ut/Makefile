@@ -10,17 +10,14 @@ endif
 ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 BIN_DIR = $(ROOT)/bin
-PROTOCO_LIB_DIR = /usr/local/lib
-GOOGLE_INCLUDE_DIR = /usr/local/include/google/
-PROTOCO_INCLUDE_DIR = /usr/local/include/google/protobuf
 
 VPATH = $(INCLUDE_ROOT_DIR) $(GOOGLE_DIR)
 
 OBJS = mi_message.pb.o mi_protocol_ut.o
 TARGET = $(BIN_DIR)/medimg_protocol_ut
 
-ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(GOOGLE_INCLUDE_DIR) -I$(PROTOCO_INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(PROTOCO_LIB_DIR) -lprotobuf
+ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lprotobuf
 
 all: pre-build main-build
 pre-build:
