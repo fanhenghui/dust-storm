@@ -5,8 +5,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 ImageData::ImageData()
-    : _data_type(SHORT), _channel_num(1), _min_scalar(0), _max_scalar(1024),
-      _slope(1.0f), _intercept(0.0f), _image_position(Point3::S_ZERO_POINT),
+    : _data_type(SHORT), _channel_num(1), _slope(1.0f), _intercept(0.0f),
+       _image_position(Point3::S_ZERO_POINT), _min_scalar(0), _max_scalar(1024), 
       _has_cal_min_max(false) {
     memset(_dim, 0, sizeof(_dim));
     memset(_dim, 0, sizeof(_spacing));

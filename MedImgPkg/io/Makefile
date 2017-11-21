@@ -1,5 +1,5 @@
 ver = debug
-CC  = g++ -std=c++11 -Wall 
+CC  = g++ -std=c++11 -Wall -Wno-unused-function
 
 ifeq ($(ver) , release)
 CFLAGS += -O3
@@ -17,10 +17,10 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_dicom_exporter.o mi_dicom_loader.o mi_dicom_rt_struct_loader.o mi_dicom_rt_struct.o \
-mi_image_data.o mi_meta_object_loader.o mi_nodule_set_parser.o mi_nodule_set.o mi_zlib_utils.o \
-mi_dcm_scu.o mi_dcm_scp.o mi_worklist_info.o mi_pacs_communicator.o mi_jpeg_parser.o mi_targa_parser.o \
-mi_mysql_db.o
+OBJS = mi_image_data.o mi_nodule_set.o mi_meta_object_loader.o  mi_dicom_exporter.o mi_dicom_loader.o mi_dicom_rt_struct_loader.o mi_dicom_rt_struct.o \
+mi_nodule_set_parser.o mi_zlib_utils.o \
+mi_dcm_scu.o mi_dcm_scp.o mi_worklist_info.o mi_pacs_communicator.o \
+mi_jpeg_parser.o mi_targa_parser.o mi_mysql_db.o
 TARGET = $(BIN_DIR)/libmedimg_io.so
 
 EXPORT_HEADER = mi_io_export.h
@@ -31,53 +31,8 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lboost_filesystem -lboost_
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
-mi_dicom_loader.o: $(EXPORT_HEADER) mi_dicom_loader.h mi_dicom_loader.cpp mi_image_data_header.h mi_image_data.o
-	$(CC) -c -fPIC $(CFLAGS) mi_dicom_loader.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_dicom_exporter.o: $(EXPORT_HEADER) mi_dicom_exporter.h mi_dicom_exporter.cpp mi_image_data.o 
-	$(CC) -c -fPIC $(CFLAGS) mi_dicom_exporter.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_image_data.o: $(EXPORT_HEADER) mi_image_data.h mi_image_data.cpp mi_io_define.h
-	$(CC) -c -fPIC $(CFLAGS) mi_image_data.cpp $(ADDITINAL_INCLUDE_DIR)	
-
-mi_zlib_utils.o: $(EXPORT_HEADER) mi_zlib_utils.h mi_zlib_utils.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_zlib_utils.cpp $(ADDITINAL_INCLUDE_DIR)	
-
-mi_meta_object_loader.o: $(EXPORT_HEADER) mi_meta_object_loader.h mi_meta_object_loader.cpp mi_image_data_header.h mi_image_data.o mi_zlib_utils.o
-	$(CC) -c -fPIC $(CFLAGS) mi_meta_object_loader.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_dicom_rt_struct.o: $(EXPORT_HEADER) mi_dicom_rt_struct.h mi_dicom_rt_struct.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_dicom_rt_struct.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_dicom_rt_struct_loader.o: $(EXPORT_HEADER) mi_dicom_rt_struct_loader.h mi_dicom_rt_struct_loader.cpp mi_dicom_rt_struct.o
-	$(CC) -c -fPIC $(CFLAGS) mi_dicom_rt_struct_loader.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_nodule_set_parser.o: $(EXPORT_HEADER) mi_nodule_set_parser.h mi_nodule_set_parser.cpp mi_nodule_set.o
-	$(CC) -c -fPIC $(CFLAGS) mi_nodule_set_parser.cpp $(ADDITINAL_INCLUDE_DIR)	
-
-mi_nodule_set.o: $(EXPORT_HEADER) mi_nodule_set.h mi_nodule_set.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_nodule_set.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_pacs_communicator.o: $(EXPORT_HEADER) mi_pacs_communicator.h mi_pacs_communicator.cpp mi_dcm_scu.o mi_dcm_scp.o mi_worklist_info.o
-	$(CC) -c -fPIC $(CFLAGS) mi_pacs_communicator.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_worklist_info.o: $(EXPORT_HEADER) mi_worklist_info.h mi_worklist_info.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_worklist_info.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_dcm_scu.o: $(EXPORT_HEADER) mi_dcm_scu.h mi_dcm_scu.cpp mi_worklist_info.o
-	$(CC) -c -fPIC $(CFLAGS) mi_dcm_scu.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_dcm_scp.o: $(EXPORT_HEADER) mi_dcm_scp.h mi_dcm_scp.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_dcm_scp.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_jpeg_parser.o: $(EXPORT_HEADER) mi_jpeg_parser.h mi_jpeg_parser.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_jpeg_parser.cpp $(ADDITINAL_INCLUDE_DIR)
-		
-mi_targa_parser.o: $(EXPORT_HEADER) mi_targa_parser.h mi_targa_parser.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_targa_parser.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_mysql_db.o: $(EXPORT_HEADER) mi_mysql_db.h mi_mysql_db.cpp
-	$(CC) -c -fPIC $(CFLAGS) mi_mysql_db.cpp $(ADDITINAL_INCLUDE_DIR)
+$(OBJS): %.o:%.cpp %.h 
+	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

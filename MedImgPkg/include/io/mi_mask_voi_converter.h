@@ -11,6 +11,7 @@ MED_IMG_BEGIN_NAMESPACE
 class MaskVOIConverter
 {
 public:
+    //TODO 这个类是个比较临时类，需要重写
     //Diameter physical distance
     //Center volume coordinate
     IO_Export static std::vector<VOISphere> convert_label_2_sphere(const std::vector<unsigned char>& labels, const unsigned int dim[3], const double spacing[3], const double origin[3]);

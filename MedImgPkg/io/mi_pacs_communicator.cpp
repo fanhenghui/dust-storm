@@ -111,7 +111,7 @@ const std::string PACSCommunicator::fetch_dicom(const std::string& series_idx) {
     // try to find the work_list_item
     WorkListInfo* ptr_work_list = nullptr;
 
-    for (int i = 0; i < this->_work_list.size(); ++i) {
+    for (size_t i = 0; i < this->_work_list.size(); ++i) {
         if (series_idx.compare(this->_work_list.at(i).GetSeriesInsUID()) == 0) {
             ptr_work_list = &(this->_work_list.at(i));
             break;
@@ -151,7 +151,9 @@ const std::string PACSCommunicator::fetch_dicom(const WorkListInfo& item) {
         std::string cmd = std::string("rm -r ") + std::string("\"") +
                           std::string(directory.c_str()) + std::string("\"");
 #endif
-        int ret = system(cmd.c_str());
+        if(0 != system(cmd.c_str()) ) {
+            //TODO 
+        }
     }
 
     OFCondition res = this->_scp->setOutputDirectory(directory.c_str());

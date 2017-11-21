@@ -515,7 +515,6 @@ IOStatus DICOMLoader::data_check_spacing_unique_i(
     same_spacing_begin_end.push_back(cur_set);
     Point2 cur_spacing = spacing[0];
     size_t cur_id = 0;
-    size_t major_seq_id = 0;
     for (size_t i = 1 ; i < spacing.size(); ++i) {
         if (spacing[i] != cur_spacing) {
             std::vector<size_t> cur_set;
@@ -602,7 +601,7 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
     // sort based on slice lotation
     std::map<double, int> locs;
 
-    for (int i = 0; i < file_format_set.size(); ++i) {
+    for (size_t i = 0; i < file_format_set.size(); ++i) {
         DcmDataset* data_set = file_format_set[i]->getDataset();
 
         if (!data_set) {
@@ -639,7 +638,7 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
     } else {
         DcmFileFormatSet new_set2(file_format_set.size());
 
-        for (int i = 0; i < new_set.size(); ++i) {
+        for (size_t i = 0; i < new_set.size(); ++i) {
             new_set2[i] = new_set[new_set.size() - i - 1];
         }
 

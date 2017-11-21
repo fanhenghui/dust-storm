@@ -245,11 +245,9 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
                                               cRequestedProDes, true);
 
         WorkListInfo tempWorklistInfo;
-        bool bRet = false;
-
         if (NULL != cPatientID) {
             std::string sPatientID(cPatientID);
-            bRet = tempWorklistInfo.SetPatientID(sPatientID);
+            tempWorklistInfo.SetPatientID(sPatientID);
         }
 
         if (NULL != cPatientName) {
@@ -257,13 +255,13 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
             std::string sTemp = sPatientName;
             // ConvertToUtf8(cCharacterSet, sPatientName, sTemp);
             // if (Trim(sTemp)) {};
-            bRet = tempWorklistInfo.SetPatientName(sTemp);
+            tempWorklistInfo.SetPatientName(sTemp);
         }
 
         if (NULL != cPatientSex) {
             std::string sPatientSex(cPatientSex);
             sPatientSex = sPatientSex.front();
-            bRet = tempWorklistInfo.SetPatientSex(sPatientSex);
+            tempWorklistInfo.SetPatientSex(sPatientSex);
         }
 
         if (NULL != cPatientBirthday) {
@@ -289,22 +287,22 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
 
         if (NULL != cStudyDate) {
             std::string sStudyDate(cStudyDate);
-            bRet = tempWorklistInfo.SetStudyDate(sStudyDate);
+            tempWorklistInfo.SetStudyDate(sStudyDate);
         }
 
         if (NULL != cStudyTime) {
             std::string sStudyTime(cStudyTime);
-            bRet = tempWorklistInfo.SetStudyTime(sStudyTime);
+            tempWorklistInfo.SetStudyTime(sStudyTime);
         }
 
         if (NULL != cStudyInsUID) {
             std::string sStudyInsUID(cStudyInsUID);
-            bRet = tempWorklistInfo.SetStudyInsUID(sStudyInsUID);
+            tempWorklistInfo.SetStudyInsUID(sStudyInsUID);
         }
 
         if (NULL != cSeriesInsUID) {
             std::string sSeriesInsUID(cSeriesInsUID);
-            bRet = tempWorklistInfo.SetSeriesInsUID(sSeriesInsUID);
+            tempWorklistInfo.SetSeriesInsUID(sSeriesInsUID);
         }
 
         if (NULL != cStudyDescription) {
@@ -312,7 +310,7 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
             std::string sTemp = sStudyDescription;
             // ConvertToUtf8(cCharacterSet, sStudyDescription, sTemp);
             // if (Trim(sTemp)) {};
-            bRet = tempWorklistInfo.SetStudyDescription(sTemp);
+            tempWorklistInfo.SetStudyDescription(sTemp);
         }
 
         if (NULL != cReferringPhysician) {
@@ -320,7 +318,7 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
             std::string sTemp = sReferringPhysician;
             // ConvertToUtf8(cCharacterSet, sReferringPhysician, sTemp);
             // if (Trim(sTemp)) {};
-            bRet = tempWorklistInfo.SetReferringPhysician(sTemp);
+            tempWorklistInfo.SetReferringPhysician(sTemp);
         }
 
         if (NULL != cRequestingPhysician) {
@@ -328,7 +326,7 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
             std::string sTemp = sRequestingPhysician;
             // ConvertToUtf8(cCharacterSet, sRequestingPhysician, sTemp);
             // if (Trim(sTemp)) {};
-            bRet = tempWorklistInfo.SetRequestingPhysician(sTemp);
+            tempWorklistInfo.SetRequestingPhysician(sTemp);
         }
 
         if (NULL != cOperatorsName) {
@@ -336,22 +334,22 @@ void MIDcmSCU::addFindResult2List(QRResponse* response,
             std::string sTemp = sOperatorsName;
             // ConvertToUtf8(cCharacterSet, sOperatorsName, sTemp);
             // if (Trim(sTemp)) {};
-            bRet = tempWorklistInfo.SetOperatorsName(sTemp);
+            tempWorklistInfo.SetOperatorsName(sTemp);
         }
 
         if (NULL != cModality) {
             std::string sModality(cModality);
-            bRet = tempWorklistInfo.SetModality(sModality);
+            tempWorklistInfo.SetModality(sModality);
         }
 
         if (NULL != cScheduledAETitle) {
             std::string sScheduledAETitle(cScheduledAETitle);
-            bRet = tempWorklistInfo.SetScheduledAETitle(sScheduledAETitle);
+            tempWorklistInfo.SetScheduledAETitle(sScheduledAETitle);
         }
 
         if (NULL != cAccessionNo) {
             std::string sAccessionNo(cAccessionNo);
-            bRet = tempWorklistInfo.SetAccessionNo(sAccessionNo);
+            tempWorklistInfo.SetAccessionNo(sAccessionNo);
         }
 
         if (NULL != cRequestedProcedureID) {

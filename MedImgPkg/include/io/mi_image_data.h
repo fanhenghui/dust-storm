@@ -74,9 +74,9 @@ template <typename T> void ImageData::find_min_max_i(T* data_array) {
     }
 
     T min = *data_array, max = *data_array;
-    size_t size = _dim[0] * _dim[1] * _dim[2] * _channel_num;
+    unsigned int size = _dim[0] * _dim[1] * _dim[2] * _channel_num;
 
-    for (int i = 1; i < size; i++) {
+    for (unsigned int i = 1; i < size; i++) {
         T temp = *(data_array + i);
         min = temp < min ? temp : min;
         max = temp > max ? temp : max;

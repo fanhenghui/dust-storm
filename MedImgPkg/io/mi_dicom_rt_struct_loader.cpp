@@ -136,7 +136,7 @@ IOStatus DICOMRTLoader::load_rt_struct(DcmFileFormatPtr file_format,
                 ContourData* contour_data = new ContourData();
                 contour_data->points.resize(points.size() / 3);
 
-                for (int k = 0; k < points.size() / 3; ++k) {
+                for (size_t k = 0; k < points.size() / 3; ++k) {
                     contour_data->points[k]._m[0] = (float)atof(points[k * 3].c_str());
                     contour_data->points[k]._m[1] =
                         (float)atof(points[k * 3 + 1].c_str());

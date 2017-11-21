@@ -29,7 +29,9 @@ MED_IMG_BEGIN_NAMESPACE
 #define IO_Export
 #endif
 
+#ifdef WIN32
 #pragma warning(disable : 4251 4819 4099)
+#endif
 
 #ifndef IO_THROW_EXCEPTION
 #define IO_THROW_EXCEPTION(desc) THROW_EXCEPTION("IO", desc);

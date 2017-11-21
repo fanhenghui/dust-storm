@@ -14,7 +14,6 @@ IOStatus TargaParser::load(const std::string& file, int& width, int& height, int
 
     TGAHEADER tga_header;
     unsigned int img_size = 0;
-    short depth = 0;
     width = 0;
     height = 0;
     channel = 3;

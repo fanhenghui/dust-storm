@@ -161,7 +161,6 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
 
     DcmFileFormatPtr fileformat_ptr;
     std::string file_name;
-    DcmDataset* data_set = nullptr;
     int progress_step =
         static_cast<int>(std::ceil(double(in_files.size()) / 10.0));
     int progress = 0;
@@ -172,7 +171,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
 
     switch (etype) {
     case EXPORT_ORIGINAL_DICOM:
-        for (int i = 0; i < in_files.size(); ++i) {
+        for (size_t i = 0; i < in_files.size(); ++i) {
             status = load_dicom_file(in_files[i], fileformat_ptr);
 
             if (status != IO_SUCCESS) {
@@ -190,7 +189,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
         break;
 
     case EXPORT_ANONYMOUS_DICOM:
-        for (int i = 0; i < in_files.size(); ++i) {
+        for (size_t i = 0; i < in_files.size(); ++i) {
             status = load_dicom_file(in_files[i], fileformat_ptr);
 
             if (status != IO_SUCCESS) {
@@ -226,7 +225,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
         break;
 
     case EXPORT_ANONYMOUS_DICOM_WITHOUT_PRIVATETAG:
-        for (int i = 0; i < in_files.size(); ++i) {
+        for (size_t i = 0; i < in_files.size(); ++i) {
             status = load_dicom_file(in_files[i], fileformat_ptr);
 
             if (status != IO_SUCCESS) {
@@ -266,7 +265,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
         break;
 
     case EXPORT_BITMAP:
-        for (int i = 0; i < in_files.size(); ++i) {
+        for (size_t i = 0; i < in_files.size(); ++i) {
             status = save_dicom_as_bitmap(in_files[i], out_files[i]);
 
             if (status != IO_SUCCESS) {
@@ -311,7 +310,7 @@ IOStatus DICOMExporter::save_dicom_as_bitmap(const std::string in_file_name,
 }
 
 void DICOMExporter::anonymous_dicom_data(DcmFileFormatPtr in_fileformat_ptr) {
-    for (int i = 0; i < _taglist.size(); ++i) {
+    for (size_t i = 0; i < _taglist.size(); ++i) {
         in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], " ");
     }
 
