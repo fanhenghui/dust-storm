@@ -1,31 +1,28 @@
-var express = require('express');
-var fs = require('fs');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-
-router.get(global.subPage + '/', function(req, res, next) {
-    // res.render('index', {
-    //     subpage: global.subPage,
-    //     title: 'Web-based Medical Viewer from Baidu'
-    // }); // 到达此路径则渲染index文件，并传出title值供 index.html使用
+router.get(global.subPage + '/', (req, res, next)=> {
     res.redirect('login');
 });
-router.route(global.subPage+'/login').get(function(req, res) { // 到达此路径则渲染login文件，并传出title值供 login.html使用
+
+router.route(global.subPage+'/login')
+.get((req, res)=>{
     res.render('login', {
         subpage: global.subPage,
         title: 'User Login'
     });
-}).post(function(req, res) {
-    var uName = req.body.uname;
-    var uPwd = req.body.upwd;
-    global.dbHandel.signIn(uName, uPwd, function(res2, err2) {
+})
+.post((req, res)=>{
+    let uName = req.body.uname;
+    let uPwd = req.body.upwd;
+    global.dbHandel.signIn(uName, uPwd, (res2, err2)=>{
         if (err2) { 
-            //数据库操作错误就返回给原post处（login.html) 状态码为500的错误
+            //server error
             res.status(500).send('数据库操作失败！');
             console.log(err2);
         } else if (res2 == -1) {
             req.session.error = '用户名不存在';
-            res.status(404).send('用户名不存在'); //	状态码返回404
+            res.status(404).send('用户名不存在');
         } else if (res2 == -2) {
             req.session.error = '密码错误';
             res.status(404).send('密码错误');
@@ -36,80 +33,50 @@ router.route(global.subPage+'/login').get(function(req, res) { // 到达此路�
     });
 });
 
-router.route(global.subPage+'/register').get(function(req, res) {
+router.route(global.subPage+'/register')
+.get((req, res)=>{
     res.render('register', {
         subpage: global.subPage,
         title: 'User register'
     });
-}).post(function(req, res) {
-    var uName = req.body.uname;
-    var uPwd = req.body.upwd;
-    global.dbHandel.register(uName, uPwd, function(res2, err2) {
+})
+.post((req, res)=>{
+    let uName = req.body.uname;
+    let uPwd = req.body.upwd;
+    global.dbHandel.register(uName, uPwd, (res2, err2)=>{
         if (err2) {
-            //数据库操作错误就返回给原post处（login.html) 状态码为500的错误
+            //server error
             res.status(500).send('数据库操作失败！');
             console.log(err2);
         } else if (res2 == -1) {
             req.session.error = '用户名已存在！';
             res.status(500).send('用户名已存在！');
         } else if (res2 == 0) {
-            req.session.user = {name:uName};
+            req.session.user = {name:uName};//record to session
             res.send(200);
         }
     });
 });
 
-router.get(global.subPage+'/home', function(req, res) {
-    if (!req.session.user) { //到达/home路径首先判断是否已经登录
-        req.session.error = '请先登录'
-        res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
-    }
-    res.render(
-        'home', {
-            title: 'Home',
-            name: req.session.user.name
-        }); //已登录则渲染home页面
-});
-
-router.get(global.subPage+'/logout', function(req, res) { // 到达 /logout 路径则登出
-    // session中user,error对象置空，并重定向到根路径
+router.get(`${global.subPage}/logout`, (req, res)=>{
+    // clear session's user/error and redirect to login
     req.session.user = null;
     req.session.error = null;
     res.redirect(global.subPage+'/login');
 });
 
-router.route(global.subPage+'/review').get(function(req, res) {
-    if (!req.session.user) { //到达/home路径首先判断是否已经登录
+router.route(global.subPage+'/review').get((req, res)=>{
+    //check login(check session's user)
+    if (!req.session.user) { 
         req.session.error = '请先登录'
-        res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
+        res.redirect(global.subPage+'/login');
     } else {
-        console.log('login name is : ', req.session.user.name);
-
-        fs.readFile(global.configPath, function(err, data) {
-            if (err) {
-                req.session.error = '服务器错误';
-                res.redirect(global.subPage+'/login'); //未登录则重定向到 /login 路径
-            }
-            else {
-                let ip = 'http://127.0.0.1';
-                let configStr = data.toString();
-                let configLines = configStr.split('\n');
-                for (let i = 0; i< configLines.length; ++i) {
-                    let items = configLines[i].split(' ');
-                    if (items.length == 3 && items[0] == 'LocalHostIP') {
-                        ip = 'http://' + items[2];
-                        break;
-                    }
-                }
-                console.log('localhost host is : ', ip + ':' + global.appPort);
-                //send user name and server ip
-                res.render('review', {
-                    subpage: global.subPage,
-                    username: req.session.user.name,
-                    serverip: ip + ':' + global.appPort
-                }); // go directly to review page
-            }
-        });        
+        console.log(`user ${req.session.user.name} into review`);
+        res.render('review', {
+            subpage: global.subPage,
+            username: req.session.user.name
+        });     
     }
 });
+
 module.exports = router;

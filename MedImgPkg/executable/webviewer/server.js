@@ -1,13 +1,13 @@
-var app = require('express')();
-var path = require('path');
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var util = require('util');
-var session = require('express-session');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var fs = require('fs');
+const app = require('express')();
+const path = require('path');
+const httpServer = require('http').Server(app);
+const wsServer = require('socket.io')(httpServer);
+const util = require('util');
+const session = require('express-session');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const fs = require('fs');
 
 global.appPort = 8000;
 if (process.argv.length == 3)  {
@@ -23,9 +23,9 @@ console.log('webviewer port : ' + appPort);
 console.log('webviewer subpage : ' + subPage);
 
 //get config path
-var confitPathFile = path.join(__dirname,'public','config','config_path');
-var configPathData = fs.readFileSync(confitPathFile);
-var linesConfigPath = configPathData.toString().split('\n');
+let confitPathFile = path.join(__dirname,'public','config','config_path');
+let configPathData = fs.readFileSync(confitPathFile);
+let linesConfigPath = configPathData.toString().split('\n');
 if (linesConfigPath.length == 0) {
     console.log('get config path failed!');
     throw('get config path failed!');
@@ -33,7 +33,7 @@ if (linesConfigPath.length == 0) {
 global.configPath = linesConfigPath[0];
 global.dbHandel = require('./public/database/db-handel');
 
-var routes = require('./public/routes/index');
+let routes = require('./public/routes/index');
 // use session for login
 app.use(session({
     secret: 'secret',
@@ -57,25 +57,22 @@ app.use('/', routes);
 
 //app.use(log4js.connectLogger(this.logger('normal') , {level:'auto', format:':method :url '}));
 //connect to web socket
-io.set('log level',0);//好像没有设置成功
-io.on('connection', require('./public/be/be-proxy').onIOSocketConnect);
+wsServer.set('log level',0);//好像没有设置成功
+wsServer.on('connection', require('./public/be/be-proxy').onWebSocketConnect);
 
 //process quit callback
-process.on('exit', function(err) {
+process.on('exit', (err)=> {
     console.log('process exit.');
-    require('./public/be/be-proxy').cleanIOSocketConnect();
+    require('./public/be/be-proxy').cleanWebSocketConnection();
 });
-process.on('uncaughtException', function(err) {
+process.on('uncaughtException', (err)=> {
     console.error('An uncaught error occurred!');
     console.log(err);
     process.exit(99);
 });
-process.on('SIGINT', function(err) {
+process.on('SIGINT', (err)=> {
     console.log('catches ctrl+c event.');
     process.exit(2);
 });
 
-var server = http.listen(global.appPort, function() {
-    var address = server.address();
-    console.log('address is ', util.inspect(address));
-});
+httpServer.listen(global.appPort);

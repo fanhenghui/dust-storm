@@ -15,8 +15,6 @@ CacheDBPWD = 123456
 CacheDBName = med_img_cache_db
 CacheDBPath = /home/wangrui22/med_img_cache_db
 
-LocalHostIP = 192.168.199.107
-
 PresetCTAbdomenWW = 400
 PresetCTAbdomenWL = 60
 PresetCTLungsWW = 1500

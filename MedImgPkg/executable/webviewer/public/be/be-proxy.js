@@ -1,23 +1,23 @@
-var fs = require('fs');
-var childProcess = require('child_process');
+const fs = require('fs');
+const childProcess = require('child_process');
 
-var COMMAND_ID_FE_SHUT_DOWN = 120000;
-var COMMAND_ID_FE_READY = 120001;
-var COMMAND_ID_FE_HEARTBEAT = 119999;
+const COMMAND_ID_FE_SHUT_DOWN = 120000;
+const COMMAND_ID_FE_READY = 120001;
+const COMMAND_ID_FE_HEARTBEAT = 119999;
 
-var onlineUsers = {};
-var onlineLocalSockets = {};
-var onlineLocalIPC = {};
-var onlineLogicProcess = {};
-var onlineBEHBClock = {};
-var onlineBETic = {};
-var onlineFETic = {};
-var onlineCount = 0;
+let onlineUsers = {};
+let onlineLocalSockets = {};
+let onlineLocalIPC = {};
+let onlineLogicProcess = {};
+let onlineBEHBClock = {};
+let onlineBETic = {};
+let onlineFETic = {};
+let onlineCount = 0;
 
 const TIC_LIMIT = 4294967296;
 const HEARTBEAT_INTERVAL = 5 * 1000;
 
-var disconnectBE = function(userid) {
+let disconnectBE = (userid)=>{
     if (!onlineUsers.hasOwnProperty(userid)) {
         console.log(userid + ' disconnecting failed.');
         return;
@@ -26,19 +26,10 @@ var disconnectBE = function(userid) {
     console.log(userid + ' has disconnecting.');
 
     // send last msg tp BE to notify BE shut down
-    if (!onlineLocalIPC.hasOwnProperty(userid)) {
-        var ipc = undefined;
-    } else {
-        var ipc = onlineLocalIPC[userid];
-    }
+    let ipc = onlineLocalIPC.hasOwnProperty(userid) ? onlineLocalIPC[userid] : null;
+    let localSocket = onlineLocalSockets.hasOwnProperty(userid) ? onlineLocalSockets[userid] : null;
 
-    if (!onlineLocalSockets.hasOwnProperty(userid)) {
-        var localSocket = undefined;
-    } else {
-        var localSocket = onlineLocalSockets[userid];
-    }
-
-    const quitMsg = new Buffer(32);
+    let quitMsg = new Buffer(32);
     quitMsg.writeUIntLE(1, 0, 4);
     quitMsg.writeUIntLE(0, 4, 4);
     quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
@@ -48,7 +39,7 @@ var disconnectBE = function(userid) {
     quitMsg.writeUIntLE(0, 24, 4);
     quitMsg.writeUIntLE(0, 28, 4);
 
-    if (ipc != undefined) {
+    if (ipc) {
         ipc.server.emit(localSocket, quitMsg);
         ipc.server.stop();
     }
@@ -68,11 +59,10 @@ var disconnectBE = function(userid) {
         delete onlineBEHBClock[userid];
     }
     onlineCount--;
-    var userName = userid.split('|', 1);
     console.log(userid + ' disconnecting success.');
-    //TODO clean user login
+    //TODO clear user online info (DB) 有极低的概率调用失败
     //wait for kill worker
-    setTimeout(function() {
+    setTimeout(()=>{
         if (onlineLogicProcess.hasOwnProperty(userid)) {
             console.log('kill ' + userid + '\'s process froce just in case');
             onlineLogicProcess[userid].kill('SIGHUP');
@@ -82,10 +72,10 @@ var disconnectBE = function(userid) {
 };
 
 module.exports = {
-    onIOSocketConnect: function(socket) {
+    onWebSocketConnect: function(socket) {
         console.log('<><><><><><> connecting <><><><><><>');
         //监听用户加入
-        socket.on('login', function(obj) {
+        socket.on('login', (obj)=>{
             if (obj.username == '') {
                 console.log('invalid null username!');
                 return;
@@ -104,7 +94,7 @@ module.exports = {
             }
 
             // create a server IPC between server and BE
-            var nodeIpc = require('node-ipc');
+            const nodeIpc = require('node-ipc');
             const ipc = new nodeIpc.IPC;
 
             console.log('UNIX path is : ' + obj.username);
@@ -112,8 +102,8 @@ module.exports = {
             ipc.config.retry = 1500;
             ipc.config.rawBuffer = true;
             ipc.config.encoding = 'hex';
-            ipc.serve(function() {
-                ipc.server.on('connect', function(localSocket) {
+            ipc.serve(()=>{
+                ipc.server.on('connect', (localSocket)=>{
                     // when IPC is constructed between server and BE
                     // server send a ready MSG to BE to make sure BE is ready
                     console.log('IPC connect. Send FE ready to BE.');
@@ -134,7 +124,7 @@ module.exports = {
                     }
 
                     // send heart bet package
-                    var heartbeatBE = (function() {
+                    let heartbeatBE = ()=>{
                         if (onlineLocalIPC.hasOwnProperty(obj.userid) && onlineLocalSockets.hasOwnProperty(obj.userid)) {
                             const msgHeartBeat = new Buffer(32);
                             msgHeartBeat.writeUIntLE(1, 0, 4);
@@ -159,19 +149,19 @@ module.exports = {
                             }
                             console.log('server heart beat for user: ' + obj.username + ' ' + onlineBETic[obj.userid]);
                         }
-                    });
+                    };
                     onlineBETic[obj.userid] = 0;
                     onlineFETic[obj.userid] = 0;
                     onlineBEHBClock[obj.userid] = setInterval(heartbeatBE, HEARTBEAT_INTERVAL);
                 });
 
                 // sever get logic process's tcp package and transfer to FE directly(not parse)
-                ipc.server.on('data', function(buffer, localSocket) {
+                ipc.server.on('data', (buffer, localSocket)=> {
                     //ipc.log('got a data : ' + buffer.length);
                     socket.emit('data', buffer);
                 });
 
-                ipc.server.on('socket.disconnected', function(localSocket, destroyedSocketID) {
+                ipc.server.on('socket.disconnected', (localSocket, destroyedSocketID)=> {
                     ipc.log('client ' + destroyedSocketID + ' has disconnected!');
                 });
             });
@@ -182,23 +172,22 @@ module.exports = {
             // Create BE process
             console.log('path: ' + '/tmp/app.' + obj.username);
             // reader BE process path form config file
-            var review_server_path;
-            fs.readFile(__dirname + '/be_path', function(err, data) {
+            fs.readFile(__dirname + '/be_path', (err, data)=>{
                 if (err) {
                     console.log('null be path!');
                     throw err;
                 }
                 //read line 0 as be path
-                var lines = data.toString().split('\n');
+                let lines = data.toString().split('\n');
                 if (lines.length == 0) {
                     console.log('read be path fiailed!');
                     throw('read be path fiailed!');
                 }
-                review_server_path = lines[0];
+                let review_server_path = lines[0];
                 console.log('app path : ' + review_server_path);
 
                 /// run process
-                var worker = childProcess.spawn(review_server_path, ['/tmp/app.' + obj.username], {
+                let worker = childProcess.spawn(review_server_path, ['/tmp/app.' + obj.username], {
                     detached: true
                 });
                 onlineLogicProcess[obj.userid] = worker;
@@ -215,19 +204,19 @@ module.exports = {
                     console.log('child process exited with code: ' + code);
                     //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
                 });
-                console.log('<><><><><><> login in success <><><><><><>');
+                console.log('<><><><><><> create review server success <><><><><><>');
             });
         });
 
-        var disconnectBEExt = function() {
-            var userid = socket.name;
+        let disconnectBEExt = ()=>{
+            let userid = socket.name;
             disconnectBE(userid);
         };
 
         // listen user disconnect(leave review page)
         socket.on('disconnect', disconnectBEExt);
 
-        socket.on('heartbeat', function(obj) {
+        socket.on('heartbeat', (obj) => {
             if (onlineFETic.hasOwnProperty(obj.userid)) {
                 onlineFETic[obj.userid] += 1;
                 if (onlineFETic[obj.userid] > TIC_LIMIT) {
@@ -237,23 +226,23 @@ module.exports = {
             }
         });
 
-        socket.on('data', function(obj) {
+        socket.on('data', (obj)=>{
             //FE发来的TCP 粘包问题是在BE端解决(UNIX socket 可以控制每次recv的字节数，因此可以天然解决粘包问题)
-            userid = obj.userid;
+            let userid = obj.userid;
             //console.log('socket on data , userid : ' + userid);
             if (!onlineLocalIPC.hasOwnProperty(userid)) {
                 console.log('socket on data , ERROR IPC');
                 return;
             }
-            var ipc = onlineLocalIPC[userid];
+            let ipc = onlineLocalIPC[userid];
             if (!onlineLocalSockets.hasOwnProperty(userid)) {
                 console.log('socket on data , ERROR SOCKET');
                 reutrn;
             }
-            var localSocket = onlineLocalSockets[userid];
+            let localSocket = onlineLocalSockets[userid];
 
-            var buffer = obj.content;
-            var commandID = buffer.readUIntLE(8, 4);
+            let buffer = obj.content;
+            let commandID = buffer.readUIntLE(8, 4);
             //console.log('web send to server : username ' + obj.username);
             //console.log('buffer length : ' + buffer.byteLength);
             //console.log('command id :' + commandID);
@@ -262,12 +251,12 @@ module.exports = {
         });
     },
 
-    cleanIOSocketConnect: function() {
-        var innerUsers = {};
-        for (var userid in onlineUsers) {
+    cleanWebSocketConnection: function() {
+        let innerUsers = {};
+        for (let userid in onlineUsers) {
             innerUsers[userid] = onlineUsers[userid];
         }
-        for (var userid in innerUsers) {
+        for (let userid in innerUsers) {
             disconnectBE(userid);
         }
     }

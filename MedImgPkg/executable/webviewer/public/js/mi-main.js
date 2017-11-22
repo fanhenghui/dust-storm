@@ -1,7 +1,6 @@
 
 (function() {
     let socket = null;
-    let serverIP = '';
     let seriesUID = '';
     let cellCanvases = null;
     let cellSVGs = null;
@@ -25,8 +24,8 @@
     }
 
     function login() {
-        //socket = io.connect(serverIP); 内网可以这样写
-        socket = io();
+        //socket = io.connect("ws://172.23.237.144:8081");//标准写法，nginx代理的时候填写nginx代理服务器的地址
+        socket = io(); //这样写貌似也可以
         if (!socket) {
             console.log('connect server failed.');
             alert('connect server failed.');
@@ -879,8 +878,6 @@
             resize()
         };
         let username = document.getElementById('username').innerHTML;
-        serverIP = document.getElementById('serverip').innerHTML;
-        console.log('server ip: ' + serverIP);
         login();
 
         //trigger on heartbeat

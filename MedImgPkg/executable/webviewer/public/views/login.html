@@ -40,10 +40,10 @@
 					</div>
 				</div>
 				<div class="form-group">
-						<button type="submit" class="btn btn-primary btn-block" id="login0">登录</button>
+						<button type="submit" class="btn btn-primary btn-block" id="btn-login">登录</button>
 				</div>
 				<div class="form-group">
-						<button type="button" class="btn btn-primary btn-block" id="register0">注册</button>
+						<button type="button" class="btn btn-primary btn-block" id="btn-register">注册</button>
 				</div>
 				</div>
 				</div>
@@ -55,27 +55,26 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	$(function(){ 
-		$("#register0").click(function(){ 
+		$("#btn-register").click(function(){ 
 			location.href = 'register';
 		});
-		$("#login0").click(function(){ 
-			var username = $("#username").val();
-			var password = $("#password").val();
-			let subpage = document.getElementById('subpage').innerHTML;
-			var data = {"uname":username,"upwd":password};
+		$("#btn-login").click(function(){ 
+			let username = $('#username').val();
+			let password = $('#password').val();
+			let subpage = $('#subpage').html();
 			$.ajax({ 
-				url: subpage + '/login',
+				url: `${subpage}/login`,
 				type:'post',
-				data: data,
-				success: function(data,status){ 
+				data: {'uname':username,'upwd':password},
+				success(data,status){ 
 					if(status == 'success'){ 
-						location.href = subpage + '/review';
+						location.href = `${subpage}/review`;
 					}
 				},
-				error: function(data,status){ 
+				error(data,status){ 
 					if(status == 'error'){
 						alert(data.responseText);
-						location.href = subpage + '/login';
+						location.href = `${subpage}/login`;
 					}
 				}
 			});

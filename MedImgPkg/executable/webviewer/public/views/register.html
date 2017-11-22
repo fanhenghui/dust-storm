@@ -50,10 +50,10 @@
 					</div>
 				</div>
 				<div class="form-group">
-						<button type="submit" class="btn btn-primary btn-block" id="register">注册</button>
+						<button type="submit" class="btn btn-primary btn-block" id="btn-register">注册</button>
 				</div>
 				<div class="form-group">
-						<button type="button" class="btn btn-info col-sm-2 col-sm-offset-10" id="login">登录</button>
+						<button type="button" class="btn btn-info col-sm-2 col-sm-offset-10" id="btn-login">登录</button>
 				</div>
 				</div>
 				</div>
@@ -65,37 +65,36 @@
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	$(function(){ 
-		$("#login").click(function(){ 
-			let subpage = document.getElementById('subpage').innerHTML;
-			location.href = subpage+'/login';
+		$("#btn-login").click(function(){ 
+			let subpage = $('#subpage').html();
+			location.href = `${subpage}/login`;
 		});
-		$("#register").click(function(){ 
-			var username = $("#username").val();
-			var password = $("#password").val();
-			let subpage = document.getElementById('subpage').innerHTML;
+		$("#btn-register").click(function(){ 
+			let username = $("#username").val();
+			let password = $("#password").val();
+			let subpage = $('#subpage').html();
 			var passwordConfirm = $("#password-confirm").val();
 			if(password !== passwordConfirm){ 
 				$("#password").css("border","1px solid red");
 				$("#password-confirm").css("border","1px solid red");
-			}else if(password === passwordConfirm){
-			var data = {"uname":username,"upwd":password};
-			$.ajax({ 
-				url: subpage+'/register',
-				type: 'post',
-				data: data,
-				success: function(data,status){ 
-					if(status == 'success'){ 
-						location.href = subpage+'/login';
+			} else if(password === passwordConfirm){
+				$.ajax({ 
+					url: `${subpage}/register`,
+					type: 'post',
+					data: {'uname':username,'upwd':password},
+					success(data,status){ 
+						if(status == 'success'){ 
+							location.href = `${subpage}/login`;
+						}
+					},
+					error(data,status){ 
+						if(status == 'error'){
+							alert(data.responseText);
+							location.href = `${subpage}/register`;
+						}
 					}
-				},
-				error: function(data,status){ 
-					if(status == 'error'){
-						alert(data.responseText);
-						location.href = subpage+'/register';
-					}
-				}
-			}); 
-		}
+				}); 
+			}
 		});
 	});
 </script>
