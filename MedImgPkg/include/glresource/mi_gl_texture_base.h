@@ -7,15 +7,28 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTextureBase : public GLObject {
 public:
-    GLTextureBase(UIDType uid);
+    GLTextureBase(UIDType uid): GLObject(uid), _texture_id(0) {
+        set_type("GLTextureBase");
+    }
 
-    virtual ~GLTextureBase();
+    virtual ~GLTextureBase() {}
 
-    virtual void initialize();
+    virtual void initialize() {
+        if (0 == _texture_id) {
+            glGenTextures(1, &_texture_id);
+        }
+    }
 
-    virtual void finalize();
+    virtual void finalize() {
+        if (0 != _texture_id) {
+        glDeleteTextures(1, &_texture_id);
+        _texture_id = 0;
+    }
+    }
 
-    unsigned int get_id() const;
+    unsigned int get_id() const {
+        return _texture_id;
+    }
 
     virtual void bind() = 0;
 
@@ -34,7 +47,9 @@ public:
     // format     Specifies the format that the elements of the image will be
     // treated as for the purposes of formatted stores.
     virtual void bind_image(GLuint unit, GLint level, GLboolean layered,
-                            GLint layer, GLenum access, GLenum format);
+                            GLint layer, GLenum access, GLenum format) {
+        glBindImageTexture(unit, _texture_id, level, layered, layer, access, format);
+    }
 
     virtual void unbind() = 0;
 

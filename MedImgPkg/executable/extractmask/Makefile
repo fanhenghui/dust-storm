@@ -22,9 +22,16 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lboost_filesystem -lboost_
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
-$(OBJS):%.o:%.cpp $(COMMON_HEADER)
-	$(CC) -c $(CFLAGS) $< -o $@ $(ADDITINAL_INCLUDE_DIR)
+
+mi_extract_mask.o: mi_extract_mask.cpp 
+	$(CC) -c $(CFLAGS) mi_extract_mask.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_extract_mask_vis.o: mi_extract_mask_vis.cpp mi_extract_mask.o
+	$(CC) -c $(CFLAGS) mi_extract_mask_vis.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_main.o: mi_main.cpp mi_extract_mask.o mi_extract_mask_vis.o
+	$(CC) -c $(CFLAGS) mi_main.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:
-	-rm $(OBJS) $(TARGET)
+	-rm *.o $(TARGET)

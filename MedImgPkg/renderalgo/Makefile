@@ -152,4 +152,4 @@ mi_graphic_object_navigator.o: $(EXPORT_HEADER) mi_graphic_object_navigator.h mi
 
 .PHONY : clean
 clean:
-	-rm $(OBJS) $(TARGET)
+	-rm *.o $(TARGET)

@@ -12,8 +12,8 @@ public:
     Point2 _pt[2];
 
 public:
-    LineSegment2D();
-    virtual ~LineSegment2D();
+    LineSegment2D() {}
+    virtual ~LineSegment2D() {}
 };
 
 class Arithmetic_Export LineSegment3D : public IShape {
@@ -21,9 +21,12 @@ public:
     Point3 _pt[2];
 
 public:
-    LineSegment3D();
-    LineSegment3D(const Point3& pt0, const Point3& pt1);
-    virtual ~LineSegment3D();
+    LineSegment3D() {}
+    LineSegment3D(const Point3& pt0, const Point3& pt1) {
+        _pt[0] = pt0;
+        _pt[1] = pt1;
+    }
+    virtual ~LineSegment3D() {}
 };
 
 MED_IMG_END_NAMESPACE

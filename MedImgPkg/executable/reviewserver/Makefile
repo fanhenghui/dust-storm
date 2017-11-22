@@ -35,8 +35,11 @@ $(TARGET): mi_review_main.o $(OBJS)
 mi_review_main.o: $(EXPORT_HEADER)  mi_review_main.cpp  mi_review_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_review_main.cpp $(ADDITINAL_INCLUDE_DIR)
 
-$(OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
-	$(CC) -c -fPIC $(CFLAGS) $< -o $@ $(ADDITINAL_INCLUDE_DIR)
+mi_review_controller.o: mi_review_controller.cpp mi_review_controller.h mi_operation_init.o
+	$(CC) -c -fPIC $(CFLAGS) mi_review_controller.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_operation_init.o:  mi_operation_init.cpp mi_operation_init.h 
+	$(CC) -c -fPIC $(CFLAGS) mi_operation_init.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

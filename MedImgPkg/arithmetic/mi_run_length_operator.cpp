@@ -1,7 +1,6 @@
 #include "mi_run_length_operator.h"
 #include "mi_arithmetic_logger.h"
 #include <fstream>
-#include "mi_arithmetic_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

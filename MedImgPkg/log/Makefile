@@ -26,8 +26,12 @@ ADDITIANL_DEPENDENCIES = -lpthread -lboost_system -lboost_filesystem -lboost_thr
 
 $(TARGET): $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
-$(OBJS):%.o:%.cpp %.h
-	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
+
+mi_logger_util.o: mi_logger_util.cpp mi_logger_util.h mi_logger.o
+	$(CC) -c -fPIC $(CFLAGS) mi_logger_util.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_logger.o: mi_logger.cpp mi_logger.h
+	$(CC) -c -fPIC $(CFLAGS) mi_logger.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

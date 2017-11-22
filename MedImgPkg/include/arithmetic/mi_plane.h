@@ -18,11 +18,13 @@ public:
     double _distance;
 
 public:
-    Plane();
+    Plane() {}
 
-    virtual ~Plane();
+    virtual ~Plane() {}
 
-    double distance_to_point(const Point3& pt) const;
+    double distance_to_point(const Point3& pt) const {
+        return _norm.dot_product(pt - Point3::S_ZERO_POINT) - _distance;
+    }
 };
 
 MED_IMG_END_NAMESPACE

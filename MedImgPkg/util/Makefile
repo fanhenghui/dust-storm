@@ -17,8 +17,10 @@ BIN_DIR = $(ROOT)/bin
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-OBJS = mi_configuration.o mi_model_interface.o mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o mi_ipc_server_proxy.o\
-mi_file_util.o
+INDEPENDENT_OBJS = mi_configuration.o mi_model_interface.o mi_file_util.o
+
+SOCKET_OBJS = mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o mi_ipc_server_proxy.o
+
 TARGET = $(BIN_DIR)/libmedimg_util.so
 
 EXPORT_HEADER = mi_util_export.h
@@ -26,11 +28,23 @@ COMMON_HEADER = mi_ipc_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lmedimg_log
 
-$(TARGET): $(OBJS)
-	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
-$(OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
+$(TARGET): $(INDEPENDENT_OBJS) $(SOCKET_OBJS)
+	$(CC) -shared $(CFLAGS) -o $(TARGET) $(INDEPENDENT_OBJS) $(SOCKET_OBJS) $(ADDITIANL_DEPENDENCIES)
+
+$(INDEPENDENT_OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
 	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
+
+mi_ipc_server_proxy.o: mi_ipc_server_proxy.cpp mi_ipc_server_proxy.h mi_socket_server.o
+	$(CC) -c -fPIC $(CFLAGS) mi_ipc_server_proxy.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_ipc_client_proxy.o: mi_ipc_client_proxy.cpp mi_ipc_client_proxy.h mi_socket_client.o
+	$(CC) -c -fPIC $(CFLAGS) mi_ipc_client_proxy.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_socket_client.o: mi_socket_client.cpp mi_socket_client.h 
+	$(CC) -c -fPIC $(CFLAGS) mi_socket_client.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_socket_server.o: mi_socket_server.cpp mi_socket_server.h 
+	$(CC) -c -fPIC $(CFLAGS) mi_socket_server.cpp $(ADDITINAL_INCLUDE_DIR)
+	
 
 .PHONY : clean
 clean:
-	-rm $(OBJS) $(TARGET)
+	-rm *.o $(TARGET)

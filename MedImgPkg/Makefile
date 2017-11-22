@@ -1,6 +1,8 @@
 MAKE = make
 ver = debug
+buildall = true
 
+ifeq ($(buildall),true) 
 subsystem:
 	-mkdir bin
 	$(MAKE) -C ./log
@@ -24,6 +26,20 @@ subsystem:
 	$(MAKE) -C ./ut/renderalgo_ut
 	$(MAKE) -C ./ut/io_ut
 	$(MAKE) -C ./ut/protocol_ut
+else 
+subsystem:
+	-mkdir bin
+	$(MAKE) -C ./log
+	$(MAKE) -C ./util
+	$(MAKE) -C ./glresource
+	$(MAKE) -C ./arithmetic
+	$(MAKE) -C ./io
+	$(MAKE) -C ./executable/shaderencoder
+	$(MAKE) -C ./renderalgo
+	$(MAKE) -C ./appcommon
+	$(MAKE) -C ./executable/reviewserver
+	$(MAKE) -C ./executable/dbserver
+endif
 
 PHONY.:clean
 clean:

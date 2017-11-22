@@ -13,8 +13,8 @@ public:
     double _a, _b, _c;
 
 public:
-    Ellipsoid();
-    virtual ~Ellipsoid();
+    Ellipsoid():_center(Point3::S_ZERO_POINT), _a(1), _b(1), _c(1)  {}
+    virtual ~Ellipsoid() {}
 
     inline bool in_ellipsoid(const Point3& pt) {
         Vector3 tmp = pt - _center;

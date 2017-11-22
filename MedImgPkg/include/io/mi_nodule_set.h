@@ -8,15 +8,28 @@ MED_IMG_BEGIN_NAMESPACE
 
 class IO_Export NoduleSet {
 public:
-    NoduleSet();
-    ~NoduleSet();
+    NoduleSet() {}
+    ~NoduleSet() {}
 
-    void add_nodule(const VOISphere& v);
-    void set_nodule(const std::vector<VOISphere>& nset);
-    void clear_nodule();
+    void add_nodule(const VOISphere& v) {
+        _nodule_set.push_back(v);
+    }
 
-    const std::vector<VOISphere>& get_nodule_set() const;
-    void get_nodule_set(std::vector<VOISphere>& nset) const;
+    void set_nodule(const std::vector<VOISphere>& nset) {
+        _nodule_set = nset;
+    }
+    
+    void clear_nodule() {
+        std::vector<VOISphere>().swap(_nodule_set);
+    }
+
+    const std::vector<VOISphere>& get_nodule_set() const {
+        return _nodule_set;
+    }
+
+    void get_nodule_set(std::vector<VOISphere>& nset) const {
+        nset = _nodule_set;
+    }
 
 private:
     std::vector<VOISphere> _nodule_set;

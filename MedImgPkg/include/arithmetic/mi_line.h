@@ -15,10 +15,14 @@ public:
     Vector2 _dir;
 
 public:
-    Line2D();
-    virtual ~Line2D();
+    Line2D() {}
+    virtual ~Line2D() {}
     //ax+by = c
-    void to_func(double& a, double& b, double& c) const;
+    void to_func(double& a, double& b, double& c) const {
+        a = _dir.y;
+        b = _dir.x;
+        c = a*_pt.x + b*_pt.y;
+    }
 
     bool operator==(const Line2D& l) {
         return l._pt == _pt && l._dir == _dir;
@@ -31,8 +35,8 @@ public:
     Vector3 _dir;
 
 public:
-    Line3D();
-    virtual ~Line3D();
+    Line3D() {}
+    virtual ~Line3D() {}
 };
 
 MED_IMG_END_NAMESPACE
