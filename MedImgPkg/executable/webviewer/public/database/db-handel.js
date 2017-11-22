@@ -55,22 +55,38 @@ module.exports = {
 			return;
 		}
 
+		//TODO check name and pwd
+
 		db.query(`SELECT * FROM usr WHERE name='${name}'`, (err, res, fields)=>{
 			if(err) {
-				//数据库错误
-				console.log(`DB query failed: ${err}`);
-				callback(-3,"数据库错误");
+				//database error
+				console.log(`DB error when sign in: ${err}`);
+				callback(-4,"数据库错误");
 			} else if(res.length == 0) {
-				//用户名不存在
+				//user doesn't exist
 				callback(-1);
 			} else {
-				if (res[0].password == pwd ) {
-					//登录成功
-					callback(0);
-				} else {
-					//密码不正确
+				console.log(res[0]);
+				if (res[0].password != pwd ) {
+					//error password
 					callback(-2);
-				} 
+				} else if (res[0].online[0] === 1) {
+					//repeat login
+					callback(-3);
+				} else {
+					//update online 
+					db.query(`UPDATE usr SET online=1 WHERE name='${name}'`, (err, res, fields)=> {
+						if (err) {
+							//database error
+							console.log(`DB error when sign in: ${err}`);
+							callback(-4,"数据库错误");
+						} else {
+							//login successs
+							callback(0);
+						}
+					});
+					
+				}
 			}
 		});
 	},
@@ -78,35 +94,49 @@ module.exports = {
 	register: function(name, pwd, callback) {
 		if (db == null) {
 			connectDB();
-			callback(-3,"数据库连接失败");
+			console.log(`DB error when register: ${err}`);
+			callback(-4,"数据库连接失败");
 			return;
 		}
 
 		db.query(`SELECT * FROM usr WHERE name='${name}'`, (err, res, fields)=>{
 			if(err) {
-				//数据库错误
-				callback(-3,err);
-				connection.end();
+				//database error
+				callback(-4,err);
 			} else if (res.length == 0) {
-				//用户名不存在
-				//TODO role
-				db.query(`INSERT INTO usr(name,role,password) VALUES ('${name}',0,'${pwd}')`, (err, res, fields)=>{
+				db.query(`INSERT INTO usr(name,role,online,password) VALUES ('${name}',0,0,'${pwd}')`, (err, res, fields)=>{
 					if(err) {
-						//数据库错误
-						callback(-3,err);
+						//database error
+						console.log(`DB error when register: ${err}`);
+						callback(-4,err);
 					} else {
-						//注册成功
+						//register success
 						callback(0);
 					}
 				});
 			} else {
-				//用户名存在
+				//username has exist
 				callback(-1);
 			}
 		});
 	},
 
-	unregister: function(name, pwd, callback) {
-
-	},
+	signOut: function(name) {
+		if (db == null) {
+			connectDB();
+			return;
+		}
+		db.query(`SELECT * FROM usr WHERE name='${name}'`, (err, res, fields)=>{
+			if(err) {
+				console.log(`DB error when sign out: ${err}`);
+			} else {
+				db.query(`UPDATE usr SET online=0 WHERE name='${name}'`, (err, res, fields)=> {
+					if (err) {
+						//database error
+						console.log(`DB error when sign out: ${err}`);
+					}
+				});
+			}
+		});
+	}
 };

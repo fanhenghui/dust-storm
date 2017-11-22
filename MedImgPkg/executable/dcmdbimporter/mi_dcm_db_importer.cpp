@@ -222,6 +222,7 @@ int import_one_series_cache(const std::string& map_path, DcmItem& series_info,
     CacheDB::ImgItem item;
     item.path = series_dst;
     item.series_id = series_info.series_id;
+    item.study_id = series_info.study_id;
     item.modality = series_info.modality;
     item.patient_id = series_info.patient_id;
     item.patient_name = series_info.patient_name;
@@ -278,6 +279,7 @@ int import_one_series(const std::string& map_path, DcmItem& series_info,
     DB::ImgItem item;
     item.dcm_path = series_dst;
     item.series_id = series_info.series_id;
+    item.study_id = series_info.study_id;
     item.modality = series_info.modality;
     item.patient_id = series_info.patient_id;
     item.patient_name = series_info.patient_name;

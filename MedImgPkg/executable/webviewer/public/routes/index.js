@@ -26,6 +26,9 @@ router.route(global.subPage+'/login')
         } else if (res2 == -2) {
             req.session.error = '密码错误';
             res.status(404).send('密码错误');
+        } else if (res2 == -3) {
+            req.session.error = '用户已经在线，不可以重复登录';
+            res.status(404).send('用户已经在线，不可以重复登录');
         } else if (res2 == 0) {
             req.session.user = {name:uName};
             res.send(200);

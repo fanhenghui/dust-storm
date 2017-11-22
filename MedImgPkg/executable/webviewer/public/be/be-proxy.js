@@ -46,6 +46,10 @@ let disconnectBE = (userid)=>{
 
     // purge user's infos
     if (onlineUsers.hasOwnProperty(userid)) {
+        let username = onlineUsers[userid];
+        //clear user online info (DB)
+        //注意 有极低的概率websocket调用disconnect失败
+        global.dbHandel.signOut(username);
         delete onlineUsers[userid];
     }
     if (onlineLocalSockets.hasOwnProperty(userid)) {
@@ -60,7 +64,7 @@ let disconnectBE = (userid)=>{
     }
     onlineCount--;
     console.log(userid + ' disconnecting success.');
-    //TODO clear user online info (DB) 有极低的概率调用失败
+
     //wait for kill worker
     setTimeout(()=>{
         if (onlineLogicProcess.hasOwnProperty(userid)) {
