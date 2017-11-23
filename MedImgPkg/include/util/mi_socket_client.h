@@ -51,7 +51,6 @@ private:
     std::shared_ptr<IPCDataRecvHandler> _handler;
     
     static const int _reconnect_times = 100;
-    bool _alive;
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketClient);
 };

@@ -19,7 +19,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 SocketClient::SocketClient(SocketType type /*= UNIX*/): 
-    _socket_type(type),_path(""),_server_ip("127.0.0.1"),_server_port("8888"), _fd_server(0), _alive(true) {
+    _socket_type(type),_path(""),_server_ip("127.0.0.1"),_server_port("8888"), _fd_server(0) {
 
 }
 
@@ -150,17 +150,19 @@ void SocketClient::run() {
     connect_i();
 
     while (true) {
-        if (!_alive) {
-            break;
-        }
-
         IPCDataHeader header;
         char* buffer = nullptr;
 
         //header is just 32 byte,use MSG_WAITALL to force client socket to return untill recv all header buffer(32byte)
-        if (recv(_fd_server, &header, sizeof(header) , MSG_WAITALL) <= 0) {
+        const int header_size = recv(_fd_server, &header, sizeof(header) , MSG_WAITALL);
+        if (header_size < 0) {
             MI_UTIL_LOG(MI_ERROR) << "client receive data header failed.";
             continue;
+        }
+        if (header_size == 0 && _fd_server == 0) {
+            //closed by other thread
+            MI_UTIL_LOG(MI_ERROR) << "client quit because socket is closed by other thread.";
+            break;
         }
         
         MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
@@ -179,6 +181,12 @@ void SocketClient::run() {
                     delete [] buffer;
                     buffer = nullptr;
                     continue;
+                } else if (cur_size == 0 && _fd_server == 0) {
+                    //closed by other thread
+                    MI_UTIL_LOG(MI_ERROR) << "client quit because socket is closed by other thread.";
+                    delete [] buffer;
+                    buffer = nullptr;
+                    break;
                 }
                 accum_size += cur_size;
                 try_size -= cur_size;
@@ -202,13 +210,19 @@ void SocketClient::run() {
     }
 
     //close socket
-    close(_fd_server);
-    _fd_server = 0;
+    if (0 != _fd_server) {
+        close(_fd_server);
+        _fd_server = 0;
+    }
+    
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running end.";
 }
 
 void SocketClient::stop() {
-    _alive = false;
+    if (0 != _fd_server) {
+        close(_fd_server);
+        _fd_server = 0;
+    }
 }
 
 void SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer) {
@@ -289,8 +303,10 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
     MI_UTIL_LOG(MI_INFO) << "socket client post send data done.\n";
 
     //close socket
-    close(_fd_server);
-    _fd_server = 0;
+    if (0 != _fd_server) {
+        close(_fd_server);
+        _fd_server = 0;
+    }
 
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketClient post.";;
 
@@ -331,10 +347,6 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
     MI_UTIL_LOG(MI_INFO) << "socket client post send header done.\n";
 
     while (true) {
-        if (!_alive) {
-            break;
-        }
-
         //receive a result
         IPCDataHeader result_header;
         char* result_data = nullptr;
@@ -383,8 +395,10 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
     }
 
     //close socket
-    close(_fd_server);
-    _fd_server = 0;
+    if (0 != _fd_server) {
+        close(_fd_server);
+        _fd_server = 0;
+    }
     MI_UTIL_LOG(MI_INFO) << "socket client post send data done.\n";
 
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketClient post.";;

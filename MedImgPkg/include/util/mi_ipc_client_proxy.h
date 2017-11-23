@@ -21,6 +21,7 @@ public:
     void set_server_address(const std::string& ipv4, const std::string& port);
 
     void run();
+    void stop();
 
     void register_command_handler(unsigned int cmd_id, std::shared_ptr<ICommandHandler> handler);
     void unregister_command_handler(unsigned int cmd_id);

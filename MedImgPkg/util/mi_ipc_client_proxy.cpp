@@ -47,6 +47,10 @@ void IPCClientProxy::run() {
     _client->run();
 }
 
+void IPCClientProxy::stop() {
+    _client->stop();
+}
+
 void IPCClientProxy::register_command_handler(unsigned int cmd_id ,
         std::shared_ptr<ICommandHandler> handler) {
     boost::mutex::scoped_lock locker(_mutex);

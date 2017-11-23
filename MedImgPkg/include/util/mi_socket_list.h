@@ -110,7 +110,7 @@ public:
 private:
     unsigned int acquire_id_i() {
         if (_cur_id > std::numeric_limits<unsigned int>::max()-255) {
-            _cur_id = 0;
+            _cur_id = 1;
         }
         return _cur_id++;
     }
