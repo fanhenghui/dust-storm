@@ -19,6 +19,7 @@ public:
         std::string dcm_path;
         std::string preprocess_mask_path;
         std::string annotation_ai_path;
+        std::string ai_intermediate_data_path;
         float size_mb;
     };
 
@@ -47,6 +48,7 @@ public:
 
     int update_preprocess_mask(const std::string& series_id, const std::string& preprocess_mask_path);
     int update_ai_annotation(const std::string& series_id, const std::string& annotation_ai_path);
+    int update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data);
     int update_usr_annotation(const std::string& series_id, const std::string& usr_name, const std::string& annotation_usr_path);
 
 private:

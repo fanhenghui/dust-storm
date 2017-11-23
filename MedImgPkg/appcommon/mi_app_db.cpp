@@ -184,6 +184,7 @@ int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
             item.preprocess_mask_path = res->getString("preprocess_mask_path");
             item.annotation_ai_path = res->getString("annotation_ai_path");
             item.size_mb = res->getInt("size_mb");
+            item.ai_intermediate_data_path = res->getString("ai_intermediate_data_path");
             delete res;
             res = nullptr;
             delete pstmt;
@@ -385,6 +386,7 @@ int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
                 item.preprocess_mask_path = res->getString("preprocess_mask_path");
                 item.annotation_ai_path = res->getString("annotation_ai_path");
                 item.size_mb = res->getInt("size_mb");
+                item.ai_intermediate_data_path = res->getInt("ai_intermediate_data_path");
                 items.push_back(item);
             } else {
                 break;
@@ -490,6 +492,32 @@ int DB::update_ai_annotation(const std::string& series_id, const std::string& an
         return -1;
     }
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update AI annotation.";
+    return 0;
+}
+
+int DB::update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data_path) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN db update AI intermediate data.";
+    if (!this->is_valid()) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        return -1;
+    }
+
+    try {
+        std::stringstream ss;
+        ss << "UPDATE " << DCM_TABLE << " SET ai_intermediate_data_path=\'" << ai_intermediate_data_path << "\'" 
+        << " WHERE series_id=\'" << series_id << "\'";
+        sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
+        sql::ResultSet* res = pstmt->executeQuery();
+        delete res;
+        res = nullptr;
+        delete pstmt;
+        pstmt = nullptr;
+    } catch (const sql::SQLException& e) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "db update AI intermediate data failed with exception: "
+        << this->get_sql_exception_info_i(&e);
+        return -1;
+    }
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update AI intermediate data.";
     return 0;
 }
 

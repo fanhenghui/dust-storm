@@ -20,6 +20,7 @@ size_mb FLOAT NOT NULL,
 dcm_path VARCHAR(4096) NOT NULL,
 preprocess_mask_path VARCHAR(4096),
 annotation_ai_path VARCHAR(4096), 
+ai_intermediate_data_path VARCHAR(4096), 
 PRIMARY KEY (series_id));
 
 create table annotations(name VARCHAR(300) NOT NULL,
