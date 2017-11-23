@@ -1,13 +1,17 @@
+#UT config 
 TestDataRoot = /home/wangrui22/data
 
+#DB host
 RemoteDBIP = 192.168.199.107
 RemoteDBPort = 3306
 RemoteDBUser = root
 RemoteDBPWD = 123456
 RemoteDBName = med_img_db
 
+#DBS port
 DBServerPort = 8888
 
+#Local Cache DB host
 CacheDBIP = 127.0.0.1
 CacheDBPort = 3306
 CacheDBUser = root
@@ -30,3 +34,6 @@ PresetCTChestWL = 40
 
 ExpectedFPS = 30
 PossibilityThreshold = 0.97
+
+#AI model version(work on DBS AIS)
+AIModelVersion = 0.0.1

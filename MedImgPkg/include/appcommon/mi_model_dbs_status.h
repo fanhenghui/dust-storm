@@ -26,10 +26,15 @@ public:
     bool has_preprocess_mask();
     void set_preprocess_mask();
 
+    //ai annotation query
+    bool has_ai_annotation();
+    void set_ai_annotation();
+
 private:
     bool _success;
     std::string _err_info;
     bool _has_preprocess_mask;
+    bool _has_ai_annotation;
 private:
     DISALLOW_COPY_AND_ASSIGN(ModelDBSStatus);
 };

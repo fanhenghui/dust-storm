@@ -22,11 +22,9 @@ int DBOpQueryPreprocessMask::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
-
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
+        APPCOMMON_THROW_EXCEPTION("parse series message failed!");
     }
-
     const std::string series_id = msg.context();
     msg.Clear();
     
@@ -34,7 +32,7 @@ int DBOpQueryPreprocessMask::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<DB> db = controller->get_db();
-    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy();
+    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
 
     const unsigned int receiver = _header.receiver;
     DB::ImgItem item;

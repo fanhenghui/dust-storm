@@ -20,7 +20,7 @@ public:
     virtual ~AppController();
 
     virtual void initialize();
-    void run(const std::string& path);
+    void run(const std::string& unix_path);
     virtual void finalize();
 
     std::shared_ptr<AppThreadModel> get_thread_model();

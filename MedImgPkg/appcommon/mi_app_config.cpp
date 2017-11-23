@@ -25,6 +25,12 @@ AppConfig::AppConfig() {
     std::string equal;
     std::string context;
     while (std::getline(in , line)) {
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '#') {
+            continue;
+        }
         std::stringstream ss(line);
         ss >> tag >> equal >> context;
 

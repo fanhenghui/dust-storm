@@ -24,7 +24,7 @@ int DBOpQueryEnd::execute() {
     std::shared_ptr<DBServerController> controller = _db_server_controller.lock();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
-    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy();
+    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
     DBSERVER_CHECK_NULL_EXCEPTION(server_proxy);
 
     IPCDataHeader header;

@@ -44,10 +44,8 @@ pid_t AppController::get_server_pid() const {
     return _server_pid;
 }
 
-void AppController::run(const std::string& path) {
-    _thread_model->start();
-    _proxy->set_path(path);
-    _proxy->run();
+void AppController::run(const std::string& unix_path) {
+    _thread_model->start(unix_path);
 }
 
 std::shared_ptr<AppThreadModel> AppController::get_thread_model() {

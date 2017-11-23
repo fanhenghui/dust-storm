@@ -14,36 +14,57 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class IPCServerProxy;
-class DBServerController;
 class DBOperation;
 class DBServerThreadModel {
 public:
     DBServerThreadModel();
     ~DBServerThreadModel();
 
-    void set_server_proxy(std::shared_ptr<IPCServerProxy> proxy);
+    void set_server_proxy_be(std::shared_ptr<IPCServerProxy> proxy);
+    void push_operation_be(const std::shared_ptr<DBOperation>& op);
 
-    void push_operation(const std::shared_ptr<DBOperation>& op);
+    void set_server_proxy_ais(std::shared_ptr<IPCServerProxy> proxy);
+    void push_operation_ais(const std::shared_ptr<DBOperation>& op);
 
     void start();
     void stop();
 
 private:
-    void process_sending_i();
-    void process_recving_i();
-    void process_operating_i();
+    //for User input
     void process_in_i();
 
+    //for INET BE
+    void process_be_sending_i();
+    void process_be_recving_i();
+    void process_be_operating_i();
+
+    //for UNIX AIS
+    void process_ais_run_i();
+    void process_ais_sending_i();
+    void process_ais_recving_i();
+    void process_ais_operating_i();
+
 private:
-    std::weak_ptr<DBServerController> _controller;
-    std::shared_ptr<IPCServerProxy> _server_proxy;
+    boost::thread _thread_in;
 
-    MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue;
+    //for BE client
+    std::shared_ptr<IPCServerProxy> _server_proxy_be;
+    MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue_be;
 
-    boost::thread _thread_sending;
-    boost::thread _thread_recving;
-    boost::thread _thread_operating;    
-    boost::thread _thread_in;    
+    boost::thread _thread_be_sending;
+    boost::thread _thread_be_recving;
+    boost::thread _thread_be_operating;        
+
+    //for AIS
+    std::shared_ptr<IPCServerProxy> _server_proxy_ais;
+    MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue_ais;
+    boost::thread _thread_ais_sending;
+    boost::thread _thread_ais_recving;
+    boost::thread _thread_ais_operating;
+    boost::thread _thread_ais_run; 
+
+private: 
+    DISALLOW_COPY_AND_ASSIGN(DBServerThreadModel);
 };
 
 MED_IMG_END_NAMESPACE

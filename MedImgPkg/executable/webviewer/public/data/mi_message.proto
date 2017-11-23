@@ -127,7 +127,7 @@ message MsgMPRMaskOverlay {
     float opacity = 2;
 };
 
-//for db server to be server
+//for DB server to BE server
 message MsgAnnotationUnitDB {
     float x = 1; //center x
     float y = 2; //center y
@@ -139,4 +139,25 @@ message MsgAnnotationUnitDB {
 message MsgAnnotationCollectionDB {
     string series_uid = 1;
     repeated MsgAnnotationUnitDB annotation = 2;
+};
+
+//for DB server to AIS server
+message MsgInferenceRequest {
+    string series_uid = 1; //series id
+    string dcm_path = 2; //if recal_im_data is true, this para will be used
+    string ai_anno_path = 3; //output annotation file path
+    string ai_im_data_path = 4; //intermediate data path for AI algorithm(resample volume ...), if recal_im_data is true, this file will be create/update
+    bool recal_im_data = 5; //recalculate AI intermediate data flag
+    uint64 client_socket_id = 6; //requested client socket ID
+};
+
+//for AIS server back to DB server
+message MsgInferenceResponse {
+    int32 status = 1;//0 success -1 error
+    string series_uid = 2; // series id
+    string ai_anno_path = 3; //output annotation file path
+    string ai_im_data_path = 4; //intermediate data path for AI algorithm,if recal_im_data is true, DBS shoule update DB
+    bool recal_im_data = 5;//recalculate AI intermediate data flag
+    uint64 client_socket_id = 6; //requested client socket ID
+    string err_msg = 7;//err message
 };

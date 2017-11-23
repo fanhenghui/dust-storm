@@ -1,4 +1,4 @@
-#include "mi_db_cmd_handler_operating.h"
+#include "mi_db_cmd_handler_ais_operating.h"
 
 #include "mi_db_server_controller.h"
 #include "mi_db_server_thread_model.h"
@@ -7,16 +7,16 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-CmdHandlerDBOperating::CmdHandlerDBOperating(std::shared_ptr<DBServerController> controller):
+CmdHandlerDBAISOperating::CmdHandlerDBAISOperating(std::shared_ptr<DBServerController> controller):
     _controller(controller) {
 
 }
 
-CmdHandlerDBOperating::~CmdHandlerDBOperating() {
+CmdHandlerDBAISOperating::~CmdHandlerDBAISOperating() {
 
 }
 
-int CmdHandlerDBOperating::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
+int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
     MI_DBSERVER_LOG(MI_TRACE) << "IN operation cmd handler.";
     std::shared_ptr<DBServerController> controller = _controller.lock();
     if (nullptr == controller) {
@@ -40,7 +40,7 @@ int CmdHandlerDBOperating::handle_command(const IPCDataHeader& ipcheader , char*
         op2->reset();
         op2->set_data(op_header , buffer);
         op2->set_db_server_controller(controller);
-        controller->get_thread_model()->push_operation(op2);
+        controller->get_thread_model()->push_operation_ais(op2);
     } else {
         MI_DBSERVER_LOG(MI_ERROR) << "cant find operation: " << op_id;
         if (nullptr != buffer) {

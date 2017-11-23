@@ -49,6 +49,8 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
         model_dbs_status->set_error_info("parse recv dbs AI annotation message failed.");
         return CLIENT_QUIT_ID;
     }
+
+    model_dbs_status->set_ai_annotation();
     
     std::vector<std::string> ids;
     const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();

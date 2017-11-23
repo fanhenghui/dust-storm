@@ -68,7 +68,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
             _err_tag = true;
             model_dbs_status->set_error_info("dcm slice sum is 0 when recv dbs DICOM series stream.");
             _condition_cache_db.notify_one();
-            return CLIENT_QUIT_ID;
+            return -1;
         }
 
         //gather the stream
@@ -86,7 +86,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
         if (end_tag == 1 || _cur_recv_slice == dcm_slice_sum) {
             if (!(end_tag == 1 && _cur_recv_slice == dcm_slice_sum)) {
                 _err_tag = true;
-                return CLIENT_QUIT_ID;
+                return -1;
             } else {
                 //load DICOM streams
                 std::shared_ptr<ImageDataHeader> data_header;
@@ -95,7 +95,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
                 IOStatus status = loader.load_series(_dcm_streams_store, img_data, data_header);
                 if (status != IO_SUCCESS) {
                     MI_APPCOMMON_LOG(MI_FATAL) << "load DICOM series stream failed.";
-                    return CLIENT_QUIT_ID;
+                    return -1;
                 }
             
                 // create volume infos
@@ -119,7 +119,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
         MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
         return 0;
     } catch(const Exception& e) {
-        return CLIENT_QUIT_ID;
+        return -1;
     }
 }
 

@@ -12,7 +12,7 @@ MED_IMG_BEGIN_NAMESPACE
 struct OpDataHeader {
     unsigned int cell_id;   //
     unsigned int op_id;     // operation id
-    unsigned int data_len;  // data length
+unsigned int data_len;  // data length
     unsigned int end_tag;   // sequenced message end tag:0 for in the process 1 for the last message
     unsigned int receiver;  //receiver pid or socket id ...
 

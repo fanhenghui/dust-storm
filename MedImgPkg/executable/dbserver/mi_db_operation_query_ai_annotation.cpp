@@ -11,6 +11,8 @@
 #include "appcommon/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
+#include "mi_db_server_thread_model.h"
+#include "mi_db_operation_request_inference.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
@@ -27,11 +29,9 @@ int DBOpQueryAIAnnotation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
-
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
+        APPCOMMON_THROW_EXCEPTION("parse series message failed!");
     }
-
     const std::string series_id = msg.context();
     msg.Clear();
     
@@ -39,7 +39,7 @@ int DBOpQueryAIAnnotation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<DB> db = controller->get_db();
-    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy();
+    std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
 
     const unsigned int receiver = _header.receiver;
     DB::ImgItem item;
@@ -47,13 +47,42 @@ int DBOpQueryAIAnnotation::execute() {
         SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series item not existed.");
         return -1;
     }
+    //TODO read and check version
     if (item.annotation_ai_path.empty()) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "AI annotation file path null.");
-        return -1;
+        //create message to request AIS inference
+        //Should set client socket id to header(recv AIS result and send calcualted result to requested client) 
+        MsgInferenceRequest msg;
+        msg.set_series_uid(series_id);
+        msg.set_dcm_path(item.dcm_path);
+        msg.set_ai_anno_path(item.dcm_path+"/"+series_id+".csv");
+        msg.set_client_socket_id(receiver);
+        if (item.ai_intermediate_data_path.empty()) {
+            msg.set_ai_im_data_path(item.dcm_path+"/"+series_id+".npy");
+            msg.set_recal_im_data(true);
+        } else {
+            msg.set_ai_im_data_path(item.ai_intermediate_data_path);
+            msg.set_recal_im_data(false);
+        }
+        int msg_buffer_size = msg.ByteSize();
+        char* msg_buffer = new char[msg_buffer_size];
+        if (msg_buffer_size != 0 && msg.SerializeToArray(msg_buffer,msg_buffer_size)){
+            OpDataHeader op_header;
+            op_header.op_id = OPERATION_ID_DB_REQUEST_AI_INFERENCE;
+            op_header.end_tag = 0;
+            op_header.data_len = msg_buffer_size;
+            op_header.receiver = controller->get_ais_socket_id();
+            std::shared_ptr<DBOpRequestInference> op(new DBOpRequestInference());
+            op->set_data(op_header , msg_buffer);
+            op->set_db_server_controller(controller);
+            controller->get_thread_model()->push_operation_ais(op);
+        } 
+        MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";
+        //SEND_ERROR_TO_BE(server_proxy, receiver, "AI annotation file path null.");
+        return 0;
     }
 
     NoduleSetParser parser;
-    parser.set_series_id(item.series_id);
+    parser.set_series_id(series_id);
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
     if( IO_SUCCESS != parser.load_as_csv(item.annotation_ai_path, nodule_set) ) {
         SEND_ERROR_TO_BE(server_proxy, receiver, "load annotation file failed.");
@@ -61,7 +90,7 @@ int DBOpQueryAIAnnotation::execute() {
     }
 
     MsgAnnotationCollectionDB msgAnnos;
-    msgAnnos.set_series_uid(item.series_id);
+    msgAnnos.set_series_uid(series_id);
 
     const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
     for (auto it = vois.begin(); it != vois.end(); ++it) {

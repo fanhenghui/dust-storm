@@ -8,7 +8,6 @@
 #include "renderalgo/mi_scene_base.h"
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
-#include "util/mi_message_queue.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_common_define.h"
@@ -67,7 +66,7 @@ void AppThreadModel::pop_operation(std::shared_ptr<IOperation>* op) {
     _op_queue->_msg_queue.pop(op);
 }
 
-void AppThreadModel::start() {
+void AppThreadModel::start(const std::string& unix_path) {
     try {
         _th_operating->th =
             boost::thread(boost::bind(&AppThreadModel::process_operating, this));
@@ -77,6 +76,9 @@ void AppThreadModel::start() {
 
         _th_rendering->th =
             boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
+
+        _proxy->set_path(unix_path);
+        _proxy->run();
     } catch (...) {
         MI_APPCOMMON_LOG(MI_FATAL) << "app thread model start failed.";
         APPCOMMON_THROW_EXCEPTION("app thread model start failed.");
@@ -93,11 +95,22 @@ void AppThreadModel::stop() {
     _th_operating->th.interrupt();
     _th_operating->condition.notify_one();
 
+
     _th_rendering->th.join();
     _th_sending->th.join();
     _th_operating->th.join();
 
     _op_queue->_msg_queue.deactivate();
+
+    _client_proxy_dbs->stop();
+    _thread_dbs_recving.join();
+    _thread_dbs_operating.interrupt();
+    _thread_dbs_operating.join();
+    _op_msg_queue_dbs.deactivate();
+
+
+
+    
 }
 
 void AppThreadModel::process_operating() {   
@@ -327,6 +340,34 @@ void AppThreadModel::process_sending() {
     } catch (...) {
         MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed failed with unknow exception";
         throw;
+    }
+}
+
+void AppThreadModel::set_client_proxy_dbs(std::shared_ptr<IPCClientProxy> proxy) {
+    _client_proxy_dbs = proxy;
+}
+
+void AppThreadModel::push_operation_dbs(const std::shared_ptr<IOperation>& op) {
+    _op_msg_queue_dbs.push(op);
+}
+
+void AppThreadModel::process_dbs_recving() {
+    _client_proxy_dbs->run();
+}
+
+void AppThreadModel::process_dbs_operation() {
+    while(true) {
+        std::shared_ptr<IOperation> op;
+        _op_msg_queue_dbs.pop(&op);
+
+        try {
+            op->execute();
+            op->reset();//release ipc data
+        } catch(const Exception& e) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "op execute failed.";
+        }
+
+        boost::this_thread::interruption_point();
     }
 }
 

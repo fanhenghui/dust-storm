@@ -20,8 +20,12 @@ public:
     void finalize();
 
     std::shared_ptr<DBServerThreadModel> get_thread_model();
-    std::shared_ptr<IPCServerProxy> get_server_proxy();
+    std::shared_ptr<IPCServerProxy> get_server_proxy_be();
+    std::shared_ptr<IPCServerProxy> get_server_proxy_ais();
     std::shared_ptr<DB> get_db();
+
+    void set_ais_socket_id(unsigned int id);
+    unsigned int get_ais_socket_id() const;
 
 private:
     void connect_db_i();
@@ -29,7 +33,11 @@ private:
 private:
     std::shared_ptr<DB> _db;
     std::shared_ptr<DBServerThreadModel> _thread_model;
-    std::shared_ptr<IPCServerProxy> _server_proxy;
+    std::shared_ptr<IPCServerProxy> _server_proxy_be;
+    std::shared_ptr<IPCServerProxy> _server_proxy_ais;
+
+    //AIS socket ID
+    unsigned int _ais_socket_id;
 };
 
 MED_IMG_END_NAMESPACE

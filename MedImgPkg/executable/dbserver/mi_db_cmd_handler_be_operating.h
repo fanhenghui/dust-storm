@@ -1,5 +1,5 @@
-#ifndef MED_IMG_MI_CMD_HANDLER_DB_SERVER_OPERATING_H
-#define MED_IMG_MI_CMD_HANDLER_DB_SERVER_OPERATING_H
+#ifndef MED_IMG_MI_CMD_HANDLER_DB_SERVER_BE_OPERATING_H
+#define MED_IMG_MI_CMD_HANDLER_DB_SERVER_BE_OPERATING_H
 
 #include <memory>
 
@@ -11,11 +11,11 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class DBServerController;
-class CmdHandlerDBOperating : public ICommandHandler {
+class CmdHandlerDBBEOperating : public ICommandHandler {
 public:
-    CmdHandlerDBOperating(std::shared_ptr<DBServerController> controller);
+    CmdHandlerDBBEOperating(std::shared_ptr<DBServerController> controller);
 
-    virtual ~CmdHandlerDBOperating();
+    virtual ~CmdHandlerDBBEOperating();
 
     virtual int handle_command(const IPCDataHeader& dataheader , char* buffer);
 

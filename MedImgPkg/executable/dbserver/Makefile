@@ -19,9 +19,10 @@ LOCAL_LIB_DIR = /usr/local/lib
 VPATH = $(INCLUDE_ROOT_DIR)
 
 OPERATION_OBJS =  mi_db_operation_query_end.o mi_db_operation_query_preprocess_mask.o \
-mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o
+mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o mi_db_operation_request_inference.o \
+mi_db_operation_receive_inference.o
 
-OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_operating.o $(OPERATION_OBJS)
+OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o $(OPERATION_OBJS)
 
 TARGET = $(BIN_DIR)/dbserver
 
@@ -41,8 +42,11 @@ mi_db_server_main.o: $(EXPORT_HEADER)  mi_db_server_main.cpp mi_db_server_contro
 mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.h mi_db_server_thread_model.o $(OPERATION_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_db_cmd_handler_operating.o: mi_db_cmd_handler_operating.cpp mi_db_cmd_handler_operating.h mi_db_server_thread_model.o
-	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_operating.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_db_cmd_handler_be_operating.o: mi_db_cmd_handler_be_operating.cpp mi_db_cmd_handler_be_operating.h mi_db_server_thread_model.o
+	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_be_operating.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_db_cmd_handler_ais_operating.o: mi_db_cmd_handler_ais_operating.cpp mi_db_cmd_handler_ais_operating.h mi_db_server_thread_model.o
+	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_ais_operating.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_db_server_thread_model.o : mi_db_server_thread_model.cpp mi_db_server_thread_model.h
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)
