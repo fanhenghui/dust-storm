@@ -19,7 +19,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 SocketServer::SocketServer(SocketType type):
-    _socket_type(type),_path(""),_server_port("8888"),_fd_server(0),_max_clients(30),_alive(true),  
+    _socket_type(type),_path(""),_server_port(""),_fd_server(0),_max_clients(30),_alive(true),  
     _client_sockets(new SocketList()),_package_cache_capcity(1024.0f*10.0f),_package_cache_size(0.0f) {
 }
 

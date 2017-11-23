@@ -17,6 +17,9 @@ public:
     IPCServerProxy(SocketType type = UNIX);
     ~IPCServerProxy();
 
+    void set_path(const std::string& path);
+    void set_server_address(const std::string& port);
+
     void run();
     void send();
     void recv();

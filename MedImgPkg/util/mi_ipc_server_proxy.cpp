@@ -35,6 +35,14 @@ IPCServerProxy::~IPCServerProxy() {
 
 }
 
+void IPCServerProxy::set_path(const std::string& path) {
+    _server->set_path(path);
+}
+
+void IPCServerProxy::set_server_address(const std::string& port) {
+    _server->set_server_address(port);
+}
+
 void IPCServerProxy::run() {
     _server->run();
 }
