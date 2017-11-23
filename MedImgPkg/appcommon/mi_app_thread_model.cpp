@@ -68,14 +68,12 @@ void AppThreadModel::pop_operation(std::shared_ptr<IOperation>* op) {
 
 void AppThreadModel::start(const std::string& unix_path) {
     try {
-        _th_operating->th =
-            boost::thread(boost::bind(&AppThreadModel::process_operating, this));
+        _th_operating->th = boost::thread(boost::bind(&AppThreadModel::process_operating, this));
+        _th_sending->th = boost::thread(boost::bind(&AppThreadModel::process_sending, this));
+        _th_rendering->th = boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
 
-        _th_sending->th =
-            boost::thread(boost::bind(&AppThreadModel::process_sending, this));
-
-        _th_rendering->th =
-            boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
+        _thread_dbs_operating = boost::thread(boost::bind(&AppThreadModel::process_dbs_operation, this));
+        _thread_dbs_recving = boost::thread(boost::bind(&AppThreadModel::process_dbs_recving, this));
 
         _proxy->set_path(unix_path);
         _proxy->run();
@@ -107,10 +105,6 @@ void AppThreadModel::stop() {
     _thread_dbs_operating.interrupt();
     _thread_dbs_operating.join();
     _op_msg_queue_dbs.deactivate();
-
-
-
-    
 }
 
 void AppThreadModel::process_operating() {   
@@ -169,6 +163,9 @@ void AppThreadModel::process_rendering() {
                 // render all dirty cells
                 std::shared_ptr<AppController> controller = _controller.lock();
                 APPCOMMON_CHECK_NULL_EXCEPTION(controller);
+
+                // GL resource update (discard)
+                GLResourceManagerContainer::instance()->update_all();
 
                 std::map<unsigned int, std::shared_ptr<AppCell>> cells =
                             controller->get_cells();

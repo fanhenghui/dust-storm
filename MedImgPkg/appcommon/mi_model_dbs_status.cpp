@@ -9,7 +9,7 @@ void ModelDBSStatus::reset() {
     _success = false;
     _has_preprocess_mask = false;
     _has_ai_annotation = false;
-    _err_info = "";
+    _err_infos.clear();
 }
 
 bool ModelDBSStatus::success() {
@@ -20,12 +20,12 @@ void ModelDBSStatus::set_success() {
     _success = true;
 }
 
-void ModelDBSStatus::set_error_info(const std::string& err) {
-    _err_info = err;
+void ModelDBSStatus::push_error_info(const std::string& err) {
+    _err_infos.push_back(err);
 }
 
-std::string ModelDBSStatus::get_error_info() const {
-    return _err_info;
+std::vector<std::string> ModelDBSStatus::get_error_infos() const {
+    return _err_infos;
 }
 
 bool ModelDBSStatus::has_preprocess_mask() {
@@ -42,6 +42,15 @@ bool ModelDBSStatus::has_ai_annotation() {
 
 void ModelDBSStatus::set_ai_annotation() {
     _has_ai_annotation = true;
+}
+
+void ModelDBSStatus::wait() {
+    boost::mutex::scoped_lock locker(_mutex);
+    _condition.wait(_mutex);
+}
+
+void ModelDBSStatus::unlock() {
+    _condition.notify_one();
 }
 
 MED_IMG_END_NAMESPACE

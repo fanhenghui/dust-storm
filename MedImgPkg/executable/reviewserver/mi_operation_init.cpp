@@ -42,11 +42,6 @@
 #include "appcommon/mi_ob_annotation_statistic.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_common_util.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_ai_annotation.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_dicom_series.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_end_signal.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_error.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_preprocess_mask.h"
 
 #include "appcommon/mi_app_config.h"
 #include "mi_review_logger.h"
@@ -225,20 +220,20 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     IPCClientProxy client_proxy(INET);
     client_proxy.set_server_address(dbs_ip,dbs_port);
 
-    if (!data_in_cache) {
-        client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
-        std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
-    }
+    // if (!data_in_cache) {
+    //     client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+    //     std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
+    // }
     
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
-    std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(controller)));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
-    std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(controller)));
+    // client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    // std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(controller)));
+    // client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    // std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(controller)));
     
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_END, 
-    std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(controller)));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
-    std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(controller)));
+    // client_proxy.register_command_handler(COMMAND_ID_DB_SEND_END, 
+    // std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(controller)));
+    // client_proxy.register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    // std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(controller)));
 
     std::vector<IPCPackage*> packages;
     if (!data_in_cache) {
@@ -248,15 +243,24 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_AI_ANNOTATION, series_uid));
     packages.push_back(create_query_end_msg_package());
 
-    if(0 != client_proxy.sync_post(packages) ) {
-        MI_REVIEW_LOG(MI_FATAL) << "query from db server failed with exception.";
-        return -1;
-    }
+    controller->get_client_proxy_dbs()->sync_send_data(packages);
 
+    //wait until end signal
+    //TODO 需要考虑超时机制？
+    MI_REVIEW_LOG(MI_DEBUG) << "lock.";
+    model_dbs_status->wait();
+    MI_REVIEW_LOG(MI_DEBUG) << "unlock.";
     //check errors
     if (!model_dbs_status->success()) {
-        std::string dbs_err = model_dbs_status->get_error_info();
-        MI_REVIEW_LOG(MI_FATAL) << "query from db server failed: " << dbs_err;
+        std::vector<std::string> dbs_errs = model_dbs_status->get_error_infos();
+        std::stringstream ss_err;
+        for (size_t i = 0; i < dbs_errs.size(); ++i) {
+            ss_err << dbs_errs[i];
+            if (i != dbs_errs.size()-1) {
+                ss_err << " ; ";
+            }
+        }
+        MI_REVIEW_LOG(MI_FATAL) << "query from db server failed: " << ss_err.str();
         return -1;
     } else {
         MI_REVIEW_LOG(MI_INFO) << "query from db server success";

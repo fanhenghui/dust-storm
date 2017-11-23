@@ -29,8 +29,10 @@ int CmdHandlerRecvDBSEndSignal::handle_command(const IPCDataHeader& ipcheader , 
     APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
     model_dbs_status->set_success();
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
-    return CLIENT_QUIT_ID;
+    model_dbs_status->unlock();
+
+    MI_APPCOMMON_LOG(MI_DEBUG) << "OUT recveive DB server DICOM series cmd handler.";
+    return -1;
 }
 
 MED_IMG_END_NAMESPACE

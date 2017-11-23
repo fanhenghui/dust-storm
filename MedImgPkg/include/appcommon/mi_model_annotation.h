@@ -48,7 +48,6 @@ public:
     const std::vector<IntensityInfo>& get_intensity_infos() const;
     void modify_intensity_info(const std::string& id , IntensityInfo info);
 
-
     void modify_name(const std::string& id , std::string name);
     void modify_diameter(const std::string& id , double diameter);
     void modify_center(const std::string& id , const Point3& center);

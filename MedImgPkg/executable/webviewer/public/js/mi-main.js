@@ -638,6 +638,8 @@
             goBackImg.onclick = function(event) {
                 document.getElementById('worklist-div').hidden = false;
                 document.getElementById('review-div').hidden = true;
+                //send back worklist to BE
+                socketClient.sendData(COMMAND_ID_FE_BACK_TO_WORKLIST, 0, 0, null);
             }
         }
 

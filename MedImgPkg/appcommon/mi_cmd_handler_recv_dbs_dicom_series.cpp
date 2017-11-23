@@ -66,7 +66,7 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
 
         if (dcm_slice_sum == 0 || dcm_slice_sum != _total_slice) {
             _err_tag = true;
-            model_dbs_status->set_error_info("dcm slice sum is 0 when recv dbs DICOM series stream.");
+            model_dbs_status->push_error_info("dcm slice sum is 0 when recv dbs DICOM series stream.");
             _condition_cache_db.notify_one();
             return -1;
         }

@@ -21,15 +21,6 @@ MED_IMG_BEGIN_NAMESPACE
   }
 #endif
 
-// FE to BE
-#define COMMAND_ID_WORKLIST 120005
-// FE to BE OPERATION ID
-#define OPERATION_ID_INIT 310000
-// BE to FE
-
-// Model ID
-
-
 MED_IMG_END_NAMESPACE
 
 #endif

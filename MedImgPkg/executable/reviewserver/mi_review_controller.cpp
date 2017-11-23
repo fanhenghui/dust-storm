@@ -28,6 +28,12 @@
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
 #include "appcommon/mi_cmd_handler_search_worklist.h"
+#include "appcommon/mi_cmd_handler_back_to_worklist.h"
+#include "appcommon/mi_cmd_handler_recv_dbs_ai_annotation.h"
+#include "appcommon/mi_cmd_handler_recv_dbs_dicom_series.h"
+#include "appcommon/mi_cmd_handler_recv_dbs_end_signal.h"
+#include "appcommon/mi_cmd_handler_recv_dbs_error.h"
+#include "appcommon/mi_cmd_handler_recv_dbs_preprocess_mask.h"
 
 #include "mi_operation_init.h"
 
@@ -74,7 +80,11 @@ void ReviewController::register_command_handler_i() {
 
     std::shared_ptr<CmdHandlerSearchWorklist> handler_search_worklist(
         new CmdHandlerSearchWorklist(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_WORKLIST, handler_search_worklist);
+    _proxy->register_command_handler(COMMAND_ID_FE_SEARCH_WORKLIST, handler_search_worklist);
+
+    std::shared_ptr<CmdHandlerBackToWorklist> handler_back_to_worklist(
+        new CmdHandlerBackToWorklist(app_controller));
+    _proxy->register_command_handler(COMMAND_ID_FE_BACK_TO_WORKLIST, handler_back_to_worklist);
 
     // Register operation
     OperationFactory::instance()->register_operation(
@@ -101,11 +111,20 @@ void ReviewController::register_command_handler_i() {
         OPERATION_ID_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_DOWNSAMPLE, std::shared_ptr<OpDownsample>(new OpDownsample()));    
-
-        
-        
     OperationFactory::instance()->register_operation(
         OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
+
+    //register command handler for DBS
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+        std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_END, 
+    std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(app_controller)));
 }
 
 

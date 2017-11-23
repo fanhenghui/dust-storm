@@ -2,8 +2,11 @@
 #define MED_IMG_APPCOMMON_MI_MODEL_DBS_STATUS_H
 
 #include <string>
+#include <vector>
 #include "appcommon/mi_app_common_export.h"
 #include "util/mi_model_interface.h"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,8 +22,8 @@ public:
     void set_success();
 
     //error msg
-    void set_error_info(const std::string& err);
-    std::string get_error_info() const;
+    void push_error_info(const std::string& err);
+    std::vector<std::string> get_error_infos() const;
 
     //preprocess mask query 
     bool has_preprocess_mask();
@@ -30,11 +33,17 @@ public:
     bool has_ai_annotation();
     void set_ai_annotation();
 
+    void wait();
+    void unlock();
 private:
     bool _success;
-    std::string _err_info;
+    std::vector<std::string> _err_infos;
     bool _has_preprocess_mask;
     bool _has_ai_annotation;
+
+    boost::mutex _mutex;
+    boost::condition _condition;
+    
 private:
     DISALLOW_COPY_AND_ASSIGN(ModelDBSStatus);
 };

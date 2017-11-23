@@ -25,6 +25,7 @@ public:
 
     std::shared_ptr<AppThreadModel> get_thread_model();
     std::shared_ptr<IPCClientProxy> get_client_proxy();
+    std::shared_ptr<IPCClientProxy> get_client_proxy_dbs();
 
     pid_t get_local_pid() const;
     void set_server_pid(pid_t pid);
@@ -50,6 +51,7 @@ public:
 
 protected:
     std::shared_ptr<IPCClientProxy> _proxy;
+    std::shared_ptr<IPCClientProxy> _client_proxy_dbs;
     std::shared_ptr<AppThreadModel> _thread_model;
 
     // Cells

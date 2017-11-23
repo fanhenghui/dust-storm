@@ -42,17 +42,17 @@ int CmdHandlerRecvDBSPreprocessMask::handle_command(const IPCDataHeader& ipchead
     //get mask
     std::shared_ptr<VolumeInfos> volume_infos = controller->get_volume_infos();
     if (nullptr == volume_infos) {
-        model_dbs_status->set_error_info("volume info is null when recv dbs preprocess mask");
-        return -1;//TODO 需要兼容DB没有预处理mask的情况？ 暂时不return CLIENT_QUIT_ID， 以下类似
+        model_dbs_status->push_error_info("volume info is null when recv dbs preprocess mask");
+        return -1;
     }
     std::shared_ptr<ImageData> mask = volume_infos->get_mask();
     if (nullptr == mask) {
-        model_dbs_status->set_error_info("mask is null when recv dbs preprocess mask");
+        model_dbs_status->push_error_info("mask is null when recv dbs preprocess mask");
         return -1;
     }
 
     if (nullptr == buffer) {
-        model_dbs_status->set_error_info("IPC buffer is null when recv dbs preprocess mask");
+        model_dbs_status->push_error_info("IPC buffer is null when recv dbs preprocess mask");
         return -1;
     }
 
@@ -62,7 +62,7 @@ int CmdHandlerRecvDBSPreprocessMask::handle_command(const IPCDataHeader& ipchead
         volume_infos->cache_original_mask();
         MI_APPCOMMON_LOG(MI_INFO) << "decode DBS compressed preprocess mask success.";
     } else {
-        model_dbs_status->set_error_info("decode IPC buffer failed when recv dbs preprocess mask");
+        model_dbs_status->push_error_info("decode IPC buffer failed when recv dbs preprocess mask");
         return -1; 
     }
 

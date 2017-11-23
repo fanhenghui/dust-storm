@@ -31,13 +31,13 @@ int CmdHandlerRecvDBSError::handle_command(const IPCDataHeader& ipcheader , char
 
     MsgString msg;
     if (!msg.ParseFromArray(buffer, ipcheader.data_len)) {
-        model_dbs_status->set_error_info("parse recv dbs error message failed.");
-        return CLIENT_QUIT_ID; 
+        model_dbs_status->push_error_info("parse recv dbs error message failed.");
+        return -1; 
     }
 
     const std::string err_msg = msg.context();
     msg.Clear();
-    model_dbs_status->set_error_info(err_msg);
+    model_dbs_status->push_error_info(err_msg);
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server error cmd handler.";
     return 0;

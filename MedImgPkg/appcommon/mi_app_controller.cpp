@@ -11,9 +11,11 @@
 MED_IMG_BEGIN_NAMESPACE
 
 AppController::AppController() {
-    _proxy.reset(new IPCClientProxy());
+    _proxy.reset(new IPCClientProxy(UNIX));
+    _client_proxy_dbs.reset(new IPCClientProxy(INET));
     _thread_model.reset(new AppThreadModel());
     _thread_model->set_client_proxy(_proxy);
+    _thread_model->set_client_proxy_dbs(_client_proxy_dbs);
 
     //process info
     _local_pid = static_cast<unsigned int>(getpid());
@@ -54,6 +56,10 @@ std::shared_ptr<AppThreadModel> AppController::get_thread_model() {
 
 std::shared_ptr<IPCClientProxy> AppController::get_client_proxy() {
     return _proxy;
+}
+
+std::shared_ptr<IPCClientProxy> AppController::get_client_proxy_dbs() {
+    return _client_proxy_dbs;
 }
 
 void AppController::add_cell(unsigned int id , std::shared_ptr<AppCell> cell) {

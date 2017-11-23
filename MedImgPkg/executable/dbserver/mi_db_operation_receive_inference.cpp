@@ -45,7 +45,6 @@ int DBOpReceiveInference::execute() {
     const std::string ai_im_data_path = msg.ai_im_data_path();
     bool recal_im_data = msg.recal_im_data();
 
-
     std::shared_ptr<DB> db = controller->get_db();
     if (recal_im_data) {
         if (!ai_im_data_path.empty()){
@@ -59,7 +58,7 @@ int DBOpReceiveInference::execute() {
         SEND_ERROR_TO_BE(server_proxy,client_socket_id,"update empty AI annotation data path.");
         return -1;
     }
-
+    
     db->update_ai_annotation(series_id, ai_anno_path);
 
     //load annotation and send to client
