@@ -28,7 +28,6 @@ public:
     void push_operation(const std::shared_ptr<IOperation>& op);
 
     void set_client_proxy_dbs(std::shared_ptr<IPCClientProxy> proxy);
-    void push_operation_dbs(const std::shared_ptr<IOperation>& op);
 
     std::shared_ptr<GLContext> get_gl_context();
 
@@ -42,23 +41,27 @@ protected:
     void pop_operation(std::shared_ptr<IOperation>* op);
 
     void process_dbs_recving();
-    void process_dbs_operation();
 
 private:
-    std::shared_ptr<IPCClientProxy> _proxy;
-
-    std::shared_ptr<GLContext> _glcontext;
-
     std::weak_ptr<AppController> _controller;
 
     //for Node server
-    struct InnerThreadData;
-    std::shared_ptr<InnerThreadData> _th_operating;
-    std::shared_ptr<InnerThreadData> _th_rendering;
-    std::shared_ptr<InnerThreadData> _th_sending;
+    std::shared_ptr<IPCClientProxy> _client_proxy;
 
-    struct InnerQueue;
-    std::unique_ptr<InnerQueue> _op_queue;
+    std::shared_ptr<GLContext> _glcontext;
+    
+    boost::thread _thread_operating;
+    boost::thread _thread_rendering;
+    boost::thread _thread_sending;
+
+    boost::mutex _mutex_operating;
+    boost::mutex _mutex_rendering;
+    boost::mutex _mutex_sending;    
+
+    boost::condition _condition_rendering;//operate -> render
+    boost::condition _condition_sending;//render -> send
+
+    MessageQueue<std::shared_ptr<IOperation>> _op_msg_queue;
 
     std::deque<unsigned int> _dirty_images;
     boost::mutex _dirty_images_mutex;
@@ -69,14 +72,11 @@ private:
     bool _rendering;
     bool _sending;
 
-    //for DBS
+    //for recv DBS's response
     std::shared_ptr<IPCClientProxy> _client_proxy_dbs;
     boost::thread _thread_dbs_recving;
-    boost::thread _thread_dbs_operating;
-    MessageQueue<std::shared_ptr<IOperation>> _op_msg_queue_dbs;
 };
 
 MED_IMG_END_NAMESPACE
-
 
 #endif

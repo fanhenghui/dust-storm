@@ -1,8 +1,5 @@
 #include "mi_app_thread_model.h"
 
-#include "boost/thread/condition.hpp"
-#include "boost/thread/thread.hpp"
-
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_resource_manager_container.h"
 #include "renderalgo/mi_scene_base.h"
@@ -18,20 +15,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-struct AppThreadModel::InnerThreadData {
-    boost::thread th;
-    boost::mutex mutex;
-    boost::condition condition;
-};
-
-struct AppThreadModel::InnerQueue {
-    MessageQueue<std::shared_ptr<IOperation>> _msg_queue;
-};
-
-AppThreadModel::AppThreadModel()
-    :  _th_operating(new InnerThreadData()), _th_rendering(new InnerThreadData()),
-       _th_sending(new InnerThreadData()), _op_queue(new InnerQueue()),
-       _rendering(false), _sending(false)  {
+AppThreadModel::AppThreadModel(): _rendering(false), _sending(false)  {
     // Creare gl context
     UIDType uid(0);
     _glcontext = GLResourceManagerContainer::instance()
@@ -41,7 +25,7 @@ AppThreadModel::AppThreadModel()
     _glcontext->create_shared_context(RENDERING_CONTEXT);
     _glcontext->create_shared_context(OPERATION_CONTEXT);
 
-    _op_queue->_msg_queue.activate();
+    _op_msg_queue.activate();
 }
 
 AppThreadModel::~AppThreadModel() {}
@@ -51,7 +35,7 @@ std::shared_ptr<GLContext> AppThreadModel::get_gl_context() {
 }
 
 void AppThreadModel::set_client_proxy(std::shared_ptr<IPCClientProxy> proxy) {
-    _proxy = proxy;
+    _client_proxy = proxy;
 }
 
 void AppThreadModel::set_controller(std::shared_ptr<AppController> controller) {
@@ -59,24 +43,23 @@ void AppThreadModel::set_controller(std::shared_ptr<AppController> controller) {
 }
 
 void AppThreadModel::push_operation(const std::shared_ptr<IOperation>& op) {
-    _op_queue->_msg_queue.push(op);
+    _op_msg_queue.push(op);
 }
 
 void AppThreadModel::pop_operation(std::shared_ptr<IOperation>* op) {
-    _op_queue->_msg_queue.pop(op);
+    _op_msg_queue.pop(op);
 }
 
 void AppThreadModel::start(const std::string& unix_path) {
     try {
-        _th_operating->th = boost::thread(boost::bind(&AppThreadModel::process_operating, this));
-        _th_sending->th = boost::thread(boost::bind(&AppThreadModel::process_sending, this));
-        _th_rendering->th = boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
+        _thread_operating = boost::thread(boost::bind(&AppThreadModel::process_operating, this));
+        _thread_sending = boost::thread(boost::bind(&AppThreadModel::process_sending, this));
+        _thread_rendering = boost::thread(boost::bind(&AppThreadModel::process_rendering, this));
 
-        _thread_dbs_operating = boost::thread(boost::bind(&AppThreadModel::process_dbs_operation, this));
         _thread_dbs_recving = boost::thread(boost::bind(&AppThreadModel::process_dbs_recving, this));
 
-        _proxy->set_path(unix_path);
-        _proxy->run();
+        _client_proxy->set_path(unix_path);
+        _client_proxy->run();
     } catch (...) {
         MI_APPCOMMON_LOG(MI_FATAL) << "app thread model start failed.";
         APPCOMMON_THROW_EXCEPTION("app thread model start failed.");
@@ -84,27 +67,22 @@ void AppThreadModel::start(const std::string& unix_path) {
 }
 
 void AppThreadModel::stop() {
-    _th_rendering->th.interrupt();
-    _th_rendering->condition.notify_one();
+    _thread_rendering.interrupt();
+    _condition_rendering.notify_one();
 
-    _th_sending->th.interrupt();
-    _th_sending->condition.notify_one();
+    _thread_sending.interrupt();
+    _condition_sending.notify_one();
 
-    _th_operating->th.interrupt();
-    _th_operating->condition.notify_one();
+    _thread_operating.interrupt();
 
+    _thread_rendering.join();
+    _thread_sending.join();
+    _thread_operating.join();
 
-    _th_rendering->th.join();
-    _th_sending->th.join();
-    _th_operating->th.join();
-
-    _op_queue->_msg_queue.deactivate();
+    _op_msg_queue.deactivate();
 
     _client_proxy_dbs->stop();
     _thread_dbs_recving.join();
-    _thread_dbs_operating.interrupt();
-    _thread_dbs_operating.join();
-    _op_msg_queue_dbs.deactivate();
 }
 
 void AppThreadModel::process_operating() {   
@@ -113,7 +91,7 @@ void AppThreadModel::process_operating() {
             std::shared_ptr<IOperation> op;
             this->pop_operation(&op);
 
-            boost::mutex::scoped_lock locker(_th_rendering->mutex);
+            boost::mutex::scoped_lock locker(_mutex_rendering);
 
             try {
                 int err = op->execute();
@@ -133,7 +111,7 @@ void AppThreadModel::process_operating() {
             // interrupt point
             boost::this_thread::interruption_point();
             _rendering = true;
-            _th_rendering->condition.notify_one();
+            _condition_rendering.notify_one();
         }
     }  catch (boost::thread_interrupted& e) {
         MI_APPCOMMON_LOG(MI_INFO) << "operating thread is interrupted.";;
@@ -154,10 +132,10 @@ void AppThreadModel::process_rendering() {
             _glcontext->make_current(RENDERING_CONTEXT);
             {
                 ///\ 1 render
-                boost::mutex::scoped_lock locker(_th_rendering->mutex);
+                boost::mutex::scoped_lock locker(_mutex_rendering);
 
                 while (!_rendering) {
-                    _th_rendering->condition.wait(_th_rendering->mutex);
+                    _condition_rendering.wait(_mutex_rendering);
                 }
 
                 // render all dirty cells
@@ -212,7 +190,7 @@ void AppThreadModel::process_rendering() {
                 _dirty_none_images = dirty_none_images;
             }
             _sending = true;
-            _th_sending->condition.notify_one();
+            _condition_sending.notify_one();
         }
     } catch (const Exception& e) {
         MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
@@ -232,10 +210,10 @@ void AppThreadModel::process_sending() {
     try {
         while (true) {
             ///\ sending image to fe by pic proxy
-            boost::mutex::scoped_lock locker(_th_sending->mutex);
+            boost::mutex::scoped_lock locker(_mutex_sending);
 
             while (!_sending) {
-                _th_sending->condition.wait(_th_sending->mutex);
+                _condition_sending.wait(_mutex_sending);
             }
 
             std::shared_ptr<AppController> controller = _controller.lock();
@@ -283,7 +261,7 @@ void AppThreadModel::process_sending() {
                 //     FileUtil::write_raw(ss.str(), buffer, buffer_size);
                 // }
 
-                _proxy->sync_send_data(header, (char*)buffer);
+                _client_proxy->sync_send_data(header, (char*)buffer);
             }
 
             // get dirty cells to be sending
@@ -316,7 +294,7 @@ void AppThreadModel::process_sending() {
                 }
                 header.data_len = static_cast<unsigned int>(buffer_size);
                 MI_APPCOMMON_LOG(MI_TRACE) << "send none image data length: " << buffer_size;
-                _proxy->sync_send_data(header, buffer);
+                _client_proxy->sync_send_data(header, buffer);
                 if (nullptr != buffer) {
                     delete [] buffer;
                 }
@@ -344,28 +322,8 @@ void AppThreadModel::set_client_proxy_dbs(std::shared_ptr<IPCClientProxy> proxy)
     _client_proxy_dbs = proxy;
 }
 
-void AppThreadModel::push_operation_dbs(const std::shared_ptr<IOperation>& op) {
-    _op_msg_queue_dbs.push(op);
-}
-
 void AppThreadModel::process_dbs_recving() {
     _client_proxy_dbs->run();
-}
-
-void AppThreadModel::process_dbs_operation() {
-    while(true) {
-        std::shared_ptr<IOperation> op;
-        _op_msg_queue_dbs.pop(&op);
-
-        try {
-            op->execute();
-            op->reset();//release ipc data
-        } catch(const Exception& e) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "op execute failed.";
-        }
-
-        boost::this_thread::interruption_point();
-    }
 }
 
 MED_IMG_END_NAMESPACE
