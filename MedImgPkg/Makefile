@@ -15,6 +15,7 @@ subsystem:
 	$(MAKE) -C ./appcommon
 	$(MAKE) -C ./executable/reviewserver
 	$(MAKE) -C ./executable/dbserver
+	$(MAKE) -C ./executable/aiserver
 	$(MAKE) -C ./executable/dcmdbimporter
 	$(MAKE) -C ./executable/extractmask
 	$(MAKE) -C ./executable/compressmask
@@ -39,6 +40,8 @@ subsystem:
 	$(MAKE) -C ./appcommon
 	$(MAKE) -C ./executable/reviewserver
 	$(MAKE) -C ./executable/dbserver
+	$(MAKE) -C ./executable/aiserver
+	$(MAKE) -C ./executable/dcmdbimporter
 endif
 
 PHONY.:clean
@@ -53,6 +56,7 @@ clean:
 	$(MAKE) clean -C ./appcommon
 	$(MAKE) clean -C ./executable/reviewserver
 	$(MAKE) clean -C ./executable/dbserver
+	$(MAKE) clean -C ./executable/aiserver
 	$(MAKE) clean -C ./executable/dcmdbimporter
 	$(MAKE) clean -C ./executable/extractmask
 	$(MAKE) clean -C ./executable/compressmask

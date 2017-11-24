@@ -66,14 +66,14 @@ void IPCClientProxy::unregister_command_handler(unsigned int cmd_id) {
     }
 }
 
-void IPCClientProxy::sync_send_data(const IPCDataHeader& header , char* buffer) {
+int IPCClientProxy::sync_send_data(const IPCDataHeader& header , char* buffer) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
-    _client->sync_send_data(header , buffer);
+    return _client->sync_send_data(header , buffer);
 }
 
-void IPCClientProxy::sync_send_data(const std::vector<IPCPackage*>& packages) {
+int IPCClientProxy::sync_send_data(const std::vector<IPCPackage*>& packages) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
-    _client->sync_send_data(packages);
+    return _client->sync_send_data(packages);
 }
 
 int IPCClientProxy::handle_command(const IPCDataHeader& header , char* buffer) {

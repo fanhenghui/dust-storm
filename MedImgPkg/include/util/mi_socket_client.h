@@ -27,8 +27,8 @@ public:
     void get_server_address(std::string& ipv4, std::string& port) const;
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
-    void sync_send_data(const IPCDataHeader& dataheader, char* buffer);
-    void sync_send_data(const std::vector<IPCPackage*>& packages);
+    int sync_send_data(const IPCDataHeader& dataheader, char* buffer);
+    int sync_send_data(const std::vector<IPCPackage*>& packages);
 
     void run();
     void stop();

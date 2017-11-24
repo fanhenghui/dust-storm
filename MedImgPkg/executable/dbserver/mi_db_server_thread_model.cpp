@@ -89,7 +89,7 @@ void DBServerThreadModel::process_be_operating_i() {
             op->execute();
             op->reset();//release ipc data
         } catch(const Exception& e) {
-            MI_DBSERVER_LOG(MI_ERROR) << "op execute failed.";
+            MI_DBSERVER_LOG(MI_ERROR) << "op execute failed with exception: " << e.what();
         }
 
         boost::this_thread::interruption_point();

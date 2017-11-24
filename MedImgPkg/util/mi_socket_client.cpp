@@ -243,32 +243,38 @@ void SocketClient::stop() {
     }
 }
 
-void SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer) {
+int SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer) {
 
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " sending data: " << STREAM_IPCHEADER_INFO(dataheader);
     if (-1 == _fd_server) {
         MI_UTIL_LOG(MI_FATAL) << "send data: server fd invalid.";
         UTIL_THROW_EXCEPTION("send data: server fd invalid!");
-        return;
+        return -1;
     }
 
     //send header
     if (-1 == send(_fd_server , &dataheader , sizeof(dataheader) , 0)) {
         MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
-        return;
+        return -1;
     }
 
     //send context
     if (buffer != nullptr && dataheader.data_len > 0) {
         if (-1 == send(_fd_server , buffer , dataheader.data_len , 0)) {
             MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(dataheader);
-            return;
+            return -1;
         }
     }
 }
 
-void SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
+int SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
     MI_UTIL_LOG(MI_INFO) << "sync post package number: " << packages.size();
+    if (-1 == _fd_server) {
+        MI_UTIL_LOG(MI_FATAL) << "send data: server fd invalid.";
+        UTIL_THROW_EXCEPTION("send data: server fd invalid!");
+        return -1;
+    }
+    
     for(auto it = packages.begin(); it != packages.end() ; ++it) {
         IPCPackage *pkg = *it;
         const IPCDataHeader& post_header = pkg->header;
@@ -277,14 +283,14 @@ void SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
         //send header
         if (-1 == send(_fd_server , &post_header , sizeof(post_header) , 0)) {
             MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data header. header detail: " << STREAM_IPCHEADER_INFO(post_header);
-            return;
+            return -1;
         }
 
         //send context
         if (post_data != nullptr && post_header.data_len > 0) {
             if (-1 == send(_fd_server , post_data , post_header.data_len , 0)) {
                 MI_UTIL_LOG(MI_ERROR) << "send data: failed to send data context. header detail: " << STREAM_IPCHEADER_INFO(post_header);
-                return;
+                return -1;
             }
         }
 

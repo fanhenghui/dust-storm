@@ -21,7 +21,6 @@ public:
 
 private:
     std::weak_ptr<DBServerController> _controller;
-
 };
 
 MED_IMG_END_NAMESPACE

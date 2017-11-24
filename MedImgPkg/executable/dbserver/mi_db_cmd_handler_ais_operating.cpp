@@ -20,7 +20,7 @@ int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , ch
     MI_DBSERVER_LOG(MI_TRACE) << "IN operation cmd handler.";
     std::shared_ptr<DBServerController> controller = _controller.lock();
     if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
+        DBSERVER_THROW_EXCEPTION("controller pointer is null!");
     }
 
     const unsigned int op_id = ipcheader.msg_info1;
@@ -32,16 +32,15 @@ int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , ch
     op_header.reserved = ipcheader.msg_info3;
 
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
-    std::shared_ptr<IOperation> op2 = std::dynamic_pointer_cast<IOperation>(op);
-    if (nullptr == op2) {
+    if (nullptr == op) {
         MI_DBSERVER_LOG(MI_ERROR) << "invalid DB server operation: " << op_id;
         return 0;
     }
-    if (op2) {
-        op2->reset();
-        op2->set_data(op_header , buffer);
-        op2->set_controller(controller);
-        controller->get_thread_model()->push_operation_ais(op2);
+    if (op) {
+        op->reset();
+        op->set_data(op_header, buffer);
+        op->set_controller(controller);
+        controller->get_thread_model()->push_operation_ais(op);
     } else {
         MI_DBSERVER_LOG(MI_ERROR) << "cant find operation: " << op_id;
         if (nullptr != buffer) {
