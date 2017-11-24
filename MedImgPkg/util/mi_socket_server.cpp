@@ -83,8 +83,8 @@ void SocketServer::run() {
 
         socklen_t addr_len = sizeof(serv_addr_unix);
         if (0 != bind(fd_s, (struct sockaddr*)(&serv_addr_unix), addr_len)) {
-            MI_UTIL_LOG(MI_FATAL) << "SocketServer INET socket binding failed.";
-            UTIL_THROW_EXCEPTION("INET socket binding failed.");
+            MI_UTIL_LOG(MI_FATAL) << "SocketServer UNIX socket binding failed. unix path: " << _path;
+            UTIL_THROW_EXCEPTION("UNIX socket binding failed.");
         }
 
     } else if (INET == _socket_type) {
@@ -155,8 +155,8 @@ void SocketServer::run() {
         //accept client socket
         if (FD_ISSET(_fd_server, &fdreads)) {
             int new_client_socket = 0;
-            socklen_t addr_len = 0;
             if (UNIX == _socket_type) {
+                socklen_t addr_len = sizeof(sockaddr_un);
                 struct sockaddr_un client_addr_unix;
                 new_client_socket = accept(_fd_server, (struct sockaddr*)(&client_addr_unix), &addr_len);
                 if (new_client_socket < 0) {
@@ -171,6 +171,7 @@ void SocketServer::run() {
                     }
                 }
             } else if (INET == _socket_type) {
+                socklen_t addr_len = sizeof(sockaddr_in);
                 struct sockaddr_in client_addr_inet;
                 new_client_socket = accept(_fd_server, (struct sockaddr*)(&client_addr_inet), &addr_len);
                 if (new_client_socket < 0) {
@@ -191,7 +192,14 @@ void SocketServer::run() {
 
     //close socket
     close(_fd_server);
+    shutdown(_fd_server, SHUT_RDWR);
     _fd_server = 0;
+    MI_UTIL_LOG(MI_INFO) << "close server success.";
+    
+    if (_socket_type == UNIX) {
+        unlink(_path.c_str());
+        MI_UTIL_LOG(MI_INFO) << "unlink UNIX path.";
+    }
     
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketServer run.";
 }
@@ -500,7 +508,17 @@ ServerStatus SocketServer::get_current_status() {
     {
         boost::mutex::scoped_lock locker(_mutex_package);
         for (auto it = _client_pkg_store.begin(); it != _client_pkg_store.end(); ++it) {
-            status.packages.insert(std::make_pair(it->first,it->second.size()));          
+            status.client_packages.insert(std::make_pair(it->first,it->second.size()));          
+        }
+        const std::map<unsigned int, SocketList::SocketInfo> client_infos = _client_sockets->get_socket_infos();
+        for (auto it = client_infos.begin(); it != client_infos.end(); ++it) {
+            if (_socket_type == INET) {
+                std::stringstream ss;
+                ss << it->second.host << "::" << it->second.port;
+                status.client_hosts.insert(std::make_pair(it->first,ss.str()));
+            } else {
+                status.client_hosts.insert(std::make_pair(it->first,it->second.host));
+            }
         }
         status.cur_client = _client_sockets->get_socket_count();
         status.package_cache_size = _package_cache_size;

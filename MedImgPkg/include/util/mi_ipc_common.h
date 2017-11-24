@@ -61,7 +61,8 @@ struct ServerStatus {
     int cur_client;
     int package_cache_capcity;
     int package_cache_size;
-    std::map<unsigned int, size_t> packages;//client ID, package to be send
+    std::map<unsigned int, size_t> client_packages;//client ID, package to be send
+    std::map<unsigned int, std::string> client_hosts;
 };
 
 class IPCDataRecvHandler {

@@ -68,10 +68,11 @@ int MySQLDB::connect(const std::string& user, const std::string& ip_port, const 
 int MySQLDB::disconnect() {
     if (_connection) {
         delete _connection;
+        _connection = nullptr;
+        _db_name = "";
+        MI_IO_LOG(MI_INFO) << "disconnect DB success.";
     }
-    _connection = nullptr;
-    _db_name = "";
-    MI_IO_LOG(MI_INFO) << "disconnect db success.";
+    
     return 0;
 }
 

@@ -164,6 +164,11 @@ void SocketClient::run() {
             MI_UTIL_LOG(MI_ERROR) << "client quit because socket is closed by other thread.";
             break;
         }
+        if (header_size == 0) {
+            //server disconnected
+            MI_UTIL_LOG(MI_ERROR) << "client quit because server close the connect.";
+            break;
+        }
         
         MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
 
@@ -174,6 +179,7 @@ void SocketClient::run() {
             int cur_size = 0;
             int accum_size = 0;
             int try_size = (int)header.data_len;
+            bool quit_signal = false;
             while (accum_size < (int)header.data_len) {
                 cur_size = recv(_fd_server, buffer+accum_size, try_size, 0);
                 if (cur_size < 0) {
@@ -186,10 +192,22 @@ void SocketClient::run() {
                     MI_UTIL_LOG(MI_ERROR) << "client quit because socket is closed by other thread.";
                     delete [] buffer;
                     buffer = nullptr;
+                    quit_signal = true;
+                    break;
+                } else if (cur_size == 0) {
+                    //server disconnected
+                    MI_UTIL_LOG(MI_ERROR) << "client quit because server close the connect.";
+                    delete [] buffer;
+                    buffer = nullptr;
+                    quit_signal = true;
                     break;
                 }
                 accum_size += cur_size;
                 try_size -= cur_size;
+            }
+            
+            if (quit_signal) {
+                break;
             }
         }
 
