@@ -190,9 +190,9 @@ int query_from_remote_db(std::shared_ptr<AppController> controller, const std::s
     //check errors
     std::shared_ptr<IModel> model = controller->get_model(MODEL_ID_DBS_STATUS);
     std::shared_ptr<ModelDBSStatus> model_dbs_status = std::dynamic_pointer_cast<ModelDBSStatus>(model);
-    std::string dbs_err = model_dbs_status->get_error_info();
-    if (dbs_err != "") {
-        MI_APPCOMMONUT_LOG(MI_FATAL) << "query from db server failed: " << dbs_err;
+    std::vector<std::string> dbs_err = model_dbs_status->get_error_infos();
+    if (dbs_err.empty()) {
+        MI_APPCOMMONUT_LOG(MI_FATAL) << "query from db server failed.";
         return -1;
     }
 
