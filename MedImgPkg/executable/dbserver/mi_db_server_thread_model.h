@@ -14,17 +14,17 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class IPCServerProxy;
-class DBOperation;
+class IOperation;
 class DBServerThreadModel {
 public:
     DBServerThreadModel();
     ~DBServerThreadModel();
 
     void set_server_proxy_be(std::shared_ptr<IPCServerProxy> proxy);
-    void push_operation_be(const std::shared_ptr<DBOperation>& op);
+    void push_operation_be(const std::shared_ptr<IOperation>& op);
 
     void set_server_proxy_ais(std::shared_ptr<IPCServerProxy> proxy);
-    void push_operation_ais(const std::shared_ptr<DBOperation>& op);
+    void push_operation_ais(const std::shared_ptr<IOperation>& op);
 
     void start();
     void stop();
@@ -49,7 +49,7 @@ private:
 
     //for BE client
     std::shared_ptr<IPCServerProxy> _server_proxy_be;
-    MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue_be;
+    MessageQueue<std::shared_ptr<IOperation>> _op_msg_queue_be;
 
     boost::thread _thread_be_sending;
     boost::thread _thread_be_recving;
@@ -57,7 +57,7 @@ private:
 
     //for AIS
     std::shared_ptr<IPCServerProxy> _server_proxy_ais;
-    MessageQueue<std::shared_ptr<DBOperation>> _op_msg_queue_ais;
+    MessageQueue<std::shared_ptr<IOperation>> _op_msg_queue_ais;
     boost::thread _thread_ais_sending;
     boost::thread _thread_ais_recving;
     boost::thread _thread_ais_operating;

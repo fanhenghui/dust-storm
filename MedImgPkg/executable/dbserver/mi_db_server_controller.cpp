@@ -24,7 +24,7 @@ DBServerController::DBServerController() {
     _server_proxy_be.reset(new IPCServerProxy(INET)); 
     _server_proxy_be->set_server_address("8888");
     _server_proxy_ais.reset(new IPCServerProxy(UNIX));
-    _server_proxy_ais->set_path("AIS");
+    _server_proxy_ais->set_path("/tmp/MIAIS");
     _thread_model.reset(new DBServerThreadModel());
     _thread_model->set_server_proxy_be(_server_proxy_be);
     _thread_model->set_server_proxy_ais(_server_proxy_ais);

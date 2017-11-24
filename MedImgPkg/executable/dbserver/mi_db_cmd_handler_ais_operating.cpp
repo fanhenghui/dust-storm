@@ -2,7 +2,7 @@
 
 #include "mi_db_server_controller.h"
 #include "mi_db_server_thread_model.h"
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 #include "appcommon/mi_operation_factory.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -26,12 +26,13 @@ int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , ch
     const unsigned int op_id = ipcheader.msg_info1;
     OpDataHeader op_header;
     op_header.op_id = op_id;
-    op_header.end_tag = ipcheader.msg_info2;
     op_header.data_len = ipcheader.data_len;
     op_header.receiver = ipcheader.receiver;
+    op_header.end_tag = ipcheader.msg_info2;
+    op_header.reserved = ipcheader.msg_info3;
 
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
-    std::shared_ptr<DBOperation> op2 = std::dynamic_pointer_cast<DBOperation>(op);
+    std::shared_ptr<IOperation> op2 = std::dynamic_pointer_cast<IOperation>(op);
     if (nullptr == op2) {
         MI_DBSERVER_LOG(MI_ERROR) << "invalid DB server operation: " << op_id;
         return 0;
@@ -39,7 +40,7 @@ int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , ch
     if (op2) {
         op2->reset();
         op2->set_data(op_header , buffer);
-        op2->set_db_server_controller(controller);
+        op2->set_controller(controller);
         controller->get_thread_model()->push_operation_ais(op2);
     } else {
         MI_DBSERVER_LOG(MI_ERROR) << "cant find operation: " << op_id;

@@ -58,7 +58,7 @@ int OpSwitchPresetWindowing::execute() {
     const float ww = S_PRESET_WL[target].get_x();
     const float wl = S_PRESET_WL[target].get_y();
     
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     std::map<unsigned int, std::shared_ptr<AppCell>> cells = controller->get_cells();

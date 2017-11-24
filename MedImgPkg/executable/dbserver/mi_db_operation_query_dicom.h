@@ -1,11 +1,11 @@
 #ifndef MED_IMG_MI_DB_OPERATION_QUERY_DICOM_H
 #define MED_IMG_MI_DB_OPERATION_QUERY_DICOM_H
 
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpQueryDICOM: public DBOperation {
+class DBOpQueryDICOM: public IOperation {
 public:
     DBOpQueryDICOM();
     virtual ~DBOpQueryDICOM();

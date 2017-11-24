@@ -1,7 +1,7 @@
 #include "mi_db_server_thread_model.h"
 #include "appcommon/mi_operation_interface.h"
 #include "util/mi_ipc_server_proxy.h"
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -21,11 +21,11 @@ void DBServerThreadModel::set_server_proxy_ais(std::shared_ptr<IPCServerProxy> p
     _server_proxy_ais = proxy;
 }
 
-void DBServerThreadModel::push_operation_be(const std::shared_ptr<DBOperation>& op) {
+void DBServerThreadModel::push_operation_be(const std::shared_ptr<IOperation>& op) {
     _op_msg_queue_be.push(op);
 }
 
-void DBServerThreadModel::push_operation_ais(const std::shared_ptr<DBOperation>& op) {
+void DBServerThreadModel::push_operation_ais(const std::shared_ptr<IOperation>& op) {
     _op_msg_queue_ais.push(op);
 }
 
@@ -62,8 +62,6 @@ void DBServerThreadModel::stop() {
     _thread_ais_recving.interrupt();
     _thread_ais_recving.join();
     _thread_ais_run.join();
-
-    _thread_in.join();
 }
 
 void DBServerThreadModel::process_be_sending_i() {
@@ -84,7 +82,7 @@ void DBServerThreadModel::process_be_recving_i() {
 
 void DBServerThreadModel::process_be_operating_i() {
     while(true) {
-        std::shared_ptr<DBOperation> op;
+        std::shared_ptr<IOperation> op;
         _op_msg_queue_be.pop(&op);
 
         try {
@@ -110,9 +108,20 @@ void DBServerThreadModel::process_in_i() {
         } else if (msg == "status") {
             //server current status
             ServerStatus status = _server_proxy_be->get_current_status();
-            MI_DBSERVER_LOG(MI_INFO) << "{server host:" << status.host <<
+            std::stringstream ss_client;
+            for (auto it = status.client_hosts.begin(); it!= status.client_hosts.end(); ++it) {
+                unsigned int socket_uid = it->first;
+                size_t pkg_size = 0;
+                auto it2 = status.client_packages.find(socket_uid);
+                if(it2 != status.client_packages.end()) {
+                    pkg_size = it2->second;
+                }
+                ss_client << "\{client host: " << it->second << ", pkg size: " << pkg_size << "}";
+            }
+            MI_DBSERVER_LOG(MI_INFO) << "\n{server host:" << status.host <<
             ", type:" << status.socket_type << ", client num:" << status.cur_client << 
-            ", pkg capcity:" << status.package_cache_capcity << ", pkg size:" << status.package_cache_size; 
+            ", pkg capcity:" << status.package_cache_capcity << ", pkg size:" << status.package_cache_size << "}" 
+            << ss_client.str();
         } else if(msg == "aistatus") {
             //server current status
             ServerStatus status = _server_proxy_ais->get_current_status();
@@ -147,7 +156,7 @@ void DBServerThreadModel::process_ais_recving_i() {
 
 void DBServerThreadModel::process_ais_operating_i() {
     while(true) {
-        std::shared_ptr<DBOperation> op;
+        std::shared_ptr<IOperation> op;
         _op_msg_queue_ais.pop(&op);
 
         try {

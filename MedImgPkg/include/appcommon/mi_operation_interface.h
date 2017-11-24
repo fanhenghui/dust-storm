@@ -6,21 +6,22 @@
 
 #include "util/mi_ipc_common.h"
 #include "appcommon/mi_app_common_logger.h"
+#include "appcommon/mi_app_common_controller_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 struct OpDataHeader {
-    unsigned int cell_id;   //
-    unsigned int op_id;     // operation id
-unsigned int data_len;  // data length
+    unsigned int cell_id;   // cell ID
+    unsigned int op_id;     // operation ID
+    unsigned int data_len;  // data length
+    unsigned int receiver;  // receiver pid or socket id ...
     unsigned int end_tag;   // sequenced message end tag:0 for in the process 1 for the last message
-    unsigned int receiver;  //receiver pid or socket id ...
+    unsigned int reserved;  // IPC header msg_info3
 
-    OpDataHeader():cell_id(0),op_id(0),data_len(0),end_tag(0),receiver(0)
+    OpDataHeader():cell_id(0),op_id(0),data_len(0),receiver(0),end_tag(0),reserved(0)
     {}
 };
 
-class AppController;
 class IOperation {
 public:
     IOperation() : _buffer(nullptr) {
@@ -40,8 +41,18 @@ public:
         _buffer = buffer;
     };
 
-    void set_controller(std::shared_ptr<AppController> controller) {
+    void set_controller(std::shared_ptr<IController> controller) {
         _controller = controller;
+    }
+
+    template<class ControllerType>
+    std::shared_ptr<ControllerType> get_controller() {
+        std::shared_ptr<IController> i_controller = _controller.lock();
+        if (nullptr == i_controller) {
+            return nullptr;
+        } else {
+            return std::dynamic_pointer_cast<ControllerType>(i_controller);
+        }
     }
 
     virtual int execute() {
@@ -61,7 +72,7 @@ public:
 protected:
     OpDataHeader _header;
     char* _buffer;
-    std::weak_ptr<AppController> _controller;
+    std::weak_ptr<IController> _controller;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(IOperation);

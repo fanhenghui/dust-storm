@@ -21,7 +21,7 @@ DBOpRequestInference::~DBOpRequestInference() {
 int DBOpRequestInference::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     
-    std::shared_ptr<DBServerController> controller = _db_server_controller.lock();
+    std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_ais();
 

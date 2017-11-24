@@ -31,7 +31,7 @@ int DBOpQueryDICOM::execute() {
     const std::string series_id = msg.context();
     msg.Clear();
     
-    std::shared_ptr<DBServerController> controller = _db_server_controller.lock();
+    std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<DB> db = controller->get_db();

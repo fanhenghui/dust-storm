@@ -35,7 +35,7 @@ int OpMPRMaskOverlay::execute() {
     
     const MaskOverlayMode mask_overlay_mode = flag != 0 ? MASK_OVERLAY_ENABLE : MASK_OVERLAY_DISABLE;
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     std::map<unsigned int, std::shared_ptr<AppCell>> cells = controller->get_cells();

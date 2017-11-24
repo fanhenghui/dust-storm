@@ -72,7 +72,7 @@ int OpSwitchPresetVRT::execute() {
         return 0;
     }
     
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<ColorTransFunc> color;

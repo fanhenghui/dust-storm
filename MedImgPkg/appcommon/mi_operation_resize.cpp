@@ -27,7 +27,7 @@ int OpResize::execute() {
         APPCOMMON_THROW_EXCEPTION("parse resize message failed!");
     }
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     for (int i = 0; i < msg.cells_size(); i++) {

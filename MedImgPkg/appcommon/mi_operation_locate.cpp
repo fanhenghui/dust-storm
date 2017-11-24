@@ -52,7 +52,7 @@ int OpLocate::execute() {
     msgCrosshair.Clear();
     const Point2 pt_cross(cx, cy);
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     const unsigned int cell_id = _header.cell_id;
     std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
@@ -77,7 +77,7 @@ int OpLocate::execute() {
 int OpLocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt_cross) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpLocate MPR.";
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<IModel> model_ = controller->get_model(MODEL_ID_CROSSHAIR);
     APPCOMMON_CHECK_NULL_EXCEPTION(model_);
@@ -111,7 +111,7 @@ int OpLocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene
 
     MI_APPCOMMON_LOG(MI_TRACE) << "IN OpLocate VR.";
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<AppThreadModel> thread_model = controller->get_thread_model();
     APPCOMMON_CHECK_NULL_EXCEPTION(thread_model);

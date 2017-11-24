@@ -71,9 +71,8 @@ int OpInit::execute() {
         return -1;
     }
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
-
     if (0 != init_model_i(controller, &msg_init)) {
         MI_REVIEW_LOG(MI_FATAL) << "init model failed.";
         return -1;

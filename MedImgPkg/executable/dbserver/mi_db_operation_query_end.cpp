@@ -21,7 +21,7 @@ int DBOpQueryEnd::execute() {
 
     MI_DBSERVER_LOG(MI_INFO) << "IN DB query end cmd handler.";
 
-    std::shared_ptr<DBServerController> controller = _db_server_controller.lock();
+    std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();

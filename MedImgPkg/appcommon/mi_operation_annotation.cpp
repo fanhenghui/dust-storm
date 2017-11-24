@@ -46,7 +46,7 @@ int OpAnnotation::execute() {
     const float anno_para2 = msgAnnotation.para2(); 
     msgAnnotation.Clear();
     
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<VolumeInfos> volumeinfos = controller->get_volume_infos();
     APPCOMMON_CHECK_NULL_EXCEPTION(volumeinfos);

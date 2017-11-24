@@ -1,11 +1,11 @@
 #ifndef MED_IMG_MI_DB_OPERATION_REQUEST_INFERENCE_H
 #define MED_IMG_MI_DB_OPERATION_REQUEST_INFERENCE_H
 
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpRequestInference: public DBOperation {
+class DBOpRequestInference: public IOperation {
 public:
     DBOpRequestInference();
     virtual ~DBOpRequestInference();

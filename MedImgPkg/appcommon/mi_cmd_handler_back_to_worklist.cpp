@@ -24,7 +24,7 @@ public:
     }
 
     virtual int execute() {
-        std::shared_ptr<AppController> controller = _controller.lock();
+        std::shared_ptr<AppController> controller = get_controller<AppController>();
         if (nullptr == controller) {
             APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
             if (_condition) {

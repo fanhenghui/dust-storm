@@ -2,6 +2,7 @@
 #define MED_IMG_APPCOMMON_MI_APP_CONTROLLER_H_
 
 #include "appcommon/mi_app_common_export.h"
+#include "appcommon/mi_app_common_controller_interface.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -14,7 +15,7 @@ class AppCell;
 class VolumeInfos;
 class IModel;
 class AppCommon_Export AppController
-        : public std::enable_shared_from_this<AppController> {
+        : public IController , public std::enable_shared_from_this<AppController> {
 public:
     AppController();
     virtual ~AppController();

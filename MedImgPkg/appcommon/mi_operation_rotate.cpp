@@ -26,7 +26,7 @@ int OpRotate::execute() {
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);

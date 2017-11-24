@@ -35,7 +35,7 @@ int DBOpQueryAIAnnotation::execute() {
     const std::string series_id = msg.context();
     msg.Clear();
     
-    std::shared_ptr<DBServerController> controller = _db_server_controller.lock();
+    std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<DB> db = controller->get_db();
@@ -73,7 +73,7 @@ int DBOpQueryAIAnnotation::execute() {
             op_header.receiver = controller->get_ais_socket_id();
             std::shared_ptr<DBOpRequestInference> op(new DBOpRequestInference());
             op->set_data(op_header , msg_buffer);
-            op->set_db_server_controller(controller);
+            op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);
         } 
         MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";

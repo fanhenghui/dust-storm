@@ -3,6 +3,7 @@
 
 #include "mi_db_server_logger.h"
 #include "mi_db_server_common.h"
+#include "appcommon/mi_app_common_controller_interface.h"
 #include <memory>
 
 MED_IMG_BEGIN_NAMESPACE
@@ -10,7 +11,7 @@ MED_IMG_BEGIN_NAMESPACE
 class DBServerThreadModel;
 class IPCServerProxy;
 class DB;
-class DBServerController : public std::enable_shared_from_this<DBServerController>{
+class DBServerController : public IController, public std::enable_shared_from_this<DBServerController> {
 public:
     DBServerController();
     ~DBServerController();

@@ -1,11 +1,11 @@
 #ifndef MED_IMG_MI_DB_OPERATION_QUERY_PROCESS_MASK_H
 #define MED_IMG_MI_DB_OPERATION_QUERY_PROCESS_MASK_H
 
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpQueryPreprocessMask: public DBOperation {
+class DBOpQueryPreprocessMask: public IOperation {
 public:
     DBOpQueryPreprocessMask();
     virtual ~DBOpQueryPreprocessMask();

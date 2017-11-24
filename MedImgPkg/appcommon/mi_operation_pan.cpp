@@ -33,7 +33,7 @@ int OpPan::execute() {
     const float cur_y = msg.cur().y();
     msg.Clear();
     
-    std::shared_ptr<AppController> controller = _controller.lock();
+    std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);

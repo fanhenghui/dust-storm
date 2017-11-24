@@ -1,11 +1,11 @@
 #ifndef MED_IMG_MI_DB_OPERATION_RECEIVE_INFERENCE_H
 #define MED_IMG_MI_DB_OPERATION_RECEIVE_INFERENCE_H
 
-#include "mi_db_operation.h"
+#include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpReceiveInference: public DBOperation {
+class DBOpReceiveInference: public IOperation {
 public:
     DBOpReceiveInference();
     virtual ~DBOpReceiveInference();
