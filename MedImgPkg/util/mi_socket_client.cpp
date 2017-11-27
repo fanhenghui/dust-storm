@@ -156,8 +156,9 @@ void SocketClient::run() {
         //header is just 32 byte,use MSG_WAITALL to force client socket to return untill recv all header buffer(32byte)
         const int header_size = recv(_fd_server, &header, sizeof(header) , MSG_WAITALL);
         if (header_size < 0) {
+            //socket error 
             MI_UTIL_LOG(MI_ERROR) << "client receive data header failed.";
-            continue;
+            break;
         }
         if (header_size == 0 && _fd_server == 0) {
             //closed by other thread
@@ -168,9 +169,7 @@ void SocketClient::run() {
             //server disconnected
             MI_UTIL_LOG(MI_ERROR) << "client quit because server close the connect.";
             break;
-        }
-        
-        MI_UTIL_LOG(MI_TRACE) << "receive data header, " << STREAM_IPCHEADER_INFO(header);   
+        }  
 
         if (header.data_len <= 0) {
             //MI_UTIL_LOG(MI_TRACE) << "client received data buffer length less than 0.";
@@ -183,10 +182,12 @@ void SocketClient::run() {
             while (accum_size < (int)header.data_len) {
                 cur_size = recv(_fd_server, buffer+accum_size, try_size, 0);
                 if (cur_size < 0) {
+                    //socket error 
                     MI_UTIL_LOG(MI_ERROR) << "client receive data buffer failed.";
                     delete [] buffer;
                     buffer = nullptr;
-                    continue;
+                    quit_signal = true;
+                    break;
                 } else if (cur_size == 0 && _fd_server == 0) {
                     //closed by other thread
                     MI_UTIL_LOG(MI_ERROR) << "client quit because socket is closed by other thread.";
@@ -223,7 +224,7 @@ void SocketClient::run() {
 
         } catch (const Exception& e) {
             //Ignore error to keep connecting
-            MI_UTIL_LOG(MI_FATAL) << "handle command error(skip and continue): " << e.what();
+            MI_UTIL_LOG(MI_ERROR) << "handle command error(skip and continue): " << e.what();
         }
     }
 
@@ -244,8 +245,6 @@ void SocketClient::stop() {
 }
 
 int SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer) {
-
-    MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " sending data: " << STREAM_IPCHEADER_INFO(dataheader);
     if (-1 == _fd_server) {
         MI_UTIL_LOG(MI_FATAL) << "send data: server fd invalid.";
         UTIL_THROW_EXCEPTION("send data: server fd invalid!");
@@ -265,10 +264,10 @@ int SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer)
             return -1;
         }
     }
+    return 0;
 }
 
 int SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
-    MI_UTIL_LOG(MI_INFO) << "sync post package number: " << packages.size();
     if (-1 == _fd_server) {
         MI_UTIL_LOG(MI_FATAL) << "send data: server fd invalid.";
         UTIL_THROW_EXCEPTION("send data: server fd invalid!");
@@ -293,11 +292,8 @@ int SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
                 return -1;
             }
         }
-
-        MI_UTIL_LOG(MI_INFO) << "socket client post msg: " << post_header.msg_id << ", op id: " << post_header.msg_info1;
     }
-    
-    MI_UTIL_LOG(MI_INFO) << "socket client post send header done.\n";
+    return 0;
 }
 
 int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, IPCDataHeader& result_header , char*& result_data)  {
