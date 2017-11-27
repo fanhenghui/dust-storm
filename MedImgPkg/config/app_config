@@ -35,5 +35,7 @@ PresetCTChestWL = 40
 ExpectedFPS = 30
 PossibilityThreshold = 0.97
 
-#AI model version(work on DBS AIS)
-AIModelVersion = 0.0.1
+#AI related(work on DBS AIS)
+PytorchPath = /home/wangrui22/anaconda2/envs/pytorch
+PyInterfacePath = /home/wangrui22/program/git/luna_detect/training
+

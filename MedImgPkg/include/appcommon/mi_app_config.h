@@ -22,6 +22,9 @@ public:
 
     int get_expected_fps() const;
     float get_nodule_possibility_threshold() const;
+
+    std::string get_pytorch_path() const;
+    std::string get_py_interface_path() const;
 private:
     AppConfig();
     static AppConfig* _instance;
@@ -50,6 +53,10 @@ private:
     std::string _cache_db_path;
 
     int _expected_fps;
+
+    std::string _pytorch_path;//anaconda/envs
+    std::string _py_interface_path;
+    
 };
 
 MED_IMG_END_NAMESPACE

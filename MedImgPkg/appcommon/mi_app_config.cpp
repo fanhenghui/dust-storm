@@ -66,6 +66,10 @@ AppConfig::AppConfig() {
             _cache_db_name = context;
         } else if (tag == "CacheDBPath") {
             _cache_db_path = context;
+        } else if (tag == "PytorchPath") {
+            _pytorch_path = context; 
+        } else if (tag == "PyInterfacePath") {
+            _py_interface_path = context;   
         }
     }
 }
@@ -122,6 +126,14 @@ int AppConfig::get_expected_fps() const {
 
 float AppConfig::get_nodule_possibility_threshold() const {
     return _nodule_possibility_threshold;
+}
+
+std::string AppConfig::get_pytorch_path() const {
+    return _pytorch_path;
+}
+
+std::string AppConfig::get_py_interface_path() const {
+    return _py_interface_path;
 }
 
 MED_IMG_END_NAMESPACE
