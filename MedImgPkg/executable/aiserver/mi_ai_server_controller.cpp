@@ -9,9 +9,30 @@
 
 #include "mi_ai_server_thread_model.h"
 #include "mi_ai_cmd_handler_operating.h"
-
+#include "mi_ai_operation_inference.h"
 
 MED_IMG_BEGIN_NAMESPACE
+
+class ReadyEvent: public IEvent {
+public:
+    ReadyEvent(std::shared_ptr<AIServerThreadModel> thread_model):_thread_model(thread_model) {}
+    virtual ~ReadyEvent() {};
+    virtual void execute() {
+        std::shared_ptr<AIServerThreadModel> thread_model = _thread_model.lock();
+        if (nullptr == thread_model) {
+            MI_AISERVER_LOG(MI_FATAL) << "thread model is null when run AI server connect event.";
+        } else {
+            IPCDataHeader header;
+            header.msg_id = COMMAND_ID_AI_DB_OPERATION;
+            header.msg_info1 = OPERATION_ID_DB_RECEIVE_AI_READY;
+            header.data_len = 0;
+            thread_model->async_send_data(new IPCPackage(header));
+        }
+    }
+
+private:
+    std::weak_ptr<AIServerThreadModel> _thread_model;
+};
 
 AIServerController::AIServerController() {
     _client_proxy.reset(new IPCClientProxy(UNIX)); 
@@ -26,8 +47,14 @@ AIServerController::~AIServerController() {
 
 void AIServerController::initialize() {
     //register cmd handler
-    // _server_proxy_be->register_command_handler(COMMAND_ID_BE_DB_OPERATION, 
-    //     std::shared_ptr<CmdHandlerDBBEOperating>(new CmdHandlerDBBEOperating(shared_from_this())));
+    _client_proxy->register_command_handler(COMMAND_ID_DB_AI_OPERATION, 
+        std::shared_ptr<CmdHandlerAIOperating>(new CmdHandlerAIOperating(shared_from_this())));
+
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_REQUEST_AI_INFERENCE, 
+    std::shared_ptr<AIOpInference>(new AIOpInference()));
+
+    //register event for on connect to DB Server
+    _client_proxy->register_on_connection_event(std::shared_ptr<ReadyEvent>(new ReadyEvent(_thread_model)));
 }
 
 void AIServerController::run() {

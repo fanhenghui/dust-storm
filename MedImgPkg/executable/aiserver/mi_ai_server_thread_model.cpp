@@ -28,6 +28,7 @@ void AIServerThreadModel::async_send_data(IPCPackage* packages) {
 
 void AIServerThreadModel::start() {
     _op_msg_queue.activate();
+    _pkg_msg_queue.activate();
     _thread_operating = boost::thread(boost::bind(&AIServerThreadModel::process_operating, this));
     _thread_sending = boost::thread(boost::bind(&AIServerThreadModel::process_sending, this));
     _client_proxy->run();
