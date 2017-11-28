@@ -242,13 +242,13 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_AI_ANNOTATION, series_uid));
     packages.push_back(create_query_end_msg_package());
 
+    model_dbs_status->query_ai_annotation();
     controller->get_client_proxy_dbs()->sync_send_data(packages);
 
     //wait until end signal
-    //TODO 需要考虑超时机制？
-    MI_REVIEW_LOG(MI_DEBUG) << "lock.";
     model_dbs_status->wait();
-    MI_REVIEW_LOG(MI_DEBUG) << "unlock.";
+    model_dbs_status->set_init();
+    
     //check errors
     if (!model_dbs_status->success()) {
         std::vector<std::string> dbs_errs = model_dbs_status->get_error_infos();

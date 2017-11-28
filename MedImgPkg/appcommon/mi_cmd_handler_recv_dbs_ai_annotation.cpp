@@ -17,6 +17,8 @@
 #include "mi_app_common_define.h"
 #include "mi_app_common_util.h"
 #include "mi_app_config.h"
+#include "mi_app_common_define.h"
+#include "mi_operation_receive_annotation.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
@@ -32,7 +34,6 @@ CmdHandlerRecvDBSAIAnno::~CmdHandlerRecvDBSAIAnno() {
 
 int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN recveive DB server DICOM series cmd handler.";
-    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
@@ -49,8 +50,11 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
         model_dbs_status->push_error_info("parse recv dbs AI annotation message failed.");
         return -1;
     }
-    if (0 == ipcheader.msg_info3) {
-        //TODO在加载数据的时候发起的请求，直接更新model
+
+    if (!model_dbs_status->has_init()) {
+        MemShield shield(buffer);//delete buffer later
+        MI_APPCOMMON_LOG(MI_INFO) << "receive AI annotation from DBS immediately.";
+        //In init
         model_dbs_status->set_ai_annotation();
     
         std::vector<std::string> ids;
@@ -78,15 +82,26 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
             model_annotation->set_processing_cache(ids);
         } else {
             //TOOD send none annotation message
+            model_annotation->set_processing_cache(std::vector<std::string>());
         }
 
-    }
-    else if (1 == ipcheader.msg_info3) {
-        //TODO数据加载的时候没有立刻返回，AIS计算结束返回了这个结果，需要检查series还是不是当前的series，以及用户有没有cancel AIS的计算等待
-        //需要构造op放到BE-FE的队列中
-    } else if (2 == ipcheader.msg_info3) {
-        //TODO用户在处理数据的时候发起的请求，需要检查series还是不是当前的series，以及用户有没有cancel AIS的计算等待
-        //需要构造op放到BE-FE的队列中
+    } else {
+        MI_APPCOMMON_LOG(MI_INFO) << "receive delay AI annotation from DBS.";
+        //After init
+        if(!model_dbs_status->has_query_ai_annotation()) {
+            //canceled by user do nothing
+            MI_APPCOMMON_LOG(MI_INFO) << "AI annotation query has been canceled by user.";
+        } else {
+            //create operation and push to BE operation queue
+            std::shared_ptr<IOperation> op(new OpReceiveAnnotation());
+            OpDataHeader op_header;
+            op_header.data_len = ipcheader.data_len;
+            op_header.end_tag = ipcheader.msg_info2;
+            op_header.reserved = ipcheader.msg_info3;
+            op->set_data(op_header , buffer);
+            op->set_controller(controller);
+            controller->get_thread_model()->push_operation(op);
+        }
     }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";

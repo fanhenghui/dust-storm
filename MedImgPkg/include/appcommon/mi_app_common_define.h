@@ -63,11 +63,11 @@ MED_IMG_BEGIN_NAMESPACE
 #define COMMAND_ID_DB_SEND_ERROR 619999
 #define COMMAND_ID_DB_SEND_END 620000
 
-//DB server send to AI server(By DB)
-#define COMMAND_ID_AI_INFERENCE 620001
-//DB server receive from AI server
+//AI server receive from DB server
 #define OPERATION_ID_DB_REQUEST_AI_INFERENCE 630001
+//DB server receive from AI server
 #define OPERATION_ID_DB_RECEIVE_AI_INFERENCE 630002
+#define OPERATION_ID_DB_RECEIVE_AI_READY 630003
 
 // Model ID
 #define MODEL_ID_ANNOTATION 910000

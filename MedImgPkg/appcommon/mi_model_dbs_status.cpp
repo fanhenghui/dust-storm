@@ -2,13 +2,17 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-ModelDBSStatus::ModelDBSStatus():_success(false),_has_preprocess_mask(false),_has_ai_annotation(false) {
+ModelDBSStatus::ModelDBSStatus():_success(false),_has_preprocess_mask(false),_has_ai_annotation(false),
+_query_ai_annotation(false),_init(false) {
 
 }
+
 void ModelDBSStatus::reset() {
     _success = false;
     _has_preprocess_mask = false;
     _has_ai_annotation = false;
+    _query_ai_annotation = false;
+    _init = false;
     _err_infos.clear();
 }
 
@@ -51,6 +55,26 @@ void ModelDBSStatus::wait() {
 
 void ModelDBSStatus::unlock() {
     _condition.notify_one();
+}
+
+bool ModelDBSStatus::has_query_ai_annotation() {
+    return _query_ai_annotation;
+}
+
+void ModelDBSStatus::cancel_ai_annotation() {
+    _query_ai_annotation = false;
+}
+
+void ModelDBSStatus::query_ai_annotation() {
+    _query_ai_annotation = true;
+}
+
+bool ModelDBSStatus::has_init() {
+    return _init;
+}
+
+void ModelDBSStatus::set_init() {
+    _init = true;
 }
 
 MED_IMG_END_NAMESPACE

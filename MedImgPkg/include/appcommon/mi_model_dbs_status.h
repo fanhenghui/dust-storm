@@ -32,6 +32,16 @@ public:
     //ai annotation query
     bool has_ai_annotation();
     void set_ai_annotation();
+    //TODO set user annotation
+
+    //after init 
+    bool has_init();
+    void set_init(); 
+
+    //user trigger ai annotation query but impatient to wait
+    bool has_query_ai_annotation();
+    void cancel_ai_annotation();
+    void query_ai_annotation();
 
     void wait();
     void unlock();
@@ -40,6 +50,8 @@ private:
     std::vector<std::string> _err_infos;
     bool _has_preprocess_mask;
     bool _has_ai_annotation;
+    bool _query_ai_annotation;
+    bool _init;
 
     boost::mutex _mutex;
     boost::condition _condition;
