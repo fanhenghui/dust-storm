@@ -19,6 +19,7 @@ subsystem:
 	$(MAKE) -C ./executable/dcmdbimporter
 	$(MAKE) -C ./executable/extractmask
 	$(MAKE) -C ./executable/compressmask
+	$(MAKE) -C ./ut/ai_ut
 	$(MAKE) -C ./ut/dbserver_ut
 	$(MAKE) -C ./ut/appcommon_ut
 	$(MAKE) -C ./ut/util_ut
@@ -60,6 +61,7 @@ clean:
 	$(MAKE) clean -C ./executable/dcmdbimporter
 	$(MAKE) clean -C ./executable/extractmask
 	$(MAKE) clean -C ./executable/compressmask
+	$(MAKE) clean -C ./ut/ai_ut
 	$(MAKE) clean -C ./ut/dbserver_ut
 	$(MAKE) clean -C ./ut/appcommon_ut
 	$(MAKE) clean -C ./ut/util_ut
