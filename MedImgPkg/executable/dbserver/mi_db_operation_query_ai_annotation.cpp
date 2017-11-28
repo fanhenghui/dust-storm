@@ -12,7 +12,7 @@
 
 #include "mi_db_server_controller.h"
 #include "mi_db_server_thread_model.h"
-#include "mi_db_operation_request_inference.h"
+#include "mi_db_operation_request_evaluation.h"
 
 
 MED_IMG_BEGIN_NAMESPACE
@@ -49,9 +49,9 @@ int DBOpQueryAIAnnotation::execute() {
     }
     //TODO read and check version
     if (item.annotation_ai_path.empty()) {
-        //create message to request AIS inference
+        //create message to request AIS evaluation
         //Should set client socket id to header(recv AIS result and send calcualted result to requested client) 
-        MsgInferenceRequest msg;
+        MsgEvaluationRequest msg;
         msg.set_series_uid(series_id);
         msg.set_dcm_path(item.dcm_path);
         msg.set_ai_anno_path(item.dcm_path+"/"+series_id+".csv");
@@ -69,7 +69,7 @@ int DBOpQueryAIAnnotation::execute() {
             OpDataHeader op_header;
             op_header.data_len = msg_buffer_size;
             op_header.receiver = controller->get_ais_socket_id();
-            std::shared_ptr<DBOpRequestInference> op(new DBOpRequestInference());
+            std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());
             op->set_data(op_header , msg_buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);

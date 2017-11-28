@@ -19,8 +19,8 @@ LOCAL_LIB_DIR = /usr/local/lib
 VPATH = $(INCLUDE_ROOT_DIR)
 
 OPERATION_OBJS =  mi_db_operation_query_end.o mi_db_operation_query_preprocess_mask.o \
-mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o mi_db_operation_request_inference.o \
-mi_db_operation_receive_inference.o mi_db_operation_receive_ai_ready.o
+mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o mi_db_operation_request_evaluation.o \
+mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o
 
 OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o $(OPERATION_OBJS)
 

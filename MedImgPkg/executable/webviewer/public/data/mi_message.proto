@@ -142,7 +142,7 @@ message MsgAnnotationCollectionDB {
 };
 
 //for DB server to AIS server
-message MsgInferenceRequest {
+message MsgEvaluationRequest {
     string series_uid = 1; //series id
     string dcm_path = 2; //if recal_im_data is true, this para will be used
     string ai_anno_path = 3; //output annotation file path
@@ -152,7 +152,7 @@ message MsgInferenceRequest {
 };
 
 //for AIS server back to DB server
-message MsgInferenceResponse {
+message MsgEvaluationResponse {
     int32 status = 1;//0 success -1 error
     string series_uid = 2; // series id
     string ai_anno_path = 3; //output annotation file path

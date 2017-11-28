@@ -1,4 +1,4 @@
-#include "mi_db_operation_request_inference.h"
+#include "mi_db_operation_request_evaluation.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
@@ -10,15 +10,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpRequestInference::DBOpRequestInference() {
+DBOpRequestEvaluation::DBOpRequestEvaluation() {
 
 }
 
-DBOpRequestInference::~DBOpRequestInference() {
+DBOpRequestEvaluation::~DBOpRequestEvaluation() {
 
 }
 
-int DBOpRequestInference::execute() {
+int DBOpRequestEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
@@ -33,7 +33,7 @@ int DBOpRequestInference::execute() {
     header.receiver = receiver;
     header.data_len = _header.data_len;
     header.msg_id = COMMAND_ID_DB_AI_OPERATION;
-    header.msg_info1 = OPERATION_ID_DB_REQUEST_AI_INFERENCE;
+    header.msg_info1 = OPERATION_ID_DB_REQUEST_AI_EVALUATION;
     IPCPackage* package = new IPCPackage(header, _buffer);
     _buffer = nullptr;//move op buffer to IPC package
 

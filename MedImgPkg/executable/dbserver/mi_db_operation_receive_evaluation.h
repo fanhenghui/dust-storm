@@ -5,15 +5,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpReceiveInference: public IOperation {
+class DBOpReceiveEvaluation: public IOperation {
 public:
-    DBOpReceiveInference();
-    virtual ~DBOpReceiveInference();
+    DBOpReceiveEvaluation();
+    virtual ~DBOpReceiveEvaluation();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpReceiveInference>(new DBOpReceiveInference());
+        return std::shared_ptr<DBOpReceiveEvaluation>(new DBOpReceiveEvaluation());
     }
 };
 

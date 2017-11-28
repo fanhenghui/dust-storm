@@ -5,15 +5,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AIOpInference: public IOperation {
+class AIOpEvaluate: public IOperation {
 public:
-    AIOpInference();
-    virtual ~AIOpInference();
+    AIOpEvaluate();
+    virtual ~AIOpEvaluate();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<AIOpInference>(new AIOpInference());
+        return std::shared_ptr<AIOpEvaluate>(new AIOpEvaluate());
     }
 };
 

@@ -1,4 +1,4 @@
-#include "mi_db_operation_receive_inference.h"
+#include "mi_db_operation_receive_evaluation.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
@@ -13,24 +13,24 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpReceiveInference::DBOpReceiveInference() {
+DBOpReceiveEvaluation::DBOpReceiveEvaluation() {
 
 }
 
-DBOpReceiveInference::~DBOpReceiveInference() {
+DBOpReceiveEvaluation::~DBOpReceiveEvaluation() {
 
 }
 
-int DBOpReceiveInference::execute() {
+int DBOpReceiveEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
 
-    MsgInferenceResponse msg;
+    MsgEvaluationResponse msg;
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse inference response message failed!");
+        APPCOMMON_THROW_EXCEPTION("parse evaluation response message failed!");
     }
 
     //Check error

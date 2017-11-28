@@ -16,7 +16,7 @@
 #include "mi_db_operation_query_end.h"
 
 #include "mi_db_cmd_handler_ais_operating.h"
-#include "mi_db_operation_receive_inference.h"
+#include "mi_db_operation_receive_evaluation.h"
 #include "mi_db_operation_receive_ai_ready.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -55,8 +55,8 @@ void DBServerController::initialize() {
     _server_proxy_ais->register_command_handler(COMMAND_ID_AI_DB_OPERATION, 
         std::shared_ptr<CmdHandlerDBAISOperating>(new CmdHandlerDBAISOperating(shared_from_this())));
 
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_RECEIVE_AI_INFERENCE, 
-        std::shared_ptr<DBOpReceiveInference>(new DBOpReceiveInference()));
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_RECEIVE_AI_EVALUATION, 
+        std::shared_ptr<DBOpReceiveEvaluation>(new DBOpReceiveEvaluation()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_RECEIVE_AI_READY, 
         std::shared_ptr<DBOpReceiveAIReady>(new DBOpReceiveAIReady()));
 

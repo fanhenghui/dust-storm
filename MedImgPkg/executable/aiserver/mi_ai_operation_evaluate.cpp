@@ -1,4 +1,4 @@
-#include "mi_ai_operation_inference.h"
+#include "mi_ai_operation_evaluate.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_memory_shield.h"
@@ -17,15 +17,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-AIOpInference::AIOpInference() {
+AIOpEvaluate::AIOpEvaluate() {
 
 }
 
-AIOpInference::~AIOpInference() {
+AIOpEvaluate::~AIOpEvaluate() {
 
 }
 
-char* serialize_msg(MsgInferenceResponse& msg, int& msg_size) {
+char* serialize_msg(MsgEvaluationResponse& msg, int& msg_size) {
     msg_size = msg.ByteSize();
     if (msg_size <= 0) {
         return nullptr;
@@ -40,13 +40,13 @@ char* serialize_msg(MsgInferenceResponse& msg, int& msg_size) {
     }
 }
 
-int notify_dbs(MsgInferenceResponse& msg, std::shared_ptr<AIServerController> controller) {
+int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> controller) {
     int msg_size = 0;                
     char* msg_buffer = serialize_msg(msg,msg_size);
     if (msg_buffer) {
         IPCDataHeader header;
         header.msg_id = COMMAND_ID_AI_DB_OPERATION;
-        header.msg_info1 = OPERATION_ID_DB_RECEIVE_AI_INFERENCE;
+        header.msg_info1 = OPERATION_ID_DB_RECEIVE_AI_EVALUATION;
         header.data_len = msg_size;
         msg.Clear();
         controller->get_thread_model()->async_send_data(new IPCPackage(header,msg_buffer));
@@ -58,7 +58,7 @@ int notify_dbs(MsgInferenceResponse& msg, std::shared_ptr<AIServerController> co
     }
 }
 
-int AIOpInference::execute() {
+int AIOpEvaluate::execute() {
     MI_AISERVER_LOG(MI_TRACE) << "IN Inference operation.";
 
     AISERVER_CHECK_NULL_EXCEPTION(_buffer);
@@ -67,12 +67,12 @@ int AIOpInference::execute() {
     AISERVER_CHECK_NULL_EXCEPTION(controller);
 
     //response message
-    MsgInferenceResponse msg_res;
+    MsgEvaluationResponse msg_res;
 
     //parse request message
-    MsgInferenceRequest msg_req;
+    MsgEvaluationRequest msg_req;
     if (!msg_req.ParseFromArray(_buffer, _header.data_len)) {
-        MI_AISERVER_LOG(MI_ERROR) << "parse inference request message failed.";
+        MI_AISERVER_LOG(MI_ERROR) << "parse evaluation request message failed.";
         msg_res.set_status(-1);
         msg_res.set_err_msg("parse request message failed.");
         return notify_dbs(msg_res, controller);
@@ -105,7 +105,7 @@ int AIOpInference::execute() {
     const std::string py_interface_path = AppConfig::instance()->get_py_interface_path();
 
     //debug print info
-    // MI_AISERVER_LOG(MI_DEBUG) << "IN AI inference operation:";
+    // MI_AISERVER_LOG(MI_DEBUG) << "IN AI evaluation operation:";
     // MI_AISERVER_LOG(MI_DEBUG) << "pytorch path: " << pytorch_path;
     // MI_AISERVER_LOG(MI_DEBUG) << "py interface path: " << py_interface_path;
     // MI_AISERVER_LOG(MI_DEBUG) << "series ID: " << series_id;
