@@ -83,7 +83,7 @@ int DBOpQueryDICOM::execute() {
         }
     }
     clock_t _end = clock();
-    MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_id << ", slice:" << files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "ms}.";
+    MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_id << ", slice:" << files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "s}.";
 
     return 0;
 }

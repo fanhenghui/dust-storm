@@ -32,6 +32,8 @@ int DBOpReceiveInference::execute() {
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse inference response message failed!");
     }
+
+    //Check error
     const int status = msg.status();
     unsigned int client_socket_id = (unsigned int)msg.client_socket_id();
     if (status == -1) {
@@ -40,6 +42,7 @@ int DBOpReceiveInference::execute() {
         return -1;
     }
 
+    //Update DB
     const std::string series_id = msg.series_uid();
     const std::string ai_anno_path = msg.ai_anno_path();
     const std::string ai_im_data_path = msg.ai_im_data_path();
@@ -106,6 +109,8 @@ int DBOpReceiveInference::execute() {
     header_end.msg_id = COMMAND_ID_DB_SEND_END;
     header_end.receiver = client_socket_id;
     server_proxy->async_send_data(new IPCPackage(header_end));
+
+    MI_DBSERVER_LOG(MI_DEBUG) << "receive AIS result and send to BE.";
 
     return 0;
 }

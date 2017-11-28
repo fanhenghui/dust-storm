@@ -61,7 +61,7 @@ int DBOpQueryPreprocessMask::execute() {
     if (0 != server_proxy->async_send_data(package)) {
         delete package;
         package = nullptr;
-        MI_DBSERVER_LOG(MI_WARNING) << "send dcm to client failed.(client disconnected)";
+        MI_DBSERVER_LOG(MI_WARNING) << "send preprocess mask to client failed.(client disconnected)";
     }
 
     return 0;

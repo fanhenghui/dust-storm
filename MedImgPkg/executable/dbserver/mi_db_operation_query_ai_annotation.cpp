@@ -67,8 +67,6 @@ int DBOpQueryAIAnnotation::execute() {
         char* msg_buffer = new char[msg_buffer_size];
         if (msg_buffer_size != 0 && msg.SerializeToArray(msg_buffer,msg_buffer_size)){
             OpDataHeader op_header;
-            op_header.op_id = OPERATION_ID_DB_REQUEST_AI_INFERENCE;
-            op_header.end_tag = 0;
             op_header.data_len = msg_buffer_size;
             op_header.receiver = controller->get_ais_socket_id();
             std::shared_ptr<DBOpRequestInference> op(new DBOpRequestInference());
@@ -76,6 +74,7 @@ int DBOpQueryAIAnnotation::execute() {
             op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);
         } 
+        msg.Clear();
         MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";
         //SEND_ERROR_TO_BE(server_proxy, receiver, "AI annotation file path null.");
         return 0;
