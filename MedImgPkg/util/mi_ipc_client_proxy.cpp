@@ -66,6 +66,10 @@ void IPCClientProxy::unregister_command_handler(unsigned int cmd_id) {
     }
 }
 
+void IPCClientProxy::register_on_connection_event(std::shared_ptr<IEvent> ev) {
+    _client->on_connect(ev);
+}
+
 int IPCClientProxy::sync_send_data(const IPCDataHeader& header , char* buffer) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
     return _client->sync_send_data(header , buffer);

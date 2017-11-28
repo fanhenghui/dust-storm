@@ -36,6 +36,8 @@ public:
     int sync_post(const IPCDataHeader& post_header, char* post_data, IPCDataHeader& result_header, char*& result_data);
     int sync_post(const std::vector<IPCPackage*>& packages);
 
+    void on_connect(std::shared_ptr<IEvent> ev);
+
 private:
     void connect_i();
 private:
@@ -50,6 +52,7 @@ private:
     int _fd_server;
 
     std::shared_ptr<IPCDataRecvHandler> _handler;
+    std::shared_ptr<IEvent> _on_connect_event;
     
     static const int _reconnect_times = 100;
 private:

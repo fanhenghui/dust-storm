@@ -83,6 +83,13 @@ protected:
 private:
 };
 
+class IEvent {
+public:
+    IEvent() {};
+    virtual ~IEvent() {};
+    virtual void execute() = 0;
+private:
+};
 
 const int CLIENT_QUIT_ID = 911119;
 

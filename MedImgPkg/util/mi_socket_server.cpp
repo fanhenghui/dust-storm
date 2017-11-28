@@ -241,7 +241,7 @@ int SocketServer::recv() {
         const unsigned int time = it->second.time;
         if (FD_ISSET(socket, &fdreads)) {
 
-            MI_UTIL_LOG(MI_INFO) << "IN socket server recv.";
+            //MI_UTIL_LOG(MI_DEBUG) << "IN socket server recv.";
 
             //reveive dataheader
             IPCDataHeader header;
@@ -316,7 +316,7 @@ int SocketServer::recv() {
                     this->clear_package_i(socket_id);
                     continue;  
                 }
-                MI_UTIL_LOG(MI_INFO) << "recv a client data msg: " << header.msg_id << ", opid: " << header.msg_info1;
+                MI_UTIL_LOG(MI_DEBUG) << "recv a client data msg: " << header.msg_id << ", opid: " << header.msg_info1;
             }
 
             try {

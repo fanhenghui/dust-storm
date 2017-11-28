@@ -24,6 +24,7 @@ public:
     void stop();
 
     void register_command_handler(unsigned int cmd_id, std::shared_ptr<ICommandHandler> handler);
+    void register_on_connection_event(std::shared_ptr<IEvent> ev);
     void unregister_command_handler(unsigned int cmd_id);
     int handle_command(const IPCDataHeader& header, char* buffer);
 

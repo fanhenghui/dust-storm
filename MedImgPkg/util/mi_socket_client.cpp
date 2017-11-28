@@ -149,6 +149,10 @@ void SocketClient::run() {
 
     connect_i();
 
+    if (_fd_server != 0 && _on_connect_event) {
+        _on_connect_event->execute();
+    }
+
     while (true) {
         IPCDataHeader header;
         char* buffer = nullptr;
@@ -425,6 +429,10 @@ int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketClient post.";;
 
     return 0;
+}
+
+void SocketClient::on_connect(std::shared_ptr<IEvent> ev) {
+    _on_connect_event = ev;
 }
 
 MED_IMG_END_NAMESPACE
