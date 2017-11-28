@@ -5,15 +5,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class DBOpAISReady: public IOperation {
+class DBOpReceiveAIReady: public IOperation {
 public:
-    DBOpAISReady();
-    virtual ~DBOpAISReady();
+    DBOpReceiveAIReady();
+    virtual ~DBOpReceiveAIReady();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpAISReady>(new DBOpAISReady());
+        return std::shared_ptr<DBOpReceiveAIReady>(new DBOpReceiveAIReady());
     }
 };
 

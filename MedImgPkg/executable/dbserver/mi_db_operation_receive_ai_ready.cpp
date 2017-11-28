@@ -1,4 +1,4 @@
-#include "mi_db_operation_ais_ready.h"
+#include "mi_db_operation_receive_ai_ready.h"
 
 #include "util/mi_ipc_server_proxy.h"
 
@@ -7,17 +7,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpAISReady::DBOpAISReady() {
+DBOpReceiveAIReady::DBOpReceiveAIReady() {
 
 }
 
-DBOpAISReady::~DBOpAISReady() {
+DBOpReceiveAIReady::~DBOpReceiveAIReady() {
 
 }
 
-int DBOpAISReady::execute() {
-    DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
-    
+int DBOpReceiveAIReady::execute() {    
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     controller->set_ais_socket_id(_header.receiver);
@@ -25,7 +23,7 @@ int DBOpAISReady::execute() {
         MI_DBSERVER_LOG(MI_FATAL) << "AIS socket ID is 0.";
         return -1;
     } else {
-        MI_DBSERVER_LOG(MI_FATAL) << "AIS ready.";
+        MI_DBSERVER_LOG(MI_INFO) << "AIS ready.";
         return 0;
     }
 }
