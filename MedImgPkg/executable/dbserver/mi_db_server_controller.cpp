@@ -18,6 +18,7 @@
 #include "mi_db_cmd_handler_ais_operating.h"
 #include "mi_db_operation_receive_evaluation.h"
 #include "mi_db_operation_receive_ai_ready.h"
+#include "mi_db_evaluatiion_dispatcher.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -30,6 +31,7 @@ DBServerController::DBServerController() {
     _thread_model->set_server_proxy_be(_server_proxy_be);
     _thread_model->set_server_proxy_ais(_server_proxy_ais);
     _db.reset(new DB());
+    _evaluation_dispatcher.reset(new DBEvaluationDispatcher());
 }
 
 DBServerController::~DBServerController() {
@@ -67,6 +69,9 @@ void DBServerController::initialize() {
         MI_DBSERVER_LOG(MI_FATAL) << "connect to db failed.";
         DBSERVER_THROW_EXCEPTION("connect to db failed.");
     }
+
+    //set controller to dispatcher
+    _evaluation_dispatcher->set_controller(shared_from_this());
 }
 
 void DBServerController::run() {
@@ -92,6 +97,10 @@ std::shared_ptr<IPCServerProxy> DBServerController::get_server_proxy_ais() {
 
 std::shared_ptr<DB> DBServerController::get_db() {
     return _db;
+}
+
+std::shared_ptr<DBEvaluationDispatcher> DBServerController::get_evaluation_dispatcher() {
+    return _evaluation_dispatcher;
 }
 
 void DBServerController::set_ais_socket_id(unsigned int id) {

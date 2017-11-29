@@ -22,7 +22,7 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 MODEL_OBJS = mi_app_cache_db.o mi_app_db.o mi_app_config.o mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o 
 OBSERVER_OBJS = mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_ob_annotation_list.o
 CMD_HANDLER_OBJS = mi_cmd_handler_operating.o mi_cmd_handler_heartbeat.o mi_cmd_handler_fe_ready.o mi_cmd_handler_shutdown.o \
-mi_cmd_handler_search_worklist.o mi_cmd_handler_mpr_play.o mi_cmd_handler_vr_play.o \
+mi_cmd_handler_search_worklist.o mi_cmd_handler_vr_play.o \
 mi_cmd_handler_recv_dbs_error.o mi_cmd_handler_recv_dbs_ai_annotation.o mi_cmd_handler_recv_dbs_end_signal.o \
 mi_cmd_handler_recv_dbs_preprocess_mask.o mi_cmd_handler_recv_dbs_dicom_series.o mi_cmd_handler_back_to_worklist.o
 OPERATION_OBJS = mi_operation_factory.o mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \

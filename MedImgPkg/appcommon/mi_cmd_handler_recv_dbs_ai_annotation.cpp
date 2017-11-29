@@ -94,11 +94,7 @@ int CmdHandlerRecvDBSAIAnno::handle_command(const IPCDataHeader& ipcheader , cha
         } else {
             //create operation and push to BE operation queue
             std::shared_ptr<IOperation> op(new OpReceiveAnnotation());
-            OpDataHeader op_header;
-            op_header.data_len = ipcheader.data_len;
-            op_header.end_tag = ipcheader.msg_info2;
-            op_header.reserved = ipcheader.msg_info3;
-            op->set_data(op_header , buffer);
+            op->set_data(ipcheader , buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation(op);
         }

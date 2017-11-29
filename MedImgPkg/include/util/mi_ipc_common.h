@@ -15,26 +15,26 @@ enum SocketType {
 
 struct IPCDataHeader { //32 byte
     unsigned int sender;//sender pid or socket id ... 
-    unsigned int receiver;//receiver pid or socket id ...
+    unsigned int receiver;//receiver pid or socket id ... (should be set when recv)
     unsigned int msg_id;//message ID : thus command ID
-    unsigned int msg_info0;//message info : client cell ID, client socket time 
-    unsigned int msg_info1;//message info : client operation ID
-    unsigned int msg_info2;//message info : reserved sequenced msg end tag(EG: send n slice dicom series. 0~n-2:0 n-1:1)
-    unsigned int msg_info3;//message info : reserved
+    unsigned int cell_id;//message info : client cell ID, client socket time 
+    unsigned int op_id;//message info : client operation ID
+    unsigned int reserved0;//message info : reserved sequenced msg end tag(EG: send n slice dicom series. 0~n-2:0 n-1:1)
+    unsigned int reserved1;//message info : reserved
     unsigned int data_len;//data length
 
     IPCDataHeader():
-        sender(0), receiver(0), msg_id(0), msg_info0(0),
-        msg_info1(0), msg_info2(0), msg_info3(0), data_len(0) {
+        sender(0), receiver(0), msg_id(0), cell_id(0),
+        op_id(0), reserved0(0), reserved1(0), data_len(0) {
     }
 };
 #define STREAM_IPCHEADER_INFO(header) "sender: " << header.sender << \
     "; receiver: " << header.receiver << \
     "; cmd id: " << header.msg_id << \
-    "; msg info0(cell id): " << header.msg_info0 << \
-    "; msg info1(op id): " << header.msg_info1 << \
-    "; msg info2(end tag): " << header.msg_info2 << \
-    "; msg info3(reserved): " << header.msg_info3 << \
+    "; msg info0(cell id): " << header.cell_id << \
+    "; msg info1(op id): " << header.op_id << \
+    "; msg info2(end tag): " << header.reserved0 << \
+    "; msg info3(reserved): " << header.reserved1 << \
     "; data len: " << header.data_len
 
 struct IPCPackage {

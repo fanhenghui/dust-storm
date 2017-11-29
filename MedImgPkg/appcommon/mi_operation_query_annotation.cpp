@@ -53,7 +53,7 @@ int OpQueryAnnotation::execute() {
         char* post_data = nullptr;
 
         post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-        post_header.msg_info1 = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
+        post_header.op_id = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
 
         MsgString msgSeries;
         msgSeries.set_context(serise_id);

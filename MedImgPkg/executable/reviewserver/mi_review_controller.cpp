@@ -11,7 +11,6 @@
 #include "appcommon/mi_cmd_handler_fe_ready.h"
 #include "appcommon/mi_cmd_handler_shutdown.h"
 #include "appcommon/mi_cmd_handler_heartbeat.h"
-#include "appcommon/mi_cmd_handler_mpr_play.h"
 #include "appcommon/mi_cmd_handler_vr_play.h"
 #include "appcommon/mi_operation_mpr_paging.h"
 #include "appcommon/mi_operation_pan.h"
@@ -69,10 +68,6 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<CmdHandlerOperating> handler_operation(
         new CmdHandlerOperating(app_controller));
     _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, handler_operation);
-
-    // std::shared_ptr<CmdHandlerMPRPlay> handler_mpr_play(
-    //     new CmdHandlerMPRPlay(app_controller));
-    // _proxy->register_command_handler(COMMAND_ID_FE_MPR_PLAY, handler_mpr_play);
 
     std::shared_ptr<CmdHandlerVRPlay> handler_vr_play(
         new CmdHandlerVRPlay(app_controller));

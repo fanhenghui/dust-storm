@@ -46,7 +46,7 @@ int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> c
     if (msg_buffer) {
         IPCDataHeader header;
         header.msg_id = COMMAND_ID_AI_DB_OPERATION;
-        header.msg_info1 = OPERATION_ID_DB_RECEIVE_AI_EVALUATION;
+        header.op_id = OPERATION_ID_DB_RECEIVE_AI_EVALUATION;
         header.data_len = msg_size;
         msg.Clear();
         controller->get_thread_model()->async_send_data(new IPCPackage(header,msg_buffer));

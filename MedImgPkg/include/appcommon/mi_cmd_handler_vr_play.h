@@ -18,7 +18,7 @@ public:
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer);
 
 private:
-    void logic_i(OpDataHeader& op_header, char* buffer);
+    void logic_i(IPCDataHeader header);
 
 private:
     std::weak_ptr<AppController> _controller;

@@ -72,8 +72,8 @@ int DBOpQueryDICOM::execute() {
         header.receiver = receiver;
         header.data_len = size;
         header.msg_id = COMMAND_ID_DB_SEND_DICOM_SERIES;
-        header.msg_info2 = i==files.size()-1 ? 1:0;
-        header.msg_info3 = files.size();
+        header.reserved0 = i==files.size()-1 ? 1:0;
+        header.reserved1 = files.size();
         IPCPackage* package = new IPCPackage(header, buffer);
         if(0 != server_proxy->async_send_data(package)){
             delete package;

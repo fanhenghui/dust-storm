@@ -22,7 +22,8 @@ OPERATION_OBJS =  mi_db_operation_query_end.o mi_db_operation_query_preprocess_m
 mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o mi_db_operation_request_evaluation.o \
 mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o
 
-OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o $(OPERATION_OBJS)
+OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o \
+mi_db_evaluatiion_dispatcher.o $(OPERATION_OBJS)
 
 TARGET = $(BIN_DIR)/dbserver
 
@@ -39,7 +40,7 @@ $(TARGET): mi_db_server_main.o $(OBJS)
 mi_db_server_main.o: $(EXPORT_HEADER)  mi_db_server_main.cpp mi_db_server_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_main.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.h mi_db_server_thread_model.o $(OPERATION_OBJS)
+mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.h mi_db_server_thread_model.o mi_db_evaluatiion_dispatcher.o $(OPERATION_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_db_cmd_handler_be_operating.o: mi_db_cmd_handler_be_operating.cpp mi_db_cmd_handler_be_operating.h mi_db_server_thread_model.o
@@ -51,8 +52,11 @@ mi_db_cmd_handler_ais_operating.o: mi_db_cmd_handler_ais_operating.cpp mi_db_cmd
 mi_db_server_thread_model.o : mi_db_server_thread_model.cpp mi_db_server_thread_model.h
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)
 
-$(OPERATION_OBJS):%.o:%.cpp %.h $(COMMON_HEADER)
+$(OPERATION_OBJS):%.o:%.cpp %.h $(COMMON_HEADER) mi_db_evaluatiion_dispatcher.o
 	$(CC) -c -fPIC $(CFLAGS) $< -o $@ $(ADDITINAL_INCLUDE_DIR)
+
+mi_db_evaluatiion_dispatcher.o : mi_db_evaluatiion_dispatcher.cpp mi_db_evaluatiion_dispatcher.h mi_db_server_thread_model.o
+	$(CC) -c -fPIC $(CFLAGS) mi_db_evaluatiion_dispatcher.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:

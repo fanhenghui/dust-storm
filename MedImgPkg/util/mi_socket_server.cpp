@@ -250,7 +250,7 @@ int SocketServer::recv() {
             //add client socket id/created_time to header
             //thus operation will get which socket to interact
             header.receiver = socket_id;//client socket id
-            header.msg_info0 = time;//client socket created time
+            header.reserved1 = time;//client socket created time
             if (err == 0) {
                 //client disconnect
                 if (UNIX == _socket_type) {
@@ -316,7 +316,7 @@ int SocketServer::recv() {
                     this->clear_package_i(socket_id);
                     continue;  
                 }
-                MI_UTIL_LOG(MI_DEBUG) << "recv a client data msg: " << header.msg_id << ", opid: " << header.msg_info1;
+                MI_UTIL_LOG(MI_DEBUG) << "recv a client data msg: " << header.msg_id << ", opid: " << header.op_id;
             }
 
             try {
@@ -413,7 +413,7 @@ int SocketServer::send() {
                 continue;
             } else {
                 // MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data header. msg id: " << 
-                // pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
+                // pkg_send->header.msg_id << ", opid: " << pkg_send->header.op_id;
             }
 
             if (nullptr != pkg_send->buffer && pkg_send->header.data_len > 0) {
@@ -422,7 +422,7 @@ int SocketServer::send() {
                     << STREAM_IPCHEADER_INFO(pkg_send->header);        
                 } else {
                    //MI_UTIL_LOG(MI_DEBUG) << "send data: success to send data . msg id: " << 
-                   //pkg_send->header.msg_id << ", opid: " << pkg_send->header.msg_info1;
+                   //pkg_send->header.msg_id << ", opid: " << pkg_send->header.op_id;
                 }
             }
 

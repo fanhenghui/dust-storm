@@ -10,18 +10,6 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-struct OpDataHeader {
-    unsigned int cell_id;   // cell ID
-    unsigned int op_id;     // operation ID
-    unsigned int data_len;  // data length
-    unsigned int receiver;  // receiver pid or socket id ...
-    unsigned int end_tag;   // sequenced message end tag:0 for in the process 1 for the last message
-    unsigned int reserved;  // IPC header msg_info3
-
-    OpDataHeader():cell_id(0),op_id(0),data_len(0),receiver(0),end_tag(0),reserved(0)
-    {}
-};
-
 class IOperation {
 public:
     IOperation() : _buffer(nullptr) {
@@ -36,7 +24,7 @@ public:
         }
     };
 
-    void set_data(const OpDataHeader& data, char* buffer) {
+    void set_data(const IPCDataHeader& data, char* buffer) {
         _header = data;
         _buffer = buffer;
     };
@@ -70,7 +58,7 @@ public:
     virtual std::shared_ptr<IOperation> create() = 0;
 
 protected:
-    OpDataHeader _header;
+    IPCDataHeader _header;
     char* _buffer;
     std::weak_ptr<IController> _controller;
 

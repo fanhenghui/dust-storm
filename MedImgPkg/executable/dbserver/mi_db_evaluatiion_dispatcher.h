@@ -23,7 +23,7 @@ public:
     DBEvaluationDispatcher();
     virtual ~DBEvaluationDispatcher();
 
-    void set_db_server_controller(std::shared_ptr<DBServerController> controller);
+    void set_controller(std::shared_ptr<DBServerController> controller);
 
     int request_evaluation(const unsigned int client_id, const std::string& series_id);
     int receive_evaluation(MsgEvaluationResponse* msg_res);

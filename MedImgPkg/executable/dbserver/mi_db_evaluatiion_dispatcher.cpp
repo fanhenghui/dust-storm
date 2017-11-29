@@ -58,7 +58,7 @@ DBEvaluationDispatcher::~DBEvaluationDispatcher() {
 
 }
 
-void DBEvaluationDispatcher::set_db_server_controller(std::shared_ptr<DBServerController> controller) {
+void DBEvaluationDispatcher::set_controller(std::shared_ptr<DBServerController> controller) {
     _controller = controller;
 }
 
@@ -144,7 +144,6 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         MI_DBSERVER_LOG(MI_WARNING) << "send AI annotation to client failed.(client disconnected)";
         return -1;
     }
-
     
     return 0;
 }
@@ -278,11 +277,13 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
         int msg_buffer_size = msg.ByteSize();
         char* msg_buffer = new char[msg_buffer_size];
         if (msg_buffer_size != 0 && msg.SerializeToArray(msg_buffer,msg_buffer_size)){
-            OpDataHeader op_header;
-            op_header.data_len = msg_buffer_size;
-            op_header.receiver = controller->get_ais_socket_id();
+            IPCDataHeader header;
+            header.data_len = msg_buffer_size;
+            header.receiver = controller->get_ais_socket_id();
+            header.msg_id = COMMAND_ID_DB_AI_OPERATION;
+            header.op_id = OPERATION_ID_DB_REQUEST_AI_EVALUATION;
             std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());
-            op->set_data(op_header , msg_buffer);
+            op->set_data(header, msg_buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);
         } 

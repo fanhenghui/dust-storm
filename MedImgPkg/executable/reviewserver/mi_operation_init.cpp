@@ -182,7 +182,7 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
     char* post_data = nullptr;
 
     post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.msg_info1 = op_id;
+    post_header.op_id = op_id;
 
     MsgString msgSeries;
     msgSeries.set_context(series_uid);
@@ -198,7 +198,7 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
 static IPCPackage* create_query_end_msg_package() {
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    header.msg_info1 = OPERATION_ID_DB_QUERY_END;
+    header.op_id = OPERATION_ID_DB_QUERY_END;
     return (new IPCPackage(header));
 }
 

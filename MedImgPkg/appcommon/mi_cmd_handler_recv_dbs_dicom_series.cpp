@@ -53,8 +53,8 @@ int CmdHandlerRecvDBSDCMSeries::handle_command(const IPCDataHeader& ipcheader , 
         std::shared_ptr<ModelDBSStatus> model_dbs_status = AppCommonUtil::get_model_dbs_status(controller);
         APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
 
-        const unsigned int end_tag = ipcheader.msg_info2;
-        const int dcm_slice_sum = (int)ipcheader.msg_info3;
+        const unsigned int end_tag = ipcheader.reserved0;
+        const int dcm_slice_sum = (int)ipcheader.reserved1;
 
         //trigger a thread to write to cache DB
         if (!_th_running) {

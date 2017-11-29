@@ -23,22 +23,15 @@ int CmdHandlerDBAISOperating::handle_command(const IPCDataHeader& ipcheader , ch
         DBSERVER_THROW_EXCEPTION("controller pointer is null!");
     }
 
-    const unsigned int op_id = ipcheader.msg_info1;
-    OpDataHeader op_header;
-    op_header.op_id = op_id;
-    op_header.data_len = ipcheader.data_len;
-    op_header.receiver = ipcheader.receiver;
-    op_header.end_tag = ipcheader.msg_info2;
-    op_header.reserved = ipcheader.msg_info3;
-
+    const unsigned int op_id = ipcheader.op_id;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
     if (nullptr == op) {
-        MI_DBSERVER_LOG(MI_ERROR) << "invalid DB server operation: " << op_id;
+        MI_DBSERVER_LOG(MI_ERROR) << "invalid DB server AIS's operation: " << op_id;
         return 0;
     }
     if (op) {
         op->reset();
-        op->set_data(op_header, buffer);
+        op->set_data(ipcheader, buffer);
         op->set_controller(controller);
         controller->get_thread_model()->push_operation_ais(op);
     } else {

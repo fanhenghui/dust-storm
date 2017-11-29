@@ -42,11 +42,7 @@ void OBAnnotationList::update(int code_id) {
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
     header.msg_id = COMMAND_ID_BE_SEND_ANNOTATION_LIST;
-    header.msg_info0 = 0;
-    header.msg_info1 = 0;
-    header.msg_info2 = 1;
-    header.msg_info3 = 0;
-
+    
     MsgAnnotationList msg;
     switch (code_id) {
         case ModelAnnotation::ADD: {

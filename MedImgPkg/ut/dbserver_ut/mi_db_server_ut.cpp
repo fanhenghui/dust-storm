@@ -29,8 +29,8 @@ class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
             out.close();
         }
 
-        // unsigned int end_tag = dataheader.msg_info2;
-        // unsigned int dicom_slice = dataheader.msg_info3;
+        // unsigned int end_tag = dataheader.reserved0;
+        // unsigned int dicom_slice = dataheader.reserved1;
 
         // if (end_tag == 0) {
 
@@ -125,7 +125,7 @@ IPCPackage* create_query_dicom_message() {
     char* post_data = nullptr;
 
     post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.msg_info1 = OPERATION_ID_DB_QUERY_DICOM;
+    post_header.op_id = OPERATION_ID_DB_QUERY_DICOM;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -144,7 +144,7 @@ IPCPackage* create_query_preprocess_mask_message() {
     char* post_data = nullptr;
 
     post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.msg_info1 = OPERATION_ID_DB_QUERY_PREPROCESS_MASK;
+    post_header.op_id = OPERATION_ID_DB_QUERY_PREPROCESS_MASK;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -163,7 +163,7 @@ IPCPackage* create_query_ai_annotation_message() {
     char* post_data = nullptr;
 
     post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.msg_info1 = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
+    post_header.op_id = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -180,7 +180,7 @@ IPCPackage* create_query_ai_annotation_message() {
 IPCPackage* create_query_end_message() {
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    header.msg_info1 = OPERATION_ID_DB_QUERY_END;
+    header.op_id = OPERATION_ID_DB_QUERY_END;
     return (new IPCPackage(header));
 }
 
