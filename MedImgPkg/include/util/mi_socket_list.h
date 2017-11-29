@@ -118,7 +118,7 @@ private:
         }
         
         for (unsigned int id=_last_id+1; id<_id_limit; ++id) {
-            if (_socket_infos.find(id) != _socket_infos.end()) {
+            if (_socket_infos.find(id) == _socket_infos.end()) {
                 return id;
             }
         }
