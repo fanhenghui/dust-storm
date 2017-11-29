@@ -23,12 +23,12 @@ class SocketList {
 public:
     struct SocketInfo {
         int socket;
-        unsigned int time;
+        unsigned int time;// created time
         std::string host;// ip for inet; path for unix
         int port;// port for inet
     };
 
-    SocketList():_cur_id(1) {}
+    SocketList() : _last_id(1) {}
 
     ~SocketList() {}
 
@@ -45,6 +45,10 @@ public:
     int insert_socket(int socket, const std::string host, int port = 0) {
         boost::mutex::scoped_lock locker(_mutex);
         const unsigned int id = acquire_id_i();
+        if (0 == id) {
+            MI_UTIL_LOG(MI_ERROR) << "socket queue full!";
+            return -1;
+        }
         const unsigned int cur_time = (unsigned int)(time(NULL));
         auto it = _sockets.find(socket);
         if (it != _sockets.end()) {
@@ -109,16 +113,23 @@ public:
 
 private:
     unsigned int acquire_id_i() {
-        if (_cur_id > std::numeric_limits<unsigned int>::max()-255) {
-            _cur_id = 1;
+        if (_last_id > std::numeric_limits<unsigned int>::max()-255) {
+            _last_id = 1;
         }
-        return _cur_id++;
+        
+        for (unsigned int id=_last_id+1; id<_id_limit; ++id) {
+            if (_socket_infos.find(id) != _socket_infos.end()) {
+                return id;
+            }
+        }
+        return 0;//full socket
     }
 
 private:
     std::set<int> _sockets;//for check
     std::map<unsigned int, SocketInfo> _socket_infos;
-    unsigned int _cur_id;
+    const unsigned int _id_limit = std::numeric_limits<unsigned int>::max()-255;
+    unsigned int _last_id;
     mutable boost::mutex _mutex;
 private:
     DISALLOW_COPY_AND_ASSIGN(SocketList);
