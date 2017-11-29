@@ -103,12 +103,12 @@ std::shared_ptr<DBEvaluationDispatcher> DBServerController::get_evaluation_dispa
     return _evaluation_dispatcher;
 }
 
-void DBServerController::set_ais_socket_id(unsigned int id) {
-    _ais_socket_id = id;
+void DBServerController::set_ais_client(unsigned int client) {
+    _ais_client = client;
 }
 
-unsigned int DBServerController::get_ais_socket_id() const {
-    return _ais_socket_id;
+unsigned int DBServerController::get_ais_client() const {
+    return _ais_client;
 }
 
 MED_IMG_END_NAMESPACE

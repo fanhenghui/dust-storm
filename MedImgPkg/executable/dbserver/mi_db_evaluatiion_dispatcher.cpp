@@ -284,7 +284,7 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
         if (msg_buffer_size != 0 && msg.SerializeToArray(msg_buffer,msg_buffer_size)){
             IPCDataHeader header;
             header.data_len = msg_buffer_size;
-            header.receiver = controller->get_ais_socket_id();
+            header.receiver = controller->get_ais_client();
             header.msg_id = COMMAND_ID_DB_AI_OPERATION;
             header.op_id = OPERATION_ID_DB_REQUEST_AI_EVALUATION;
             std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());

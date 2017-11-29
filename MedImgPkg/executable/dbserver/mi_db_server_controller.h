@@ -27,8 +27,8 @@ public:
     std::shared_ptr<DB> get_db();
     std::shared_ptr<DBEvaluationDispatcher> get_evaluation_dispatcher();
 
-    void set_ais_socket_id(unsigned int id);
-    unsigned int get_ais_socket_id() const;
+    void set_ais_client(unsigned int client);
+    unsigned int get_ais_client() const;
 
 private:
     void connect_db_i();
@@ -40,7 +40,7 @@ private:
     std::shared_ptr<IPCServerProxy> _server_proxy_ais;
     std::shared_ptr<DBEvaluationDispatcher> _evaluation_dispatcher;
     //AIS socket ID
-    unsigned int _ais_socket_id;
+    unsigned int _ais_client;
 };
 
 MED_IMG_END_NAMESPACE

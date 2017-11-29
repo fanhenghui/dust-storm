@@ -22,8 +22,8 @@ public:
     std::shared_ptr<AIServerThreadModel> get_thread_model();
     std::shared_ptr<IPCClientProxy> get_client_proxy();
 
-    void set_ais_socket_id(unsigned int id);
-    unsigned int get_ais_socket_id() const;
+    void set_ais_client(unsigned int id);
+    unsigned int get_ais_client() const;
 
 private:
     void connect_db_i();
