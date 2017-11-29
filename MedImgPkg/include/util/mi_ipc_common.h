@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <map>
+#include <string.h>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -51,6 +52,16 @@ struct IPCPackage {
                 delete [] buffer;
                 buffer = nullptr;
             }
+        }
+    }
+
+    IPCPackage* clone() {
+        if(nullptr != buffer) {
+            char* buffer0 = new char[header.data_len];
+            memcpy(buffer0, buffer , header.data_len);
+            return new IPCPackage(header,buffer0);
+        } else {
+            return new IPCPackage(header);
         }
     }
 };

@@ -247,9 +247,12 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
     auto it = _request_queue.find(series_id);
     if (it != _request_queue.end()) {
         RequesterCollection& req_coll = it->second;
-        if (req_coll.req_set.find(client_id) != req_coll.req_set.end()) {
+        if (req_coll.req_set.find(client_id) == req_coll.req_set.end()) {
             req_coll.req_set.insert(client_id);
             req_coll.req_queue.push_back(client_id);
+            MI_DBSERVER_LOG(MI_INFO) << "Ecaluation dispatcher: add to evaluation request queue " << client_id;
+        } else {
+            MI_DBSERVER_LOG(MI_INFO) << "Ecaluation dispatcher: evaluation request already in queue " << client_id;
         }
     } else {
         //first request
@@ -257,6 +260,8 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
         req_coll.req_set.insert(client_id);
         req_coll.req_queue.push_back(client_id);
         _request_queue.insert(std::make_pair(series_id, req_coll));
+
+        MI_DBSERVER_LOG(MI_INFO) << "Ecaluation dispatcher: trigger evaluation " << client_id;
 
         //send evaluation request to AI server
         std::shared_ptr<DBServerController> controller = _controller.lock();
@@ -299,40 +304,39 @@ void DBEvaluationDispatcher::notify_all(IPCPackage* pkg) {
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
     DBSERVER_CHECK_NULL_EXCEPTION(server_proxy);
 
-
-    auto it = _request_queue.find(_receive_series);
-    if (it == _request_queue.end()) {
-        MI_DBSERVER_LOG(MI_ERROR) << "DB AI dispacher notify null requester.";
-        return;
-    }
-    if (nullptr == pkg) {
-        MI_DBSERVER_LOG(MI_ERROR) << "DB AI dispacher notify null package.";
-        return;
-    }
-
     //send message to notify all requester(BE)
     int notify_num = 0;
     {
         boost::mutex::scoped_lock locker(_mutex_queue);
 
+        auto it = _request_queue.find(_receive_series);
+        if (it == _request_queue.end()) {
+            MI_DBSERVER_LOG(MI_ERROR) << "DB AI dispacher notify null requester.";
+            return;
+        }
+        if (nullptr == pkg) {
+            MI_DBSERVER_LOG(MI_ERROR) << "DB AI dispacher notify null package.";
+            return;
+        }
+
         RequesterCollection& req_coll = it->second;
+        
         for (auto requester = req_coll.req_queue.begin(); requester != req_coll.req_queue.end(); ++requester ) {
-            const unsigned int socket_id = *requester;
-            pkg->header.receiver = socket_id;
-            if(0 != server_proxy->async_send_data(pkg)) {
-                MI_DBSERVER_LOG(MI_WARNING) << "send AI annotation to client failed.(client disconnected)";
+            const unsigned int client_id = *requester;
+            pkg->header.receiver = client_id;
+            if(0 != server_proxy->async_send_data(pkg->clone())) {
+                MI_DBSERVER_LOG(MI_WARNING) << "send evaluation to client failed.(client disconnected)";
                 continue;
             }
+            MI_DBSERVER_LOG(MI_INFO) << "send evaluation to " << client_id;
             ++notify_num;
         }
         //clear queue
         _request_queue.erase(it);
     }
-
-    if (0 == notify_num) {
-        delete pkg;
-        pkg = nullptr;
-    }
+    
+    delete pkg;
+    pkg = nullptr;
 }
 
 bool DBEvaluationDispatcher::update_request_series(const std::string& series) {

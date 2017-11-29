@@ -27,8 +27,13 @@ int DBOpReceiveEvaluation::execute() {
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
         APPCOMMON_THROW_EXCEPTION("parse evaluation response message failed!");
     }
-    dispatcher->receive_evaluation(&msg);
+    if (-1 == dispatcher->receive_evaluation(&msg)) {
+        MI_DBSERVER_LOG(MI_DEBUG) << "receive evaluation failed."; 
+        msg.Clear();
+        return -1;
+    }
     msg.Clear();
+    
 
     MI_DBSERVER_LOG(MI_DEBUG) << "receive AIS result and send to BE.";
 
