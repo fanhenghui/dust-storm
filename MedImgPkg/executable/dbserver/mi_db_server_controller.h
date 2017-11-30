@@ -15,11 +15,11 @@ class DBEvaluationDispatcher;
 class DBServerController : public IController, public std::enable_shared_from_this<DBServerController> {
 public:
     DBServerController();
-    ~DBServerController();
+    virtual ~DBServerController();
 
-    void initialize();
+    virtual void initialize();
     void run();
-    void finalize();
+    virtual void finalize();
 
     std::shared_ptr<DBServerThreadModel> get_thread_model();
     std::shared_ptr<IPCServerProxy> get_server_proxy_be();

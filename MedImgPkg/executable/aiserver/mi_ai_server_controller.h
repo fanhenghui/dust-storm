@@ -13,20 +13,14 @@ class IPCClientProxy;
 class AIServerController : public IController, public std::enable_shared_from_this<AIServerController> {
 public:
     AIServerController();
-    ~AIServerController();
+    virtual ~AIServerController();
 
-    void initialize();
+    virtual void initialize();
     void run();
-    void finalize();
+    virtual void finalize();
 
     std::shared_ptr<AIServerThreadModel> get_thread_model();
     std::shared_ptr<IPCClientProxy> get_client_proxy();
-
-    void set_ais_client(unsigned int id);
-    unsigned int get_ais_client() const;
-
-private:
-    void connect_db_i();
 
 private:
     std::shared_ptr<AIServerThreadModel> _thread_model;
