@@ -13,23 +13,23 @@ MED_IMG_BEGIN_NAMESPACE
 #endif
 
 #ifndef DBSERVER_CHECK_NULL_EXCEPTION
-#define DBSERVER_CHECK_NULL_EXCEPTION(pointer)                                   \
+#define DBSERVER_CHECK_NULL_EXCEPTION(pointer)                                 \
   if (nullptr == pointer) {                                                    \
-    DBSERVER_THROW_EXCEPTION(std::string(typeid(pointer).name()) +               \
+    DBSERVER_THROW_EXCEPTION(std::string(typeid(pointer).name()) +             \
                            std::string(" ") + std::string(#pointer) +          \
                            " is null.");                                       \
   }
 #endif
 
 #ifndef SEND_ERROR_TO_BE
-#define SEND_ERROR_TO_BE(server_proxy, client_socket_id, err)                   \
+#define SEND_ERROR_TO_BE(server_proxy, client_socket_id, err)           \
 if (nullptr != server_proxy && !std::string(err).empty()) {             \
     MsgString msgErr;                                                   \
     msgErr.set_context(err);                                            \
     const int buffer_size = msgErr.ByteSize();                          \
     if (buffer_size > 0) {                                              \
         IPCDataHeader header;                                           \
-        header.receiver = (client_socket_id);                                   \
+        header.receiver = (client_socket_id);                           \
         header.msg_id = COMMAND_ID_DB_SEND_ERROR;                       \
         header.data_len = buffer_size;                                  \
         char* buffer = new char[buffer_size];                           \
