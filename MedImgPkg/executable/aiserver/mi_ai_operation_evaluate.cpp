@@ -1,5 +1,7 @@
 #include "mi_ai_operation_evaluate.h"
 
+#include <time.h>
+
 #include "util/mi_file_util.h"
 #include "util/mi_memory_shield.h"
 
@@ -123,7 +125,8 @@ int AIOpEvaluate::execute() {
 
     //Preprocess
     if (recal_im_data) {
-        MI_AISERVER_LOG(MI_DEBUG) << "AI lung preprocess";
+        MI_AISERVER_LOG(MI_DEBUG) << "AI lung preprocess start.";
+        clock_t _start = clock();
         char* buffer_im_data = nullptr;
         int buffer_im_data_size = 0;
         if (-1 == wrapper->preprocess(dcm_path.c_str(), buffer_im_data, buffer_im_data_size) ){
@@ -133,6 +136,8 @@ int AIOpEvaluate::execute() {
             msg_res.set_err_msg("AI lung preprocess failed.");
             return notify_dbs(msg_res, controller);
         }
+        clock_t _end = clock();
+        MI_AISERVER_LOG(MI_DEBUG) << "AI lung preprocess end. cost " << double(_end-_start)/CLOCKS_PER_SEC << " s.";
 
         MemShield shield(buffer_im_data);
         if (0 != FileUtil::write_raw(ai_im_data_path, buffer_im_data, buffer_im_data_size)) {
@@ -144,7 +149,8 @@ int AIOpEvaluate::execute() {
     }
 
     //Evaluate
-    MI_AISERVER_LOG(MI_DEBUG) << "AI lung evalulate";
+    MI_AISERVER_LOG(MI_DEBUG) << "AI lung evalulate start.";
+    clock_t _start = clock();
     medical_ai::AILungEvaulatePyWrapper::VPredictedNodules nodules;
     if(-1 == wrapper->evaluate(ai_im_data_path.c_str(), nodules)) {
         const char* err = wrapper->get_last_err();
@@ -153,6 +159,8 @@ int AIOpEvaluate::execute() {
         msg_res.set_err_msg("evalulate series failed.");
         return notify_dbs(msg_res, controller);
     }
+    clock_t _end = clock();
+    MI_AISERVER_LOG(MI_DEBUG) << "AI lung evalulate end. cost " << double(_end-_start)/CLOCKS_PER_SEC << " s.";
 
     //encode and write to disk
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
