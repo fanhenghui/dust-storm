@@ -1,5 +1,7 @@
 #include "mi_nodule_set_parser.h"
 
+#include <set>
+
 #include "boost/algorithm/string.hpp"
 #include "boost/format.hpp"
 #include "boost/tokenizer.hpp"
@@ -8,6 +10,7 @@
 #include "util/mi_string_number_converter.h"
 
 #include "mi_nodule_set.h"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -39,96 +42,128 @@ NoduleSetParser::~NoduleSetParser() {}
 
 IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
                                       std::shared_ptr<NoduleSet>& nodule_set) {
-    std::fstream in(file_path.c_str(), std::ios::in);
+    ////////////////////////////////////////////////////////////////////////
+    //Columen char
+    //seriesuid: (Not NULL) series ID
+    //noduleuid: (optional) useless yet
+    //coordX: (Not NULL) sphere center X
+    //coordY: (Not NULL) sphere center Y
+    //coordZ: (Not NULL) sphere center Z
+    //diameter_mm/radius: (Alternative) LUNA lung set use diameter_mm; AI evaluation use radius
+    //Type: (optinal) user annotation set; AI can't evaluate yet)
+    //probability:(optinal) AI evaluated
+    ////////////////////////////////////////////////////////////////////////
+    typedef struct InnerItem_ {
+        std::string series_id;
+        double cx;
+        double cy;
+        double cz;
+        double diameter;
+        double probability;
+        std::string type;
+    
+        InnerItem_():cx(0),cy(0),cz(0),diameter(0),probability(0) {};
+    } InnerItem;
+    std::vector<InnerItem> items;
+    std::vector<std::string> column_name;
+    std::set<std::string> column_set;
 
+    std::ifstream in(file_path.c_str(), std::ios::in);
     if (!in.is_open()) {
         return IO_FILE_OPEN_FAILED;
     }
-
-    nodule_set->clear_nodule();
     // series uid,nodule uid,coordX,coordY,coordZ,diameter_mm,Type
     std::string line;
     std::getline(in, line);
     std::vector<std::string> infos;
     boost::split(infos, line, boost::is_any_of(","));
-    const size_t nodule_file_type = infos.size();
+    
+    for (size_t i = 0; i < infos.size(); ++i) {
+        column_set.insert(infos[i]);
+        column_name.push_back(infos[i]);
+    }
+    const size_t column_num = column_set.size();
 
-    //TODO should double check table header
-    if (nodule_file_type != 7 && nodule_file_type != 5 && nodule_file_type != 6) {
+    //check header(not null)
+    const static int COLUMNS_NOT_NULL_NUM = 4;
+    const static std::string COLUMNS_NOT_NULL_STR[COLUMNS_NOT_NULL_NUM] = {"seriesuid", "coordX", "coordY", "coordZ"};  
+    int pass = 0;
+    for (int i = 0; i<4; ++i ) {
+        if (column_set.find(COLUMNS_NOT_NULL_STR[i]) != column_set.end()) {
+            ++pass;
+        } else {
+            break;
+        }
+    }
+    if(pass != COLUMNS_NOT_NULL_NUM) {
+        MI_IO_LOG(MI_ERROR) << "csv file header column check failed.";
         in.close();
-        return IO_UNSUPPORTED_YET;
+        return IO_DATA_DAMAGE;
+    }
+    //check radius or diameter
+    if (!(column_set.find("radius") != column_set.end() || 
+          column_set.find("diameter_mm") != column_set.end()) ) {
+        in.close();
+        MI_IO_LOG(MI_ERROR) << "csv file has no radius/diameter_mm column.";
+        return IO_DATA_DAMAGE;
     }
 
-    std::string series_id;
-    double pos_x, pos_y, pos_z, diameter;
-    std::string separate;
-    std::string type;
-    StrNumConverter<double> str_num_converter;
-
+    StrNumConverter<double> num_converter;    
     while (std::getline(in, line)) {
         std::vector<std::string> infos;
         boost::split(infos, line, boost::is_any_of(","));
 
-        if (infos.size() != nodule_file_type) {
-            in.close();
-            return IO_DATA_DAMAGE;
+        if (column_num != infos.size()) {
+            MI_IO_LOG(MI_ERROR) << "csv file column damage: " << line;
+            continue;
         }
 
-        if (7 == nodule_file_type) { // Mine nodule list file
-            series_id = infos[0];
-
-            // Check series id
-            if (!_series_id.empty()) {
-                if (series_id != _series_id) {
-                    return IO_UNMATCHED_FILE;
-                }
+        std::string item_name;
+        InnerItem item;
+        for(size_t i=0; i < infos.size(); ++i) { 
+            item_name = column_name[i];
+            const std::string& column_value = infos[i];
+            if (item_name == "seriesuid") {
+                item.series_id = column_value;
+            } else if (item_name == "coordX") {
+                item.cx = num_converter.to_num(column_value);
+            } else if (item_name == "coordY") {
+                item.cy = num_converter.to_num(column_value);
+            } else if (item_name == "coordZ") {
+                item.cz = num_converter.to_num(column_value);
+            } else if (item_name == "radius") {
+                item.diameter = num_converter.to_num(column_value)*2.0;
+            } else if (item_name == "diameter_mm") {
+                item.diameter = num_converter.to_num(column_value);
+            } else if (item_name == "probability") {
+                item.probability = num_converter.to_num(column_value);
+            } else if (item_name == "type" || item_name == "Type") {
+                item.type = column_value;
             }
+        }
 
-            //double id = str_num_converter.to_num(infos[1]);
-            pos_x = str_num_converter.to_num(infos[2]);
-            pos_y = str_num_converter.to_num(infos[3]);
-            pos_z = str_num_converter.to_num(infos[4]);
-            diameter = str_num_converter.to_num(infos[5]);
-            type = infos[6];
-            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, type);
-            voi.para0 = 1.0f;
-            nodule_set->add_nodule(voi);
-        } else if (5 == nodule_file_type) { // Luna nodule list file
-            series_id = infos[0];
-
-            // Check series id
-            if (series_id != _series_id) {
-                continue;
-            }
-
-            pos_x = str_num_converter.to_num(infos[1]);
-            pos_y = str_num_converter.to_num(infos[2]);
-            pos_z = str_num_converter.to_num(infos[3]);
-            diameter = str_num_converter.to_num(infos[4]);
-            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, "W");
-            voi.para0 = 1.0f;
-            nodule_set->add_nodule(voi);
-        } else if (6 == nodule_file_type) { //Mine nodule list file without type without nodule id
-            series_id = infos[0];
-            // Check series id
-            if (!_series_id.empty()) {
-                if (series_id != _series_id) {
-                    return IO_UNMATCHED_FILE;
-                }
-            }
-
-            pos_x = str_num_converter.to_num(infos[1]);
-            pos_y = str_num_converter.to_num(infos[2]);
-            pos_z = str_num_converter.to_num(infos[3]);
-            diameter = str_num_converter.to_num(infos[4])*2.0;
-            const float possibility = str_num_converter.to_num(infos[5]);
-            VOISphere voi(Point3(pos_x, pos_y, pos_z), diameter, "unknown");
-            voi.para0 = possibility;
-            nodule_set->add_nodule(voi);
+        if (_series_id.empty()) {
+            items.push_back(item);
+        } else if( item.series_id == _series_id) {
+            items.push_back(item);
         }
     }
 
     in.close();
+
+    if (items.empty()) {
+        //TODO 这种情况怎么处理(没有数据条目)
+        MI_IO_LOG(MI_WARNING) << "load empty csv result.";
+        return IO_SUCCESS;
+    }
+
+    nodule_set->clear_nodule();
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        const InnerItem& item = *it;
+        VOISphere voi(Point3(item.cx, item.cy, item.cz), item.diameter, item.type);\
+        voi.para0 = item.probability;
+        nodule_set->add_nodule(voi);
+    }
 
     return IO_SUCCESS;
 }
@@ -142,16 +177,40 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path,
     if (!out.is_open()) {
         return IO_FILE_OPEN_FAILED;
     } else {
-        const std::vector<VOISphere>& nodules = nodule_set->get_nodule_set();
-        out << "seriesuid,noduleuid,coordX,coordY,coordZ,diameter_mm,Type\n";
+        const std::vector<VOISphere>& nodules = nodule_set->get_nodule_set();        
+        out << "seriesuid,coordX,coordY,coordZ,radius";
+        bool has_type = false;
+        bool has_probablity = false;
+        float probability_sum = 0;
+        for (auto it = nodules.begin(); it != nodules.end(); ++it) {
+            probability_sum += (*it).para0;
+            if (!has_type && !(*it).name.empty()) {
+                has_type = true;
+            }
+        }
+        has_probablity = probability_sum > 0;
+        if (has_probablity) {
+            out << ",probability";
+        }
+        if (has_type) {
+            out << ",type";
+        }
+        out << std::endl; 
+
+        
         out << std::fixed;
-        int id = 0;
 
         for (auto it = nodules.begin(); it != nodules.end(); ++it) {
             const VOISphere& voi = *it;
-            out << _series_id << "," << id++ << "," << voi.center.x << ","
-                << voi.center.y << "," << voi.center.z << "," << voi.diameter << ","
-                << voi.name << std::endl;
+            out << _series_id << "," << voi.center.x << ","
+                << voi.center.y << "," << voi.center.z << "," << voi.diameter*0.5f;
+            if (has_probablity)  {
+               out << "," << voi.para0;
+            }
+            if (has_type) {
+                out << "," << voi.name;
+            }
+            out << std::endl;
         }
 
         out.close();

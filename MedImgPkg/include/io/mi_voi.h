@@ -10,7 +10,9 @@ struct VOISphere {
     Point3 center;
     double diameter;
     std::string name;
-    float para0;//ext parameter
+    //reserverd
+    //1 means probability in lung nodule
+    float para0;
 
     VOISphere() : center(Point3::S_ZERO_POINT), diameter(0), name(""), para0(0) {}
 
