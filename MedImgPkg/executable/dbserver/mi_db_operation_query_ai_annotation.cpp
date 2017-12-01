@@ -5,7 +5,6 @@
 #include "mi_db_server_controller.h"
 #include "mi_db_evaluatiion_dispatcher.h"
 
-
 MED_IMG_BEGIN_NAMESPACE
 
 DBOpQueryAIAnnotation::DBOpQueryAIAnnotation() {
