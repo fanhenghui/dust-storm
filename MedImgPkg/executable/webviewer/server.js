@@ -62,6 +62,7 @@ wsServer.on('connection', require('./public/be/be-proxy').onWebSocketConnect);
 
 //process quit callback
 process.on('exit', (err)=> {
+    global.dbHandel.closeDB();
     console.log('process exit.');
     require('./public/be/be-proxy').cleanWebSocketConnection();
 });
