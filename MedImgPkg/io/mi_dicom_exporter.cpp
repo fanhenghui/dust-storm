@@ -311,7 +311,14 @@ IOStatus DICOMExporter::save_dicom_as_bitmap(const std::string in_file_name,
 
 void DICOMExporter::anonymous_dicom_data(DcmFileFormatPtr in_fileformat_ptr) {
     for (size_t i = 0; i < _taglist.size(); ++i) {
-        in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], " ");
+        if (_taglist[i] == DCM_PatientName) {
+            in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], "Anonymous");
+        } else if (_taglist[i] == DCM_PatientID) {
+            in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], "Anonymous");
+        } else {
+            in_fileformat_ptr->getDataset()->putAndInsertString(_taglist[i], " ");
+        }
+        
     }
 
     anonymous_all_patient_name(in_fileformat_ptr);
