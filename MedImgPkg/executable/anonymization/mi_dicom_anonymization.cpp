@@ -1,6 +1,8 @@
 #include "boost/filesystem.hpp"
 #include <fstream>
+#ifdef WIN32
 #include <io.h>
+#endif
 #include <iostream>
 #include <sstream>
 
@@ -293,11 +295,11 @@ int main(int argc, char* argv[]) {
 
     int cur_file_id(0);
     int status =
-        anon(src_root, dst_root, ignore_tags, true, cur_file_id, file_sum);
+        anon(src_root, dst_root, ignore_tags, skip_derived, cur_file_id, file_sum);
 
     std::cout << std::endl;
 
-    if (status != 0 || cur_file_id != file_sum) {
+    if (status != 0 || cur_file_id != (int)file_sum) {
         out_log << "DICOM anonymization failed : \n";
         std::cout << "DICOM anonymization failed : \n";
         return -1;

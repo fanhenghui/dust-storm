@@ -19,6 +19,7 @@ subsystem:
 	$(MAKE) -C ./executable/dcmdbimporter
 	$(MAKE) -C ./executable/extractmask
 	$(MAKE) -C ./executable/compressmask
+	$(MAKE) -C ./executable/anonymization
 	$(MAKE) -C ./ut/ai_ut
 	$(MAKE) -C ./ut/dbserver_ut
 	$(MAKE) -C ./ut/appcommon_ut
@@ -43,6 +44,7 @@ subsystem:
 	$(MAKE) -C ./executable/dbserver
 	$(MAKE) -C ./executable/aiserver
 	$(MAKE) -C ./executable/dcmdbimporter
+	$(MAKE) -C ./executable/anonymization
 endif
 
 PHONY.:clean
@@ -61,6 +63,7 @@ clean:
 	$(MAKE) clean -C ./executable/dcmdbimporter
 	$(MAKE) clean -C ./executable/extractmask
 	$(MAKE) clean -C ./executable/compressmask
+	$(MAKE) clean -C ./executable/anonymization
 	$(MAKE) clean -C ./ut/ai_ut
 	$(MAKE) clean -C ./ut/dbserver_ut
 	$(MAKE) clean -C ./ut/appcommon_ut
