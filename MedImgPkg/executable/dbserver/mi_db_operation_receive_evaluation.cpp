@@ -25,7 +25,7 @@ int DBOpReceiveEvaluation::execute() {
 
     MsgEvaluationResponse msg;
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse evaluation response message failed!");
+        DBSERVER_THROW_EXCEPTION("parse evaluation response message failed!");
     }
     if (-1 == dispatcher->receive_evaluation(&msg)) {
         MI_DBSERVER_LOG(MI_DEBUG) << "receive evaluation failed."; 

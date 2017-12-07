@@ -20,7 +20,8 @@ VPATH = $(INCLUDE_ROOT_DIR)
 
 OPERATION_OBJS =  mi_db_operation_query_end.o mi_db_operation_query_preprocess_mask.o \
 mi_db_operation_query_ai_annotation.o mi_db_operation_query_dicom.o mi_db_operation_request_evaluation.o \
-mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o
+mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o \
+mi_db_operation_pacs_fetch.o mi_db_operation_pacs_retrieve.o 
 
 OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o \
 mi_db_evaluatiion_dispatcher.o $(OPERATION_OBJS)

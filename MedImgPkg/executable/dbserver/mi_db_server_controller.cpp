@@ -2,6 +2,8 @@
 
 #include "util/mi_ipc_server_proxy.h"
 
+#include "io/mi_pacs_communicator.h"
+
 #include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_config.h"
@@ -14,6 +16,8 @@
 #include "mi_db_operation_query_ai_annotation.h"
 #include "mi_db_operation_query_preprocess_mask.h"
 #include "mi_db_operation_query_end.h"
+#include "mi_db_operation_pacs_retrieve.h"
+#include "mi_db_operation_pacs_fetch.h"
 
 #include "mi_db_cmd_handler_ais_operating.h"
 #include "mi_db_operation_receive_evaluation.h"
@@ -32,6 +36,7 @@ DBServerController::DBServerController() {
     _thread_model->set_server_proxy_ais(_server_proxy_ais);
     _db.reset(new DB());
     _evaluation_dispatcher.reset(new DBEvaluationDispatcher());
+    _pacs_communicator.reset(new PACSCommunicator());
 }
 
 DBServerController::~DBServerController() {
@@ -51,7 +56,11 @@ void DBServerController::initialize() {
         std::shared_ptr<DBOpQueryPreprocessMask>(new DBOpQueryPreprocessMask()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_QUERY_END, 
         std::shared_ptr<DBOpQueryEnd>(new DBOpQueryEnd()));
-
+    
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_PACS_RETRIEVE, 
+        std::shared_ptr<DBOpPACSRetrieve>(new DBOpPACSRetrieve()));
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_PACS_FETCH, 
+        std::shared_ptr<DBOpPACSFetch>(new DBOpPACSFetch()));
 
     //register cmd handler for AI server
     _server_proxy_ais->register_command_handler(COMMAND_ID_AI_DB_OPERATION, 
@@ -72,6 +81,15 @@ void DBServerController::initialize() {
 
     //set controller to dispatcher
     _evaluation_dispatcher->set_controller(shared_from_this());
+
+    //connect PACS
+    std::string server_ae_title,server_host,client_ae_title;
+    unsigned short server_port(0), client_port(0);
+    AppConfig::instance()->get_pacs_info(server_ae_title, server_host, server_port, client_ae_title, client_port);
+    if(-1 == _pacs_communicator->connect(server_ae_title, server_host, server_port, client_ae_title, client_port)) {
+        MI_DBSERVER_LOG(MI_FATAL) << "connect to PACS failed.";
+        DBSERVER_THROW_EXCEPTION("connect to PACS failed.");
+    }
 }
 
 void DBServerController::run() {
@@ -101,6 +119,10 @@ std::shared_ptr<DB> DBServerController::get_db() {
 
 std::shared_ptr<DBEvaluationDispatcher> DBServerController::get_evaluation_dispatcher() {
     return _evaluation_dispatcher;
+}
+
+std::shared_ptr<PACSCommunicator> DBServerController::get_pacs_communicator() {
+    return _pacs_communicator;
 }
 
 void DBServerController::set_ais_client(unsigned int client) {

@@ -498,6 +498,29 @@
         socketClient.sendData(COMMAND_ID_FE_SEARCH_WORKLIST, 0, 0, null);
     }
 
+    function retrievePACS() {
+        if (!revcBEReady) {
+            console.log('BE not ready!');
+            alert('BE not ready!');
+            return;
+        }
+        socketClient.sendData(COMMAND_ID_FE_PACS_RETRIEVE, 0, 0, null);
+    }
+
+    function fetchPACS() {
+        if (!revcBEReady) {
+            console.log('BE not ready!');
+            alert('BE not ready!');
+            return;
+        }
+
+        let series = $('#table-pacs tbody tr.success td:nth-child(3)').html();
+        if (!series) {
+            alert('please choose one series to fetch.');
+            reutrn;
+        }
+    }
+
     function playVR() {
         socketClient.sendData(COMMAND_ID_FE_VR_PLAY, 0, 3, null);
     }
@@ -857,21 +880,70 @@
             };
         }
 
+        function backToLogin() {
+            let subpage = document.getElementById('subpage').innerHTML;
+            window.location.href = subpage+'/login';
+        }
+
         let loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
-            loginBtn.onclick = function(event) {
-                let subpage = document.getElementById('subpage').innerHTML;
-                window.location.href = subpage+'/login';
+            loginBtn.onclick = function() {
+                backToLogin();
             }
         }
         loginBtn = document.getElementById('btn-login-1');
         if (loginBtn) {
-            loginBtn.onclick = function(event) {
-                let subpage = document.getElementById('subpage').innerHTML;
-                window.location.href = subpage+'/login';
+            loginBtn.onclick = function() {
+                backToLogin();
             }
         }
-        
+
+        loginBtn = document.getElementById('btn-login-2');
+        if (loginBtn) {
+            loginBtn.onclick = function() {
+                backToLogin();
+            }
+        }
+
+        function rollDBPACS() {
+            if (document.getElementById('pacs-div').hidden) {
+                document.getElementById('pacs-div').hidden = false;
+                document.getElementById('worklist-div').hidden = true;
+                document.getElementById('review-div').hidden = true;
+            } else {
+                document.getElementById('pacs-div').hidden = true;
+                document.getElementById('worklist-div').hidden = false;
+                document.getElementById('review-div').hidden = true;
+            }
+        }
+
+        let pacsBtn = document.getElementById('btn-pacs-0');
+        if (pacsBtn) {
+            pacsBtn.onclick = function() {
+                rollDBPACS();
+            }
+        }
+        pacsBtn = document.getElementById('btn-pacs-1');
+        if (pacsBtn) {
+            pacsBtn.onclick = function() {
+                rollDBPACS();
+            }
+        }
+
+        let queryPACSBtn = document.getElementById('btn-retrieve-pacs');
+        if (queryPACSBtn) {
+            queryPACSBtn.onclick = function() {
+                retrievePACS();
+            }
+        }
+
+        let fetchPACSBtn = document.getElementById('btn-fetch-pacs');
+        if (fetchPACSBtn) {
+            fetchPACSBtn.onclick = function() {
+                fetchPACS();
+            }
+        }
+
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();

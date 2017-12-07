@@ -33,6 +33,8 @@
 #include "appcommon/mi_cmd_handler_recv_dbs_end_signal.h"
 #include "appcommon/mi_cmd_handler_recv_dbs_error.h"
 #include "appcommon/mi_cmd_handler_recv_dbs_preprocess_mask.h"
+#include "appcommon/mi_cmd_handler_pacs_retrieve.h"
+#include "appcommon/mi_cmd_handler_pacs_fetch.h"
 
 #include "mi_operation_init.h"
 
@@ -53,33 +55,35 @@ void ReviewController::initialize() {
 void ReviewController::register_command_handler_i() {
     // Register command handler
     std::shared_ptr<AppController> app_controller = shared_from_this();
-    std::shared_ptr<CmdHandlerHeartbeat> handler_heart_beat(
-        new CmdHandlerHeartbeat(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_HEARTBEAT, handler_heart_beat);
+    ;
+    _proxy->register_command_handler(COMMAND_ID_FE_HEARTBEAT, 
+    std::shared_ptr<CmdHandlerHeartbeat>(new CmdHandlerHeartbeat(app_controller)));
 
-    std::shared_ptr<CmdHandlerFEReady> handler_ready(
-        new CmdHandlerFEReady(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_READY, handler_ready);
+    _proxy->register_command_handler(COMMAND_ID_FE_READY, 
+    std::shared_ptr<CmdHandlerFEReady>(new CmdHandlerFEReady(app_controller)));
 
-    std::shared_ptr<CmdHandlerShutdown> handler_shutdown(
-        new CmdHandlerShutdown(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_SHUT_DOWN, handler_shutdown);
+    _proxy->register_command_handler(COMMAND_ID_FE_SHUT_DOWN,
+    std::shared_ptr<CmdHandlerShutdown>(new CmdHandlerShutdown(app_controller)));
 
-    std::shared_ptr<CmdHandlerOperating> handler_operation(
-        new CmdHandlerOperating(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, handler_operation);
+    _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, 
+    std::shared_ptr<CmdHandlerOperating>(new CmdHandlerOperating(app_controller)));
 
-    std::shared_ptr<CmdHandlerVRPlay> handler_vr_play(
-        new CmdHandlerVRPlay(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_VR_PLAY, handler_vr_play);
+    _proxy->register_command_handler(COMMAND_ID_FE_VR_PLAY,
+    std::shared_ptr<CmdHandlerVRPlay>(new CmdHandlerVRPlay(app_controller)));
 
-    std::shared_ptr<CmdHandlerSearchWorklist> handler_search_worklist(
-        new CmdHandlerSearchWorklist(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_SEARCH_WORKLIST, handler_search_worklist);
+    _proxy->register_command_handler(COMMAND_ID_FE_SEARCH_WORKLIST,
+    std::shared_ptr<CmdHandlerSearchWorklist>(new CmdHandlerSearchWorklist(app_controller)));
 
-    std::shared_ptr<CmdHandlerBackToWorklist> handler_back_to_worklist(
-        new CmdHandlerBackToWorklist(app_controller));
-    _proxy->register_command_handler(COMMAND_ID_FE_BACK_TO_WORKLIST, handler_back_to_worklist);
+    _proxy->register_command_handler(COMMAND_ID_FE_BACK_TO_WORKLIST, 
+    std::shared_ptr<CmdHandlerBackToWorklist> (new CmdHandlerBackToWorklist(app_controller)));
+
+    _proxy->register_command_handler(COMMAND_ID_FE_PACS_RETRIEVE, 
+    std::shared_ptr<CmdHandlerPACSRetrieve>(new CmdHandlerPACSRetrieve(app_controller)));
+
+    _proxy->register_command_handler(COMMAND_ID_FE_PACS_FETCH, 
+    std::shared_ptr<CmdHandlerPACSFetch>(new CmdHandlerPACSFetch(app_controller)));
+
+
 
     // Register operation
     OperationFactory::instance()->register_operation(

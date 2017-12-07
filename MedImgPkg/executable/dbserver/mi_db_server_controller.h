@@ -12,6 +12,7 @@ class DBServerThreadModel;
 class IPCServerProxy;
 class DB;
 class DBEvaluationDispatcher;
+class PACSCommunicator;
 class DBServerController : public IController, public std::enable_shared_from_this<DBServerController> {
 public:
     DBServerController();
@@ -26,6 +27,7 @@ public:
     std::shared_ptr<IPCServerProxy> get_server_proxy_ais();
     std::shared_ptr<DB> get_db();
     std::shared_ptr<DBEvaluationDispatcher> get_evaluation_dispatcher();
+    std::shared_ptr<PACSCommunicator> get_pacs_communicator();
 
     void set_ais_client(unsigned int client);
     unsigned int get_ais_client() const;
@@ -41,6 +43,9 @@ private:
     std::shared_ptr<DBEvaluationDispatcher> _evaluation_dispatcher;
     //AIS socket ID
     unsigned int _ais_client;
+
+    //PACS module
+    std::shared_ptr<PACSCommunicator> _pacs_communicator;
 };
 
 MED_IMG_END_NAMESPACE

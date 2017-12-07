@@ -26,7 +26,7 @@ int DBOpQueryDICOM::execute() {
 
     MsgString msg;
     if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse series message failed!");
+        DBSERVER_THROW_EXCEPTION("parse series message failed!");
     }
     const std::string series_id = msg.context();
     msg.Clear();
