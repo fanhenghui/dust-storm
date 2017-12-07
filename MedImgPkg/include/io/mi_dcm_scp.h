@@ -6,17 +6,19 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class MIDcmSCP : public DcmStorageSCP {
+class IO_Export MIDcmSCP : public DcmStorageSCP {
 public:
-    IO_Export MIDcmSCP(const char* self_AE_title);
-    IO_Export ~MIDcmSCP() {};
-    IO_Export void initialize(const unsigned short port);
+    MIDcmSCP();
+    virtual ~MIDcmSCP();
+
+    void stop();
+
+protected:
+    virtual OFCondition handleIncomingCommand(T_DIMSE_Message* incomingMsg, const DcmPresentationContextInfo& presInfo);
+    virtual OFBool stopAfterCurrentAssociation();
 
 private:
-    virtual OFCondition
-    handleIncomingCommand(T_DIMSE_Message* incomingMsg,
-                          const DcmPresentationContextInfo& presInfo);
-    void start_listening(const unsigned short port);
+    bool _stop;
 };
 
 MED_IMG_END_NAMESPACE

@@ -20,7 +20,7 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 DATA_OBJS = mi_image_data.o mi_dicom_rt_struct.o
 DATA_PARSER_OBJS = mi_meta_object_loader.o mi_dicom_exporter.o mi_dicom_loader.o mi_dicom_rt_struct_loader.o \
 mi_nodule_set_parser.o mi_zlib_utils.o mi_jpeg_parser.o mi_targa_parser.o mi_mysql_db.o
-PACS_OBJS = mi_dcm_scu.o mi_dcm_scp.o mi_worklist_info.o mi_pacs_communicator.o
+PACS_OBJS = mi_dcm_scu.o mi_dcm_scp.o mi_pacs_communicator.o
 OBJS = $(DATA_OBJS) $(DATA_PARSER_OBJS) $(PACS_OBJS)
 
 TARGET = $(BIN_DIR)/libmedimg_io.so
@@ -46,10 +46,7 @@ mi_dcm_scu.o: mi_dcm_scu.cpp mi_dcm_scu.h
 mi_dcm_scp.o: mi_dcm_scp.cpp mi_dcm_scp.h 
 	$(CC) -c -fPIC $(CFLAGS) mi_dcm_scp.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_worklist_info.o: mi_worklist_info.cpp mi_worklist_info.h 
-	$(CC) -c -fPIC $(CFLAGS) mi_worklist_info.cpp $(ADDITINAL_INCLUDE_DIR)
-
-mi_pacs_communicator.o: mi_pacs_communicator.cpp mi_pacs_communicator.h mi_worklist_info.o mi_dcm_scp.o mi_dcm_scu.o
+mi_pacs_communicator.o: mi_pacs_communicator.cpp mi_pacs_communicator.h 
 	$(CC) -c -fPIC $(CFLAGS) mi_pacs_communicator.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean

@@ -11,7 +11,6 @@
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
 #include "io/mi_pacs_communicator.h"
-#include "io/mi_worklist_info.h"
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
 

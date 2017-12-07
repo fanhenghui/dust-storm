@@ -1,6 +1,5 @@
-#include "dcmtk/oflog/oflog.h"
 #include "io/mi_pacs_communicator.h"
-#include "io/mi_worklist_info.h"
+#include "io/mi_io_logger.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -20,44 +19,64 @@ int pacs_ut(int argc, char* argv[]) {
     chdir(dirname(argv[0]));
 #endif
 
-    OFLog::configure(OFLogger::DEBUG_LOG_LEVEL);
+    const std::string PACSServerAETitle = "DCM4CHEE";
+    const std::string PACSServerHost = "172.23.232.71";
+    const unsigned short PACSServerPort = 11112;
+    const std::string PACSClientAETitle = "DBS";
+    const unsigned short PACSClientPort = 11115;
 
-    PACSCommunicator test;
+    PACSCommunicator pacs_comm;
+    if(-1 == pacs_comm.connect(PACSServerAETitle, PACSServerHost, PACSServerPort, PACSClientAETitle, PACSClientPort)) {
+        return -1;
+    }
 
-    if (test.initialize(
-                "../config/pacs_config")) // alternative:test.initialize("SelfSCU",
-        // 11115, "172.20.70.27", 11112,
-        // "DCM4CHEE");
-    {
-        test.populate_whole_work_list();
-        const std::vector<WorkListInfo>& ls = test.get_work_list();
+    std::vector<DcmInfo> dcm_infos;
+    if(-1 == pacs_comm.query_all_series(dcm_infos)) {
+        return -1;
+    }
 
-        for (auto it = ls.begin(); it != ls.end(); ++it) {
-            std::cout << it->GetStudyInsUID() << "   " << it->GetSeriesInsUID()
-                      << std::endl;
-        }
+    MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
+    int id = 0;
+    for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
+        const std::string series_id = (*it).series_id;
+        MI_IO_LOG(MI_DEBUG) << id++ << series_id;
+    }
+    MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
 
-        int series_uid_idx = 1;
-
-        // std::string output = test.fetch_dicom(ls[series_uid_idx]);
-        // if (output == "")
-        // {
-        //     //break;
-        // }
-        // else
-        // {
-        //     std::cout << "Output directory : " << output << std::endl;
-        // }
-        while (std::cin >> series_uid_idx) {
-            std::string output = test.fetch_dicom(ls[series_uid_idx]);
-
-            if (output == "") {
-                break;
-            } else {
-                std::cout << "Output directory : " << output << std::endl;
+    int query_id = -1;
+    while (std::cin >> query_id) {
+        if (query_id == -1) {
+            MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
+            int id = 0;
+            for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
+                const std::string series_id = (*it).series_id;
+                MI_IO_LOG(MI_DEBUG) << id++ << series_id;
             }
+            MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
+        } else if(query_id == -2) {
+            MI_IO_LOG(MI_INFO) << "query all series again.";
+            if(-1 == pacs_comm.query_all_series(dcm_infos)) {
+                return -1;
+            }
+            MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
+            int id = 0;
+            for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
+                const std::string series_id = (*it).series_id;
+                MI_IO_LOG(MI_DEBUG) << "ID: "<< id++ << "  SeriesID: "<< series_id;
+            }
+            MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
+        } else if(query_id == -3) {
+            pacs_comm.disconnect();
+            break;
+        } else if(query_id >= 0 && query_id < id) {
+            MI_IO_LOG(MI_DEBUG) << "fetch series: " << dcm_infos[query_id].series_id;
+            pacs_comm.fetch_series(dcm_infos[query_id].series_id, "/home/wangrui22/data/cache");
+        } else {
+            MI_IO_LOG(MI_WARNING) << "invalid query ID.";
         }
     }
+
+    MI_IO_LOG(MI_INFO) << "DONE.";
 
     return 0;
 }

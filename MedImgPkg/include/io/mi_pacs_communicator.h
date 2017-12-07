@@ -1,43 +1,46 @@
 #ifndef MEDIMGIO_PACS_COMMUNICATOR_H
 #define MEDIMGIO_PACS_COMMUNICATOR_H
 
-#include "io/mi_io_export.h"
-#include <memory>
 #include <string>
 #include <vector>
+#include <memory>
+#include <boost/thread/thread.hpp>
 
+#include "io/mi_io_export.h"
+#include "io/mi_dicom_info.h"
+#include "io/mi_io_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class MIDcmSCP;
 class MIDcmSCU;
-class WorkListInfo;
-
+class MIDcmSCP;
 class IO_Export PACSCommunicator {
 public:
-    PACSCommunicator();
+    explicit PACSCommunicator(bool open_dcmtk_console_log=false);
     ~PACSCommunicator();
 
-    bool initialize(const char* configure_file_path);
-    bool initialize(const char* self_AE_title, const unsigned short self_port,
-                    const char* serive_ip_address,
-                    const unsigned short serive_port,
-                    const char* service_AE_title);
+    int connect(const std::string& server_ae_title,const std::string& server_host, unsigned short server_port,
+                const std::string& client_ae_title, unsigned short client_port);
+    void disconnect();
 
-    bool populate_whole_work_list();
-    const std::vector<WorkListInfo>& get_work_list() {
-        return _work_list;
-    };
-
-    const std::string fetch_dicom(const std::string& series_idx);
-    const std::string fetch_dicom(const WorkListInfo& item);
+    int query_all_series(std::vector<DcmInfo>& dcm_infos);
+    int fetch_series(const std::string& series_id, const std::string& map_path);
 
 private:
-    bool _initialized;
+    int try_connect_i();
+    void run_scp_i();
+
+private:
+    struct ConnectionCache;
+    std::unique_ptr<ConnectionCache> _connection_cache;
     std::unique_ptr<MIDcmSCP> _scp;
     std::unique_ptr<MIDcmSCU> _scu;
-    std::vector<WorkListInfo> _work_list;
-    std::string _cache_path;
+    std::string _series_to_release_scp;
+
+    boost::thread _scp_thread;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(PACSCommunicator);
 };
 
 MED_IMG_END_NAMESPACE
