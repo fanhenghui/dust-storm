@@ -166,7 +166,7 @@ int PACSCommunicator::try_connect_i() {
     return 0;
 }
 
-int PACSCommunicator::query_all_series(std::vector<DcmInfo>& dcm_infos) {
+int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
     if(0 != try_connect_i() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before query all series.";
         return -1;

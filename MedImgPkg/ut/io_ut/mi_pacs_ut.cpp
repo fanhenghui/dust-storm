@@ -20,7 +20,7 @@ int pacs_ut(int argc, char* argv[]) {
 #endif
 
     const std::string PACSServerAETitle = "DCM4CHEE";
-    const std::string PACSServerHost = "172.23.232.71";
+    const std::string PACSServerHost = "192.168.199.107";
     const unsigned short PACSServerPort = 11112;
     const std::string PACSClientAETitle = "DBS";
     const unsigned short PACSClientPort = 11115;
@@ -31,7 +31,7 @@ int pacs_ut(int argc, char* argv[]) {
     }
 
     std::vector<DcmInfo> dcm_infos;
-    if(-1 == pacs_comm.query_all_series(dcm_infos)) {
+    if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
         return -1;
     }
 
@@ -55,7 +55,7 @@ int pacs_ut(int argc, char* argv[]) {
             MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
         } else if(query_id == -2) {
             MI_IO_LOG(MI_INFO) << "query all series again.";
-            if(-1 == pacs_comm.query_all_series(dcm_infos)) {
+            if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
                 return -1;
             }
             MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";

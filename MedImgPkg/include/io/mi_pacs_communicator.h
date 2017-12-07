@@ -23,7 +23,7 @@ public:
                 const std::string& client_ae_title, unsigned short client_port);
     void disconnect();
 
-    int query_all_series(std::vector<DcmInfo>& dcm_infos);
+    int retrieve_all_series(std::vector<DcmInfo>& dcm_infos);
     int fetch_series(const std::string& series_id, const std::string& map_path);
 
 private:
