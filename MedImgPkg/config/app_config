@@ -39,3 +39,9 @@ PossibilityThreshold = 0.97
 PytorchPath = /home/wangrui22/anaconda2/envs/pytorch
 PyInterfacePath = /home/wangrui22/program/git/luna_detect/training
 
+#DBS<=>PACS(work on DBS)
+PACSServerAETitle = DCM4CHEE
+PACSServerHost = 172.23.232.71
+PACSServerPort = 11112
+PACSClientAETitle = DBS
+PACSClientPort = 11115

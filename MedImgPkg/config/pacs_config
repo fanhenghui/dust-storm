@@ -1,6 +1,0 @@
-Client_Port = 11115
-Client_Title = DBS
-Server_Host = 192.168.199.107
-Server_Port = 11112
-Server_Title = DCM4CHEE
-Cache_Path = /home/wangrui22/data/cache

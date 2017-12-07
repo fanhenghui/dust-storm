@@ -13,26 +13,38 @@ public:
     ~AppConfig();
 
     std::string get_config_root() const;
-    std::string get_log_config_file() const;
     std::string get_test_data_root() const;
 
+    //For LOG module
+    std::string get_log_config_file() const;
+
+    //For DB module
     void get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path);
     void get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name);
     void get_db_server_host(std::string& ip, std::string& port);
 
+    //For Render Module
     int get_expected_fps() const;
-    float get_nodule_possibility_threshold() const;
 
+    //For AI Module
+    float get_nodule_possibility_threshold() const;
     std::string get_pytorch_path() const;
     std::string get_py_interface_path() const;
+
+    //For DBS <=> PACS
+    void get_pacs_info(std::string& server_ae_title, std::string& server_host ,unsigned short& server_port,
+    std::string& client_ae_title, unsigned short& client_port);
+
 private:
     AppConfig();
+    void init_i();
+
     static AppConfig* _instance;
     static boost::mutex _mutex;
 
 private:
+    //For debug
     std::string _test_data_root;
-    float _nodule_possibility_threshold;
 
     //DB info
     std::string _db_ip;
@@ -54,9 +66,17 @@ private:
 
     int _expected_fps;
 
+    //AI server
+    float _nodule_possibility_threshold;
     std::string _pytorch_path;//anaconda/envs
     std::string _py_interface_path;
-    
+
+    //DBS <=> PACS
+    std::string _pacs_server_ae_title;
+    std::string _pacs_server_host;
+    unsigned short _pacs_server_port;
+    std::string _pacs_client_ae_title;
+    unsigned short _pacs_client_port;  
 };
 
 MED_IMG_END_NAMESPACE
