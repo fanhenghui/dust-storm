@@ -151,11 +151,21 @@ int PACSCommunicator::try_connect_i() {
         return -1;
     }
 
+    //Default connection timeout is -1(block until connected/refused)
+    //Here set non-blocking mode to make progress going
+    //DBS communicate with PACS will try connect before DIMSE 
+    const int connection_timeout = _scu->getConnectionTimeout();
+    //MI_IO_LOG(MI_DEBUG) << "SCU old connection timeout is " << connection_timeout << ".";//
+    _scu->setConnectionTimeout(5);
+    MI_IO_LOG(MI_INFO) << "SCU negotiating association in 5s.";
     result = _scu->negotiateAssociation();
+    _scu->setConnectionTimeout(connection_timeout);
+
     if (result.bad()) {
         MI_IO_LOG(MI_FATAL) << "SCU negotiate association failed.";
         return -1;
     }
+    MI_IO_LOG(MI_INFO) << "SCU negotiating association success.";
 
     result = _scu->sendECHORequest(0);
     if (result.bad()) {

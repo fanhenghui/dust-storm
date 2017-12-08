@@ -92,7 +92,7 @@ void DBServerController::initialize() {
     unsigned short server_port(0), client_port(0);
     AppConfig::instance()->get_pacs_info(server_ae_title, server_host, server_port, client_ae_title, client_port);
     if(-1 == _pacs_communicator->connect(server_ae_title, server_host, server_port, client_ae_title, client_port)) {
-        MI_DBSERVER_LOG(MI_FATAL) << "Connect to PACS {AET: " << server_ae_title << "; URL: " << server_host << ":" << server_port << "} success.";
+        MI_DBSERVER_LOG(MI_FATAL) << "Connect to PACS {AET: " << server_ae_title << "; URL: " << server_host << ":" << server_port << "} failed.";
         //Start with disconnect.
         //DBSERVER_THROW_EXCEPTION("connect to PACS failed.");
     }
