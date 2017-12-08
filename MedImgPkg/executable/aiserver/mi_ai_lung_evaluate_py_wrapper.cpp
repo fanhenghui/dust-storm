@@ -6,6 +6,7 @@ namespace medical_ai{
 // env settings
 //
 const char* INTERFACE_MODULE                          = "interface";
+
 // working methods
 const char* PREPROCESS_NEW_IMG_TOBUFFER_METHOD        = "cpp_preprocess_dicomdir_tobuffer";
 const char* EVALUATE_NEW_IMG_METHOD_TOVEC             = "cpp_evaluate_newimage_tovec";
@@ -30,22 +31,17 @@ int AILungEvaulatePyWrapper::init(const char* py_home, const char* interface_pat
     // doing python work
     //
     Py_Initialize();
-
-    // ugly, but no other choices since we are using python27
-    // Py_SetPath is only provided for python3
-    // should be used as:
-    //    char python_path[1024];
-    //    char* orig_path = Py_GetPath();
-    //    int nRet = snprintf(python_path, 1024, "%s:%s", orig_path, LUNA_INTERFACE_PATH);
-    //    Py_SetPath(python_path);
-    char cCommand[MAX_PATH];
-    int nRet = snprintf(cCommand, MAX_PATH, "sys.path.append('%s')", interface_path);
-    if (nRet >= MAX_PATH) { 
-        set_err("cCommand out of index");
-        return -1;
+    if (!Py_IsInitialized()){
+        set_err("python not initialized");
     }
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString(cCommand);
+
+    // setting down python path
+    char python_path[MAX_PATH];
+    char site_packages_path[MAX_PATH];
+    char* orig_path = Py_GetPath();
+    snprintf(site_packages_path, MAX_PATH, "%s/%s", py_home, "lib/python2.7/site-packages");
+    snprintf(python_path, MAX_PATH, "%s:%s:%s", orig_path, interface_path, site_packages_path);
+    PySys_SetPath(python_path);
 
     //
     // now, we are all setting down
@@ -77,23 +73,22 @@ PyObject* AILungEvaulatePyWrapper::get_func_inmodule(const char *strFunName)
 void AILungEvaulatePyWrapper::clean_module()
 {
     finalize_pyinterface();
-
-    PyImport_Cleanup();
-    Py_Finalize();
+    Py_DECREF(_module);
+    //Py_Finalize();
 }
 
 int AILungEvaulatePyWrapper::initilize_interface()
 {
     int nRet = -1;
     PyObject* pFunc = get_func_inmodule(INITIALIZE_INTERFACE);
-    if (pFunc != NULL)
-    {
+    if (pFunc != NULL) {
         PyObject* pResult = PyObject_CallObject(pFunc, NULL);
-        if (pResult)
-        {
+        if (pResult) {
             PyArg_Parse(pResult, "i", &nRet);
             Py_DECREF(pResult);
         }
+
+        Py_DECREF(pFunc);
     }
 
     return  nRet;
@@ -108,6 +103,7 @@ int AILungEvaulatePyWrapper::finalize_pyinterface() {
             PyArg_Parse(pResult, "i", &nRet);
             Py_DECREF(pResult);
         }
+        Py_DECREF(pFunc);
     }
     return  nRet;
 }
@@ -136,6 +132,7 @@ int AILungEvaulatePyWrapper::preprocess(const char *str_fullinputpath, char *&bu
 
             Py_DECREF(pResult);
         }
+        Py_DECREF(pFunc);
         Py_DECREF(pParam);
     }
     return  nRet;
@@ -145,8 +142,7 @@ int AILungEvaulatePyWrapper::evaluate(const char *str_full_inputpath, VPredicted
     v_nodules.clear();
 
     PyObject* pFunc = get_func_inmodule(EVALUATE_NEW_IMG_METHOD_TOVEC);
-    if (pFunc != NULL)
-    {
+    if (pFunc != NULL) {
         PyObject *pParam = Py_BuildValue("(s)", str_full_inputpath);
         PyObject *pResult = PyObject_CallObject(pFunc, pParam);
         if (pResult) {
@@ -182,6 +178,7 @@ int AILungEvaulatePyWrapper::evaluate(const char *str_full_inputpath, VPredicted
             }
             Py_DECREF(pResult);
         }
+        Py_DECREF(pFunc);
         Py_DECREF(pParam);
     }
 
@@ -204,14 +201,13 @@ const char* AILungEvaulatePyWrapper::get_last_err() const {
 const char* AILungEvaulatePyWrapper::get_version() {
     char *str_version = NULL;
     PyObject* pFunc = get_func_inmodule(GET_MODULE_VERSION);
-    if (pFunc != NULL)
-    {
+    if (pFunc != NULL) {
         PyObject* pResult = PyObject_CallObject(pFunc, NULL);
-        if (pResult)
-        {
+        if (pResult) {
             PyArg_Parse(pResult, "s", &str_version);
-            // Py_DECREF(pResult);
+            Py_DECREF(pResult);
         }
+        Py_DECREF(pFunc);
     }
     return  str_version;
 }

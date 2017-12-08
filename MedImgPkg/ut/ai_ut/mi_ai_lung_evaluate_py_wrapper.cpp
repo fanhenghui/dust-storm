@@ -1,4 +1,7 @@
 #include "mi_ai_lung_evaluate_py_wrapper.h"
+#include "log/mi_logger.h"
+
+using namespace medical_imaging;
 
 namespace medical_ai{
 
@@ -31,6 +34,8 @@ int AILungEvaulatePyWrapper::init(const char* py_home, const char* interface_pat
     //
     Py_Initialize();
 
+    
+
     // ugly, but no other choices since we are using python27
     // Py_SetPath is only provided for python3
     // should be used as:
@@ -50,11 +55,13 @@ int AILungEvaulatePyWrapper::init(const char* py_home, const char* interface_pat
     //
     // now, we are all setting down
     //
+    MI_LOG(MI_DEBUG) << "before import module.";
     _module = PyImport_ImportModule(INTERFACE_MODULE);
     if (!_module) {
-        set_err("import python module test failed.");
+        MI_LOG(MI_ERROR) << "import module failed.";
         return -1;
     }
+    MI_LOG(MI_DEBUG) << "after import module.";
 
     // init interface
     initilize_interface();
