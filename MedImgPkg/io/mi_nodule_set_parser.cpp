@@ -62,7 +62,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
         double probability;
         std::string type;
     
-        InnerItem_():cx(0),cy(0),cz(0),diameter(0),probability(0) {};
+        InnerItem_():cx(0),cy(0),cz(0),diameter(0),probability(1.0) {};
     } InnerItem;
     std::vector<InnerItem> items;
     std::vector<std::string> column_name;
@@ -219,8 +219,7 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path,
     return IO_SUCCESS;
 }
 
-IOStatus
-NoduleSetParser::load_as_rsa_binary(const std::string& file_path,
+IOStatus NoduleSetParser::load_as_rsa_binary(const std::string& file_path,
                                     const mbedtls_rsa_context& rsa,
                                     std::shared_ptr<NoduleSet>& nodule_set) {
     IO_CHECK_NULL_EXCEPTION(nodule_set);
