@@ -7,11 +7,11 @@
 
 #include "appcommon/mi_message.pb.h"
 #include "appcommon/mi_app_common_define.h"
+#include "appcommon/mi_operation_interface.h"
 
 #include "mi_db_server_thread_model.h"
 #include "mi_db_server_logger.h"
 #include "mi_db_server_controller.h"
-#include "mi_db_operation_request_evaluation.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -45,6 +45,35 @@ struct ConditionGuard {
 
     ~ConditionGuard() {
         _condition->notify_one();
+    }
+};
+
+class DBOpRequestEvaluation: public IOperation {
+public:
+    DBOpRequestEvaluation() {}
+    virtual ~DBOpRequestEvaluation() {}
+
+    virtual int execute() {
+        DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
+    
+        std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
+        DBSERVER_CHECK_NULL_EXCEPTION(controller);
+        std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_ais();
+
+        IPCPackage* package = new IPCPackage(_header, _buffer);
+        _buffer = nullptr;//move op buffer to IPC package
+
+        if (0 != server_proxy->async_send_data(package)) {
+            delete package;
+            package = nullptr;
+            MI_DBSERVER_LOG(MI_WARNING) << "send request infernce.(client disconnected)";
+        }
+
+        return 0;
+    }
+
+    virtual std::shared_ptr<IOperation> create() {
+        return std::shared_ptr<DBOpRequestEvaluation>(new DBOpRequestEvaluation());
     }
 };
 
