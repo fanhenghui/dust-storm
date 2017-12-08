@@ -28,7 +28,7 @@ int DBOpQueryEnd::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(server_proxy);
 
     IPCDataHeader header;
-    header.msg_id = COMMAND_ID_DB_SEND_END;
+    header.msg_id = COMMAND_ID_BE_DB_SEND_END;
     header.receiver = _header.receiver;
 
     server_proxy->async_send_data(new IPCPackage(header));

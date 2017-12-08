@@ -26,7 +26,7 @@ int CmdHandlerPACSRetrieve::handle_command(const IPCDataHeader& dataheader, char
     //send message to DBS to retrive all DICOM series
     std::vector<IPCPackage*> packages;
     IPCDataHeader header;
-    header.msg_id = COMMAND_ID_BE_DB_OPERATION;
+    header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     header.op_id = OPERATION_ID_DB_PACS_RETRIEVE;
     packages.push_back(new IPCPackage(header));
     controller->get_client_proxy_dbs()->sync_send_data(packages);

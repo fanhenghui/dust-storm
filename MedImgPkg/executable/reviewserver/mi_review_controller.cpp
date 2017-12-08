@@ -56,73 +56,73 @@ void ReviewController::register_command_handler_i() {
     // Register command handler
     std::shared_ptr<AppController> app_controller = shared_from_this();
     ;
-    _proxy->register_command_handler(COMMAND_ID_FE_HEARTBEAT, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_HEARTBEAT, 
     std::shared_ptr<CmdHandlerHeartbeat>(new CmdHandlerHeartbeat(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_READY, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_READY, 
     std::shared_ptr<CmdHandlerFEReady>(new CmdHandlerFEReady(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_SHUT_DOWN,
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_SHUTDOWN,
     std::shared_ptr<CmdHandlerShutdown>(new CmdHandlerShutdown(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_OPERATION, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_OPERATION, 
     std::shared_ptr<CmdHandlerOperating>(new CmdHandlerOperating(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_VR_PLAY,
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_PLAY_VR,
     std::shared_ptr<CmdHandlerVRPlay>(new CmdHandlerVRPlay(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_SEARCH_WORKLIST,
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_RETRIEVE_DB,
     std::shared_ptr<CmdHandlerSearchWorklist>(new CmdHandlerSearchWorklist(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_BACK_TO_WORKLIST, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_BACK_TO_WORKLIST, 
     std::shared_ptr<CmdHandlerBackToWorklist> (new CmdHandlerBackToWorklist(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_PACS_RETRIEVE, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_RETRIEVE_PACS, 
     std::shared_ptr<CmdHandlerPACSRetrieve>(new CmdHandlerPACSRetrieve(app_controller)));
 
-    _proxy->register_command_handler(COMMAND_ID_FE_PACS_FETCH, 
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_FETCH_PACS, 
     std::shared_ptr<CmdHandlerPACSFetch>(new CmdHandlerPACSFetch(app_controller)));
 
 
 
     // Register operation
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
+        OPERATION_ID_BE_FE_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_INIT, std::shared_ptr<OpInit>(new OpInit()));
+        OPERATION_ID_BE_FE_INIT, std::shared_ptr<OpInit>(new OpInit()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
+        OPERATION_ID_BE_FE_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
+        OPERATION_ID_BE_FE_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_PAN, std::shared_ptr<OpPan>(new OpPan()));
+        OPERATION_ID_BE_FE_PAN, std::shared_ptr<OpPan>(new OpPan()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
+        OPERATION_ID_BE_FE_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
+        OPERATION_ID_BE_FE_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_MPR_MASK_OVERLAY, std::shared_ptr<OpMPRMaskOverlay>(new OpMPRMaskOverlay()));
+        OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, std::shared_ptr<OpMPRMaskOverlay>(new OpMPRMaskOverlay()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_SWITCH_PRESET_WINDOWING, std::shared_ptr<OpSwitchPresetWindowing>(new OpSwitchPresetWindowing()));
+        OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, std::shared_ptr<OpSwitchPresetWindowing>(new OpSwitchPresetWindowing()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_SWITCH_PRESET_VRT, std::shared_ptr<OpSwitchPresetVRT>(new OpSwitchPresetVRT()));
+        OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, std::shared_ptr<OpSwitchPresetVRT>(new OpSwitchPresetVRT()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
+        OPERATION_ID_BE_FE_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_DOWNSAMPLE, std::shared_ptr<OpDownsample>(new OpDownsample()));    
+        OPERATION_ID_BE_FE_DOWNSAMPLE, std::shared_ptr<OpDownsample>(new OpDownsample()));    
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
+        OPERATION_ID_BE_FE_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
 
     //register command handler for DBS
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
         std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(app_controller)));
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
     std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(app_controller)));
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
     std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(app_controller)));
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_END, 
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
     std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(app_controller)));
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
     std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(app_controller)));
 }
 

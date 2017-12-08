@@ -62,7 +62,7 @@ void CmdHandlerVRPlay::logic_i(IPCDataHeader header) {
         }
         usleep(50000);//50 ms 的播放速度
         std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(
-                                             OPERATION_ID_ROTATE);
+                                             OPERATION_ID_BE_FE_ROTATE);
 
         GOOGLE_PROTOBUF_VERIFY_VERSION;
         MsgRotation msg;

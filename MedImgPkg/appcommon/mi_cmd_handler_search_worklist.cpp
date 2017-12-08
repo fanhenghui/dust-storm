@@ -78,7 +78,7 @@ int CmdHandlerSearchWorklist::handle_command(const IPCDataHeader& dataheader, ch
     IPCDataHeader header;
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
-    header.msg_id = COMMAND_ID_BE_SEND_WORKLIST;
+    header.msg_id = COMMAND_ID_FE_BE_RETRIEVE_DB_RESULT;
 
     if (!res) {
         size = 0;

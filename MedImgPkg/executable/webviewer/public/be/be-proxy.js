@@ -1,9 +1,9 @@
 const fs = require('fs');
 const childProcess = require('child_process');
 
-const COMMAND_ID_FE_SHUT_DOWN = 120000;
-const COMMAND_ID_FE_READY = 120001;
-const COMMAND_ID_FE_HEARTBEAT = 119999;
+const COMMAND_ID_BE_FE_SHUTDOWN = 120000;
+const COMMAND_ID_BE_FE_READY = 120001;
+const COMMAND_ID_BE_FE_HEARTBEAT = 119999;
 
 let onlineUsers = {};
 let onlineLocalSockets = {};
@@ -32,7 +32,7 @@ let disconnectBE = (userid)=>{
     let quitMsg = new Buffer(32);
     quitMsg.writeUIntLE(1, 0, 4);
     quitMsg.writeUIntLE(0, 4, 4);
-    quitMsg.writeUIntLE(COMMAND_ID_FE_SHUT_DOWN, 8, 4);
+    quitMsg.writeUIntLE(COMMAND_ID_BE_FE_SHUTDOWN, 8, 4);
     quitMsg.writeUIntLE(0, 12, 4);
     quitMsg.writeUIntLE(0, 16, 4);
     quitMsg.writeUIntLE(0, 20, 4);
@@ -116,7 +116,7 @@ module.exports = {
                     const msgFEReady = new Buffer(32);
                     msgFEReady.writeUIntLE(1, 0, 4);
                     msgFEReady.writeUIntLE(0, 4, 4);
-                    msgFEReady.writeUIntLE(COMMAND_ID_FE_READY, 8, 4);
+                    msgFEReady.writeUIntLE(COMMAND_ID_BE_FE_READY, 8, 4);
                     msgFEReady.writeUIntLE(0, 12, 4);
                     msgFEReady.writeUIntLE(0, 16, 4);
                     msgFEReady.writeUIntLE(0, 20, 4);
@@ -133,7 +133,7 @@ module.exports = {
                             const msgHeartBeat = new Buffer(32);
                             msgHeartBeat.writeUIntLE(1, 0, 4);
                             msgHeartBeat.writeUIntLE(0, 4, 4);
-                            msgHeartBeat.writeUIntLE(COMMAND_ID_FE_HEARTBEAT, 8, 4);
+                            msgHeartBeat.writeUIntLE(COMMAND_ID_BE_FE_HEARTBEAT, 8, 4);
                             msgHeartBeat.writeUIntLE(0, 12, 4);
                             msgHeartBeat.writeUIntLE(0, 16, 4);
                             msgHeartBeat.writeUIntLE(0, 20, 4);

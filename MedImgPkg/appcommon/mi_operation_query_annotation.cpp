@@ -52,8 +52,8 @@ int OpQueryAnnotation::execute() {
         IPCDataHeader post_header;
         char* post_data = nullptr;
 
-        post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-        post_header.op_id = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
+        post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+        post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
 
         MsgString msgSeries;
         msgSeries.set_context(serise_id);

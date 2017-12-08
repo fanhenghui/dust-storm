@@ -238,7 +238,7 @@ void AppThreadModel::process_sending() {
                 IPCDataHeader header;
                 header.sender = static_cast<unsigned int>(controller->get_local_pid());
                 header.receiver = static_cast<unsigned int>(controller->get_server_pid());
-                header.msg_id = COMMAND_ID_BE_SEND_IMAGE;
+                header.msg_id = COMMAND_ID_FE_BE_SEND_IMAGE;
                 header.cell_id = cell_id;
                 header.op_id = 0;
                 header.reserved0 = 0;
@@ -280,7 +280,7 @@ void AppThreadModel::process_sending() {
                 IPCDataHeader header;
                 header.sender = static_cast<unsigned int>(controller->get_local_pid());
                 header.receiver = static_cast<unsigned int>(controller->get_server_pid());
-                header.msg_id = COMMAND_ID_BE_SEND_NONE_IMAGE;
+                header.msg_id = COMMAND_ID_FE_BE_SEND_NONE_IMAGE;
                 header.cell_id = cell_id;
                 header.op_id = 0;
                 header.reserved0 = 0;

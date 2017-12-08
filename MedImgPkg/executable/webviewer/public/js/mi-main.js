@@ -216,22 +216,22 @@
 
     function cmdHandler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
-            case COMMAND_ID_BE_SEND_IMAGE:
+            case COMMAND_ID_FE_BE_SEND_IMAGE:
                 cells[cellID].handleJpegBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
-            case COMMAND_ID_BE_SEND_NONE_IMAGE:
+            case COMMAND_ID_FE_BE_SEND_NONE_IMAGE:
                 cells[cellID].handleNongImgBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
-            case COMMAND_ID_BE_READY:
+            case COMMAND_ID_FE_BE_READY:
                 revcBEReady = true;
                 break;
-            case COMMAND_ID_BE_SEND_WORKLIST:
+            case COMMAND_ID_FE_BE_RETRIEVE_DB_RESULT:
                 recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
-            case COMMAND_ID_BE_HEARTBEAT:
+            case COMMAND_ID_FE_BE_HEARTBEAT:
                 keepHeartbeat();
                 break;
-            case COMMAND_ID_BE_SEND_ANNOTATION_LIST:
+            case COMMAND_ID_FE_BE_SEND_ANNOTATION_LIST:
                 recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             default:
@@ -282,7 +282,7 @@
         msgResize.cells.push({id: 2, type: 1, direction: 2, width: w, height: h});
         msgResize.cells.push({id: 3, type: 2, direction: 0, width: w, height: h});
         let msgBuffer = MsgResize.encode(msgResize).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
     }
 
     function resizeCell(cellID, w, h) {
@@ -302,7 +302,7 @@
         let msgResize = MsgResize.create();
         msgResize.cells.push({id: cellID, type: 1, direction: 0, width: w, height: h});
         let msgBuffer = MsgResize.encode(msgResize).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_RESIZE, 0, msgBuffer.byteLength, msgBuffer);
     }
 
     function changeLayout(cellID) {
@@ -445,7 +445,7 @@
         msgInit.cells.push({id: 2, type: 1, direction: 2, width: w, height: h});
         msgInit.cells.push({id: 3, type: 2, direction: 0, width: w, height: h});
         let msgBuffer = MsgInit.encode(msgInit).finish();
-        socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_INIT, 0, msgBuffer.byteLength, msgBuffer);
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_INIT, 0, msgBuffer.byteLength, msgBuffer);
     }
 
     function switchCommonTool(btnID) {
@@ -495,7 +495,7 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_FE_SEARCH_WORKLIST, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_RETRIEVE_DB, 0, 0, null);
     }
 
     function retrievePACS() {
@@ -504,7 +504,7 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_FE_PACS_RETRIEVE, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_RETRIEVE_PACS, 0, 0, null);
     }
 
     function fetchPACS() {
@@ -522,7 +522,7 @@
     }
 
     function playVR() {
-        socketClient.sendData(COMMAND_ID_FE_VR_PLAY, 0, 3, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_PLAY_VR, 0, 3, null);
     }
 
     function prepare() {
@@ -636,7 +636,7 @@
             if (!msgBuffer) {
                 console.log('encode mpr mask overlay message failed.');
             }
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
+            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         let annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
@@ -662,7 +662,7 @@
                 document.getElementById('worklist-div').hidden = false;
                 document.getElementById('review-div').hidden = true;
                 //send back worklist to BE
-                socketClient.sendData(COMMAND_ID_FE_BACK_TO_WORKLIST, 0, 0, null);
+                socketClient.sendData(COMMAND_ID_BE_FE_BACK_TO_WORKLIST, 0, 0, null);
             }
         }
 
@@ -711,7 +711,7 @@
             if (!msgBuffer) {
                 console.log('encode switch preset WL message failed.');
             }
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
+            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         document.getElementById('a-preset-wl-abdomen').onclick = function(event) {switchPresetWLFunc(this);return false;}
@@ -774,7 +774,7 @@
             if (!msgBuffer) {
                 console.log('encode switch vrt message failed.');
             }
-            socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
+            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         let presetVRTTable = document.getElementById('table-preset-vrt');

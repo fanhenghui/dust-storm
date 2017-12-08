@@ -23,8 +23,8 @@ public:
             MI_AISERVER_LOG(MI_FATAL) << "thread model is null when run AI server connect event.";
         } else {
             IPCDataHeader header;
-            header.msg_id = COMMAND_ID_AI_DB_OPERATION;
-            header.op_id = OPERATION_ID_DB_RECEIVE_AI_READY;
+            header.msg_id = COMMAND_ID_DB_AI_OPERATION;
+            header.op_id = OPERATION_ID_DB_AI_READY;
             header.data_len = 0;
             thread_model->async_send_data(new IPCPackage(header));
         }
@@ -47,10 +47,10 @@ AIServerController::~AIServerController() {
 
 void AIServerController::initialize() {
     //register cmd handler
-    _client_proxy->register_command_handler(COMMAND_ID_DB_AI_OPERATION, 
+    _client_proxy->register_command_handler(COMMAND_ID_AI_DB_OPERATION, 
         std::shared_ptr<CmdHandlerAIOperating>(new CmdHandlerAIOperating(shared_from_this())));
 
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_REQUEST_AI_EVALUATION, 
+    OperationFactory::instance()->register_operation(OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION, 
     std::shared_ptr<AIOpEvaluate>(new AIOpEvaluate()));
 
     //register event for on connect to DB Server

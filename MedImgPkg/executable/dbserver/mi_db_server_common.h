@@ -30,7 +30,7 @@ if (nullptr != server_proxy && !std::string(err).empty()) {             \
     if (buffer_size > 0) {                                              \
         IPCDataHeader header;                                           \
         header.receiver = (client_socket_id);                           \
-        header.msg_id = COMMAND_ID_DB_SEND_ERROR;                       \
+        header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;                       \
         header.data_len = buffer_size;                                  \
         char* buffer = new char[buffer_size];                           \
         if (nullptr != buffer) {                                        \

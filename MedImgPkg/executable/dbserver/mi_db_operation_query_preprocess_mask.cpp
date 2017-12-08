@@ -56,7 +56,7 @@ int DBOpQueryPreprocessMask::execute() {
     IPCDataHeader header;
     header.receiver = _header.receiver;
     header.data_len = size;
-    header.msg_id = COMMAND_ID_DB_SEND_PREPROCESS_MASK;
+    header.msg_id = COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK;
     IPCPackage* package = new IPCPackage(header, buffer);
     if (0 != server_proxy->async_send_data(package)) {
         delete package;

@@ -126,7 +126,7 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
     IPCDataHeader post_header;
     char* post_data = nullptr;
 
-    post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
+    post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = op_id;
 
     MsgString msgSeries;
@@ -142,8 +142,8 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
 
 static IPCPackage* create_query_end_msg_package() {
     IPCDataHeader header;
-    header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    header.op_id = OPERATION_ID_DB_QUERY_END;
+    header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+    header.op_id = OPERATION_ID_DB_REQUEST_END;
     return (new IPCPackage(header));
 }
 
@@ -159,26 +159,26 @@ int query_from_remote_db(std::shared_ptr<AppController> controller, const std::s
     client_proxy.set_server_address(dbs_ip,dbs_port);
 
     if (!data_in_cache) {
-        client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+        client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
         std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
     }
     
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
     std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(controller)));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
     std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(controller)));
     
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_END, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
     std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(controller)));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
     std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(controller)));
 
     std::vector<IPCPackage*> packages;
     if (!data_in_cache) {
-        packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_DICOM, series_uid));
+        packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_DICOM, series_uid));
     }
-    packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_PREPROCESS_MASK, series_uid));
-    packages.push_back(create_info_msg_package(OPERATION_ID_DB_QUERY_AI_ANNOTATION, series_uid));
+    packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK, series_uid));
+    packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_AI_EVALUATION, series_uid));
     packages.push_back(create_query_end_msg_package());
 
     if(0 != client_proxy.sync_post(packages) ) {

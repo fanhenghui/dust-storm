@@ -124,8 +124,8 @@ IPCPackage* create_query_dicom_message() {
     IPCDataHeader post_header;
     char* post_data = nullptr;
 
-    post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.op_id = OPERATION_ID_DB_QUERY_DICOM;
+    post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+    post_header.op_id = OPERATION_ID_DB_BE_FETCH_DICOM;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -143,8 +143,8 @@ IPCPackage* create_query_preprocess_mask_message() {
     IPCDataHeader post_header;
     char* post_data = nullptr;
 
-    post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.op_id = OPERATION_ID_DB_QUERY_PREPROCESS_MASK;
+    post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+    post_header.op_id = OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -162,8 +162,8 @@ IPCPackage* create_query_ai_annotation_message() {
     IPCDataHeader post_header;
     char* post_data = nullptr;
 
-    post_header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    post_header.op_id = OPERATION_ID_DB_QUERY_AI_ANNOTATION;
+    post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+    post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
 
     MsgString msgSeries;
     msgSeries.set_context(series_id);
@@ -179,8 +179,8 @@ IPCPackage* create_query_ai_annotation_message() {
 
 IPCPackage* create_query_end_message() {
     IPCDataHeader header;
-    header.msg_id = COMMAND_ID_BE_DB_OPERATION;
-    header.op_id = OPERATION_ID_DB_QUERY_END;
+    header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+    header.op_id = OPERATION_ID_DB_REQUEST_END;
     return (new IPCPackage(header));
 }
 
@@ -193,16 +193,16 @@ int main(int argc , char* argv[]) {
 
     IPCClientProxy client_proxy(INET);
     client_proxy.set_server_address("127.0.0.1","8888");
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_DICOM_SERIES, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
     std::shared_ptr<CmdHandlerDBSendDICOMSeries>(new CmdHandlerDBSendDICOMSeries()));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_PREPROCESS_MASK, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
     std::shared_ptr<CmdHandlerDBSendPreprocessMask>(new CmdHandlerDBSendPreprocessMask()));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_AI_ANNOTATION, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
     std::shared_ptr<CmdHandlerDBSendAIAnnotation>(new CmdHandlerDBSendAIAnnotation()));
     
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_END, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
     std::shared_ptr<CmdHandlerDBSendEnd>(new CmdHandlerDBSendEnd()));
-    client_proxy.register_command_handler(COMMAND_ID_DB_SEND_ERROR, 
+    client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
     std::shared_ptr<CmdHandlerDBSendError>(new CmdHandlerDBSendError()));
     
     std::vector<IPCPackage*> packages;

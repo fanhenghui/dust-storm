@@ -24,7 +24,7 @@ function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
         return;
     }
     let msgBuffer = MsgCrosshair.encode(msgCrosshair).finish();
-    socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_LOCATE, cellID, msgBuffer.byteLength, msgBuffer);
+    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_LOCATE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
 function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, style) {

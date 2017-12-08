@@ -1,4 +1,4 @@
-#include "mi_db_operation_query_ai_annotation.h"
+#include "mi_db_operation_fetch_ai_evaluation.h"
 
 #include "appcommon/mi_message.pb.h"
 
@@ -7,15 +7,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpQueryAIAnnotation::DBOpQueryAIAnnotation() {
+DBOpFetchAIEvaluation::DBOpFetchAIEvaluation() {
 
 }
 
-DBOpQueryAIAnnotation::~DBOpQueryAIAnnotation() {
+DBOpFetchAIEvaluation::~DBOpFetchAIEvaluation() {
 
 }
 
-int DBOpQueryAIAnnotation::execute() {
+int DBOpFetchAIEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;

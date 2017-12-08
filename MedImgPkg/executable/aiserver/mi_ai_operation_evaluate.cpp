@@ -47,8 +47,8 @@ int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> c
     char* msg_buffer = serialize_msg(msg,msg_size);
     if (msg_buffer) {
         IPCDataHeader header;
-        header.msg_id = COMMAND_ID_AI_DB_OPERATION;
-        header.op_id = OPERATION_ID_DB_RECEIVE_AI_EVALUATION;
+        header.msg_id = COMMAND_ID_DB_AI_OPERATION;
+        header.op_id = OPERATION_ID_DB_AI_EVALUATION_RESULT;
         header.data_len = msg_size;
         msg.Clear();
         controller->get_thread_model()->async_send_data(new IPCPackage(header,msg_buffer));
@@ -115,13 +115,25 @@ int AIOpEvaluate::execute() {
     // MI_AISERVER_LOG(MI_DEBUG) << "AI intermediate data path: "  << ai_im_data_path;
     // MI_AISERVER_LOG(MI_DEBUG) << "msg buffer length: " << _header.data_len;
 
-    std::shared_ptr<medical_ai::AILungEvaulatePyWrapper> wrapper(new medical_ai::AILungEvaulatePyWrapper());
-    if(-1 == wrapper->init(pytorch_path.c_str() ,py_interface_path.c_str()) ){
+    static std::shared_ptr<medical_ai::AILungEvaulatePyWrapper> wrapper(new medical_ai::AILungEvaulatePyWrapper());
+    static bool init_wrapper = false;
+    if (!init_wrapper) {
+        if(-1 == wrapper->init(pytorch_path.c_str() ,py_interface_path.c_str()) ){
         MI_AISERVER_LOG(MI_FATAL) << "init python env failed.";
         msg_res.set_status(-1);
         msg_res.set_err_msg("init python env failed.");
-        return notify_dbs(msg_res, controller);
+        //return notify_dbs(msg_res, controller);
     }
+        init_wrapper = true;
+    }
+    // if(-1 == wrapper->init(pytorch_path.c_str() ,py_interface_path.c_str()) ){
+    //     MI_AISERVER_LOG(MI_FATAL) << "init python env failed.";
+    //     msg_res.set_status(-1);
+    //     msg_res.set_err_msg("init python env failed.");
+    //     return notify_dbs(msg_res, controller);
+    // }
+
+    MI_AISERVER_LOG(MI_DEBUG) << "after initialize.";
 
     //Preprocess
     if (recal_im_data) {

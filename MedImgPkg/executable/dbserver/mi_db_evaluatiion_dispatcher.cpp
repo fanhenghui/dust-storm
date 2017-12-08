@@ -22,7 +22,7 @@ IPCPackage* create_error_message(const std::string& err) {
     const int buffer_size = msgErr.ByteSize();
     if (buffer_size > 0) {
         IPCDataHeader header;
-        header.msg_id = COMMAND_ID_DB_SEND_ERROR;
+        header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;
         header.data_len = buffer_size;
         char* buffer = new char[buffer_size];
         if (nullptr != buffer) {
@@ -164,7 +164,7 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
     
     IPCDataHeader header;
     header.receiver = client_id;
-    header.msg_id = COMMAND_ID_DB_SEND_AI_ANNOTATION;
+    header.msg_id = COMMAND_ID_BE_DB_SEND_AI_EVALUATION;
     header.data_len = buffer_size;
     IPCPackage* package = new IPCPackage(header,buffer); 
     if(0 != server_proxy->async_send_data(package)) {
@@ -262,7 +262,7 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     }
     msgAnnos.Clear();
     IPCDataHeader header;
-    header.msg_id = COMMAND_ID_DB_SEND_AI_ANNOTATION;
+    header.msg_id = COMMAND_ID_BE_DB_SEND_AI_EVALUATION;
     header.data_len = buffer_size;
     IPCPackage* res_pkg = new IPCPackage(header,buffer); 
     notify_all(res_pkg);
@@ -314,8 +314,8 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
             IPCDataHeader header;
             header.data_len = msg_buffer_size;
             header.receiver = controller->get_ais_client();
-            header.msg_id = COMMAND_ID_DB_AI_OPERATION;
-            header.op_id = OPERATION_ID_DB_REQUEST_AI_EVALUATION;
+            header.msg_id = COMMAND_ID_AI_DB_OPERATION;
+            header.op_id = OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION;
             std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());
             op->set_data(header, msg_buffer);
             op->set_controller(controller);

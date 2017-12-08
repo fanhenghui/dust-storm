@@ -30,7 +30,7 @@ function sendDownsampleMSG(cellID, flag, socketClient) {
         return;
     }
     let msgBuffer = MsgFlag.encode(msgFlag).finish();
-    socketClient.sendData(COMMAND_ID_FE_OPERATION, OPERATION_ID_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
+    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
 ActionCommon.prototype.registerOpID = function(left, right, mid, hold) {
@@ -89,7 +89,7 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         return;
     }
 
-    this.socketClient.sendData(COMMAND_ID_FE_OPERATION, opID, this.cellID, msgBuffer.byteLength, msgBuffer);
+    this.socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, opID, this.cellID, msgBuffer.byteLength, msgBuffer);
 
     return true;
 }
@@ -132,7 +132,7 @@ function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0,
         return;
     }
     let msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-    socketClient.sendData(COMMAND_ID_FE_OPERATION, ACTION_ID_MRP_ANNOTATION, cellID, msgBuffer.byteLength, msgBuffer);
+    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, ACTION_ID_MRP_ANNOTATION, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
 function ActionAnnotation(socketClient, cellID) {
