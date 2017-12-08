@@ -75,6 +75,11 @@ int IPCClientProxy::sync_send_data(const IPCDataHeader& header , char* buffer) {
     return _client->sync_send_data(header , buffer);
 }
 
+int IPCClientProxy::sync_send_data(IPCPackage* package) {
+    boost::mutex::scoped_lock locker(_mutex_send_data);
+    return _client->sync_send_data(package);
+}
+
 int IPCClientProxy::sync_send_data(const std::vector<IPCPackage*>& packages) {
     boost::mutex::scoped_lock locker(_mutex_send_data);
     return _client->sync_send_data(packages);

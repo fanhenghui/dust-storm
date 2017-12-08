@@ -35,6 +35,8 @@
 #include "appcommon/mi_cmd_handler_be_db_send_preprocess_mask.h"
 #include "appcommon/mi_cmd_handler_be_fe_pacs_retrieve.h"
 #include "appcommon/mi_cmd_handler_be_fe_pacs_fetch.h"
+#include "appcommon/mi_cmd_handler_be_db_pacs_retrieve_result.h"
+#include "appcommon/mi_cmd_handler_be_db_pacs_fetch_result.h"
 
 #include "mi_operation_init.h"
 
@@ -124,6 +126,11 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<CmdHandlerBE_DBSendEndSignal>(new CmdHandlerBE_DBSendEndSignal(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
     std::shared_ptr<CmdHandlerBE_DBSendError>(new CmdHandlerBE_DBSendError(app_controller)));
+
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_RETRIEVE_RESULT, 
+    std::shared_ptr<CmdHandlerBE_DBPACSRetrieveResult>(new CmdHandlerBE_DBPACSRetrieveResult(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_FETCH_RESULT, 
+    std::shared_ptr<CmdHandlerBE_DBPACSFetchResult>(new CmdHandlerBE_DBPACSFetchResult(app_controller)));
 }
 
 

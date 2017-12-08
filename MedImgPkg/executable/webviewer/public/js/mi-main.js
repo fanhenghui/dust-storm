@@ -7,6 +7,7 @@
     let cells = null;
     let protocRoot = null;
     let worklistBuffer = null;
+    let recvPACSRetrieveBuffer = null;
     let socketClient = null;
     let revcBEReady = false;
     
@@ -106,6 +107,60 @@
                 imaging_modality: String
             }).items;
             let tbody = document.getElementById('worklist');
+            tbody.innerHTML = '';
+            for (let i = 0; i < obj.length; i++) {
+                let tr = '<tr>';
+                for (let propt in obj[i]) {
+                    tr += '<td>' + obj[i][propt] + '</td>';
+                }
+                tr += '</tr>';
+                tbody.innerHTML += tr;
+            }
+        }
+
+        //style changed when choose tr (based on bootstrap)
+        $('#table tbody tr').click(function() {
+            $(this).addClass('success').siblings().removeClass('success');
+        });
+    }
+
+    function recvPACSRetrieveResult(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+        if (!socketClient.protocRoot) {
+            console.log('null protocbuf.');
+            return;
+        }
+        if (withHeader) {
+            recvPACSRetrieveBuffer = new ArrayBuffer(dataLen + restDataLen);
+        }
+
+        let dstview = new Uint8Array(recvPACSRetrieveBuffer);
+        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+        let cpSrc = recvPACSRetrieveBuffer.byteLength - (dataLen + restDataLen);
+        for (let i = 0; i < dataLen; i++) {
+            dstview[i+cpSrc] = srcview[i];
+        }
+
+        if (restDataLen <= 0) {
+            console.log('recv worklist.');
+            let MsgDcmInfosType = socketClient.protocRoot.lookup('medical_imaging.MsgDcmInfoCollection');
+            if (!MsgDcmInfosType) {
+                console.log('get DICOM info collection message type failed.');
+            }
+            let diconInfoView = new Uint8Array(recvPACSRetrieveBuffer);
+            let message = MsgWorklistType.decode(diconInfoView);
+            let obj = MsgWorklistType.toObject(message, {
+                study_id: String,
+                series_id: String,
+                study_date: String,
+                study_time: String,
+                study_description: String,
+                patient_name: String,
+                patient_sex: String,
+                patient_age: String,
+                patient_birth_date: String,
+                modality: String
+            }).items;
+            let tbody = document.getElementById('worklist-pacs');
             tbody.innerHTML = '';
             for (let i = 0; i < obj.length; i++) {
                 let tr = '<tr>';
@@ -234,6 +289,8 @@
             case COMMAND_ID_FE_BE_SEND_ANNOTATION_LIST:
                 recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
+            case COMMAND_ID_FE_BE_PACS_RETRIEVE_RESULT:
+                recvPACSRetrieveResult(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
             default:
                 break;
         }

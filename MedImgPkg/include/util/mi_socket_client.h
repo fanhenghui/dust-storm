@@ -28,6 +28,7 @@ public:
 
     void register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler);
     int sync_send_data(const IPCDataHeader& dataheader, char* buffer);
+    int sync_send_data(IPCPackage* package);
     int sync_send_data(const std::vector<IPCPackage*>& packages);
 
     void run();

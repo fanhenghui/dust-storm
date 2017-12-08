@@ -172,16 +172,15 @@ message MsgEvaluationResponse {
 message MsgDcmInfo {
     string study_id = 1;
     string series_id = 2;
-    string series_date = 3;
-    string study_date = 4;
-    string study_time = 5;
-    string study_desciption = 6;
-    string patient_id = 7;
-    string patient_name = 8;
-    string patient_sex = 9;
-    string patient_age = 10;
-    string patient_birth_date = 11;
-    string modality = 12;
+    string study_date = 3;
+    string study_time = 4;
+    string study_description = 5;
+    string patient_id = 6;
+    string patient_name = 7;
+    string patient_sex = 8;
+    string patient_age = 9;
+    string patient_birth_date = 10;
+    string modality = 11;
 };
 
 message MsgDcmInfoCollection {

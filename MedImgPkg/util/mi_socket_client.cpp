@@ -271,6 +271,14 @@ int SocketClient::sync_send_data(const IPCDataHeader& dataheader , char* buffer)
     return 0;
 }
 
+int SocketClient::sync_send_data(IPCPackage* package) {
+    if (package) {
+        return this->sync_send_data(package->header, package->buffer);
+    } else {
+        return -1;
+    }
+}
+
 int SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
     if (-1 == _fd_server) {
         MI_UTIL_LOG(MI_FATAL) << "send data: server fd invalid.";

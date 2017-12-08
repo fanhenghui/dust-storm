@@ -29,6 +29,7 @@ public:
     int handle_command(const IPCDataHeader& header, char* buffer);
 
     int sync_send_data(const IPCDataHeader& header, char* buffer);
+    int sync_send_data(IPCPackage* package);
     int sync_send_data(const std::vector<IPCPackage*>& packages);
     int sync_post(const std::vector<IPCPackage*>& packages);
 
