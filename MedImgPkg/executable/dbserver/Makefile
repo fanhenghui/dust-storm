@@ -24,7 +24,7 @@ mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o \
 mi_db_operation_pacs_fetch.o mi_db_operation_pacs_retrieve.o 
 
 OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o \
-mi_db_evaluatiion_dispatcher.o $(OPERATION_OBJS)
+mi_db_evaluatiion_dispatcher.o mi_db_server_console_echo.o $(OPERATION_OBJS)
 
 TARGET = $(BIN_DIR)/dbserver
 
@@ -41,7 +41,8 @@ $(TARGET): mi_db_server_main.o $(OBJS)
 mi_db_server_main.o: $(EXPORT_HEADER)  mi_db_server_main.cpp mi_db_server_controller.o
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_main.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.h mi_db_server_thread_model.o mi_db_evaluatiion_dispatcher.o $(OPERATION_OBJS)
+mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.h mi_db_server_thread_model.o \
+mi_db_evaluatiion_dispatcher.o mi_db_server_console_echo.o $(OPERATION_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_db_cmd_handler_be_operating.o: mi_db_cmd_handler_be_operating.cpp mi_db_cmd_handler_be_operating.h mi_db_server_thread_model.o
@@ -58,6 +59,9 @@ $(OPERATION_OBJS):%.o:%.cpp %.h $(COMMON_HEADER) mi_db_evaluatiion_dispatcher.o
 
 mi_db_evaluatiion_dispatcher.o : mi_db_evaluatiion_dispatcher.cpp mi_db_evaluatiion_dispatcher.h mi_db_server_thread_model.o
 	$(CC) -c -fPIC $(CFLAGS) mi_db_evaluatiion_dispatcher.cpp $(ADDITINAL_INCLUDE_DIR)
+
+mi_db_server_console_echo.o : mi_db_server_console_echo.cpp mi_db_server_console_echo.h
+	$(CC) -c -fPIC $(CFLAGS) mi_db_server_console_echo.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
 clean:
