@@ -180,7 +180,7 @@ IPCPackage* create_query_ai_annotation_message() {
 IPCPackage* create_query_end_message() {
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
-    header.op_id = OPERATION_ID_DB_REQUEST_END;
+    header.op_id = OPERATION_ID_DB_BE_REQUEST_END;
     return (new IPCPackage(header));
 }
 

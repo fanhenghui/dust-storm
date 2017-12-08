@@ -55,12 +55,12 @@ void DBServerController::initialize() {
         std::shared_ptr<DBOpFetchAIEvaluation>(new DBOpFetchAIEvaluation()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK, 
         std::shared_ptr<DBOpQueryPreprocessMask>(new DBOpQueryPreprocessMask()));
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_REQUEST_END, 
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_REQUEST_END, 
         std::shared_ptr<DBOpQueryEnd>(new DBOpQueryEnd()));
     
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_PACS_RETRIEVE, 
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_RETRIEVE, 
         std::shared_ptr<DBOpPACSRetrieve>(new DBOpPACSRetrieve()));
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_PACS_FETCH, 
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_FETCH, 
         std::shared_ptr<DBOpPACSFetch>(new DBOpPACSFetch()));
 
     //register cmd handler for AI server

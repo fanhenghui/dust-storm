@@ -225,7 +225,7 @@
             case COMMAND_ID_FE_BE_READY:
                 revcBEReady = true;
                 break;
-            case COMMAND_ID_FE_BE_RETRIEVE_DB_RESULT:
+            case COMMAND_ID_FE_BE_DB_RETRIEVE_RESULT:
                 recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_FE_BE_HEARTBEAT:
@@ -495,7 +495,7 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_RETRIEVE_DB, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_DB_RETRIEVE, 0, 0, null);
     }
 
     function retrievePACS() {
@@ -504,7 +504,7 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_RETRIEVE_PACS, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_PACS_RETRIEVE, 0, 0, null);
     }
 
     function fetchPACS() {

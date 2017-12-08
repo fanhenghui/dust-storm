@@ -42,11 +42,11 @@
 #include "appcommon/mi_ob_annotation_statistic.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_common_util.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_ai_annotation.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_dicom_series.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_end_signal.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_error.h"
-#include "appcommon/mi_cmd_handler_recv_dbs_preprocess_mask.h"
+#include "appcommon/mi_cmd_handler_be_db_send_ai_evaluation.h"
+#include "appcommon/mi_cmd_handler_be_db_send_dicom.h"
+#include "appcommon/mi_cmd_handler_be_db_send_end_signal.h"
+#include "appcommon/mi_cmd_handler_be_db_send_error.h"
+#include "appcommon/mi_cmd_handler_be_db_send_preprocess_mask.h"
 
 #include "appcommon/mi_app_config.h"
 
@@ -143,7 +143,7 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
 static IPCPackage* create_query_end_msg_package() {
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
-    header.op_id = OPERATION_ID_DB_REQUEST_END;
+    header.op_id = OPERATION_ID_DB_BE_REQUEST_END;
     return (new IPCPackage(header));
 }
 
@@ -160,18 +160,18 @@ int query_from_remote_db(std::shared_ptr<AppController> controller, const std::s
 
     if (!data_in_cache) {
         client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
-        std::shared_ptr<CmdHandlerRecvDBSDCMSeries>(new CmdHandlerRecvDBSDCMSeries(controller)));
+        std::shared_ptr<CmdHandlerBE_DBSendDICOM>(new CmdHandlerBE_DBSendDICOM(controller)));
     }
     
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
-    std::shared_ptr<CmdHandlerRecvDBSPreprocessMask>(new CmdHandlerRecvDBSPreprocessMask(controller)));
+    std::shared_ptr<CmdHandlerBE_DBSendPreprocessMask>(new CmdHandlerBE_DBSendPreprocessMask(controller)));
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
-    std::shared_ptr<CmdHandlerRecvDBSAIAnno>(new CmdHandlerRecvDBSAIAnno(controller)));
+    std::shared_ptr<CmdHandlerBE_DBSendAIEvaluation>(new CmdHandlerBE_DBSendAIEvaluation(controller)));
     
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
-    std::shared_ptr<CmdHandlerRecvDBSEndSignal>(new CmdHandlerRecvDBSEndSignal(controller)));
+    std::shared_ptr<CmdHandlerBE_DBSendEndSignal>(new CmdHandlerBE_DBSendEndSignal(controller)));
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
-    std::shared_ptr<CmdHandlerRecvDBSError>(new CmdHandlerRecvDBSError(controller)));
+    std::shared_ptr<CmdHandlerBE_DBSendError>(new CmdHandlerBE_DBSendError(controller)));
 
     std::vector<IPCPackage*> packages;
     if (!data_in_cache) {
