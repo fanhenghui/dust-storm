@@ -15,6 +15,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class IPCServerProxy;
 class IOperation;
+class DBServerConsoleEcho;
 class DBServerThreadModel {
 public:
     DBServerThreadModel();
@@ -26,12 +27,14 @@ public:
     void set_server_proxy_ais(std::shared_ptr<IPCServerProxy> proxy);
     void push_operation_ais(const std::shared_ptr<IOperation>& op);
 
+    void set_console_echo(std::shared_ptr<DBServerConsoleEcho> console_echo);
+
     void start();
     void stop();
 
 private:
     //for User input
-    void process_in_i();
+    void process_console_echo();
 
     //for INET BE
     void process_be_sending_i();
@@ -45,7 +48,7 @@ private:
     void process_ais_operating_i();
 
 private:
-    boost::thread _thread_in;
+    boost::thread _thread_console_echo;
 
     //for BE client
     std::shared_ptr<IPCServerProxy> _server_proxy_be;
@@ -62,6 +65,9 @@ private:
     boost::thread _thread_ais_recving;
     boost::thread _thread_ais_operating;
     boost::thread _thread_ais_run; 
+
+    //console echo 
+    std::shared_ptr<DBServerConsoleEcho> _console_echo;
 
 private: 
     DISALLOW_COPY_AND_ASSIGN(DBServerThreadModel);

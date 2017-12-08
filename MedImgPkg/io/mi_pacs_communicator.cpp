@@ -163,6 +163,9 @@ int PACSCommunicator::try_connect_i() {
         return -1;
     }
 
+    MI_IO_LOG(MI_INFO) << "Connect to PACS {AET: " << _connection_cache->server_ae_title << "; URL: "
+    << _connection_cache->server_host << ":" << _connection_cache->server_port << "} success.";
+
     return 0;
 }
 

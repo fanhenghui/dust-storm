@@ -23,6 +23,7 @@
 #include "mi_db_operation_receive_evaluation.h"
 #include "mi_db_operation_receive_ai_ready.h"
 #include "mi_db_evaluatiion_dispatcher.h"
+#include "mi_db_server_console_echo.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -82,13 +83,18 @@ void DBServerController::initialize() {
     //set controller to dispatcher
     _evaluation_dispatcher->set_controller(shared_from_this());
 
+    //create console echo
+    std::shared_ptr<DBServerConsoleEcho> console_echo(new DBServerConsoleEcho(shared_from_this()));
+    _thread_model->set_console_echo(console_echo);
+
     //connect PACS
     std::string server_ae_title,server_host,client_ae_title;
     unsigned short server_port(0), client_port(0);
     AppConfig::instance()->get_pacs_info(server_ae_title, server_host, server_port, client_ae_title, client_port);
     if(-1 == _pacs_communicator->connect(server_ae_title, server_host, server_port, client_ae_title, client_port)) {
-        MI_DBSERVER_LOG(MI_FATAL) << "connect to PACS failed.";
-        DBSERVER_THROW_EXCEPTION("connect to PACS failed.");
+        MI_DBSERVER_LOG(MI_FATAL) << "Connect to PACS {AET: " << server_ae_title << "; URL: " << server_host << ":" << server_port << "} success.";
+        //Start with disconnect.
+        //DBSERVER_THROW_EXCEPTION("connect to PACS failed.");
     }
 }
 

@@ -3,6 +3,8 @@
 #include "util/mi_ipc_server_proxy.h"
 #include "appcommon/mi_operation_interface.h"
 
+#include "mi_db_server_console_echo.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 DBServerThreadModel::DBServerThreadModel() {
@@ -10,7 +12,7 @@ DBServerThreadModel::DBServerThreadModel() {
 }
 
 DBServerThreadModel::~DBServerThreadModel() {
-    _thread_in.join();
+    _thread_console_echo.join();
 }
 
 void DBServerThreadModel::set_server_proxy_be(std::shared_ptr<IPCServerProxy> proxy) {
@@ -19,6 +21,10 @@ void DBServerThreadModel::set_server_proxy_be(std::shared_ptr<IPCServerProxy> pr
 
 void DBServerThreadModel::set_server_proxy_ais(std::shared_ptr<IPCServerProxy> proxy) {
     _server_proxy_ais = proxy;
+}
+
+void DBServerThreadModel::set_console_echo(std::shared_ptr<DBServerConsoleEcho> console_echo) {
+    _console_echo = console_echo;
 }
 
 void DBServerThreadModel::push_operation_be(const std::shared_ptr<IOperation>& op) {
@@ -41,7 +47,7 @@ void DBServerThreadModel::start() {
     _thread_ais_sending = boost::thread(boost::bind(&DBServerThreadModel::process_ais_sending_i, this));
     _thread_ais_recving = boost::thread(boost::bind(&DBServerThreadModel::process_ais_recving_i, this));
 
-    _thread_in = boost::thread(boost::bind(&DBServerThreadModel::process_in_i, this));
+    _thread_console_echo = boost::thread(boost::bind(&DBServerThreadModel::process_console_echo, this));
 
     _server_proxy_be->run();//main thread is accept APPS's client
 }
@@ -96,41 +102,9 @@ void DBServerThreadModel::process_be_operating_i() {
     }
 }
 
-void DBServerThreadModel::process_in_i() {
-    std::string msg;
-    while(std::cin >> msg) {
-        if(msg == "shutdown") {
-            //quit signal
-            _server_proxy_be->stop();
-            _server_proxy_ais->stop();
-            this->stop();
-            break;
-        } else if (msg == "status") {
-            //server current status
-            ServerStatus status = _server_proxy_be->get_current_status();
-            std::stringstream ss_client;
-            for (auto it = status.client_hosts.begin(); it!= status.client_hosts.end(); ++it) {
-                unsigned int socket_uid = it->first;
-                size_t pkg_size = 0;
-                auto it2 = status.client_packages.find(socket_uid);
-                if(it2 != status.client_packages.end()) {
-                    pkg_size = it2->second;
-                }
-                ss_client << "\{client host: " << it->second << ", pkg size: " << pkg_size << "}";
-            }
-            MI_DBSERVER_LOG(MI_INFO) << "\n{server host:" << status.host <<
-            ", type:" << status.socket_type << ", client num:" << status.cur_client << 
-            ", pkg capcity:" << status.package_cache_capcity << ", pkg size:" << status.package_cache_size << "}" 
-            << ss_client.str();
-        } else if(msg == "aistatus") {
-            //server current status
-            ServerStatus status = _server_proxy_ais->get_current_status();
-            MI_DBSERVER_LOG(MI_INFO) << "{server host:" << status.host <<
-            ", type:" << status.socket_type << ", client num:" << status.cur_client << 
-            ", pkg capcity:" << status.package_cache_capcity << ", pkg size:" << status.package_cache_size; 
-        } else {
-            MI_DBSERVER_LOG(MI_DEBUG) << "invalid msg."; 
-        }
+void DBServerThreadModel::process_console_echo() {
+    if (_console_echo) {
+        _console_echo->run();
     }
 }
 
