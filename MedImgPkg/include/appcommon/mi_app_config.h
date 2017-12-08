@@ -12,6 +12,9 @@ public:
     static AppConfig* instance();
     ~AppConfig();
 
+    //For warm start/update
+    void refresh();
+
     std::string get_config_root() const;
     std::string get_test_data_root() const;
 

@@ -35,9 +35,7 @@ void AppConfig::init_i() {
     _pacs_client_port = 11115;
 }
 
-AppConfig::AppConfig() {
-    init_i();
-
+void AppConfig::refresh() {
     std::ifstream in("../config/app_config");
     if (!in.is_open()) {
         MI_APPCOMMON_LOG(MI_ERROR) << "can't open configure file.";
@@ -108,6 +106,11 @@ AppConfig::AppConfig() {
             _pacs_client_port = conv.to_num(context);   
         }
     }
+}
+
+AppConfig::AppConfig() {
+    init_i();
+    refresh();
 }
 
 AppConfig::~AppConfig() {}
