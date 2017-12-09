@@ -24,12 +24,15 @@ int CmdHandlerBE_FEPACSRetrieve::handle_command(const IPCDataHeader& dataheader,
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     //send message to DBS to retrive all DICOM series
-    std::vector<IPCPackage*> packages;
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     header.op_id = OPERATION_ID_DB_BE_PACS_RETRIEVE;
-    packages.push_back(new IPCPackage(header));
-    controller->get_client_proxy_dbs()->sync_send_data(packages);
+    IPCPackage* package = new IPCPackage(header);
+    if(0 != controller->get_client_proxy_dbs()->sync_send_data(package)) {
+        delete package;
+        MI_APPCOMMON_LOG(MI_ERROR) << "send to DB to retrieve PACS failed.";
+        return -1;
+    }
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS retrieve";
     return 0;

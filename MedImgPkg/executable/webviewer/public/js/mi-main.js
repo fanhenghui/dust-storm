@@ -573,6 +573,27 @@
             alert('please choose one series to fetch.');
             reutrn;
         }
+
+        if (!socketClient.protocRoot) {
+            console.log('null protobuf.');
+            return;
+        }
+        let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
+        if (!MsgStringType) {
+            console.log('get MsgMsgStringType type failed.');
+            return;
+        }
+        let msg = MsgStringType.create({context:series});
+        if (!msg) {
+            console.log('create PCAS fetch message failed.');
+            return;
+        }
+        let msgBuffer = MsgStringType.encode(msg).finish();
+        if (!msgBuffer) {
+            console.log('encode PCAS fetch message failed.');
+        }
+        socketClient.sendData(COMMAND_ID_BE_FE_PACS_FETCH, 0, 0, msgBuffer.byteLength, msgBuffer);
+        
     }
 
     function playVR() {

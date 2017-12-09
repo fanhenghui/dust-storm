@@ -6,6 +6,8 @@
 #include "mi_app_controller.h"
 #include "mi_app_common_define.h"
 #include "mi_app_thread_model.h"
+#include "mi_app_common_util.h"
+#include "mi_model_pacs.h"
 
 #include "mi_operation_interface.h"
 #include "mi_message.pb.h"
@@ -58,26 +60,44 @@ int CmdHandlerBE_DBPACSRetrieveResult::handle_command(const IPCDataHeader& datah
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
-    //DEBUG testing
-    // MsgDcmInfoCollection msg;
-    // if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
-    //     MI_APPCOMMON_LOG(MI_ERROR) << "parse dicom info collection msg from DBS failed(PCAS retrieve).";
-    // }
-    // for (int i=0; i<msg.dcminfo_size(); ++i) {
-    //     MsgDcmInfo item = msg.dcminfo(i);
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "<><><><><><>series specification:<><><><><><>";
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "study id: " << item.study_id();
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "series id: " << item.series_id();
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "study date: " << item.study_date(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "study time: " << item.study_time(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "patient id: " << item.patient_id(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "patient name: " << item.patient_name(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "patient sex: " << item.patient_sex();
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "patient age: " << item.patient_age(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "patient birth date: " << item.patient_birth_date(); 
-    //     MI_APPCOMMON_LOG(MI_DEBUG) << "modality: " << item.modality(); 
-    // }
-    // msg.Clear();
+    //parse PACS result and save to model
+    MsgDcmInfoCollection msg;
+    if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse dicom info collection msg from DBS failed(PCAS retrieve).";
+    }
+    std::vector<DcmInfo> dcm_infos(dcminfo_size());
+    int id=0;
+    for (int i=0; i<msg.dcminfo_size(); ++i) {
+        MsgDcmInfo item = msg.dcminfo(i);
+        MI_APPCOMMON_LOG(MI_DEBUG) << "<><><><><><>series specification:<><><><><><>";
+        MI_APPCOMMON_LOG(MI_DEBUG) << "study id: " << item.study_id();
+        MI_APPCOMMON_LOG(MI_DEBUG) << "series id: " << item.series_id();
+        MI_APPCOMMON_LOG(MI_DEBUG) << "study date: " << item.study_date(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "study time: " << item.study_time(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "patient id: " << item.patient_id(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "patient name: " << item.patient_name(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "patient sex: " << item.patient_sex();
+        MI_APPCOMMON_LOG(MI_DEBUG) << "patient age: " << item.patient_age(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "patient birth date: " << item.patient_birth_date(); 
+        MI_APPCOMMON_LOG(MI_DEBUG) << "modality: " << item.modality(); 
+        
+        DcmInfo dcm_info;
+        dcm_info.study_id = item.study_id();
+        dcm_info.series_id = item.series_id();
+        dcm_info.study_date = item.study_date();
+        dcm_info.study_time = item.study_time();
+        dcm_info.patient_id = item.patient_id();
+        dcm_info.patient_name = item.patient_name();
+        dcm_info.patient_sex = item.patient_sex();
+        dcm_info.patient_age = item.patient_age();
+        dcm_info.patient_birth_date = item.patient_birth_date();
+        dcm_infos[id++] = dcm_info;
+    }
+    msg.Clear();
+
+    std::shared_ptr<ModelPACS> model_pacs = AppCommonUtil::get_model_pacs(controller);
+    APPCOMMON_CHECK_NULL_EXCEPTION(model_pacs);
+    model_pacs->update(dcm_infos);
 
     //receive DB's retrive response , and create operation to BE queue to nofity FE to refresh PACS table
     //transmit to FE 

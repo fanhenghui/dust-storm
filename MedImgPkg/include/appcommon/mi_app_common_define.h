@@ -91,6 +91,7 @@ MED_IMG_BEGIN_NAMESPACE
 #define MODEL_ID_ANNOTATION 910000
 #define MODEL_ID_CROSSHAIR 910001
 #define MODEL_ID_DBS_STATUS 910002
+#define MODEL_ID_PACS 910002
 //***************************************************************//
 
 MED_IMG_END_NAMESPACE

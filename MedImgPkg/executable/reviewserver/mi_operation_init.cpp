@@ -458,14 +458,17 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
 int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation: model.";
 
-    std::shared_ptr<ModelAnnotation> model_annotation(new ModelAnnotation());
-    controller->add_model(MODEL_ID_ANNOTATION , model_annotation);
+    controller->add_model(MODEL_ID_ANNOTATION,
+    std::shared_ptr<ModelAnnotation>(new ModelAnnotation()));
 
-    std::shared_ptr<ModelCrosshair> model_crosshair(new ModelCrosshair());
-    controller->add_model(MODEL_ID_CROSSHAIR , model_crosshair);
+    controller->add_model(MODEL_ID_CROSSHAIR,
+    std::shared_ptr<ModelCrosshair>(new ModelCrosshair()));
 
-    std::shared_ptr<ModelDBSStatus> model_dbs_status(new ModelDBSStatus());
-    controller->add_model(MODEL_ID_DBS_STATUS , model_dbs_status);
+    controller->add_model(MODEL_ID_DBS_STATUS, 
+    std::shared_ptr<ModelDBSStatus>(new ModelDBSStatus()));
+
+    controller->add_model(MODEL_ID_PACS, 
+    std::shared_ptr<ModelDBSStatus>(new ModelPACS()));
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
     return 0;

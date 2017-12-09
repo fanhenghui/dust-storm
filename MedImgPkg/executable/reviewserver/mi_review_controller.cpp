@@ -86,7 +86,6 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<CmdHandlerBE_FEPACSFetch>(new CmdHandlerBE_FEPACSFetch(app_controller)));
 
 
-
     // Register operation
     OperationFactory::instance()->register_operation(
         OPERATION_ID_BE_FE_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));

@@ -19,7 +19,7 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-MODEL_OBJS = mi_app_cache_db.o mi_app_db.o mi_app_config.o mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o 
+MODEL_OBJS = mi_app_cache_db.o mi_app_db.o mi_app_config.o mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_model_pacs.o
 OBSERVER_OBJS = mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_ob_annotation_list.o
 CMD_HANDLER_OBJS = mi_cmd_handler_be_fe_operation.o mi_cmd_handler_be_fe_heartbeat.o mi_cmd_handler_be_fe_ready.o mi_cmd_handler_be_fe_shutdown.o \
 mi_cmd_handler_be_fe_db_retrieve.o mi_cmd_handler_be_fe_play_vr.o \

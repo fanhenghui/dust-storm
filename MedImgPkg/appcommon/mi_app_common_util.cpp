@@ -5,6 +5,7 @@
 #include "mi_model_annotation.h"
 #include "mi_model_crosshair.h"
 #include "mi_model_dbs_status.h"
+#include "mi_model_pacs.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -34,6 +35,16 @@ std::shared_ptr<ModelDBSStatus> AppCommonUtil::get_model_dbs_status(std::shared_
         return nullptr;
     } else {
         std::shared_ptr<ModelDBSStatus> model = std::dynamic_pointer_cast<ModelDBSStatus>(model_);
+        return model;
+    }
+}
+
+std::shared_ptr<ModelPACS> AppCommonUtil::get_model_pacs(std::shared_ptr<AppController> controller) {
+    std::shared_ptr<IModel> model_ = controller->get_model(MODEL_ID_PACS);
+    if (nullptr == model_) {
+        return nullptr;
+    } else {
+        std::shared_ptr<ModelPACS> model = std::dynamic_pointer_cast<ModelPACS>(model_);
         return model;
     }
 }
