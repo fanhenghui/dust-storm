@@ -141,39 +141,36 @@
         }
 
         if (restDataLen <= 0) {
-            console.log('recv worklist.');
+            console.log('recv pacs worklist.');
             let MsgDcmInfosType = socketClient.protocRoot.lookup('medical_imaging.MsgDcmInfoCollection');
             if (!MsgDcmInfosType) {
                 console.log('get DICOM info collection message type failed.');
+                return;
             }
             let diconInfoView = new Uint8Array(recvPACSRetrieveBuffer);
-            let message = MsgWorklistType.decode(diconInfoView);
-            let obj = MsgWorklistType.toObject(message, {
-                study_id: String,
-                series_id: String,
-                study_date: String,
-                study_time: String,
-                study_description: String,
-                patient_name: String,
-                patient_sex: String,
-                patient_age: String,
-                patient_birth_date: String,
-                modality: String
-            }).items;
+            let message = MsgDcmInfosType.decode(diconInfoView);
+            let dcminfo = message.dcminfo;
+            if (!dcminfo) {
+                console.log(`can't get dcminfo.`);
+                return;
+            }
+
             let tbody = document.getElementById('worklist-pacs');
             tbody.innerHTML = '';
-            for (let i = 0; i < obj.length; i++) {
-                let tr = '<tr>';
-                for (let propt in obj[i]) {
-                    tr += '<td>' + obj[i][propt] + '</td>';
-                }
-                tr += '</tr>';
-                tbody.innerHTML += tr;
-            }
+            let tr = '<tr>';
+            dcminfo.forEach(ele => {
+                tr += `<td>${ele.patientName}</td>`;
+                tr += `<td>${ele.patientId}</td>`;
+                tr += `<td>${ele.seriesId}</td>`;
+                tr += `<td>${ele.modality}</td>`;
+                
+            });
+            tr += '</tr>';
+            tbody.innerHTML += tr;
         }
 
         //style changed when choose tr (based on bootstrap)
-        $('#table tbody tr').click(function() {
+        $('#table-pacs tbody tr').click(function() {
             $(this).addClass('success').siblings().removeClass('success');
         });
     }

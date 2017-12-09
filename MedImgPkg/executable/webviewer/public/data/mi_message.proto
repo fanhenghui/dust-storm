@@ -174,13 +174,12 @@ message MsgDcmInfo {
     string series_id = 2;
     string study_date = 3;
     string study_time = 4;
-    string study_description = 5;
-    string patient_id = 6;
-    string patient_name = 7;
-    string patient_sex = 8;
-    string patient_age = 9;
-    string patient_birth_date = 10;
-    string modality = 11;
+    string patient_id = 5;
+    string patient_name = 6;
+    string patient_sex = 7;
+    string patient_age = 8;
+    string patient_birth_date = 9;
+    string modality = 10;
 };
 
 message MsgDcmInfoCollection {

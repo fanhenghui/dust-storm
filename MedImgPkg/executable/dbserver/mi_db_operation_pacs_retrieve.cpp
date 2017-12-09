@@ -57,7 +57,6 @@ int DBOpPACSRetrieve::execute() {
         msg_dcm_info->set_series_id((*it).series_id);
         msg_dcm_info->set_study_date((*it).study_date);
         msg_dcm_info->set_study_time((*it).study_time);
-        msg_dcm_info->set_study_description((*it).study_description);
         msg_dcm_info->set_patient_id((*it).patient_id);
         msg_dcm_info->set_patient_name((*it).patient_name);
         msg_dcm_info->set_patient_sex((*it).patient_sex);

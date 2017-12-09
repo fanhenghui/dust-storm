@@ -32,9 +32,6 @@ static void fill_dcm_info(DcmDataset* dataset, DcmInfo& info) {
     if (dataset->findAndGetOFString(DCM_SeriesInstanceUID, str).good()) {
         info.series_id = std::string(str.c_str());
     }
-    if (dataset->findAndGetOFString(DCM_StudyDescription, str).good()) {
-        info.study_description = std::string(str.c_str());
-    }
     if (dataset->findAndGetOFString(DCM_Modality, str).good()) {
         info.modality = std::string(str.c_str());
     }
@@ -197,7 +194,6 @@ int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
     query_key.putAndInsertString(DCM_PatientSex, "");
     query_key.putAndInsertString(DCM_PatientBirthDate, "");
     query_key.putAndInsertString(DCM_PatientAge, "");
-    query_key.putAndInsertString(DCM_SeriesNumber, "");
 
     const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
     if (id == 0) {
