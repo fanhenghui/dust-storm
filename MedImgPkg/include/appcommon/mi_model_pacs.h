@@ -12,15 +12,15 @@ MED_IMG_BEGIN_NAMESPACE
 class AppCommon_Export ModelPACS : public IModel { 
 public:
     enum SortStrategy {
-        STUDY_DATE,
-        BIRTHDAY,
-        PATIENT_ID,
+        SORT_STUDY_DATE,
+        SORT_BIRTHDAY,
+        SORT_PATIENT_ID,
     };
 
     enum FilterStrategy {
-        STUDY_DATE,
-        BIRTHDAY,
-        MODALITY,
+        FILTER_STUDY_DATE,
+        FILTER_BIRTHDAY,
+        FILTER_MODALITY,
     };
 
     ModelPACS();
@@ -29,7 +29,8 @@ public:
     void clear();
     void insert(DcmInfo dcm_info);
     void update(const std::vector<DcmInfo>& dcm_infos);
-    
+
+    int  query_dicom(int idx, DcmInfo& dcm_info);    
     int  query_dicom(const std::string& series_id, DcmInfo& dcm_info);
     void sort(SortStrategy strategy, std::vector<DcmInfo>& result);
     void filter(FilterStrategy strategy, std::string attribute, std::vector<DcmInfo>& result);
@@ -46,3 +47,4 @@ private:
 };
 
 MED_IMG_END_NAMESPACE
+#endif

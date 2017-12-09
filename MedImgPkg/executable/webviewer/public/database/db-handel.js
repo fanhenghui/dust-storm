@@ -13,15 +13,15 @@ function connectDB() {
 		let addr = {};
 		for (let i = 0; i< configLines.length; ++i) {
 			let items = configLines[i].split(' ');
-			if (items.length == 3 && items[0] == 'RemoteDBIP')	 {
+			if (items.length == 3 && items[0] == 'DBIP')	 {
 				addr['ip'] = items[2];
-			} else if (items.length == 3 && items[0] == 'RemoteDBPort')	 {
+			} else if (items.length == 3 && items[0] == 'DBPort')	 {
 				addr['port'] = items[2];
-			} else if (items.length == 3 && items[0] == 'RemoteDBUser')	 {
+			} else if (items.length == 3 && items[0] == 'DBUser')	 {
 				addr['user'] = items[2];
-			} else if (items.length == 3 && items[0] == 'RemoteDBPWD')	 {
+			} else if (items.length == 3 && items[0] == 'DBPWD')	 {
 				addr['password'] = items[2];
-			} else if (items.length == 3 && items[0] == 'RemoteDBName')	 {
+			} else if (items.length == 3 && items[0] == 'DBName')	 {
 				addr['database'] = items[2];
 			}
 	

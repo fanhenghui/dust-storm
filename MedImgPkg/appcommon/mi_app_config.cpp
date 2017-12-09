@@ -64,16 +64,18 @@ void AppConfig::refresh() {
         } else if (tag == "PossibilityThreshold") {
             StrNumConverter<float> conv;
             _nodule_possibility_threshold = conv.to_num(context);
-        } else if (tag == "RemoteDBIP") {
+        } else if (tag == "DBIP") {
             _db_ip = context;
-        } else if (tag == "RemoteDBPort") {
+        } else if (tag == "DBPort") {
             _db_port = context;
-        } else if (tag == "RemoteDBUser") {
+        } else if (tag == "DBUser") {
             _db_user = context;
-        } else if (tag == "RemoteDBPWD") {
+        } else if (tag == "DBPWD") {
             _db_pwd = context;
-        } else if (tag == "RemoteDBName") {
+        } else if (tag == "DBName") {
             _db_name = context;
+        } else if (tag == "DBPath") {
+            _db_path = context;
         } else if (tag == "DBServerPort"){
             _db_server_port = context;
         } else if (tag == "CacheDBIP") {
@@ -137,7 +139,7 @@ std::string AppConfig::get_test_data_root() const {
     return _test_data_root;
 }
 
-void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path) {
+void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path) const {
     ip_port = _cache_db_ip + ":" + _cache_db_port;
     user = _cache_db_user;
     pwd = _cache_db_pwd;
@@ -145,14 +147,18 @@ void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::
     path = _cache_db_path;
 }
 
-void AppConfig::get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) {
+void AppConfig::get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) const {
     ip_port = _db_ip  + ":" + _db_port;
     user = _db_user;
     pwd = _db_pwd; 
     db_name = _db_name;
 }
 
-void AppConfig::get_db_server_host(std::string& ip, std::string& port) {
+std::string AppConfig::get_db_path() const {
+    return _db_path;
+}
+
+void AppConfig::get_db_server_host(std::string& ip, std::string& port) const {
     ip = _db_ip;
     port = _db_server_port;
 }

@@ -19,6 +19,9 @@ public:
         const std::string& root, const std::set<std::string>& postfix,
         std::map<std::string, std::vector<std::string>>& files);
 
+    static int check_direction(const std::string& path);
+    static int make_direction(const std::string& path);
+
     static int write_raw(const std::string& path, void* buffer, unsigned int length);
     static int read_raw(const std::string& path, void* buffer, unsigned int length);
     static int read_raw_ext(const std::string& path, char*& buffer, unsigned int& length);

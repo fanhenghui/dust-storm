@@ -4,6 +4,12 @@
 #include <fstream>
 #include "boost/filesystem.hpp"
 
+#ifdef WIN32
+//TODO
+#else
+#include <sys/stat.h>
+#endif
+
 MED_IMG_BEGIN_NAMESPACE
 
 namespace {
@@ -181,6 +187,24 @@ int FileUtil::read_raw_ext(const std::string& path, char*& buffer, unsigned int&
     in.close();
 
     return 0;
+}
+
+int FileUtil::check_direction(const std::string& path) {
+#ifdef WIN32
+    //TODO Windows function
+    return -1;
+#else
+    return access(path.c_str(), F_OK);
+#endif
+}
+
+int FileUtil::make_direction(const std::string& path) {
+#ifdef WIN32
+    //TODO Windows function
+    return -1;
+#else
+    return mkdir(path.c_str(), S_IRWXU);
+#endif
 }
 
 MED_IMG_END_NAMESPACE

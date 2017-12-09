@@ -1,5 +1,7 @@
 #include "mi_model_pacs.h"
 
+#include "mi_app_common_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 ModelPACS::ModelPACS() {
@@ -33,6 +35,15 @@ void ModelPACS::update(const std::vector<DcmInfo>& dcm_infos) {
     for(auto it=dcm_infos.begin(); it!=dcm_infos.end(); ++it) {
         const DcmInfo& dcm_info = *it;
         _series_mapper[dcm_info.series_id] = id++;
+    }
+}
+
+int ModelPACS::query_dicom(int idx, DcmInfo& dcm_info) {
+    if (idx < 0 || idx > (int)_dcm_infos.size()-1) {
+        return -1;
+    } else {
+        dcm_info = _dcm_infos[idx];
+        return 0;
     }
 }
 

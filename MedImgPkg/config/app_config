@@ -2,11 +2,12 @@
 TestDataRoot = /home/wangrui22/data
 
 #DB host
-RemoteDBIP = 192.168.199.107
-RemoteDBPort = 3306
-RemoteDBUser = root
-RemoteDBPWD = 123456
-RemoteDBName = med_img_db
+DBIP = 192.168.199.107
+DBPort = 3306
+DBUser = root
+DBPWD = 123456
+DBName = med_img_db
+DBPath = /home/wangrui22/med_img_db
 
 #DBS port
 DBServerPort = 8888
@@ -41,7 +42,7 @@ PyInterfacePath = /home/wangrui22/program/git/luna_detect/training
 
 #DBS<=>PACS(work on DBS)
 PACSServerAETitle = DCM4CHEE
-PACSServerHost = 172.23.232.71
+PACSServerHost = 192.168.199.107
 PACSServerPort = 11112
 PACSClientAETitle = DBS
 PACSClientPort = 11115

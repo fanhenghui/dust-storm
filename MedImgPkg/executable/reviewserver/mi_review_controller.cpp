@@ -38,6 +38,8 @@
 #include "appcommon/mi_cmd_handler_be_db_pacs_retrieve_result.h"
 #include "appcommon/mi_cmd_handler_be_db_pacs_fetch_result.h"
 
+#include "appcommon/mi_model_pacs.h"
+
 #include "mi_operation_init.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -50,6 +52,8 @@ void ReviewController::initialize() {
     AppController::initialize();
     // configure
     Configuration::instance()->set_processing_unit_type(GPU);
+    // init default model
+    init_default_model_i();
     // register command handler and operation
     register_command_handler_i();
 }
@@ -132,5 +136,8 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<CmdHandlerBE_DBPACSFetchResult>(new CmdHandlerBE_DBPACSFetchResult(app_controller)));
 }
 
+void ReviewController::init_default_model_i() {
+    this->add_model(MODEL_ID_PACS,  std::shared_ptr<ModelPACS>(new ModelPACS()));
+}
 
 MED_IMG_END_NAMESPACE

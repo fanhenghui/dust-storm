@@ -18,6 +18,7 @@ public:
     virtual void initialize();
 
 private:
+    void init_default_model_i();
     void register_command_handler_i();
 private:
 };

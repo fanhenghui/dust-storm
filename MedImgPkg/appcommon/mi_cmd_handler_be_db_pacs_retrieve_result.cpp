@@ -65,7 +65,7 @@ int CmdHandlerBE_DBPACSRetrieveResult::handle_command(const IPCDataHeader& datah
     if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse dicom info collection msg from DBS failed(PCAS retrieve).";
     }
-    std::vector<DcmInfo> dcm_infos(dcminfo_size());
+    std::vector<DcmInfo> dcm_infos(msg.dcminfo_size());
     int id=0;
     for (int i=0; i<msg.dcminfo_size(); ++i) {
         MsgDcmInfo item = msg.dcminfo(i);

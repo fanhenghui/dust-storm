@@ -22,9 +22,10 @@ public:
     std::string get_log_config_file() const;
 
     //For DB module
-    void get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path);
-    void get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name);
-    void get_db_server_host(std::string& ip, std::string& port);
+    void get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path) const;
+    void get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) const;
+    std::string get_db_path() const;
+    void get_db_server_host(std::string& ip, std::string& port) const;
 
     //For Render Module
     int get_expected_fps() const;
@@ -55,6 +56,7 @@ private:
     std::string _db_user;
     std::string _db_pwd;
     std::string _db_name;
+    std::string _db_path;
 
     //DB server (ip is the same with DB)
     std::string _db_server_port;

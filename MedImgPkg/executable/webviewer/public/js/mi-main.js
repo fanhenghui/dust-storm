@@ -157,21 +157,25 @@
 
             let tbody = document.getElementById('worklist-pacs');
             tbody.innerHTML = '';
-            let tr = '<tr>';
+            
             dcminfo.forEach(ele => {
+                let tr = '<tr>';
                 tr += `<td>${ele.patientName}</td>`;
                 tr += `<td>${ele.patientId}</td>`;
                 tr += `<td>${ele.seriesId}</td>`;
                 tr += `<td>${ele.modality}</td>`;
-                
+                tr += '</tr>';   
+                tbody.innerHTML += tr; 
             });
-            tr += '</tr>';
-            tbody.innerHTML += tr;
         }
 
         //style changed when choose tr (based on bootstrap)
         $('#table-pacs tbody tr').click(function() {
-            $(this).addClass('success').siblings().removeClass('success');
+            if ($(this).hasClass('success')) {
+                $(this).removeClass('success');
+            } else {
+                $(this).addClass('success');
+            }
         });
     }
 
@@ -479,8 +483,6 @@
         cells[3].activeAction(ACTION_ID_ROTATE, ACTION_ID_ZOOM, ACTION_ID_WINDOWING, ACTION_ID_PAN);
         cells[3].crosshair = new Crosshair(cellSVGs[3], 3, 0, 0,{a:0, b:0, c:0}, {a:0, b:0, c:0}, socketClient, 1);
 
-
-
         //nofity BE
         let MsgInit = socketClient.protocRoot.lookup('medical_imaging.MsgInit');
         if (!MsgInit) {
@@ -568,8 +570,16 @@
             return;
         }
 
-        let series = $('#table-pacs tbody tr.success td:nth-child(3)').html();
-        if (!series) {
+        let choosed = $('#table-pacs tbody tr');
+        let choosedIndex = '';
+        Array.from(choosed).forEach((item,index)=>{
+            if($(item).hasClass('success')) {
+                choosedIndex += index + '|';
+            }
+        });
+        console.log(choosedIndex);
+
+        if (!choosedIndex) {
             alert('please choose one series to fetch.');
             reutrn;
         }
@@ -583,7 +593,7 @@
             console.log('get MsgMsgStringType type failed.');
             return;
         }
-        let msg = MsgStringType.create({context:series});
+        let msg = MsgStringType.create({context:choosedIndex});
         if (!msg) {
             console.log('create PCAS fetch message failed.');
             return;

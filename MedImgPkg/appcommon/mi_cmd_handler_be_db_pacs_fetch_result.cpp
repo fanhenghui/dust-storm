@@ -25,7 +25,16 @@ int CmdHandlerBE_DBPACSFetchResult::handle_command(const IPCDataHeader& datahead
 
     //receive DBS's fetch response, and create operation to BE queue to notify FE to update series status(in PACS table)
 
+    MsgString msg;
+    if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse DB PACS fetch response message failed.";
+        msg.Clear();
+        return -1;
+    }
+    const std::string series_id = msg.context();
+    msg.Clear();
     
+    MI_APPCOMMON_LOG(MI_DEBUG) << "fetch series: " << series_id << " done.";
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS fetch response";
     return 0;

@@ -36,6 +36,7 @@
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_dbs_status.h"
 #include "appcommon/mi_model_crosshair.h"
+#include "appcommon/mi_model_pacs.h"
 #include "appcommon/mi_ob_annotation_list.h"
 #include "appcommon/mi_ob_annotation_segment.h"
 #include "appcommon/mi_ob_annotation_statistic.h"
@@ -466,9 +467,6 @@ int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
 
     controller->add_model(MODEL_ID_DBS_STATUS, 
     std::shared_ptr<ModelDBSStatus>(new ModelDBSStatus()));
-
-    controller->add_model(MODEL_ID_PACS, 
-    std::shared_ptr<ModelDBSStatus>(new ModelPACS()));
 
     MI_REVIEW_LOG(MI_TRACE) << "OUT init operation: model.";
     return 0;
