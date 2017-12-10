@@ -36,8 +36,10 @@ char* serialize_msg(MsgEvaluationResponse& msg, int& msg_size) {
     if (!msg.SerializeToArray(msg_buffer,msg_size)) {
         delete [] msg_buffer;
         msg_buffer = nullptr;
+        msg.Clear();
         return nullptr; 
     } else {
+        msg.Clear();
         return msg_buffer;
     }
 }

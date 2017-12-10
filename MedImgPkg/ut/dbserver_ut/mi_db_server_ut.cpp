@@ -127,14 +127,19 @@ IPCPackage* create_query_dicom_message() {
     post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = OPERATION_ID_DB_BE_FETCH_DICOM;
 
-    MsgString msgSeries;
-    msgSeries.set_context(series_id);
-    int post_size = msgSeries.ByteSize();
+    MsgString msg_series;
+    msg_series.set_context(series_id);
+    int post_size = msg_series.ByteSize();
     post_data = new char[post_size];
-    if (!msgSeries.SerializeToArray(post_data, post_size)) {
+    if (!msg_series.SerializeToArray(post_data, post_size)) {
         MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
+        delete [] post_data;
+        post_data = nullptr;
+        msg_series.Clear();
         return nullptr;
     }
+    msg_series.Clear();
+    
     post_header.data_len = post_size;
     return (new IPCPackage(post_header,post_data));
 }
@@ -146,14 +151,19 @@ IPCPackage* create_query_preprocess_mask_message() {
     post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK;
 
-    MsgString msgSeries;
-    msgSeries.set_context(series_id);
-    int post_size = msgSeries.ByteSize();
+    MsgString msg_series;
+    msg_series.set_context(series_id);
+    int post_size = msg_series.ByteSize();
     post_data = new char[post_size];
-    if (!msgSeries.SerializeToArray(post_data, post_size)) {
+    if (!msg_series.SerializeToArray(post_data, post_size)) {
         MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
+        delete [] post_data;
+        post_data = nullptr;
+        msg_series.Clear();
         return nullptr;
     }
+    msg_series.Clear();
+
     post_header.data_len = post_size;
     return (new IPCPackage(post_header,post_data));
 }
@@ -165,14 +175,19 @@ IPCPackage* create_query_ai_annotation_message() {
     post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
 
-    MsgString msgSeries;
-    msgSeries.set_context(series_id);
-    int post_size = msgSeries.ByteSize();
+    MsgString msg_series;
+    msg_series.set_context(series_id);
+    int post_size = msg_series.ByteSize();
     post_data = new char[post_size];
-    if (!msgSeries.SerializeToArray(post_data, post_size)) {
+    if (!msg_series.SerializeToArray(post_data, post_size)) {
         MI_LOG(MI_ERROR) << "[DB UT] " << "serialize message failed.";
+        delete [] post_data;
+        post_data = nullptr;
+        msg_series.Clear();
         return nullptr;
     }
+    msg_series.Clear();
+
     post_header.data_len = post_size;
     return (new IPCPackage(post_header,post_data));
 }

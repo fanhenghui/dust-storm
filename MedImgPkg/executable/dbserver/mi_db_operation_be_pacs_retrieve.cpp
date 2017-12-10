@@ -74,10 +74,13 @@ int DBOpBEPACSRetrieve::execute() {
     char* buffer = new char[buffer_size];
     if (!msg_dcm_info_collection.SerializeToArray(buffer, buffer_size)) {
         MI_DBSERVER_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
+        delete [] buffer;
+        buffer = nullptr;
         msg_dcm_info_collection.Clear();
         return -1;
     }
-
+    msg_dcm_info_collection.Clear();
+    
     IPCDataHeader header;
     header.receiver = _header.receiver;
     header.data_len = buffer_size;

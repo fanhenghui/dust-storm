@@ -15,6 +15,7 @@
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
 #include "mi_app_common_define.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -72,9 +73,14 @@ void BECmdHandlerFEPlayVR::logic_i(IPCDataHeader header) {
                                          
         char* buffer_rotation = new char[msg.ByteSize()];
         if (!msg.SerializeToArray(buffer_rotation, msg.ByteSize())) {
-            printf("serialize rotation msg failed!\n");
+            MI_APPCOMMON_LOG(MI_ERROR) << "serialize rotation msg failed.";
+            delete [] buffer_rotation;
+            buffer_rotation = nullptr;
+            msg.Clear();
             return;
         }
+        msg.Clear();
+        
         header.data_len = msg.ByteSize();
         if (op) {
             op->reset();

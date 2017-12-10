@@ -129,13 +129,18 @@ static IPCPackage* create_info_msg_package(int op_id, const std::string& series_
     post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = op_id;
 
-    MsgString msgSeries;
-    msgSeries.set_context(series_uid);
-    int post_size = msgSeries.ByteSize();
+    MsgString msg_series;
+    msg_series.set_context(series_uid);
+    int post_size = msg_series.ByteSize();
     post_data = new char[post_size];
-    if (!msgSeries.SerializeToArray(post_data, post_size)) {
+    if (!msg_series.SerializeToArray(post_data, post_size)) {
+        delete [] post_data;
+        post_data = nullptr;
+        msg_series.Clear();
         return nullptr;
     }
+    msg_series.Clear();
+    
     post_header.data_len = post_size;
     return (new IPCPackage(post_header,post_data));
 }

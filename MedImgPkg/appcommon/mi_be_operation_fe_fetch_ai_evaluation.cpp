@@ -57,14 +57,19 @@ int BEOpFEFetchAIEvaluation::execute() {
         post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
         post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
 
-        MsgString msgSeries;
-        msgSeries.set_context(serise_id);
-        int post_size = msgSeries.ByteSize();
+        MsgString msg_series;
+        msg_series.set_context(serise_id);
+        int post_size = msg_series.ByteSize();
         post_data = new char[post_size];
-        if (!msgSeries.SerializeToArray(post_data, post_size)) {
+        if (!msg_series.SerializeToArray(post_data, post_size)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "create series message failed. ";
+            delete [] post_data;
+            post_data = nullptr;
+            msg_series.Clear();
             return -1;
         }
+        msg_series.Clear();
+        
         post_header.data_len = post_size;
         std::vector<IPCPackage*> pkgs;
         pkgs.push_back(new IPCPackage(post_header,post_data));

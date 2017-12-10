@@ -24,20 +24,22 @@ MED_IMG_BEGIN_NAMESPACE
 #ifndef SEND_ERROR_TO_BE
 #define SEND_ERROR_TO_BE(server_proxy, client_socket_id, err)           \
 if (nullptr != server_proxy && !std::string(err).empty()) {             \
-    MsgString msgErr;                                                   \
-    msgErr.set_context(err);                                            \
-    const int buffer_size = msgErr.ByteSize();                          \
+    MsgString msg_err;                                                  \
+    msg_err.set_context(err);                                           \
+    const int buffer_size = msg_err.ByteSize();                         \
     if (buffer_size > 0) {                                              \
         IPCDataHeader header;                                           \
         header.receiver = (client_socket_id);                           \
-        header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;                       \
+        header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;                    \
         header.data_len = buffer_size;                                  \
         char* buffer = new char[buffer_size];                           \
         if (nullptr != buffer) {                                        \
-            if (!msgErr.SerializeToArray(buffer, buffer_size)) {        \
+            if (!msg_err.SerializeToArray(buffer, buffer_size)) {       \
                 delete [] buffer;                                       \
                 buffer = nullptr;                                       \
+                msg_err.Clear();                                        \
             } else {                                                    \
+                msg_err.Clear();                                        \
                 IPCPackage* package = new IPCPackage(header, buffer);   \
                 if (0 != server_proxy->async_send_data(package)) {      \
                     delete package;                                     \

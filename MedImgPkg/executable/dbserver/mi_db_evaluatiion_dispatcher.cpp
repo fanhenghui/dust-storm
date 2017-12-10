@@ -17,19 +17,21 @@ MED_IMG_BEGIN_NAMESPACE
 
 namespace {
 IPCPackage* create_error_message(const std::string& err) {
-    MsgString msgErr;
-    msgErr.set_context(err);
-    const int buffer_size = msgErr.ByteSize();
+    MsgString msg_err;
+    msg_err.set_context(err);
+    const int buffer_size = msg_err.ByteSize();
     if (buffer_size > 0) {
         IPCDataHeader header;
         header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;
         header.data_len = buffer_size;
         char* buffer = new char[buffer_size];
         if (nullptr != buffer) {
-            if (!msgErr.SerializeToArray(buffer, buffer_size)) {
+            if (!msg_err.SerializeToArray(buffer, buffer_size)) {
                 delete [] buffer;
                 buffer = nullptr;
+                msg_err.Clear();
             } else {
+                msg_err.Clear();
                 return new IPCPackage(header, buffer);;
             }
         }
@@ -139,13 +141,13 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         return -1;
     }
 
-    MsgAnnotationCollectionDB msgAnnos;
-    msgAnnos.set_series_uid(series_id);
+    MsgAnnotationCollectionDB msg_annos;
+    msg_annos.set_series_uid(series_id);
 
     const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
     for (auto it = vois.begin(); it != vois.end(); ++it) {
         const VOISphere &voi = *it;
-        MsgAnnotationUnitDB* anno = msgAnnos.add_annotation();
+        MsgAnnotationUnitDB* anno = msg_annos.add_annotation();
         anno->set_x(voi.center.x);
         anno->set_y(voi.center.y);        
         anno->set_z(voi.center.z);        
@@ -153,14 +155,16 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         anno->set_p(voi.para0);
     }
 
-    const int buffer_size = msgAnnos.ByteSize();
+    const int buffer_size = msg_annos.ByteSize();
     char* buffer = new char[buffer_size];
-    if (!msgAnnos.SerializeToArray(buffer, buffer_size)) {
+    if (!msg_annos.SerializeToArray(buffer, buffer_size)) {
         SEND_ERROR_TO_BE(server_proxy, client_id, "serialize message for AI annotation failed.");
         delete [] buffer;
+        buffer = nullptr;
+        msg_annos.Clear();
         return -1;
     }
-    msgAnnos.Clear();
+    msg_annos.Clear();
     
     IPCDataHeader header;
     header.receiver = client_id;
@@ -240,27 +244,29 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         return -1;
     }
 
-    MsgAnnotationCollectionDB msgAnnos;
-    msgAnnos.set_series_uid(series_id);
+    MsgAnnotationCollectionDB msg_annos;
+    msg_annos.set_series_uid(series_id);
     const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
     for (auto it = vois.begin(); it != vois.end(); ++it) {
         const VOISphere &voi = *it;
-        MsgAnnotationUnitDB* anno = msgAnnos.add_annotation();
+        MsgAnnotationUnitDB* anno = msg_annos.add_annotation();
         anno->set_x(voi.center.x);
         anno->set_y(voi.center.y);        
         anno->set_z(voi.center.z);        
         anno->set_r(voi.diameter);
         anno->set_p(voi.para0);
     }
-    const int buffer_size = msgAnnos.ByteSize();
+    const int buffer_size = msg_annos.ByteSize();
     char* buffer = new char[buffer_size];
-    if (!msgAnnos.SerializeToArray(buffer, buffer_size)) {
+    if (!msg_annos.SerializeToArray(buffer, buffer_size)) {
         IPCPackage* err_pkg = create_error_message("serialize message for AI annotation failed.");
         notify_all(err_pkg);
         delete [] buffer;
+        msg_annos.Clear();
         return -1;
     }
-    msgAnnos.Clear();
+    msg_annos.Clear();
+
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_BE_DB_SEND_AI_EVALUATION;
     header.data_len = buffer_size;
@@ -320,7 +326,10 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
             op->set_data(header, msg_buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);
-        } 
+        } else {
+            delete [] msg_buffer;
+            msg_buffer = nullptr;
+        }
         msg.Clear();
         MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";
     }

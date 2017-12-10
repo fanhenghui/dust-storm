@@ -78,6 +78,7 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
     if (!msg_response.SerializeToArray(msg_buffer, msg_buffer_size)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialize FE fetch series message failed.";
         delete [] msg_buffer;
+        msg_buffer = nullptr;
         msg_response.Clear();
         return -1;
     }
