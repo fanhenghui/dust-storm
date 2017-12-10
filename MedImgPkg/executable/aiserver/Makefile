@@ -18,8 +18,8 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-OBJS = mi_ai_server_controller.o mi_ai_server_thread_model.o  mi_ai_cmd_handler_operating.o mi_ai_lung_evaluate_py_wrapper.o \
-mi_ai_operation_evaluate.o 
+OBJS = mi_ai_server_controller.o mi_ai_server_thread_model.o  mi_ai_cmd_handler_db_operation.o mi_ai_lung_evaluate_py_wrapper.o \
+mi_ai_operation_db_request_evaluation.o 
 
 TARGET = $(BIN_DIR)/aiserver
 
@@ -36,14 +36,14 @@ mi_ai_server_main.o: $(EXPORT_HEADER)  mi_ai_server_main.cpp mi_ai_server_contro
 	$(CC) -c -fPIC $(CFLAGS) mi_ai_server_main.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_ai_server_controller.o : mi_ai_server_controller.cpp mi_ai_server_controller.h \
-mi_ai_server_thread_model.o mi_ai_operation_evaluate.o mi_ai_cmd_handler_operating.o
+mi_ai_server_thread_model.o mi_ai_operation_db_request_evaluation.o mi_ai_cmd_handler_db_operation.o
 	$(CC) -c -fPIC $(CFLAGS) mi_ai_server_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_ai_operation_evaluate.o: mi_ai_operation_evaluate.cpp mi_ai_operation_evaluate.h mi_ai_lung_evaluate_py_wrapper.o
-	$(CC) -c -fPIC $(CFLAGS) mi_ai_operation_evaluate.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_ai_operation_db_request_evaluation.o: mi_ai_operation_db_request_evaluation.cpp mi_ai_operation_db_request_evaluation.h mi_ai_lung_evaluate_py_wrapper.o
+	$(CC) -c -fPIC $(CFLAGS) mi_ai_operation_db_request_evaluation.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_ai_cmd_handler_operating.o: mi_ai_cmd_handler_operating.cpp mi_ai_cmd_handler_operating.h 
-	$(CC) -c -fPIC $(CFLAGS) mi_ai_cmd_handler_operating.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_ai_cmd_handler_db_operation.o: mi_ai_cmd_handler_db_operation.cpp mi_ai_cmd_handler_db_operation.h 
+	$(CC) -c -fPIC $(CFLAGS) mi_ai_cmd_handler_db_operation.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_ai_server_thread_model.o : mi_ai_server_thread_model.cpp mi_ai_server_thread_model.h
 	$(CC) -c -fPIC $(CFLAGS) mi_ai_server_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)

@@ -8,8 +8,8 @@
 #include "appcommon/mi_operation_factory.h"
 
 #include "mi_ai_server_thread_model.h"
-#include "mi_ai_cmd_handler_operating.h"
-#include "mi_ai_operation_evaluate.h"
+#include "mi_ai_cmd_handler_db_operation.h"
+#include "mi_ai_operation_db_request_evaluation.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -51,7 +51,7 @@ void AIServerController::initialize() {
         std::shared_ptr<CmdHandlerAIOperating>(new CmdHandlerAIOperating(shared_from_this())));
 
     OperationFactory::instance()->register_operation(OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION, 
-    std::shared_ptr<AIOpEvaluate>(new AIOpEvaluate()));
+    std::shared_ptr<AIODBRequestEvaluation>(new AIODBRequestEvaluation()));
 
     //register event for on connect to DB Server
     _client_proxy->register_on_connection_event(std::shared_ptr<ReadyEvent>(new ReadyEvent(_thread_model)));

@@ -1,5 +1,5 @@
-#ifndef MED_IMG_MI_CMD_HANDLER_AI_SERVER_OPERATING_H
-#define MED_IMG_MI_CMD_HANDLER_AI_SERVER_OPERATING_H
+#ifndef MEDIMG_AI_MI_AI_CMD_HANDLER_DB_OPERATION_H
+#define MEDIMG_AI_MI_AI_CMD_HANDLER_DB_OPERATION_H
 
 #include <memory>
 
@@ -13,7 +13,7 @@ MED_IMG_BEGIN_NAMESPACE
 class AIServerController;
 class CmdHandlerAIOperating : public ICommandHandler {
 public:
-    CmdHandlerAIOperating(std::shared_ptr<AIServerController> controller);
+    explicit CmdHandlerAIOperating(std::shared_ptr<AIServerController> controller);
 
     virtual ~CmdHandlerAIOperating();
 

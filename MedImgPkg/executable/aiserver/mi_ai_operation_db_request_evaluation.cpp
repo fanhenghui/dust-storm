@@ -1,4 +1,4 @@
-#include "mi_ai_operation_evaluate.h"
+#include "mi_ai_operation_db_request_evaluation.h"
 
 #include <time.h>
 
@@ -19,11 +19,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-AIOpEvaluate::AIOpEvaluate() {
+AIODBRequestEvaluation::AIODBRequestEvaluation() {
 
 }
 
-AIOpEvaluate::~AIOpEvaluate() {
+AIODBRequestEvaluation::~AIODBRequestEvaluation() {
 
 }
 
@@ -60,7 +60,7 @@ int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> c
     }
 }
 
-int AIOpEvaluate::execute() {
+int AIODBRequestEvaluation::execute() {
     MI_AISERVER_LOG(MI_TRACE) << "IN Inference operation.";
 
     AISERVER_CHECK_NULL_EXCEPTION(_buffer);
