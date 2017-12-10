@@ -15,20 +15,25 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCaster::RayCaster()
-    : _inner_buffer(new RayCasterInnerBuffer()), _sample_rate(0.5f), _custom_sample_rate(0.5f), 
-      _global_ww(1.0f), _global_wl(0.0f), _pseudo_color_array(nullptr),
-      _pseudo_color_length(256), _ssd_gray(1.0f), _enable_jittering(false),
+    :  _sample_rate(0.5f), _custom_sample_rate(0.5f), 
+      _global_ww(1.0f), _global_wl(0.0f),
+      _pseudo_color_array(nullptr), _pseudo_color_length(256), 
+      _inner_buffer(new RayCasterInnerBuffer()),
+      _ssd_gray(1.0f), _enable_jittering(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
-      _mask_mode(MASK_NONE), _composite_mode(COMPOSITE_AVERAGE),
-      _interpolation_mode(LINEAR), _shading_mode(SHADING_NONE),
+      _mask_mode(MASK_NONE), 
+      _composite_mode(COMPOSITE_AVERAGE),
+      _interpolation_mode(LINEAR), 
+      _shading_mode(SHADING_NONE),
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
-      _mask_overlay_mode(MASK_OVERLAY_DISABLE), _strategy(CPU_BASE),
-      _test_code(0),
+      _mask_overlay_mode(MASK_OVERLAY_DISABLE), 
       _mask_overlay_opacity(0.5f),
+      _strategy(CPU_BASE),
+      _pre_rendering_duration(0),
       _downsample(false), 
       _expected_fps(30), 
-      _pre_rendering_duration(0),
-      _map_quarter_canvas(false) {
+      _map_quarter_canvas(false),
+      _test_code(0) {
     _ambient_color[0] = 1.0f;
     _ambient_color[1] = 1.0f;
     _ambient_color[2] = 1.0f;

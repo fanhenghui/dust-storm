@@ -78,9 +78,9 @@ enum ProxyGeometry {
 #define BUFFER_BINDING_WINDOW_LEVEL_BUCKET 4
 #define BUFFER_BINDING_MATERIAL_BUCKET 5
 
-static const RGBUnit kColorTransverse = RGBUnit(237, 25, 35); //����� ��ɫ
-static const RGBUnit kColorCoronal = RGBUnit(255, 128, 0); //��״�� �ۻ�ɫ
-static const RGBUnit kColorSagittal = RGBUnit(1, 255, 64); //ʸ״�� ��ɫ
+static const RGBUnit kColorTransverse = RGBUnit(237, 25, 35);
+static const RGBUnit kColorCoronal = RGBUnit(255, 128, 0);
+static const RGBUnit kColorSagittal = RGBUnit(1, 255, 64);
 
 static const int S_TRANSFER_FUNC_WIDTH = 512;
 

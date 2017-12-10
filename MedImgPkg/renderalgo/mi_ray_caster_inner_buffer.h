@@ -20,16 +20,6 @@ public:
         TYPE_END,
     };
 
-    LabelLevel _label_level;
-
-    std::vector<unsigned char> _labels;
-
-    std::map<unsigned char, Vector2f> _window_levels;
-
-    std::map<unsigned char, RGBAUnit> _mask_overlay_colors;
-
-    std::map<unsigned char, Material> _material;
-
 public:
     RayCasterInnerBuffer();
 
@@ -55,6 +45,13 @@ private:
     std::unique_ptr<GLResource> _inner_resource;
 
     std::unique_ptr<char[]> _shared_buffer_array;
+
+    LabelLevel _label_level;
+
+    std::vector<unsigned char> _labels;
+    std::map<unsigned char, Vector2f> _window_levels;
+    std::map<unsigned char, RGBAUnit> _mask_overlay_colors;
+    std::map<unsigned char, Material> _material;
 };
 
 MED_IMG_END_NAMESPACE

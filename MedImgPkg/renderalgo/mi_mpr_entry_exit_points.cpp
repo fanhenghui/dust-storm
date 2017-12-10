@@ -79,8 +79,9 @@ bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound, Ve
 }
 
 MPREntryExitPoints::MPREntryExitPoints()
-    : _thickness(1.0f), _entry_plane(1, 0, 0, 0), _exit_plane(1, 0, 0, 0),
-      _sample_rate(1.0) {}
+    : _thickness(1.0f), _sample_rate(1.0), 
+    _entry_plane(1,0,0,0), _exit_plane(1,0,0,0),_ray_dir_norm(0,0,0),
+    _standard_steps(0) {}
 
 MPREntryExitPoints::~MPREntryExitPoints() {}
 

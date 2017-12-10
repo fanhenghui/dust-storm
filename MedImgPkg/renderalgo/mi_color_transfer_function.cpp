@@ -167,7 +167,7 @@ int ColorTransFunc::get_width() const {
 }
 
 ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv) {
-    /// \�����HSV�ķ�Χ�� H��hue��0~360
+    // H(hue) 0 ~ 359
     // S(saturation) 0 ~ 1(0~100%)
     // V(value) 0~1(0~100%)
     float h = hsv.x / 360.0f;
@@ -221,7 +221,7 @@ ColorTFPoint ColorTransFunc::hsv_to_rgb(const ColorTFPoint& hsv) {
 }
 
 ColorTFPoint ColorTransFunc::rgb_to_hsv(const ColorTFPoint& rgb) {
-    /// \�����RGB�ķ�Χ�� 0~1
+    //input rgb 0 ~ 1
     float onethird = 1.0f / 3.0f;
     float onesixth = 1.0f / 6.0f;
     float twothird = 2.0f / 3.0f;

@@ -139,15 +139,15 @@ void RayCastingCPU::ray_casting_average_i(
     for (int idx = 0; idx < pixel_sum; ++idx) {
         const Sampler<T> sampler;
 
-        const int y = idx / _width;
-        const int x = idx - y * _width;
+        //const int y = idx / _width;
+        //const int x = idx - y * _width;
 
         // 1 Get entry exit points
         const Vector3f start_point(_entry_points[idx]._m128);
         const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool skip = start_point._m[3] <
-                          -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        // -1.0 for skip , 0  for valid entry exit points
+        const bool skip = start_point._m[3] <-0.5f; 
 
         if (skip) {
             _canvas_array[idx] = RGBAUnit();
@@ -206,15 +206,15 @@ void RayCastingCPU::ray_casting_mip_i(std::shared_ptr<RayCaster> ray_caster) {
     for (int idx = 0; idx < pixel_sum; ++idx) {
         const Sampler<T> sampler;
 
-        const int y = idx / _width;
-        const int x = idx - y * _width;
+        //const int y = idx / _width;
+        //const int x = idx - y * _width;
 
         // 1 Get entry exit points
         const Vector3f start_point(_entry_points[idx]._m128);
         const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool skip = start_point._m[3] <
-                          -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        // -1.0 for skip , 0  for valid entry exit points
+        const bool skip = start_point._m[3] < -0.5f; 
 
         if (skip) {
             _canvas_array[idx] = RGBAUnit();
@@ -269,15 +269,15 @@ void RayCastingCPU::ray_casting_minip_i(std::shared_ptr<RayCaster> ray_caster) {
     for (int idx = 0; idx < pixel_sum; ++idx) {
         const Sampler<T> sampler;
 
-        const int y = idx / _width;
-        const int x = idx - y * _width;
+        //const int y = idx / _width;
+        //const int x = idx - y * _width;
 
         // 1 Get entry exit points
         const Vector3f start_point(_entry_points[idx]._m128);
         const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool skip = start_point._m[3] <
-                          -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        // -1.0 for skip , 0  for valid entry exit points
+        const bool skip = start_point._m[3] < -0.5f; 
 
         if (skip) {
             _canvas_array[idx] = RGBAUnit();
@@ -391,15 +391,14 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
         Sampler<unsigned char> sampler;
         int active_mask_code[4] = {0, 0, 0, 0};
 
-        const int y = idx / _width;
-        const int x = idx - y * _width;
+        //const int y = idx / _width;
+        //const int x = idx - y * _width;
 
         // 1 Get entry exit points
         const Vector3f start_point(_entry_points[idx]._m128);
         const Vector3f end_point(_exit_points[idx]._m128);
 
-        const bool skip = start_point._m[3] <
-                          -0.5f; // -1.0 for skip , 0  for valid entry exit points
+        const bool skip = start_point._m[3] < -0.5f; // -1.0 for skip , 0  for valid entry exit points
 
         if (skip) {
             continue;
@@ -459,8 +458,7 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
         // 4 Blend
         RGBAUnit& previous_rgba = _canvas_array[idx];
         current_color = Vector3f((float)previous_rgba.r, (float)previous_rgba.g,
-                                 (float)previous_rgba.b) +
-                        current_color * current_alpha;
+                                 (float)previous_rgba.b) + current_color * current_alpha;
 
         RGBAUnit current_rgba;
         current_rgba.r = current_color._m[0] > 255.0f

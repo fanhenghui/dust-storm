@@ -131,9 +131,6 @@ void CameraCalculator::calculate_patient_axis_info_i() {
     const Vector3& y_coord_patient = _volume_data->_image_orientation[1];
     const Vector3& z_coord_patient = _volume_data->_image_orientation[2];
 
-    const double* spacing = _volume_data->_spacing;
-    const unsigned int* dim = _volume_data->_dim;
-
     /// rotate the volume to get consistent with patient coordinate
     const Vector3 standard_haed_axis(0.0, 0.0, 1.0);
     const Vector3 standard_left_axis(1.0, 0.0, 0.0);
@@ -394,12 +391,11 @@ bool CameraCalculator::page_orthogonal_mpr_to(
     changed_look_at += dir * (step) * spacing_step;
     changed_eye += dir * (step) * spacing_step;
 
-    const double distance =
-        dir.dot_product(changed_look_at - _othogonal_mpr_camera[scan_type].get_look_at());
-    const double delta = distance / spacing_step;
-    const int delta_i = int(delta);
+    //const double distance = dir.dot_product(changed_look_at - _othogonal_mpr_camera[scan_type].get_look_at());
+    //const double delta = distance / spacing_step;
+    //const int delta_i = int(delta);
+    //int cur_page = get_default_page(scan_type) + delta_i;
 
-    int cur_page = get_default_page(scan_type) + delta_i;
     if (page >= 0 && page < get_page_maximum(scan_type)) {
         camera->set_eye(changed_eye);
         camera->set_look_at(changed_look_at);
@@ -611,7 +607,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
 
     if (uiSagittalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
-                   _volume_data->_spacing[_leftInfo.volume_coord / 2]; //ȡ����
+                   _volume_data->_spacing[_leftInfo.volume_coord / 2]; //floor
     }
 
     // Transversal translate
@@ -622,7 +618,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
 
     if (uiTransversalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
-                   _volume_data->_spacing[_headInfo.volume_coord / 2]; //ȡ����
+                   _volume_data->_spacing[_headInfo.volume_coord / 2]; //floor
     }
 
     // Coronal translate
@@ -633,7 +629,7 @@ void CameraCalculator::calculate_default_mpr_center_world_i() {
 
     if (uiCoronalDimension % 2 != 0) {
         look_at -= view_dir * 0.5 *
-                   _volume_data->_spacing[_posteriorInfo.volume_coord / 2]; //ȡ����
+                   _volume_data->_spacing[_posteriorInfo.volume_coord / 2]; //floor
     }
 
     _default_mpr_center = look_at;

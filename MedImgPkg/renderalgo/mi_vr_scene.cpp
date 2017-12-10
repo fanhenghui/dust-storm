@@ -29,7 +29,7 @@ struct VRScene::RayEnd
     int height;
     bool lut_dirty;
 
-    RayEnd():width(0),height(0),array(nullptr),lut_dirty(true) {}
+    RayEnd():array(nullptr),width(0),height(0),lut_dirty(true) {}
     ~RayEnd() {
         if (array) {
             delete [] array;

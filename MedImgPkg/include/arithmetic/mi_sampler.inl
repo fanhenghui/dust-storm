@@ -37,10 +37,8 @@ float Sampler<T>::sample_2d_linear(float x, float y, unsigned int uiWidth,
     }
 
     unsigned int uiYAdjust = uiWidth;
-
-    if (y >=
-            (float)(uiHeight - 1) -
-            FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
+    //TODO 这里必须带==号 否则在诸如y正好为整数的时候会进不去分支
+    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) { 
         y = (float)(uiHeight - 1);
         uiYAdjust = 0;
     }
@@ -77,17 +75,6 @@ float Sampler<T>::sample_3d_nearst(float x, float y, float z,
         x = (float)(uiWidth - 1);
     }
 
-    unsigned int uiYAdjust = uiWidth;
-
-    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
-        uiYAdjust = 0;
-    }
-
-    unsigned int uiZAdjust = uiWidth * uiHeight;
-
-    if (z >= (float)(uiDepth - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������z����Ϊ������ʱ������ȥ��֧
-        uiZAdjust = 0;
-    }
     const unsigned int uX = (unsigned int)x;
     const unsigned int uY = (unsigned int)y;
     const unsigned int uZ = (unsigned int)z;
@@ -112,14 +99,14 @@ float Sampler<T>::sample_3d_linear(float x, float y, float z,
 
     unsigned int uiYAdjust = uiWidth;
 
-    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������y����Ϊ������ʱ������ȥ��֧
+    if (y >= (float)(uiHeight - 1) - FLOAT_EPSILON) {
         y = (float)(uiHeight - 1);
         uiYAdjust = 0;
     }
 
     unsigned int uiZAdjust = uiWidth * uiHeight;
 
-    if (z >= (float)(uiDepth - 1) - FLOAT_EPSILON) { // TODO ��������==�� ����������z����Ϊ������ʱ������ȥ��֧
+    if (z >= (float)(uiDepth - 1) - FLOAT_EPSILON) {
         z = (float)(uiDepth - 1);
         uiZAdjust = 0;
     }

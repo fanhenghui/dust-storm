@@ -43,10 +43,11 @@ private:
     GLTexture2DPtr _depth_attach;
     GLResourceShield _res_shield;
 
+    bool _has_init;
+
     int _width;
     int _height;
     std::unique_ptr<RGBAUnit[]> _color_array;
-    bool _has_init;
 };
 
 MED_IMG_END_NAMESPACE

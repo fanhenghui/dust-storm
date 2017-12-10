@@ -12,10 +12,10 @@ MED_IMG_BEGIN_NAMESPACE
 
 
 //Notify code ID:
-//0 �޸Ľ��� 
-//1 �޸Ĺ�����
-//2 ���voi
-//3 ɾ��voi
+//0 modify complete
+//1 modifying
+//2 add voi
+//3 dlete voi
 class QtWidgets_Export VOIModel : public IModel
 {
 public:

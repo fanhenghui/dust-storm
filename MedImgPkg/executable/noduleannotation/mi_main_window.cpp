@@ -131,7 +131,7 @@ NoduleAnnotation::NoduleAnnotation(QWidget *parent, Qt::WFlags flags)
     _mpr_00->setMinimumSize(100,100);
     _vr_11->setMinimumSize(100,100);
 
-    //_mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//����Ӧ����
+    //_mpr_00->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);//自适应窗口
     //_mpr_01->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
     //_mpr10->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
     //_vr_11->setSizePolicy(QSizePolicy::Expanding , QSizePolicy::Expanding);
@@ -412,7 +412,7 @@ void NoduleAnnotation::create_model_observer_i()
     _ob_voi_table.reset(new VOITableObserver());
     _ob_voi_table->set_nodule_object(_object_nodule);
 
-    _ob_scene_container.reset(new SceneContainerObserver());//���� observer
+    _ob_scene_container.reset(new SceneContainerObserver());
     _ob_scene_container->add_scene_container(_mpr_00);
     _ob_scene_container->add_scene_container(_mpr_01);
     _ob_scene_container->add_scene_container(_mpr_10);
@@ -429,7 +429,7 @@ void NoduleAnnotation::create_model_observer_i()
     _model_voi->add_observer(_ob_voi_segment);//Segment first
     _model_voi->add_observer(_ob_voi_statistic);// Then statistic
 
-    //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene��ˢ��ͨ��change item�����
+    //m_painter_voiModel->add_observer(m_pSceneContainerOb);//Scene refresh called by change item
 
     //Crosshair & cross location
     _model_crosshair.reset(new CrosshairModel());

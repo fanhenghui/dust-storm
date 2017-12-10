@@ -86,7 +86,7 @@ mi_entry_exit_points.o mi_ray_caster_canvas.o $(GPU_REBDER_STEP)
 	$(CC) -c -fPIC $(CFLAGS) mi_ray_casting_gpu.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 $(GPU_REBDER_STEP): %.o:%.cpp %.h 
-	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) -Wno-unused-variable -o $@ $< $(ADDITINAL_INCLUDE_DIR)
 
 mi_ray_casting_cpu.o: $(EXPORT_HEADER) mi_ray_casting_cpu.h mi_ray_casting_cpu.cpp \
 mi_entry_exit_points.o mi_ray_caster_canvas.o
@@ -105,16 +105,16 @@ mi_camera_calculator.o mi_entry_exit_points.o mi_vr_proxy_geometry_cube.o mi_vr_
 
 mi_vr_proxy_geometry_cube.o: $(EXPORT_HEADER) mi_vr_proxy_geometry_cube.h mi_vr_proxy_geometry_cube.cpp mi_ray_caster_define.h \
 mi_camera_calculator.o
-	$(CC) -c -fPIC $(CFLAGS) mi_vr_proxy_geometry_cube.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) -Wno-unused-variable mi_vr_proxy_geometry_cube.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_vr_proxy_geometry_brick.o: $(EXPORT_HEADER) mi_vr_proxy_geometry_brick.h mi_vr_proxy_geometry_brick.cpp mi_ray_caster_define.h \
 mi_camera_calculator.o
-	$(CC) -c -fPIC $(CFLAGS) mi_vr_proxy_geometry_brick.cpp $(ADDITINAL_INCLUDE_DIR)		
+	$(CC) -c -fPIC $(CFLAGS) -Wno-unused-variable mi_vr_proxy_geometry_brick.cpp $(ADDITINAL_INCLUDE_DIR)		
 
 #Entry exit points(MPR)
 mi_mpr_entry_exit_points.o: $(EXPORT_HEADER) mi_mpr_entry_exit_points.h mi_mpr_entry_exit_points.cpp mi_ray_caster_define.h \
 mi_camera_calculator.o mi_entry_exit_points.o
-	$(CC) -c -fPIC $(CFLAGS) mi_mpr_entry_exit_points.cpp $(ADDITINAL_INCLUDE_DIR)	
+	$(CC) -c -fPIC $(CFLAGS) -Wno-unused-variable mi_mpr_entry_exit_points.cpp $(ADDITINAL_INCLUDE_DIR)	
 
 mi_entry_exit_points.o: $(EXPORT_HEADER) mi_entry_exit_points.h mi_entry_exit_points.cpp mi_camera_calculator.o
 	$(CC) -c -fPIC $(CFLAGS) mi_entry_exit_points.cpp $(ADDITINAL_INCLUDE_DIR)	
@@ -141,7 +141,7 @@ mi_brick_pool.o: $(EXPORT_HEADER) mi_brick_pool.h mi_brick_pool.cpp mi_brick_def
 	$(CC) -c -fPIC $(CFLAGS) mi_brick_pool.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_brick_info_calculator.o: $(EXPORT_HEADER) mi_brick_info_calculator.h mi_brick_info_calculator.cpp mi_brick_define.h
-	$(CC) -c -fPIC $(CFLAGS) mi_brick_info_calculator.cpp $(ADDITINAL_INCLUDE_DIR)
+	$(CC) -c -fPIC $(CFLAGS) -Wno-unused-variable mi_brick_info_calculator.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_mask_label_store.o: $(EXPORT_HEADER) mi_mask_label_store.h mi_mask_label_store.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_mask_label_store.cpp $(ADDITINAL_INCLUDE_DIR)	

@@ -21,8 +21,9 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster)
-    : _ray_caster(ray_caster), _last_test_code(-1), _render_duration(0), 
-      _gl_act_tex_counter(new GLActiveTextureCounter()) {}
+    : _ray_caster(ray_caster), _gl_act_tex_counter(new GLActiveTextureCounter()), 
+    _render_duration(0), _last_test_code(-1)
+       {}
 
 RayCastingGPU::~RayCastingGPU() {}
 
@@ -43,8 +44,7 @@ void RayCastingGPU::render() {
 
     _gl_act_tex_counter->reset();
 
-    for (auto it = _ray_casting_steps.begin(); it != _ray_casting_steps.end();
-            ++it) {
+    for (auto it = _ray_casting_steps.begin(); it != _ray_casting_steps.end(); ++it) {
         (*it)->set_gpu_parameter();
     }
 
