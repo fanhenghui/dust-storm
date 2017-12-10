@@ -11,17 +11,17 @@
 
 #include "mi_db_server_thread_model.h"
 
-#include "mi_db_cmd_handler_be_operating.h"
-#include "mi_db_operation_query_dicom.h"
-#include "mi_db_operation_fetch_ai_evaluation.h"
-#include "mi_db_operation_query_preprocess_mask.h"
-#include "mi_db_operation_query_end.h"
-#include "mi_db_operation_pacs_retrieve.h"
-#include "mi_db_operation_pacs_fetch.h"
+#include "mi_db_cmd_handler_be_operation.h"
+#include "mi_db_operation_be_fetch_dicom.h"
+#include "mi_db_operation_be_fetch_ai_evaluation.h"
+#include "mi_db_operation_be_fetch_preprocess_mask.h"
+#include "mi_db_operation_be_request_end.h"
+#include "mi_db_operation_be_pacs_retrieve.h"
+#include "mi_db_operation_be_pacs_fetch.h"
 
-#include "mi_db_cmd_handler_ais_operating.h"
-#include "mi_db_operation_receive_evaluation.h"
-#include "mi_db_operation_receive_ai_ready.h"
+#include "mi_db_cmd_handler_ai_operation.h"
+#include "mi_db_operation_ai_send_evaluation.h"
+#include "mi_db_operation_ai_ready.h"
 #include "mi_db_evaluatiion_dispatcher.h"
 #include "mi_db_server_console_echo.h"
 
@@ -47,30 +47,30 @@ DBServerController::~DBServerController() {
 void DBServerController::initialize() {
     //register cmd handler for BE 
     _server_proxy_be->register_command_handler(COMMAND_ID_DB_BE_OPERATION, 
-        std::shared_ptr<CmdHandlerDBBEOperating>(new CmdHandlerDBBEOperating(shared_from_this())));
+        std::shared_ptr<DBCmdHandlerBEOperation>(new DBCmdHandlerBEOperation(shared_from_this())));
     //register operation
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_FETCH_DICOM, 
-        std::shared_ptr<DBOpQueryDICOM>(new DBOpQueryDICOM()));
+        std::shared_ptr<DBOpBEFetchDICOM>(new DBOpBEFetchDICOM()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_FETCH_AI_EVALUATION, 
-        std::shared_ptr<DBOpFetchAIEvaluation>(new DBOpFetchAIEvaluation()));
+        std::shared_ptr<DBOpBEFetchAIEvaluation>(new DBOpBEFetchAIEvaluation()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK, 
-        std::shared_ptr<DBOpQueryPreprocessMask>(new DBOpQueryPreprocessMask()));
+        std::shared_ptr<DBOpBEFetchPreprocessMask>(new DBOpBEFetchPreprocessMask()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_REQUEST_END, 
-        std::shared_ptr<DBOpQueryEnd>(new DBOpQueryEnd()));
+        std::shared_ptr<DBOpBERequestEnd>(new DBOpBERequestEnd()));
     
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_RETRIEVE, 
-        std::shared_ptr<DBOpPACSRetrieve>(new DBOpPACSRetrieve()));
+        std::shared_ptr<DBOpBEPACSRetrieve>(new DBOpBEPACSRetrieve()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_FETCH, 
-        std::shared_ptr<DBOpPACSFetch>(new DBOpPACSFetch()));
+        std::shared_ptr<DBOpBEPACSFetch>(new DBOpBEPACSFetch()));
 
     //register cmd handler for AI server
     _server_proxy_ais->register_command_handler(COMMAND_ID_DB_AI_OPERATION, 
-        std::shared_ptr<CmdHandlerDBAISOperating>(new CmdHandlerDBAISOperating(shared_from_this())));
+        std::shared_ptr<DBCmdHandlerAIOperation>(new DBCmdHandlerAIOperation(shared_from_this())));
 
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_AI_EVALUATION_RESULT, 
-        std::shared_ptr<DBOpReceiveEvaluation>(new DBOpReceiveEvaluation()));
+        std::shared_ptr<DBOpAISendEvaluation>(new DBOpAISendEvaluation()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_AI_READY, 
-        std::shared_ptr<DBOpReceiveAIReady>(new DBOpReceiveAIReady()));
+        std::shared_ptr<DBOpAIReady>(new DBOpAIReady()));
 
     //connect db
     std::string ip_port,user,pwd,db_name;

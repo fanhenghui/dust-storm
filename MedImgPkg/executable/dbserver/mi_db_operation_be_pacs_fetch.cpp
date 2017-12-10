@@ -1,4 +1,4 @@
-#include "mi_db_operation_pacs_fetch.h"    
+#include "mi_db_operation_be_pacs_fetch.h"    
 
 #include "util/mi_ipc_server_proxy.h"
 #include "util/mi_file_util.h"
@@ -12,15 +12,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpPACSFetch::DBOpPACSFetch() {
+DBOpBEPACSFetch::DBOpBEPACSFetch() {
 
 }
 
-DBOpPACSFetch::~DBOpPACSFetch() {
+DBOpBEPACSFetch::~DBOpBEPACSFetch() {
 
 }
 
-int DBOpPACSFetch::execute() {
+int DBOpBEPACSFetch::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();

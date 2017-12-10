@@ -1,4 +1,4 @@
-#include "mi_db_operation_pacs_retrieve.h"
+#include "mi_db_operation_be_pacs_retrieve.h"
 
 #include "util/mi_ipc_server_proxy.h"
 #include "io/mi_pacs_communicator.h"
@@ -9,15 +9,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpPACSRetrieve::DBOpPACSRetrieve() {
+DBOpBEPACSRetrieve::DBOpBEPACSRetrieve() {
 
 }
 
-DBOpPACSRetrieve::~DBOpPACSRetrieve() {
+DBOpBEPACSRetrieve::~DBOpBEPACSRetrieve() {
 
 }
 
-int DBOpPACSRetrieve::execute() {    
+int DBOpBEPACSRetrieve::execute() {    
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();

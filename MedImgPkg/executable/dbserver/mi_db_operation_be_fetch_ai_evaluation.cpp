@@ -1,4 +1,4 @@
-#include "mi_db_operation_fetch_ai_evaluation.h"
+#include "mi_db_operation_be_fetch_ai_evaluation.h"
 
 #include "appcommon/mi_message.pb.h"
 
@@ -7,15 +7,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpFetchAIEvaluation::DBOpFetchAIEvaluation() {
+DBOpBEFetchAIEvaluation::DBOpBEFetchAIEvaluation() {
 
 }
 
-DBOpFetchAIEvaluation::~DBOpFetchAIEvaluation() {
+DBOpBEFetchAIEvaluation::~DBOpBEFetchAIEvaluation() {
 
 }
 
-int DBOpFetchAIEvaluation::execute() {
+int DBOpBEFetchAIEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;

@@ -1,4 +1,4 @@
-#include "mi_db_operation_query_preprocess_mask.h"
+#include "mi_db_operation_be_fetch_preprocess_mask.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
@@ -10,15 +10,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpQueryPreprocessMask::DBOpQueryPreprocessMask() {
+DBOpBEFetchPreprocessMask::DBOpBEFetchPreprocessMask() {
 
 }
 
-DBOpQueryPreprocessMask::~DBOpQueryPreprocessMask() {
+DBOpBEFetchPreprocessMask::~DBOpBEFetchPreprocessMask() {
 
 }
 
-int DBOpQueryPreprocessMask::execute() {
+int DBOpBEFetchPreprocessMask::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;

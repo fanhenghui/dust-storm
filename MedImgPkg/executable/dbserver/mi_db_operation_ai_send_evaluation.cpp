@@ -1,4 +1,4 @@
-#include "mi_db_operation_receive_evaluation.h"
+#include "mi_db_operation_ai_send_evaluation.h"
 
 #include "appcommon/mi_message.pb.h"
 
@@ -7,15 +7,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpReceiveEvaluation::DBOpReceiveEvaluation() {
+DBOpAISendEvaluation::DBOpAISendEvaluation() {
 
 }
 
-DBOpReceiveEvaluation::~DBOpReceiveEvaluation() {
+DBOpAISendEvaluation::~DBOpAISendEvaluation() {
 
 }
 
-int DBOpReceiveEvaluation::execute() {
+int DBOpAISendEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();

@@ -18,12 +18,12 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR)
 
-OPERATION_OBJS =  mi_db_operation_query_end.o mi_db_operation_query_preprocess_mask.o \
-mi_db_operation_fetch_ai_evaluation.o mi_db_operation_query_dicom.o \
-mi_db_operation_receive_evaluation.o mi_db_operation_receive_ai_ready.o \
-mi_db_operation_pacs_fetch.o mi_db_operation_pacs_retrieve.o 
+OPERATION_OBJS =  mi_db_operation_be_request_end.o mi_db_operation_be_fetch_preprocess_mask.o \
+mi_db_operation_be_fetch_ai_evaluation.o mi_db_operation_be_fetch_dicom.o \
+mi_db_operation_ai_send_evaluation.o mi_db_operation_ai_ready.o \
+mi_db_operation_be_pacs_fetch.o mi_db_operation_be_pacs_retrieve.o 
 
-OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operating.o mi_db_cmd_handler_ais_operating.o \
+OBJS = mi_db_server_controller.o mi_db_server_thread_model.o mi_db_cmd_handler_be_operation.o mi_db_cmd_handler_ai_operation.o \
 mi_db_evaluatiion_dispatcher.o mi_db_server_console_echo.o $(OPERATION_OBJS)
 
 TARGET = $(BIN_DIR)/dbserver
@@ -45,11 +45,11 @@ mi_db_server_controller.o : mi_db_server_controller.cpp mi_db_server_controller.
 mi_db_evaluatiion_dispatcher.o mi_db_server_console_echo.o $(OPERATION_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_controller.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_db_cmd_handler_be_operating.o: mi_db_cmd_handler_be_operating.cpp mi_db_cmd_handler_be_operating.h mi_db_server_thread_model.o
-	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_be_operating.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_db_cmd_handler_be_operation.o: mi_db_cmd_handler_be_operation.cpp mi_db_cmd_handler_be_operation.h mi_db_server_thread_model.o
+	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_be_operation.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_db_cmd_handler_ais_operating.o: mi_db_cmd_handler_ais_operating.cpp mi_db_cmd_handler_ais_operating.h mi_db_server_thread_model.o
-	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_ais_operating.cpp $(ADDITINAL_INCLUDE_DIR)
+mi_db_cmd_handler_ai_operation.o: mi_db_cmd_handler_ai_operation.cpp mi_db_cmd_handler_ai_operation.h mi_db_server_thread_model.o
+	$(CC) -c -fPIC $(CFLAGS) mi_db_cmd_handler_ai_operation.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_db_server_thread_model.o : mi_db_server_thread_model.cpp mi_db_server_thread_model.h
 	$(CC) -c -fPIC $(CFLAGS) mi_db_server_thread_model.cpp $(ADDITINAL_INCLUDE_DIR)

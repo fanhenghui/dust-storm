@@ -1,4 +1,4 @@
-#include "mi_db_operation_query_end.h"
+#include "mi_db_operation_be_request_end.h"
 
 #include "util/mi_ipc_server_proxy.h"
 
@@ -9,15 +9,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpQueryEnd::DBOpQueryEnd() {
+DBOpBERequestEnd::DBOpBERequestEnd() {
 
 }
 
-DBOpQueryEnd::~DBOpQueryEnd() {
+DBOpBERequestEnd::~DBOpBERequestEnd() {
 
 }
 
-int DBOpQueryEnd::execute() {
+int DBOpBERequestEnd::execute() {
 
     MI_DBSERVER_LOG(MI_INFO) << "IN DB query end cmd handler.";
 

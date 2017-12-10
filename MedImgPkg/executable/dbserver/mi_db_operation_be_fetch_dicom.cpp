@@ -1,4 +1,4 @@
-#include "mi_db_operation_query_dicom.h"
+#include "mi_db_operation_be_fetch_dicom.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
@@ -12,15 +12,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-DBOpQueryDICOM::DBOpQueryDICOM() {
+DBOpBEFetchDICOM::DBOpBEFetchDICOM() {
 
 }
 
-DBOpQueryDICOM::~DBOpQueryDICOM() {
+DBOpBEFetchDICOM::~DBOpBEFetchDICOM() {
     
 }
 
-int DBOpQueryDICOM::execute() {
+int DBOpBEFetchDICOM::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     clock_t _start = clock();
 
