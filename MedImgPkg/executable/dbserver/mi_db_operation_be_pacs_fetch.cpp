@@ -1,5 +1,11 @@
 #include "mi_db_operation_be_pacs_fetch.h"    
 
+#include "arithmetic/mi_connected_domain_analysis.h"
+#include "arithmetic/mi_segment_threshold.h"
+#include "arithmetic/mi_morphology.h"
+#include "arithmetic/mi_ct_table_removal.h"
+#include "arithmetic/mi_run_length_operator.h"
+
 #include "util/mi_ipc_server_proxy.h"
 #include "util/mi_file_util.h"
 
@@ -7,6 +13,10 @@
 #include "io/mi_message.pb.h"
 #include "io/mi_configure.h"
 #include "io/mi_db.h"
+
+#include "io/mi_dicom_loader.h"
+#include "io/mi_image_data.h"
+#include "io/mi_image_data_header.h"
 
 #include "mi_db_server_controller.h"
 
@@ -63,12 +73,20 @@ int DBOpBEPACSFetch::execute() {
         }
 
         //2 fetch data from PACS
-        if(0 != pacs_commu->fetch_series(series_id, "/home/wangrui22/data/cache")){
-            MI_DBSERVER_LOG(MI_ERROR) << "PACS try fetch series: " << series_id << "failed.";
+        if(0 != pacs_commu->fetch_series(series_id, series_dir)){
+            MI_DBSERVER_LOG(MI_ERROR) << "PACS try fetch series: " << series_id << " failed.";
+            continue;
         }
-        MI_DBSERVER_LOG(MI_DEBUG) << "PACS fetch series: " << series_id << "success.";
+        MI_DBSERVER_LOG(MI_INFO) << "PACS fetch series: " << series_id << " success.";
 
-        //3 TODO push preprocess mask calculate(size mb will calculate then)
+        //3 preprocess mask calculate(size mb will calculate then)
+        // TODO 暂时使用方案2（简单版本：串行计算），方案1会比较好
+        const std::string preprocess_mask_path = series_dir + "/" + series_id + ".rle";
+        if(0 != preprocess_i(series_dir, preprocess_mask_path)) {
+            MI_DBSERVER_LOG(MI_ERROR) << "preprocess PACS fetched series: " << series_id << " failed.";
+            continue;
+        }
+        MI_DBSERVER_LOG(MI_INFO) << "preprocess PACS fetched series: " << series_id << " success.";
 
         //4 update DB
         DB::ImgItem img;
@@ -78,6 +96,7 @@ int DBOpBEPACSFetch::execute() {
         img.patient_id = item.patient_id();
         img.modality = item.modality();
         img.dcm_path = series_dir;
+        img.preprocess_mask_path = preprocess_mask_path;
         db->insert_dcm_item(img);
 
         //4 send response message back to BE
@@ -107,4 +126,73 @@ int DBOpBEPACSFetch::execute() {
     return 0;
 }
 
+int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path) {
+    std::vector<std::string> files;
+    std::set<std::string> dcm_postfix;
+    dcm_postfix.insert(".dcm");
+    FileUtil::get_all_file_recursion(series_dir, dcm_postfix, files);
+
+    std::shared_ptr<ImageDataHeader> data_header;
+    std::shared_ptr<ImageData> volume_data;
+    DICOMLoader loader;
+    IOStatus status = loader.load_series(files, volume_data, data_header);
+    if(status != IO_SUCCESS) {
+        MI_DBSERVER_LOG(MI_ERROR) << "preprocess load DICOM root " << series_dir << " failed.";
+        return -1;
+    }
+    MI_DBSERVER_LOG(MI_DEBUG) << "preprocess load DICOM " << data_header->series_uid << " done.";
+    MI_DBSERVER_LOG(MI_DEBUG) << "preprocess DICOM dim " << volume_data->_dim[0] << " " << volume_data->_dim[1] << " " << volume_data->_dim[2];
+    const unsigned int dim[3] = {volume_data->_dim[0] , volume_data->_dim[1] , volume_data->_dim[2]};
+    const unsigned int volume_size = dim[0]*dim[1]*dim[2];
+    std::unique_ptr<unsigned char[]> mask_(new unsigned char[volume_size]);
+    unsigned char* mask = mask_.get();
+    memset(mask, 0, volume_size);
+
+    if (volume_data->_data_type == USHORT) {
+        CTTableRemoval<unsigned short> removal;
+        removal.set_data_ref((unsigned short*)(volume_data->get_pixel_pointer()));
+        removal.set_dim(dim);
+        removal.set_mask_ref(mask);
+        removal.set_target_label(1);
+        removal.set_min_scalar(volume_data->get_min_scalar());
+        removal.set_max_scalar(volume_data->get_max_scalar());
+        removal.set_image_orientation(volume_data->_image_orientation);
+        removal.set_intercept(volume_data->_intercept);
+        removal.set_slope(volume_data->_slope);
+        removal.remove();
+        {
+            //DEBUG
+            std::stringstream ss;
+            ss << "/home/wangrui22/data/" << data_header->series_uid << "|mask.raw";
+            FileUtil::write_raw(ss.str(), mask, volume_size);
+        }
+        
+    } else {
+        CTTableRemoval<short> removal;
+        removal.set_data_ref((short*)(volume_data->get_pixel_pointer()));
+        removal.set_dim(dim);
+        removal.set_mask_ref(mask);
+        removal.set_target_label(1);
+        removal.set_min_scalar(volume_data->get_min_scalar());
+        removal.set_max_scalar(volume_data->get_max_scalar());
+        removal.set_image_orientation(volume_data->_image_orientation);
+        removal.set_intercept(volume_data->_intercept);
+        removal.set_slope(volume_data->_slope);
+        removal.remove();
+        {
+            std::stringstream ss;
+            ss << "/home/wangrui22/data/" << data_header->series_uid << "|mask.raw";
+            FileUtil::write_raw(ss.str(), mask, volume_size);
+        }
+    }
+
+    std::vector<unsigned int> res = RunLengthOperator::encode(mask, volume_size);
+    if (0 != FileUtil::write_raw(preprocess_mask_path, res.data(), res.size()*sizeof(unsigned int))) {
+        MI_DBSERVER_LOG(MI_ERROR) << "preprocess series:  " << data_header->series_uid << " failed.";
+        return -1;
+    } else {
+        MI_DBSERVER_LOG(MI_DEBUG) << "preprocess series:  " << data_header->series_uid << " success.";
+        return 0;
+    }
+}
 MED_IMG_END_NAMESPACE

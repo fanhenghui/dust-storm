@@ -39,7 +39,7 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
     }
     const std::string series_idx_str = msg.context();
     msg.Clear();
-    
+
     std::vector<std::string> series_idx;
     boost::split(series_idx, series_idx_str, boost::is_any_of("|"));
     if (series_idx.empty()) {
@@ -50,6 +50,11 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
     bool query_more_than_0 = false;
     MsgDcmInfoCollection msg_response;
     for (auto it = series_idx.begin(); it != series_idx.end(); ++it) {
+        //must check null string, because atoi("") will return 0!
+        if((*it).empty()) {
+            continue;
+        }
+
         int idx = atoi(((*it).c_str()));
         DcmInfo dcm_info;
         if (0 != model_pacs->query_dicom(idx, dcm_info)) {
@@ -60,6 +65,8 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
         MsgDcmInfo* item = msg_response.add_dcminfo();
         item->set_study_id(dcm_info.study_id);
         item->set_series_id(dcm_info.series_id);
+
+        MI_APPCOMMON_LOG(MI_INFO) << "FE fetch series : " << dcm_info.series_id;
     }
     if (!query_more_than_0 ) {
         msg_response.Clear();
