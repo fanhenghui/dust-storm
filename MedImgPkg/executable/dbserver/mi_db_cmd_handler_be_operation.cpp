@@ -1,9 +1,10 @@
 #include "mi_db_cmd_handler_be_operation.h"
 
+#include "util/mi_operation_interface.h"
+#include "util/mi_operation_factory.h"
+
 #include "mi_db_server_controller.h"
 #include "mi_db_server_thread_model.h"
-#include "appcommon/mi_operation_interface.h"
-#include "appcommon/mi_operation_factory.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

@@ -1,10 +1,10 @@
 #include "mi_be_cmd_handler_db_send_error.h"
 
 #include "util/mi_memory_shield.h"
+#include "io/mi_message.pb.h"
 
 #include "mi_app_controller.h"
 #include "mi_app_common_logger.h"
-#include "mi_message.pb.h"
 #include "mi_model_dbs_status.h"
 #include "mi_app_common_define.h"
 #include "mi_app_common_util.h"

@@ -1,16 +1,16 @@
-#include "mi_app_config.h"
+#include "mi_configure.h"
 #include <fstream>
 #include <sstream>
 
 #include "util/mi_string_number_converter.h"
-#include "mi_app_common_logger.h"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-AppConfig* AppConfig::_instance = nullptr;
-boost::mutex AppConfig::_mutex;
+Configure* Configure::_instance = nullptr;
+boost::mutex Configure::_mutex;
 
-void AppConfig::init_i() {
+void Configure::init_i() {
     _test_data_root = "";
     _db_ip = "127.0.0.1";
     _db_port = "3306";
@@ -33,12 +33,13 @@ void AppConfig::init_i() {
     _pacs_server_port = 11112;
     _pacs_client_ae_title = "DBS";
     _pacs_client_port = 11115;
+    _processing_unit_type = GPU;
 }
 
-void AppConfig::refresh() {
+void Configure::refresh() {
     std::ifstream in("../config/app_config");
     if (!in.is_open()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "can't open configure file.";
+        MI_IO_LOG(MI_ERROR) << "can't open configure file.";
         return;
     }
 
@@ -110,36 +111,36 @@ void AppConfig::refresh() {
     }
 }
 
-AppConfig::AppConfig() {
+Configure::Configure() {
     init_i();
     refresh();
 }
 
-AppConfig::~AppConfig() {}
+Configure::~Configure() {}
 
-std::string AppConfig::get_config_root() const {
+std::string Configure::get_config_root() const {
     return std::string("../config/");
 }
 
-std::string AppConfig::get_log_config_file() const {
+std::string Configure::get_log_config_file() const {
     return this->get_config_root() + std::string("log_config");
 }
 
-AppConfig* AppConfig::instance() {
+Configure* Configure::instance() {
     if (nullptr == _instance) {
         boost::mutex::scoped_lock locker(_mutex);
         if (nullptr == _instance) {
-            _instance = new AppConfig();
+            _instance = new Configure();
         }
     }
     return _instance;
 }
 
-std::string AppConfig::get_test_data_root() const {
+std::string Configure::get_test_data_root() const {
     return _test_data_root;
 }
 
-void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path) const {
+void Configure::get_cache_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name, std::string& path) const {
     ip_port = _cache_db_ip + ":" + _cache_db_port;
     user = _cache_db_user;
     pwd = _cache_db_pwd;
@@ -147,45 +148,53 @@ void AppConfig::get_cache_db_info(std::string& ip_port, std::string& user, std::
     path = _cache_db_path;
 }
 
-void AppConfig::get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) const {
+void Configure::get_db_info(std::string& ip_port, std::string& user, std::string& pwd, std::string& db_name) const {
     ip_port = _db_ip  + ":" + _db_port;
     user = _db_user;
     pwd = _db_pwd; 
     db_name = _db_name;
 }
 
-std::string AppConfig::get_db_path() const {
+std::string Configure::get_db_path() const {
     return _db_path;
 }
 
-void AppConfig::get_db_server_host(std::string& ip, std::string& port) const {
+void Configure::get_db_server_host(std::string& ip, std::string& port) const {
     ip = _db_ip;
     port = _db_server_port;
 }
 
-int AppConfig::get_expected_fps() const {
+int Configure::get_expected_fps() const {
     return _expected_fps;
 }
 
-float AppConfig::get_nodule_possibility_threshold() const {
+float Configure::get_nodule_possibility_threshold() const {
     return _nodule_possibility_threshold;
 }
 
-std::string AppConfig::get_pytorch_path() const {
+std::string Configure::get_pytorch_path() const {
     return _pytorch_path;
 }
 
-std::string AppConfig::get_py_interface_path() const {
+std::string Configure::get_py_interface_path() const {
     return _py_interface_path;
 }
 
-void AppConfig::get_pacs_info(std::string& server_ae_title, std::string& server_host ,unsigned short& server_port,
+void Configure::get_pacs_info(std::string& server_ae_title, std::string& server_host ,unsigned short& server_port,
     std::string& client_ae_title, unsigned short& client_port) {
     server_ae_title = _pacs_server_ae_title;
     server_host = _pacs_server_host;
     server_port = _pacs_server_port;
     client_ae_title = _pacs_client_ae_title;
     client_port = _pacs_client_port;
+}
+
+ProcessingUnitType Configure::get_processing_unit_type() const {
+    return _processing_unit_type;
+}
+
+void Configure::set_processing_unit_type(ProcessingUnitType type) {
+    _processing_unit_type = type;
 }
 
 MED_IMG_END_NAMESPACE

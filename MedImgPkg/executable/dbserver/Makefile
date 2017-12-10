@@ -31,7 +31,7 @@ TARGET = $(BIN_DIR)/dbserver
 COMMON_HEADER = mi_db_server_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)
 ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lboost_log_setup -lprotobuf \
--lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_renderalgo -lmedimg_appcommon
+-lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io
 
 EXPORT_HEADER = mi_db_server_common.h
 

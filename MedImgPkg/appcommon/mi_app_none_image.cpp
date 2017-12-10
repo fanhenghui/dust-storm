@@ -1,11 +1,14 @@
 #include "mi_app_none_image.h"
+
+#include "io/mi_image_data_header.h"
+#include "io/mi_message.pb.h"
+
 #include "renderalgo/mi_scene_base.h"
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_mpr_scene.h"
-#include "io/mi_image_data_header.h"
+
 #include "mi_app_none_image_item.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

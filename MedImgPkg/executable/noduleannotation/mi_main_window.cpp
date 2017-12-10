@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "util/mi_string_number_converter.h"
 #include "util/mi_model_progress.h"
 
@@ -1904,7 +1904,7 @@ void NoduleAnnotation::slot_load_label_file()
         unsigned int lower_bound[3] = {0,0,0};
         unsigned int upper_bound[3] = {mask_in_use->_dim[0], mask_in_use->_dim[1], mask_in_use->_dim[2]};
 
-        if (Configuration::instance()->get_processing_unit_type() == GPU)
+        if (Configure::instance()->get_processing_unit_type() == GPU)
         {
             this->_volume_infos->update_mask(lower_bound, upper_bound, src_value, true); // "src_value": temporary data container; "true" : already update loaded
         }

@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "util/mi_string_number_converter.h"
 
 using namespace medical_imaging;
@@ -51,9 +51,9 @@ void NoduleAnnoConfig::initialize()
             ss >> tag >> equal >> context;
             if (tag == std::string("ProcessingUnit")) {
                 if (context == "GPU") {
-                    Configuration::instance()->set_processing_unit_type(GPU);
+                    Configure::instance()->set_processing_unit_type(GPU);
                 } else {
-                    Configuration::instance()->set_processing_unit_type(CPU);
+                    Configure::instance()->set_processing_unit_type(CPU);
                 }
             } else if (tag == "NoduleOutput") {
                 if(context == "TEXT") {
@@ -106,7 +106,7 @@ void NoduleAnnoConfig::finalize()
     if (output_file.is_open()) {
 
         output_file << "ProcessingUnit = ";
-        if (Configuration::instance()->get_processing_unit_type() == CPU) {
+        if (Configure::instance()->get_processing_unit_type() == CPU) {
             output_file << "CPU\n";
         } else {
             output_file << "GPU\n";
@@ -148,7 +148,7 @@ NoduleAnnoConfig::NoduleAnnoConfig() {
 void NoduleAnnoConfig::init_i() {
     _config_file.clear();
 
-    Configuration::instance()->set_processing_unit_type(CPU);
+    Configure::instance()->set_processing_unit_type(CPU);
 
     _is_nodule_file_rsa = true;
 

@@ -1,11 +1,11 @@
 #include "mi_be_operation_fe_switch_preset_windowing.h"
 
 #include "arithmetic/mi_vector2f.h"
+#include "io/mi_message.pb.h"
 #include "renderalgo/mi_mpr_scene.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

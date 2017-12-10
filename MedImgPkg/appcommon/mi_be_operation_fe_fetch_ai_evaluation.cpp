@@ -1,7 +1,11 @@
 #include "mi_be_operation_fe_fetch_ai_evaluation.h"
 
 #include "util/mi_ipc_client_proxy.h"
+
 #include "arithmetic/mi_circle.h"
+
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
 
 #include "renderalgo/mi_mask_label_store.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -18,9 +22,7 @@
 #include "mi_app_common_define.h"
 #include "mi_app_none_image_item.h"
 #include "mi_app_none_image.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_util.h"
-#include "mi_app_config.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

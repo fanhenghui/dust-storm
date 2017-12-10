@@ -7,10 +7,10 @@
 
 #include "io/mi_nodule_set.h"
 #include "io/mi_nodule_set_parser.h"
+#include "io/mi_db.h"
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
 
-#include "appcommon/mi_app_db.h"
-#include "appcommon/mi_message.pb.h"
-#include "appcommon/mi_app_config.h"
 #include "appcommon/mi_app_common_define.h"
 
 #include "mi_ai_server_controller.h"
@@ -103,8 +103,8 @@ int AIODBRequestEvaluation::execute() {
     msg_res.set_client_socket_id(socket_id);//TODO DBS增加 计算状态机以及等待计算结果的observer后可以删除
 
     //get python running path
-    const std::string pytorch_path = AppConfig::instance()->get_pytorch_path();
-    const std::string py_interface_path = AppConfig::instance()->get_py_interface_path();
+    const std::string pytorch_path = Configure::instance()->get_pytorch_path();
+    const std::string py_interface_path = Configure::instance()->get_py_interface_path();
 
     //debug print info
     // MI_AISERVER_LOG(MI_DEBUG) << "IN AI evaluation operation:";

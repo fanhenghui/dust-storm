@@ -2,16 +2,16 @@
 #include <stdlib.h>
 
 #include "util/mi_exception.h"
+#include "io/mi_configure.h"
 
 #include "mi_db_server_controller.h"
 #include "mi_db_server_logger.h"
-#include "appcommon/mi_app_config.h"
 
 using namespace medical_imaging;
 
 int main(int argc , char* argv[]) {
     try {
-        const std::string log_config_file = AppConfig::instance()->get_log_config_file();
+        const std::string log_config_file = Configure::instance()->get_log_config_file();
         Logger::instance()->bind_config_file(log_config_file);
 
         Logger::instance()->set_file_name_format("logs/mi-db-%Y-%m-%d_%H-%M-%S.%N.log");

@@ -1,4 +1,4 @@
-#include "mi_operation_factory.h"
+#include "util/mi_operation_factory.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

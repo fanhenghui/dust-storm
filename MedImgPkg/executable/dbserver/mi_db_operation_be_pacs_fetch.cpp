@@ -4,9 +4,9 @@
 #include "util/mi_file_util.h"
 
 #include "io/mi_pacs_communicator.h"
-#include "appcommon/mi_message.pb.h"
-#include "appcommon/mi_app_config.h"
-#include "appcommon/mi_app_db.h"
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
+#include "io/mi_db.h"
 
 #include "mi_db_server_controller.h"
 
@@ -40,7 +40,7 @@ int DBOpBEPACSFetch::execute() {
 
     const int series_num = msg.dcminfo_size();
     std::string series_id(""), study_id(""), study_dir(""), series_dir("");
-    const std::string db_path = AppConfig::instance()->get_db_path();
+    const std::string db_path = Configure::instance()->get_db_path();
     for (int i = 0; i < series_num; ++i) {
         MsgDcmInfo item = msg.dcminfo(i);
         study_id = item.study_id();

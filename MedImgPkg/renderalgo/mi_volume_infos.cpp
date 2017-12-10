@@ -1,6 +1,6 @@
 #include "mi_volume_infos.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
@@ -338,7 +338,7 @@ std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator() {
 }
 
 void VolumeInfos::refresh() {
-    if (Configuration::instance()->get_processing_unit_type() == CPU) {
+    if (Configure::instance()->get_processing_unit_type() == CPU) {
         return;
     }
 

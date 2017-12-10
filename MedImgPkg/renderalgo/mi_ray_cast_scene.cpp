@@ -1,6 +1,6 @@
 #include "mi_ray_cast_scene.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "util/mi_file_util.h"
 
 #include "arithmetic/mi_ortho_camera.h"
@@ -42,7 +42,7 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
 
     _canvas.reset(new RayCasterCanvas());
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _ray_caster->set_strategy(CPU_BASE);
     } else {
         _ray_caster->set_strategy(GPU_BASE);
@@ -71,7 +71,7 @@ RayCastScene::RayCastScene(int width, int height)
     _canvas.reset(new RayCasterCanvas());
     _canvas->set_display_size(_width, _height);
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _ray_caster->set_strategy(CPU_BASE);
     } else {
         _ray_caster->set_strategy(GPU_BASE);
@@ -132,7 +132,7 @@ void RayCastScene::pre_render_i() {
 }
 
 void RayCastScene::init_default_color_texture_i() {
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         // initialize gray pseudo color texture
         if (!_pseudo_color_texture) {
             UIDType uid;
@@ -175,7 +175,7 @@ void RayCastScene::init_default_color_texture_i() {
         }
     }
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         // TODO gray pseudo array
     }
 }
@@ -365,7 +365,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
         _ray_caster->set_volume_data(volume);
         _ray_caster->set_mask_data(mask);
 
-        if (GPU == Configuration::instance()->get_processing_unit_type()) {
+        if (GPU == Configure::instance()->get_processing_unit_type()) {
             // set texture
             _ray_caster->set_pseudo_color_texture(_pseudo_color_texture,
                                                   S_TRANSFER_FUNC_WIDTH);
@@ -389,7 +389,7 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
 void RayCastScene::set_mask_label_level(LabelLevel label_level) {
     _ray_caster->set_mask_label_level(label_level);
 
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         if (!_color_opacity_texture_array) {
             UIDType uid;
             _color_opacity_texture_array = GLResourceManagerContainer::instance()
@@ -549,7 +549,7 @@ void RayCastScene::set_material(const Material& m, unsigned char label) {
 }
 
 void RayCastScene::set_pseudo_color(std::shared_ptr<ColorTransFunc> color) {
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         RENDERALGO_CHECK_NULL_EXCEPTION(_pseudo_color_texture);
 
         std::vector<ColorTFPoint> pts;
@@ -574,7 +574,7 @@ void RayCastScene::set_pseudo_color(std::shared_ptr<ColorTransFunc> color) {
 void RayCastScene::set_color_opacity(std::shared_ptr<ColorTransFunc> color,
                                      std::shared_ptr<OpacityTransFunc> opacity,
                                      unsigned char label) {
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         std::vector<ColorTFPoint> color_pts;
         color->set_width(S_TRANSFER_FUNC_WIDTH);
         color->get_point_list(color_pts);

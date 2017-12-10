@@ -2,25 +2,24 @@
 
 #include "util/mi_memory_shield.h"
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_operation_interface.h"
 
 #include "io/mi_image_data.h"
+#include "io/mi_configure.h"
+#include "io/mi_message.pb.h"
 
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_mask_label_store.h"
 
-#include "mi_operation_interface.h"
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
 #include "mi_app_common_logger.h"
-#include "mi_message.pb.h"
 #include "mi_model_crosshair.h"
 #include "mi_model_dbs_status.h"
 #include "mi_model_annotation.h"
 #include "mi_app_common_define.h"
 #include "mi_app_common_util.h"
-#include "mi_app_config.h"
 #include "mi_app_common_define.h"
-
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -68,7 +67,7 @@ public:
         model_dbs_status->set_ai_annotation();//AI annotation flag
 
         std::vector<std::string> processing_cache_add;
-        const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();
+        const float possibility_threshold = Configure::instance()->get_nodule_possibility_threshold();
         for (int i = 0; i < msg.annotation_size(); ++i) {
             const MsgAnnotationUnitDB& anno = msg.annotation(i);
             if (anno.p() < possibility_threshold) {
@@ -138,7 +137,7 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
         model_dbs_status->set_ai_annotation();
     
         std::vector<std::string> ids;
-        const float possibility_threshold = AppConfig::instance()->get_nodule_possibility_threshold();
+        const float possibility_threshold = Configure::instance()->get_nodule_possibility_threshold();
         for (int i = 0; i < msgAnnos.annotation_size(); ++i) {
             const MsgAnnotationUnitDB& anno = msgAnnos.annotation(i);
             if (anno.p() < possibility_threshold) {

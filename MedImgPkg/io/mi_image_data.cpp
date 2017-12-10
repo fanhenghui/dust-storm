@@ -1,6 +1,6 @@
 #include "mi_image_data.h"
 #include "arithmetic/mi_sampler.h"
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -51,7 +51,7 @@ bool ImageData::regulate_wl(float& window, float& level) {
         return false;
     }
 
-    if (Configuration::instance()->get_processing_unit_type() == GPU) {
+    if (Configure::instance()->get_processing_unit_type() == GPU) {
         const float min_gray = get_min_scalar();
 
         if (_data_type == SHORT || _data_type == CHAR) {

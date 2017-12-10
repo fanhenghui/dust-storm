@@ -1,4 +1,4 @@
-#include "mi_app_db.h"
+#include "mi_db.h"
 
 #include "cppconn/driver.h"
 #include "cppconn/exception.h"
@@ -7,7 +7,7 @@
 #include "cppconn/sqlstring.h"
 #include "cppconn/statement.h"
 #include "mysql_connection.h"
-#include "mi_app_common_logger.h"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -20,23 +20,23 @@ DB::~DB() {
 }
 
 int DB::insert_dcm_item(const ImgItem& item) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db inset item."; 
+    MI_IO_LOG(MI_TRACE) << "IN db inset item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
     //query    
     bool in_db(false);
     if(-1 == query_dcm_item(item.series_id, in_db)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "query failed when insert item.";
+        MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
         return -1;
     }
 
     //delete if exit
     if (in_db) {
         if(-1 == delete_dcm_item(item.series_id)) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "delete item failed when insert the item with the same primary key.";
+            MI_IO_LOG(MI_ERROR) << "delete item failed when insert the item with the same primary key.";
             return -1;
         }
     }
@@ -67,32 +67,32 @@ int DB::insert_dcm_item(const ImgItem& item) {
         res = nullptr;
 
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         
         //TODO recovery old one if insert failed
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query inset item."; 
+    MI_IO_LOG(MI_TRACE) << "OUT db query inset item."; 
     return 0;
 }
 
 int DB::delete_dcm_item(const std::string& series_id) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query delete item."; 
+    MI_IO_LOG(MI_TRACE) << "IN db query delete item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
     //query    
     bool in_db(false);
     if(-1 == query_dcm_item(series_id, in_db)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "query failed when insert item.";
+        MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
         return -1;
     }
 
     if (!in_db) {
-        MI_APPCOMMON_LOG(MI_WARNING) << "delete item not exist which series is: " << series_id;        
+        MI_IO_LOG(MI_WARNING) << "delete item not exist which series is: " << series_id;        
         return 0;
     }
 
@@ -112,19 +112,19 @@ int DB::delete_dcm_item(const std::string& series_id) {
         res = nullptr;
 
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         // TODO recovery DB if delete failed
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db delete item."; 
+    MI_IO_LOG(MI_TRACE) << "OUT db delete item."; 
     return 0;
 }
 
 int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db query item."; 
+    MI_IO_LOG(MI_TRACE) << "IN db query item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -153,18 +153,18 @@ int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
             in_db = false;
         }
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db query item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db query item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query item.";
+    MI_IO_LOG(MI_TRACE) << "OUT db query item.";
     return 0;    
 }
 
 int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get item."; 
+    MI_IO_LOG(MI_TRACE) << "IN db get item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -197,19 +197,19 @@ int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
             return -1;
         }
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "Out db get item."; 
+    MI_IO_LOG(MI_TRACE) << "Out db get item."; 
     return 0; 
 }
 
 int DB::get_ai_annotation_item(const std::string& series_id, std::string& annotation_ai_path) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get AI annotation item."; 
+    MI_IO_LOG(MI_TRACE) << "IN db get AI annotation item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -233,19 +233,19 @@ int DB::get_ai_annotation_item(const std::string& series_id, std::string& annota
             return -1;
         }
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "Out db get AI annotation item."; 
+    MI_IO_LOG(MI_TRACE) << "Out db get AI annotation item."; 
     return 0; 
 }
 
 int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::vector<AnnoItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get usr annotation items by series id.";
+    MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by series id.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -272,18 +272,18 @@ int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::ve
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get annotation items by series id failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get annotation items by series id failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db get usr annotation items by series id.";
+    MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by series id.";
     return 0;
 }
 
 int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector<AnnoItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get usr annotation items by usr.";
+    MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by usr.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -310,18 +310,18 @@ int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get annotation items by usr name failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get annotation items by usr name failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db get usr annotation items by usr.";
+    MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by usr.";
     return 0;
 }
 
 int DB::get_usr_annotation_item(const std::string& series_id, const std::string& usr_name, std::vector<DB::AnnoItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get usr annotation item.";
+    MI_IO_LOG(MI_TRACE) << "IN db get usr annotation item.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -349,18 +349,18 @@ int DB::get_usr_annotation_item(const std::string& series_id, const std::string&
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get annotation item failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get annotation item failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db get usr annotation item.";
+    MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation item.";
     return 0;
 }
 
 int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get all dcm items."; 
+    MI_IO_LOG(MI_TRACE) << "IN db get all dcm items."; 
     if (!this->is_valid()) {;
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -397,18 +397,18 @@ int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get all items failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get all items failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db get all dcm items."; 
+    MI_IO_LOG(MI_TRACE) << "OUT db get all dcm items."; 
     return 0;
 }
 
 int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db get all usr annotation items.";
+    MI_IO_LOG(MI_TRACE) << "IN db get all usr annotation items.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -435,18 +435,18 @@ int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db get all usr annotation items failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db get all usr annotation items failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db get all usr annotation items.";
+    MI_IO_LOG(MI_TRACE) << "OUT db get all usr annotation items.";
     return 0;
 }
 
 int DB::update_preprocess_mask(const std::string& series_id, const std::string& preprocess_mask_path) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db update preprocess mask.";
+    MI_IO_LOG(MI_TRACE) << "IN db update preprocess mask.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -461,18 +461,18 @@ int DB::update_preprocess_mask(const std::string& series_id, const std::string& 
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db update preprocess mask failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db update preprocess mask failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update preprocess mask.";
+    MI_IO_LOG(MI_TRACE) << "OUT db update preprocess mask.";
     return 0;
 }
 
 int DB::update_ai_annotation(const std::string& series_id, const std::string& annotation_ai_path) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db update AI annotation.";
+    MI_IO_LOG(MI_TRACE) << "IN db update AI annotation.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -487,18 +487,18 @@ int DB::update_ai_annotation(const std::string& series_id, const std::string& an
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db update AI annotation failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db update AI annotation failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update AI annotation.";
+    MI_IO_LOG(MI_TRACE) << "OUT db update AI annotation.";
     return 0;
 }
 
 int DB::update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data_path) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db update AI intermediate data.";
+    MI_IO_LOG(MI_TRACE) << "IN db update AI intermediate data.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -513,18 +513,18 @@ int DB::update_ai_intermediate_data(const std::string& series_id, const std::str
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db update AI intermediate data failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db update AI intermediate data failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update AI intermediate data.";
+    MI_IO_LOG(MI_TRACE) << "OUT db update AI intermediate data.";
     return 0;
 }
 
 int DB::update_usr_annotation(const std::string& series_id, const std::string& usr_name, const std::string& annotation_usr_path) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN db update usr annotation.";
+    MI_IO_LOG(MI_TRACE) << "IN db update usr annotation.";
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
 
@@ -539,11 +539,11 @@ int DB::update_usr_annotation(const std::string& series_id, const std::string& u
         delete pstmt;
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "db update usr annotation failed with exception: "
+        MI_IO_LOG(MI_ERROR) << "db update usr annotation failed with exception: "
         << this->get_sql_exception_info_i(&e);
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db update usr annotation.";
+    MI_IO_LOG(MI_TRACE) << "OUT db update usr annotation.";
     return 0;
 }
 

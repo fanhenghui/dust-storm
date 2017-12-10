@@ -1,7 +1,5 @@
 #include "mi_be_cmd_handler_fe_ready.h"
 
-#include <iostream>
-
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
 

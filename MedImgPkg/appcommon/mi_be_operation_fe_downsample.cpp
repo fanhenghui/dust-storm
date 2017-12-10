@@ -1,12 +1,13 @@
 #include "mi_be_operation_fe_downsample.h"
 
 #include "io/mi_image_data.h"
+#include "io/mi_message.pb.h"
+
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_scene_base.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

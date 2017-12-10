@@ -1,11 +1,13 @@
 #include "mi_be_operation_fe_mpr_mask_overlay.h"
+
+#include "io/mi_message.pb.h"
+
 #include "renderalgo/mi_mpr_scene.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_controller.h"
 #include "mi_app_common_define.h"
-#include "mi_message.pb.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

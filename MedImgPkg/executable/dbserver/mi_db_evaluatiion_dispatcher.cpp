@@ -1,13 +1,13 @@
 #include "mi_db_evaluatiion_dispatcher.h"
 
 #include "util/mi_ipc_server_proxy.h"
+#include "util/mi_operation_interface.h"
 
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
+#include "io/mi_message.pb.h"
 
-#include "appcommon/mi_message.pb.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_operation_interface.h"
 
 #include "mi_db_server_thread_model.h"
 #include "mi_db_server_logger.h"

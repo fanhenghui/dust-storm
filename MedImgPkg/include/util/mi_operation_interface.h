@@ -1,12 +1,10 @@
-#ifndef MED_IMG_APPCOMMON_MI_OPERATION_INTERFACE_H
-#define MED_IMG_APPCOMMON_MI_OPERATION_INTERFACE_H
+#ifndef MEDIMG_UTIL_MI_OPERATION_INTERFACE_H
+#define MEDIMG_UTIL_MI_OPERATION_INTERFACE_H
 
-#include "appcommon/mi_app_common_export.h"
-#include <string.h>
+#include <memory>
 
 #include "util/mi_ipc_common.h"
-#include "appcommon/mi_app_common_logger.h"
-#include "appcommon/mi_app_common_controller_interface.h"
+#include "util/mi_controller_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -18,7 +16,6 @@ public:
 
     virtual ~IOperation() {
         if (nullptr != _buffer) {
-            //MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete [] _buffer;
             _buffer = nullptr;
         }
@@ -49,7 +46,6 @@ public:
 
     void reset() {
         if (nullptr != _buffer) {
-            //MI_APPCOMMON_LOG(MI_DEBUG) << "delete buffer.";
             delete[] _buffer;
             _buffer = nullptr;
         }

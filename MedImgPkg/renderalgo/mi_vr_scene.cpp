@@ -1,6 +1,6 @@
 #include "mi_vr_scene.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 
 #include "arithmetic/mi_arithmetic_utils.h"
 
@@ -53,7 +53,7 @@ VRScene::VRScene() : RayCastScene(), _cache_ray_end(new RayEnd()) {
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _entry_exit_points->set_strategy(CPU_BASE);
     } else {
         _entry_exit_points->set_strategy(GPU_BASE);
@@ -66,7 +66,7 @@ VRScene::VRScene(int width, int height) : RayCastScene(width, height), _cache_ra
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _entry_exit_points->set_strategy(CPU_BASE);
     } else {
         _entry_exit_points->set_strategy(GPU_BASE);

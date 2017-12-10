@@ -2,7 +2,7 @@
 #define MEDIMG_APPCOMMON_MI_BE_OPERATION_FE_RESIZE_H
 
 #include "appcommon/mi_app_common_export.h"
-#include "appcommon/mi_operation_interface.h"
+#include "util/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

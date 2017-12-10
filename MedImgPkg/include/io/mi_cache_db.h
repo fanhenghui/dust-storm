@@ -1,14 +1,13 @@
-#ifndef MED_IMG_APPCOMMON_MI_APP_CACHE_DATABASE_H
-#define MED_IMG_APPCOMMON_MI_APP_CACHE_DATABASE_H
+#ifndef MEDIMG_IO_MI_CACHE_DB_H
+#define MEDIMG_IO_MI_CACHE_DB_H
 
 #include <string>
 #include <vector>
-#include "appcommon/mi_app_common_export.h"
 #include "io/mi_mysql_db.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export CacheDB : public MySQLDB {
+class IO_Export CacheDB : public MySQLDB {
 public:
     struct ImgItem {
         std::string series_id;

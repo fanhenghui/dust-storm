@@ -1,11 +1,12 @@
 #include "mi_ai_server_controller.h"
 
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_operation_factory.h"
 
-#include "appcommon/mi_app_db.h"
+#include "io/mi_db.h"
+#include "io/mi_configure.h"
+
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_config.h"
-#include "appcommon/mi_operation_factory.h"
 
 #include "mi_ai_server_thread_model.h"
 #include "mi_ai_cmd_handler_db_operation.h"

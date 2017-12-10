@@ -5,7 +5,7 @@
 
 #include "mi_review_controller.h"
 #include "mi_review_logger.h"
-#include "appcommon/mi_app_config.h"
+#include "io/mi_configure.h"
 
 #ifdef WIN32
 #else
@@ -20,7 +20,7 @@ int main(int argc , char* argv[]) {
         chdir(dirname(argv[0]));
 #endif
 
-        const std::string log_config_file = AppConfig::instance()->get_log_config_file();
+        const std::string log_config_file = Configure::instance()->get_log_config_file();
         Logger::instance()->bind_config_file(log_config_file);
         std::string path = (argc == 2) ? argv[1] : "";
         std::string usr_name = path;

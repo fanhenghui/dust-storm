@@ -1,13 +1,14 @@
 #include "mi_review_controller.h"
 
-#include "util/mi_configuration.h"
+#include "util/mi_operation_factory.h"
+
+#include "io/mi_configure.h"
 
 #include "renderalgo/mi_volume_infos.h"
 
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_thread_model.h"
 #include "appcommon/mi_be_cmd_handler_fe_operation.h"
-#include "appcommon/mi_operation_factory.h"
 #include "appcommon/mi_be_cmd_handler_fe_ready.h"
 #include "appcommon/mi_be_cmd_handler_fe_shutdown.h"
 #include "appcommon/mi_be_cmd_handler_fe_heartbeat.h"
@@ -51,7 +52,7 @@ ReviewController::~ReviewController() {}
 void ReviewController::initialize() {
     AppController::initialize();
     // configure
-    Configuration::instance()->set_processing_unit_type(GPU);
+    Configure::instance()->set_processing_unit_type(GPU);
     // init default model
     init_default_model_i();
     // register command handler and operation

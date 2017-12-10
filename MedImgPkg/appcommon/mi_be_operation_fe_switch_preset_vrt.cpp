@@ -1,5 +1,7 @@
 #include "mi_be_operation_fe_switch_preset_vrt.h"
 
+#include "io/mi_message.pb.h"
+
 #include "renderalgo/mi_color_transfer_function.h"
 #include "renderalgo/mi_opacity_transfer_function.h"
 #include "renderalgo/mi_transfer_function_loader.h"
@@ -7,7 +9,6 @@
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

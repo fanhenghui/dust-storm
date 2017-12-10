@@ -4,7 +4,7 @@
 #include <memory>
 #include "appcommon/mi_app_common_export.h"
 #include "util/mi_ipc_common.h"
-#include "appcommon/mi_operation_interface.h"
+#include "util/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

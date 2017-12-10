@@ -1,6 +1,6 @@
 #include "mi_ai_server_thread_model.h"
 #include "util/mi_ipc_client_proxy.h"
-#include "appcommon/mi_operation_interface.h"
+#include "util/mi_operation_interface.h"
 
 #include "mi_ai_server_logger.h"
 

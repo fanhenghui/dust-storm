@@ -2,7 +2,7 @@
 #define MED_IMG_APPCOMMON_MI_APP_CONTROLLER_H_
 
 #include "appcommon/mi_app_common_export.h"
-#include "appcommon/mi_app_common_controller_interface.h"
+#include "util/mi_controller_interface.h"
 #include <map>
 #include <memory>
 #include <string>

@@ -1,6 +1,6 @@
 #include "GL/glew.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "util/mi_file_util.h"
 
 #include "io/mi_dicom_loader.h"
@@ -67,7 +67,7 @@ std::vector<std::string> GetFiles() {
 }
 
 void Init() {
-    Configuration::instance()->set_processing_unit_type(GPU);
+    Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
 
     std::vector<std::string> files = GetFiles();

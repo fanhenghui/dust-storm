@@ -3,11 +3,12 @@
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
 
+#include "io/mi_configure.h"
+#include "io/mi_message.pb.h"
+
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_common_define.h"
 
-#include "mi_message.pb.h"
-#include "mi_app_config.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

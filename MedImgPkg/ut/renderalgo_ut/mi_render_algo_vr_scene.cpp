@@ -1,6 +1,6 @@
 #include "GL/glew.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "util/mi_file_util.h"
 #include "log/mi_logger.h"
 
@@ -93,7 +93,7 @@ void Finalize() {
 }
 
 void Init() {
-    Configuration::instance()->set_processing_unit_type(GPU);
+    Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
     Logger::instance()->bind_config_file("../config/log_config");
     Logger::instance()->initialize();

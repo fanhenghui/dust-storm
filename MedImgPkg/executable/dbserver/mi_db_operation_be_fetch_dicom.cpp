@@ -1,14 +1,16 @@
 #include "mi_db_operation_be_fetch_dicom.h"
 
+#include <time.h>
+
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
 
-#include "appcommon/mi_app_db.h"
+#include "io/mi_db.h"
+#include "io/mi_message.pb.h"
+
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
-#include <time.h>
 
 MED_IMG_BEGIN_NAMESPACE
 

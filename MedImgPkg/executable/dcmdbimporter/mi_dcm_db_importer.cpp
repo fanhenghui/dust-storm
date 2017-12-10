@@ -19,12 +19,13 @@
 #include <dlfcn.h>
 #endif
 
-#include "appcommon/mi_app_db.h"
-#include "appcommon/mi_app_cache_db.h"
+#include "util/mi_file_util.h"
+#include "io/mi_db.h"
+#include "io/mi_cache_db.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
-#include "util/mi_file_util.h"
+
 
 using namespace medical_imaging;
 

@@ -1,9 +1,9 @@
 #include "mi_db_operation_be_pacs_retrieve.h"
 
 #include "util/mi_ipc_server_proxy.h"
-#include "io/mi_pacs_communicator.h"
 
-#include "appcommon/mi_message.pb.h"
+#include "io/mi_pacs_communicator.h"
+#include "io/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
 

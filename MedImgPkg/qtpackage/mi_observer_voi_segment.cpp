@@ -1,6 +1,6 @@
 #include "mi_observer_voi_segment.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 
 #include "arithmetic/mi_segment_threshold.h"
 #include "arithmetic/mi_connected_domain_analysis.h"
@@ -370,7 +370,7 @@ void VOISegmentObserver::recover_i(const AABBUI& aabb , unsigned char label)
     }
 
     //Update to texture
-    if (GPU == Configuration::instance()->get_processing_unit_type())
+    if (GPU == Configure::instance()->get_processing_unit_type())
     {
         if (aabb != AABBUI())
         {
@@ -437,7 +437,7 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
     }
 
     //Update to texture
-    if (GPU == Configuration::instance()->get_processing_unit_type())
+    if (GPU == Configure::instance()->get_processing_unit_type())
     {
         if (aabb != AABBUI())
         {

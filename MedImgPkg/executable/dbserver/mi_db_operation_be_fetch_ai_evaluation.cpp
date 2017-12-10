@@ -1,6 +1,6 @@
 #include "mi_db_operation_be_fetch_ai_evaluation.h"
 
-#include "appcommon/mi_message.pb.h"
+#include "io/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
 #include "mi_db_evaluatiion_dispatcher.h"

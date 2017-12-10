@@ -12,17 +12,17 @@
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
+#include "io/mi_cache_db.h"
 
 #include "renderalgo/mi_volume_infos.h"
 
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
 #include "mi_app_common_logger.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_util.h"
 #include "mi_model_dbs_status.h"
-#include "mi_app_config.h"
-#include "mi_app_cache_db.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -157,7 +157,7 @@ void BECmdHandlerDBSendDICOM::update_cache_db_i() {
 
             //get cache DB path
             std::string ip_port,user,pwd,db_name,path;
-            AppConfig::instance()->get_cache_db_info(ip_port,user,pwd,db_name,path);
+            Configure::instance()->get_cache_db_info(ip_port,user,pwd,db_name,path);
             CacheDB cache_db;
             if (0 != cache_db.connect(user,ip_port,pwd,db_name)) {
                 MI_APPCOMMON_LOG(MI_ERROR) << "connect cache DB failed.";
@@ -204,7 +204,7 @@ void BECmdHandlerDBSendDICOM::update_cache_db_i() {
         //add a column to DB
         if (_cur_save_slice == _total_slice) {
             std::string ip_port,user,pwd,db_name,path;
-            AppConfig::instance()->get_cache_db_info(ip_port,user,pwd,db_name,path);
+            Configure::instance()->get_cache_db_info(ip_port,user,pwd,db_name,path);
             CacheDB cache_db;
             if (0 != cache_db.connect(user,ip_port,pwd,db_name)) {
                 MI_APPCOMMON_LOG(MI_ERROR) << "connect cache DB failed.";

@@ -1,15 +1,16 @@
 #include "mi_be_operation_fe_mpr_paging.h"
 
+#include "arithmetic/mi_ortho_camera.h"
+
+#include "io/mi_image_data.h"
+#include "io/mi_message.pb.h"
+
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
-#include "io/mi_image_data.h"
-
-#include "arithmetic/mi_ortho_camera.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 #include "mi_model_crosshair.h"
 #include "mi_app_common_define.h"

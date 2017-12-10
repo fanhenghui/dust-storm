@@ -1,11 +1,9 @@
 #include "mi_be_cmd_handler_fe_back_to_worklist.h"
 
-#include <iostream>
-
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
+#include "util/mi_operation_interface.h"
 
-#include "mi_operation_interface.h"
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
 #include "mi_app_common_logger.h"

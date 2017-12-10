@@ -1,16 +1,15 @@
 #include "mi_db_server_controller.h"
 
 #include "util/mi_ipc_server_proxy.h"
+#include "util/mi_operation_factory.h"
 
 #include "io/mi_pacs_communicator.h"
+#include "io/mi_db.h"
+#include "io/mi_configure.h"
 
-#include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_config.h"
-#include "appcommon/mi_operation_factory.h"
 
 #include "mi_db_server_thread_model.h"
-
 #include "mi_db_cmd_handler_be_operation.h"
 #include "mi_db_operation_be_fetch_dicom.h"
 #include "mi_db_operation_be_fetch_ai_evaluation.h"
@@ -18,7 +17,6 @@
 #include "mi_db_operation_be_request_end.h"
 #include "mi_db_operation_be_pacs_retrieve.h"
 #include "mi_db_operation_be_pacs_fetch.h"
-
 #include "mi_db_cmd_handler_ai_operation.h"
 #include "mi_db_operation_ai_send_evaluation.h"
 #include "mi_db_operation_ai_ready.h"
@@ -74,7 +72,7 @@ void DBServerController::initialize() {
 
     //connect db
     std::string ip_port,user,pwd,db_name;
-    AppConfig::instance()->get_db_info(ip_port, user, pwd, db_name);
+    Configure::instance()->get_db_info(ip_port, user, pwd, db_name);
     if(0 != _db->connect(user, ip_port, pwd, db_name) ) {
         MI_DBSERVER_LOG(MI_FATAL) << "connect to db failed.";
         DBSERVER_THROW_EXCEPTION("connect to db failed.");
@@ -90,7 +88,7 @@ void DBServerController::initialize() {
     //connect PACS
     std::string server_ae_title,server_host,client_ae_title;
     unsigned short server_port(0), client_port(0);
-    AppConfig::instance()->get_pacs_info(server_ae_title, server_host, server_port, client_ae_title, client_port);
+    Configure::instance()->get_pacs_info(server_ae_title, server_host, server_port, client_ae_title, client_port);
     if(-1 == _pacs_communicator->connect(server_ae_title, server_host, server_port, client_ae_title, client_port)) {
         MI_DBSERVER_LOG(MI_FATAL) << "Connect to PACS {AET: " << server_ae_title << "; URL: " << server_host << ":" << server_port << "} failed.";
         //Start with disconnect.

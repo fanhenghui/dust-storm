@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 #include "io/mi_image_data.h"
 #include "glresource/mi_gl_buffer.h"
 

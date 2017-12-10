@@ -11,7 +11,7 @@
 
 #include "mi_db_server_common.h"
 #include "util/mi_ipc_common.h"
-#include "appcommon/mi_app_db.h"
+#include "io/mi_db.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

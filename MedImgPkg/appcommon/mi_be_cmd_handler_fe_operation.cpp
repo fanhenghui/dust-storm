@@ -1,9 +1,9 @@
 #include "mi_be_cmd_handler_fe_operation.h"
 
+#include "util/mi_operation_factory.h"
+
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
-#include "mi_operation_factory.h"
-
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

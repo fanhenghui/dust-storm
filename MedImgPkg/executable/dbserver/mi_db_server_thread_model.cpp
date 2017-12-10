@@ -1,7 +1,8 @@
 #include "mi_db_server_thread_model.h"
-#include "appcommon/mi_operation_interface.h"
+
+#include "util/mi_operation_interface.h"
 #include "util/mi_ipc_server_proxy.h"
-#include "appcommon/mi_operation_interface.h"
+#include "util/mi_operation_interface.h"
 
 #include "mi_db_server_console_echo.h"
 

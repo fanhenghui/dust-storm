@@ -1,10 +1,9 @@
 #include "mi_be_cmd_handler_fe_shutdown.h"
 
-#include "mi_app_controller.h"
 #include "util/mi_ipc_common.h"
 #include "util/mi_memory_shield.h"
 
-#include <arpa/inet.h>
+#include "mi_app_controller.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

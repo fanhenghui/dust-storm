@@ -1,5 +1,4 @@
 #include "mi_operation_init.h"
-#include "appcommon/mi_message.pb.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
@@ -13,6 +12,10 @@
 #include "io/mi_pacs_communicator.h"
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
+#include "io/mi_cache_db.h"
+#include "io/mi_db.h"
+#include "io/mi_configure.h"
+#include "io/mi_message.pb.h"
 
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_utils.h"
@@ -29,8 +32,6 @@
 #include "appcommon/mi_app_thread_model.h"
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_cache_db.h"
-#include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_none_image.h"
 #include "appcommon/mi_model_annotation.h"
@@ -43,7 +44,6 @@
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_common_util.h"
 
-#include "appcommon/mi_app_config.h"
 #include "mi_review_logger.h"
 
 #include <time.h>
@@ -101,7 +101,7 @@ int OpInit::init_data_i(std::shared_ptr<AppController> controller, const std::st
     // get series path from img cache db
     MI_REVIEW_LOG(MI_TRACE) << "try to get series from local img cache db. series id: " << series_uid;
     std::string db_ip_port,db_user,db_pwd,db_name,db_path;
-    AppConfig::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name,db_path);
+    Configure::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name,db_path);
     CacheDB cache_db;
     if( 0 != cache_db.connect(db_user, db_ip_port, db_pwd, db_name)) {
         MI_REVIEW_LOG(MI_FATAL) << "connect Cache DB failed.";
@@ -204,7 +204,7 @@ static IPCPackage* create_query_end_msg_package() {
 
 int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, const std::string& series_uid, bool data_in_cache, bool& preprocessing_mask) {
     std::string dbs_ip,dbs_port;
-    AppConfig::instance()->get_db_server_host(dbs_ip, dbs_port);
+    Configure::instance()->get_db_server_host(dbs_ip, dbs_port);
     if (dbs_ip.empty() || dbs_port.empty()) {
         MI_REVIEW_LOG(MI_FATAL) << "DBS host is null. U need check the config file.";
         return -1;
@@ -284,7 +284,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     std::vector<ScanSliceType> mpr_scan_types;
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
-    const int expected_fps = AppConfig::instance()->get_expected_fps();
+    const int expected_fps = Configure::instance()->get_expected_fps();
     // create cells
     for (int i = 0; i < msg_init->cells_size(); ++i)
     {

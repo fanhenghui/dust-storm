@@ -7,15 +7,14 @@
 
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
+#include "io/mi_message.pb.h"
 
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_mask_label_store.h"
 
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
-
 #include "mi_app_common_logger.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_util.h"
 #include "mi_model_dbs_status.h"
 

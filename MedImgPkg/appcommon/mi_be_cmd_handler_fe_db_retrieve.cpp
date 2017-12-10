@@ -5,12 +5,12 @@
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
 
-#include "appcommon/mi_app_controller.h"
-#include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_db.h"
+#include "io/mi_db.h"
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
 
-#include "mi_message.pb.h"
-#include "mi_app_config.h"
+#include "mi_app_controller.h"
+#include "mi_app_common_define.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -28,7 +28,7 @@ int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, ch
 
     //query series in remote DB
     std::string db_ip_port,db_user,db_pwd,db_name;
-    AppConfig::instance()->get_db_info(db_ip_port, db_user, db_pwd, db_name);
+    Configure::instance()->get_db_info(db_ip_port, db_user, db_pwd, db_name);
     DB db;
     if( 0 != db.connect(db_user, db_ip_port, db_pwd, db_name)) {
         MI_APPCOMMON_LOG(MI_FATAL) << "connect DB failed.";

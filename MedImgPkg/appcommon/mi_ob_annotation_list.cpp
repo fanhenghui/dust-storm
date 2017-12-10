@@ -1,12 +1,12 @@
 #include "mi_ob_annotation_list.h"
 
 #include "util/mi_ipc_client_proxy.h"
+#include "io/mi_message.pb.h"
 
 #include "mi_model_annotation.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_controller.h"
 #include "mi_app_common_define.h"
-#include "mi_message.pb.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

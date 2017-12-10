@@ -25,7 +25,7 @@ TARGET = $(BIN_DIR)/aiserver
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)
 ADDITIANL_DEPENDENCIES = -L$(LOCAL_LIB_DIR) -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lboost_log_setup -lprotobuf -lpython2.7 \
- -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io -lmedimg_renderalgo -lmedimg_appcommon
+ -lmedimg_log -lmedimg_util -lmedimg_glresource -lmedimg_arithmetic -lmedimg_io
 
 EXPORT_HEADER = mi_ai_server_common.h
 

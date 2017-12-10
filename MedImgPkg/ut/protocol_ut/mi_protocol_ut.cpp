@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-#include "mi_message.pb.h"
+#include "io/mi_message.pb.h"
 
 using namespace medical_imaging;
 int main(int argc, char* argv[]) {

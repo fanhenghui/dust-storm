@@ -2,16 +2,16 @@
 
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
+#include "util/mi_operation_interface.h"
+
+#include "io/mi_message.pb.h"
+#include "io/mi_configure.h"
 
 #include "mi_app_controller.h"
 #include "mi_app_common_define.h"
 #include "mi_app_thread_model.h"
 #include "mi_app_common_util.h"
 #include "mi_model_pacs.h"
-
-#include "mi_operation_interface.h"
-#include "mi_message.pb.h"
-#include "mi_app_config.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE

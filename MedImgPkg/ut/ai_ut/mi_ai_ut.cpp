@@ -6,8 +6,8 @@
 #include "util/mi_file_util.h"
 #include "io/mi_nodule_set.h"
 #include "io/mi_nodule_set_parser.h"
-#include "appcommon/mi_app_config.h"
-#include "appcommon/mi_app_db.h"
+#include "io/mi_configure.h"
+#include "io/mi_db.h"
 #include "mi_ai_lung_evaluate_py_wrapper.h" 
 
 using namespace medical_imaging;
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
     MI_LOG(MI_INFO) << "series id: " << series_id << std::endl;
 
     std::string ip_port,user,pwd,db_name;
-    AppConfig::instance()->get_db_info(ip_port,user,pwd,db_name);
+    Configure::instance()->get_db_info(ip_port,user,pwd,db_name);
     DB db;
     if (-1 == db.connect(user,ip_port,pwd,db_name) ) {
         MI_LOG(MI_ERROR) << "connect DB failed.\n";
@@ -48,8 +48,8 @@ int main(int argc, char* argv[]) {
     }
 
     //get python running path
-    const std::string pytorch_path = AppConfig::instance()->get_pytorch_path();
-    const std::string py_interface_path = AppConfig::instance()->get_py_interface_path();
+    const std::string pytorch_path = Configure::instance()->get_pytorch_path();
+    const std::string py_interface_path = Configure::instance()->get_py_interface_path();
 
     std::shared_ptr<medical_ai::AILungEvaulatePyWrapper> wrapper(new medical_ai::AILungEvaulatePyWrapper());
     if(-1 == wrapper->init(pytorch_path.c_str() ,py_interface_path.c_str()) ){

@@ -1,4 +1,4 @@
-#include "mi_app_cache_db.h"
+#include "mi_cache_db.h"
 
 #include "cppconn/driver.h"
 #include "cppconn/exception.h"
@@ -7,7 +7,7 @@
 #include "cppconn/sqlstring.h"
 #include "cppconn/statement.h"
 #include "mysql_connection.h"
-#include "mi_app_common_logger.h"
+#include "mi_io_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,23 +19,23 @@ CacheDB::~CacheDB() {
 }
 
 int CacheDB::insert_item(const ImgItem& item) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN cache db inset item."; 
+    MI_IO_LOG(MI_TRACE) << "IN cache db inset item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
 
     //query    
     bool in_db(false);
     if(-1 == query_item(item.series_id, in_db)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "query failed when insert item.";
+        MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
         return -1;
     }
 
     //delete if exit
     if (in_db) {
         if(-1 == delete_item(item.series_id)) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "delete item failed when insert the item with the same primary key.";
+            MI_IO_LOG(MI_ERROR) << "delete item failed when insert the item with the same primary key.";
             return -1;
         }
     }
@@ -70,31 +70,31 @@ int CacheDB::insert_item(const ImgItem& item) {
         ss << "# ERR: " << e.what()
         << " (MySQL error code: " << e.getErrorCode()
         << ", SQLState: " << e.getSQLState() << " )";
-        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
+        MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
         
         //TODO recovery old one if insert failed
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT db query inset item.";
+    MI_IO_LOG(MI_TRACE) << "OUT db query inset item.";
     return 0;
 }
 
 int CacheDB::delete_item(const std::string& series_id) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN cache db query delete item."; 
+    MI_IO_LOG(MI_TRACE) << "IN cache db query delete item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
 
     //query    
     bool in_db(false);
     if(-1 == query_item(series_id, in_db)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "query failed when insert item.";
+        MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
         return -1;
     }
 
     if (!in_db) {
-        MI_APPCOMMON_LOG(MI_WARNING) << "delete item not exist which series is: " << series_id;        
+        MI_IO_LOG(MI_WARNING) << "delete item not exist which series is: " << series_id;        
         return 0;
     }
 
@@ -117,18 +117,18 @@ int CacheDB::delete_item(const std::string& series_id) {
         ss << "# ERR: " << e.what()
         << " (MySQL error code: " << e.getErrorCode()
         << ", SQLState: " << e.getSQLState() << " )";
-        MI_APPCOMMON_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
+        MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: " << ss.str();
         // TODO recovery DB if delete failed
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT cache db delete item."; 
+    MI_IO_LOG(MI_TRACE) << "OUT cache db delete item."; 
     return 0;
 }
 
 int CacheDB::query_item(const std::string& series_id, bool& in_db) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN cache db query item."; 
+    MI_IO_LOG(MI_TRACE) << "IN cache db query item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
 
@@ -160,18 +160,18 @@ int CacheDB::query_item(const std::string& series_id, bool& in_db) {
         ss << "# ERR: " << e.what()
         << " (MySQL error code: " << e.getErrorCode()
         << ", SQLState: " << e.getSQLState() << " )";
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db query item failed with exception: " << ss.str();
+        MI_IO_LOG(MI_ERROR) << "cache db query item failed with exception: " << ss.str();
         return -1;
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT cache db query item."; 
+    MI_IO_LOG(MI_TRACE) << "OUT cache db query item."; 
     return 0;
 }
 
 int CacheDB::get_item(const std::string& series_id, ImgItem& item) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN cache db get item."; 
+    MI_IO_LOG(MI_TRACE) << "IN cache db get item."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
 
@@ -205,18 +205,18 @@ int CacheDB::get_item(const std::string& series_id, ImgItem& item) {
         ss << "# ERR: " << e.what()
         << " (MySQL error code: " << e.getErrorCode()
         << ", SQLState: " << e.getSQLState() << " )";
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db get item failed with exception: " << ss.str();
+        MI_IO_LOG(MI_ERROR) << "cache db get item failed with exception: " << ss.str();
         return -1;
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "Out cache db get item."; 
+    MI_IO_LOG(MI_TRACE) << "Out cache db get item."; 
     return 0;
 }
 
 int CacheDB::get_all_items(std::vector<ImgItem>& items) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN cache db get all items."; 
+    MI_IO_LOG(MI_TRACE) << "IN cache db get all items."; 
     if (!this->is_valid()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache db connection invalid.";
+        MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
 
@@ -254,10 +254,10 @@ int CacheDB::get_all_items(std::vector<ImgItem>& items) {
         ss << "# ERR: " << e.what()
         << " (MySQL error code: " << e.getErrorCode()
         << ", SQLState: " << e.getSQLState() << " )";
-        MI_APPCOMMON_LOG(MI_ERROR) << "cache cache db get all items failed with exception: " << ss.str();
+        MI_IO_LOG(MI_ERROR) << "cache cache db get all items failed with exception: " << ss.str();
         return -1;
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT cache db get all items.";
+    MI_IO_LOG(MI_TRACE) << "OUT cache db get all items.";
     return 0;
 }
 

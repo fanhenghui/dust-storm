@@ -1,21 +1,20 @@
 #include "mi_be_cmd_handler_fe_play_vr.h"
 
 #include <memory>
-
-#include "util/mi_memory_shield.h"
-
-#include "mi_app_controller.h"
-#include "mi_app_thread_model.h"
-#include "mi_operation_factory.h"
-#include "mi_app_common_define.h"
-
 #include "boost/thread.hpp"
-#include "mi_message.pb.h"
-
 #ifdef WIN32
 #else
 #include <unistd.h>
 #endif
+
+#include "util/mi_memory_shield.h"
+#include "util/mi_operation_factory.h"
+
+#include "io/mi_message.pb.h"
+
+#include "mi_app_controller.h"
+#include "mi_app_thread_model.h"
+#include "mi_app_common_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

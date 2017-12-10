@@ -1,16 +1,21 @@
-#ifndef MED_IMG_APPCOMMON_MI_APP_CONFIG_H
-#define MED_IMG_APPCOMMON_MI_APP_CONFIG_H
+#ifndef MEDIMG_IO_MI_CONFIGURE_H
+#define MEDIMG_IO_MI_CONFIGURE_H
 
-#include "appcommon/mi_app_common_export.h"
 #include <string>
+#include "io/mi_io_export.h"
 #include "boost/thread/mutex.hpp"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppConfig {
+enum ProcessingUnitType {
+    CPU = 0,
+    GPU,
+};
+
+class Configure {
 public:
-    static AppConfig* instance();
-    ~AppConfig();
+    static Configure* instance();
+    ~Configure();
 
     //For warm start/update
     void refresh();
@@ -39,11 +44,14 @@ public:
     void get_pacs_info(std::string& server_ae_title, std::string& server_host ,unsigned short& server_port,
     std::string& client_ae_title, unsigned short& client_port);
 
+    //GPU/CPU MPR rendering(Just for Windows client)
+    ProcessingUnitType get_processing_unit_type() const;
+    void set_processing_unit_type(ProcessingUnitType type);//For testing
 private:
-    AppConfig();
+    Configure();
     void init_i();
 
-    static AppConfig* _instance;
+    static Configure* _instance;
     static boost::mutex _mutex;
 
 private:
@@ -82,9 +90,10 @@ private:
     unsigned short _pacs_server_port;
     std::string _pacs_client_ae_title;
     unsigned short _pacs_client_port;  
+
+    //GPU/CPU MPR rendering
+    ProcessingUnitType _processing_unit_type;
 };
 
 MED_IMG_END_NAMESPACE
-
-
 #endif

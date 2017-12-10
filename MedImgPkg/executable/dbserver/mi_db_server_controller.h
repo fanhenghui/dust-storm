@@ -3,7 +3,7 @@
 
 #include "mi_db_server_logger.h"
 #include "mi_db_server_common.h"
-#include "appcommon/mi_app_common_controller_interface.h"
+#include "util/mi_controller_interface.h"
 #include <memory>
 
 MED_IMG_BEGIN_NAMESPACE

@@ -1,6 +1,6 @@
 #include "log/mi_logger.h"
 
-#include "appcommon/mi_message.pb.h"
+#include "io/mi_message.pb.h"
 
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
@@ -14,6 +14,8 @@
 #include "io/mi_pacs_communicator.h"
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
+#include "io/mi_cache_db.h"
+#include "io/mi_db.h"
 
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_utils.h"
@@ -30,8 +32,6 @@
 #include "appcommon/mi_app_thread_model.h"
 #include "appcommon/mi_app_cell.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_app_cache_db.h"
-#include "appcommon/mi_app_db.h"
 #include "appcommon/mi_app_controller.h"
 #include "appcommon/mi_app_none_image.h"
 #include "appcommon/mi_model_annotation.h"
@@ -48,7 +48,7 @@
 #include "appcommon/mi_be_cmd_handler_db_send_error.h"
 #include "appcommon/mi_be_cmd_handler_db_send_preprocess_mask.h"
 
-#include "appcommon/mi_app_config.h"
+#include "io/mi_configure.h"
 
 using namespace medical_imaging;
 
@@ -149,7 +149,7 @@ static IPCPackage* create_query_end_msg_package() {
 
 int query_from_remote_db(std::shared_ptr<AppController> controller, const std::string& series_uid, bool data_in_cache, bool& preprocessing_mask) {
     std::string dbs_ip,dbs_port;
-    AppConfig::instance()->get_db_server_host(dbs_ip, dbs_port);
+    Configure::instance()->get_db_server_host(dbs_ip, dbs_port);
     if (dbs_ip.empty() || dbs_port.empty()) {
         MI_APPCOMMONUT_LOG(MI_FATAL) << "DBS host is null. U need check the config file.";
         return -1;
@@ -202,7 +202,7 @@ int init_data(std::shared_ptr<AppController> controller, const std::string& seri
     // load data
     // get series path from img cache db
     std::string db_ip_port,db_user,db_pwd,db_name,db_path;
-    AppConfig::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name,db_path);
+    Configure::instance()->get_cache_db_info(db_ip_port, db_user, db_pwd, db_name,db_path);
     CacheDB cache_db;
     if( 0 != cache_db.connect(db_user, db_ip_port, db_pwd, db_name)) {
         MI_APPCOMMONUT_LOG(MI_FATAL) << "connect Cache DB failed.";
@@ -231,7 +231,7 @@ int init_data(std::shared_ptr<AppController> controller, const std::string& seri
 }
 
 int init_ut(int argc, char* argv[]) {
-    const std::string log_config_file = AppConfig::instance()->get_log_config_file();
+    const std::string log_config_file = Configure::instance()->get_log_config_file();
     Logger::instance()->bind_config_file(log_config_file);
     Logger::instance()->set_file_name_format("logs/mi-db-ut-%Y-%m-%d_%H-%M-%S.%N.log");
     Logger::instance()->set_file_direction("");

@@ -1,19 +1,18 @@
-#ifndef MED_IMG_APPCOMMON_MI_OPERATION_FACTORY_H
-#define MED_IMG_APPCOMMON_MI_OPERATION_FACTORY_H
+#ifndef MEDIMG_UTIL_MI_OPERATION_FACTORY_H
+#define MEDIMG_UTIL_MI_OPERATION_FACTORY_H
 
-#include "appcommon/mi_app_common_export.h"
-#include "appcommon/mi_operation_interface.h"
+#include "util/mi_util_export.h"
+#include "util/mi_operation_interface.h"
 
-#include "boost/thread/mutex.hpp"
+#include <boost/thread/mutex.hpp>
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export OperationFactory {
+class Util_Export OperationFactory {
 public:
     static OperationFactory* instance();
     ~OperationFactory();
 
-    // void register_operation(unsigned int id , std::shared_ptr<IOperation> operation);
     std::shared_ptr<IOperation> get_operation(unsigned int id);
     void register_operation(unsigned int id , std::shared_ptr<IOperation> op);
 
@@ -25,8 +24,6 @@ private:
     static boost::mutex _mutex;
 
     std::map<unsigned int , std::shared_ptr<IOperation>> _ops;
-
-private:
 };
 
 MED_IMG_END_NAMESPACE

@@ -1,12 +1,12 @@
 #include "mi_ob_annotation_segment.h"
 
-#include "util/mi_configuration.h"
-
 #include "arithmetic/mi_segment_threshold.h"
 #include "arithmetic/mi_connected_domain_analysis.h"
 #include "arithmetic/mi_intersection_test.h"
 
 #include "io/mi_image_data.h"
+
+#include "io/mi_configure.h"
 
 #include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -263,7 +263,7 @@ void OBAnnotationSegment::recover_i(const AABBUI& aabb , unsigned char label)
     }
 
     //Update to texture
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         if (aabb != AABBUI()) {
             update_aabb_i(aabb);
         }
@@ -327,7 +327,7 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
     }
 
     //Update to texture
-    if (GPU == Configuration::instance()->get_processing_unit_type()) {
+    if (GPU == Configure::instance()->get_processing_unit_type()) {
         if (aabb != AABBUI()) {
             update_aabb_i(aabb);
         }

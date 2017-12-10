@@ -3,8 +3,8 @@
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_server_proxy.h"
 
-#include "appcommon/mi_app_db.h"
-#include "appcommon/mi_message.pb.h"
+#include "io/mi_db.h"
+#include "io/mi_message.pb.h"
 
 #include "mi_db_server_controller.h"
 

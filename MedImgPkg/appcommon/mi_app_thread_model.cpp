@@ -1,15 +1,17 @@
 #include "mi_app_thread_model.h"
 
-#include "glresource/mi_gl_context.h"
-#include "glresource/mi_gl_resource_manager_container.h"
-#include "renderalgo/mi_scene_base.h"
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_operation_interface.h"
+
+#include "glresource/mi_gl_context.h"
+#include "glresource/mi_gl_resource_manager_container.h"
+
+#include "renderalgo/mi_scene_base.h"
 
 #include "mi_app_cell.h"
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
-#include "mi_operation_interface.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_none_image_interface.h"
 

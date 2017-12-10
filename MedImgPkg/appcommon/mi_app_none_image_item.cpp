@@ -4,6 +4,7 @@
 
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
+#include "io/mi_message.pb.h"
 
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -14,7 +15,7 @@
 #include "mi_model_annotation.h"
 #include "mi_model_crosshair.h"
 #include "mi_app_common_logger.h"
-#include "mi_message.pb.h"
+
 
 MED_IMG_BEGIN_NAMESPACE
 

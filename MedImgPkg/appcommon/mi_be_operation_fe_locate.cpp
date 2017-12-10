@@ -7,7 +7,8 @@
 #include "arithmetic/mi_vector3.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 
-#include "mi_message.pb.h"
+#include "io/mi_message.pb.h"
+
 #include "glresource/mi_gl_context.h"
 
 #include "renderalgo/mi_mpr_scene.h"

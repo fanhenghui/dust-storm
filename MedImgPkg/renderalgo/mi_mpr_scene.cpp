@@ -1,6 +1,6 @@
 #include "mi_mpr_scene.h"
 
-#include "util/mi_configuration.h"
+#include "io/mi_configure.h"
 
 #include "arithmetic/mi_arithmetic_utils.h"
 
@@ -20,7 +20,7 @@ MPRScene::MPRScene() : RayCastScene() {
         new MPREntryExitPoints());
     _entry_exit_points = mpr_entry_exit_points;
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _entry_exit_points->set_strategy(CPU_BASE);
     } else {
         _entry_exit_points->set_strategy(GPU_BASE);
@@ -32,7 +32,7 @@ MPRScene::MPRScene(int width, int height) : RayCastScene(width, height) {
         new MPREntryExitPoints());
     _entry_exit_points = mpr_entry_exit_points;
 
-    if (CPU == Configuration::instance()->get_processing_unit_type()) {
+    if (CPU == Configure::instance()->get_processing_unit_type()) {
         _entry_exit_points->set_strategy(CPU_BASE);
     } else {
         _entry_exit_points->set_strategy(GPU_BASE);

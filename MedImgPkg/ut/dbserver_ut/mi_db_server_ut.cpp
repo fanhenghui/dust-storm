@@ -8,9 +8,9 @@
 #include "util/mi_memory_shield.h"
 #include "io/mi_dicom_loader.h"
 #include "arithmetic/mi_run_length_operator.h"
-#include "appcommon/mi_app_config.h"
+#include "io/mi_configure.h"
 #include "appcommon/mi_app_common_define.h"
-#include "appcommon/mi_message.pb.h"
+#include "io/mi_message.pb.h"
 
 using namespace medical_imaging;
 class CmdHandlerDBSendDICOMSeries : public ICommandHandler {
@@ -185,7 +185,7 @@ IPCPackage* create_query_end_message() {
 }
 
 int main(int argc , char* argv[]) {
-    const std::string log_config_file = AppConfig::instance()->get_log_config_file();
+    const std::string log_config_file = Configure::instance()->get_log_config_file();
     Logger::instance()->bind_config_file(log_config_file);
     Logger::instance()->set_file_name_format("logs/mi-db-ut-%Y-%m-%d_%H-%M-%S.%N.log");
     Logger::instance()->set_file_direction("");
