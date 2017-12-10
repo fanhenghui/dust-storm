@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include "boost/filesystem.hpp"
+#include "boost/exception/exception.hpp"
 
 #ifdef WIN32
 //TODO
@@ -83,26 +84,57 @@ void get_files(const std::string& root , const std::set<std::string>& postfix,
 
 }
 
-void FileUtil::get_all_file_recursion(
+int FileUtil::get_all_file_recursion(
     const std::string& root ,
     const std::set<std::string>& postfix ,
     std::vector<std::string>& files) {
     if (root.empty()) {
-        return;
+        MI_UTIL_LOG(MI_ERROR) << "get all file from empty root.";
+        return -1;
     }
-
-    get_files(root , postfix, files);
+    if(0 == FileUtil::check_direction(root)) {
+        try {
+            get_files(root , postfix, files);
+            return 0;
+        } catch(const boost::exception& ex) {
+            MI_UTIL_LOG(MI_ERROR) << "get all file failed.";
+            return -1;
+        } catch(const std::exception& ex) {
+            MI_UTIL_LOG(MI_ERROR) << "get all file failed: " << ex.what();
+            return -1;
+        }
+        
+    } else {
+        MI_UTIL_LOG(MI_ERROR) << "get all file from root: " << root << " don't existed.";
+        return -1;
+    }
 }
 
-void FileUtil::get_all_file_recursion( 
+int FileUtil::get_all_file_recursion( 
     const std::string& root , 
     const std::set<std::string>& postfix , 
     std::map<std::string , std::vector<std::string>>& files) {
     if (root.empty() || postfix.empty()){
-        return;
+        MI_UTIL_LOG(MI_ERROR) << "get all file from empty root or empty postfix.";
+        return -1;
     }
 
-    get_files(root , postfix , files);
+    if(0 == FileUtil::check_direction(root)) {
+        try {
+            get_files(root , postfix , files);
+            return 0;
+        } catch(const boost::exception& ex) {
+            MI_UTIL_LOG(MI_ERROR) << "get all file failed.";
+            return -1;
+        } catch(const std::exception& ex) {
+            MI_UTIL_LOG(MI_ERROR) << "get all file failed: " << ex.what();
+            return -1;
+        }
+        
+    } else {
+        MI_UTIL_LOG(MI_ERROR) << "get all file from root: " << root << " don't existed.";
+        return -1;
+    }
 }
 
 int FileUtil::write_raw(const std::string& path , void* buffer , unsigned int length) {

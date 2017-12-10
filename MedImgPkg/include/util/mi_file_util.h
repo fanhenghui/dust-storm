@@ -11,11 +11,11 @@ MED_IMG_BEGIN_NAMESPACE
 
 class Util_Export FileUtil {
 public:
-    static void get_all_file_recursion(
+    static int get_all_file_recursion(
         const std::string& root, const std::set<std::string>& postfix,
         std::vector<std::string>& files);
     
-    static void get_all_file_recursion(
+    static int get_all_file_recursion(
         const std::string& root, const std::set<std::string>& postfix,
         std::map<std::string, std::vector<std::string>>& files);
 
