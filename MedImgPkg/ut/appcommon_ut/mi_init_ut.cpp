@@ -42,11 +42,11 @@
 #include "appcommon/mi_ob_annotation_statistic.h"
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_common_util.h"
-#include "appcommon/mi_cmd_handler_be_db_send_ai_evaluation.h"
-#include "appcommon/mi_cmd_handler_be_db_send_dicom.h"
-#include "appcommon/mi_cmd_handler_be_db_send_end_signal.h"
-#include "appcommon/mi_cmd_handler_be_db_send_error.h"
-#include "appcommon/mi_cmd_handler_be_db_send_preprocess_mask.h"
+#include "appcommon/mi_be_cmd_handler_db_send_ai_evaluation.h"
+#include "appcommon/mi_be_cmd_handler_db_send_dicom.h"
+#include "appcommon/mi_be_cmd_handler_db_send_end_signal.h"
+#include "appcommon/mi_be_cmd_handler_db_send_error.h"
+#include "appcommon/mi_be_cmd_handler_db_send_preprocess_mask.h"
 
 #include "appcommon/mi_app_config.h"
 
@@ -160,18 +160,18 @@ int query_from_remote_db(std::shared_ptr<AppController> controller, const std::s
 
     if (!data_in_cache) {
         client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
-        std::shared_ptr<CmdHandlerBE_DBSendDICOM>(new CmdHandlerBE_DBSendDICOM(controller)));
+        std::shared_ptr<BECmdHandlerDBSendDICOM>(new BECmdHandlerDBSendDICOM(controller)));
     }
     
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
-    std::shared_ptr<CmdHandlerBE_DBSendPreprocessMask>(new CmdHandlerBE_DBSendPreprocessMask(controller)));
+    std::shared_ptr<BECmdHandlerDBSendPreprocessMask>(new BECmdHandlerDBSendPreprocessMask(controller)));
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
-    std::shared_ptr<CmdHandlerBE_DBSendAIEvaluation>(new CmdHandlerBE_DBSendAIEvaluation(controller)));
+    std::shared_ptr<BECmdHandlerDBSendAIEvaluation>(new BECmdHandlerDBSendAIEvaluation(controller)));
     
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
-    std::shared_ptr<CmdHandlerBE_DBSendEndSignal>(new CmdHandlerBE_DBSendEndSignal(controller)));
+    std::shared_ptr<BECmdHandlerDBSendEndSignal>(new BECmdHandlerDBSendEndSignal(controller)));
     client_proxy.register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
-    std::shared_ptr<CmdHandlerBE_DBSendError>(new CmdHandlerBE_DBSendError(controller)));
+    std::shared_ptr<BECmdHandlerDBSendError>(new BECmdHandlerDBSendError(controller)));
 
     std::vector<IPCPackage*> packages;
     if (!data_in_cache) {

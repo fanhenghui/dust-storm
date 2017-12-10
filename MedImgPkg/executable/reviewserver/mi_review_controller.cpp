@@ -6,12 +6,12 @@
 
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_thread_model.h"
-#include "appcommon/mi_cmd_handler_be_fe_operation.h"
+#include "appcommon/mi_be_cmd_handler_fe_operation.h"
 #include "appcommon/mi_operation_factory.h"
-#include "appcommon/mi_cmd_handler_be_fe_ready.h"
-#include "appcommon/mi_cmd_handler_be_fe_shutdown.h"
-#include "appcommon/mi_cmd_handler_be_fe_heartbeat.h"
-#include "appcommon/mi_cmd_handler_be_fe_play_vr.h"
+#include "appcommon/mi_be_cmd_handler_fe_ready.h"
+#include "appcommon/mi_be_cmd_handler_fe_shutdown.h"
+#include "appcommon/mi_be_cmd_handler_fe_heartbeat.h"
+#include "appcommon/mi_be_cmd_handler_fe_play_vr.h"
 #include "appcommon/mi_be_operation_fe_mpr_paging.h"
 #include "appcommon/mi_be_operation_fe_pan.h"
 #include "appcommon/mi_be_operation_fe_resize.h"
@@ -26,17 +26,17 @@
 #include "appcommon/mi_be_operation_fe_downsample.h"
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
-#include "appcommon/mi_cmd_handler_be_fe_db_retrieve.h"
-#include "appcommon/mi_cmd_handler_be_fe_back_to_worklist.h"
-#include "appcommon/mi_cmd_handler_be_db_send_ai_evaluation.h"
-#include "appcommon/mi_cmd_handler_be_db_send_dicom.h"
-#include "appcommon/mi_cmd_handler_be_db_send_end_signal.h"
-#include "appcommon/mi_cmd_handler_be_db_send_error.h"
-#include "appcommon/mi_cmd_handler_be_db_send_preprocess_mask.h"
-#include "appcommon/mi_cmd_handler_be_fe_pacs_retrieve.h"
-#include "appcommon/mi_cmd_handler_be_fe_pacs_fetch.h"
-#include "appcommon/mi_cmd_handler_be_db_pacs_retrieve_result.h"
-#include "appcommon/mi_cmd_handler_be_db_pacs_fetch_result.h"
+#include "appcommon/mi_be_cmd_handler_fe_db_retrieve.h"
+#include "appcommon/mi_be_cmd_handler_fe_back_to_worklist.h"
+#include "appcommon/mi_be_cmd_handler_db_send_ai_evaluation.h"
+#include "appcommon/mi_be_cmd_handler_db_send_dicom.h"
+#include "appcommon/mi_be_cmd_handler_db_send_end_signal.h"
+#include "appcommon/mi_be_cmd_handler_db_send_error.h"
+#include "appcommon/mi_be_cmd_handler_db_send_preprocess_mask.h"
+#include "appcommon/mi_be_cmd_handler_fe_pacs_retrieve.h"
+#include "appcommon/mi_be_cmd_handler_fe_pacs_fetch.h"
+#include "appcommon/mi_be_cmd_handler_db_pacs_retrieve_result.h"
+#include "appcommon/mi_be_cmd_handler_db_pacs_fetch_result.h"
 
 #include "appcommon/mi_model_pacs.h"
 
@@ -63,31 +63,31 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<AppController> app_controller = shared_from_this();
     ;
     _proxy->register_command_handler(COMMAND_ID_BE_FE_HEARTBEAT, 
-    std::shared_ptr<CmdHandlerBE_FEHeartbeat>(new CmdHandlerBE_FEHeartbeat(app_controller)));
+    std::shared_ptr<BECmdHandlerFEHeartbeat>(new BECmdHandlerFEHeartbeat(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_READY, 
-    std::shared_ptr<CmdHandlerBE_FEReady>(new CmdHandlerBE_FEReady(app_controller)));
+    std::shared_ptr<BECmdHandlerFEReady>(new BECmdHandlerFEReady(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_SHUTDOWN,
-    std::shared_ptr<CmdHandlerBE_FEShutdown>(new CmdHandlerBE_FEShutdown(app_controller)));
+    std::shared_ptr<BECmdHandlerFEShutdown>(new BECmdHandlerFEShutdown(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_OPERATION, 
-    std::shared_ptr<CmdHandlerBE_FEOperation>(new CmdHandlerBE_FEOperation(app_controller)));
+    std::shared_ptr<BECmdHandlerFEOperation>(new BECmdHandlerFEOperation(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PLAY_VR,
-    std::shared_ptr<CmdHandlerBE_FEPlayVR>(new CmdHandlerBE_FEPlayVR(app_controller)));
+    std::shared_ptr<BECmdHandlerFEPlayVR>(new BECmdHandlerFEPlayVR(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_DB_RETRIEVE,
-    std::shared_ptr<CmdHandlerBE_FEDBRetrieve>(new CmdHandlerBE_FEDBRetrieve(app_controller)));
+    std::shared_ptr<BECmdHandlerFEDBRetrieve>(new BECmdHandlerFEDBRetrieve(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_BACK_TO_WORKLIST, 
-    std::shared_ptr<CmdHandlerBE_FEBackToWorklist> (new CmdHandlerBE_FEBackToWorklist(app_controller)));
+    std::shared_ptr<BECmdHandlerFEBackToWorklist> (new BECmdHandlerFEBackToWorklist(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_RETRIEVE, 
-    std::shared_ptr<CmdHandlerBE_FEPACSRetrieve>(new CmdHandlerBE_FEPACSRetrieve(app_controller)));
+    std::shared_ptr<BECmdHandlerFEPACSRetrieve>(new BECmdHandlerFEPACSRetrieve(app_controller)));
 
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_FETCH, 
-    std::shared_ptr<CmdHandlerBE_FEPACSFetch>(new CmdHandlerBE_FEPACSFetch(app_controller)));
+    std::shared_ptr<BECmdHandlerFEPACSFetch>(new BECmdHandlerFEPACSFetch(app_controller)));
 
 
     // Register operation
@@ -120,20 +120,20 @@ void ReviewController::register_command_handler_i() {
 
     //register command handler for DBS
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
-        std::shared_ptr<CmdHandlerBE_DBSendDICOM>(new CmdHandlerBE_DBSendDICOM(app_controller)));
+        std::shared_ptr<BECmdHandlerDBSendDICOM>(new BECmdHandlerDBSendDICOM(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_PREPROCESS_MASK, 
-    std::shared_ptr<CmdHandlerBE_DBSendPreprocessMask>(new CmdHandlerBE_DBSendPreprocessMask(app_controller)));
+    std::shared_ptr<BECmdHandlerDBSendPreprocessMask>(new BECmdHandlerDBSendPreprocessMask(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_AI_EVALUATION, 
-    std::shared_ptr<CmdHandlerBE_DBSendAIEvaluation>(new CmdHandlerBE_DBSendAIEvaluation(app_controller)));
+    std::shared_ptr<BECmdHandlerDBSendAIEvaluation>(new BECmdHandlerDBSendAIEvaluation(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_END, 
-    std::shared_ptr<CmdHandlerBE_DBSendEndSignal>(new CmdHandlerBE_DBSendEndSignal(app_controller)));
+    std::shared_ptr<BECmdHandlerDBSendEndSignal>(new BECmdHandlerDBSendEndSignal(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
-    std::shared_ptr<CmdHandlerBE_DBSendError>(new CmdHandlerBE_DBSendError(app_controller)));
+    std::shared_ptr<BECmdHandlerDBSendError>(new BECmdHandlerDBSendError(app_controller)));
 
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_RETRIEVE_RESULT, 
-    std::shared_ptr<CmdHandlerBE_DBPACSRetrieveResult>(new CmdHandlerBE_DBPACSRetrieveResult(app_controller)));
+    std::shared_ptr<BECmdHandlerDBPACSRetrieveResult>(new BECmdHandlerDBPACSRetrieveResult(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_FETCH_RESULT, 
-    std::shared_ptr<CmdHandlerBE_DBPACSFetchResult>(new CmdHandlerBE_DBPACSFetchResult(app_controller)));
+    std::shared_ptr<BECmdHandlerDBPACSFetchResult>(new BECmdHandlerDBPACSFetchResult(app_controller)));
 }
 
 void ReviewController::init_default_model_i() {

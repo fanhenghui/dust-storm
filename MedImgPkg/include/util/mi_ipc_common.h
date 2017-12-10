@@ -92,6 +92,7 @@ public:
     virtual int handle_command(const IPCDataHeader& dataheader , char* buffer) = 0;
 protected:
 private:
+    DISALLOW_COPY_AND_ASSIGN(ICommandHandler);
 };
 
 class IEvent {
