@@ -1,5 +1,5 @@
-#ifndef MED_IMG_APPCOMMON_MI_OPERATION_LOCATE_H
-#define MED_IMG_APPCOMMON_MI_OPERATION_LOCATE_H
+#ifndef MEDIMG_APPCOMMON_MI_BE_OPERATION_FE_LOCATE_H
+#define MEDIMG_APPCOMMON_MI_BE_OPERATION_FE_LOCATE_H
 
 #include "appcommon/mi_app_common_export.h"
 #include "appcommon/mi_operation_interface.h"
@@ -9,15 +9,15 @@ MED_IMG_BEGIN_NAMESPACE
 class MPRScene;
 class VRScene;
 class AppCell;
-class AppCommon_Export OpLocate : public IOperation {
+class AppCommon_Export BEOpFELocate : public IOperation {
 public:
-    OpLocate();
-    virtual ~OpLocate();
+    BEOpFELocate();
+    virtual ~BEOpFELocate();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<OpLocate>(new OpLocate());
+        return std::shared_ptr<BEOpFELocate>(new BEOpFELocate());
     }
 
 private:

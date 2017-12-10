@@ -1,4 +1,4 @@
-#include "mi_operation_locate.h"
+#include "mi_be_operation_fe_locate.h"
 
 #include "util/mi_ipc_client_proxy.h"
 
@@ -27,11 +27,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpLocate::OpLocate() {}
+BEOpFELocate::BEOpFELocate() {}
 
-OpLocate::~OpLocate() {}
+BEOpFELocate::~BEOpFELocate() {}
 
-int OpLocate::execute() {
+int BEOpFELocate::execute() {
     if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted locate message.";
         return -1;
@@ -74,8 +74,8 @@ int OpLocate::execute() {
     return -1;
 }
 
-int OpLocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt_cross) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpLocate MPR.";
+int BEOpFELocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt_cross) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFELocate MPR.";
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -103,13 +103,13 @@ int OpLocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRSce
     crosshair_nonimg->check_dirty();
     crosshair_nonimg->update();
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpLocate MPR.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFELocate MPR.";
     return 0;
 }
 
-int OpLocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt_cross) {
+int BEOpFELocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt_cross) {
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpLocate VR.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFELocate VR.";
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -151,7 +151,7 @@ int OpLocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene
         vr_scene->get_display_size(width, height);
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpLocate VR.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFELocate VR.";
     return 0;
 }
 

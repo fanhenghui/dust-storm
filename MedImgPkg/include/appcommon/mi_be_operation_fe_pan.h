@@ -1,20 +1,20 @@
-#ifndef MED_IMG_APPCOMMON_MI_OPERATION_ROTATE_H
-#define MED_IMG_APPCOMMON_MI_OPERATION_ROTATE_H
+#ifndef MEDIMG_APPCOMMON_MI_BE_OPERATION_FE_PAN_H
+#define MEDIMG_APPCOMMON_MI_BE_OPERATION_FE_PAN_H
 
 #include "appcommon/mi_app_common_export.h"
 #include "appcommon/mi_operation_interface.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export OpRotate : public IOperation {
+class AppCommon_Export BEOpFEPan : public IOperation {
 public:
-    OpRotate();
-    virtual ~OpRotate();
+    BEOpFEPan();
+    virtual ~BEOpFEPan();
 
     virtual int execute();
 
     virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<OpRotate>(new OpRotate());
+        return std::shared_ptr<BEOpFEPan>(new BEOpFEPan());
     }
 
 protected:

@@ -1,4 +1,4 @@
-#include "mi_operation_query_annotation.h"
+#include "mi_be_operation_fe_fetch_ai_evaluation.h"
 
 #include "util/mi_ipc_client_proxy.h"
 #include "arithmetic/mi_circle.h"
@@ -24,12 +24,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpQueryAnnotation::OpQueryAnnotation() {}
+BEOpFEFetchAIEvaluation::BEOpFEFetchAIEvaluation() {}
 
-OpQueryAnnotation::~OpQueryAnnotation() {}
+BEOpFEFetchAIEvaluation::~BEOpFEFetchAIEvaluation() {}
 
-int OpQueryAnnotation::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpQueryAnnotation.";
+int BEOpFEFetchAIEvaluation::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEFetchAIEvaluation.";
     if (_buffer == nullptr || _header.data_len == 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation request message from BE.";
         return -1;
@@ -74,7 +74,7 @@ int OpQueryAnnotation::execute() {
 
 
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpQueryAnnotation.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEFetchAIEvaluation.";
     return 0;
 }
 

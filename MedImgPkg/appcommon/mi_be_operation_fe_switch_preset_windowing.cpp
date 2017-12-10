@@ -1,4 +1,4 @@
-#include "mi_operation_switch_preset_windowing.h"
+#include "mi_be_operation_fe_switch_preset_windowing.h"
 
 #include "arithmetic/mi_vector2f.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -10,12 +10,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpSwitchPresetWindowing::OpSwitchPresetWindowing() {}
+BEOpFESwitchPresetWindowing::BEOpFESwitchPresetWindowing() {}
 
-OpSwitchPresetWindowing::~OpSwitchPresetWindowing() {}
+BEOpFESwitchPresetWindowing::~BEOpFESwitchPresetWindowing() {}
 
-int OpSwitchPresetWindowing::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpSwitchPresetWindowing.";
+int BEOpFESwitchPresetWindowing::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFESwitchPresetWindowing.";
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
@@ -71,7 +71,7 @@ int OpSwitchPresetWindowing::execute() {
             mpr_scene->set_dirty(true);
         }
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpSwitchPresetWindowing.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFESwitchPresetWindowing.";
     return 0;
 }
 

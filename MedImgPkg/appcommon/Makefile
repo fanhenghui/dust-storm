@@ -27,9 +27,9 @@ mi_cmd_handler_be_db_send_error.o mi_cmd_handler_be_db_send_ai_evaluation.o mi_c
 mi_cmd_handler_be_db_send_preprocess_mask.o mi_cmd_handler_be_db_send_dicom.o mi_cmd_handler_be_fe_back_to_worklist.o \
 mi_cmd_handler_be_fe_pacs_fetch.o mi_cmd_handler_be_fe_pacs_retrieve.o mi_cmd_handler_be_db_pacs_fetch_result.o \
 mi_cmd_handler_be_db_pacs_retrieve_result.o
-OPERATION_OBJS = mi_operation_factory.o mi_operation_mpr_paging.o mi_operation_rotate.o mi_operation_pan.o mi_operation_zoom.o \
-mi_operation_windowing.o mi_operation_resize.o mi_operation_mpr_mask_overlay.o mi_operation_switch_preset_windowing.o \
-mi_operation_switch_preset_vrt.o mi_operation_locate.o mi_operation_downsample.o mi_operation_annotation.o mi_operation_query_annotation.o 
+OPERATION_OBJS = mi_operation_factory.o mi_be_operation_fe_mpr_paging.o mi_be_operation_fe_rotate.o mi_be_operation_fe_pan.o mi_be_operation_fe_zoom.o \
+mi_be_operation_fe_windowing.o mi_be_operation_fe_resize.o mi_be_operation_fe_mpr_mask_overlay.o mi_be_operation_fe_switch_preset_windowing.o \
+mi_be_operation_fe_switch_preset_vrt.o mi_be_operation_fe_locate.o mi_be_operation_fe_downsample.o mi_be_operation_fe_annotation.o mi_be_operation_fe_fetch_ai_evaluation.o 
 THREAD_MODEL_OBJS = mi_app_cell.o mi_app_none_image_item.o mi_app_none_image.o mi_app_controller.o mi_app_thread_model.o mi_app_common_util.o
 
 OBJS = $(MODEL_OBJS) $(OBSERVER_OBJS) $(CMD_HANDLER_OBJS) $(OPERATION_OBJS) $(THREAD_MODEL_OBJS)

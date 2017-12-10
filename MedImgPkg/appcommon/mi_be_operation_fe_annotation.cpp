@@ -1,4 +1,4 @@
-#include "mi_operation_annotation.h"
+#include "mi_be_operation_fe_annotation.h"
 
 #include "util/mi_ipc_client_proxy.h"
 #include "arithmetic/mi_circle.h"
@@ -21,12 +21,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpAnnotation::OpAnnotation() {}
+BNOpFEAnnotation::BNOpFEAnnotation() {}
 
-OpAnnotation::~OpAnnotation() {}
+BNOpFEAnnotation::~BNOpFEAnnotation() {}
 
-int OpAnnotation::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpAnnotation.";
+int BNOpFEAnnotation::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BNOpFEAnnotation.";
     if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation message.";
         return -1;
@@ -158,7 +158,7 @@ int OpAnnotation::execute() {
         model_crosshair->locate(voi_center_w, false);
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpAnnotation.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BNOpFEAnnotation.";
     return 0;
 }
 

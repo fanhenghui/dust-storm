@@ -1,4 +1,4 @@
-#include "mi_operation_windowing.h"
+#include "mi_be_operation_fe_windowing.h"
 
 #include "io/mi_image_data.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -13,11 +13,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpWindowing::OpWindowing() {}
+BEOpFEWindowing::BEOpFEWindowing() {}
 
-OpWindowing::~OpWindowing() {}
+BEOpFEWindowing::~BEOpFEWindowing() {}
 
-int OpWindowing::execute() {
+int BEOpFEWindowing::execute() {
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 

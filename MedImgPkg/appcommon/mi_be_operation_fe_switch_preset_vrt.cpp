@@ -1,4 +1,4 @@
-#include "mi_operation_switch_preset_vrt.h"
+#include "mi_be_operation_fe_switch_preset_vrt.h"
 
 #include "renderalgo/mi_color_transfer_function.h"
 #include "renderalgo/mi_opacity_transfer_function.h"
@@ -12,12 +12,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpSwitchPresetVRT::OpSwitchPresetVRT() {}
+BEOpFESwitchPresetVRT::BEOpFESwitchPresetVRT() {}
 
-OpSwitchPresetVRT::~OpSwitchPresetVRT() {}
+BEOpFESwitchPresetVRT::~BEOpFESwitchPresetVRT() {}
 
-int OpSwitchPresetVRT::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpSwitchPresetVRT.";
+int BEOpFESwitchPresetVRT::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFESwitchPresetVRT.";
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
@@ -103,7 +103,7 @@ int OpSwitchPresetVRT::execute() {
             }
         }
     }
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpSwitchPresetVRT.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFESwitchPresetVRT.";
     return 0;
 }
 

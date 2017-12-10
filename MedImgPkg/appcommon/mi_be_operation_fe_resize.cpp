@@ -1,4 +1,4 @@
-#include "mi_operation_resize.h"
+#include "mi_be_operation_fe_resize.h"
 
 #include "io/mi_image_data.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -14,11 +14,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpResize::OpResize() {}
+BEOpFEResize::BEOpFEResize() {}
 
-OpResize::~OpResize() {}
+BEOpFEResize::~BEOpFEResize() {}
 
-int OpResize::execute() {
+int BEOpFEResize::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgResize msg;

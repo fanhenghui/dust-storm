@@ -1,4 +1,4 @@
-#include "mi_operation_mpr_mask_overlay.h"
+#include "mi_be_operation_fe_mpr_mask_overlay.h"
 #include "renderalgo/mi_mpr_scene.h"
 
 #include "mi_app_cell.h"
@@ -9,16 +9,16 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpMPRMaskOverlay::OpMPRMaskOverlay() {
+BEOpFEMPRMaskOverlay::BEOpFEMPRMaskOverlay() {
 
 }
 
-OpMPRMaskOverlay::~OpMPRMaskOverlay() {
+BEOpFEMPRMaskOverlay::~BEOpFEMPRMaskOverlay() {
 
 }
 
-int OpMPRMaskOverlay::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpMPRMaskOverlay.";
+int BEOpFEMPRMaskOverlay::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEMPRMaskOverlay.";
     if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted mask overlay message.";
         return -1;
@@ -49,7 +49,7 @@ int OpMPRMaskOverlay::execute() {
         } 
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpMPRMaskOverlay.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEMPRMaskOverlay.";
     return 0;
 }
 

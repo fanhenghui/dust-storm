@@ -1,4 +1,4 @@
-#include "mi_operation_rotate.h"
+#include "mi_be_operation_fe_rotate.h"
 
 #include "arithmetic/mi_matrix4.h"
 #include "arithmetic/mi_camera_base.h"
@@ -17,12 +17,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpRotate::OpRotate() {}
+BEOpFERotate::BEOpFERotate() {}
 
-OpRotate::~OpRotate() {}
+BEOpFERotate::~BEOpFERotate() {}
 
-int OpRotate::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpRotate.";
+int BEOpFERotate::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFERotate.";
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -61,7 +61,7 @@ int OpRotate::execute() {
         msg.Clear();
     }
     
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpRotate";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFERotate";
     return 0;
 }
 

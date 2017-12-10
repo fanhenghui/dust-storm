@@ -1,4 +1,4 @@
-#include "mi_operation_mpr_paging.h"
+#include "mi_be_operation_fe_mpr_paging.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
@@ -16,15 +16,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-OpMPRPaging::OpMPRPaging() {
+BEOpFEMPRPaging::BEOpFEMPRPaging() {
 
 }
 
-OpMPRPaging::~OpMPRPaging() {
+BEOpFEMPRPaging::~BEOpFEMPRPaging() {
 }
 
-int OpMPRPaging::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN OpMPRPaging";
+int BEOpFEMPRPaging::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEMPRPaging";
     //Parse data
     const unsigned int cell_id = _header.cell_id;
     int page_step = 1;
@@ -69,7 +69,7 @@ int OpMPRPaging::execute() {
     
     model_crosshair->page(mpr_scene, page_step);
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT OpMPRPaging";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEMPRPaging";
     return 0;
 }
 

@@ -12,18 +12,18 @@
 #include "appcommon/mi_cmd_handler_be_fe_shutdown.h"
 #include "appcommon/mi_cmd_handler_be_fe_heartbeat.h"
 #include "appcommon/mi_cmd_handler_be_fe_play_vr.h"
-#include "appcommon/mi_operation_mpr_paging.h"
-#include "appcommon/mi_operation_pan.h"
-#include "appcommon/mi_operation_resize.h"
-#include "appcommon/mi_operation_rotate.h"
-#include "appcommon/mi_operation_windowing.h"
-#include "appcommon/mi_operation_zoom.h"
-#include "appcommon/mi_operation_annotation.h"
-#include "appcommon/mi_operation_mpr_mask_overlay.h"
-#include "appcommon/mi_operation_switch_preset_windowing.h"
-#include "appcommon/mi_operation_switch_preset_vrt.h"
-#include "appcommon/mi_operation_locate.h"
-#include "appcommon/mi_operation_downsample.h"
+#include "appcommon/mi_be_operation_fe_mpr_paging.h"
+#include "appcommon/mi_be_operation_fe_pan.h"
+#include "appcommon/mi_be_operation_fe_resize.h"
+#include "appcommon/mi_be_operation_fe_rotate.h"
+#include "appcommon/mi_be_operation_fe_windowing.h"
+#include "appcommon/mi_be_operation_fe_zoom.h"
+#include "appcommon/mi_be_operation_fe_annotation.h"
+#include "appcommon/mi_be_operation_fe_mpr_mask_overlay.h"
+#include "appcommon/mi_be_operation_fe_switch_preset_windowing.h"
+#include "appcommon/mi_be_operation_fe_switch_preset_vrt.h"
+#include "appcommon/mi_be_operation_fe_locate.h"
+#include "appcommon/mi_be_operation_fe_downsample.h"
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
 #include "appcommon/mi_cmd_handler_be_fe_db_retrieve.h"
@@ -92,31 +92,31 @@ void ReviewController::register_command_handler_i() {
 
     // Register operation
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_MPR_PAGING, std::shared_ptr<OpMPRPaging>(new OpMPRPaging()));
+        OPERATION_ID_BE_FE_MPR_PAGING, std::shared_ptr<BEOpFEMPRPaging>(new BEOpFEMPRPaging()));
     OperationFactory::instance()->register_operation(
         OPERATION_ID_BE_FE_INIT, std::shared_ptr<OpInit>(new OpInit()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_ROTATE, std::shared_ptr<OpRotate>(new OpRotate()));
+        OPERATION_ID_BE_FE_ROTATE, std::shared_ptr<BEOpFERotate>(new BEOpFERotate()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_ZOOM, std::shared_ptr<OpZoom>(new OpZoom()));
+        OPERATION_ID_BE_FE_ZOOM, std::shared_ptr<BEOpFEZoom>(new BEOpFEZoom()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_PAN, std::shared_ptr<OpPan>(new OpPan()));
+        OPERATION_ID_BE_FE_PAN, std::shared_ptr<BEOpFEPan>(new BEOpFEPan()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_WINDOWING, std::shared_ptr<OpWindowing>(new OpWindowing()));
+        OPERATION_ID_BE_FE_WINDOWING, std::shared_ptr<BEOpFEWindowing>(new BEOpFEWindowing()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_RESIZE, std::shared_ptr<OpResize>(new OpResize()));
+        OPERATION_ID_BE_FE_RESIZE, std::shared_ptr<BEOpFEResize>(new BEOpFEResize()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, std::shared_ptr<OpMPRMaskOverlay>(new OpMPRMaskOverlay()));
+        OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, std::shared_ptr<BEOpFEMPRMaskOverlay>(new BEOpFEMPRMaskOverlay()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, std::shared_ptr<OpSwitchPresetWindowing>(new OpSwitchPresetWindowing()));
+        OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, std::shared_ptr<BEOpFESwitchPresetWindowing>(new BEOpFESwitchPresetWindowing()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, std::shared_ptr<OpSwitchPresetVRT>(new OpSwitchPresetVRT()));
+        OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, std::shared_ptr<BEOpFESwitchPresetVRT>(new BEOpFESwitchPresetVRT()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_LOCATE, std::shared_ptr<OpLocate>(new OpLocate()));
+        OPERATION_ID_BE_FE_LOCATE, std::shared_ptr<BEOpFELocate>(new BEOpFELocate()));
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_DOWNSAMPLE, std::shared_ptr<OpDownsample>(new OpDownsample()));    
+        OPERATION_ID_BE_FE_DOWNSAMPLE, std::shared_ptr<BEOpFEDownsample>(new BEOpFEDownsample()));    
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_ANNOTATION, std::shared_ptr<OpAnnotation>(new OpAnnotation()));
+        OPERATION_ID_BE_FE_ANNOTATION, std::shared_ptr<BNOpFEAnnotation>(new BNOpFEAnnotation()));
 
     //register command handler for DBS
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 
