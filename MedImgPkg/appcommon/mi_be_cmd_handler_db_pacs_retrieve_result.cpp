@@ -91,6 +91,7 @@ int BECmdHandlerDBPACSRetrieveResult::handle_command(const IPCDataHeader& datahe
         dcm_info.patient_sex = item.patient_sex();
         dcm_info.patient_age = item.patient_age();
         dcm_info.patient_birth_date = item.patient_birth_date();
+        dcm_info.modality = item.modality();
         dcm_infos[id++] = dcm_info;
     }
     msg.Clear();

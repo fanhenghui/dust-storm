@@ -48,14 +48,15 @@ int DB::insert_dcm_item(const ImgItem& item) {
         {
             std::stringstream ss;
             ss << "INSERT INTO " << DCM_TABLE << " (series_id, study_id, patient_name, "
-               "patient_id, modality, size_mb, dcm_path) values (";
+               "patient_id, modality, size_mb, dcm_path, preprocess_mask_path) values (";
             ss << "\'" << item.series_id << "\',";
             ss << "\'" << item.study_id << "\',";
             ss << "\'" << item.patient_name << "\',";
             ss << "\'" << item.patient_id << "\',";
             ss << "\'" << item.modality << "\',";
             ss << "\'" << item.size_mb << "\',";
-            ss << "\'" << item.dcm_path << "\'";
+            ss << "\'" << item.dcm_path << "\',";
+            ss << "\'" << item.preprocess_mask_path << "\'";
             ss << ");";
             sql_str = ss.str();
         }

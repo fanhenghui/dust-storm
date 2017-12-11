@@ -239,4 +239,22 @@ int FileUtil::make_direction(const std::string& path) {
 #endif
 }
 
+float FileUtil::get_size_mb(std::vector<std::string>& files) {
+    float size_sum = 0;
+    std::ifstream in;
+    for (auto it = files.begin(); it != files.end(); ++it) {
+        in.open((*it).c_str(), std::ios::binary | std::ios::in);
+        if(!in.is_open()) {
+            in.close();
+            continue;
+        } else {
+            in.seekg(0, std::ios::end);
+            size_sum += (float)(in.tellg()) * (1/1024.0f);  
+            in.close();
+        }
+    }
+
+    return size_sum/1024.0f;
+}
+
 MED_IMG_END_NAMESPACE

@@ -19,6 +19,8 @@ public:
         const std::string& root, const std::set<std::string>& postfix,
         std::map<std::string, std::vector<std::string>>& files);
 
+    static float get_size_mb(std::vector<std::string>& files);
+
     static int check_direction(const std::string& path);
     static int make_direction(const std::string& path);
 

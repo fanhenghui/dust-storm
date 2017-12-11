@@ -72,6 +72,7 @@ int DBOpBEPACSFetch::execute() {
             }
         }
 
+        MI_DBSERVER_LOG(MI_INFO) << "PACS fetching series : " << series_id << " >>>>>>";
         //2 fetch data from PACS
         if(0 != pacs_commu->fetch_series(series_id, series_dir)){
             MI_DBSERVER_LOG(MI_ERROR) << "PACS try fetch series: " << series_id << " failed.";
@@ -82,7 +83,8 @@ int DBOpBEPACSFetch::execute() {
         //3 preprocess mask calculate(size mb will calculate then)
         // TODO 暂时使用方案2（简单版本：串行计算），方案1会比较好
         const std::string preprocess_mask_path = series_dir + "/" + series_id + ".rle";
-        if(0 != preprocess_i(series_dir, preprocess_mask_path)) {
+        float dicoms_size_mb = 0;
+        if(0 != preprocess_i(series_dir, preprocess_mask_path, dicoms_size_mb)) {
             MI_DBSERVER_LOG(MI_ERROR) << "preprocess PACS fetched series: " << series_id << " failed.";
             continue;
         }
@@ -97,6 +99,7 @@ int DBOpBEPACSFetch::execute() {
         img.modality = item.modality();
         img.dcm_path = series_dir;
         img.preprocess_mask_path = preprocess_mask_path;
+        img.size_mb = dicoms_size_mb;
         db->insert_dcm_item(img);
 
         //4 send response message back to BE
@@ -126,11 +129,12 @@ int DBOpBEPACSFetch::execute() {
     return 0;
 }
 
-int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path) {
+int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb) {
     std::vector<std::string> files;
     std::set<std::string> dcm_postfix;
     dcm_postfix.insert(".dcm");
     FileUtil::get_all_file_recursion(series_dir, dcm_postfix, files);
+    dicoms_size_mb = FileUtil::get_size_mb(files);
 
     std::shared_ptr<ImageDataHeader> data_header;
     std::shared_ptr<ImageData> volume_data;

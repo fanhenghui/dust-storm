@@ -65,6 +65,14 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
         MsgDcmInfo* item = msg_response.add_dcminfo();
         item->set_study_id(dcm_info.study_id);
         item->set_series_id(dcm_info.series_id);
+        item->set_study_date(dcm_info.study_date);
+        item->set_study_time(dcm_info.study_time);
+        item->set_patient_id(dcm_info.patient_id);
+        item->set_patient_name(dcm_info.patient_name);
+        item->set_patient_sex(dcm_info.patient_sex);
+        item->set_patient_age(dcm_info.patient_age);
+        item->set_patient_birth_date(dcm_info.patient_birth_date);
+        item->set_modality(dcm_info.modality);
 
         MI_APPCOMMON_LOG(MI_INFO) << "FE fetch series : " << dcm_info.series_id;
     }

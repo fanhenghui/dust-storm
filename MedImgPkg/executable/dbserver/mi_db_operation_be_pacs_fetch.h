@@ -16,7 +16,7 @@ public:
         return std::shared_ptr<DBOpBEPACSFetch>(new DBOpBEPACSFetch());
     }
 private:
-    int preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path);
+    int preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb);
 };
 
 MED_IMG_END_NAMESPACE
