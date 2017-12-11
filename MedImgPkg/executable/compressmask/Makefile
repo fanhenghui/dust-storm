@@ -15,12 +15,14 @@ ROOT = ../..
 INCLUDE_ROOT_DIR = $(ROOT)/include
 BIN_DIR = $(ROOT)/bin
 
+LOCAL_LIB_DIR = /usr/local/lib
+
 VPATH = $(INCLUDE_ROOT_DIR)
 
 TARGET = $(BIN_DIR)/compressmask
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lmedimg_util -lmedimg_arithmetic
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lboost_system -lmedimg_util -lmedimg_arithmetic
 $(TARGET): mi_compress_mask.cpp
 	$(CC) $(CFLAGS) -o $(TARGET) mi_compress_mask.cpp $(ADDITINAL_INCLUDE_DIR) $(ADDITIANL_DEPENDENCIES)
 

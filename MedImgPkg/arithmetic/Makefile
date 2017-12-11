@@ -15,6 +15,8 @@ INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/arithmetic
 BIN_DIR = $(ROOT)/bin
 
+LOCAL_LIB_DIR = /usr/local/lib
+
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 DOUBLE_ARITHMETIC_OBJS = mi_vector2.o mi_vector3.o mi_point2.o mi_point3.o mi_matrix4.o
@@ -28,7 +30,7 @@ TARGET = $(BIN_DIR)/libmedimg_arithmetic.so
 
 EXPORT_HEADER = mi_arithmetic_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log_setup -lboost_log -lmedimg_log -lmedimg_util -lmbedcrypto -lmbedtls -lmbedx509 
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log_setup -lboost_log -lmedimg_log -lmedimg_util -lmbedcrypto -lmbedtls -lmbedx509 
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_log.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)

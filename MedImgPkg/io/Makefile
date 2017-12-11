@@ -15,6 +15,8 @@ INCLUDE_ROOT_DIR = $(ROOT)/include
 INCLUDE_DIR = $(INCLUDE_ROOT_DIR)/io
 BIN_DIR = $(ROOT)/bin
 
+LOCAL_LIB_DIR = /usr/local/lib
+
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
 DATA_OBJS = mi_image_data.o mi_dicom_rt_struct.o
@@ -30,7 +32,7 @@ TARGET = $(BIN_DIR)/libmedimg_io.so
 
 EXPORT_HEADER = mi_io_export.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -lboost_system -lboost_filesystem -lboost_thread -ljpeg \
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lboost_system -lboost_filesystem -lboost_thread -ljpeg \
 -ldcmdata -ldcmimage -ldcmnet -loflog -lofstd -ldcmjpeg -lz -lmysqlcppconn -lprotobuf -lmedimg_log -lmedimg_util -lmedimg_arithmetic
 
 $(TARGET): $(PROTOC) $(OBJS) $(BIN_DIR)/libmedimg_util.so
