@@ -61,6 +61,8 @@ public:
                     MI_UTIL_LOG(MI_ERROR) << "console echo catch&skip exception: " << e.what();
                 } catch(const std::exception& e) {
                     MI_UTIL_LOG(MI_ERROR) << "console echo catch&skip exception: " << e.what();
+                } catch(...) {
+                    MI_UTIL_LOG(MI_ERROR) << "console echo catch&skip unexpected exception";
                 }
             }
         }

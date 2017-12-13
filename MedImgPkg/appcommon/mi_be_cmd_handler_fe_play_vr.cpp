@@ -86,7 +86,7 @@ void BECmdHandlerFEPlayVR::logic_i(IPCDataHeader header) {
             op->reset();
             op->set_data(header , buffer_rotation);
             op->set_controller(controller);
-            controller->get_thread_model()->push_operation(op);
+            controller->get_thread_model()->push_operation_fe(op);
         } else {
             //TODO
             APPCOMMON_THROW_EXCEPTION("cant find operation!");

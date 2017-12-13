@@ -67,7 +67,7 @@ int BECmdHandlerFEBackToWorklist::handle_command(const IPCDataHeader& ipcheader,
     //trigger a sync operation to release cells/models/volume
     std::shared_ptr<IOperation> op(new OpResetController(&_condition));
     op->set_controller(controller);
-    controller->get_thread_model()->push_operation(op);
+    controller->get_thread_model()->push_operation_fe(op);
 
     //wait realse operation executed
     boost::mutex::scoped_lock locker(_mutex);

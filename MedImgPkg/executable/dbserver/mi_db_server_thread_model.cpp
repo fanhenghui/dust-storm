@@ -13,7 +13,6 @@ DBServerThreadModel::DBServerThreadModel() {
 }
 
 DBServerThreadModel::~DBServerThreadModel() {
-    _thread_console_echo.join();
 }
 
 void DBServerThreadModel::set_server_proxy_be(std::shared_ptr<IPCServerProxy> proxy) {
@@ -36,39 +35,75 @@ void DBServerThreadModel::push_operation_ais(const std::shared_ptr<IOperation>& 
     _op_msg_queue_ais.push(op);
 }
 
-void DBServerThreadModel::start() {
-    _op_msg_queue_be.activate();
-    _thread_be_operating = boost::thread(boost::bind(&DBServerThreadModel::process_be_operating_i, this));
-    _thread_be_sending = boost::thread(boost::bind(&DBServerThreadModel::process_be_sending_i, this));
-    _thread_be_recving = boost::thread(boost::bind(&DBServerThreadModel::process_be_recving_i, this));
+void DBServerThreadModel::run() {
+    try {
+        _op_msg_queue_be.activate();
+        _thread_be_operating = boost::thread(boost::bind(&DBServerThreadModel::process_be_operating_i, this));
+        _thread_be_sending = boost::thread(boost::bind(&DBServerThreadModel::process_be_sending_i, this));
+        _thread_be_recving = boost::thread(boost::bind(&DBServerThreadModel::process_be_recving_i, this));
 
-    _op_msg_queue_ais.activate();
-    _thread_ais_run = boost::thread(boost::bind(&DBServerThreadModel::process_ais_run_i, this));
-    _thread_ais_operating = boost::thread(boost::bind(&DBServerThreadModel::process_ais_operating_i, this));
-    _thread_ais_sending = boost::thread(boost::bind(&DBServerThreadModel::process_ais_sending_i, this));
-    _thread_ais_recving = boost::thread(boost::bind(&DBServerThreadModel::process_ais_recving_i, this));
+        _op_msg_queue_ais.activate();
+        _thread_ais_run = boost::thread(boost::bind(&DBServerThreadModel::process_ais_run_i, this));
+        _thread_ais_operating = boost::thread(boost::bind(&DBServerThreadModel::process_ais_operating_i, this));
+        _thread_ais_sending = boost::thread(boost::bind(&DBServerThreadModel::process_ais_sending_i, this));
+        _thread_ais_recving = boost::thread(boost::bind(&DBServerThreadModel::process_ais_recving_i, this));
 
-    _thread_console_echo = boost::thread(boost::bind(&DBServerThreadModel::process_console_echo, this));
+        boost::thread th_echo = boost::thread(boost::bind(&DBServerThreadModel::process_console_echo, this));
+        th_echo.detach();
 
-    _server_proxy_be->run();//main thread is accept APPS's client
+    
+        _server_proxy_be->run();//main thread is accept APPS's client
+    } catch (const Exception& e) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept BE clients exit with exception: " << e.what();
+    } catch (const std::exception& e) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept BE clients exit with exception: " << e.what();
+    } catch (...) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept BE clients exit with unexpected exception.";
+    }    
 }
 
 void DBServerThreadModel::stop() {
-    _op_msg_queue_be.deactivate();
-    _thread_be_sending.interrupt();
-    _thread_be_sending.join();
-    _thread_be_operating.interrupt();
-    _thread_be_operating.join();
-    _thread_be_recving.interrupt();
-    _thread_be_recving.join();
+    //stop can be call more than once
 
-    _thread_ais_sending.interrupt();
-    _thread_ais_sending.join();
-    _thread_ais_operating.interrupt();
-    _thread_ais_operating.join();
-    _thread_ais_recving.interrupt();
-    _thread_ais_recving.join();
-    _thread_ais_run.join();
+    _server_proxy_ais->stop();
+    _server_proxy_be->stop();
+
+    if (_thread_be_sending.joinable()) {
+        _thread_be_sending.interrupt();
+        _thread_be_sending.join();
+    }
+    
+    if (_thread_be_operating.joinable()) {
+        _thread_be_operating.interrupt();
+        _thread_be_operating.join();
+    }
+
+    if (_thread_be_recving.joinable()) {
+        _thread_be_recving.interrupt();
+        _thread_be_recving.join();
+    }
+
+    if (_thread_ais_sending.joinable()) {
+        _thread_ais_sending.interrupt();
+        _thread_ais_sending.join();
+    }
+
+    if (_thread_ais_operating.joinable()) {
+        _thread_ais_operating.interrupt();
+        _thread_ais_operating.join();
+    }
+
+    if (_thread_ais_recving.joinable()) {
+        _thread_ais_recving.interrupt();
+        _thread_ais_recving.join();
+    }
+
+    if (_thread_ais_run.joinable()) {
+        _thread_ais_run.join();
+    }    
+
+    _op_msg_queue_ais.deactivate();
+    _op_msg_queue_be.deactivate();
 }
 
 void DBServerThreadModel::process_be_sending_i() {
@@ -93,8 +128,11 @@ void DBServerThreadModel::process_be_operating_i() {
         _op_msg_queue_be.pop(&op);
 
         try {
-            op->execute();
-            op->reset();//release ipc data
+            if (nullptr != op) {
+                op->execute();
+                op->reset();//release ipc data
+            }
+            
         } catch(const Exception& e) {
             MI_DBSERVER_LOG(MI_ERROR) << "op execute failed with exception: " << e.what();
         }
@@ -110,7 +148,18 @@ void DBServerThreadModel::process_console_echo() {
 }
 
 void DBServerThreadModel::process_ais_run_i() {
-    _server_proxy_ais->run();
+    try {
+        _server_proxy_ais->run();
+    } catch (const Exception& e) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept AI clients exit with exception: " << e.what();
+        _server_proxy_be->stop();//stop main thread(blocking) then stop all
+    } catch (const std::exception& e) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept AI clients exit with exception: " << e.what();
+        _server_proxy_be->stop();//stop main thread(blocking) then stop all
+    } catch (...) {
+        MI_DBSERVER_LOG(MI_FATAL) << "DB server accept AI clients exit with unexpected exception.";
+        _server_proxy_be->stop();//stop main thread(blocking) then stop all
+    }    
 }
 
 void DBServerThreadModel::process_ais_sending_i() {
@@ -135,8 +184,10 @@ void DBServerThreadModel::process_ais_operating_i() {
         _op_msg_queue_ais.pop(&op);
 
         try {
-            op->execute();
-            op->reset();//release ipc data
+            if (nullptr != op) {
+                op->execute();
+                op->reset();//release ipc data
+            }
         } catch(const Exception& e) {
             MI_DBSERVER_LOG(MI_ERROR) << "op execute failed.";
         }

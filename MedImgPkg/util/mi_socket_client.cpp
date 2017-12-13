@@ -24,10 +24,7 @@ SocketClient::SocketClient(SocketType type /*= UNIX*/):
 }
 
 SocketClient::~SocketClient() {
-    if(_fd_server != 0) {
-        close(_fd_server);
-        _fd_server = 0;
-    }
+    this->stop();
 }
 
 void SocketClient::register_revc_handler(std::shared_ptr<IPCDataRecvHandler> handler) {
@@ -234,7 +231,7 @@ void SocketClient::run() {
 
     //close socket
     if (0 != _fd_server) {
-        close(_fd_server);
+        close(_fd_server);   
         _fd_server = 0;
     }
     

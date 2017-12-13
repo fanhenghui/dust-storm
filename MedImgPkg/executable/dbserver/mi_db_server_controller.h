@@ -20,6 +20,7 @@ public:
 
     virtual void initialize();
     void run();
+    void stop();
     virtual void finalize();
 
     std::shared_ptr<DBServerThreadModel> get_thread_model();

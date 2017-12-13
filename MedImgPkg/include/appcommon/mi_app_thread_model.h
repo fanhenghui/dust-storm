@@ -24,29 +24,27 @@ public:
 
     void set_controller(std::shared_ptr<AppController> controller);
 
-    void set_client_proxy(std::shared_ptr<IPCClientProxy> proxy);
-    void push_operation(const std::shared_ptr<IOperation>& op);
+    void set_client_proxy_fe(std::shared_ptr<IPCClientProxy> proxy);
+    void push_operation_fe(const std::shared_ptr<IOperation>& op);
 
     void set_client_proxy_dbs(std::shared_ptr<IPCClientProxy> proxy);
 
     std::shared_ptr<GLContext> get_gl_context();
 
-    void start(const std::string& unix_path);
+    void run(const std::string& unix_path);
     void stop();
 
 protected:
     void process_operating();
     void process_rendering();
     void process_sending();
-    void pop_operation(std::shared_ptr<IOperation>* op);
-
     void process_dbs_recving();
 
 private:
     std::weak_ptr<AppController> _controller;
 
     //for Node server
-    std::shared_ptr<IPCClientProxy> _client_proxy;
+    std::shared_ptr<IPCClientProxy> _client_proxy_fe;
 
     std::shared_ptr<GLContext> _glcontext;
     

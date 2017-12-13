@@ -30,7 +30,7 @@ int BECmdHandlerFEOperation::handle_command(const IPCDataHeader& ipcheader , cha
         op->reset();
         op->set_data(ipcheader , buffer);
         op->set_controller(controller);
-        controller->get_thread_model()->push_operation(op);
+        controller->get_thread_model()->push_operation_fe(op);
     } else {
         MI_APPCOMMON_LOG(MI_ERROR) << "cant find operation: " << op_id;
         if (nullptr != buffer) {
