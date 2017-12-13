@@ -13,12 +13,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFEMPRPaging>(new BEOpFEMPRPaging());
-    }
-
-protected:
-private:
+    CREATE_EXTENDS_OP(BEOpFEMPRPaging)
 };
 
 MED_IMG_END_NAMESPACE

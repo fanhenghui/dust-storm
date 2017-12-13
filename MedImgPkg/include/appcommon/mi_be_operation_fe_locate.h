@@ -16,9 +16,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFELocate>(new BEOpFELocate());
-    }
+    CREATE_EXTENDS_OP(BEOpFELocate)
 
 private:
     int mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt);

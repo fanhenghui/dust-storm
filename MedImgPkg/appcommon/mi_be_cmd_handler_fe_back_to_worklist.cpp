@@ -13,7 +13,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class OpResetController: public IOperation {
 public:
-    OpResetController(boost::condition* condition):_condition(condition) {
+    OpResetController(boost::condition* condition=nullptr):_condition(condition) {
         
     }
 
@@ -44,12 +44,9 @@ public:
         return 0;
     }
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<OpResetController>(new OpResetController(nullptr));
-    }
+    CREATE_EXTENDS_OP(OpResetController)
 private:
     boost::condition* _condition;
-    DISALLOW_COPY_AND_ASSIGN(OpResetController);
 };
 
 BECmdHandlerFEBackToWorklist::BECmdHandlerFEBackToWorklist(

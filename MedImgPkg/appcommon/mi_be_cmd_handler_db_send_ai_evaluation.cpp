@@ -96,9 +96,7 @@ public:
         return 0;
     }
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<OpReceiveAnnotation>(new OpReceiveAnnotation());
-    }
+    CREATE_EXTENDS_OP(OpReceiveAnnotation)
 };
 }
 

@@ -14,9 +14,7 @@ public:
     virtual ~OpInit();
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<OpInit>(new OpInit());
-    }
+    CREATE_EXTENDS_OP(OpInit)
 
 private:
     int init_data_i(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask);

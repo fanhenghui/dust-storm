@@ -13,12 +13,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFESwitchPresetWindowing>(new BEOpFESwitchPresetWindowing());
-    }
-
-protected:
-private:
+    CREATE_EXTENDS_OP(BEOpFESwitchPresetWindowing)
 };
 
 MED_IMG_END_NAMESPACE

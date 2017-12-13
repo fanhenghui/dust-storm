@@ -41,10 +41,7 @@ public:
         return 0;
     }
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpDBSendPACSRetrieveResult>(new BEOpDBSendPACSRetrieveResult());
-    }
-
+    CREATE_EXTENDS_OP(BEOpDBSendPACSRetrieveResult)
 };
 }
 

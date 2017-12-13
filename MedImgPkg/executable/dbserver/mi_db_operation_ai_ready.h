@@ -12,9 +12,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpAIReady>(new DBOpAIReady());
-    }
+    CREATE_EXTENDS_OP(DBOpAIReady)
 };
 
 MED_IMG_END_NAMESPACE

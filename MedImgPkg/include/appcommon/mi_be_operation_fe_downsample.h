@@ -13,9 +13,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFEDownsample>(new BEOpFEDownsample());
-    }
+    CREATE_EXTENDS_OP(BEOpFEDownsample)
 };
 MED_IMG_END_NAMESPACE
 

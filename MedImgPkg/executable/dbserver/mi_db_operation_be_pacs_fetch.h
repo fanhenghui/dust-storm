@@ -12,9 +12,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpBEPACSFetch>(new DBOpBEPACSFetch());
-    }
+    CREATE_EXTENDS_OP(DBOpBEPACSFetch)
 private:
     int preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb);
 };

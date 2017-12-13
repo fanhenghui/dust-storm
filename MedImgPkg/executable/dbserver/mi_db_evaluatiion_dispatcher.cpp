@@ -74,9 +74,7 @@ public:
         return 0;
     }
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpRequestEvaluation>(new DBOpRequestEvaluation());
-    }
+    CREATE_EXTENDS_OP(DBOpRequestEvaluation)
 };
 
 }
