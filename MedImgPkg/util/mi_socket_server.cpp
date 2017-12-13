@@ -25,8 +25,13 @@ SocketServer::SocketServer(SocketType type):
 
 SocketServer::~SocketServer() {
     if (_fd_server != 0) {
-        close(_fd_server);
+        shutdown(_fd_server, SHUT_RDWR);
         _fd_server = 0;
+        MI_UTIL_LOG(MI_INFO) << "close socket when destruction.";
+    }
+    if (!_path.empty()) {
+        unlink(_path.c_str());
+        MI_UTIL_LOG(MI_INFO) << "unlink UNIX path when destruction.";
     }
 }
 
@@ -66,8 +71,7 @@ void SocketServer::run() {
             UTIL_THROW_EXCEPTION("create UNIX socket failed.");
         }
 
-        //set master socket to allow multiple connections , 
-	    //this is just a good habit, it will work without this
+        //set master to allow multiple connections , and bind closed socket immediately 
         int opt = 1;
         if(setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) { 
 		    MI_UTIL_LOG(MI_FATAL) << "SocketServer set UNIX socket option failed.";
@@ -83,7 +87,9 @@ void SocketServer::run() {
 
         socklen_t addr_len = sizeof(serv_addr_unix);
         if (0 != bind(fd_s, (struct sockaddr*)(&serv_addr_unix), addr_len)) {
+            shutdown(fd_s, SHUT_RDWR);
             MI_UTIL_LOG(MI_FATAL) << "SocketServer UNIX socket binding failed. unix path: " << _path;
+            _path = "";//clean path to prevent unlink it(others is using it.)
             UTIL_THROW_EXCEPTION("UNIX socket binding failed.");
         }
 
@@ -99,13 +105,12 @@ void SocketServer::run() {
             UTIL_THROW_EXCEPTION("create INET socket failed.");
         }
 
-        //set master socket to allow multiple connections , 
-	    //this is just a good habit, it will work without this
-        // int opt = 1;
-        // if(setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) { 
-		//     MI_UTIL_LOG(MI_FATAL) << "SocketServer set UNIX socket option failed.";
-        //     UTIL_THROW_EXCEPTION("set UNIX socket option failed.");
-	    // } 
+        //set master to allow multiple connections , and bind closed socket immediately 
+        int opt = 1;
+        if(setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)) < 0 ) { 
+		    MI_UTIL_LOG(MI_FATAL) << "SocketServer set UNIX socket option failed.";
+            UTIL_THROW_EXCEPTION("set UNIX socket option failed.");
+	    } 
 
         struct sockaddr_in serv_addr_inet;
         bzero((char*)(&serv_addr_inet), sizeof(serv_addr_inet));
@@ -115,6 +120,7 @@ void SocketServer::run() {
 
         socklen_t addr_len = sizeof(serv_addr_inet);
         if (0 != bind(fd_s, (struct sockaddr*)(&serv_addr_inet), addr_len)) {
+            shutdown(fd_s, SHUT_RDWR);
             MI_UTIL_LOG(MI_FATAL) << "SocketServer INET socket binding failed.";
             UTIL_THROW_EXCEPTION("INET socket binding failed.");
         }
@@ -191,7 +197,6 @@ void SocketServer::run() {
     }
 
     //close socket
-    close(_fd_server);
     shutdown(_fd_server, SHUT_RDWR);
     _fd_server = 0;
     MI_UTIL_LOG(MI_INFO) << "close server success.";
@@ -199,6 +204,7 @@ void SocketServer::run() {
     if (_socket_type == UNIX) {
         unlink(_path.c_str());
         MI_UTIL_LOG(MI_INFO) << "unlink UNIX path.";
+        _path = "";
     }
     
     MI_UTIL_LOG(MI_TRACE) << "OUT SocketServer run.";
@@ -259,7 +265,7 @@ int SocketServer::recv() {
                     MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " disconnect.";
                 }
                 MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err 0.";
-                close(socket);
+                shutdown(socket, SHUT_RDWR);
                 _client_sockets->remove_socket(socket_id);
                 this->clear_package_i(socket_id);
                 continue;    
@@ -271,7 +277,7 @@ int SocketServer::recv() {
                     MI_UTIL_LOG(MI_INFO) << "client inet socket address:" << host << ":" << port << " recv failed.";
                 }
                 MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err" << err;
-                close(socket);
+                shutdown(socket, SHUT_RDWR);
                 _client_sockets->remove_socket(socket_id);
                 this->clear_package_i(socket_id);
                 continue;  
@@ -296,7 +302,7 @@ int SocketServer::recv() {
                     MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err 0.";
                     delete [] buffer;
                     buffer = nullptr;
-                    close(socket);
+                    shutdown(socket, SHUT_RDWR);
                     _client_sockets->remove_socket(socket_id);
                     this->clear_package_i(socket_id);
                     continue;
@@ -311,7 +317,7 @@ int SocketServer::recv() {
                     MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data: err" << err;
                     delete [] buffer;
                     buffer = nullptr;
-                    close(socket);
+                    shutdown(socket, SHUT_RDWR);
                     _client_sockets->remove_socket(socket_id);
                     this->clear_package_i(socket_id);
                     continue;  

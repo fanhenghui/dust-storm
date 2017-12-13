@@ -108,7 +108,7 @@ int BECmdHandlerDBPACSRetrieveResult::handle_command(const IPCDataHeader& datahe
     std::shared_ptr<IOperation> op(new BEOpDBSendPACSRetrieveResult());
     op->set_controller(controller);
     op->set_data(header , buffer);//transmit buffer from DB to FE(no need to shield)
-    controller->get_thread_model()->push_operation(op);
+    controller->get_thread_model()->push_operation_fe(op);
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS retrieve response";
     return 0;

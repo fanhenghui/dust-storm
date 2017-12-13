@@ -28,14 +28,7 @@ public:
     virtual int execute() {
         std::shared_ptr<DBServerController> controller = _controller.lock();
         if (controller) {
-            std::shared_ptr<IPCServerProxy> proxy_be = controller->get_server_proxy_be();
-            std::shared_ptr<IPCServerProxy> proxy_ais = controller->get_server_proxy_ais();
-            if (proxy_be) {
-                proxy_be->stop();
-            }
-            if (proxy_ais) {
-                proxy_ais->stop();
-            }
+            controller->stop();
         }
         return ConsoleEcho::STOP_ECHO_SIGNAL;
     }
@@ -102,7 +95,7 @@ DBServerConsoleEcho::~DBServerConsoleEcho() {
 void DBServerConsoleEcho::init() {
     //register echo actions
     std::shared_ptr<DBServerController> controller = _controller.lock();
-    _console_echo->register_action("shutdown", std::shared_ptr<ActionShutdown>(new ActionShutdown(controller)));
+    _console_echo->register_action("close", std::shared_ptr<ActionShutdown>(new ActionShutdown(controller)));
     _console_echo->register_action("bestatus", std::shared_ptr<ActionDBSBEStatus>(new ActionDBSBEStatus(controller)));
     _console_echo->register_action("aistatus", std::shared_ptr<ActionDBSAIStatus>(new ActionDBSAIStatus(controller)));
 }

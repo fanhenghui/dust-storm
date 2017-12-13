@@ -175,7 +175,7 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
             std::shared_ptr<IOperation> op(new OpReceiveAnnotation());
             op->set_data(ipcheader , buffer);
             op->set_controller(controller);
-            controller->get_thread_model()->push_operation(op);
+            controller->get_thread_model()->push_operation_fe(op);
         }
     }
 

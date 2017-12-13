@@ -21,7 +21,7 @@ public:
     void push_operation(const std::shared_ptr<IOperation> op);
     void async_send_data(IPCPackage* packages);
 
-    void start();
+    void run();
     void stop();
     
 private:

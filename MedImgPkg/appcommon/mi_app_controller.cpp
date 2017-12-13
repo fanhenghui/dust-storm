@@ -14,7 +14,7 @@ AppController::AppController() {
     _proxy.reset(new IPCClientProxy(UNIX));
     _client_proxy_dbs.reset(new IPCClientProxy(INET));
     _thread_model.reset(new AppThreadModel());
-    _thread_model->set_client_proxy(_proxy);
+    _thread_model->set_client_proxy_fe(_proxy);
     _thread_model->set_client_proxy_dbs(_client_proxy_dbs);
 
     //process info
@@ -47,7 +47,7 @@ pid_t AppController::get_server_pid() const {
 }
 
 void AppController::run(const std::string& unix_path) {
-    _thread_model->start(unix_path);
+    _thread_model->run(unix_path);
 }
 
 std::shared_ptr<AppThreadModel> AppController::get_thread_model() {

@@ -28,6 +28,7 @@ public:
     virtual void clear() = 0;
 };
 
+//TODD 目前只需要FIFO queue，需不需要带优先级的queue
 template<class T>
 class FIFOQueue : public Queue<T> {
 public:
@@ -41,21 +42,6 @@ public:
     virtual void clear();
 private:
     std::deque<T> _container;
-};
-
-template<class T>
-class LIFOQueue : public Queue<T> {
-public:
-    LIFOQueue();
-    virtual ~LIFOQueue();
-
-    virtual size_t size() const;
-    virtual bool is_empty() const;
-    virtual void push(const T&);
-    virtual void pop(T*);
-    virtual void clear();
-private:
-    std::vector<T> _container;
 };
 
 template<class T , class TQueue = FIFOQueue<T>>
@@ -90,7 +76,6 @@ public:
                 UTIL_THROW_EXCEPTION("message time out to pop.");
             }
         }
-
     }
 
     size_t capacity() const {
@@ -152,7 +137,9 @@ public:
             UTIL_THROW_EXCEPTION("message queue is not activated.");
         }
 
-        _container.pop(msg);
+        if (!_container.is_empty()) {
+            _container.pop(msg);
+        }
 
         _condition_write.notify_one();
     }

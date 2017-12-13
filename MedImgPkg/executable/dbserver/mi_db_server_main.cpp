@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "util/mi_exception.h"
 #include "io/mi_configure.h"
@@ -8,6 +9,11 @@
 #include "mi_db_server_logger.h"
 
 using namespace medical_imaging;
+std::shared_ptr<DBServerController> controller(new DBServerController());
+
+void dbs_exit() {
+    //quiet logic
+};
 
 int main(int argc , char* argv[]) {
     try {
@@ -19,8 +25,9 @@ int main(int argc , char* argv[]) {
         Logger::instance()->initialize();
         MI_DBSERVER_LOG(MI_INFO) << "hello DB server.";
 
-        std::shared_ptr<DBServerController> controller(new DBServerController());
         controller->initialize();
+        //atexit(dbs_exit);
+        signal(SIGINT, SIG_IGN);//ignore Ctrl+C
         controller->run();
         controller->finalize();
     } catch (Exception& e) {

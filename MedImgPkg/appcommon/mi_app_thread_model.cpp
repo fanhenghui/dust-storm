@@ -3,6 +3,7 @@
 #include "util/mi_file_util.h"
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_operation_interface.h"
+#include "util/mi_memory_shield.h"
 
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_resource_manager_container.h"
@@ -36,23 +37,19 @@ std::shared_ptr<GLContext> AppThreadModel::get_gl_context() {
     return _glcontext;
 }
 
-void AppThreadModel::set_client_proxy(std::shared_ptr<IPCClientProxy> proxy) {
-    _client_proxy = proxy;
+void AppThreadModel::set_client_proxy_fe(std::shared_ptr<IPCClientProxy> proxy) {
+    _client_proxy_fe = proxy;
 }
 
 void AppThreadModel::set_controller(std::shared_ptr<AppController> controller) {
     _controller = controller;
 }
 
-void AppThreadModel::push_operation(const std::shared_ptr<IOperation>& op) {
+void AppThreadModel::push_operation_fe(const std::shared_ptr<IOperation>& op) {
     _op_msg_queue.push(op);
 }
 
-void AppThreadModel::pop_operation(std::shared_ptr<IOperation>* op) {
-    _op_msg_queue.pop(op);
-}
-
-void AppThreadModel::start(const std::string& unix_path) {
+void AppThreadModel::run(const std::string& unix_path) {
     try {
         _thread_operating = boost::thread(boost::bind(&AppThreadModel::process_operating, this));
         _thread_sending = boost::thread(boost::bind(&AppThreadModel::process_sending, this));
@@ -60,38 +57,54 @@ void AppThreadModel::start(const std::string& unix_path) {
 
         _thread_dbs_recving = boost::thread(boost::bind(&AppThreadModel::process_dbs_recving, this));
 
-        _client_proxy->set_path(unix_path);
-        _client_proxy->run();
+        _client_proxy_fe->set_path(unix_path);
+        _client_proxy_fe->run();
+    } catch (const Exception& e) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "BE client connect Node Web Server thread exit with exception: " << e.what();
+    } catch (const std::exception& e) {
+        MI_APPCOMMON_LOG(MI_FATAL) << "BE client connect Node Web Server thread exit with exception: " << e.what();
     } catch (...) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "app thread model start failed.";
-        APPCOMMON_THROW_EXCEPTION("app thread model start failed.");
+        MI_APPCOMMON_LOG(MI_FATAL) << "BE client connect Node Web Server thread exit with unexpected exception.";
     }
 }
 
 void AppThreadModel::stop() {
-    _thread_rendering.interrupt();
-    _condition_rendering.notify_one();
+    if (_thread_rendering.joinable()) {
+        _thread_rendering.interrupt();
+        _condition_rendering.notify_one();
+        _thread_rendering.join();
+    }
 
-    _thread_sending.interrupt();
-    _condition_sending.notify_one();
+    if (_thread_sending.joinable()) {
+        _thread_sending.interrupt();
+        _condition_sending.notify_one();
+        _thread_sending.join();
+    }
 
-    _thread_operating.interrupt();
+    if (_thread_operating.joinable()) {
+        _thread_operating.interrupt();
+        _thread_operating.join();
+    }
 
-    _thread_rendering.join();
-    _thread_sending.join();
-    _thread_operating.join();
-
+    //after interrupt/join thread(msg queue is useless). then deactivate
     _op_msg_queue.deactivate();
 
-    _client_proxy_dbs->stop();
-    _thread_dbs_recving.join();
+    _client_proxy_dbs->stop();//force close socket
+    if (_thread_dbs_recving.joinable()) {
+        _thread_dbs_recving.join();
+    }
 }
 
 void AppThreadModel::process_operating() {   
     try{ 
         while(true) {
             std::shared_ptr<IOperation> op;
-            this->pop_operation(&op);
+            _op_msg_queue.pop(&op);
+            if (nullptr == op) {
+                continue;
+            }
+
+            boost::this_thread::interruption_point();
 
             boost::mutex::scoped_lock locker(_mutex_rendering);
 
@@ -111,16 +124,18 @@ void AppThreadModel::process_operating() {
             }
 
             // interrupt point
-            boost::this_thread::interruption_point();
             _rendering = true;
             _condition_rendering.notify_one();
+
+            boost::this_thread::interruption_point();
         }
+        MI_APPCOMMON_LOG(MI_INFO) << "Out operating thread.";
     }  catch (boost::thread_interrupted& e) {
-        MI_APPCOMMON_LOG(MI_INFO) << "operating thread is interrupted.";;
-        throw e;
+        MI_APPCOMMON_LOG(MI_INFO) << "operating thread is interrupted.";
+        _op_msg_queue.deactivate();
     } catch (...) {
         MI_APPCOMMON_LOG(MI_FATAL) << "operating run failed with unknow exception";
-        throw;
+        _op_msg_queue.deactivate();
     }
 }
 
@@ -133,7 +148,7 @@ void AppThreadModel::process_rendering() {
 
             _glcontext->make_current(RENDERING_CONTEXT);
             {
-                ///\ 1 render
+                // 1 render
                 boost::mutex::scoped_lock locker(_mutex_rendering);
 
                 while (!_rendering) {
@@ -166,12 +181,12 @@ void AppThreadModel::process_rendering() {
                         none_image->update();
                     }
                 }
-                // interrupt point
-                boost::this_thread::interruption_point();
                 _rendering = false;
             }
 
-            /// \2 get image result to buffer
+            boost::this_thread::interruption_point();
+
+            // 2 get image result to buffer
             // download all dirty scene image to buffer
             for (auto it = dirty_scenes.begin(); it != dirty_scenes.end(); ++it) {
                 (*it)->download_image_buffer();
@@ -193,25 +208,25 @@ void AppThreadModel::process_rendering() {
             }
             _sending = true;
             _condition_sending.notify_one();
+
+            boost::this_thread::interruption_point();
         }
+        MI_APPCOMMON_LOG(MI_INFO) << "Out rendering thread.";
     } catch (const Exception& e) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
-        throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering exit with exception: " << e.what();
     } catch (const std::exception& e) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed with exception: " << e.what();
-        throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering exit with exception: " << e.what();
     } catch (boost::thread_interrupted& e) {
         MI_APPCOMMON_LOG(MI_INFO) << "rendering thread is interrupted.";
     } catch (...) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "rendering run failed failed with unknow exception";
-        throw;
+        MI_APPCOMMON_LOG(MI_FATAL) << "rendering exit with unknow exception";
     }
 }
 
 void AppThreadModel::process_sending() {
     try {
         while (true) {
-            ///\ sending image to fe by pic proxy
+            // sending image to FE
             boost::mutex::scoped_lock locker(_mutex_sending);
 
             while (!_sending) {
@@ -227,7 +242,7 @@ void AppThreadModel::process_sending() {
                 boost::mutex::scoped_lock dirty_images_locker(_dirty_images_mutex);
                 dirty_images = _dirty_images;
             }
-            // sendong image buffer
+            // sending image buffer
             for (auto it = dirty_images.begin(); it != dirty_images.end(); ++it) {
                 const unsigned int cell_id = *it;
                 std::shared_ptr<AppCell> cell = controller->get_cell(cell_id);
@@ -242,9 +257,6 @@ void AppThreadModel::process_sending() {
                 header.receiver = static_cast<unsigned int>(controller->get_server_pid());
                 header.msg_id = COMMAND_ID_FE_BE_SEND_IMAGE;
                 header.cell_id = cell_id;
-                header.op_id = 0;
-                header.reserved0 = 0;
-                header.reserved1 = 0;
 
                 unsigned char* buffer = nullptr;
                 int buffer_size = 0;
@@ -263,10 +275,12 @@ void AppThreadModel::process_sending() {
                 //     FileUtil::write_raw(ss.str(), buffer, buffer_size);
                 // }
 
-                _client_proxy->sync_send_data(header, (char*)buffer);
+                _client_proxy_fe->sync_send_data(header, (char*)buffer);
             }
 
-            // get dirty cells to be sending
+            boost::this_thread::interruption_point();
+
+            // get dirty none images to be sending
             std::deque<unsigned int> dirty_none_images;
             {
                 boost::mutex::scoped_lock dirty_none_images_locker(_dirty_none_images_mutex);
@@ -284,39 +298,31 @@ void AppThreadModel::process_sending() {
                 header.receiver = static_cast<unsigned int>(controller->get_server_pid());
                 header.msg_id = COMMAND_ID_FE_BE_SEND_NONE_IMAGE;
                 header.cell_id = cell_id;
-                header.op_id = 0;
-                header.reserved0 = 0;
-                header.reserved1 = 0;
 
                 int buffer_size = 0;
                 char* buffer = none_image->serialize_dirty(buffer_size);
+                MemShield shield(buffer);
                 if (nullptr == buffer || buffer_size == 0) {
                     //MI_APPCOMMON_LOG(MI_WARNING) << "dirty none image has no serialized dirty buffer.";
                     continue;
                 }
                 header.data_len = static_cast<unsigned int>(buffer_size);
                 MI_APPCOMMON_LOG(MI_TRACE) << "send none image data length: " << buffer_size;
-                _client_proxy->sync_send_data(header, buffer);
-                if (nullptr != buffer) {
-                    delete [] buffer;
-                }
+                _client_proxy_fe->sync_send_data(header, buffer);
             }
 
-            // interrupt point
-            boost::this_thread::interruption_point();
             _sending = false;
+            boost::this_thread::interruption_point();
         }
+        MI_APPCOMMON_LOG(MI_INFO) << "Out sending thread.";
     } catch (const Exception& e) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed with exception: " << e.what();
-        throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending exit with exception: " << e.what();
     } catch (const std::exception& e) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed with exception: " << e.what();
-        throw e;
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending exit failed with exception: " << e.what();
     } catch (boost::thread_interrupted& e) {
         MI_APPCOMMON_LOG(MI_INFO) << "sending thread is interrupted.";
     } catch (...) {
-        MI_APPCOMMON_LOG(MI_FATAL) << "sending run failed failed with unknow exception";
-        throw;
+        MI_APPCOMMON_LOG(MI_FATAL) << "sending exit with unknow exception";
     }
 }
 

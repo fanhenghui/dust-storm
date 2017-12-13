@@ -97,7 +97,11 @@ void DBServerController::initialize() {
 }
 
 void DBServerController::run() {
-    _thread_model->start();
+    _thread_model->run();
+}
+
+void DBServerController::stop() {
+    _thread_model->stop();
 }
 
 void DBServerController::finalize() {

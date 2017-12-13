@@ -102,7 +102,7 @@ int DBOpBEPACSFetch::execute() {
         img.size_mb = dicoms_size_mb;
         db->insert_dcm_item(img);
 
-        //4 send response message back to BE
+        //5 send response message back to BE
         MsgString msg_response;
         msg_response.set_context(series_id);
         const int buffer_size = msg_response.ByteSize();
@@ -163,14 +163,7 @@ int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::stri
         removal.set_image_orientation(volume_data->_image_orientation);
         removal.set_intercept(volume_data->_intercept);
         removal.set_slope(volume_data->_slope);
-        removal.remove();
-        {
-            //DEBUG
-            std::stringstream ss;
-            ss << "/home/wangrui22/data/" << data_header->series_uid << "|mask.raw";
-            FileUtil::write_raw(ss.str(), mask, volume_size);
-        }
-        
+        removal.remove();      
     } else {
         CTTableRemoval<short> removal;
         removal.set_data_ref((short*)(volume_data->get_pixel_pointer()));
@@ -183,12 +176,14 @@ int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::stri
         removal.set_intercept(volume_data->_intercept);
         removal.set_slope(volume_data->_slope);
         removal.remove();
-        {
-            std::stringstream ss;
-            ss << "/home/wangrui22/data/" << data_header->series_uid << "|mask.raw";
-            FileUtil::write_raw(ss.str(), mask, volume_size);
-        }
     }
+
+    //DEBUG
+    // {
+    //     std::stringstream ss;
+    //     ss << "/home/wangrui22/data/" << data_header->series_uid << "|mask.raw";
+    //     FileUtil::write_raw(ss.str(), mask, volume_size);
+    // }
 
     std::vector<unsigned int> res = RunLengthOperator::encode(mask, volume_size);
     if (0 != FileUtil::write_raw(preprocess_mask_path, res.data(), res.size()*sizeof(unsigned int))) {

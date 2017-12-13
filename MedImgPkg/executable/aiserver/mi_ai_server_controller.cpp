@@ -59,7 +59,7 @@ void AIServerController::initialize() {
 }
 
 void AIServerController::run() {
-    _thread_model->start();
+    _thread_model->run();
 }
 
 void AIServerController::finalize() {

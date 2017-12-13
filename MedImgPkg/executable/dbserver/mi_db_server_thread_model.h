@@ -29,7 +29,7 @@ public:
 
     void set_console_echo(std::shared_ptr<DBServerConsoleEcho> console_echo);
 
-    void start();
+    void run();
     void stop();
 
 private:
@@ -48,8 +48,6 @@ private:
     void process_ais_operating_i();
 
 private:
-    boost::thread _thread_console_echo;
-
     //for BE client
     std::shared_ptr<IPCServerProxy> _server_proxy_be;
     MessageQueue<std::shared_ptr<IOperation>> _op_msg_queue_be;
