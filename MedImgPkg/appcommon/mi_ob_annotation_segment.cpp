@@ -71,6 +71,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         }
     }
 
+    const float probability = model->get_probability_threshold();
     /// \ ADD
     if (ModelAnnotation::ADD == code_id) {
         //add pre_vois and segment
@@ -79,7 +80,10 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             const std::string id = (*it);
             const VOISphere voi = model->get_annotation(id);
             const unsigned char label = model->get_label(id);
-            //TODO add threshold judge
+            if (voi.probability < probability) {
+                continue;
+            }
+
             add_labels.push_back(label);
             if (voi.diameter >= 0.1f) {
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi);

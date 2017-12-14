@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package medical_imaging;
 
+message MsgNumber {
+    float value = 1;
+}
+
 message MsgFlag {
     int32 flag = 1; 
 }
@@ -69,27 +73,13 @@ message MsgAnnotationUnit {
     float para0 = 5; //center x
     float para1 = 6; //center y
     float para2 = 7; //radius
-    string info = 8; //statistic info
+    float para3 = 8; //diameter
+    string info = 9; //statistic info
+    float probability = 10;//probability
 };
 
 message MsgNoneImgAnnotations {
     repeated MsgAnnotationUnit annotation = 1;
-};
-
-message MsgAnnotationListItem {
-    string id = 1; // id format: "time|num"
-    string info = 2; // nodule type
-    int32 row = 3; //row value
-    int32 status = 4; //0 add; 1 delete; 2 modifying; 3 modify completed ; 4 focus
-    float para0 = 5; //center x
-    float para1 = 6; //center y
-    float para2 = 7; //center z
-    float para3 = 8; //diameter
-    float probability = 9;//probability
-};
-
-message MsgAnnotationList {
-    repeated MsgAnnotationListItem item = 1;
 };
 
 message MsgAnnotationQuery {

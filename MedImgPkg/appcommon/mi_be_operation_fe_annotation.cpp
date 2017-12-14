@@ -18,6 +18,7 @@
 #include "mi_app_common_define.h"
 #include "mi_app_none_image_item.h"
 #include "mi_app_none_image.h"
+#include "mi_app_common_util.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -73,16 +74,12 @@ int BNOpFEAnnotation::execute() {
     std::shared_ptr<NoneImgAnnotations> annotation_nonimg = std::dynamic_pointer_cast<NoneImgAnnotations>(annotation_nonimg_);
     APPCOMMON_CHECK_NULL_EXCEPTION(annotation_nonimg);
 
-    std::shared_ptr<IModel> model_i = controller->get_model(MODEL_ID_ANNOTATION);
-    if (!model_i) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "annotation model null.";
-        return -1;
-    }
-    std::shared_ptr<ModelAnnotation> model = std::dynamic_pointer_cast<ModelAnnotation>(model_i);
+    std::shared_ptr<ModelAnnotation> model = AppCommonUtil::get_model_annotation(controller);
     if (!model) {
         MI_APPCOMMON_LOG(MI_ERROR) << "error model id to acquire annotation model.";
         return -1;
     }
+    
     model->set_processing_cache(std::vector<std::string>(1, anno_id));
 
     if (ModelAnnotation::ADD == anno_status) {

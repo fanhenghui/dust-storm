@@ -12,7 +12,7 @@
     let revcBEReady = false;
     
     let annotationListBuffer = null;
-    let annotationTable = null;
+    let annotationList = null;
     
     //layout parameter
     const LAYOUT_1X1 = '1x1';
@@ -179,20 +179,26 @@
         });
     }
 
-    function annoListDeleteRow(row) {
-        let annoTableRows = annotationTable.rows;
-        if (annoTableRows.length > row + 1) {
-            annotationTable.deleteRow(row + 1);
-        }
+    function annoListDelete(id) {
+        let trDelete = $(`annotationList #{id}`);
+        annotationList.removeChild(trDelete);
     }
 
-    function annoListAddRow(row,id,cx,cy,cz,diameter,probability) {
+    function annoListAdd(id,cx,cy,cz,diameter,probability) {
         if (document.getElementById(id)) {
-            console.log('add repeated row');
+            console.log('add repeated annotation');
             return;
         }
-        let rowItem = annotationTable.insertRow(row + 1);
-        $(rowItem).click(function(event) {
+
+        let trAdd = document.createElement('tr');
+        trAdd.id = id;
+        let tdAdd = `<td>${cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2)}</td>`;
+        tdAdd += `<td>${diameter.toFixed(2)}</td>`;
+        tdAdd += `<td>${probability.toFixed(2)}</td>`;
+        trAdd.innerHTML = tdAdd;
+        annotationList.appendChild(trAdd);
+
+        $(trAdd).click(function(event) {
             $(this).addClass('success').siblings().removeClass('success');
             //send focus annotation message
             let anno_id = $(this).attr('id');
@@ -200,15 +206,11 @@
                 sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
             }
         });
-        rowItem.setAttribute('id',id);
-        rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-        rowItem.insertCell(1).innerHTML = diameter.toFixed(2);
-        rowItem.insertCell(2).innerHTML = `${probability}`.slice(0,4);
     }
 
-    function annoListModifyRow(row,cx,cy,cz,diameter,probability) {
-        let annoTableRows = annotationTable.rows;
-        if (annoTableRows.length > row + 1) {
+    function annoListModify(id,cx,cy,cz,diameter,probability) {
+        let annoCell = $(`annotationList #{id}`);
+        if(annoCell) {
             let annoCell = annoTableRows[row + 1].cells;
             annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
             annoCell[1].innerHTML = diameter.toFixed(2);  
@@ -217,9 +219,9 @@
     }
 
     function annoListClean() {
-        let annoTableRows = annotationTable.rows;
+        let annoTableRows = annotationList.rows;
         while (annoTableRows.length > 1) {
-            annotationTable.deleteRow(annoTableRows.length-1);
+            annotationList.deleteRow(annoTableRows.length-1);
         }
     }
 
@@ -240,17 +242,17 @@
         }
 
         if (restDataLen <= 0) {
-            let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationList');
+            let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgAnnotations');
             if (!MsgAnnotationListType) {
                 console.log('get annotation list message type failed.');
             }
             let annotationListView = new Uint8Array(annotationListBuffer);
             let annotationList = MsgAnnotationListType.decode(annotationListView);
             if (annotationList) {
-                let listItems = annotationList.item;for (let i = 0; i < listItems.length; ++i) {
+                let listItems = annotationList.item;
+                for (let i = 0; i < listItems.length; ++i) {
                     let id = listItems[i].id;
                     let info = listItems[i].info;
-                    let row = listItems[i].row;
                     let status = listItems[i].status;
                     let cx = listItems[i].para0;
                     let cy = listItems[i].para1;
@@ -259,11 +261,11 @@
                     let probability = listItems[i].probability;
 
                     if(status == 0) {//add
-                        annoListAddRow(row, id, cx, cy, cz, diameter, probability);
+                        annoListAdd(id, cx, cy, cz, diameter, probability);
                     } else if (status == 1) {// delete
-                        annoListDeleteRow(row);
+                        annoListDelete(id);
                     } else if (status == 2) {// modifying
-                        annoListModifyRow(row, cx, cy, cz, diameter, probability);
+                        annoListModify(cx, cy, cz, diameter, probability);
                     }
 
                 }
@@ -678,12 +680,12 @@
             console.log('get btn-play-vr node failed.');
         }
 
-        annotationTable = document.getElementById("annotation-table");
+        annotationList = document.getElementById("annotation-list");
 
         let deleteAnnotationBtn = document.getElementById('btn-delete-annotation');
         if (deleteAnnotationBtn) {
             deleteAnnotationBtn.onclick = function(event) {
-                let choosedItem = $('#annotation-table tr.success');
+                let choosedItem = $('#annotation-list tr.success');
                 if (choosedItem.length > 0) {
                     let id = choosedItem.attr('id')
                     if (id) {

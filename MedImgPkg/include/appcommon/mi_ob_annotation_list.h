@@ -24,13 +24,7 @@ public:
 private:
     std::weak_ptr<ModelAnnotation> _model;
     std::weak_ptr<AppController> _controller;
-    struct VOIUnit {
-        VOISphere voi;
-        int row;
-        
-        VOIUnit(const VOISphere& v, int r): voi(v), row(r) {};
-    };
-    std::map<std::string, VOIUnit> _pre_vois;
+    std::map<std::string, VOISphere> _pre_vois;
 };
 
 MED_IMG_END_NAMESPACE

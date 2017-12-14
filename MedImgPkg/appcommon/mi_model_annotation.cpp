@@ -4,7 +4,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-ModelAnnotation::ModelAnnotation() :_visibility(true)/*, _notify_cache(-1)*/ {}
+ModelAnnotation::ModelAnnotation() :_visibility(true),
+_probability_threshold(Configure::instance()->get_evaluation_probability_threshold()) {}
 
 ModelAnnotation::~ModelAnnotation() {}
 
@@ -13,23 +14,18 @@ void ModelAnnotation::add_annotation(const VOISphere &voi, const std::string& id
     unit.voi = voi;
     unit.label = label;
     unit.intensity_info = IntensityInfo();
-    unit.row = _annotations.size();
     _annotations[id] = unit;
     set_changed();
-    _probability_threshold = Configure::instance()->get_evaluation_probability_threshold();
+    _last_annotation = id;
 }
 
 void ModelAnnotation::remove_annotation(const std::string& id) {
     auto it = _annotations.find(id);
     if (it != _annotations.end()) {
-        //change rear vois row value
-        int delete_row = it->second.row;
-        for (auto it2 = _annotations.begin(); it2 != _annotations.end(); ++it2) {
-            if (it2->second.row > delete_row) {
-                it2->second.row -= 1;
-            }
-        }
         _annotations.erase(it);
+    }
+    if (_annotations.empty()) {
+        _last_annotation.clear();
     }
     set_changed();
 }
@@ -54,29 +50,12 @@ VOISphere ModelAnnotation::get_annotation(const std::string& id) const {
 }
 
 std::string ModelAnnotation::get_last_annotation() const {
-    if (_annotations.empty()) {
+    if (_annotations.empty() || _last_annotation.empty()) {
         MI_APPCOMMON_LOG(MI_ERROR) << "get last annotation failed. empty annotations.";
         APPCOMMON_THROW_EXCEPTION("get last annotation failed. empty annotations.");
     }
-    const int row = static_cast<int>(_annotations.size()) - 1;
-    for (auto it = _annotations.begin(); it != _annotations.end(); ++it) {
-        if (it->second.row == row) {
-            return it->first;
-        }
-    }
 
-    MI_APPCOMMON_LOG(MI_ERROR) << "get last annotation failed.";
-    APPCOMMON_THROW_EXCEPTION("get last annotation failed.");
-}
-
-int ModelAnnotation::get_annotation_row(const std::string& id) const {
-    auto it = _annotations.find(id);
-    if (it != _annotations.end()) {
-        return it->second.row;
-    } else {
-        MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation id: " << id;
-        APPCOMMON_THROW_EXCEPTION("get annotation failed!");
-    }
+    return _last_annotation;
 }
 
 unsigned char ModelAnnotation::get_label(const std::string& id) const {
@@ -168,6 +147,17 @@ void ModelAnnotation::set_probability_threshold(float thres) {
 
 float ModelAnnotation::get_probability_threshold() const {
     return _probability_threshold;
+}
+
+std::set<std::string> ModelAnnotation::get_filter_annotations(float probability) const {
+    std::set<std::string> match_annos;
+    for (std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator it = _annotations.begin(); 
+        it != _annotations.end(); ++it) {
+        if (it->second.voi.probability <= probability) {
+            match_annos.insert(it->first);
+        }
+    }
+    return match_annos;
 }
 
 MED_IMG_END_NAMESPACE

@@ -2,6 +2,7 @@
 #define MED_IMG_APPCOMMON_MI_MODEL_ANNOTATION_H
 
 #include <map>
+#include <set>
 #include "appcommon/mi_app_common_export.h"
 #include "util/mi_model_interface.h"
 #include "io/mi_voi.h"
@@ -18,13 +19,13 @@ public:
         MODIFYING = 2, //modifying when mouse moving
         MODIFY_COMPLETED = 3, //modify completed when mouse release
         FOCUS = 4, //focus certain voi in each scenes
+        PROBABILITY = 5, //adjust probability to change voi visibility & voi list
     };
 
     struct AnnotationUnit {
         VOISphere voi;
         unsigned char label;
         IntensityInfo intensity_info;
-        int row;
     };
 
     ModelAnnotation();
@@ -35,7 +36,6 @@ public:
     VOISphere get_annotation_by_label(unsigned char label) const;
     const std::map<std::string, ModelAnnotation::AnnotationUnit>& get_annotations() const;
     std::string get_last_annotation() const;
-    int get_annotation_row(const std::string& id) const;
 
     unsigned char get_label(const std::string& id) const;
 
@@ -60,6 +60,7 @@ public:
 
     void set_probability_threshold(float thres);
     float get_probability_threshold() const;
+    std::set<std::string> get_filter_annotations(float probability) const;
 protected:
 
 private:
@@ -68,6 +69,8 @@ private:
     bool _probability_threshold;
 
     std::vector<std::string> _cache_ids;
+
+    std::string _last_annotation;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ModelAnnotation);

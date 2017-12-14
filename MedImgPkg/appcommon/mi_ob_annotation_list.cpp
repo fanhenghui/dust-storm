@@ -42,25 +42,27 @@ void OBAnnotationList::update(int code_id) {
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
     header.msg_id = COMMAND_ID_FE_BE_SEND_ANNOTATION_LIST;
-    
-    MsgAnnotationList msg;
+
+    const float probability = model->get_probability_threshold();    
+    MsgNoneImgAnnotations msg;
     switch (code_id) {
         case ModelAnnotation::ADD: {
             for (auto it = processing_ids.begin(); it != processing_ids.end(); ++it) {
                 const std::string id = *it;
-                const int row = model->get_annotation_row(id);
                 const VOISphere voi = model->get_annotation(id);
-                MsgAnnotationListItem* item = msg.add_item();
+                if (voi.probability < probability) {
+                    continue;
+                }
+                MsgAnnotationUnit* item = msg.add_annotation();
                 item->set_id(id);
                 item->set_info(voi.name);
-                item->set_row(row);
                 item->set_status(ModelAnnotation::ADD);
                 item->set_para0(voi.center.x);
                 item->set_para1(voi.center.y);
                 item->set_para2(voi.center.z);
                 item->set_para3(voi.diameter);
                 item->set_probability(voi.probability);
-                _pre_vois.insert(std::make_pair(id, OBAnnotationList::VOIUnit(voi,row)));
+                _pre_vois.insert(std::make_pair(id, voi));
             }          
             break;
         }
@@ -71,12 +73,10 @@ void OBAnnotationList::update(int code_id) {
                 for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
                     const std::string id = *it2;
                     if(it->first == id) {
-                        MsgAnnotationListItem* item = msg.add_item();
-                        const VOISphere& voi = it->second.voi;
-                        const int row = it->second.row;
+                        MsgAnnotationUnit* item = msg.add_annotation();
+                        const VOISphere& voi = it->second;
                         item->set_id(id);
                         item->set_info(voi.name);
-                        item->set_row(row);
                         item->set_status(ModelAnnotation::DELETE);
                         item->set_para0(voi.center.x);
                         item->set_para1(voi.center.y);
@@ -101,12 +101,10 @@ void OBAnnotationList::update(int code_id) {
                 for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
                     const std::string id = *it2;
                     if(it->first == id) {
-                        MsgAnnotationListItem* item = msg.add_item();
-                        const VOISphere& voi = it->second.voi;
-                        const int row = it->second.row;
+                        MsgAnnotationUnit* item = msg.add_annotation();
+                        const VOISphere& voi = it->second;
                         item->set_id(id);
                         item->set_info(voi.name);
-                        item->set_row(row);
                         item->set_status(ModelAnnotation::MODIFYING);
                         item->set_para0(voi.center.x);
                         item->set_para1(voi.center.y);
@@ -114,12 +112,56 @@ void OBAnnotationList::update(int code_id) {
                         item->set_para3(voi.diameter);
                         item->set_probability(voi.probability);
     
-                        it->second.voi = model->get_annotation(id);
+                        it->second = model->get_annotation(id);
                         break;
                     }
                 }
             }
             break;
+        }
+        case ModelAnnotation::PROBABILITY: {
+            //get add & delete
+            std::set<std::string> delete_vois;
+            std::set<std::string> add_vois;
+            for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
+                add_vois.insert(*it2);
+            }
+
+            for (auto it = _pre_vois.begin(); it != _pre_vois.end(); ++it) {
+                delete_vois.insert(it->first);
+                auto it_try_add = add_vois.find(it->first);
+                if (it_try_add != add_vois.end()) {
+                    add_vois.erase(it_try_add);
+                }
+
+                for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
+                    const std::string id = *it2;
+                    if(it->first != id) { 
+                        //stay the same
+                        delete_vois.erase(delete_vois.find(id));
+                        break;
+                    }
+                }
+            }
+
+            //erase voi 
+            // for (auto it = delete_vois.begin(); it != delete_vois.end(); ++it) {
+            //     MsgAnnotationUnit* item = msg.add_annotation();
+            //             const VOISphere voi = model->get_annotation((*it));
+            //             item->set_id(id);
+            //             item->set_info(voi.name);
+            //             item->set_status(ModelAnnotation::DELETE);
+            //             item->set_para0(voi.center.x);
+            //             item->set_para1(voi.center.y);
+            //             item->set_para2(voi.center.z);
+            //             item->set_para3(voi.diameter);
+            //             item->set_probability(voi.probability);
+    
+            //             it = _pre_vois.erase(it);
+            // }
+            break;
+            
+
         }
         default:
             return;
