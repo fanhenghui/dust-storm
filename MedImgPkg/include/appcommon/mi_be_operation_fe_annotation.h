@@ -13,9 +13,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BNOpFEAnnotation>(new BNOpFEAnnotation());
-    }
+    CREATE_EXTENDS_OP(BNOpFEAnnotation)
 };
 MED_IMG_END_NAMESPACE
 

@@ -12,12 +12,8 @@ public:
     virtual ~BEOpFEMPRMaskOverlay();
 
     virtual int execute();
-    
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFEMPRMaskOverlay>(new BEOpFEMPRMaskOverlay());
-    }
 
-private:
+    CREATE_EXTENDS_OP(BEOpFEMPRMaskOverlay)
 };
 
 MED_IMG_END_NAMESPACE

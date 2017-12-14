@@ -13,12 +13,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<BEOpFEPan>(new BEOpFEPan());
-    }
-
-protected:
-private:
+    CREATE_EXTENDS_OP(BEOpFEPan)
 };
 
 MED_IMG_END_NAMESPACE

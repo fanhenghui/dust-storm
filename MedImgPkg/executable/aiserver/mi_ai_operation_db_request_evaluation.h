@@ -12,9 +12,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<AIODBRequestEvaluation>(new AIODBRequestEvaluation());
-    }
+    CREATE_EXTENDS_OP(AIODBRequestEvaluation)
 };
 
 MED_IMG_END_NAMESPACE

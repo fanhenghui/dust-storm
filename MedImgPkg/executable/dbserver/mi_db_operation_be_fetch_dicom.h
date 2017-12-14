@@ -12,9 +12,7 @@ public:
 
     virtual int execute();
 
-    virtual std::shared_ptr<IOperation> create() {
-        return std::shared_ptr<DBOpBEFetchDICOM>(new DBOpBEFetchDICOM());
-    }
+    CREATE_EXTENDS_OP(DBOpBEFetchDICOM)
 };
 
 MED_IMG_END_NAMESPACE
