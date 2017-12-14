@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
     for (size_t i=0; i<nodules.size(); ++i) {
         VOISphere voi(Point3(nodules[i].fX,nodules[i].fY,nodules[i].fZ),nodules[i].fRadius*2.0);
-        voi.para0 = nodules[i].fProb;
+        voi.probability = nodules[i].fProb;
         nodule_set->add_nodule(voi);
     }
 

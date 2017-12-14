@@ -10,16 +10,14 @@ struct VOISphere {
     Point3 center;
     double diameter;
     std::string name;
-    //reserverd
-    //1 means probability in lung nodule
-    float para0;
+    float probability;
 
-    VOISphere() : center(Point3::S_ZERO_POINT), diameter(0), name(""), para0(0) {}
+    VOISphere() : center(Point3::S_ZERO_POINT), diameter(0), name(""), probability(0) {}
 
-    VOISphere(const Point3& pt, double d) : center(pt), diameter(d), name(""), para0(0) {}
+    VOISphere(const Point3& pt, double d) : center(pt), diameter(d), name(""), probability(0) {}
 
     VOISphere(const Point3& pt, double d, const std::string& name)
-        : center(pt), diameter(d), name(name), para0(0) {}
+        : center(pt), diameter(d), name(name), probability(0) {}
 
     bool operator==(const VOISphere& voi) const {
         return voi.center == center &&

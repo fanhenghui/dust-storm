@@ -66,15 +66,18 @@ public:
 
         model_dbs_status->set_ai_annotation();//AI annotation flag
 
+        //load all(with max limit), and set invisible to result below default threshold
         std::vector<std::string> processing_cache_add;
-        const float possibility_threshold = Configure::instance()->get_nodule_possibility_threshold();
-        for (int i = 0; i < msg.annotation_size(); ++i) {
+        const int evaluation_limit = Configure::instance()->get_evaluation_limit();
+        if (msg.annotation_size() > evaluation_limit) {
+            MI_APPCOMMON_LOG(MI_WARNING) << "more than " << evaluation_limit << " evaluation/annotation result " 
+            << msg.annotation_size() << ", clamp it.";
+        }
+        const int anno_size = (std::min)(evaluation_limit, msg.annotation_size());
+        for (int i = 0; i < anno_size; ++i) {
             const MsgAnnotationUnitDB& anno = msg.annotation(i);
-            if (anno.p() < possibility_threshold) {
-                continue;
-            }
             VOISphere voi(Point3(anno.x(),anno.y(),anno.z()), anno.r());
-            voi.para0 = anno.p();
+            voi.probability = anno.p();
             std::stringstream ss;
             ss << clock() << '|' << i; 
             const std::string id = ss.str();
@@ -137,14 +140,10 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
         model_dbs_status->set_ai_annotation();
     
         std::vector<std::string> ids;
-        const float possibility_threshold = Configure::instance()->get_nodule_possibility_threshold();
         for (int i = 0; i < msgAnnos.annotation_size(); ++i) {
             const MsgAnnotationUnitDB& anno = msgAnnos.annotation(i);
-            if (anno.p() < possibility_threshold) {
-                continue;
-            }
             VOISphere voi(Point3(anno.x(),anno.y(),anno.z()), anno.r());
-            voi.para0 = anno.p();
+            voi.probability = anno.p();
 
             std::stringstream ss;
             ss << clock() << '|' << i; 

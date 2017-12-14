@@ -85,6 +85,7 @@ message MsgAnnotationListItem {
     float para1 = 6; //center y
     float para2 = 7; //center z
     float para3 = 8; //diameter
+    float probability = 9;//probability
 };
 
 message MsgAnnotationList {

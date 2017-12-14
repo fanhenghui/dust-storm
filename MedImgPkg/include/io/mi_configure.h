@@ -36,7 +36,8 @@ public:
     int get_expected_fps() const;
 
     //For AI Module
-    float get_nodule_possibility_threshold() const;
+    float get_evaluation_probability_threshold() const;
+    int get_evaluation_limit() const;
     std::string get_pytorch_path() const;
     std::string get_py_interface_path() const;
 
@@ -81,6 +82,7 @@ private:
 
     //AI server
     float _nodule_possibility_threshold;
+    int _evaluation_limit;
     std::string _pytorch_path;//anaconda/envs
     std::string _py_interface_path;
 
@@ -93,6 +95,8 @@ private:
 
     //GPU/CPU MPR rendering
     ProcessingUnitType _processing_unit_type;
+
+    //
 };
 
 MED_IMG_END_NAMESPACE

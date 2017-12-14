@@ -152,7 +152,7 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         anno->set_y(voi.center.y);        
         anno->set_z(voi.center.z);        
         anno->set_r(voi.diameter);
-        anno->set_p(voi.para0);
+        anno->set_p(voi.probability);
     }
 
     const int buffer_size = msg_annos.ByteSize();
@@ -254,7 +254,7 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         anno->set_y(voi.center.y);        
         anno->set_z(voi.center.z);        
         anno->set_r(voi.diameter);
-        anno->set_p(voi.para0);
+        anno->set_p(voi.probability);
     }
     const int buffer_size = msg_annos.ByteSize();
     char* buffer = new char[buffer_size];

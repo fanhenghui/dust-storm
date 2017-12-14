@@ -236,7 +236,7 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     controller->get_client_proxy_dbs()->sync_send_data(packages);
 
     //sync: wait until end signal array
-    model_dbs_status->wait();
+    model_dbs_status->wait();//TODO 设置超时机制
     model_dbs_status->set_init();
     
     //check errors

@@ -34,7 +34,10 @@ PresetCTChestWW = 400
 PresetCTChestWL = 40
 
 ExpectedFPS = 30
-PossibilityThreshold = 0.97
+ProbabilityThreshold = 0.97
+
+#valid value (1 ~ 64)
+EvaluationLimit = 20
 
 #AI related(work on DBS AIS)
 PytorchPath = /home/wangrui22/anaconda2/envs/pytorch

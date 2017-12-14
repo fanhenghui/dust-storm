@@ -26,6 +26,7 @@ void Configure::init_i() {
     _cache_db_path = "";
     _expected_fps = 30;
     _nodule_possibility_threshold = 0.97f;
+    _evaluation_limit = 20;
     _pytorch_path = "";
     _py_interface_path = "";
     _pacs_server_ae_title = "DCM4CHEE";
@@ -62,9 +63,12 @@ void Configure::refresh() {
         } else if (tag == "ExpectedFPS") {
             StrNumConverter<int> conv;
             _expected_fps = conv.to_num(context);
-        } else if (tag == "PossibilityThreshold") {
+        } else if (tag == "ProbabilityThreshold") {
             StrNumConverter<float> conv;
             _nodule_possibility_threshold = conv.to_num(context);
+        } else if (tag == "EvaluationLimit") {
+            StrNumConverter<int> conv;
+            _evaluation_limit = conv.to_num(context);
         } else if (tag == "DBIP") {
             _db_ip = context;
         } else if (tag == "DBPort") {
@@ -168,7 +172,7 @@ int Configure::get_expected_fps() const {
     return _expected_fps;
 }
 
-float Configure::get_nodule_possibility_threshold() const {
+float Configure::get_evaluation_probability_threshold() const {
     return _nodule_possibility_threshold;
 }
 
@@ -197,4 +201,7 @@ void Configure::set_processing_unit_type(ProcessingUnitType type) {
     _processing_unit_type = type;
 }
 
+int Configure::get_evaluation_limit() const {
+    return _evaluation_limit;
+}
 MED_IMG_END_NAMESPACE

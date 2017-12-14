@@ -1,4 +1,5 @@
 #include "mi_model_annotation.h"
+#include "io/mi_configure.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -15,6 +16,7 @@ void ModelAnnotation::add_annotation(const VOISphere &voi, const std::string& id
     unit.row = _annotations.size();
     _annotations[id] = unit;
     set_changed();
+    _probability_threshold = Configure::instance()->get_evaluation_probability_threshold();
 }
 
 void ModelAnnotation::remove_annotation(const std::string& id) {
@@ -158,6 +160,14 @@ void ModelAnnotation::set_processing_cache(const std::vector<std::string>& ids) 
 
 void ModelAnnotation::get_processing_cache(std::vector<std::string>& ids) {
     ids = _cache_ids;
+}
+
+void ModelAnnotation::set_probability_threshold(float thres) {
+    _probability_threshold = thres;
+}
+
+float ModelAnnotation::get_probability_threshold() const {
+    return _probability_threshold;
 }
 
 MED_IMG_END_NAMESPACE

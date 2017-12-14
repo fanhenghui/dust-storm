@@ -186,7 +186,7 @@
         }
     }
 
-    function annoListAddRow(row,id,cx,cy,cz,diameter,info) {
+    function annoListAddRow(row,id,cx,cy,cz,diameter,probability) {
         if (document.getElementById(id)) {
             console.log('add repeated row');
             return;
@@ -203,16 +203,16 @@
         rowItem.setAttribute('id',id);
         rowItem.insertCell(0).innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
         rowItem.insertCell(1).innerHTML = diameter.toFixed(2);
-        rowItem.insertCell(2).innerHTML = info;
+        rowItem.insertCell(2).innerHTML = `${probability}`.slice(0,4);
     }
 
-    function annoListModifyRow(row,cx,cy,cz,diameter,info) {
+    function annoListModifyRow(row,cx,cy,cz,diameter,probability) {
         let annoTableRows = annotationTable.rows;
         if (annoTableRows.length > row + 1) {
             let annoCell = annoTableRows[row + 1].cells;
             annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
             annoCell[1].innerHTML = diameter.toFixed(2);  
-            annoCell[2].innerHTML = info;
+            annoCell[2].innerHTML = `${probability}`.slice(0,3);
         }
     }
 
@@ -256,13 +256,14 @@
                     let cy = listItems[i].para1;
                     let cz = listItems[i].para2;
                     let diameter = listItems[i].para3;
+                    let probability = listItems[i].probability;
 
                     if(status == 0) {//add
-                        annoListAddRow(row, id, cx, cy, cz, diameter, info);
+                        annoListAddRow(row, id, cx, cy, cz, diameter, probability);
                     } else if (status == 1) {// delete
                         annoListDeleteRow(row);
                     } else if (status == 2) {// modifying
-                        annoListModifyRow(row, cx, cy, cz, diameter, info);
+                        annoListModifyRow(row, cx, cy, cz, diameter, probability);
                     }
 
                 }

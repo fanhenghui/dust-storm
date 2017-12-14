@@ -59,7 +59,7 @@ void OBAnnotationList::update(int code_id) {
                 item->set_para1(voi.center.y);
                 item->set_para2(voi.center.z);
                 item->set_para3(voi.diameter);
-    
+                item->set_probability(voi.probability);
                 _pre_vois.insert(std::make_pair(id, OBAnnotationList::VOIUnit(voi,row)));
             }          
             break;
@@ -82,6 +82,7 @@ void OBAnnotationList::update(int code_id) {
                         item->set_para1(voi.center.y);
                         item->set_para2(voi.center.z);
                         item->set_para3(voi.diameter);
+                        item->set_probability(voi.probability);
     
                         it = _pre_vois.erase(it);
                         got_deleted = true;
@@ -111,6 +112,7 @@ void OBAnnotationList::update(int code_id) {
                         item->set_para1(voi.center.y);
                         item->set_para2(voi.center.z);
                         item->set_para3(voi.diameter);
+                        item->set_probability(voi.probability);
     
                         it->second.voi = model->get_annotation(id);
                         break;

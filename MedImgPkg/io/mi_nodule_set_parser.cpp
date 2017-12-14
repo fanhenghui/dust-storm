@@ -161,7 +161,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
     for (auto it = items.begin(); it != items.end(); ++it) {
         const InnerItem& item = *it;
         VOISphere voi(Point3(item.cx, item.cy, item.cz), item.diameter, item.type);\
-        voi.para0 = item.probability;
+        voi.probability = item.probability;
         nodule_set->add_nodule(voi);
     }
 
@@ -183,7 +183,7 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path,
         bool has_probablity = false;
         float probability_sum = 0;
         for (auto it = nodules.begin(); it != nodules.end(); ++it) {
-            probability_sum += (*it).para0;
+            probability_sum += (*it).probability;
             if (!has_type && !(*it).name.empty()) {
                 has_type = true;
             }
@@ -205,7 +205,7 @@ IOStatus NoduleSetParser::save_as_csv(const std::string& file_path,
             out << _series_id << "," << voi.center.x << ","
                 << voi.center.y << "," << voi.center.z << "," << voi.diameter*0.5f;
             if (has_probablity)  {
-               out << "," << voi.para0;
+               out << "," << voi.probability;
             }
             if (has_type) {
                 out << "," << voi.name;

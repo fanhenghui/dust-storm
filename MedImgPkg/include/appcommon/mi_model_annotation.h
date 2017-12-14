@@ -58,11 +58,14 @@ public:
     void set_processing_cache(const std::vector<std::string>& ids);
     void get_processing_cache(std::vector<std::string>& ids);
 
+    void set_probability_threshold(float thres);
+    float get_probability_threshold() const;
 protected:
 
 private:
     std::map<std::string, ModelAnnotation::AnnotationUnit>  _annotations;
     bool _visibility;
+    bool _probability_threshold;
 
     std::vector<std::string> _cache_ids;
 
