@@ -19,7 +19,6 @@ public:
         MODIFYING = 2, //modifying when mouse moving
         MODIFY_COMPLETED = 3, //modify completed when mouse release
         FOCUS = 4, //focus certain voi in each scenes
-        PROBABILITY = 5, //adjust probability to change voi visibility & voi list
     };
 
     struct AnnotationUnit {
@@ -60,13 +59,14 @@ public:
 
     void set_probability_threshold(float thres);
     float get_probability_threshold() const;
-    std::set<std::string> get_filter_annotations(float probability) const;
+    std::set<std::string> get_filter_annotation_ids(float probability) const;
+    std::map<std::string, ModelAnnotation::AnnotationUnit> get_filter_annotations(float probability) const;
 protected:
 
 private:
     std::map<std::string, ModelAnnotation::AnnotationUnit>  _annotations;
     bool _visibility;
-    bool _probability_threshold;
+    float _probability_threshold;
 
     std::vector<std::string> _cache_ids;
 

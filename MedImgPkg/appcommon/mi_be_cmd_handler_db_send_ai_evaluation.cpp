@@ -66,7 +66,8 @@ public:
 
         model_dbs_status->set_ai_annotation();//AI annotation flag
 
-        //load all(with max limit), and set invisible to result below default threshold
+        //add all(with count limit) to model ,but changed part with high probability
+        const float probability = model_annotation->get_probability_threshold();
         std::vector<std::string> processing_cache_add;
         const int evaluation_limit = Configure::instance()->get_evaluation_limit();
         if (msg.annotation_size() > evaluation_limit) {
@@ -79,11 +80,16 @@ public:
             VOISphere voi(Point3(anno.x(),anno.y(),anno.z()), anno.r());
             voi.probability = anno.p();
             std::stringstream ss;
-            ss << clock() << '|' << i; 
+            ss << "eva-" << clock() << '-' << i; 
             const std::string id = ss.str();
-            processing_cache_add.push_back(id);
+            
+            if (voi.probability >= probability) {
+                processing_cache_add.push_back(id);
+            }
+
             MI_APPCOMMON_LOG(MI_INFO) << "anno item: (" << anno.x() << "," << anno.y() << "," << anno.z() << ") " 
                 << anno.r() << ", " << anno.p();
+
             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
             model_annotation->add_annotation(voi, id, new_label);
         }
@@ -125,8 +131,8 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
         model_dbs_status->push_error_info("model annotation is null.");
     }
 
-    MsgAnnotationCollectionDB msgAnnos;
-    if (!msgAnnos.ParseFromArray(buffer,ipcheader.data_len)) {
+    MsgAnnotationCollectionDB msg;
+    if (!msg.ParseFromArray(buffer,ipcheader.data_len)) {
         model_dbs_status->push_error_info("parse recv dbs AI annotation message failed.");
         return -1;
     }
@@ -137,25 +143,36 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
         //In init
         model_dbs_status->set_ai_annotation();
     
-        std::vector<std::string> ids;
-        for (int i = 0; i < msgAnnos.annotation_size(); ++i) {
-            const MsgAnnotationUnitDB& anno = msgAnnos.annotation(i);
+        //add all(with count limit) to model ,but changed part with high probability
+        const float probability = model_annotation->get_probability_threshold();
+        std::vector<std::string> processing_cache_add;
+        const int evaluation_limit = Configure::instance()->get_evaluation_limit();
+        if (msg.annotation_size() > evaluation_limit) {
+            MI_APPCOMMON_LOG(MI_WARNING) << "more than " << evaluation_limit << " evaluation/annotation result " 
+            << msg.annotation_size() << ", clamp it.";
+        }
+        const int anno_size = (std::min)(evaluation_limit, msg.annotation_size());
+        for (int i = 0; i < anno_size; ++i) {
+            const MsgAnnotationUnitDB& anno = msg.annotation(i);
             VOISphere voi(Point3(anno.x(),anno.y(),anno.z()), anno.r());
             voi.probability = anno.p();
 
             std::stringstream ss;
-            ss << clock() << '|' << i; 
+            ss << "eva-" << clock() << '-' << i; 
             const std::string id = ss.str();
-            ids.push_back(id);
 
+            if (voi.probability >= probability) {
+                processing_cache_add.push_back(id);
+            }
+            
             MI_APPCOMMON_LOG(MI_INFO) << "anno item: (" << anno.x() << "," << anno.y() << "," << anno.z() << ") " 
                 << anno.r() << ", " << anno.p();
 
             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
             model_annotation->add_annotation(voi, id, new_label);
         }
-        if (!ids.empty()) {
-            model_annotation->set_processing_cache(ids);
+        if (!processing_cache_add.empty()) {
+            model_annotation->set_processing_cache(processing_cache_add);
         } else {
             //TOOD send none annotation message
             model_annotation->set_processing_cache(std::vector<std::string>());

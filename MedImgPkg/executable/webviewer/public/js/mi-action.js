@@ -107,7 +107,7 @@ const ANNOTATION_MODIFYING = 2;
 const ANNOTATION_MODIFYCOMPLETED = 3;
 const ANNOTATION_FOCUS = 4;
 
-function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, socketClient) {
+function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, probability, socketClient) {
     if(!socketClient.protocRoot) {
         console.log('null protocbuf.');
         return;
@@ -125,7 +125,8 @@ function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0,
         visibility: annoVis,
         para0: para0,
         para1: para1,
-        para2: para2
+        para2: para2,
+        probability: probability, 
     });
     if(!msgAnnoUnit) {
         console.log('create annotation unit message failed.');
@@ -142,19 +143,20 @@ function ActionAnnotation(socketClient, cellID) {
     this.upCallback = null;
 };
 
-ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility, contentStr) {
+ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibility, probability, contentStr) {
     let roi = new ROICircle(id, svg, cx, cy, r);
     roi.visible(visibility);
     roi.setCtrlRadius(0.0);
     roi.addAnnotationLabel(contentStr); // temporily placed here
+    roi.probability = probability;//add a new attribute
     //bind drag callback
     roi.dragingCallback = (function(cx, cy, r, key) {
-        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
+        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYING, true, cx, cy, r, probability, this.socketClient);
         return true;
     }).bind(this);
 
     roi.dragEndCallback = (function(cx, cy, r, key) {
-        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
+        sendAnnotationMSG(this.cellID, 0, key, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, probability, this.socketClient);
         return true;
     }).bind(this);
 
@@ -162,15 +164,17 @@ ActionAnnotation.prototype.createROICircle = function(id, svg, cx, cy, r, visibi
 }
 
 ActionAnnotation.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
-    let annoID = new Date().getTime() + '|' + cell.rois.length;
+    let annoID = 'eva-' + new Date().getTime() + '-' + cell.rois.length;
+
     //add a new ROI to operating cell
-    cell.lastROI = this.createROICircle(annoID, cell.svg, x, y, 0, true);
+    let probability = 1.0;//created by user, default probability is 1.0
+    cell.lastROI = this.createROICircle(annoID, cell.svg, x, y, 0, probability, true);
     
     //send msg to BE
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r, this.socketClient);
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_ADD, true, cx, cy, r, probability, this.socketClient);
 }
 
 ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell) {
@@ -193,7 +197,8 @@ ActionAnnotation.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, pre
     let cx = cell.lastROI.cx;
     let cy = cell.lastROI.cy;
     let r = cell.lastROI.r;
-    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r, this.socketClient);
+    let probability = cell.lastROI.probability;
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYING, true, cx, cy, r, probability, this.socketClient);
 
     return true;
 }
@@ -213,7 +218,8 @@ ActionAnnotation.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell)
     let cx = roi.cx;
     let cy = roi.cy;
     let r = roi.r;
-    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, this.socketClient);
+    let probability = roi.probability;
+    sendAnnotationMSG(this.cellID, 0, annoID, ANNOTATION_MODIFYCOMPLETED, true, cx, cy, r, probability, this.socketClient);
 
     if(this.upCallback) {
         this.upCallback();

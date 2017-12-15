@@ -149,15 +149,27 @@ float ModelAnnotation::get_probability_threshold() const {
     return _probability_threshold;
 }
 
-std::set<std::string> ModelAnnotation::get_filter_annotations(float probability) const {
+std::set<std::string> ModelAnnotation::get_filter_annotation_ids(float probability) const {
     std::set<std::string> match_annos;
     for (std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator it = _annotations.begin(); 
         it != _annotations.end(); ++it) {
-        if (it->second.voi.probability <= probability) {
+        if (it->second.voi.probability >= probability) {
             match_annos.insert(it->first);
         }
     }
     return match_annos;
+}
+
+std::map<std::string, ModelAnnotation::AnnotationUnit> ModelAnnotation::get_filter_annotations(float probability) const {
+    std::map<std::string, ModelAnnotation::AnnotationUnit> filter_res;
+    for (std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator it = _annotations.begin(); 
+        it != _annotations.end(); ++it) {
+        if (it->second.voi.probability >= probability) {
+            filter_res[it->first] = it->second;
+        }
+    }
+
+    return filter_res;
 }
 
 MED_IMG_END_NAMESPACE

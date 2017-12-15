@@ -45,6 +45,7 @@ int BNOpFEAnnotation::execute() {
     const float anno_para0 = msgAnnotation.para0();
     const float anno_para1 = msgAnnotation.para1();
     const float anno_para2 = msgAnnotation.para2(); 
+    const float probability = msgAnnotation.probability(); 
     msgAnnotation.Clear();
     
     std::shared_ptr<AppController> controller = get_controller<AppController>();
@@ -87,6 +88,7 @@ int BNOpFEAnnotation::execute() {
         Point3 center_patient;
         if (mpr_scene->get_patient_position(center_dc, center_patient)) {
             VOISphere new_voi(center_patient, FLOAT_EPSILON);
+            new_voi.probability = probability;
             unsigned char new_label = MaskLabelStore::instance()->acquire_label();
             model->add_annotation(new_voi, anno_id, new_label);
 
@@ -118,7 +120,6 @@ int BNOpFEAnnotation::execute() {
                 annotation_nonimg->update();
                 model->notify(ModelAnnotation::MODIFYING);
             } else {
-                MI_APPCOMMON_LOG(MI_WARNING) << "annotation circle update to patient sphere does not change.";
                 return 0;
             }
         } else {

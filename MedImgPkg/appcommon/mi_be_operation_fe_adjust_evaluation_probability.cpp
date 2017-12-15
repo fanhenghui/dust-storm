@@ -1,23 +1,13 @@
-#include "mi_be_operation_fe_annotation.h"
+#include "mi_be_operation_fe_adjust_evaluation_probability.h"
 
 #include "arithmetic/mi_circle.h"
 #include "util/mi_ipc_client_proxy.h"
 #include "io/mi_message.pb.h"
 
-#include "renderalgo/mi_mask_label_store.h"
-#include "renderalgo/mi_mpr_scene.h"
-#include "renderalgo/mi_vr_scene.h"
-#include "renderalgo/mi_annotation_calculator.h"
-#include "renderalgo/mi_volume_infos.h"
-
 #include "mi_model_annotation.h"
-#include "mi_model_crosshair.h"
-#include "mi_app_cell.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_controller.h"
-#include "mi_app_common_define.h"
-#include "mi_app_none_image_item.h"
-#include "mi_app_none_image.h"
+#include "mi_app_common_util.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -49,11 +39,45 @@ int BNOpFEAdjustEvaluationProbability::execute() {
         return -1;
     }
 
-    std::set<std::string> cur_annos = model->get_filter_annotations(probability);
-    model->set_prabobility_threshold(probability);
-    model->set_processing_cache(cur_annos);
+    const float pre_probability = model->get_probability_threshold();
+    if (fabs(pre_probability - probability) < FLOAT_EPSILON) {
+        MI_APPCOMMON_LOG(MI_DEBUG) << "probability stay the same.";
+        return 0;
+    }
+
+    std::set<std::string> cur_annos = model->get_filter_annotation_ids(probability);
+    std::set<std::string> pre_annos = model->get_filter_annotation_ids(model->get_probability_threshold());
+    model->set_probability_threshold(probability);//update
+    std::vector<std::string> changed;
+    if (probability > pre_probability) {
+        // try add
+        for (auto it = cur_annos.begin(); it != cur_annos.end(); ++it) {
+            if (pre_annos.find(*it) == pre_annos.end()) {
+                changed.push_back(*it);
+            }
+        }
+    } else {
+        // try delete
+        for (auto it = pre_annos.begin(); it != pre_annos.end(); ++it) {
+            if (cur_annos.find(*it) == cur_annos.end()) {
+                changed.push_back(*it);
+            }
+        }
+    }
+    
+    if(changed.empty()) {
+        MI_APPCOMMON_LOG(MI_DEBUG) << "evauluation count stay the same.";
+        return 0;
+    }
+
+    model->set_processing_cache(changed);
     model->set_changed();
-    model->notify(ModelAnnotation::PROBABILITY);
+    if (probability > pre_probability) {
+        model->notify(ModelAnnotation::ADD);
+    } else {
+        model->notify(ModelAnnotation::DELETE);
+    }
+    
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT BNOpFEAdjustEvaluationProbability.";
     return 0;

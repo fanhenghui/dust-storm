@@ -180,8 +180,10 @@
     }
 
     function annoListDelete(id) {
-        let trDelete = $(`annotationList #{id}`);
-        annotationList.removeChild(trDelete);
+        let trDelete = $(`#annotation-list #${id}`);
+        if (trDelete.length != 0) {
+            annotationList.removeChild(trDelete[0]);
+        }
     }
 
     function annoListAdd(id,cx,cy,cz,diameter,probability) {
@@ -192,10 +194,10 @@
 
         let trAdd = document.createElement('tr');
         trAdd.id = id;
-        let tdAdd = `<td>${cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2)}</td>`;
-        tdAdd += `<td>${diameter.toFixed(2)}</td>`;
-        tdAdd += `<td>${probability.toFixed(2)}</td>`;
-        trAdd.innerHTML = tdAdd;
+        let tdValue = `<td>${cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2)}</td>`;
+        tdValue += `<td>${diameter.toFixed(2)}</td>`;
+        tdValue += `<td>${probability.toFixed(2)}</td>`;
+        trAdd.innerHTML = tdValue;
         annotationList.appendChild(trAdd);
 
         $(trAdd).click(function(event) {
@@ -203,18 +205,19 @@
             //send focus annotation message
             let anno_id = $(this).attr('id');
             if (anno_id) {
-                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, socketClient); 
+                sendAnnotationMSG(0, 0, anno_id, ANNOTATION_FOCUS, true, 0, 0, 0, 1.0, socketClient); 
             }
         });
     }
 
     function annoListModify(id,cx,cy,cz,diameter,probability) {
-        let annoCell = $(`annotationList #{id}`);
-        if(annoCell) {
-            let annoCell = annoTableRows[row + 1].cells;
-            annoCell[0].innerHTML = cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2);
-            annoCell[1].innerHTML = diameter.toFixed(2);  
-            annoCell[2].innerHTML = `${probability}`.slice(0,3);
+        let trModify = $(`#annotation-list #${id}`);
+        if (trModify.length != 0) {
+            trModify[0].innerHTML = '';
+            let tdValue= `<td>${cx.toFixed(2) + ',' + cy.toFixed(2) + ',' + cz.toFixed(2)}</td>`;
+            tdValue += `<td>${diameter.toFixed(2)}</td>`;
+            tdValue += `<td>${probability.toFixed(2)}</td>`;
+            trModify[0].innerHTML = tdValue;
         }
     }
 
@@ -249,7 +252,7 @@
             let annotationListView = new Uint8Array(annotationListBuffer);
             let annotationList = MsgAnnotationListType.decode(annotationListView);
             if (annotationList) {
-                let listItems = annotationList.item;
+                let listItems = annotationList.annotation;
                 for (let i = 0; i < listItems.length; ++i) {
                     let id = listItems[i].id;
                     let info = listItems[i].info;
@@ -265,7 +268,7 @@
                     } else if (status == 1) {// delete
                         annoListDelete(id);
                     } else if (status == 2) {// modifying
-                        annoListModify(cx, cy, cz, diameter, probability);
+                        annoListModify(id, cx, cy, cz, diameter, probability);
                     }
 
                 }
@@ -689,7 +692,7 @@
                 if (choosedItem.length > 0) {
                     let id = choosedItem.attr('id')
                     if (id) {
-                        sendAnnotationMSG(0, 0, id, 1, false, 0, 0, 0, socketClient);//Delete msg
+                        sendAnnotationMSG(0, 0, id, ANNOTATION_DELETE, false, 0, 0, 0, 0, socketClient);//Delete msg
                     }
                 }
 

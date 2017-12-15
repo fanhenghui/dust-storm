@@ -73,11 +73,10 @@ bool  NoneImgAnnotations::check_dirty() {
     APPCOMMON_CHECK_NULL_EXCEPTION(camera_cal);
     std::shared_ptr<CameraBase> camera = mpr_scene->get_camera();
     std::shared_ptr<OrthoCamera> ortho_camera = std::dynamic_pointer_cast<OrthoCamera>(camera);
-    const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_annotations();
+    const std::map<std::string, ModelAnnotation::AnnotationUnit>& vois = model->get_filter_annotations(model->get_probability_threshold());
     typedef std::map<std::string, ModelAnnotation::AnnotationUnit>::const_iterator VOIConstIter;
 
     //TODO intensity info
-
     _annotations.clear();
     bool voi_dirty = false;
     const bool camera_dirty = !(*ortho_camera == _pre_camera);
@@ -163,7 +162,6 @@ bool  NoneImgAnnotations::check_dirty() {
             this->add_annotation(unit);
         }
     } else {
-        //MI_APPCOMMON_LOG(MI_DEBUG) << "check unchanged vois." ;
         //check unchanged vois's info
         for (auto it = unchanged_vois.begin(); it != unchanged_vois.end(); ++it) {
             const std::string& id = (*it)->first;

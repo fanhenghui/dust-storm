@@ -119,50 +119,6 @@ void OBAnnotationList::update(int code_id) {
             }
             break;
         }
-        case ModelAnnotation::PROBABILITY: {
-            //get add & delete
-            std::set<std::string> delete_vois;
-            std::set<std::string> add_vois;
-            for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
-                add_vois.insert(*it2);
-            }
-
-            for (auto it = _pre_vois.begin(); it != _pre_vois.end(); ++it) {
-                delete_vois.insert(it->first);
-                auto it_try_add = add_vois.find(it->first);
-                if (it_try_add != add_vois.end()) {
-                    add_vois.erase(it_try_add);
-                }
-
-                for (auto it2 = processing_ids.begin(); it2 != processing_ids.end(); ++it2) {
-                    const std::string id = *it2;
-                    if(it->first != id) { 
-                        //stay the same
-                        delete_vois.erase(delete_vois.find(id));
-                        break;
-                    }
-                }
-            }
-
-            //erase voi 
-            // for (auto it = delete_vois.begin(); it != delete_vois.end(); ++it) {
-            //     MsgAnnotationUnit* item = msg.add_annotation();
-            //             const VOISphere voi = model->get_annotation((*it));
-            //             item->set_id(id);
-            //             item->set_info(voi.name);
-            //             item->set_status(ModelAnnotation::DELETE);
-            //             item->set_para0(voi.center.x);
-            //             item->set_para1(voi.center.y);
-            //             item->set_para2(voi.center.z);
-            //             item->set_para3(voi.diameter);
-            //             item->set_probability(voi.probability);
-    
-            //             it = _pre_vois.erase(it);
-            // }
-            break;
-            
-
-        }
         default:
             return;
     }

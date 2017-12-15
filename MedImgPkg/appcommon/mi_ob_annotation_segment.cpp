@@ -71,7 +71,6 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
         }
     }
 
-    const float probability = model->get_probability_threshold();
     /// \ ADD
     if (ModelAnnotation::ADD == code_id) {
         //add pre_vois and segment
@@ -80,9 +79,6 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             const std::string id = (*it);
             const VOISphere voi = model->get_annotation(id);
             const unsigned char label = model->get_label(id);
-            if (voi.probability < probability) {
-                continue;
-            }
 
             add_labels.push_back(label);
             if (voi.diameter >= 0.1f) {
@@ -166,10 +162,6 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
 
     /// \Modify completed
     if (ModelAnnotation::MODIFY_COMPLETED == code_id) {
-        if((int)_pre_vois.size() != model->get_annotation_count()) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "invalid annotation cache.";
-            return;
-        }
         //modify segment
         for (auto it = processing_ids.begin(); it != processing_ids.end(); ++it) {
             const std::string id = *it;

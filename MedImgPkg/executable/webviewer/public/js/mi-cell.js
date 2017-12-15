@@ -201,9 +201,10 @@ Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen,
                     let cy = annoUnit.para1;
                     let r = annoUnit.para2;
                     let content = annoUnit.info;
+                    let probability = annoUnit.probability;
                     switch (annoUnit.status) {
                         case 0: //add
-                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), content));
+                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), probability, content));
                             break;
                         case 1: //delete
                             for (let j = 0; j < this.rois.length; ++j) {
