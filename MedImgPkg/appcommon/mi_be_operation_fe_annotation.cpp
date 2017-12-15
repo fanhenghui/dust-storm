@@ -22,12 +22,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-BNOpFEAnnotation::BNOpFEAnnotation() {}
+BEOpFEAnnotation::BEOpFEAnnotation() {}
 
-BNOpFEAnnotation::~BNOpFEAnnotation() {}
+BEOpFEAnnotation::~BEOpFEAnnotation() {}
 
-int BNOpFEAnnotation::execute() {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN BNOpFEAnnotation.";
+int BEOpFEAnnotation::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEAnnotation.";
     if (_buffer == nullptr || _header.data_len < 0) {
         MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation message.";
         return -1;
@@ -156,7 +156,7 @@ int BNOpFEAnnotation::execute() {
         model_crosshair->locate(voi_center_w, false);
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BNOpFEAnnotation.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEAnnotation.";
     return 0;
 }
 

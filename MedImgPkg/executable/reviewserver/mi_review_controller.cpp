@@ -25,6 +25,7 @@
 #include "appcommon/mi_be_operation_fe_switch_preset_vrt.h"
 #include "appcommon/mi_be_operation_fe_locate.h"
 #include "appcommon/mi_be_operation_fe_downsample.h"
+#include "appcommon/mi_be_operation_fe_adjust_evaluation_probability.h"
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_crosshair.h"
 #include "appcommon/mi_be_cmd_handler_fe_db_retrieve.h"
@@ -117,7 +118,9 @@ void ReviewController::register_command_handler_i() {
     OperationFactory::instance()->register_operation(
         OPERATION_ID_BE_FE_DOWNSAMPLE, std::shared_ptr<BEOpFEDownsample>(new BEOpFEDownsample()));    
     OperationFactory::instance()->register_operation(
-        OPERATION_ID_BE_FE_ANNOTATION, std::shared_ptr<BNOpFEAnnotation>(new BNOpFEAnnotation()));
+        OPERATION_ID_BE_FE_ANNOTATION, std::shared_ptr<BEOpFEAnnotation>(new BEOpFEAnnotation()));
+    OperationFactory::instance()->register_operation(
+        OPERATION_ID_BE_FE_ADJUST_EVALUATION_PROBABILITY_THRESHOLD, std::shared_ptr<BEOpFEAdjustEvaluationProbability>(new BEOpFEAdjustEvaluationProbability()));
 
     //register command handler for DBS
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_DICOM_SERIES, 

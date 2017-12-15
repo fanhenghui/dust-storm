@@ -6,14 +6,14 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export BNOpFEAdjustEvaluationProbability : public IOperation {
+class AppCommon_Export BEOpFEAdjustEvaluationProbability : public IOperation {
 public:
-    BNOpFEAdjustEvaluationProbability();
-    virtual ~BNOpFEAdjustEvaluationProbability();
+    BEOpFEAdjustEvaluationProbability();
+    virtual ~BEOpFEAdjustEvaluationProbability();
 
     virtual int execute();
 
-    CREATE_EXTENDS_OP(BNOpFEAdjustEvaluationProbability)
+    CREATE_EXTENDS_OP(BEOpFEAdjustEvaluationProbability)
 };
 
 MED_IMG_END_NAMESPACE

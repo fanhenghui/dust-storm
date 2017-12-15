@@ -18,9 +18,10 @@ function Cell(cellName, cellID, canvas, svg, socketClient) {
     //canvas JPEG based draw
     this.jpegStr = '';
     this.jpegImg = new Image();
-
-    //svg(d3.js) based graphic
-    this.noneImgBuf = null;
+    
+    this.jpegImg.onload = (function(){
+        refreshCanvas(this.canvas, this.jpegImg);
+    }).bind(this);
 
     //mouse event
     this.mouseBtn = BTN_NONE;
@@ -70,11 +71,11 @@ function refreshCanvas(canvas, img) {
     canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 }
 
-Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+Cell.prototype.handleJpegBuffer = function(buffer, bufferOffset, dataLen, restDataLen, withHeader) {
     if (withHeader) {
         this.jpegStr = '';
     } 
-    let imgBuffer = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
+    let imgBuffer = new Uint8Array(buffer, bufferOffset, dataLen);
     this.jpegStr += String.fromCharCode.apply(null, imgBuffer);
     if(restDataLen <= 0) {
         this.jpegImg.src =  'data:image/jpg;base64,' + btoa(this.jpegStr);
@@ -85,272 +86,258 @@ Cell.prototype.handleJpegBuffer = function(tcpBuffer, bufferOffset, dataLen, res
     }
 }
 
-Cell.prototype.handleNongImgBuffer = function (tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
-    if (withHeader) {
-        this.noneImgBuf = new ArrayBuffer(dataLen + restDataLen);
+Cell.prototype.handleNongImgBuffer = function (arrayBuffer) {
+    //console.log('receive Nong Img Buffer.');
+    let MsgNoneImgCollection = this.socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
+    if (!MsgNoneImgCollection) {
+        console.log('get MsgNoneImgCollection type failed.');
     }
-    let dstRecord = new Uint8Array(this.noneImgBuf);
-    let srcRecord = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-    let cpSrc = this.noneImgBuf.byteLength - (dataLen + restDataLen);
-    for (let i = 0; i < dataLen; i++) {
-        dstRecord[i+cpSrc] = srcRecord[i];
-    }
-
-    // sucessfully receive all none-image
-    if (restDataLen <= 0) {
-        //console.log('receive Nong Img Buffer.');
-        let MsgNoneImgCollection = this.socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
-        if (!MsgNoneImgCollection) {
-            console.log('get MsgNoneImgCollection type failed.');
+    //decode the byte array with protobuffer
+    let noneImgBufView = new Uint8Array(arrayBuffer);
+    let receivedMsg = null;
+    try {
+        receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
+    } catch (e) {
+        if (e instanceof protobuf.util.ProtocolError) {
+            console.log('decode none image message failed.');
+            console.log('e.instance holds the so far decoded message with missing required fields');
+        } else {
+            console.log('decode none image message failed.');
+            console.log('wire format is invalid');
+            console.log(arrayBuffer.byteLength);
         }
+        return;
+    }
+    if (receivedMsg.hasOwnProperty('cornerInfos')) {
+        let txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
+        let corners = txt.split('\n');
 
-        //decode the byte array with protobuffer
-        let noneImgBufView = new Uint8Array(this.noneImgBuf);
-        let receivedMsg = null;
-        try {
-            receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
-        } catch (e) {
-            if (e instanceof protobuf.util.ProtocolError) {
-                console.log('decode none image message failed.');
-                console.log('e.instance holds the so far decoded message with missing required fields');
-            } else {
-                console.log('decode none image message failed.');
-                console.log('wire format is invalid');
-                console.log(this.noneImgBuf.byteLength);
+        // for each corner
+        // 'length-1': avoid the last empty string "" after '\n'
+        for (let i = 0; i < (corners.length - 1); ++i) {
+            let oneCornerInfo = corners[i].split('|');
+            let cornerTag = oneCornerInfo[0];
+            let infoContext = [];
+            for (let j = 1; j < oneCornerInfo.length; ++j) {
+                let info = oneCornerInfo[j].split(',');
+                infoContext.push({pos:info[0], context:info[1]});
             }
-            return;
-        }
-        if (receivedMsg.hasOwnProperty('cornerInfos')) {
-            let txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
-            let corners = txt.split('\n');
-
-            // for each corner
-            // 'length-1': avoid the last empty string "" after '\n'
-            for (let i = 0; i < (corners.length - 1); ++i) {
-                let oneCornerInfo = corners[i].split('|');
-                let cornerTag = oneCornerInfo[0];
-                let infoContext = [];
-                for (let j = 1; j < oneCornerInfo.length; ++j) {
-                    let info = oneCornerInfo[j].split(',');
-                    infoContext.push({pos:info[0], context:info[1]});
-                }
+            
+            let svgText = d3.select(this.svg).select('#' + cornerTag);
+            let xpos = null;
+            let txtspacing = null;
+            let texorigin = null;
+            switch(cornerTag) {
+                case 'LT':
+                    xpos = TEXT_MARGIN;
+                    txtspacing = parseFloat(svgText.attr('font-size'));
+                    texorigin = 1.2*txtspacing;
+                    break;
+                case 'RT':
+                    xpos = this.canvas.width - TEXT_MARGIN;
+                    txtspacing = parseFloat(svgText.attr('font-size'));
+                    texorigin = 1.2*txtspacing;
+                    break;
                 
-                let svgText = d3.select(this.svg).select('#' + cornerTag);
-                let xpos = null;
-                let txtspacing = null;
-                let texorigin = null;
-                switch(cornerTag) {
-                    case 'LT':
-                        xpos = TEXT_MARGIN;
-                        txtspacing = parseFloat(svgText.attr('font-size'));
-                        texorigin = 1.2*txtspacing;
-                        break;
-                    case 'RT':
-                        xpos = this.canvas.width - TEXT_MARGIN;
-                        txtspacing = parseFloat(svgText.attr('font-size'));
-                        texorigin = 1.2*txtspacing;
-                        break;
-                    
-                    case 'LB':
-                        xpos = TEXT_MARGIN;
-                        txtspacing = -parseFloat(svgText.attr('font-size'));
-                        texorigin = this.canvas.height + 0.2*txtspacing;
-                        break;
-                    case 'RB':
-                        xpos = this.canvas.width - TEXT_MARGIN;
-                        txtspacing = -parseFloat(svgText.attr('font-size'));
-                        texorigin = this.canvas.height + 0.2*txtspacing;
-                        break;
-                }                
+                case 'LB':
+                    xpos = TEXT_MARGIN;
+                    txtspacing = -parseFloat(svgText.attr('font-size'));
+                    texorigin = this.canvas.height + 0.2*txtspacing;
+                    break;
+                case 'RB':
+                    xpos = this.canvas.width - TEXT_MARGIN;
+                    txtspacing = -parseFloat(svgText.attr('font-size'));
+                    texorigin = this.canvas.height + 0.2*txtspacing;
+                    break;
+            }                
 
-                let tspans = svgText.selectAll('tspan');
-                if(tspans.empty())
-                {
-                    tspans.data(infoContext).enter()
-                    .append('tspan')
-                    .attr('x', xpos)
-                    .attr('y', function (d) {
-                        return texorigin + (d.pos)*txtspacing;
-                    })
-                    .attr('id', function (d) {
-                        return cornerTag + '-' + d.pos;
-                    })
-                    .text(function (d, i) {
-                        return d.context;
-                    });
-                } else {
-                    tspans.data(infoContext, function(d) {//change data[d.pos]
-                        return d.pos;
-                    })
-                    .text(function (d, i) {
-                        return d.context;
-                    });
-                }
-            }
-        }
-        
-        if (receivedMsg.hasOwnProperty('annotations')) {
-            let annotations = receivedMsg.annotations.annotation;
-            if (annotations) {
-                for (let i = 0; i < annotations.length; ++i) {
-                    let annoUnit = annotations[i];
-                    let id = annoUnit.id;
-                    let status = annoUnit.status;
-                    let vis = annoUnit.visibility;
-                    let cx = annoUnit.para0;
-                    let cy = annoUnit.para1;
-                    let r = annoUnit.para2;
-                    let content = annoUnit.info;
-                    let probability = annoUnit.probability;
-                    switch (annoUnit.status) {
-                        case 0: //add
-                            this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), probability, content));
-                            break;
-                        case 1: //delete
-                            for (let j = 0; j < this.rois.length; ++j) {
-                                if (this.rois[j].key == id) {
-                                    this.rois[j].release();
-                                    this.rois.splice(j, 1);
-                                    break;
-                                }
-                            }
-                            break;
-                        case 2: //modifying
-                            for (let j = 0; j < this.rois.length; ++j) {
-                                if (this.rois[j].key == id) {
-                                    this.rois[j].locate(cx, cy, r);
-                                    this.rois[j].visible(vis);
-                                    this.rois[j].updateContent(content);
-                                    break;
-                                }
-                            }
-                        break;
-                    }                    
-                }
-            }
-        }
-
-        //TODO crosshair message
-        if (receivedMsg.hasOwnProperty('crosshair')) {
-            if (this.crosshair) {
-                this.crosshair.parseNoneImg(receivedMsg.crosshair);
-                if (receivedMsg.crosshair.borderColor) {
-                    this.borderColor = receivedMsg.crosshair.borderColor;
-                    this.canvas.style.border = '3px solid ' + this.borderColor;
-                }
-            }
-        }
-
-        if (receivedMsg.hasOwnProperty('direction')) {
-            //console.log('cellID:' + this.cellID + '  ' + receivedMsg.direction.info);
-            let txt = receivedMsg.direction.info.split('|'); // format "A|P|H|F"
-            let keyTxtArray = [];
-            let directionKey = this.key + '-direction';
-            for(let i=0; i<txt.length; ++i)
+            let tspans = svgText.selectAll('tspan');
+            if(tspans.empty())
             {
-                keyTxtArray.push({key: directionKey, content: txt[i]});
-            }
-            let directionInfoTxt =
-                d3.select(this.svg).selectAll('text').filter(function (d) {
-                    return (d && d.key) ? d.key == directionKey : false;
+                tspans.data(infoContext).enter()
+                .append('tspan')
+                .attr('x', xpos)
+                .attr('y', function (d) {
+                    return texorigin + (d.pos)*txtspacing;
+                })
+                .attr('id', function (d) {
+                    return cornerTag + '-' + d.pos;
+                })
+                .text(function (d, i) {
+                    return d.context;
                 });
-            let width = parseFloat(this.svg.getAttribute('width'));
-            let height = parseFloat(this.svg.getAttribute('height'));
-            if (directionInfoTxt.empty()) {
-                directionInfoTxt.data(keyTxtArray)
-                    .enter()
-                    .append('text')
-                    .attr('font-family', 'monospace')
-                    .attr('font-size', '15px')
-                    .attr('fill', '#dcdcdc')
-                    .attr('class', 'no-select-text')
-                    .attr('alignment-baseline', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return 'central';
-                            case 1:
-                                return 'central';
-                            case 2:
-                                return 'hanging';
-                            case 3:
-                                return 'baseline';
-                        };
-                    })
-                    .attr('text-anchor', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return 'start';
-                            case 1:
-                                return 'end';
-                            case 2:
-                                return 'middle';
-                            case 3:
-                                return 'middle';
-                        };
-                    })
-                    .attr('x', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return 0;
-                            case 1:
-                                return width;
-                            case 2:
-                                return width*0.5;
-                            case 3:
-                                return width*0.5;
-                        };
-                    })
-                    .attr('y', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return height*0.5;
-                            case 1:
-                                return height*0.5;
-                            case 2:
-                                return 0;
-                            case 3:
-                                return height;
-                        };
-                    })
-                    .text(function (d) {
-                        return d.content;
-                    });
             } else {
-                directionInfoTxt.data(keyTxtArray)
-                    .attr('x', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return 0;
-                            case 1:
-                                return width;
-                            case 2:
-                                return width * 0.5;
-                            case 3:
-                                return width * 0.5;
-                        };
-                    })
-                    .attr('y', function (d, i) {
-                        switch (i) {
-                            case 0:
-                                return height * 0.5;
-                            case 1:
-                                return height * 0.5;
-                            case 2:
-                                return 0;
-                            case 3:
-                                return height;
-                        };
-                    }).text(function (d) {
-                        return d.content;
-                    });
+                tspans.data(infoContext, function(d) {//change data[d.pos]
+                    return d.pos;
+                })
+                .text(function (d, i) {
+                    return d.context;
+                });
             }
         }
-
-        // frustum information to adapt vertical ruler
-        if (receivedMsg.hasOwnProperty('frustum')) {
-            if (this.ruler) {
-                this.ruler.updateRuler(receivedMsg.frustum.height);
+    }
+    
+    if (receivedMsg.hasOwnProperty('annotations')) {
+        let annotations = receivedMsg.annotations.annotation;
+        if (annotations) {
+            for (let i = 0; i < annotations.length; ++i) {
+                let annoUnit = annotations[i];
+                let id = annoUnit.id;
+                let status = annoUnit.status;
+                let vis = annoUnit.visibility;
+                let cx = annoUnit.para0;
+                let cy = annoUnit.para1;
+                let r = annoUnit.para2;
+                let content = annoUnit.info;
+                let probability = annoUnit.probability;
+                switch (annoUnit.status) {
+                    case 0: //add
+                        this.rois.push(this.mouseActionAnnotation.createROICircle(id, this.svg, cx, cy, r, (vis!=0), probability, content));
+                        break;
+                    case 1: //delete
+                        for (let j = 0; j < this.rois.length; ++j) {
+                            if (this.rois[j].key == id) {
+                                this.rois[j].release();
+                                this.rois.splice(j, 1);
+                                break;
+                            }
+                        }
+                        break;
+                    case 2: //modifying
+                        for (let j = 0; j < this.rois.length; ++j) {
+                            if (this.rois[j].key == id) {
+                                this.rois[j].locate(cx, cy, r);
+                                this.rois[j].visible(vis);
+                                this.rois[j].updateContent(content);
+                                break;
+                            }
+                        }
+                    break;
+                }                    
             }
+        }
+    }
+
+    //TODO crosshair message
+    if (receivedMsg.hasOwnProperty('crosshair')) {
+        if (this.crosshair) {
+            this.crosshair.parseNoneImg(receivedMsg.crosshair);
+            if (receivedMsg.crosshair.borderColor) {
+                this.borderColor = receivedMsg.crosshair.borderColor;
+                this.canvas.style.border = '3px solid ' + this.borderColor;
+            }
+        }
+    }
+
+    if (receivedMsg.hasOwnProperty('direction')) {
+        //console.log('cellID:' + this.cellID + '  ' + receivedMsg.direction.info);
+        let txt = receivedMsg.direction.info.split('|'); // format "A|P|H|F"
+        let keyTxtArray = [];
+        let directionKey = this.key + '-direction';
+        for(let i=0; i<txt.length; ++i)
+        {
+            keyTxtArray.push({key: directionKey, content: txt[i]});
+        }
+        let directionInfoTxt =
+            d3.select(this.svg).selectAll('text').filter(function (d) {
+                return (d && d.key) ? d.key == directionKey : false;
+            });
+        let width = parseFloat(this.svg.getAttribute('width'));
+        let height = parseFloat(this.svg.getAttribute('height'));
+        if (directionInfoTxt.empty()) {
+            directionInfoTxt.data(keyTxtArray)
+                .enter()
+                .append('text')
+                .attr('font-family', 'monospace')
+                .attr('font-size', '15px')
+                .attr('fill', '#dcdcdc')
+                .attr('class', 'no-select-text')
+                .attr('alignment-baseline', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return 'central';
+                        case 1:
+                            return 'central';
+                        case 2:
+                            return 'hanging';
+                        case 3:
+                            return 'baseline';
+                    };
+                })
+                .attr('text-anchor', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return 'start';
+                        case 1:
+                            return 'end';
+                        case 2:
+                            return 'middle';
+                        case 3:
+                            return 'middle';
+                    };
+                })
+                .attr('x', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return 0;
+                        case 1:
+                            return width;
+                        case 2:
+                            return width*0.5;
+                        case 3:
+                            return width*0.5;
+                    };
+                })
+                .attr('y', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return height*0.5;
+                        case 1:
+                            return height*0.5;
+                        case 2:
+                            return 0;
+                        case 3:
+                            return height;
+                    };
+                })
+                .text(function (d) {
+                    return d.content;
+                });
+        } else {
+            directionInfoTxt.data(keyTxtArray)
+                .attr('x', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return 0;
+                        case 1:
+                            return width;
+                        case 2:
+                            return width * 0.5;
+                        case 3:
+                            return width * 0.5;
+                    };
+                })
+                .attr('y', function (d, i) {
+                    switch (i) {
+                        case 0:
+                            return height * 0.5;
+                        case 1:
+                            return height * 0.5;
+                        case 2:
+                            return 0;
+                        case 3:
+                            return height;
+                    };
+                }).text(function (d) {
+                    return d.content;
+                });
+        }
+    }
+
+    // frustum information to adapt vertical ruler
+    if (receivedMsg.hasOwnProperty('frustum')) {
+        if (this.ruler) {
+            this.ruler.updateRuler(receivedMsg.frustum.height);
         }
     }
 }

@@ -2,6 +2,7 @@
 #define MEDIMG_APPCOMMON_MI_BE_CMD_HANDLER_FE_READY_H
 
 #include <memory>
+#include <string>
 #include "appcommon/mi_app_common_export.h"
 #include "util/mi_ipc_common.h"
 
@@ -15,6 +16,8 @@ public:
 
     virtual int handle_command(const IPCDataHeader& dataheader , char* buffer);
 
+protected:  
+    virtual int generate_ready_message_buffer(char*& buffer, int& buffer_size);
 private:
     std::weak_ptr<AppController> _controller;
 };

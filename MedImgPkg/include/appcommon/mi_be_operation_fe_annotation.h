@@ -6,14 +6,14 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AppCommon_Export BNOpFEAnnotation : public IOperation {
+class AppCommon_Export BEOpFEAnnotation : public IOperation {
 public:
-    BNOpFEAnnotation();
-    virtual ~BNOpFEAnnotation();
+    BEOpFEAnnotation();
+    virtual ~BEOpFEAnnotation();
 
     virtual int execute();
 
-    CREATE_EXTENDS_OP(BNOpFEAnnotation)
+    CREATE_EXTENDS_OP(BEOpFEAnnotation)
 };
 MED_IMG_END_NAMESPACE
 

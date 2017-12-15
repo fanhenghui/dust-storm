@@ -2,16 +2,12 @@
 (function() {
     let socket = null;
     let seriesUID = '';
+    let revcBEReady = false;
+
     let cellCanvases = null;
     let cellSVGs = null;
     let cells = null;
-    let protocRoot = null;
-    let worklistBuffer = null;
-    let recvPACSRetrieveBuffer = null;
     let socketClient = null;
-    let revcBEReady = false;
-    
-    let annotationListBuffer = null;
     let annotationList = null;
     
     //layout parameter
@@ -76,46 +72,34 @@
         }
     }
 
-    function recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    function handleBEDBRetrieve(arrayBuffer) {
         if (!socketClient.protocRoot) {
             console.log('null protocbuf.');
             return;
         }
-        if (withHeader) {
-            worklistBuffer = new ArrayBuffer(dataLen + restDataLen);
+            
+        console.log('recv DB retrieve.');
+        let MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
+        if (!MsgWorklistType) {
+            console.log('get worklist message type failed.');
         }
-
-        let dstview = new Uint8Array(worklistBuffer);
-        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        let cpSrc = worklistBuffer.byteLength - (dataLen + restDataLen);
-        for (let i = 0; i < dataLen; i++) {
-            dstview[i+cpSrc] = srcview[i];
-        }
-
-        if (restDataLen <= 0) {
-            console.log('recv worklist.');
-            let MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
-            if (!MsgWorklistType) {
-                console.log('get worklist message type failed.');
+        let worklistView = new Uint8Array(arrayBuffer);
+        let message = MsgWorklistType.decode(worklistView);
+        let obj = MsgWorklistType.toObject(message, {
+            patient_name: String,
+            patient_id: String,
+            series_uid: String,
+            imaging_modality: String
+        }).items;
+        let tbody = document.getElementById('worklist');
+        tbody.innerHTML = '';
+        for (let i = 0; i < obj.length; i++) {
+            let tr = '<tr>';
+            for (let propt in obj[i]) {
+                tr += '<td>' + obj[i][propt] + '</td>';
             }
-            let worklistView = new Uint8Array(worklistBuffer);
-            let message = MsgWorklistType.decode(worklistView);
-            let obj = MsgWorklistType.toObject(message, {
-                patient_name: String,
-                patient_id: String,
-                series_uid: String,
-                imaging_modality: String
-            }).items;
-            let tbody = document.getElementById('worklist');
-            tbody.innerHTML = '';
-            for (let i = 0; i < obj.length; i++) {
-                let tr = '<tr>';
-                for (let propt in obj[i]) {
-                    tr += '<td>' + obj[i][propt] + '</td>';
-                }
-                tr += '</tr>';
-                tbody.innerHTML += tr;
-            }
+            tr += '</tr>';
+            tbody.innerHTML += tr;
         }
 
         //style changed when choose tr (based on bootstrap)
@@ -124,50 +108,37 @@
         });
     }
 
-    function recvPACSRetrieveResult(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    function handleBEPACSRetrieve(arrayBuffer) {
         if (!socketClient.protocRoot) {
             console.log('null protocbuf.');
             return;
         }
-        if (withHeader) {
-            recvPACSRetrieveBuffer = new ArrayBuffer(dataLen + restDataLen);
+
+        let MsgDcmInfosType = socketClient.protocRoot.lookup('medical_imaging.MsgDcmInfoCollection');
+        if (!MsgDcmInfosType) {
+            console.log('get DICOM info collection message type failed.');
+            return;
+        }
+        let diconInfoView = new Uint8Array(arrayBuffer);
+        let message = MsgDcmInfosType.decode(diconInfoView);
+        let dcminfo = message.dcminfo;
+        if (!dcminfo) {
+            console.log(`can't get dcminfo.`);
+            return;
         }
 
-        let dstview = new Uint8Array(recvPACSRetrieveBuffer);
-        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        let cpSrc = recvPACSRetrieveBuffer.byteLength - (dataLen + restDataLen);
-        for (let i = 0; i < dataLen; i++) {
-            dstview[i+cpSrc] = srcview[i];
-        }
-
-        if (restDataLen <= 0) {
-            console.log('recv pacs worklist.');
-            let MsgDcmInfosType = socketClient.protocRoot.lookup('medical_imaging.MsgDcmInfoCollection');
-            if (!MsgDcmInfosType) {
-                console.log('get DICOM info collection message type failed.');
-                return;
-            }
-            let diconInfoView = new Uint8Array(recvPACSRetrieveBuffer);
-            let message = MsgDcmInfosType.decode(diconInfoView);
-            let dcminfo = message.dcminfo;
-            if (!dcminfo) {
-                console.log(`can't get dcminfo.`);
-                return;
-            }
-
-            let tbody = document.getElementById('worklist-pacs');
-            tbody.innerHTML = '';
-            
-            dcminfo.forEach(ele => {
-                let tr = '<tr>';
-                tr += `<td>${ele.patientName}</td>`;
-                tr += `<td>${ele.patientId}</td>`;
-                tr += `<td>${ele.seriesId}</td>`;
-                tr += `<td>${ele.modality}</td>`;
-                tr += '</tr>';   
-                tbody.innerHTML += tr; 
-            });
-        }
+        let tbody = document.getElementById('worklist-pacs');
+        tbody.innerHTML = '';
+        
+        dcminfo.forEach(ele => {
+            let tr = '<tr>';
+            tr += `<td>${ele.patientName}</td>`;
+            tr += `<td>${ele.patientId}</td>`;
+            tr += `<td>${ele.seriesId}</td>`;
+            tr += `<td>${ele.modality}</td>`;
+            tr += '</tr>';   
+            tbody.innerHTML += tr; 
+        });
 
         //style changed when choose tr (based on bootstrap)
         $('#table-pacs tbody tr').click(function() {
@@ -228,76 +199,147 @@
         }
     }
 
-    function recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    
+    function handleEvaluationResult(arrayBuffer) {
         if (!socketClient.protocRoot) {
             console.log('null protocbuf.');
             return;
         }
-        if (withHeader) {
-            annotationListBuffer = new ArrayBuffer(dataLen + restDataLen);
+
+        let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgAnnotations');
+        if (!MsgAnnotationListType) {
+            console.log('get annotation list message type failed.');
+        }
+        let annotationListView = new Uint8Array(arrayBuffer);
+        let annotationList = MsgAnnotationListType.decode(annotationListView);
+        if (annotationList) {
+            let listItems = annotationList.annotation;
+            for (let i = 0; i < listItems.length; ++i) {
+                let id = listItems[i].id;
+                let info = listItems[i].info;
+                let status = listItems[i].status;
+                let cx = listItems[i].para0;
+                let cy = listItems[i].para1;
+                let cz = listItems[i].para2;
+                let diameter = listItems[i].para3;
+                let probability = listItems[i].probability;
+
+                if(status == 0) {//add
+                    annoListAdd(id, cx, cy, cz, diameter, probability);
+                } else if (status == 1) {// delete
+                    annoListDelete(id);
+                } else if (status == 2) {// modifying
+                    annoListModify(id, cx, cy, cz, diameter, probability);
+                }
+
+            }
+        }            
+    }
+
+    function adjustEvaluationProbabilityThreshold(probability) {
+        if (!socketClient.protocRoot) {
+            console.log('null protobuf.');
+            return;
+        }
+        let MsgFloatType = socketClient.protocRoot.lookup('medical_imaging.MsgFloat');
+        if (!MsgFloatType) {
+            console.log('get MsgFloatType type failed.');
+            return;
+        }
+        let msg = MsgFloatType.create({value:probability});
+        if (!msg) {
+            console.log('create switch vrt message failed.');
+            return;
+        }
+        let msgBuffer = MsgFloatType.encode(msg).finish();
+        if (!msgBuffer) {
+            console.log('encode switch vrt message failed.');
         }
 
-        let dstview = new Uint8Array(annotationListBuffer);
-        let srcview = new Uint8Array(tcpBuffer, bufferOffset, dataLen);
-        let cpSrc = annotationListBuffer.byteLength - (dataLen + restDataLen);
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, 
+            OPERATION_ID_BE_FE_ADJUST_EVALUATION_PROBABILITY_THRESHOLD, 0, msgBuffer.byteLength, msgBuffer);
+    }
+    
+    function handleBEReady(arrayBuffer) {
+        if (!socketClient.protocRoot) {
+            console.log('null protocbuf.');
+            return;
+        }
+
+        revcBEReady = true;
+
+        let MsgType = socketClient.protocRoot.lookup('medical_imaging.MsgFloat');
+        if (!MsgType) {
+            console.log('get message type: MsgFloat failed.');
+            return;
+        }
+        let arrayMap = new Uint8Array(arrayBuffer);
+        let msg = MsgType.decode(arrayMap);
+        if (msg) {
+            console.log(msg);
+            let probabilityThreshol = msg.value;
+            let evaluationProbabilityRange = document.getElementById('range-probability');
+            if (evaluationProbabilityRange) {
+                evaluationProbabilityRange.onchange = null;
+                evaluationProbabilityRange.min = 0;
+                evaluationProbabilityRange.max = 1;
+                evaluationProbabilityRange.step = 0.025;
+                evaluationProbabilityRange.defaultValue = probabilityThreshol;
+                evaluationProbabilityRange.value = probabilityThreshol;
+                evaluationProbabilityRange.onchange = function() {
+                    adjustEvaluationProbabilityThreshold(this.value);
+                };
+            }
+        }        
+    }
+
+    //FE command recv package context(binary stream)
+    let packageBuffer;
+    function recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader) {
+        if (withHeader) {
+            packageBuffer = new ArrayBuffer(dataLen + restDataLen);
+        }
+        let dstview = new Uint8Array(packageBuffer);
+        let srcview = new Uint8Array(buffer, bufferOffset, dataLen);
+        let cpSrc = packageBuffer.byteLength - (dataLen + restDataLen);
         for (let i = 0; i < dataLen; i++) {
             dstview[i+cpSrc] = srcview[i];
         }
-
-        if (restDataLen <= 0) {
-            let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgAnnotations');
-            if (!MsgAnnotationListType) {
-                console.log('get annotation list message type failed.');
-            }
-            let annotationListView = new Uint8Array(annotationListBuffer);
-            let annotationList = MsgAnnotationListType.decode(annotationListView);
-            if (annotationList) {
-                let listItems = annotationList.annotation;
-                for (let i = 0; i < listItems.length; ++i) {
-                    let id = listItems[i].id;
-                    let info = listItems[i].info;
-                    let status = listItems[i].status;
-                    let cx = listItems[i].para0;
-                    let cy = listItems[i].para1;
-                    let cz = listItems[i].para2;
-                    let diameter = listItems[i].para3;
-                    let probability = listItems[i].probability;
-
-                    if(status == 0) {//add
-                        annoListAdd(id, cx, cy, cz, diameter, probability);
-                    } else if (status == 1) {// delete
-                        annoListDelete(id);
-                    } else if (status == 2) {// modifying
-                        annoListModify(id, cx, cy, cz, diameter, probability);
-                    }
-
-                }
-            }
-        }
+        return restDataLen <= 0; 
     }
-
-    function cmdHandler(cmdID, cellID, opID, tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader) {
+    function cmdHandler(cmdID, cellID, opID, buffer, bufferOffset, dataLen, restDataLen, withHeader) {
         switch (cmdID) {
             case COMMAND_ID_FE_BE_SEND_IMAGE:
-                cells[cellID].handleJpegBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                cells[cellID].handleJpegBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader);
                 break;
             case COMMAND_ID_FE_BE_SEND_NONE_IMAGE:
-                cells[cellID].handleNongImgBuffer(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    cells[cellID].handleNongImgBuffer(packageBuffer);
+                }
                 break;
             case COMMAND_ID_FE_BE_READY:
-                revcBEReady = true;
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEReady(packageBuffer);
+                }
                 break;
             case COMMAND_ID_FE_BE_DB_RETRIEVE_RESULT:
-                recvWorklist(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEDBRetrieve(packageBuffer);
+                }
                 break;
             case COMMAND_ID_FE_BE_HEARTBEAT:
                 keepHeartbeat();
                 break;
             case COMMAND_ID_FE_BE_SEND_ANNOTATION_LIST:
-                recvAnnotationList(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleEvaluationResult(packageBuffer);
+                }
                 break;
             case COMMAND_ID_FE_BE_PACS_RETRIEVE_RESULT:
-                recvPACSRetrieveResult(tcpBuffer, bufferOffset, dataLen, restDataLen, withHeader);
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEPACSRetrieve(packageBuffer);
+                }
+                break;
             default:
                 break;
         }

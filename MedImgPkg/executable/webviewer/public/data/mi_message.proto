@@ -2,8 +2,12 @@ syntax = "proto3";
 
 package medical_imaging;
 
-message MsgNumber {
+message MsgFloat {
     float value = 1;
+}
+
+message MsgInt {
+    int32 value = 1;
 }
 
 message MsgFlag {
