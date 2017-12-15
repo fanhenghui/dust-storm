@@ -1077,6 +1077,22 @@
             }
         }
 
+        let anonymousBtn = document.getElementById('btn-anonymous');
+        if (anonymousBtn) {
+            anonymousBtn.onclick = function() {
+                let glyphIcon = $('#btn-anonymous span');
+                if(glyphIcon.hasClass('glyphicon-eye-open')) {
+                    glyphIcon.removeClass('glyphicon-eye-open');
+                    glyphIcon.addClass('glyphicon-eye-close');
+                    //TODO anonymous
+                } else {
+                    glyphIcon.removeClass('glyphicon-eye-close');
+                    glyphIcon.addClass('glyphicon-eye-open');
+                    //TODO cancle anonymous
+                }
+            }
+        }
+
         // register window quit linsener
         window.onbeforeunload = function(event) {
             logout();
