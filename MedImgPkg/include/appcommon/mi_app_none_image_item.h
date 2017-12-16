@@ -91,6 +91,7 @@ private:
 
 // LT|1:patientName|2:patientID\n
 //just sending once
+class ModelAnonymization;
 class NoneImgCornerInfos : public INoneImg {
 public:
     enum PositionType {
@@ -107,6 +108,8 @@ public:
     virtual bool check_dirty();
     virtual void update();
 
+    void set_model(std::shared_ptr<ModelAnonymization> model) {_model = model;};
+
     void set_infos(PositionType pos, std::vector<std::pair<int, std::string>> infos);
     void add_info(PositionType pos, std::pair<int, std::string> info);
     std::string to_string() const;
@@ -117,6 +120,7 @@ private:
     float _ww;
     float _wl;
     int _mpr_page;
+    std::weak_ptr<ModelAnonymization> _model;
 };
 
 class NoneImgDirection : public INoneImg {

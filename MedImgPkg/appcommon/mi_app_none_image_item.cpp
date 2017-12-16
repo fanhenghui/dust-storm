@@ -14,6 +14,7 @@
 
 #include "mi_model_annotation.h"
 #include "mi_model_crosshair.h"
+#include "mi_model_anonymization.h"
 #include "mi_app_common_logger.h"
 
 
@@ -324,6 +325,16 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
     default:
         break;
     }
+    std::string patient_name = header->patient_name.empty() ? UNKNOWN : header->patient_name;
+    std::string patient_id = header->patient_id.empty() ? UNKNOWN : header->patient_id;
+    std::string patient_sex = header->patient_sex.empty() ? UNKNOWN : header->patient_sex;
+    std::shared_ptr<ModelAnonymization> model = _model.lock();
+    if (model && model->get_anonymization_flag()) {
+        patient_name = "ANONYMOUS";
+        patient_id = "ANONYMOUS";
+        patient_sex = "ANONYMOUS";
+    }
+
     this->add_info(NoneImgCornerInfos::LT, std::make_pair(0, header->manufacturer.empty() ? UNKNOWN : header->manufacturer));
     this->add_info(NoneImgCornerInfos::LT, std::make_pair(1, header->manufacturer_model_name.empty() ? UNKNOWN : header->manufacturer_model_name));
     this->add_info(NoneImgCornerInfos::LT, std::make_pair(2, modality));
@@ -333,9 +344,9 @@ void NoneImgCornerInfos::update() {//TODO set corner based on config file
 
     //RT
 
-    this->add_info(NoneImgCornerInfos::RT, std::make_pair(0, header->patient_name.empty() ? UNKNOWN : header->patient_name));
-    this->add_info(NoneImgCornerInfos::RT, std::make_pair(1, header->patient_id.empty() ? UNKNOWN : header->patient_id));
-    this->add_info(NoneImgCornerInfos::RT, std::make_pair(2, header->patient_sex.empty() ? UNKNOWN : header->patient_sex));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(0, patient_name));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(1, patient_id));
+    this->add_info(NoneImgCornerInfos::RT, std::make_pair(2, patient_sex));
     std::stringstream ss;
     ss << header->columns << " " << header->rows << " " << header->slice_location.size();
     this->add_info(NoneImgCornerInfos::RT, std::make_pair(3, ss.str()));
@@ -488,7 +499,6 @@ void NoneImgFrustum::fill_msg(MsgNoneImgCollection* msg) const {
     frustum_msg->set_width(_frustum_width);
     frustum_msg->set_height(_frustum_height);
 }
-
 
 void NoneImgCrosshair::fill_msg(MsgNoneImgCollection* msg) const {
     MsgCrosshair* cross_hair = msg->mutable_crosshair();

@@ -19,10 +19,10 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-MODEL_OBJS = mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_model_pacs.o
+MODEL_OBJS = mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_model_pacs.o mi_model_anonymization.o
 OBSERVER_OBJS = mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_ob_annotation_list.o
-CMD_HANDLER_OBJS = mi_be_cmd_handler_fe_operation.o mi_be_cmd_handler_fe_heartbeat.o mi_be_cmd_handler_fe_ready.o mi_be_cmd_handler_fe_shutdown.o \
-mi_be_cmd_handler_fe_db_retrieve.o mi_be_cmd_handler_fe_play_vr.o \
+CMD_HANDLER_OBJS = mi_be_cmd_handler_fe_operation.o mi_be_cmd_handler_fe_heartbeat.o mi_be_cmd_handler_fe_ready.o \
+mi_be_cmd_handler_fe_shutdown.o mi_be_cmd_handler_fe_anonymization.o mi_be_cmd_handler_fe_db_retrieve.o mi_be_cmd_handler_fe_play_vr.o \
 mi_be_cmd_handler_db_send_error.o mi_be_cmd_handler_db_send_ai_evaluation.o mi_be_cmd_handler_db_send_end_signal.o \
 mi_be_cmd_handler_db_send_preprocess_mask.o mi_be_cmd_handler_db_send_dicom.o mi_be_cmd_handler_fe_back_to_worklist.o \
 mi_be_cmd_handler_fe_pacs_fetch.o mi_be_cmd_handler_fe_pacs_retrieve.o mi_be_cmd_handler_db_pacs_fetch_result.o \

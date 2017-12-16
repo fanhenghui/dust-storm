@@ -11,7 +11,7 @@ message MsgInt {
 }
 
 message MsgFlag {
-    int32 flag = 1; 
+    bool flag = 1; 
 }
 
 message MsgString {

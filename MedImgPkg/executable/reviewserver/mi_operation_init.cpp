@@ -38,6 +38,7 @@
 #include "appcommon/mi_model_dbs_status.h"
 #include "appcommon/mi_model_crosshair.h"
 #include "appcommon/mi_model_pacs.h"
+#include "appcommon/mi_model_anonymization.h"
 #include "appcommon/mi_ob_annotation_list.h"
 #include "appcommon/mi_ob_annotation_segment.h"
 #include "appcommon/mi_ob_annotation_statistic.h"
@@ -236,7 +237,7 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     controller->get_client_proxy_dbs()->sync_send_data(packages);
 
     //sync: wait until end signal array
-    model_dbs_status->wait();//TODO 设置超时机制
+    model_dbs_status->await();//TODO 设置超时机制
     model_dbs_status->set_init();
     
     //check errors
@@ -271,6 +272,8 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     REVIEW_CHECK_NULL_EXCEPTION(model_annotation);
     std::shared_ptr<ModelCrosshair> model_crosshair = AppCommonUtil::get_model_crosshair(controller);
     REVIEW_CHECK_NULL_EXCEPTION(model_crosshair);
+    std::shared_ptr<ModelAnonymization> model_anonymization = AppCommonUtil::get_model_anonymization(controller);
+    REVIEW_CHECK_NULL_EXCEPTION(model_anonymization);
 
     //obs
     std::shared_ptr<OBAnnotationSegment> ob_annotation_segment(new OBAnnotationSegment());
@@ -341,6 +344,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
             //none-image
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(mpr_scene);
+            noneimg_infos->set_model(model_anonymization);
             none_image->add_none_image_item(noneimg_infos);
             
             std::shared_ptr<NoneImgAnnotations> noneimg_annotations(new NoneImgAnnotations());

@@ -659,6 +659,9 @@
     }
 
     function prepare() {
+        let username = document.getElementById('username').innerHTML;
+        login();
+
         // disable the annoying context menu triggered by the right button
         document.oncontextmenu = function(event) {
             event.preventDefault();
@@ -1084,11 +1087,17 @@
                 if(glyphIcon.hasClass('glyphicon-eye-open')) {
                     glyphIcon.removeClass('glyphicon-eye-open');
                     glyphIcon.addClass('glyphicon-eye-close');
-                    //TODO anonymous
+                    let buffer = Protobuf.encode(socketClient, 'MsgFlag', {flag:true});
+                    if (buffer) {
+                        socketClient.sendData(COMMAND_ID_BE_FE_ANONYMIZATION, 0, 0, buffer.byteLength, buffer);
+                    }
                 } else {
                     glyphIcon.removeClass('glyphicon-eye-close');
                     glyphIcon.addClass('glyphicon-eye-open');
-                    //TODO cancle anonymous
+                    let buffer = Protobuf.encode(socketClient, 'MsgFlag', {flag:false});
+                    if (buffer) {
+                        socketClient.sendData(COMMAND_ID_BE_FE_ANONYMIZATION, 0, 0, buffer.byteLength, buffer);
+                    }
                 }
             }
         }
@@ -1100,8 +1109,6 @@
         window.onresize = function() {
             resize()
         };
-        let username = document.getElementById('username').innerHTML;
-        login();
 
         //trigger on heartbeat
         let checkHeartbearFunc = setInterval(function() {

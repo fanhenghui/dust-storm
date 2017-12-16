@@ -43,7 +43,7 @@ public:
     void cancel_ai_annotation();
     void query_ai_annotation();
 
-    void wait();
+    void await();
     void unlock();
 private:
     bool _success;

@@ -48,7 +48,7 @@ void ModelDBSStatus::set_ai_annotation() {
     _has_ai_annotation = true;
 }
 
-void ModelDBSStatus::wait() {
+void ModelDBSStatus::await() {
     boost::mutex::scoped_lock locker(_mutex);
     _condition.wait(_mutex);
 }

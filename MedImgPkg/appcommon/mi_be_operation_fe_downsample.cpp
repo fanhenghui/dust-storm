@@ -26,7 +26,7 @@ int BEOpFEDownsample::execute() {
         APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
     }
 
-    const bool flag = msg.flag() == 1;
+    const bool flag = msg.flag();
     msg.Clear();
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);

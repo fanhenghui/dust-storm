@@ -41,7 +41,7 @@ ActionCommon.prototype.registerOpID = function(left, right, mid, hold) {
 }
 
 ActionCommon.prototype.mouseDown = function(mouseBtn, mouseStatus, x, y, cell){
-    sendDownsampleMSG(this.cellID, 1, this.socketClient);
+    sendDownsampleMSG(this.cellID, true, this.socketClient);
 }
 
 ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, preY, cell){
@@ -95,7 +95,7 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
 }
 
 ActionCommon.prototype.mouseUp = function(mouseBtn, mouseStatus, x, y, cell) {
-    sendDownsampleMSG(this.cellID, 0, this.socketClient);
+    sendDownsampleMSG(this.cellID, false, this.socketClient);
 }
 
 /////////////////////////////////////////////////////////////

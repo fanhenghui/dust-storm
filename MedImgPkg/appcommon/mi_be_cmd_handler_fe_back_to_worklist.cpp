@@ -8,6 +8,9 @@
 #include "mi_app_controller.h"
 #include "mi_app_common_logger.h"
 #include "mi_app_thread_model.h"
+#include "mi_app_common_util.h"
+#include "mi_model_anonymization.h"
+#include "mi_model_pacs.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -35,7 +38,18 @@ public:
         //clear volume infos, cells , models
         controller->set_volume_infos(nullptr);
         controller->remove_all_cells();
+
+        //keep PACS/Anonymization model, and remove other models
+        std::shared_ptr<ModelAnonymization> model_anonymization = AppCommonUtil::get_model_anonymization(controller);
+        std::shared_ptr<ModelPACS> model_pacs = AppCommonUtil::get_model_pacs(controller);
         controller->remove_all_models();
+        if (model_anonymization) {
+            controller->add_model(MODEL_ID_ANONYMIZATION, model_anonymization);
+        }
+        if (model_pacs) {
+            controller->add_model(MODEL_ID_PACS, model_pacs);
+        }
+        
 
         if (_condition) {
             _condition->notify_one();
