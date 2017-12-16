@@ -79,32 +79,36 @@
         }
             
         console.log('recv DB retrieve.');
-        let MsgWorklistType = socketClient.protocRoot.lookup('medical_imaging.MsgWorklist');
-        if (!MsgWorklistType) {
-            console.log('get worklist message type failed.');
-        }
-        let worklistView = new Uint8Array(arrayBuffer);
-        let message = MsgWorklistType.decode(worklistView);
-        let obj = MsgWorklistType.toObject(message, {
-            patient_name: String,
-            patient_id: String,
-            series_uid: String,
-            imaging_modality: String
-        }).items;
-        let tbody = document.getElementById('worklist');
-        tbody.innerHTML = '';
-        for (let i = 0; i < obj.length; i++) {
-            let tr = '<tr>';
-            for (let propt in obj[i]) {
-                tr += '<td>' + obj[i][propt] + '</td>';
-            }
-            tr += '</tr>';
-            tbody.innerHTML += tr;
+        let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
+        if (!message) {
+            reutrn;
         }
 
+        let dcminfo = message.dcminfo;
+        if (!dcminfo) {
+            return;
+        }
+
+        let tbody = document.getElementById('worklist-db');
+        tbody.innerHTML = '';
+        
+        dcminfo.forEach(ele => {
+            let tr = '<tr>';
+            tr += `<td>${ele.patientName}</td>`;
+            tr += `<td>${ele.patientId}</td>`;
+            tr += `<td>${ele.seriesId}</td>`;
+            tr += `<td>${ele.modality}</td>`;
+            tr += '</tr>';   
+            tbody.innerHTML += tr; 
+        });
+
         //style changed when choose tr (based on bootstrap)
-        $('#table tbody tr').click(function() {
-            $(this).addClass('success').siblings().removeClass('success');
+        $('#table-db tbody tr').click(function() {
+            if ($(this).hasClass('success')) {
+                $(this).removeClass('success');
+            } else {
+                $(this).addClass('success');
+            }
         });
     }
 
@@ -691,12 +695,12 @@
         let loadSeriesBtn = document.getElementById('btn-load-series');
         if (loadSeriesBtn) {
             loadSeriesBtn.onclick = function(event) {
-                let series = $('#table tbody tr.success td:nth-child(3)').html();
+                let series = $('#table-db tbody tr.success td:nth-child(3)').html();
                 if (!series) {
                     alert('please choose one series.');
                     reutrn;
                 }
-                document.getElementById('worklist-div').hidden = true;
+                document.getElementById('worklist-db-div').hidden = true;
                 document.getElementById('review-div').hidden = false;
                 annoListClean();
                 loadSeries(series);
@@ -795,7 +799,7 @@
         if(goBackImg)
         {
             goBackImg.onclick = function(event) {
-                document.getElementById('worklist-div').hidden = false;
+                document.getElementById('worklist-db-div').hidden = false;
                 document.getElementById('review-div').hidden = true;
                 //send back worklist to BE
                 socketClient.sendData(COMMAND_ID_BE_FE_BACK_TO_WORKLIST, 0, 0, null);
@@ -1042,13 +1046,13 @@
         }
 
         function rollDBPACS() {
-            if (document.getElementById('pacs-div').hidden) {
-                document.getElementById('pacs-div').hidden = false;
-                document.getElementById('worklist-div').hidden = true;
+            if (document.getElementById('worklist-pacs-div').hidden) {
+                document.getElementById('worklist-pacs-div').hidden = false;
+                document.getElementById('worklist-db-div').hidden = true;
                 document.getElementById('review-div').hidden = true;
             } else {
-                document.getElementById('pacs-div').hidden = true;
-                document.getElementById('worklist-div').hidden = false;
+                document.getElementById('worklist-pacs-div').hidden = true;
+                document.getElementById('worklist-db-div').hidden = false;
                 document.getElementById('review-div').hidden = true;
             }
         }

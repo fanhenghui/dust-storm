@@ -25,7 +25,7 @@ int BECmdHandlerFEAnonymization::handle_command(const IPCDataHeader &header, cha
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     
     MsgFlag msg;
-    if (0 != protobuf_decode<MsgFlag>(buffer, header.data_len, msg)) {
+    if (0 != protobuf_parse(buffer, header.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse anonymazitation flag failed.";
         return -1;
     }

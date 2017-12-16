@@ -6,7 +6,7 @@
 #include "util/mi_memory_shield.h"
 
 #include "io/mi_db.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 
 #include "mi_app_controller.h"
@@ -21,7 +21,7 @@ BECmdHandlerFEDBRetrieve::BECmdHandlerFEDBRetrieve(std::shared_ptr<AppController
 BECmdHandlerFEDBRetrieve::~BECmdHandlerFEDBRetrieve() {}
 
 int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN CmdHandler search worklist";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEDBRetrieve";
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -41,58 +41,34 @@ int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, ch
         return -1;
     }
 
-    MsgWorklist worklist;
+    MsgDcmInfoCollection msg;
     const static std::string UNKNOWN = "UNKNOWN";
-    for (size_t i = 0; i < items.size() ; ++i) {
-        MsgWorklistItem* item = worklist.add_items();
-        if (items[i].patient_id.empty()) {
-            item->set_patient_id(UNKNOWN);
-        } else {
-            item->set_patient_id(items[i].patient_id);
-        }
-
-        if (items[i].patient_name.empty()) {
-            item->set_patient_name(UNKNOWN);
-        } else {
-            item->set_patient_name(items[i].patient_name);
-        }
-
-        if (items[i].series_id.empty()) {
-            item->set_series_uid(UNKNOWN);
-        } else {
-            item->set_series_uid(items[i].series_id);
-        }
-        
-        if (items[i].modality.empty()) {
-            item->set_imaging_modality(UNKNOWN);
-        } else {
-            item->set_imaging_modality(items[i].modality);
-        }      
+    for (auto it = items.begin(); it != items.end(); ++it) {
+        const std::string series_id = (*it).series_id;
+        MsgDcmInfo* msg_dcm_info = msg.add_dcminfo();
+        msg_dcm_info->set_study_id((*it).study_id.empty()?UNKNOWN:(*it).study_id);
+        msg_dcm_info->set_series_id((*it).series_id.empty()?UNKNOWN:(*it).series_id);
+        msg_dcm_info->set_patient_id((*it).patient_id.empty()?UNKNOWN:(*it).patient_id);
+        msg_dcm_info->set_patient_name((*it).patient_name.empty()?UNKNOWN:(*it).patient_name);
+        msg_dcm_info->set_modality((*it).modality.empty()?UNKNOWN:(*it).modality);
     }
-
-    int size = worklist.ByteSize();
-    char* data = new char[size];
-    bool res = worklist.SerializeToArray(data, size);
-    worklist.Clear();
+    char* msg_buffer = nullptr;
+    int msg_size = 0;
+    if (0 != protobuf_serialize(msg,msg_buffer,msg_size)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "decode DICOM info collection failed.";
+        return -1;
+    }
+    MemShield shield2(msg_buffer);
 
     IPCDataHeader header;
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
     header.msg_id = COMMAND_ID_FE_BE_DB_RETRIEVE_RESULT;
+    header.data_len = msg_size;
 
-    if (!res) {
-        size = 0;
-        free(data);
-        data = nullptr;
-    }
+    controller->get_client_proxy()->sync_send_data(header, msg_buffer);
 
-    header.data_len = size;
-    controller->get_client_proxy()->sync_send_data(header, data);
-    if (data != nullptr) {
-        delete [] data;
-    }
-
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler search worklist";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEDBRetrieve";
     return 0;
 }
 

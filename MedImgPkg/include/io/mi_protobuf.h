@@ -7,7 +7,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 template<class MsgType>
-int protobuf_decode(char* buffer, int size, MsgType& msg) {
+int protobuf_parse(char* buffer, int size, MsgType& msg) {
     if (buffer==nullptr || size<=0) {
         return -1;
     }
@@ -19,11 +19,11 @@ int protobuf_decode(char* buffer, int size, MsgType& msg) {
 }
 
 template<class MsgType>
-int protobuf_decode(MsgType& msg, char*& buffer, int& size) {
+int protobuf_serialize(MsgType& msg, char*& buffer, int& size) {
     if (nullptr != buffer) {
         return -1;
     }
-    size = msg.Byte();
+    size = msg.ByteSize();
     if (size <= 0) {
         return -1;
     }
