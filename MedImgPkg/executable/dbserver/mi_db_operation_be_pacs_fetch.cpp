@@ -85,7 +85,7 @@ int DBOpBEPACSFetch::execute() {
         // TODO 暂时使用方案2（简单版本：串行计算），方案1会比较好
         const std::string preprocess_mask_path = series_dir + "/" + series_id + ".rle";
         float dicoms_size_mb = 0;
-        if(0 != preprocess_i(series_dir, preprocess_mask_path, dicoms_size_mb)) {
+        if(0 != preprocess(series_dir, preprocess_mask_path, dicoms_size_mb)) {
             MI_DBSERVER_LOG(MI_ERROR) << "preprocess PACS fetched series: " << series_id << " failed.";
             continue;
         }
@@ -129,7 +129,7 @@ int DBOpBEPACSFetch::execute() {
     return 0;
 }
 
-int DBOpBEPACSFetch::preprocess_i(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb) {
+int DBOpBEPACSFetch::preprocess(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb) {
     std::vector<std::string> files;
     std::set<std::string> dcm_postfix;
     dcm_postfix.insert(".dcm");

@@ -37,15 +37,15 @@ private:
     void process_console_echo();
 
     //for INET BE
-    void process_be_sending_i();
-    void process_be_recving_i();
-    void process_be_operating_i();
+    void process_be_sending();
+    void process_be_recving();
+    void process_be_operating();
 
     //for UNIX AIS
-    void process_ais_run_i();
-    void process_ais_sending_i();
-    void process_ais_recving_i();
-    void process_ais_operating_i();
+    void process_ais_run();
+    void process_ais_sending();
+    void process_ais_recving();
+    void process_ais_operating();
 
 private:
     //for BE client

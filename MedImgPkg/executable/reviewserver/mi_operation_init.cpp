@@ -74,18 +74,18 @@ int OpInit::execute() {
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
-    if (0 != init_model_i(controller, &msg_init)) {
+    if (0 != init_model(controller, &msg_init)) {
         MI_REVIEW_LOG(MI_FATAL) << "init model failed.";
         return -1;
     }
 
     bool preprocessing_mask = false;
-    if (0 != init_data_i(controller, msg_init.series_uid(), preprocessing_mask)) {
+    if (0 != init_data(controller, msg_init.series_uid(), preprocessing_mask)) {
         MI_REVIEW_LOG(MI_FATAL) << "init data failed.";
         return -1;
     }
 
-    if (0 != init_cell_i(controller, &msg_init, preprocessing_mask)) {
+    if (0 != init_cell(controller, &msg_init, preprocessing_mask)) {
         MI_REVIEW_LOG(MI_FATAL) << "init cell failed.";
         return -1;
     }
@@ -95,7 +95,7 @@ int OpInit::execute() {
     return 0;
 }
 
-int OpInit::init_data_i(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask) {
+int OpInit::init_data(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask) {
     // reset mask label store
     MaskLabelStore::instance()->reset_labels();
     
@@ -257,7 +257,7 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     return 0;
 }
 
-int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask) {
+int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask) {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation: cell.";
 
     std::shared_ptr<VolumeInfos> volume_infos = controller->get_volume_infos();
@@ -461,7 +461,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
     return 0;
 }
 
-int OpInit::init_model_i(std::shared_ptr<AppController> controller, MsgInit*) {
+int OpInit::init_model(std::shared_ptr<AppController> controller, MsgInit*) {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation: model.";
 
     controller->add_model(MODEL_ID_ANNOTATION,

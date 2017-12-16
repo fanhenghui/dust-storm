@@ -54,12 +54,12 @@ void ReviewController::initialize() {
     // configure
     Configure::instance()->set_processing_unit_type(GPU);
     // init default model
-    init_default_model_i();
+    init_default_model();
     // register command handler and operation
-    register_command_handler_i();
+    register_command_handler();
 }
 
-void ReviewController::register_command_handler_i() {
+void ReviewController::register_command_handler() {
     // Register command handler
     std::shared_ptr<AppController> app_controller = shared_from_this();
     
@@ -131,7 +131,7 @@ void ReviewController::register_command_handler_i() {
     std::shared_ptr<ICommandHandler>(new BECmdHandlerDBPACSFetchResult(app_controller)));
 }
 
-void ReviewController::init_default_model_i() {
+void ReviewController::init_default_model() {
     this->add_model(MODEL_ID_PACS,
     std::shared_ptr<IModel>(new ModelPACS()));
     this->add_model(MODEL_ID_ANONYMIZATION,

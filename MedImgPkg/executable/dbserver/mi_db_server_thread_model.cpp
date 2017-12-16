@@ -38,15 +38,15 @@ void DBServerThreadModel::push_operation_ais(const std::shared_ptr<IOperation>& 
 void DBServerThreadModel::run() {
     try {
         _op_msg_queue_be.activate();
-        _thread_be_operating = boost::thread(boost::bind(&DBServerThreadModel::process_be_operating_i, this));
-        _thread_be_sending = boost::thread(boost::bind(&DBServerThreadModel::process_be_sending_i, this));
-        _thread_be_recving = boost::thread(boost::bind(&DBServerThreadModel::process_be_recving_i, this));
+        _thread_be_operating = boost::thread(boost::bind(&DBServerThreadModel::process_be_operating, this));
+        _thread_be_sending = boost::thread(boost::bind(&DBServerThreadModel::process_be_sending, this));
+        _thread_be_recving = boost::thread(boost::bind(&DBServerThreadModel::process_be_recving, this));
 
         _op_msg_queue_ais.activate();
-        _thread_ais_run = boost::thread(boost::bind(&DBServerThreadModel::process_ais_run_i, this));
-        _thread_ais_operating = boost::thread(boost::bind(&DBServerThreadModel::process_ais_operating_i, this));
-        _thread_ais_sending = boost::thread(boost::bind(&DBServerThreadModel::process_ais_sending_i, this));
-        _thread_ais_recving = boost::thread(boost::bind(&DBServerThreadModel::process_ais_recving_i, this));
+        _thread_ais_run = boost::thread(boost::bind(&DBServerThreadModel::process_ais_run, this));
+        _thread_ais_operating = boost::thread(boost::bind(&DBServerThreadModel::process_ais_operating, this));
+        _thread_ais_sending = boost::thread(boost::bind(&DBServerThreadModel::process_ais_sending, this));
+        _thread_ais_recving = boost::thread(boost::bind(&DBServerThreadModel::process_ais_recving, this));
 
         boost::thread th_echo = boost::thread(boost::bind(&DBServerThreadModel::process_console_echo, this));
         th_echo.detach();
@@ -106,7 +106,7 @@ void DBServerThreadModel::stop() {
     _op_msg_queue_be.deactivate();
 }
 
-void DBServerThreadModel::process_be_sending_i() {
+void DBServerThreadModel::process_be_sending() {
     while(true) {
         _server_proxy_be->send();
 
@@ -114,7 +114,7 @@ void DBServerThreadModel::process_be_sending_i() {
     }
 }
 
-void DBServerThreadModel::process_be_recving_i() {
+void DBServerThreadModel::process_be_recving() {
     while(true) {
         _server_proxy_be->recv();
 
@@ -122,7 +122,7 @@ void DBServerThreadModel::process_be_recving_i() {
     }
 }
 
-void DBServerThreadModel::process_be_operating_i() {
+void DBServerThreadModel::process_be_operating() {
     while(true) {
         std::shared_ptr<IOperation> op;
         _op_msg_queue_be.pop(&op);
@@ -147,7 +147,7 @@ void DBServerThreadModel::process_console_echo() {
     }
 }
 
-void DBServerThreadModel::process_ais_run_i() {
+void DBServerThreadModel::process_ais_run() {
     try {
         _server_proxy_ais->run();
     } catch (const Exception& e) {
@@ -162,7 +162,7 @@ void DBServerThreadModel::process_ais_run_i() {
     }    
 }
 
-void DBServerThreadModel::process_ais_sending_i() {
+void DBServerThreadModel::process_ais_sending() {
     while(true) {
         _server_proxy_ais->send();
 
@@ -170,7 +170,7 @@ void DBServerThreadModel::process_ais_sending_i() {
     }
 }
 
-void DBServerThreadModel::process_ais_recving_i() {
+void DBServerThreadModel::process_ais_recving() {
     while(true) {
         _server_proxy_ais->recv();
 
@@ -178,7 +178,7 @@ void DBServerThreadModel::process_ais_recving_i() {
     }
 }
 
-void DBServerThreadModel::process_ais_operating_i() {
+void DBServerThreadModel::process_ais_operating() {
     while(true) {
         std::shared_ptr<IOperation> op;
         _op_msg_queue_ais.pop(&op);

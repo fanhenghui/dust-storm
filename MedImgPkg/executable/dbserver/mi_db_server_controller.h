@@ -34,9 +34,6 @@ public:
     unsigned int get_ais_client() const;
 
 private:
-    void connect_db_i();
-
-private:
     std::shared_ptr<DB> _db;
     std::shared_ptr<DBServerThreadModel> _thread_model;
     std::shared_ptr<IPCServerProxy> _server_proxy_be;
