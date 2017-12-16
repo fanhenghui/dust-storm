@@ -35,6 +35,7 @@ int protobuf_serialize(MsgType& msg, char*& buffer, int& size) {
         size = 0;
         delete [] buffer;
         buffer = nullptr;
+        msg.Clear();
         return -1;
     } else {
         return 0;

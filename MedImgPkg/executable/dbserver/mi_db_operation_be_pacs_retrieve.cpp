@@ -3,7 +3,7 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "io/mi_pacs_communicator.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_db_server_controller.h"
 
@@ -66,18 +66,10 @@ int DBOpBEPACSRetrieve::execute() {
         msg_dcm_info->set_modality((*it).modality);
     }
 
-    const int buffer_size = msg_dcm_info_collection.ByteSize();
-    if (buffer_size <= 0) {
-        MI_DBSERVER_LOG(MI_ERROR) << "dicom info collection message empty buffer when serialize.";
-        msg_dcm_info_collection.Clear();
-        return -1;
-    }
-    char* buffer = new char[buffer_size];
-    if (!msg_dcm_info_collection.SerializeToArray(buffer, buffer_size)) {
+    char* buffer = nullptr;
+    int buffer_size = 0;
+    if (0 != protobuf_serialize(msg_dcm_info_collection, buffer, buffer_size)) {
         MI_DBSERVER_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
-        delete [] buffer;
-        buffer = nullptr;
-        msg_dcm_info_collection.Clear();
         return -1;
     }
     msg_dcm_info_collection.Clear();

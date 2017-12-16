@@ -10,7 +10,7 @@
 #include "util/mi_memory_shield.h"
 #include "util/mi_operation_factory.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_app_controller.h"
 #include "mi_app_thread_model.h"
@@ -65,18 +65,16 @@ void BECmdHandlerFEPlayVR::logic_i(IPCDataHeader header) {
         msg.set_axis_x(0);
         msg.set_axis_y(1);
         msg.set_axis_z(0);
-                                         
-        char* buffer_rotation = new char[msg.ByteSize()];
-        if (!msg.SerializeToArray(buffer_rotation, msg.ByteSize())) {
+
+        int buffer_size = 0;                
+        char* buffer_rotation = nullptr;
+        if (0 != protobuf_serialize(msg, buffer_rotation, buffer_size)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "serialize rotation msg failed.";
-            delete [] buffer_rotation;
-            buffer_rotation = nullptr;
-            msg.Clear();
             return;
         }
         msg.Clear();
         
-        header.data_len = msg.ByteSize();
+        header.data_len = buffer_size;
         if (op) {
             op->reset();
             op->set_data(header , buffer_rotation);

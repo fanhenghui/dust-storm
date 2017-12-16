@@ -6,7 +6,7 @@
 #include "util/mi_memory_shield.h"
 
 #include "io/mi_configure.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_app_common_define.h"
 #include "mi_app_controller.h"
@@ -49,21 +49,7 @@ int BECmdHandlerFEReady::generate_ready_message_buffer(char*& buffer, int& buffe
     const float probability_threshold = Configure::instance()->get_evaluation_probability_threshold();
     MsgFloat msg;
     msg.set_value(probability_threshold);
-    buffer_size = msg.ByteSize();
-    if (buffer_size <= 0) {
-        msg.Clear();
-        return -1;
-    }
-    buffer = new char[buffer_size];
-    if (!msg.SerializeToArray(buffer, buffer_size)) {
-        msg.Clear();
-        delete [] buffer;
-        buffer = nullptr;
-        return -1;
-    } else {
-
-        return 0;
-    }
+    return protobuf_serialize(msg, buffer, buffer_size);
 }
 
 MED_IMG_END_NAMESPACE

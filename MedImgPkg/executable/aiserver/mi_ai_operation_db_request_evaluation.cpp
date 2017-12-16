@@ -27,27 +27,13 @@ AIOpDBRequestEvaluation::~AIOpDBRequestEvaluation() {
 
 }
 
-char* serialize_msg(MsgEvaluationResponse& msg, int& msg_size) {
-    msg_size = msg.ByteSize();
-    if (msg_size <= 0) {
-        return nullptr;
-    }
-    char* msg_buffer = new char[msg_size];
-    if (!msg.SerializeToArray(msg_buffer,msg_size)) {
-        delete [] msg_buffer;
-        msg_buffer = nullptr;
-        msg.Clear();
-        return nullptr; 
-    } else {
-        msg.Clear();
-        return msg_buffer;
-    }
-}
-
 int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> controller) {
     int msg_size = 0;                
-    char* msg_buffer = serialize_msg(msg,msg_size);
-    if (msg_buffer) {
+    char* msg_buffer = nullptr;
+    if (0 != protobuf_serialize(msg, msg_buffer, msg_size)) {
+        MI_AISERVER_LOG(MI_ERROR) << "notify DBS failed.";
+        return -1;
+    } else {
         IPCDataHeader header;
         header.msg_id = COMMAND_ID_DB_AI_OPERATION;
         header.op_id = OPERATION_ID_DB_AI_EVALUATION_RESULT;
@@ -55,10 +41,6 @@ int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> c
         msg.Clear();
         controller->get_thread_model()->async_send_data(new IPCPackage(header,msg_buffer));
         return 0;
-    } else {
-        msg.Clear();
-        MI_AISERVER_LOG(MI_ERROR) << "notify DBS failed.";
-        return -1;
     }
 }
 

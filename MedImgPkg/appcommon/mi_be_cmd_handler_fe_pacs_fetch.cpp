@@ -82,13 +82,10 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
         return -1;
     }
 
-    const int msg_buffer_size = msg_response.ByteSize();
-    char* msg_buffer = new char[msg_buffer_size];
-    if (!msg_response.SerializeToArray(msg_buffer, msg_buffer_size)) {
+    int msg_buffer_size = 0;
+    char* msg_buffer = nullptr;
+    if (0 != protobuf_serialize(msg_response, msg_buffer, msg_buffer_size)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialize FE fetch series message failed.";
-        delete [] msg_buffer;
-        msg_buffer = nullptr;
-        msg_response.Clear();
         return -1;
     }
     msg_response.Clear();

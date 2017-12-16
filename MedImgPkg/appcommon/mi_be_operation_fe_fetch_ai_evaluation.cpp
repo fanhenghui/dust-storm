@@ -50,20 +50,15 @@ int BEOpFEFetchAIEvaluation::execute() {
 
     if (role == 0) {
         IPCDataHeader post_header;
-        char* post_data = nullptr;
-
         post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
         post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
 
         MsgString msg_series;
         msg_series.set_context(serise_id);
-        int post_size = msg_series.ByteSize();
-        post_data = new char[post_size];
-        if (!msg_series.SerializeToArray(post_data, post_size)) {
+        char* post_data = nullptr;
+        int post_size = 0;
+        if (0 != protobuf_serialize(msg_series, post_data, post_size)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "create series message failed. ";
-            delete [] post_data;
-            post_data = nullptr;
-            msg_series.Clear();
             return -1;
         }
         msg_series.Clear();

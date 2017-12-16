@@ -1,7 +1,7 @@
 #include "mi_ob_annotation_list.h"
 
 #include "util/mi_ipc_client_proxy.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_model_annotation.h"
 #include "mi_app_common_logger.h"
@@ -123,17 +123,10 @@ void OBAnnotationList::update(int code_id) {
             return;
     }
 
-    const int buffer_size = msg.ByteSize();
-    if (buffer_size <= 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialized annotation list msg buffer length less than 0.";
-        return;
-    }
-    char* buffer = new char[buffer_size];
-    if (!msg.SerializeToArray(buffer, buffer_size)) {
+    char* buffer = nullptr;
+    int buffer_size = 0;
+    if (0 != protobuf_serialize(msg, buffer, buffer_size)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialized annotation list msg buffer failed.";
-        delete [] buffer;
-        buffer = nullptr;
-        msg.Clear();
         return;
     }
     msg.Clear();

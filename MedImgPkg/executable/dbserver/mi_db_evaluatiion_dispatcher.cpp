@@ -5,7 +5,7 @@
 
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "appcommon/mi_app_common_define.h"
 
@@ -19,24 +19,17 @@ namespace {
 IPCPackage* create_error_message(const std::string& err) {
     MsgString msg_err;
     msg_err.set_context(err);
-    const int buffer_size = msg_err.ByteSize();
-    if (buffer_size > 0) {
+    char* buffer = nullptr;
+    int buffer_size = 0;
+    if (0 != protobuf_serialize(msg_err, buffer, buffer_size)) {
+        msg_err.Clear();
         IPCDataHeader header;
         header.msg_id = COMMAND_ID_BE_DB_SEND_ERROR;
         header.data_len = buffer_size;
-        char* buffer = new char[buffer_size];
-        if (nullptr != buffer) {
-            if (!msg_err.SerializeToArray(buffer, buffer_size)) {
-                delete [] buffer;
-                buffer = nullptr;
-                msg_err.Clear();
-            } else {
-                msg_err.Clear();
-                return new IPCPackage(header, buffer);;
-            }
-        }
+        return new IPCPackage(header, buffer);
+    } else {
+        return nullptr;
     }
-    return nullptr;
 }
 
 struct ConditionGuard {
@@ -153,13 +146,10 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         anno->set_p(voi.probability);
     }
 
-    const int buffer_size = msg_annos.ByteSize();
-    char* buffer = new char[buffer_size];
-    if (!msg_annos.SerializeToArray(buffer, buffer_size)) {
+    int buffer_size = 0;
+    char* buffer = nullptr;
+    if (0 != protobuf_serialize(msg_annos, buffer, buffer_size)) {
         SEND_ERROR_TO_BE(server_proxy, client_id, "serialize message for AI annotation failed.");
-        delete [] buffer;
-        buffer = nullptr;
-        msg_annos.Clear();
         return -1;
     }
     msg_annos.Clear();
@@ -254,13 +244,11 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         anno->set_r(voi.diameter);
         anno->set_p(voi.probability);
     }
-    const int buffer_size = msg_annos.ByteSize();
-    char* buffer = new char[buffer_size];
-    if (!msg_annos.SerializeToArray(buffer, buffer_size)) {
+    int buffer_size = 0;
+    char* buffer = nullptr;
+    if (0 != protobuf_serialize(msg_annos, buffer, buffer_size)) {
         IPCPackage* err_pkg = create_error_message("serialize message for AI annotation failed.");
         notify_all(err_pkg);
-        delete [] buffer;
-        msg_annos.Clear();
         return -1;
     }
     msg_annos.Clear();
@@ -312,9 +300,9 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
             msg.set_ai_im_data_path(item.ai_intermediate_data_path);
             msg.set_recal_im_data(false);
         }
-        int msg_buffer_size = msg.ByteSize();
-        char* msg_buffer = new char[msg_buffer_size];
-        if (msg_buffer_size != 0 && msg.SerializeToArray(msg_buffer,msg_buffer_size)){
+        int msg_buffer_size = 0;
+        char* msg_buffer = nullptr;
+        if (0 == protobuf_serialize(msg, msg_buffer, msg_buffer_size)) {
             IPCDataHeader header;
             header.data_len = msg_buffer_size;
             header.receiver = controller->get_ais_client();
@@ -324,9 +312,6 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
             op->set_data(header, msg_buffer);
             op->set_controller(controller);
             controller->get_thread_model()->push_operation_ais(op);
-        } else {
-            delete [] msg_buffer;
-            msg_buffer = nullptr;
         }
         msg.Clear();
         MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";

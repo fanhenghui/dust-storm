@@ -106,12 +106,10 @@ int DBOpBEPACSFetch::execute() {
         //5 send response message back to BE
         MsgString msg_response;
         msg_response.set_context(series_id);
-        const int buffer_size = msg_response.ByteSize();
-        char* buffer_response = new char[buffer_size];
-        if (!msg_response.SerializeToArray(buffer_response, buffer_size)) {
+        int buffer_size = 0;
+        char* buffer_response = nullptr;
+        if (0 != protobuf_serialize(msg_response, buffer_response, buffer_size)) {
             MI_DBSERVER_LOG(MI_ERROR) << "DB parse PACS fetch response message failed.";
-            msg_response.Clear();
-            delete [] buffer_response;
             continue;
         }
         msg_response.Clear();

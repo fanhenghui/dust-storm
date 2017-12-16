@@ -180,19 +180,14 @@ int OpInit::load_dcm_from_cache_db(std::shared_ptr<AppController> controller, co
 
 static IPCPackage* create_info_msg_package(int op_id, const std::string& series_uid) {
     IPCDataHeader post_header;
-    char* post_data = nullptr;
-
     post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     post_header.op_id = op_id;
 
     MsgString msg_series;
     msg_series.set_context(series_uid);
-    int post_size = msg_series.ByteSize();
-    post_data = new char[post_size];
-    if (!msg_series.SerializeToArray(post_data, post_size)) {
-        delete [] post_data;
-        post_data = nullptr;
-        msg_series.Clear();
+    char* post_data = nullptr;
+    int post_size = 0;
+    if (0 != protobuf_serialize(msg_series, post_data, post_size)) {
         return nullptr;
     }
     msg_series.Clear();
@@ -422,6 +417,7 @@ int OpInit::init_cell_i(std::shared_ptr<AppController> controller, MsgInit* msg_
             //none-image
             std::shared_ptr<NoneImgCornerInfos> noneimg_infos(new NoneImgCornerInfos());
             noneimg_infos->set_scene(vr_scene);
+            noneimg_infos->set_model(model_anonymization);
             none_image->add_none_image_item(noneimg_infos);
 
             std::shared_ptr<NoneImgCrosshair> noneimg_crosshair(new NoneImgCrosshair());

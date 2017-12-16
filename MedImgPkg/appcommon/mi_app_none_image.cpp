@@ -1,7 +1,7 @@
 #include "mi_app_none_image.h"
 
 #include "io/mi_image_data_header.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_scene_base.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -39,18 +39,9 @@ char* AppNoneImage::serialize_dirty(int& buffer_size) const {
         }
     }
 
-    buffer_size = msg.ByteSize();
-    if(buffer_size == 0) {
-        //MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: byte length is 0.";
-        return nullptr;
-    }
-    char* data = new char[buffer_size];
-    if (!msg.SerializeToArray(data, buffer_size)) {
+    char* data = nullptr;
+    if (0 != protobuf_serialize(msg,data,buffer_size)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "serialize none-img-collection: serialize failed.";
-        delete [] data;
-        data = nullptr;
-        buffer_size = 0;
-        msg.Clear();
         return nullptr; 
     } else {
         msg.Clear();
