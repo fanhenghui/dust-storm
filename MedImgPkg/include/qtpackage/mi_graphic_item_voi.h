@@ -86,9 +86,9 @@ protected:
     std::shared_ptr<medical_imaging::VOIModel>& get_voi_model();
 
 private:
-    void update_circle_center_i();
-    void update_sphere_center_i(int code_id = 0);
-    void update_sphere_diameter_i(int code_id = 0);
+    void update_circle_center();
+    void update_sphere_center(int code_id = 0);
+    void update_sphere_diameter(int code_id = 0);
     QPointF _pre_center;
     int _id;
     std::shared_ptr<medical_imaging::VOIModel> _model;

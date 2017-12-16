@@ -109,7 +109,7 @@ bool CrosshairModel::page_to(const std::shared_ptr<MPRScene>& target_mpr_scene, 
     }
 
     target_mpr_scene->set_dirty(true);
-    set_page_i(target_mpr_scene , page);
+    set_page(target_mpr_scene , page);
 
     //2 Change cross location
     const Point3 sphere_center = target_mpr_scene->get_camera()->get_look_at();
@@ -135,7 +135,7 @@ bool CrosshairModel::page(const std::shared_ptr<MPRScene>& target_mpr_scene , in
 
     target_mpr_scene->set_dirty(true);
     //printf("cur page : %i \n" , cur_page);
-    set_page_i(target_mpr_scene , cur_page);
+    set_page(target_mpr_scene , cur_page);
 
     //2 Change cross location
     const Point3 sphere_center = target_mpr_scene->get_camera()->get_look_at();
@@ -200,7 +200,7 @@ bool CrosshairModel::locate(const Point3& center_w , bool ignore_pan /*= true*/)
 {
     //MPR plane paging to the input point slice towards to each normal
     //don't focus the center
-    if (!set_center_i(center_w))
+    if (!set_center(center_w))
     {
         return false;
     }
@@ -246,7 +246,7 @@ bool CrosshairModel::locate(const Point3& center_w , bool ignore_pan /*= true*/)
 //    return true;
 //}
 
-void CrosshairModel::set_page_i(const std::shared_ptr<MPRScene>& target_mpr_scene , int page)
+void CrosshairModel::set_page(const std::shared_ptr<MPRScene>& target_mpr_scene , int page)
 {
     for (int i = 0 ; i< 3; ++i)
     {
@@ -273,7 +273,7 @@ int CrosshairModel::get_page(const std::shared_ptr<MPRScene>& target_mpr_scene)
     QTWIDGETS_THROW_EXCEPTION("Cant find certain MPR scene!");
 }
 
-bool CrosshairModel::set_center_i(const Point3& center_w)
+bool CrosshairModel::set_center(const Point3& center_w)
 {
     QTWIDGETS_CHECK_NULL_EXCEPTION(_mpr_scenes[0]);
     std::shared_ptr<VolumeInfos> volume_infos = _mpr_scenes[0]->get_volume_infos();

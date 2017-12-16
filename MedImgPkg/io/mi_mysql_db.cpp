@@ -54,7 +54,7 @@ int MySQLDB::connect(const std::string& user, const std::string& ip_port, const 
         }
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "connect db failed with exception: " 
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         delete _connection;
         _connection = nullptr;
         return -1;
@@ -98,7 +98,7 @@ bool MySQLDB::reconnect() {
     }
 }
 
-std::string MySQLDB::get_sql_exception_info_i(const sql::SQLException* e) {
+std::string MySQLDB::get_sql_exception_info(const sql::SQLException* e) {
     if (nullptr == e) {
         MI_IO_LOG(MI_ERROR) << "SQL exception is null.";
         return "";

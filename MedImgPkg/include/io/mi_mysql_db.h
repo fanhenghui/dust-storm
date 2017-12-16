@@ -38,7 +38,7 @@ protected:
     std::string _db_name;    
 
 protected:
-    std::string get_sql_exception_info_i(const sql::SQLException* exception);
+    std::string get_sql_exception_info(const sql::SQLException* exception);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(MySQLDB);

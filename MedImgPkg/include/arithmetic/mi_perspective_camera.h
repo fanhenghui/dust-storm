@@ -40,7 +40,7 @@ public:
     PerspectiveCamera& operator=(const PerspectiveCamera& camera);
 
 protected:
-    virtual void calculate_projection_matrix_i();
+    virtual void calculate_projection_matrix();
 
 private:
     double _Fovy;

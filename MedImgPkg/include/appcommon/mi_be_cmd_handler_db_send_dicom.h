@@ -22,7 +22,7 @@ public:
     virtual int handle_command(const IPCDataHeader& dataheader , char* buffer);
 
 private:
-    void update_cache_db_i();
+    void update_cache_db();
 private:
     std::weak_ptr<AppController> _controller;
 

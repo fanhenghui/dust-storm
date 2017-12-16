@@ -39,17 +39,17 @@ void OrthoCamera::get_ortho(double& left, double& right, double& bottom,
 }
 
 Matrix4 OrthoCamera::get_projection_matrix() {
-    calculate_projection_matrix_i();
+    calculate_projection_matrix();
     return _mat_projection;
 }
 
 Matrix4 OrthoCamera::get_view_projection_matrix() {
-    calculate_view_matrix_i();
-    calculate_projection_matrix_i();
+    calculate_view_matrix();
+    calculate_projection_matrix();
     return _mat_projection * _mat_view;
 }
 
-void OrthoCamera::calculate_projection_matrix_i() {
+void OrthoCamera::calculate_projection_matrix() {
     if (!_is_proj_mat_cal) {
         _mat_projection = Matrix4::S_IDENTITY_MATRIX;
         _mat_projection[0][0] = 2.0f / ((_right - _left) * _zoom_factor);

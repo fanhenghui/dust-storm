@@ -27,11 +27,11 @@ public:
                                 ThresholdType type = Otsu);
 
 public:
-    T get_threshold_otsu_i(const Ellipsoid& region_ellipsoid);
+    T get_threshold_otsu(const Ellipsoid& region_ellipsoid);
 
-    T get_threshold_center_i(const Ellipsoid& region_ellipsoid);
+    T get_threshold_center(const Ellipsoid& region_ellipsoid);
 
-    T get_threshold_otsu_i();
+    T get_threshold_otsu();
 };
 
 #include "arithmetic/mi_segment_threshold.inl"

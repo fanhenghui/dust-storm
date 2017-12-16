@@ -54,7 +54,7 @@ void SocketClient::get_server_address(std::string& ip, std::string& port) const 
     port = _server_port;
 }
 
-void SocketClient::connect_i() {
+void SocketClient::connect() {
     int fd_s = 0;
     if (UNIX == _socket_type) {
         fd_s = socket(AF_UNIX , SOCK_STREAM , 0);
@@ -75,7 +75,7 @@ void SocketClient::connect_i() {
         int connect_status = -1;
     
         for (int i = 0; i < _reconnect_times; ++i) {
-            connect_status = connect(fd_s , (struct sockaddr*)(&remote) , len);
+            connect_status = ::connect(fd_s , (struct sockaddr*)(&remote) , len);
     
             if (connect_status != -1) {
                 break;
@@ -122,7 +122,7 @@ void SocketClient::connect_i() {
         int connect_status = -1;
     
         for (int i = 0; i < _reconnect_times; ++i) {
-            connect_status = connect(fd_s, (struct sockaddr*)(&remote), len);
+            connect_status = ::connect(fd_s, (struct sockaddr*)(&remote), len);
     
             if (connect_status != -1) {
                 break;
@@ -144,7 +144,7 @@ void SocketClient::connect_i() {
 void SocketClient::run() {
     MI_UTIL_LOG(MI_TRACE) << "SocketClient("<< _path<< ")" << " running start.";
 
-    connect_i();
+    connect();
 
     if (_fd_server != 0 && _on_connect_event) {
         _on_connect_event->execute();
@@ -308,7 +308,7 @@ int SocketClient::sync_send_data(const std::vector<IPCPackage*>& packages) {
 int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, IPCDataHeader& result_header , char*& result_data)  {
     MI_UTIL_LOG(MI_TRACE) << "IN SocketClient post.";
 
-    connect_i();
+    connect();
 
     //send a message
     //send header 
@@ -372,7 +372,7 @@ int SocketClient::sync_post(const IPCDataHeader& post_header , char* post_data, 
 int SocketClient::sync_post(const std::vector<IPCPackage*>& packages) {
     MI_UTIL_LOG(MI_TRACE) << "IN SocketClient post.";
 
-    connect_i();
+    connect();
 
     sync_send_data(packages);
 

@@ -43,10 +43,10 @@ public:
     
     ServerStatus get_current_status();
 private:
-    IPCPackage* pop_front_package_i(unsigned int socket_list_id);
-    void try_pop_front_package_i();
-    void push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg);
-    void clear_package_i(unsigned int socket_list_id);
+    IPCPackage* pop_front_package(unsigned int socket_list_id);
+    void try_pop_front_package();
+    void push_back_package(unsigned int socket_list_id, IPCPackage* pkg);
+    void clear_package(unsigned int socket_list_id);
 
     inline float byte_to_mb(IPCPackage* pkg) {
         const static float val = 1.0f / 1024.0f / 1024.0f;

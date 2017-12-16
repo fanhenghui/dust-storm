@@ -56,19 +56,19 @@ int BEOpFELocate::execute() {
 
     std::shared_ptr<MPRScene> mpr_scene = std::dynamic_pointer_cast<MPRScene>(scene);
     if (mpr_scene) {
-        return mpr_locate_i(cell, mpr_scene, pt_cross);
+        return mpr_locate(cell, mpr_scene, pt_cross);
     }
 
     std::shared_ptr<VRScene> vr_scene = std::dynamic_pointer_cast<VRScene>(scene);
     if (vr_scene) {
-        return vr_locate_i(cell, vr_scene, pt_cross);
+        return vr_locate(cell, vr_scene, pt_cross);
     }
 
     MI_APPCOMMON_LOG(MI_ERROR) << "invalid scene type when locate.";
     return -1;
 }
 
-int BEOpFELocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt_cross) {
+int BEOpFELocate::mpr_locate(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt_cross) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFELocate MPR.";
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
@@ -101,7 +101,7 @@ int BEOpFELocate::mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MP
     return 0;
 }
 
-int BEOpFELocate::vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt_cross) {
+int BEOpFELocate::vr_locate(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt_cross) {
 
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFELocate VR.";
 

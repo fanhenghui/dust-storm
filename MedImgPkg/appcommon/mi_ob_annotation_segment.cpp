@@ -84,8 +84,8 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             if (voi.diameter >= 0.1f) {
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi);
                 AABBUI aabb;
-                get_aabb_i(ellipsoid, aabb);
-                segment_i(ellipsoid , aabb , label);
+                get_aabb(ellipsoid, aabb);
+                segment(ellipsoid , aabb , label);
                 _pre_vois.insert(std::make_pair(id, VOIUnit(voi, label, aabb)));  
             } else {
                 _pre_vois.insert(std::make_pair(id, VOIUnit(voi, label)));  
@@ -143,7 +143,7 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
             //recover
             const AABBUI& aabb = pre->second.aabb;
             const unsigned char label = pre->second.label;
-            recover_i(aabb , label);
+            recover(aabb , label);
             _pre_vois.erase(*it);
         }
 
@@ -173,12 +173,12 @@ void OBAnnotationSegment::update(int code_id /*= 0*/) {
                 continue;
             }
             //recover
-            recover_i(pre->second.aabb , label);
+            recover(pre->second.aabb , label);
             //segment
             Ellipsoid ellipsoid = voi_patient_to_volume(voi);
             AABBUI aabb;
-            get_aabb_i(ellipsoid, aabb);
-            segment_i(ellipsoid , aabb , label);
+            get_aabb(ellipsoid, aabb);
+            segment(ellipsoid , aabb , label);
 
             pre->second.voi = voi;
             pre->second.aabb = aabb;
@@ -222,7 +222,7 @@ Ellipsoid OBAnnotationSegment::voi_patient_to_volume(const VOISphere& voi) {
     return ellipsoid;
 }
 
-int OBAnnotationSegment::get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb) {
+int OBAnnotationSegment::get_aabb(const Ellipsoid& ellipsoid, AABBUI& aabb) {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     unsigned int begin[3] , end[3];
     int inter_status = ArithmeticUtils::get_valid_region(volume_data->_dim , ellipsoid , begin , end);
@@ -230,7 +230,7 @@ int OBAnnotationSegment::get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb) {
     return inter_status;
 }
 
-void OBAnnotationSegment::recover_i(const AABBUI& aabb , unsigned char label)
+void OBAnnotationSegment::recover(const AABBUI& aabb , unsigned char label)
 {
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
     unsigned char* mask_array = (unsigned char*)mask_data->get_pixel_pointer();
@@ -262,12 +262,12 @@ void OBAnnotationSegment::recover_i(const AABBUI& aabb , unsigned char label)
     //Update to texture
     if (GPU == Configure::instance()->get_processing_unit_type()) {
         if (aabb != AABBUI()) {
-            update_aabb_i(aabb);
+            update_aabb(aabb);
         }
     }
 }
 
-void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aabb ,unsigned char label)
+void OBAnnotationSegment::segment(const Ellipsoid& ellipsoid , const AABBUI& aabb ,unsigned char label)
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
@@ -326,12 +326,12 @@ void OBAnnotationSegment::segment_i(const Ellipsoid& ellipsoid , const AABBUI& a
     //Update to texture
     if (GPU == Configure::instance()->get_processing_unit_type()) {
         if (aabb != AABBUI()) {
-            update_aabb_i(aabb);
+            update_aabb(aabb);
         }
     }
 }
 
-void OBAnnotationSegment::update_aabb_i(const AABBUI& aabb)
+void OBAnnotationSegment::update_aabb(const AABBUI& aabb)
 {
     unsigned int dim_brick[3] = {aabb._max[0] - aabb._min[0],
         aabb._max[1] - aabb._min[1],

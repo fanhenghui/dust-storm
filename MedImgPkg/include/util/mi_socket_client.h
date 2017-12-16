@@ -40,7 +40,7 @@ public:
     void on_connect(std::shared_ptr<IEvent> ev);
 
 private:
-    void connect_i();
+    void connect();
 private:
     SocketType _socket_type;
     

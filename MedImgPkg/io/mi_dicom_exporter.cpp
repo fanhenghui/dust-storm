@@ -155,7 +155,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
     const std::vector<std::string>& out_files, ExportDicomDataType etype) {
     if (in_files.empty() || out_files.empty() ||
             in_files.size() != out_files.size()) {
-        set_progress_i(100);
+        set_progress(100);
         return IO_EMPTY_INPUT;
     }
 
@@ -165,7 +165,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
         static_cast<int>(std::ceil(double(in_files.size()) / 10.0));
     int progress = 0;
 
-    set_progress_i(0);
+    set_progress(0);
 
     IOStatus status;
 
@@ -181,7 +181,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
 
             if (i % progress_step == 1) {
-                set_progress_i(progress);
+                set_progress(progress);
                 progress += 10;
             }
         }
@@ -217,7 +217,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
 
             if (i % progress_step == 1) {
-                set_progress_i(progress);
+                set_progress(progress);
                 progress += 10;
             }
         }
@@ -254,7 +254,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
             fileformat_ptr->saveFile(out_files[i].c_str(), EXS_LittleEndianExplicit);
 
             if (i % progress_step == 1) {
-                set_progress_i(progress);
+                set_progress(progress);
                 progress += 10;
             }
         }
@@ -273,7 +273,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
             }
 
             if (i % progress_step == 1) {
-                set_progress_i(progress);
+                set_progress(progress);
                 progress += 10;
             }
         }
@@ -284,7 +284,7 @@ IOStatus MED_IMG_NAMESPACE::DICOMExporter::export_series(
         break;
     }
 
-    set_progress_i(100);
+    set_progress(100);
 
     return IO_SUCCESS;
 }
@@ -384,7 +384,7 @@ IOStatus DICOMExporter::save_dicom_as_raw(const std::string in_file_name,
     return IO_SUCCESS;
 }
 
-void DICOMExporter::add_progress_i(float value) {
+void DICOMExporter::add_progress(float value) {
     if (_model) {
         _progress += value;
         int progress = static_cast<int>(_progress);
@@ -394,7 +394,7 @@ void DICOMExporter::add_progress_i(float value) {
     }
 }
 
-void DICOMExporter::set_progress_i(int value) {
+void DICOMExporter::set_progress(int value) {
     if (_model) {
         _progress = static_cast<float>(value);
         _model->set_progress(value);

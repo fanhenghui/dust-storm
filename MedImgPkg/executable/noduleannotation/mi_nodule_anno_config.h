@@ -39,7 +39,7 @@ public:
 protected:
 private:
     NoduleAnnoConfig();
-    void init_i();
+    void init();
 
     static NoduleAnnoConfig* _s_instance;
     static boost::mutex _s_mutex;

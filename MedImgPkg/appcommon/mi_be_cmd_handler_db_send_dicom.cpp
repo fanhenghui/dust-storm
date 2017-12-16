@@ -59,7 +59,7 @@ int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , cha
 
         //trigger a thread to write to cache DB
         if (!_th_running) {
-            _th_cache_db = boost::thread(boost::bind(&BECmdHandlerDBSendDICOM::update_cache_db_i, this));
+            _th_cache_db = boost::thread(boost::bind(&BECmdHandlerDBSendDICOM::update_cache_db, this));
             _th_running = true;
             _cur_recv_slice = 0;
             _total_slice = dcm_slice_sum;
@@ -124,7 +124,7 @@ int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , cha
     }
 }
 
-void BECmdHandlerDBSendDICOM::update_cache_db_i() {
+void BECmdHandlerDBSendDICOM::update_cache_db() {
     while(true) {
         DICOMLoader::DCMSliceStream *dcm_stream = nullptr;
         {

@@ -81,8 +81,8 @@ const std::string& client_ae_title, unsigned short client_port) {
     _connection_cache->client_ae_title = client_ae_title;
     _connection_cache->client_port = client_port;
 
-    _scp_thread = boost::thread(boost::bind(&PACSCommunicator::run_scp_i, this));
-    return try_connect_i();
+    _scp_thread = boost::thread(boost::bind(&PACSCommunicator::run_scp, this));
+    return try_connect();
 }
 
 void PACSCommunicator::disconnect() {
@@ -109,7 +109,7 @@ void PACSCommunicator::disconnect() {
     }
 }
 
-int PACSCommunicator::try_connect_i() {
+int PACSCommunicator::try_connect() {
     if (!_connection_cache) {
         MI_IO_LOG(MI_FATAL) << "connection cache is null when try connect.";
         return -1;
@@ -177,7 +177,7 @@ int PACSCommunicator::try_connect_i() {
 }
 
 int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
-    if(0 != try_connect_i() ) {
+    if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before query all series.";
         return -1;
     }
@@ -226,7 +226,7 @@ int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
 }
 
 int PACSCommunicator::fetch_series(const std::string& series_id, const std::string& map_path) {
-    if(0 != try_connect_i() ) {
+    if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_id;
         return -1;
     }
@@ -258,7 +258,7 @@ int PACSCommunicator::fetch_series(const std::string& series_id, const std::stri
     }
 }
 
-void PACSCommunicator::run_scp_i() {
+void PACSCommunicator::run_scp() {
     if (!_connection_cache) {
         MI_IO_LOG(MI_FATAL) << "connection cache is null when run scp.";
         return;

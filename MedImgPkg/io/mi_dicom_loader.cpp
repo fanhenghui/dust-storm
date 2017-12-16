@@ -223,7 +223,7 @@ IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffer
                 std::shared_ptr<ImageDataHeader>& img_data_header) {
     MI_IO_LOG(MI_TRACE) << "IN load_series.";
     if (buffers.empty()) {
-        set_progress_i(100);
+        set_progress(100);
         return IO_EMPTY_INPUT;
     }
 
@@ -241,72 +241,72 @@ IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffer
         OFCondition status = file_format->read(dcm_buffer_stream);
 
         if (status.bad()) {
-            set_progress_i(100);
+            set_progress(100);
             return IO_FILE_OPEN_FAILED;
         }
 
         data_format_set.push_back(file_format);
     }
 
-    add_progress_i(2);
+    add_progress(2);
 
     //TODO add  data check
     //////////////////////////////////////////////////////////////////////////
     // 2 Data check
-    // IOStatus checking_status = data_check_i(files, data_format_set);
+    // IOStatus checking_status = data_check(files, data_format_set);
 
     // if (IO_SUCCESS != checking_status) {
-    //     set_progress_i(100);
+    //     set_progress(100);
     //     return checking_status;
     // }
 
     if (uiSliceCount <
             16) { //不支持少于16张的数据进行三维可视化 // TODO 这一步在这里做不太合适
-        set_progress_i(100);
+        set_progress(100);
         return IO_UNSUPPORTED_YET;
     }
 
-    add_progress_i(3);
+    add_progress(3);
 
     //////////////////////////////////////////////////////////////////////////
     // 3 Sort series
-    IOStatus sort_status = sort_series_i(data_format_set);
+    IOStatus sort_status = sort_series(data_format_set);
 
     if (IO_SUCCESS != sort_status) {
-        set_progress_i(100);
+        set_progress(100);
         return sort_status;
     }
 
-    add_progress_i(4);
+    add_progress(4);
 
     //////////////////////////////////////////////////////////////////////////
     // 4 Construct image data header
     img_data_header.reset(new ImageDataHeader());
     IOStatus data_heading_status =
-        construct_data_header_i(data_format_set, img_data_header);
+        construct_data_header(data_format_set, img_data_header);
 
     if (IO_SUCCESS != data_heading_status) {
-        set_progress_i(100);
+        set_progress(100);
         img_data_header.reset();
         return data_heading_status;
     }
 
-    add_progress_i(10);
+    add_progress(10);
 
     //////////////////////////////////////////////////////////////////////////
     // 5 Construct image data
     image_data.reset(new ImageData());
     IOStatus data_imaging_status =
-        construct_image_data_i(data_format_set, img_data_header, image_data);
+        construct_image_data(data_format_set, img_data_header, image_data);
 
     if (IO_SUCCESS != data_imaging_status) {
-        set_progress_i(100);
+        set_progress(100);
         img_data_header.reset();
         image_data.reset();
         return data_imaging_status;
     }
 
-    set_progress_i(100);
+    set_progress(100);
     MI_IO_LOG(MI_TRACE) << "OUT load_series.";
     return IO_SUCCESS;
 }
@@ -316,7 +316,7 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files,
                          std::shared_ptr<ImageDataHeader>& img_data_header) {
     MI_IO_LOG(MI_TRACE) << "IN load_series.";
     if (files.empty()) {
-        set_progress_i(100);
+        set_progress(100);
         return IO_EMPTY_INPUT;
     }
 
@@ -331,84 +331,84 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files,
         OFCondition status = file_format->loadFile(file_name.c_str());
 
         if (status.bad()) {
-            set_progress_i(100);
+            set_progress(100);
             return IO_FILE_OPEN_FAILED;
         }
 
         data_format_set.push_back(file_format);
     }
 
-    add_progress_i(2);
+    add_progress(2);
 
     //////////////////////////////////////////////////////////////////////////
     // 2 Data check
-    IOStatus checking_status = data_check_i(files, data_format_set);
+    IOStatus checking_status = data_check(files, data_format_set);
 
     if (IO_SUCCESS != checking_status) {
-        set_progress_i(100);
+        set_progress(100);
         return checking_status;
     }
 
     if (uiSliceCount <
             16) { //不支持少于16张的数据进行三维可视化 // TODO 这一步在这里做不太合适
-        set_progress_i(100);
+        set_progress(100);
         return IO_UNSUPPORTED_YET;
     }
 
-    add_progress_i(3);
+    add_progress(3);
 
     //////////////////////////////////////////////////////////////////////////
     // 3 Sort series
-    IOStatus sort_status = sort_series_i(data_format_set);
+    IOStatus sort_status = sort_series(data_format_set);
 
     if (IO_SUCCESS != sort_status) {
-        set_progress_i(100);
+        set_progress(100);
         return sort_status;
     }
 
-    add_progress_i(4);
+    add_progress(4);
 
     //////////////////////////////////////////////////////////////////////////
     // 4 Construct image data header
     img_data_header.reset(new ImageDataHeader());
     IOStatus data_heading_status =
-        construct_data_header_i(data_format_set, img_data_header);
+        construct_data_header(data_format_set, img_data_header);
 
     if (IO_SUCCESS != data_heading_status) {
-        set_progress_i(100);
+        set_progress(100);
         img_data_header.reset();
         return data_heading_status;
     }
 
-    add_progress_i(10);
+    add_progress(10);
 
     //////////////////////////////////////////////////////////////////////////
     // 5 Construct image data
     image_data.reset(new ImageData());
     IOStatus data_imaging_status =
-        construct_image_data_i(data_format_set, img_data_header, image_data);
+        construct_image_data(data_format_set, img_data_header, image_data);
 
     if (IO_SUCCESS != data_imaging_status) {
-        set_progress_i(100);
+        set_progress(100);
         img_data_header.reset();
         image_data.reset();
         return data_imaging_status;
     }
 
-    set_progress_i(100);
+    set_progress(100);
     MI_IO_LOG(MI_TRACE) << "OUT load_series.";
     return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
+IOStatus DICOMLoader::data_check(std::vector<std::string>& files,
                                    DcmFileFormatSet& file_format_set) {
-    IOStatus status = data_check_series_unique_i(files, file_format_set);
+    IOStatus status = data_check_series_unique(files, file_format_set);
     if (status != IO_SUCCESS) {
         return status;
     }
 
     DcmFileFormatSet sequece_series_set;
-    status = data_check_spacing_unique_i(file_format_set , sequece_series_set);
+    status = data_check_spacing_unique(file_format_set , sequece_series_set);
     if (status != IO_SUCCESS) {
         return status;
     }
@@ -417,7 +417,7 @@ IOStatus DICOMLoader::data_check_i(std::vector<std::string>& files,
     return status;
 }
 
-IOStatus DICOMLoader::data_check_series_unique_i(
+IOStatus DICOMLoader::data_check_series_unique(
     std::vector<std::string>& files, DcmFileFormatSet& file_format_set)
 {
     std::map<std::string, std::vector<int>> series_separate;
@@ -502,11 +502,11 @@ IOStatus DICOMLoader::data_check_series_unique_i(
     return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::data_check_spacing_unique_i(
+IOStatus DICOMLoader::data_check_spacing_unique(
     DcmFileFormatSet& set_in, DcmFileFormatSet& set_out) {
     std::vector<Point2> spacing(set_in.size());
     for (size_t i = 0; i < spacing.size(); ++i) {
-        get_pixel_spacing_i(set_in[i]->getDataset(), spacing[i]);
+        get_pixel_spacing(set_in[i]->getDataset(), spacing[i]);
     }
     
     std::vector<std::vector<size_t>> same_spacing_begin_end;
@@ -551,11 +551,11 @@ IOStatus DICOMLoader::data_check_spacing_unique_i(
 
 //IOStatus DICOMLoader::data_check_series_image_sequece_i(
 //    DcmFileFormatSet& set_in , DcmFileFormatSet& set_out) {
-//    sort_series_i(set_in);
+//    sort_series(set_in);
 //
 //    std::vector<Point3> z_pos(set_in.size());
 //    for (size_t i = 0; i < z_pos.size(); ++i) {
-//        get_image_position_i(set_in[i]->getDataset(), z_pos[i]);
+//        get_image_position(set_in[i]->getDataset(), z_pos[i]);
 //    }
 //
 //    std::vector<Vector3> z_dir(set_in.size()-1);
@@ -597,7 +597,7 @@ IOStatus DICOMLoader::data_check_spacing_unique_i(
 //    }
 //}
 
-IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
+IOStatus DICOMLoader::sort_series(DcmFileFormatSet& file_format_set) {
     // sort based on slice lotation
     std::map<double, int> locs;
 
@@ -609,7 +609,7 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
         }
 
         double sl(0);
-        get_slice_location_i(data_set, sl);
+        get_slice_location(data_set, sl);
 
         if (locs.find(sl) != locs.end()) {
             // Same slice location
@@ -629,8 +629,8 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
     DcmDataset* data_set_first = new_set[0]->getDataset();
     DcmDataset* data_set_last = new_set[new_set.size() - 1]->getDataset();
     Point3 pt_first, pt_last;
-    get_image_position_i(data_set_first, pt_first);
-    get_image_position_i(data_set_last, pt_last);
+    get_image_position(data_set_first, pt_first);
+    get_image_position(data_set_last, pt_last);
 
     if (pt_first.z <
             pt_last.z) { // image postion is the same sequence with slice location
@@ -648,7 +648,7 @@ IOStatus DICOMLoader::sort_series_i(DcmFileFormatSet& file_format_set) {
     return IO_SUCCESS;
 }
 
-IOStatus DICOMLoader::construct_data_header_i(
+IOStatus DICOMLoader::construct_data_header(
     DcmFileFormatSet& file_format_set,
     std::shared_ptr<ImageDataHeader> img_data_header) {
     IOStatus io_status = IO_DATA_DAMAGE;
@@ -670,25 +670,25 @@ IOStatus DICOMLoader::construct_data_header_i(
         }
 
         // 4.1 Get Transfer Syntax UID
-        if (!get_transfer_syntax_uid_i(meta_info_first, img_data_header)) {
+        if (!get_transfer_syntax_uid(meta_info_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag TransferSyntaxUID failed!");
         }
 
         // 4.2 Get Study UID
-        if (!get_study_uid_i(data_set_first, img_data_header)) {
+        if (!get_study_uid(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag StudyUID failed!");
         }
 
         // 4.3 Get Series UID
-        if (!get_series_uid_i(data_set_first, img_data_header)) {
+        if (!get_series_uid(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag SeriesUID failed!");
         }
 
         // 4.4 Get Date
-        if (!get_content_time_i(data_set_first, img_data_header)) {
+        if (!get_content_time(data_set_first, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag ContentTime failed!");
         }
@@ -717,61 +717,61 @@ IOStatus DICOMLoader::construct_data_header_i(
         }
 
         // 4.6 Manufacturer
-        if (!get_manufacturer_i(data_set_first, img_data_header)) {
+        if (!get_manufacturer(data_set_first, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag Manufacturer failed!");
         }
 
         // 4.7 Manufacturer model
-        if (!get_manufacturer_model_name_i(data_set_first, img_data_header)) {
+        if (!get_manufacturer_model_name(data_set_first, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag ManufacturerModelName failed!");
         }
 
         // 4.8 Patient name
-        if (!get_patient_name_i(data_set_first, img_data_header)) {
+        if (!get_patient_name(data_set_first, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientName failed!");
         }
 
         // 4.9 Patient ID
-        if (!get_patient_id_i(data_set_first, img_data_header)) {
+        if (!get_patient_id(data_set_first, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
         // 4.10 Patient Sex(很多图像都没有这个Tag)
-        if (!get_patient_sex_i(data_set_first, img_data_header)) {
+        if (!get_patient_sex(data_set_first, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientSex failed!");
         }
 
         // 4.11 Patient Age(很多图像都没有这个Tag)
-        if (!get_patient_age_i(data_set_first, img_data_header)) {
+        if (!get_patient_age(data_set_first, img_data_header)) {
             /*eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientAge failed!");*/
         }
 
         // 4.12 Slice thickness (不是一定必要)
-        if (!get_slice_thickness_i(data_set_first, img_data_header)) {
+        if (!get_slice_thickness(data_set_first, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag SliceThickness failed!");
         }
 
         // 4.13 KVP (CT only)
-        if (!get_kvp_i(data_set_first, img_data_header)) {
+        if (!get_kvp(data_set_first, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag KVP failed!");
         }
 
         // 4.14 Patient position
-        if (!get_patient_position_i(data_set_first, img_data_header)) {
+        if (!get_patient_position(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientPositio failed!");
         }
 
         // 4.15 Samples per Pixel
-        if (!get_sample_per_pixel_i(data_set_first, img_data_header)) {
+        if (!get_sample_per_pixel(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag SamplePerPixel failed!");
         }
@@ -800,31 +800,31 @@ IOStatus DICOMLoader::construct_data_header_i(
         }
 
         // 4.17 Rows
-        if (!get_rows_i(data_set_first, img_data_header)) {
+        if (!get_rows(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag Rows failed!");
         }
 
         // 4.18 Columns
-        if (!get_columns_i(data_set_first, img_data_header)) {
+        if (!get_columns(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag Columns failed!");
         }
 
         // 4.19 Pixel Spacing
-        if (!get_pixel_spacing_i(data_set_first, img_data_header)) {
+        if (!get_pixel_spacing(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PixelSpacing failed!");
         }
 
         // 4.20 Bits Allocated
-        if (!get_bits_allocated_i(data_set_first, img_data_header)) {
+        if (!get_bits_allocated(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag BitsAllocated failed!");
         }
 
         // 4.21 Pixel Representation
-        if (!get_pixel_representation_i(data_set_first, img_data_header)) {
+        if (!get_pixel_representation(data_set_first, img_data_header)) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PixelRepresentation failed!");
         }
@@ -841,7 +841,7 @@ IOStatus DICOMLoader::construct_data_header_i(
     }
 }
 
-IOStatus DICOMLoader::construct_image_data_i(
+IOStatus DICOMLoader::construct_image_data(
     DcmFileFormatSet& file_format_set,
     std::shared_ptr<ImageDataHeader> data_header,
     std::shared_ptr<ImageData> image_data) {
@@ -851,8 +851,8 @@ IOStatus DICOMLoader::construct_image_data_i(
     DcmDataset* data_set_first = file_format_first->getDataset();
 
     // Intercept and slope
-    get_intercept_i(data_set_first, image_data->_intercept);
-    get_slope_i(data_set_first, image_data->_slope);
+    get_intercept(data_set_first, image_data->_intercept);
+    get_slope(data_set_first, image_data->_slope);
 
     data_header->slice_location.resize(slice_count);
     data_header->image_position.resize(slice_count);
@@ -866,10 +866,10 @@ IOStatus DICOMLoader::construct_image_data_i(
             return IO_DATA_DAMAGE;
         }
 
-        get_slice_location_i(dataset, slice_location);
+        get_slice_location(dataset, slice_location);
         data_header->slice_location[i] = slice_location;
 
-        get_image_position_i(dataset, image_position);
+        get_image_position(dataset, image_position);
         data_header->image_position[i] = image_position;
     }
 
@@ -927,7 +927,7 @@ IOStatus DICOMLoader::construct_image_data_i(
     Vector3 row_orientation;
     Vector3 column_orientation;
 
-    if (!get_image_orientation_i(data_set_first, row_orientation,
+    if (!get_image_orientation(data_set_first, row_orientation,
                                  column_orientation)) {
         return IO_DATA_DAMAGE;
     }
@@ -980,10 +980,10 @@ IOStatus DICOMLoader::construct_image_data_i(
                 return IO_DATA_DAMAGE;
             }
 
-            get_pixel_data_i(file_format_set[i], dataset, data_array + image_size * i,
+            get_pixel_data(file_format_set[i], dataset, data_array + image_size * i,
                              image_size);
 
-            add_progress_i(progress_step);
+            add_progress(progress_step);
         }
     } else if (my_tsu == TSU_JPEGProcess14SV1TransferSyntax ||
                my_tsu == TSU_JPEGProcess14TransferSyntax) {
@@ -994,10 +994,10 @@ IOStatus DICOMLoader::construct_image_data_i(
                 return IO_DATA_DAMAGE;
             }
 
-            get_jpeg_compressed_pixel_data_i(file_format_set[i], dataset,
+            get_jpeg_compressed_pixel_data(file_format_set[i], dataset,
                                              data_array + image_size * i, image_size);
 
-            add_progress_i(progress_step);
+            add_progress(progress_step);
         }
     } else if (my_tsu == TSU_JEPG2000CompressionLosslessOnly ||
                my_tsu == TSU_JEPG2000Compression) {
@@ -1009,7 +1009,7 @@ IOStatus DICOMLoader::construct_image_data_i(
     return IO_SUCCESS;
 }
 
-bool DICOMLoader::get_transfer_syntax_uid_i(
+bool DICOMLoader::get_transfer_syntax_uid(
     DcmMetaInfo* meta_info, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1023,7 +1023,7 @@ bool DICOMLoader::get_transfer_syntax_uid_i(
     return true;
 }
 
-bool DICOMLoader::get_content_time_i(
+bool DICOMLoader::get_content_time(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_ContentDate, context);
@@ -1036,7 +1036,7 @@ bool DICOMLoader::get_content_time_i(
     return true;
 }
 
-bool DICOMLoader::get_manufacturer_i(
+bool DICOMLoader::get_manufacturer(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_Manufacturer, context);
@@ -1049,7 +1049,7 @@ bool DICOMLoader::get_manufacturer_i(
     return true;
 }
 
-bool DICOMLoader::get_manufacturer_model_name_i(
+bool DICOMLoader::get_manufacturer_model_name(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1063,7 +1063,7 @@ bool DICOMLoader::get_manufacturer_model_name_i(
     return true;
 }
 
-bool DICOMLoader::get_patient_name_i(
+bool DICOMLoader::get_patient_name(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_PatientName, context);
@@ -1076,7 +1076,7 @@ bool DICOMLoader::get_patient_name_i(
     return true;
 }
 
-bool DICOMLoader::get_patient_id_i(
+bool DICOMLoader::get_patient_id(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_PatientID, context);
@@ -1089,7 +1089,7 @@ bool DICOMLoader::get_patient_id_i(
     return true;
 }
 
-bool DICOMLoader::get_patient_sex_i(
+bool DICOMLoader::get_patient_sex(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_PatientSex, context);
@@ -1102,7 +1102,7 @@ bool DICOMLoader::get_patient_sex_i(
     return true;
 }
 
-bool DICOMLoader::get_patient_age_i(
+bool DICOMLoader::get_patient_age(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_PatientAge, context);
@@ -1115,7 +1115,7 @@ bool DICOMLoader::get_patient_age_i(
     return true;
 }
 
-bool DICOMLoader::get_slice_thickness_i(
+bool DICOMLoader::get_slice_thickness(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1129,7 +1129,7 @@ bool DICOMLoader::get_slice_thickness_i(
     return true;
 }
 
-bool DICOMLoader::get_kvp_i(DcmDataset* data_set,
+bool DICOMLoader::get_kvp(DcmDataset* data_set,
                             std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_KVP, context);
@@ -1142,7 +1142,7 @@ bool DICOMLoader::get_kvp_i(DcmDataset* data_set,
     return true;
 }
 
-bool DICOMLoader::get_patient_position_i(
+bool DICOMLoader::get_patient_position(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1175,7 +1175,7 @@ bool DICOMLoader::get_patient_position_i(
     return true;
 }
 
-bool DICOMLoader::get_series_uid_i(
+bool DICOMLoader::get_series_uid(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1189,7 +1189,7 @@ bool DICOMLoader::get_series_uid_i(
     return true;
 }
 
-bool DICOMLoader::get_study_uid_i(
+bool DICOMLoader::get_study_uid(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString context;
     OFCondition status =
@@ -1203,7 +1203,7 @@ bool DICOMLoader::get_study_uid_i(
     return true;
 }
 
-bool DICOMLoader::get_sample_per_pixel_i(
+bool DICOMLoader::get_sample_per_pixel(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
     OFCondition status = data_set->findAndGetUint16(DCM_SamplesPerPixel, context);
@@ -1216,7 +1216,7 @@ bool DICOMLoader::get_sample_per_pixel_i(
     return true;
 }
 
-bool DICOMLoader::get_rows_i(
+bool DICOMLoader::get_rows(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
     OFCondition status = data_set->findAndGetUint16(DCM_Rows, context);
@@ -1229,7 +1229,7 @@ bool DICOMLoader::get_rows_i(
     return true;
 }
 
-bool DICOMLoader::get_columns_i(
+bool DICOMLoader::get_columns(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
     OFCondition status = data_set->findAndGetUint16(DCM_Columns, context);
@@ -1242,7 +1242,7 @@ bool DICOMLoader::get_columns_i(
     return true;
 }
 
-bool DICOMLoader::get_pixel_spacing_i(
+bool DICOMLoader::get_pixel_spacing(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     OFString row_spacing, col_spacing;
     OFCondition status1 =
@@ -1260,7 +1260,7 @@ bool DICOMLoader::get_pixel_spacing_i(
     return true;
 }
 
-bool DICOMLoader::get_pixel_spacing_i(
+bool DICOMLoader::get_pixel_spacing(
     DcmDataset* data_set, Point2& spacing) {
     OFString row_spacing, col_spacing;
     OFCondition status1 =
@@ -1277,7 +1277,7 @@ bool DICOMLoader::get_pixel_spacing_i(
     return true;
 }
 
-bool DICOMLoader::get_bits_allocated_i(
+bool DICOMLoader::get_bits_allocated(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
     OFCondition status = data_set->findAndGetUint16(DCM_BitsAllocated, context);
@@ -1290,7 +1290,7 @@ bool DICOMLoader::get_bits_allocated_i(
     return true;
 }
 
-bool DICOMLoader::get_pixel_representation_i(
+bool DICOMLoader::get_pixel_representation(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
     OFCondition status =
@@ -1304,7 +1304,7 @@ bool DICOMLoader::get_pixel_representation_i(
     return true;
 }
 
-bool DICOMLoader::get_intercept_i(DcmDataset* data_set, float& intercept) {
+bool DICOMLoader::get_intercept(DcmDataset* data_set, float& intercept) {
     OFString context;
     OFCondition status =
         data_set->findAndGetOFString(DCM_RescaleIntercept, context);
@@ -1317,7 +1317,7 @@ bool DICOMLoader::get_intercept_i(DcmDataset* data_set, float& intercept) {
     return true;
 }
 
-bool DICOMLoader::get_slope_i(DcmDataset* data_set, float& slope) {
+bool DICOMLoader::get_slope(DcmDataset* data_set, float& slope) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_RescaleSlope, context);
 
@@ -1329,7 +1329,7 @@ bool DICOMLoader::get_slope_i(DcmDataset* data_set, float& slope) {
     return true;
 }
 
-bool DICOMLoader::get_instance_number_i(DcmDataset* data_set,
+bool DICOMLoader::get_instance_number(DcmDataset* data_set,
                                         int& instance_num) {
     OFString context;
     OFCondition status =
@@ -1343,7 +1343,7 @@ bool DICOMLoader::get_instance_number_i(DcmDataset* data_set,
     return true;
 }
 
-bool DICOMLoader::get_image_position_i(DcmDataset* data_set,
+bool DICOMLoader::get_image_position(DcmDataset* data_set,
                                        Point3& image_position) {
     OFString context;
     OFCondition status =
@@ -1374,7 +1374,7 @@ bool DICOMLoader::get_image_position_i(DcmDataset* data_set,
     return true;
 }
 
-bool DICOMLoader::get_image_orientation_i(DcmDataset* data_set,
+bool DICOMLoader::get_image_orientation(DcmDataset* data_set,
         Vector3& row_orientation,
         Vector3& column_orientation) {
     double img_orientation[6] = {0};
@@ -1399,7 +1399,7 @@ bool DICOMLoader::get_image_orientation_i(DcmDataset* data_set,
     return true;
 }
 
-bool DICOMLoader::get_slice_location_i(DcmDataset* data_set,
+bool DICOMLoader::get_slice_location(DcmDataset* data_set,
                                        double& slice_location) {
     OFString context;
     OFCondition status = data_set->findAndGetOFString(DCM_SliceLocation, context);
@@ -1412,7 +1412,7 @@ bool DICOMLoader::get_slice_location_i(DcmDataset* data_set,
     return true;
 }
 
-bool DICOMLoader::get_pixel_data_i(DcmFileFormatPtr pFileFormat,
+bool DICOMLoader::get_pixel_data(DcmFileFormatPtr pFileFormat,
                                    DcmDataset* data_set, char* data_array,
                                    unsigned int length) {
     const unsigned char* dara_ref;
@@ -1427,7 +1427,7 @@ bool DICOMLoader::get_pixel_data_i(DcmFileFormatPtr pFileFormat,
     return true;
 }
 
-bool DICOMLoader::get_jpeg_compressed_pixel_data_i(DcmFileFormatPtr file_format,
+bool DICOMLoader::get_jpeg_compressed_pixel_data(DcmFileFormatPtr file_format,
         DcmDataset* data_set,
         char* data_array,
         unsigned int length) {
@@ -1449,14 +1449,14 @@ bool DICOMLoader::get_jpeg_compressed_pixel_data_i(DcmFileFormatPtr file_format,
     file_format->loadFile("test_decompressed.dcm");
     DcmDataset* dataset = file_format->getDataset();
 
-    return get_pixel_data_i(file_format, dataset, data_array, length);
+    return get_pixel_data(file_format, dataset, data_array, length);
 }
 
 void DICOMLoader::set_progress_model(std::shared_ptr<ProgressModel> model) {
     _model = model;
 }
 
-void DICOMLoader::add_progress_i(float value) {
+void DICOMLoader::add_progress(float value) {
     if (_model) {
         _progress += value;
         int progress = static_cast<int>(_progress);
@@ -1466,7 +1466,7 @@ void DICOMLoader::add_progress_i(float value) {
     }
 }
 
-void DICOMLoader::set_progress_i(int value) {
+void DICOMLoader::set_progress(int value) {
     if (_model) {
         _progress = static_cast<float>(value);
         _model->set_progress(value);

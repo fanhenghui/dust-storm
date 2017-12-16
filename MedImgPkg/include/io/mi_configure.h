@@ -50,7 +50,7 @@ public:
     void set_processing_unit_type(ProcessingUnitType type);//For testing
 private:
     Configure();
-    void init_i();
+    void init();
 
     static Configure* _instance;
     static boost::mutex _mutex;

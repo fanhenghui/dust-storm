@@ -16,8 +16,7 @@ public:
 
 protected:
     /// Convert 2D window coordinates to coordinates on the 3D unit sphere.
-    static Point3
-    convert_screen_point_to_sphere_i(const Point2& ptPos, double width,
+    static Point3 convert_screen_point_to_sphere(const Point2& ptPos, double width,
                                      double height,
                                      const Point2& ptBottomLeftCorner);
 

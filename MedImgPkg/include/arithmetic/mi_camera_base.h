@@ -54,9 +54,9 @@ public:
     bool operator!=(const CameraBase& camera) const;
 
 protected:
-    void calculate_view_matrix_i();
+    void calculate_view_matrix();
 
-    virtual void calculate_projection_matrix_i() = 0;
+    virtual void calculate_projection_matrix() = 0;
 
 protected:
     Point3 _eye;

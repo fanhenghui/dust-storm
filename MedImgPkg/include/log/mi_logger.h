@@ -60,7 +60,7 @@ public:
 
 private:
     Logger();
-    void read_config_file_i();
+    void read_config_file();
 
 private:
     static Logger* _s_instance;

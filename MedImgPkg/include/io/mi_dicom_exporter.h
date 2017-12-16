@@ -44,8 +44,8 @@ private:
                                const std::string out_file_name);
 
 private:
-    void add_progress_i(float value);
-    void set_progress_i(int value);
+    void add_progress(float value);
+    void set_progress(int value);
 
     float _progress;
     std::shared_ptr<ProgressModel> _model;

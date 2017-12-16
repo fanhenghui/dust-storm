@@ -92,8 +92,8 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
 
                 Ellipsoid ellipsoid = voi_patient_to_volume(voi_added);
                 AABBUI aabb;
-                get_aabb_i(ellipsoid, aabb);
-                segment_i(ellipsoid , aabb , label_added);
+                get_aabb(ellipsoid, aabb);
+                segment(ellipsoid , aabb , label_added);
 
                 _pre_voi_aabbs[label_added] = aabb;
                 _pre_vois = vois;
@@ -124,7 +124,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
                 
                 Ellipsoid ellipsoid = voi_patient_to_volume(vois[voi_idx]);
                 AABBUI aabb;
-                get_aabb_i(ellipsoid, aabb);
+                get_aabb(ellipsoid, aabb);
                 _pre_voi_aabbs[label_loaded] = aabb;
 
                 // codes copy from above
@@ -178,7 +178,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             assert(label_deleted != 0);
 
             //Recover mask
-            recover_i(aabb_deleted , label_deleted);
+            recover(aabb_deleted , label_deleted);
             _pre_voi_aabbs.erase(it_deleted);
             _pre_vois = vois;
 
@@ -226,14 +226,14 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             const unsigned char label_modify = model->get_label(idx);
 
             //1 Recover
-            recover_i(_pre_voi_aabbs[label_modify] , label_modify);
+            recover(_pre_voi_aabbs[label_modify] , label_modify);
 
             //2 Segment
             Ellipsoid ellipsoid = voi_patient_to_volume(model->get_voi(idx));
             AABBUI aabb;
-            get_aabb_i(ellipsoid, aabb);
+            get_aabb(ellipsoid, aabb);
 
-            segment_i(ellipsoid , aabb , label_modify);
+            segment(ellipsoid , aabb , label_modify);
 
             _pre_voi_aabbs[label_modify] = aabb;
             _pre_vois = vois;
@@ -277,7 +277,7 @@ void VOISegmentObserver::update(int code_id /*= 0*/)
             AABBUI interected_aabb;
             if(IntersectionTest::aabb_to_aabb(erase_voxel_block, voi_boundingbox,interected_aabb))
             {
-                recover_i( interected_aabb, voi_label);
+                recover( interected_aabb, voi_label);
 
                 for (auto it = _scenes.begin() ; it != _scenes.end() ; ++it)
                 {
@@ -329,7 +329,7 @@ Ellipsoid VOISegmentObserver::voi_patient_to_volume(const VOISphere& voi)
     return ellipsoid;
 }
 
-int VOISegmentObserver::get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb)
+int VOISegmentObserver::get_aabb(const Ellipsoid& ellipsoid, AABBUI& aabb)
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
 
@@ -339,7 +339,7 @@ int VOISegmentObserver::get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb)
 
     return inter_status;
 }
-void VOISegmentObserver::recover_i(const AABBUI& aabb , unsigned char label)
+void VOISegmentObserver::recover(const AABBUI& aabb , unsigned char label)
 {
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
     unsigned char* mask_array = (unsigned char*)mask_data->get_pixel_pointer();
@@ -374,12 +374,12 @@ void VOISegmentObserver::recover_i(const AABBUI& aabb , unsigned char label)
     {
         if (aabb != AABBUI())
         {
-            update_aabb_i(aabb);
+            update_aabb(aabb);
         }
     }
 }
 
-void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aabb ,unsigned char label)
+void VOISegmentObserver::segment(const Ellipsoid& ellipsoid , const AABBUI& aabb ,unsigned char label)
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
@@ -441,12 +441,12 @@ void VOISegmentObserver::segment_i(const Ellipsoid& ellipsoid , const AABBUI& aa
     {
         if (aabb != AABBUI())
         {
-            update_aabb_i(aabb);
+            update_aabb(aabb);
         }
     }
 }
 
-void VOISegmentObserver::update_aabb_i(const AABBUI& aabb)
+void VOISegmentObserver::update_aabb(const AABBUI& aabb)
 {
     unsigned int dim_brick[3] = {aabb._max[0] - aabb._min[0],
         aabb._max[1] - aabb._min[1],

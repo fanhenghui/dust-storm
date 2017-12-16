@@ -59,16 +59,16 @@ private:
     std::unique_ptr<char[]> _data_array;
 
 private:
-    template <typename T> void find_min_max_i(T* data_array);
+    template <typename T> void find_min_max(T* data_array);
 
-    void find_min_max_i();
+    void find_min_max();
 
     float _min_scalar;
     float _max_scalar;
     bool _has_cal_min_max;
 };
 
-template <typename T> void ImageData::find_min_max_i(T* data_array) {
+template <typename T> void ImageData::find_min_max(T* data_array) {
     if (nullptr == data_array) {
         return;
     }

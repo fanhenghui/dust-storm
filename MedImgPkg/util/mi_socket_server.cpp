@@ -267,7 +267,7 @@ int SocketServer::recv() {
                 MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err 0.";
                 shutdown(socket, SHUT_RDWR);
                 _client_sockets->remove_socket(socket_id);
-                this->clear_package_i(socket_id);
+                this->clear_package(socket_id);
                 continue;    
             } else if (err < 0) {
                 //recv failed
@@ -279,7 +279,7 @@ int SocketServer::recv() {
                 MI_UTIL_LOG(MI_WARNING) << "close client socket when recv data header: err" << err;
                 shutdown(socket, SHUT_RDWR);
                 _client_sockets->remove_socket(socket_id);
-                this->clear_package_i(socket_id);
+                this->clear_package(socket_id);
                 continue;  
             }
             //MI_UTIL_LOG(MI_INFO) << "receive client :" << socket << " data header. data length: " << header.data_len;
@@ -304,7 +304,7 @@ int SocketServer::recv() {
                     buffer = nullptr;
                     shutdown(socket, SHUT_RDWR);
                     _client_sockets->remove_socket(socket_id);
-                    this->clear_package_i(socket_id);
+                    this->clear_package(socket_id);
                     continue;
                 } else if (err < 0) {
                     //recv failed
@@ -319,7 +319,7 @@ int SocketServer::recv() {
                     buffer = nullptr;
                     shutdown(socket, SHUT_RDWR);
                     _client_sockets->remove_socket(socket_id);
-                    this->clear_package_i(socket_id);
+                    this->clear_package(socket_id);
                     continue;  
                 }
                 MI_UTIL_LOG(MI_DEBUG) << "recv a client data msg: " << header.msg_id << ", opid: " << header.op_id;
@@ -352,14 +352,14 @@ int SocketServer::async_send_data(IPCPackage* package) {
         //MI_UTIL_LOG(MI_DEBUG) << "async send data failed, invalid socket list id : "  << socket_list_id;
         return -1;
     } else {
-        push_back_package_i(socket_list_id, package);
+        push_back_package(socket_list_id, package);
         //MI_UTIL_LOG(MI_DEBUG) << "async send data success, socket list id : "  << socket_list_id;
         return 0;
     }
 }
 
 int SocketServer::send() {
-    try_pop_front_package_i();
+    try_pop_front_package();
 
     //this thread send data to clients
     fd_set fdwrites;
@@ -395,7 +395,7 @@ int SocketServer::send() {
 
         if (FD_ISSET(socket, &fdwrites)) {
             //check package
-            IPCPackage* pkg_send = pop_front_package_i(socket_id);
+            IPCPackage* pkg_send = pop_front_package(socket_id);
             if(nullptr == pkg_send) {
                 //pop empty package
                 continue;
@@ -440,7 +440,7 @@ int SocketServer::send() {
     return 0;
 }
 
-void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* pkg) {
+void SocketServer::push_back_package(unsigned int socket_list_id, IPCPackage* pkg) {
     boost::mutex::scoped_lock locker(_mutex_package);
     while (package_cache_full(pkg)) {
         _condition_full_package.wait(_mutex_package);
@@ -459,7 +459,7 @@ void SocketServer::push_back_package_i(unsigned int socket_list_id, IPCPackage* 
     _condition_empty_package.notify_one();
 }
 
-IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
+IPCPackage* SocketServer::pop_front_package(unsigned int socket_list_id) {
     boost::mutex::scoped_lock locker(_mutex_package);
     auto client_store = _client_pkg_store.find(socket_list_id);
     if (client_store == _client_pkg_store.end()) {
@@ -477,7 +477,7 @@ IPCPackage* SocketServer::pop_front_package_i(unsigned int socket_list_id) {
     return pkg;
 }
 
-void SocketServer::clear_package_i(unsigned int socket_list_id) {
+void SocketServer::clear_package(unsigned int socket_list_id) {
     MI_UTIL_LOG(MI_INFO) << "try clear package.";
     PackageStore old_package_store;
     {
@@ -502,7 +502,7 @@ void SocketServer::clear_package_i(unsigned int socket_list_id) {
     MI_UTIL_LOG(MI_INFO) << "clear package success.";
 }
 
-void SocketServer::try_pop_front_package_i() {
+void SocketServer::try_pop_front_package() {
     boost::mutex::scoped_lock locker(_mutex_package);
     while(_client_pkg_store.empty()) {
         _condition_empty_package.wait(_mutex_package);

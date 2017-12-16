@@ -44,7 +44,7 @@ public:
 
     int insert_socket(int socket, const std::string host, int port = 0) {
         boost::mutex::scoped_lock locker(_mutex);
-        const unsigned int id = acquire_id_i();
+        const unsigned int id = acquire_id();
         if (0 == id) {
             MI_UTIL_LOG(MI_ERROR) << "socket queue full!";
             return -1;
@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    unsigned int acquire_id_i() {
+    unsigned int acquire_id() {
         if (_last_id > std::numeric_limits<unsigned int>::max()-255) {
             _last_id = 1;
         }

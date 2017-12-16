@@ -39,7 +39,7 @@ public:
     bool operator!=(const OrthoCamera& camera) const;
 
 protected:
-    virtual void calculate_projection_matrix_i();
+    virtual void calculate_projection_matrix();
 
 private:
     double _left;

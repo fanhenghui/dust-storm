@@ -39,14 +39,14 @@ int BECmdHandlerFEPlayVR::handle_command(const IPCDataHeader& ipcheader , char* 
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
-    boost::thread th(boost::bind(&BECmdHandlerFEPlayVR::logic_i , this, ipcheader));
+    boost::thread th(boost::bind(&BECmdHandlerFEPlayVR::logic , this, ipcheader));
     th.detach();
 
     return 0;
 }
 
 
-void BECmdHandlerFEPlayVR::logic_i(IPCDataHeader header) {
+void BECmdHandlerFEPlayVR::logic(IPCDataHeader header) {
     _playing = true;
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);

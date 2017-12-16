@@ -14,21 +14,21 @@ MetaObjectLoader::load(const std::string& info_file,
                        std::shared_ptr<MetaObjectTag>& meta_obj_tag,
                        std::shared_ptr<ImageDataHeader>& img_data_header) {
     // 1 construct meta obj tag
-    IOStatus status = construct_meta_object_tag_i(info_file, meta_obj_tag);
+    IOStatus status = construct_meta_object_tag(info_file, meta_obj_tag);
 
     if (status != IO_SUCCESS) {
         return status;
     }
 
     // 2 construct data header
-    status = construct_data_header_i(meta_obj_tag, img_data_header, image_data);
+    status = construct_data_header(meta_obj_tag, img_data_header, image_data);
 
     if (status != IO_SUCCESS) {
         return status;
     }
 
     // 3 construct image data
-    status = construct_image_data_i(info_file, meta_obj_tag, img_data_header,
+    status = construct_image_data(info_file, meta_obj_tag, img_data_header,
                                     image_data);
 
     if (status != IO_SUCCESS) {
@@ -38,7 +38,7 @@ MetaObjectLoader::load(const std::string& info_file,
     return IO_SUCCESS;
 }
 
-IOStatus MetaObjectLoader::construct_meta_object_tag_i(
+IOStatus MetaObjectLoader::construct_meta_object_tag(
     const std::string& info_file,
     std::shared_ptr<MetaObjectTag>& meta_obj_tag) {
     meta_obj_tag.reset(new MetaObjectTag());
@@ -214,7 +214,7 @@ IOStatus MetaObjectLoader::construct_meta_object_tag_i(
     return IO_SUCCESS;
 }
 
-IOStatus MetaObjectLoader::construct_data_header_i(
+IOStatus MetaObjectLoader::construct_data_header(
     std::shared_ptr<MetaObjectTag> meta_obj_tag,
     std::shared_ptr<ImageDataHeader>& img_data_header,
     std::shared_ptr<ImageData>& img_data) {
@@ -308,7 +308,7 @@ IOStatus MetaObjectLoader::construct_data_header_i(
     return IO_SUCCESS;
 }
 
-IOStatus MetaObjectLoader::construct_image_data_i(
+IOStatus MetaObjectLoader::construct_image_data(
     const std::string& info_file, std::shared_ptr<MetaObjectTag> meta_obj_tag,
     std::shared_ptr<ImageDataHeader> img_data_header,
     std::shared_ptr<ImageData> img_data) {

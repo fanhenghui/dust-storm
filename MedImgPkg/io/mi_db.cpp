@@ -69,7 +69,7 @@ int DB::insert_dcm_item(const ImgItem& item) {
 
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         
         //TODO recovery old one if insert failed
         return -1;
@@ -114,7 +114,7 @@ int DB::delete_dcm_item(const std::string& series_id) {
 
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         // TODO recovery DB if delete failed
         return -1;
     }
@@ -155,7 +155,7 @@ int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
         }
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db query item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db query item.";
@@ -199,7 +199,7 @@ int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
         }
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
 
@@ -235,7 +235,7 @@ int DB::get_ai_annotation_item(const std::string& series_id, std::string& annota
         }
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
 
@@ -274,7 +274,7 @@ int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::ve
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get annotation items by series id failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by series id.";
@@ -312,7 +312,7 @@ int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get annotation items by usr name failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by usr.";
@@ -351,7 +351,7 @@ int DB::get_usr_annotation_item(const std::string& series_id, const std::string&
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get annotation item failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation item.";
@@ -399,7 +399,7 @@ int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get all items failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db get all dcm items."; 
@@ -437,7 +437,7 @@ int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db get all usr annotation items failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db get all usr annotation items.";
@@ -463,7 +463,7 @@ int DB::update_preprocess_mask(const std::string& series_id, const std::string& 
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db update preprocess mask failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db update preprocess mask.";
@@ -489,7 +489,7 @@ int DB::update_ai_annotation(const std::string& series_id, const std::string& an
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db update AI annotation failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db update AI annotation.";
@@ -515,7 +515,7 @@ int DB::update_ai_intermediate_data(const std::string& series_id, const std::str
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db update AI intermediate data failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db update AI intermediate data.";
@@ -541,7 +541,7 @@ int DB::update_usr_annotation(const std::string& series_id, const std::string& u
         pstmt = nullptr;
     } catch (const sql::SQLException& e) {
         MI_IO_LOG(MI_ERROR) << "db update usr annotation failed with exception: "
-        << this->get_sql_exception_info_i(&e);
+        << this->get_sql_exception_info(&e);
         return -1;
     }
     MI_IO_LOG(MI_TRACE) << "OUT db update usr annotation.";

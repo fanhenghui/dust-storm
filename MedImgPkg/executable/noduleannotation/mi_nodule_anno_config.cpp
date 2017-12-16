@@ -142,10 +142,10 @@ void NoduleAnnoConfig::finalize()
 }
 
 NoduleAnnoConfig::NoduleAnnoConfig() {
-    init_i();
+    init();
 }
 
-void NoduleAnnoConfig::init_i() {
+void NoduleAnnoConfig::init() {
     _config_file.clear();
 
     Configure::instance()->set_processing_unit_type(CPU);

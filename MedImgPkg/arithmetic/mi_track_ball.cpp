@@ -5,7 +5,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 Point3
-TrackBall::convert_screen_point_to_sphere_i(const Point2& ptPos, double width,
+TrackBall::convert_screen_point_to_sphere(const Point2& ptPos, double width,
         double height,
         const Point2& ptBottomLeftCorner) {
     double x = (ptPos.x - ptBottomLeftCorner.x) / (width / 2) - 1;
@@ -25,9 +25,9 @@ Quat4 TrackBall::mouse_motion_to_rotation(const Point2& ptMouseFrom,
             (ptMouseFrom.x < ptBottomLeftCorner.x + width) &&
             (ptMouseFrom.y > ptBottomLeftCorner.y) &&
             (ptMouseFrom.y < ptBottomLeftCorner.y + height)) {
-        const Point3 ptMouseFrom3D = convert_screen_point_to_sphere_i(
+        const Point3 ptMouseFrom3D = convert_screen_point_to_sphere(
                                          ptMouseFrom, width, height, ptBottomLeftCorner);
-        const Point3 ptMouseTo3D = convert_screen_point_to_sphere_i(
+        const Point3 ptMouseTo3D = convert_screen_point_to_sphere(
                                        ptMouseTo, width, height, ptBottomLeftCorner);
 
         Quat4 qRotation = calculate_track_ball_rotation(ptMouseFrom3D, ptMouseTo3D,

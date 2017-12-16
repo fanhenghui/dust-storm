@@ -48,7 +48,7 @@ GraphicItemCornersInfo::~GraphicItemCornersInfo()
 void GraphicItemCornersInfo::set_scene(std::shared_ptr<SceneBase> scene)
 {
     GraphicItemBase::set_scene(scene);
-    refresh_text_i();
+    refresh_text();
 }
 
 
@@ -71,7 +71,7 @@ void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std
 
     if (_pre_window_width != width || _pre_window_height != height)
     {
-        refresh_text_i();
+        refresh_text();
         _pre_window_width = width;
         _pre_window_height = height;
         return;
@@ -185,7 +185,7 @@ void GraphicItemCornersInfo::update(std::vector<QGraphicsItem*>& to_be_add , std
     }
 }
 
-void GraphicItemCornersInfo::refresh_text_i()
+void GraphicItemCornersInfo::refresh_text()
 {
     std::shared_ptr<SceneBase> scene_base = _scene.lock();
     QTWIDGETS_CHECK_NULL_EXCEPTION(scene_base);

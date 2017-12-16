@@ -52,8 +52,8 @@ public:
     void reset();//reset MPRs to orginal orthogonal slice
 
 private:
-    void set_page_i(const std::shared_ptr<MPRScene>& target_mpr_scene, int page);
-    bool set_center_i(const Point3& center_w);
+    void set_page(const std::shared_ptr<MPRScene>& target_mpr_scene, int page);
+    bool set_center(const Point3& center_w);
 
 private:
     MPRScenePtr _mpr_scenes[3];

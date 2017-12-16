@@ -27,8 +27,8 @@ public:
     int fetch_series(const std::string& series_id, const std::string& map_path);
 
 private:
-    int try_connect_i();
-    void run_scp_i();
+    int try_connect();
+    void run_scp();
 
 private:
     struct ConnectionCache;

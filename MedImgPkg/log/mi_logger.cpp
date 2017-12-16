@@ -147,7 +147,7 @@ void Logger::initialize()
         return;
     }
 
-    read_config_file_i();
+    read_config_file();
 
     boost::shared_ptr< sinks::text_file_backend > file_sink_backend =
         boost::make_shared< sinks::text_file_backend >(
@@ -272,7 +272,7 @@ void Logger::filter_level_file(SeverityLevel level) {
     _file_filer_level = level;
 }
 
-void Logger::read_config_file_i() {
+void Logger::read_config_file() {
     if (_config_file.empty()) {
         return;
     }

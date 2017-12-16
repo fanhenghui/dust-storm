@@ -98,8 +98,8 @@ private slots:
     void slot_mouse_click();
 
 private:
-    bool get_mouse_operation_i(IMouseOpPtrCollection& op);
-    bool no_graphics_item_grab_i();
+    bool get_mouse_operation(IMouseOpPtrCollection& op);
+    bool no_graphics_item_grab();
 
 private:
     QGLWidget* _inner_gl_widget;

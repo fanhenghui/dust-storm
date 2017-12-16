@@ -80,12 +80,12 @@ void SegmentThreshold<T>::segment_auto_threshold(const Ellipsoid& ellipsoid,
 
     switch (type) {
     case Center: {
-        threshold = get_threshold_center_i(ellipsoid);
+        threshold = get_threshold_center(ellipsoid);
         break;
     }
 
     case Otsu: {
-        threshold = get_threshold_otsu_i(ellipsoid);
+        threshold = get_threshold_otsu(ellipsoid);
         MI_ARITHMETIC_LOG(MI_DEBUG) << "Auto Otsu threshold is : " << threshold;
         break;
     }
@@ -98,7 +98,7 @@ void SegmentThreshold<T>::segment_auto_threshold(const Ellipsoid& ellipsoid,
 }
 
 template <class T>
-T SegmentThreshold<T>::get_threshold_center_i(const Ellipsoid& ellipsoid) {
+T SegmentThreshold<T>::get_threshold_center(const Ellipsoid& ellipsoid) {
     Sampler<T> sampler;
     float v = sampler.sample_3d_linear(ellipsoid._center.x, ellipsoid._center.y,
                                        ellipsoid._center.z, this->_dim[0], this->_dim[1],
@@ -108,7 +108,7 @@ T SegmentThreshold<T>::get_threshold_center_i(const Ellipsoid& ellipsoid) {
 }
 
 template <class T>
-T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
+T SegmentThreshold<T>::get_threshold_otsu(const Ellipsoid& ellipsoid) {
     const Point3& center = ellipsoid._center;
     const double& aa_r = 1.0 / (ellipsoid._a * ellipsoid._a);
     const double& bb_r = 1.0 / (ellipsoid._b * ellipsoid._b);
@@ -208,7 +208,7 @@ T SegmentThreshold<T>::get_threshold_otsu_i(const Ellipsoid& ellipsoid) {
 }
 
 template <class T>
-T SegmentThreshold<T>::get_threshold_otsu_i() {
+T SegmentThreshold<T>::get_threshold_otsu() {
 
     const unsigned int layer = this->_dim[0] * this->_dim[1];
 

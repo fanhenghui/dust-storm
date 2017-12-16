@@ -47,17 +47,17 @@ void PerspectiveCamera::set_aspect_ratio(double aspect) {
 }
 
 Matrix4 PerspectiveCamera::get_projection_matrix() {
-    calculate_projection_matrix_i();
+    calculate_projection_matrix();
     return _matProjection;
 }
 
 Matrix4 PerspectiveCamera::get_view_projection_matrix() {
-    calculate_view_matrix_i();
-    calculate_projection_matrix_i();
+    calculate_view_matrix();
+    calculate_projection_matrix();
     return _matProjection * _mat_view;
 }
 
-void PerspectiveCamera::calculate_projection_matrix_i() {
+void PerspectiveCamera::calculate_projection_matrix() {
     if (!_bIsPCalculated) {
         double range = tan(_Fovy / 2.0f) * _Near;
         double left = -range * _Aspect;

@@ -31,13 +31,13 @@ public:
 private:
     Ellipsoid voi_patient_to_volume(const VOISphere& voi);
 
-    int get_aabb_i(const Ellipsoid& ellipsoid, AABBUI& aabb);
+    int get_aabb(const Ellipsoid& ellipsoid, AABBUI& aabb);
 
-    void segment_i(const Ellipsoid& ellipsoid, const AABBUI& aabb , unsigned char label);
+    void segment(const Ellipsoid& ellipsoid, const AABBUI& aabb , unsigned char label);
 
-    void recover_i(const AABBUI& aabb , unsigned char label);
+    void recover(const AABBUI& aabb , unsigned char label);
 
-    void update_aabb_i(const AABBUI& aabb);
+    void update_aabb(const AABBUI& aabb);
 
 private:
     std::weak_ptr<VOIModel> _model;

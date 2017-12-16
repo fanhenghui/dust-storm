@@ -30,7 +30,7 @@ bool ImageData::mem_allocate() {
 
 float ImageData::get_min_scalar() {
     if (!_has_cal_min_max) {
-        find_min_max_i();
+        find_min_max();
     }
 
     return _min_scalar;
@@ -38,7 +38,7 @@ float ImageData::get_min_scalar() {
 
 float ImageData::get_max_scalar() {
     if (!_has_cal_min_max) {
-        find_min_max_i();
+        find_min_max();
     }
 
     return _max_scalar;
@@ -267,7 +267,7 @@ void ImageData::deep_copy(ImageData* image_data) {
     memcpy(image_data->_data_array.get(), this->_data_array.get(), imemSize);
 }
 
-void ImageData::find_min_max_i() {
+void ImageData::find_min_max() {
     void* data_array = _data_array.get();
 
     if (nullptr == data_array) {
@@ -276,23 +276,23 @@ void ImageData::find_min_max_i() {
 
     switch (_data_type) {
     case CHAR:
-        this->find_min_max_i((char*)data_array);
+        this->find_min_max((char*)data_array);
         break;
 
     case UCHAR:
-        this->find_min_max_i((unsigned char*)data_array);
+        this->find_min_max((unsigned char*)data_array);
         break;
 
     case USHORT:
-        this->find_min_max_i((unsigned short*)data_array);
+        this->find_min_max((unsigned short*)data_array);
         break;
 
     case SHORT:
-        this->find_min_max_i((short*)data_array);
+        this->find_min_max((short*)data_array);
         break;
 
     case FLOAT:
-        this->find_min_max_i((float*)data_array);
+        this->find_min_max((float*)data_array);
         break;
 
     default:

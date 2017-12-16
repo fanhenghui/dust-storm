@@ -37,11 +37,11 @@ Vector3 CameraBase::get_up_direction() const {
 }
 
 Matrix4 CameraBase::get_view_matrix() {
-    calculate_view_matrix_i();
+    calculate_view_matrix();
     return _mat_view;
 }
 
-void CameraBase::calculate_view_matrix_i() {
+void CameraBase::calculate_view_matrix() {
     if (!_is_view_mat_cal) {
         Vector3 v_z = _eye - _at;
         v_z.normalize();

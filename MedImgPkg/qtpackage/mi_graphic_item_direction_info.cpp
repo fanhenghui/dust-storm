@@ -54,7 +54,7 @@ GraphicItemDirectionInfo::~GraphicItemDirectionInfo()
 void GraphicItemDirectionInfo::set_scene(std::shared_ptr<SceneBase> scene)
 {
     GraphicItemBase::set_scene(scene);
-    refresh_text_i();
+    refresh_text();
 }
 
 
@@ -86,12 +86,12 @@ void GraphicItemDirectionInfo::update(std::vector<QGraphicsItem*>& to_be_add , s
         _pre_window_height = height;
         this->_slice_left = view_left;
         this->_slice_up = view_up;
-        refresh_text_i();
+        refresh_text();
         return;
     }
 }
 
-void GraphicItemDirectionInfo::refresh_text_i()
+void GraphicItemDirectionInfo::refresh_text()
 {
     std::shared_ptr<SceneBase> scene_base = _scene.lock();
     QTWIDGETS_CHECK_NULL_EXCEPTION(scene_base);

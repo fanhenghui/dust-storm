@@ -415,13 +415,13 @@ void GraphicsSphereItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         QGraphicsEllipseItem::mouseReleaseEvent(event);
 
-        update_circle_center_i();
+        update_circle_center();
 
         frezze(true);
     }
     else if (event->button() == Qt::RightButton)
     {
-        update_circle_center_i();
+        update_circle_center();
 
         frezze(true);
     }
@@ -433,9 +433,9 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
     {
         QGraphicsEllipseItem::mouseMoveEvent(event);
 
-        update_circle_center_i();
+        update_circle_center();
 
-        update_sphere_center_i(VOIModel::MODIFYING);
+        update_sphere_center(VOIModel::MODIFYING);
     }
     else if (event->buttons() == Qt::RightButton)
     {
@@ -445,9 +445,9 @@ void GraphicsSphereItem::mouseMoveEvent( QGraphicsSceneMouseEvent *event )
 
         set_sphere(_pre_center , radius);
 
-        update_circle_center_i();
+        update_circle_center();
 
-        update_sphere_diameter_i(VOIModel::MODIFYING);
+        update_sphere_diameter(VOIModel::MODIFYING);
     }
 }
 
@@ -457,7 +457,7 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     {
         QGraphicsEllipseItem::mouseReleaseEvent(event);
 
-        update_sphere_center_i(VOIModel::MODIFY_COMPLETED);
+        update_sphere_center(VOIModel::MODIFY_COMPLETED);
 
         frezze(false);
 
@@ -465,7 +465,7 @@ void GraphicsSphereItem::mouseReleaseEvent( QGraphicsSceneMouseEvent *event )
     }
     else if (event->button() == Qt::RightButton)
     {
-        update_sphere_diameter_i(VOIModel::MODIFY_COMPLETED);
+        update_sphere_diameter(VOIModel::MODIFY_COMPLETED);
 
         frezze(false);
 
@@ -477,7 +477,7 @@ std::shared_ptr<medical_imaging::VOIModel>& GraphicsSphereItem::get_voi_model()
     return this->_model;
 }
 
-void GraphicsSphereItem::update_circle_center_i()
+void GraphicsSphereItem::update_circle_center()
 {
     _pre_center = QPointF(this->pos().x() + this->rect().width()*0.5f , this->pos().y() + this->rect().height()*0.5f);
     //MI_QTPACKAGE_LOG(MI_DEBUG) << "center : " << _pre_center.x()  << " , " << _pre_center.y();
@@ -491,7 +491,7 @@ void GraphicsSphereItem::set_sphere(QPointF center , float radius)
     this->setPos(center - QPointF(radius,radius));
 }
 
-void GraphicsSphereItem::update_sphere_center_i(int code_id /*= 0*/)
+void GraphicsSphereItem::update_sphere_center(int code_id /*= 0*/)
 {
     //////////////////////////////////////////////////////////////////////////
     //Calculate new sphere center
@@ -543,7 +543,7 @@ void GraphicsSphereItem::update_sphere_center_i(int code_id /*= 0*/)
     }
 }
 
-void GraphicsSphereItem::update_sphere_diameter_i(int code_id /*= 0*/)
+void GraphicsSphereItem::update_sphere_diameter(int code_id /*= 0*/)
 {
     //////////////////////////////////////////////////////////////////////////
     //Calculate new sphere diameter

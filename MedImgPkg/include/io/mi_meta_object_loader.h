@@ -214,16 +214,16 @@ public:
 
 private:
     IOStatus
-    construct_meta_object_tag_i(const std::string& info_file,
+    construct_meta_object_tag(const std::string& info_file,
                                 std::shared_ptr<MetaObjectTag>& meta_obj_tag);
 
     IOStatus
-    construct_data_header_i(std::shared_ptr<MetaObjectTag> meta_obj_tag,
+    construct_data_header(std::shared_ptr<MetaObjectTag> meta_obj_tag,
                             std::shared_ptr<ImageDataHeader>& img_data_header,
                             std::shared_ptr<ImageData>& img_data);
 
     IOStatus
-    construct_image_data_i(const std::string& info_file,
+    construct_image_data(const std::string& info_file,
                            std::shared_ptr<MetaObjectTag> meta_obj_tag,
                            std::shared_ptr<ImageDataHeader> img_data_header,
                            std::shared_ptr<ImageData> img_data);

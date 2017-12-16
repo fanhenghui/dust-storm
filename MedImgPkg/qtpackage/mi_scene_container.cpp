@@ -180,7 +180,7 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
-    if (no_graphics_item_grab_i())
+    if (no_graphics_item_grab())
     {
         _buttons = event->buttons();
         _pre_point = event->pos();
@@ -200,7 +200,7 @@ void SceneContainer::mousePressEvent(QMouseEvent *event)
         }
         //do single click directly
         IMouseOpPtrCollection ops;
-        if(get_mouse_operation_i(ops))
+        if(get_mouse_operation(ops))
         {
             for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
@@ -218,7 +218,7 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
-    if (no_graphics_item_grab_i())
+    if (no_graphics_item_grab())
     {
         if (!this->get_mouse_hovering() && _buttons == Qt::NoButton)
         {
@@ -227,7 +227,7 @@ void SceneContainer::mouseMoveEvent(QMouseEvent *event)
 
         IMouseOpPtrCollection ops;
         _modifiers = event->modifiers();
-        if(get_mouse_operation_i( ops))
+        if(get_mouse_operation( ops))
         {
             for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
@@ -247,11 +247,11 @@ void SceneContainer::mouseReleaseEvent(QMouseEvent *event)
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
-    if (no_graphics_item_grab_i())
+    if (no_graphics_item_grab())
     {
         IMouseOpPtrCollection ops;
         _modifiers = event->modifiers();
-        if(get_mouse_operation_i(ops))
+        if(get_mouse_operation(ops))
         {
             for (auto it = ops.begin() ; it != ops.end() ; ++it)
             {
@@ -271,7 +271,7 @@ void SceneContainer::mouseDoubleClickEvent(QMouseEvent *event)
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
-    if (no_graphics_item_grab_i())
+    if (no_graphics_item_grab())
     {
         if (1 == _mouse_press_time)// In timer slot to wait to run
         {
@@ -288,7 +288,7 @@ void SceneContainer::wheelEvent(QWheelEvent *event)
     //2 TODO Graphic primitive(3D) interaction
 
     //3 Mouse operation
-    if (no_graphics_item_grab_i())
+    if (no_graphics_item_grab())
     {
         if (_mouse_wheel_ops.empty())
         {
@@ -333,7 +333,7 @@ void SceneContainer::register_mouse_operation(IMouseOpPtrCollection mouse_ops , 
     _mouse_ops[button|keyboard_modifier] = mouse_ops;
 }
 
-bool SceneContainer::get_mouse_operation_i(IMouseOpPtrCollection& op)
+bool SceneContainer::get_mouse_operation(IMouseOpPtrCollection& op)
 {
     int key = _buttons | _modifiers;
     auto it = _mouse_ops.find(key);
@@ -387,7 +387,7 @@ void SceneContainer::register_mouse_double_click_operation(IMouseOpPtr mouse_op)
     _mouse_double_click_op = mouse_op;
 }
 
-bool SceneContainer::no_graphics_item_grab_i()
+bool SceneContainer::no_graphics_item_grab()
 {
     return _inner_graphic_scene->mouseGrabberItem() == nullptr;
 }

@@ -19,8 +19,8 @@ public:
     CREATE_EXTENDS_OP(BEOpFELocate)
 
 private:
-    int mpr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt);
-    int vr_locate_i(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt);
+    int mpr_locate(std::shared_ptr<AppCell> cell, std::shared_ptr<MPRScene> mpr_scene, const Point2& pt);
+    int vr_locate(std::shared_ptr<AppCell> cell, std::shared_ptr<VRScene> vr_scene, const Point2& pt);
 };
 MED_IMG_END_NAMESPACE
 

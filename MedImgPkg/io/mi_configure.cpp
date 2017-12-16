@@ -10,7 +10,7 @@ MED_IMG_BEGIN_NAMESPACE
 Configure* Configure::_instance = nullptr;
 boost::mutex Configure::_mutex;
 
-void Configure::init_i() {
+void Configure::init() {
     _test_data_root = "";
     _db_ip = "127.0.0.1";
     _db_port = "3306";
@@ -116,7 +116,7 @@ void Configure::refresh() {
 }
 
 Configure::Configure() {
-    init_i();
+    init();
     refresh();
 }
 

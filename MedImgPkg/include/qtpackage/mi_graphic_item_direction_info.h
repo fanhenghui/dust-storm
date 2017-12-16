@@ -21,7 +21,7 @@ public:
     virtual void update(std::vector<QGraphicsItem*>& to_be_add , std::vector<QGraphicsItem*>& to_be_remove);
 
 private:
-    void refresh_text_i();
+    void refresh_text();
 
 private:
     QGraphicsTextItem* _text_item_left;
