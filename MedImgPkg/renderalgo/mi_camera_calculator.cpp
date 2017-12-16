@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 CameraCalculator::CameraCalculator(std::shared_ptr<ImageData> image_data)
     : _volume_data(image_data), _is_volume_orthogonal(true) {
-    calculate_i();
+    calculate();
 }
 
 const Matrix4& CameraCalculator::get_volume_to_physical_matrix() const {
@@ -48,26 +48,26 @@ void CameraCalculator::init_vr_placement(
     *camera = _vr_placement_camera;
 }
 
-void CameraCalculator::calculate_i() {
+void CameraCalculator::calculate() {
     // Check orthogonal
     // 对于CT机架倾斜的数据来说，其扫描的X和Y方向并不正交，渲染需要特殊处理
-    check_volume_orthogonal_i();
+    check_volume_orthogonal();
 
     //计算体数据的每个轴和标准病人坐标系下的轴的关系
-    calculate_patient_axis_info_i();
+    calculate_patient_axis_info();
 
     // Calculate volume to physical/world/patient
-    calculate_matrix_i();
+    calculate_matrix();
 
     // Calculate VR replacement
-    calculate_vr_placement_i();
+    calculate_vr_placement();
 
     // Calculate orthogonal MPR replacement
-    calculate_default_mpr_center_world_i();
-    caluculate_orthogonal_mpr_placement_i();
+    calculate_default_mpr_center_world();
+    caluculate_orthogonal_mpr_placement();
 }
 
-void CameraCalculator::calculate_matrix_i() {
+void CameraCalculator::calculate_matrix() {
     // 1 Calculate volume to physical
     unsigned int* dim = _volume_data->_dim;
     double* spacing = _volume_data->_spacing;
@@ -126,7 +126,7 @@ void CameraCalculator::calculate_matrix_i() {
     _mat_patient_to_world = _mat_world_to_patient.get_inverse();
 }
 
-void CameraCalculator::calculate_patient_axis_info_i() {
+void CameraCalculator::calculate_patient_axis_info() {
     const Vector3& x_coord_patient = _volume_data->_image_orientation[0];
     const Vector3& y_coord_patient = _volume_data->_image_orientation[1];
     const Vector3& z_coord_patient = _volume_data->_image_orientation[2];
@@ -235,7 +235,7 @@ void CameraCalculator::calculate_patient_axis_info_i() {
     }
 }
 
-void CameraCalculator::calculate_vr_placement_i() {
+void CameraCalculator::calculate_vr_placement() {
     //视角方向和体的平面垂直，即不是和病人坐标系轴平行
     Vector3 view_dir = Vector3(0.0, 0.0, 0.0);
 
@@ -265,7 +265,7 @@ void CameraCalculator::calculate_vr_placement_i() {
                                    -max_length * 2.0, max_length * 6.0);
 }
 
-void CameraCalculator::check_volume_orthogonal_i() {
+void CameraCalculator::check_volume_orthogonal() {
     const Vector3& x_coord_patient = _volume_data->_image_orientation[0];
     const Vector3& y_coord_patient = _volume_data->_image_orientation[1];
     const Vector3& z_coord_patient = _volume_data->_image_orientation[2];
@@ -518,7 +518,7 @@ int CameraCalculator::get_default_page(ScanSliceType type) const {
     }
 }
 
-void CameraCalculator::caluculate_orthogonal_mpr_placement_i() {
+void CameraCalculator::caluculate_orthogonal_mpr_placement() {
     double* spacing = _volume_data->_spacing;
     unsigned int* dim = _volume_data->_dim;
     const double max_length = std::max(
@@ -597,7 +597,7 @@ void CameraCalculator::caluculate_orthogonal_mpr_placement_i() {
     }
 }
 
-void CameraCalculator::calculate_default_mpr_center_world_i() {
+void CameraCalculator::calculate_default_mpr_center_world() {
     Point3 look_at = Point3(0.0, 0.0, 0.0);
     // Sagittal translate
     Vector3 view_dir = _leftInfo.patient_orientation;

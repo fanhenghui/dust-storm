@@ -206,7 +206,7 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3],
     _mask_array_to_be_update.push_back(data_updated);
 }
 
-void VolumeInfos::refresh_update_mask_i() {
+void VolumeInfos::refresh_update_mask() {
     if (!_mask_aabb_to_be_update.empty()) {
         CHECK_GL_ERROR;
 
@@ -235,11 +235,11 @@ void VolumeInfos::refresh_update_mask_i() {
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
 
-        refresh_stored_mask_brick_info_i();
+        refresh_stored_mask_brick_info();
     }
 }
 
-void VolumeInfos::refresh_cache_mask_brick_info_i() {
+void VolumeInfos::refresh_cache_mask_brick_info() {
     std::vector<std::vector<unsigned char>> vis_labels;
     _brick_pool->get_visible_labels_cache(vis_labels);
     for (auto it = vis_labels.begin(); it != vis_labels.end(); ++it) {
@@ -248,14 +248,14 @@ void VolumeInfos::refresh_cache_mask_brick_info_i() {
     _brick_pool->clear_visible_labels_cache();
 }
 
-void VolumeInfos::refresh_stored_mask_brick_info_i() {
+void VolumeInfos::refresh_stored_mask_brick_info() {
     std::vector<std::vector<unsigned char>> stored_labels = _brick_pool->get_stored_visible_labels();
     for (auto it = stored_labels.begin(); it != stored_labels.end(); ++it) {
         _brick_pool->calculate_mask_brick_info(*it);
     }
 }
 
-void VolumeInfos::refresh_upload_mask_i() {
+void VolumeInfos::refresh_upload_mask() {
     if (!_mask_dirty) {
         return;
     }
@@ -272,12 +272,12 @@ void VolumeInfos::refresh_upload_mask_i() {
     tex->unbind();
     CHECK_GL_ERROR;
 
-    refresh_stored_mask_brick_info_i();
+    refresh_stored_mask_brick_info();
 
     _mask_dirty = false;
 }
 
-void VolumeInfos::refresh_upload_volume_i() {
+void VolumeInfos::refresh_upload_volume() {
     if (!_volume_dirty) {
         return;
     }
@@ -342,13 +342,13 @@ void VolumeInfos::refresh() {
         return;
     }
 
-    refresh_upload_volume_i();
+    refresh_upload_volume();
 
-    refresh_upload_mask_i();
+    refresh_upload_mask();
 
-    refresh_update_mask_i();
+    refresh_update_mask();
 
-    refresh_cache_mask_brick_info_i();
+    refresh_cache_mask_brick_info();
 }
 
 void VolumeInfos::cache_original_mask() {

@@ -53,9 +53,9 @@ public:
     virtual void calculate();
 
 private:
-    void initialize_i();
-    void calculate_i();
-    void download_i();
+    void initialize();
+    void calculate_gpu();
+    void download();
 
 private:
     GLProgramPtr _gl_program;
@@ -72,10 +72,10 @@ public:
     void update(const AABBUI& aabb);
 
 private:
-    void initialize_i();
-    void calculate_i();
-    void update_i(const AABBUI& aabb);
-    void download_i();
+    void initialize();
+    void calculate_gpu();
+    void update_gpu(const AABBUI& aabb);
+    void download();
 
 private:
     GLProgramPtr _gl_program;

@@ -45,7 +45,7 @@ public:
     void cache_ray_end();
 
 protected:
-    virtual void pre_render_i();
+    virtual void pre_render();
 
 private:
     struct RayEnd;

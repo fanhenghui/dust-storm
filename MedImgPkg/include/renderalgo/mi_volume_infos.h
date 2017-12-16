@@ -46,11 +46,11 @@ public:
                      bool has_data_array_changed = true);
 
 private:
-    void refresh_upload_volume_i();
-    void refresh_upload_mask_i();
-    void refresh_update_mask_i();
-    void refresh_stored_mask_brick_info_i();
-    void refresh_cache_mask_brick_info_i();
+    void refresh_upload_volume();
+    void refresh_upload_mask();
+    void refresh_update_mask();
+    void refresh_stored_mask_brick_info();
+    void refresh_cache_mask_brick_info();
 
 private:
     std::shared_ptr<ImageData> _volume_data;

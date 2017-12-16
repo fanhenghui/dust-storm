@@ -54,7 +54,7 @@ public:
     void set_compress_ld_quality(int quality = 15);
 
 protected:
-    virtual void pre_render_i();
+    virtual void pre_render();
 
 protected:
     int _width, _height;

@@ -127,19 +127,19 @@ public:
     pMPRCamera , float fThicknessWorldmm) const;*/
 
 private:
-    void calculate_i();
+    void calculate();
 
-    void calculate_matrix_i();
+    void calculate_matrix();
 
-    void check_volume_orthogonal_i();
+    void check_volume_orthogonal();
 
-    void calculate_patient_axis_info_i();
+    void calculate_patient_axis_info();
 
-    void calculate_vr_placement_i();
+    void calculate_vr_placement();
 
-    void calculate_default_mpr_center_world_i();
+    void calculate_default_mpr_center_world();
 
-    void caluculate_orthogonal_mpr_placement_i();
+    void caluculate_orthogonal_mpr_placement();
 
 private:
     std::shared_ptr<ImageData> _volume_data;

@@ -53,12 +53,12 @@ VolumeBrickInfoCalculator::VolumeBrickInfoCalculator() {}
 VolumeBrickInfoCalculator::~VolumeBrickInfoCalculator() {}
 
 void VolumeBrickInfoCalculator::calculate() {
-    initialize_i();
-    calculate_i();
-    download_i();
+    initialize();
+    calculate_gpu();
+    download();
 }
 
-void VolumeBrickInfoCalculator::download_i() {
+void VolumeBrickInfoCalculator::download() {
     _info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
     _info_buffer->bind();
     _info_buffer->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
@@ -67,7 +67,7 @@ void VolumeBrickInfoCalculator::download_i() {
     _info_buffer->unbind();
 }
 
-void VolumeBrickInfoCalculator::calculate_i() {
+void VolumeBrickInfoCalculator::calculate_gpu() {
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_data);
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_texture);
     RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
@@ -152,7 +152,7 @@ void VolumeBrickInfoCalculator::calculate_i() {
 #undef VOLUME_REGULATE_PARAMETER
 }
 
-void VolumeBrickInfoCalculator::initialize_i() {
+void VolumeBrickInfoCalculator::initialize() {
     if (nullptr == _gl_program) {
         UIDType uid;
         _gl_program = GLResourceManagerContainer::instance()
@@ -178,18 +178,18 @@ MaskBrickInfoCalculator::MaskBrickInfoCalculator() {}
 MaskBrickInfoCalculator::~MaskBrickInfoCalculator() {}
 
 void MaskBrickInfoCalculator::update(const AABBUI& aabb) {
-    initialize_i();
-    update_i(aabb);
-    download_i();
+    initialize();
+    update_gpu(aabb);
+    download();
 }
 
 void MaskBrickInfoCalculator::calculate() {
-    initialize_i();
-    calculate_i();
-    download_i();
+    initialize();
+    calculate_gpu();
+    download();
 }
 
-void MaskBrickInfoCalculator::download_i() {
+void MaskBrickInfoCalculator::download() {
     _info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
     _info_buffer->bind();
     _info_buffer->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
@@ -198,7 +198,7 @@ void MaskBrickInfoCalculator::download_i() {
     _info_buffer->unbind();
 }
 
-void MaskBrickInfoCalculator::calculate_i() {
+void MaskBrickInfoCalculator::calculate_gpu() {
     AABBUI aabb;
     aabb._min[0] = 0;
     aabb._min[1] = 0;
@@ -208,10 +208,10 @@ void MaskBrickInfoCalculator::calculate_i() {
     aabb._max[1] = _img_data->_dim[1];
     aabb._max[2] = _img_data->_dim[2];
 
-    this->update_i(aabb);
+    this->update_gpu(aabb);
 }
 
-void MaskBrickInfoCalculator::update_i(const AABBUI& aabb) {
+void MaskBrickInfoCalculator::update_gpu(const AABBUI& aabb) {
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_data);
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_texture);
     RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
@@ -310,7 +310,7 @@ void MaskBrickInfoCalculator::update_i(const AABBUI& aabb) {
 #undef VISIBLE_LABEL_COUNT
 }
 
-void MaskBrickInfoCalculator::initialize_i() {
+void MaskBrickInfoCalculator::initialize() {
     if (nullptr == _gl_program) {
         UIDType uid;
         _gl_program = GLResourceManagerContainer::instance()

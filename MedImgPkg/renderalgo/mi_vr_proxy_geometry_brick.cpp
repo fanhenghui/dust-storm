@@ -110,11 +110,11 @@ void ProxyGeometryBrick::calculate_entry_exit_points() {
         _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
-    if (need_brick_filtering_i()) {
+    if (need_brick_filtering()) {
         if (entry_exit_points->_brick_filter_items & BF_MASK) {
-            brick_flitering_mask_i();
+            brick_flitering_mask();
         } else {
-            brick_filtering_non_mask_i();
+            brick_filtering_non_mask();
         }
     }
 
@@ -190,7 +190,7 @@ void ProxyGeometryBrick::calculate_entry_exit_points() {
     CHECK_GL_ERROR;
 }
 
-bool ProxyGeometryBrick::need_brick_filtering_i() {
+bool ProxyGeometryBrick::need_brick_filtering() {
     std::shared_ptr<VREntryExitPoints> entry_exit_points =
         _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
@@ -198,7 +198,7 @@ bool ProxyGeometryBrick::need_brick_filtering_i() {
     bool no_changed = true;
 
     if (_last_aabb != entry_exit_points->_aabb) {
-        update_vertex_color_i();
+        update_vertex_color();
         _last_aabb = entry_exit_points->_aabb;
         no_changed &= false;
     }
@@ -221,7 +221,7 @@ bool ProxyGeometryBrick::need_brick_filtering_i() {
     return !no_changed;
 }
 
-void ProxyGeometryBrick::update_vertex_color_i() {
+void ProxyGeometryBrick::update_vertex_color() {
     std::shared_ptr<VREntryExitPoints> entry_exit_points =
         _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
@@ -260,7 +260,7 @@ void ProxyGeometryBrick::update_vertex_color_i() {
                            _cur_color_array.get(), GL_STATIC_DRAW);
 }
 
-void ProxyGeometryBrick::brick_filtering_non_mask_i() {
+void ProxyGeometryBrick::brick_filtering_non_mask() {
     MI_RENDERALGO_LOG(MI_TRACE) << "IN proxy geometry brick filtering.";
     std::shared_ptr<VREntryExitPoints> entry_exit_points =
         _vr_entry_exit_points.lock();
@@ -329,7 +329,7 @@ void ProxyGeometryBrick::brick_filtering_non_mask_i() {
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT proxy geometry brick filtering.";
 }
 
-void ProxyGeometryBrick::brick_flitering_mask_i() {
+void ProxyGeometryBrick::brick_flitering_mask() {
     MI_RENDERALGO_LOG(MI_TRACE) << "IN proxy geometry brick filtering with mask.";
 
     std::shared_ptr<VREntryExitPoints> entry_exit_points =

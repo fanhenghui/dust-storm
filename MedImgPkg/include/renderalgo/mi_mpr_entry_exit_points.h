@@ -37,9 +37,9 @@ public:
                               Vector3f& ray_dir_norm);
 
 private:
-    void cal_entry_exit_points_cpu_i();
+    void cal_entry_exit_points_cpu();
 
-    void cal_entry_exit_points_gpu_i();
+    void cal_entry_exit_points_gpu();
 
 private:
     float _thickness;

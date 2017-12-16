@@ -173,8 +173,8 @@ void VRScene::set_proxy_geometry(ProxyGeometry pg_type) {
     vr_entry_exit_points->set_proxy_geometry(pg_type);
 }
 
-void VRScene::pre_render_i() {
-    RayCastScene::pre_render_i();
+void VRScene::pre_render() {
+    RayCastScene::pre_render();
 
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
         std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);

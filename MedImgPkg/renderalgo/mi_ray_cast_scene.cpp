@@ -48,7 +48,7 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
         _ray_caster->set_strategy(GPU_BASE);
     }
 
-    init_default_color_texture_i();
+    init_default_color_texture();
 
     _navigator_margin[0] = 20;
     _navigator_margin[1] = 20;
@@ -77,7 +77,7 @@ RayCastScene::RayCastScene(int width, int height)
         _ray_caster->set_strategy(GPU_BASE);
     }
 
-    init_default_color_texture_i();
+    init_default_color_texture();
 
     _navigator_margin[0] = 20;
     _navigator_margin[1] = 20;
@@ -108,7 +108,7 @@ void RayCastScene::set_display_size(int width, int height) {
     _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
 
-void RayCastScene::pre_render_i() {
+void RayCastScene::pre_render() {
     // refresh volume & mask & their infos
     _volume_infos->refresh();
 
@@ -126,12 +126,12 @@ void RayCastScene::pre_render_i() {
 
     // scene base prerender to recreate jpeg encoder(this must be call after gl
     // resource update)
-    SceneBase::pre_render_i();
+    SceneBase::pre_render();
 
     _navigator->set_camera(_camera);
 }
 
-void RayCastScene::init_default_color_texture_i() {
+void RayCastScene::init_default_color_texture() {
     if (GPU == Configure::instance()->get_processing_unit_type()) {
         // initialize gray pseudo color texture
         if (!_pseudo_color_texture) {
@@ -181,7 +181,7 @@ void RayCastScene::init_default_color_texture_i() {
 }
 
 void RayCastScene::render() {
-    pre_render_i();
+    pre_render();
 
     // Skip render scene
     if (!get_dirty()) {

@@ -24,13 +24,13 @@ public:
     void calculate_entry_exit_points();
 
 private:
-    bool need_brick_filtering_i();
+    bool need_brick_filtering();
 
-    void update_vertex_color_i();
+    void update_vertex_color();
 
-    void brick_flitering_mask_i();
+    void brick_flitering_mask();
 
-    void brick_filtering_non_mask_i();
+    void brick_filtering_non_mask();
 
 private:
     GLVAOPtr _gl_vao;

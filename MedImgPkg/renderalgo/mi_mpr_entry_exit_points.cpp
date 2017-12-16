@@ -99,16 +99,16 @@ void MPREntryExitPoints::calculate_entry_exit_points() {
 
     // clock_t t0 = clock();
     if (CPU_BASE == _strategy) {
-        cal_entry_exit_points_cpu_i();
+        cal_entry_exit_points_cpu();
     } else if (GPU_BASE == _strategy) {
-        cal_entry_exit_points_gpu_i();
+        cal_entry_exit_points_gpu();
     }
     // clock_t t1 = clock();
     // MI_RENDERALGO_LOG(MI_DEBUG) << "Calculate entry exit points cost : " << double(t1 - t0)/CLOCKS_PER_SEC;
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT calculate MPR entry exit points.";
 }
 
-void MPREntryExitPoints::cal_entry_exit_points_cpu_i() {
+void MPREntryExitPoints::cal_entry_exit_points_cpu() {
     try {
         RENDERALGO_CHECK_NULL_EXCEPTION(_camera);
         RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
@@ -284,7 +284,7 @@ void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point,
     ray_dir_norm = _ray_dir_norm;
 }
 
-void MPREntryExitPoints::cal_entry_exit_points_gpu_i() {
+void MPREntryExitPoints::cal_entry_exit_points_gpu() {
     try {
 #define IMAGE_ENTRY_POINT 0
 #define IMAGE_EXIT_POINT 1

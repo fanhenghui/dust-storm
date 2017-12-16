@@ -96,8 +96,8 @@ public:
     void set_navigator_para(int x_margin, int y_margin, float ratio);
 
 protected:
-    virtual void pre_render_i();
-    void init_default_color_texture_i();
+    virtual void pre_render();
+    void init_default_color_texture();
 
 protected:
     std::shared_ptr<VolumeInfos> _volume_infos;

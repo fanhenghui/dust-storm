@@ -243,7 +243,7 @@ bool SceneBase::get_dirty() const {
     return _dirty;
 }
 
-void SceneBase::pre_render_i() {
+void SceneBase::pre_render() {
 #ifndef WIN32
     if (_gpujpeg_encoder_hd && _gpujpeg_encoder_dirty) {
         //release previous
