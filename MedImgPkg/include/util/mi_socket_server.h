@@ -19,7 +19,7 @@ MED_IMG_BEGIN_NAMESPACE
 class SocketList;
 class SocketServer {
 public:
-    SocketServer(SocketType type = UNIX);
+    explicit SocketServer(SocketType type = UNIX);
     ~SocketServer();
 
     void set_max_client(int max_clients);

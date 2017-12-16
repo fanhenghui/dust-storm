@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTextureBase : public GLObject {
 public:
-    GLTextureBase(UIDType uid): GLObject(uid), _texture_id(0) {
+    explicit GLTextureBase(UIDType uid): GLObject(uid), _texture_id(0) {
         set_type("GLTextureBase");
     }
 

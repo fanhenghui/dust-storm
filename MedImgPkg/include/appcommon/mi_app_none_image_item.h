@@ -29,7 +29,7 @@ class MsgNoneImgCollection;
 class SceneBase;
 class INoneImg {
 public:
-    INoneImg( NoneImageType type):_type(type) {};
+    explicit INoneImg( NoneImageType type):_type(type) {};
     virtual ~INoneImg() {};
 
     virtual void fill_msg(MsgNoneImgCollection* msg) const = 0;

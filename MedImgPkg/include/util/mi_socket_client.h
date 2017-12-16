@@ -15,7 +15,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class SocketClient {
 public:
-    SocketClient(SocketType type = UNIX);
+    explicit SocketClient(SocketType type = UNIX);
     ~SocketClient();
 
     //for AF_UNIX

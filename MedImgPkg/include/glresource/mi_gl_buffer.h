@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLBuffer : public GLObject {
 public:
-    GLBuffer(UIDType uid);
+    explicit GLBuffer(UIDType uid);
 
     ~GLBuffer();
 

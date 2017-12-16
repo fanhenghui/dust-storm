@@ -14,7 +14,7 @@ class OrthoCamera;
 class CameraCalculator;
 class RenderAlgo_Export OrthoCameraInteractor {
 public:
-    OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera);
+    explicit OrthoCameraInteractor(std::shared_ptr<OrthoCamera> camera);
     ~OrthoCameraInteractor();
 
     void reset_camera();

@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLVAO : public GLObject {
 public:
-    GLVAO(UIDType uid);
+    explicit GLVAO(UIDType uid);
 
     ~GLVAO();
 

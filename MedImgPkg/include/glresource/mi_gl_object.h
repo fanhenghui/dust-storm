@@ -34,7 +34,7 @@ private:
 
 class GLResource_Export GLObject {
 public:
-    GLObject(UIDType uid) : m_uid(uid) {}
+    explicit GLObject(UIDType uid) : m_uid(uid) {}
     ~GLObject() {}
     UIDType get_uid() const {
         return m_uid;

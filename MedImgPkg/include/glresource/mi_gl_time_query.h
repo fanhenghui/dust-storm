@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTimeQuery : public GLObject {
 public:
-    GLTimeQuery(UIDType uid);
+    explicit GLTimeQuery(UIDType uid);
 
     ~GLTimeQuery();
 

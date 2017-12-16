@@ -17,7 +17,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export MSGLContext : public GLObject {
 public:
-    MSGLContext(UIDType uid);
+    explicit MSGLContext(UIDType uid);
     ~MSGLContext();
 
     virtual void initialize();
@@ -36,7 +36,7 @@ private:
 
 class GLResource_Export XGLContext : public GLObject {
 public:
-    XGLContext(UIDType uid);
+    explicit XGLContext(UIDType uid);
     ~XGLContext();
 
     virtual void initialize();

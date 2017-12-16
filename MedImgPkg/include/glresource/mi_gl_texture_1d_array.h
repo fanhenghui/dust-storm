@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTexture1DArray : public GLTextureBase {
 public:
-    GLTexture1DArray(UIDType uid);
+    explicit GLTexture1DArray(UIDType uid);
 
     ~GLTexture1DArray();
 

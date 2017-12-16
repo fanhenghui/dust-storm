@@ -49,7 +49,7 @@ enum ScanSliceType {
 
 class RenderAlgo_Export CameraCalculator {
 public:
-    CameraCalculator(std::shared_ptr<ImageData> image_data);
+    explicit CameraCalculator(std::shared_ptr<ImageData> image_data);
 
     //////////////////////////////////////////////////////////////////////////
     // Initializion

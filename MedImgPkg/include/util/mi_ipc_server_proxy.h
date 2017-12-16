@@ -14,7 +14,7 @@ MED_IMG_BEGIN_NAMESPACE
 class SocketServer;
 class IPCServerProxy {
 public:
-    IPCServerProxy(SocketType type = UNIX);
+    explicit IPCServerProxy(SocketType type = UNIX);
     ~IPCServerProxy();
 
     void set_path(const std::string& path);

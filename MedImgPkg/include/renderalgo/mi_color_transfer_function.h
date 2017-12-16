@@ -27,7 +27,7 @@ struct ColorTFPoint {
 
 class RenderAlgo_Export ColorTransFunc {
 public:
-    ColorTransFunc(int width = 512);
+    explicit ColorTransFunc(int width = 512);
     ~ColorTransFunc();
 
     void set_name(const std::string& lut_name);

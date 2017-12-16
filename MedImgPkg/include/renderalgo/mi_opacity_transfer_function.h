@@ -20,7 +20,7 @@ struct OpacityTFPoint {
 
 class RenderAlgo_Export OpacityTransFunc {
 public:
-    OpacityTransFunc(int width = 512);
+    explicit OpacityTransFunc(int width = 512);
     ~OpacityTransFunc();
 
     void set_name(const std::string& lut_name);

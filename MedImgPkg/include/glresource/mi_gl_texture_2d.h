@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLResource_Export GLTexture2D : public GLTextureBase {
 public:
-    GLTexture2D(UIDType uid);
+    explicit GLTexture2D(UIDType uid);
 
     ~GLTexture2D();
 

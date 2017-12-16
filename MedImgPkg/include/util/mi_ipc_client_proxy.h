@@ -14,7 +14,7 @@ MED_IMG_BEGIN_NAMESPACE
 class SocketClient;
 class IPCClientProxy {
 public:
-    IPCClientProxy(SocketType type = UNIX);
+    explicit IPCClientProxy(SocketType type = UNIX);
     ~IPCClientProxy();
 
     void set_path(const std::string& path);

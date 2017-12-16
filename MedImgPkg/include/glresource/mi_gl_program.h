@@ -19,7 +19,7 @@ struct GLShaderInfo {
 
 class GLResource_Export GLProgram : public GLObject {
 public:
-    GLProgram(UIDType uid);
+    explicit GLProgram(UIDType uid);
 
     ~GLProgram();
 

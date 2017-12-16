@@ -8,7 +8,7 @@ MED_IMG_BEGIN_NAMESPACE
 class GLTexture2D;
 class GLResource_Export GLFBO : public GLObject {
 public:
-    GLFBO(UIDType uid);
+    explicit GLFBO(UIDType uid);
 
     ~GLFBO();
 

@@ -90,8 +90,6 @@ class IO_Export TargaParser
 {
 public:
     static IOStatus load(const std::string& file, int& width, int& height, int& channel, unsigned char*& img_buf);
-protected:
-private:
 };
 
 MED_IMG_END_NAMESPACE
