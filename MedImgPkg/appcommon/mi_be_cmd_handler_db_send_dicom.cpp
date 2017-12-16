@@ -46,10 +46,11 @@ BECmdHandlerDBSendDICOM::~BECmdHandlerDBSendDICOM() {
 
 int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
     try {
-        MI_APPCOMMON_LOG(MI_TRACE) << "IN recveive DB server DICOM series cmd handler.";
+        MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerDBSendDICOM.";
+        
+        APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
         std::shared_ptr<AppController> controller = _controller.lock();
         APPCOMMON_CHECK_NULL_EXCEPTION(controller);
-
         std::shared_ptr<ModelDBSStatus> model_dbs_status = AppCommonUtil::get_model_dbs_status(controller);
         APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
 
@@ -116,7 +117,7 @@ int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , cha
                 MI_APPCOMMON_LOG(MI_INFO) << "load DBS DICOM stream success.";
             }
         }
-        MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
+        MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerDBSendDICOM.";
         return 0;
     } catch(const Exception& e) {
         return -1;
@@ -228,6 +229,5 @@ void BECmdHandlerDBSendDICOM::update_cache_db_i() {
         }
     }
 }
-
 
 MED_IMG_END_NAMESPACE

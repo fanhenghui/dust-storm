@@ -3,7 +3,7 @@
 #include "arithmetic/mi_ortho_camera.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -11,6 +11,7 @@
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,15 +20,15 @@ BEOpFEPan::BEOpFEPan() {}
 BEOpFEPan::~BEOpFEPan() {}
 
 int BEOpFEPan::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEPan.";
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgMouse msg;
-
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse pan mouse message failed.";
+        return -1;
     }
-
     const float pre_x = msg.pre().x();
     const float pre_y = msg.pre().y();
     const float cur_x = msg.cur().x();
@@ -45,6 +46,7 @@ int BEOpFEPan::execute() {
 
     scene->pan(Point2(pre_x, pre_y), Point2(cur_x, cur_y));
 
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEPan.";
     return 0;
 }
 

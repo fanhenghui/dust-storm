@@ -4,7 +4,7 @@
 
 #include "arithmetic/mi_circle.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 
 #include "renderalgo/mi_mask_label_store.h"
@@ -32,16 +32,14 @@ BEOpFEFetchAIEvaluation::~BEOpFEFetchAIEvaluation() {}
 
 int BEOpFEFetchAIEvaluation::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEFetchAIEvaluation.";
-    if (_buffer == nullptr || _header.data_len == 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation request message from BE.";
+    APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
+
+    MsgAnnotationQuery msg;
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse evaluation request message from BE failed.";
         return -1;
     }
 
-    MsgAnnotationQuery msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "parse annotation request message from BE failed.";
-        return -1;
-    }
     const int role = msg.role();
     const std::string username = msg.username();
     const std::string serise_id = msg.series_uid();
@@ -78,8 +76,6 @@ int BEOpFEFetchAIEvaluation::execute() {
     } else {
         //TODO query from annotation table
     }
-
-
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEFetchAIEvaluation.";
     return 0;

@@ -10,7 +10,7 @@
 #include "util/mi_file_util.h"
 
 #include "io/mi_pacs_communicator.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 #include "io/mi_db.h"
 
@@ -31,6 +31,7 @@ DBOpBEPACSFetch::~DBOpBEPACSFetch() {
 }
 
 int DBOpBEPACSFetch::execute() {
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEPACSFetch.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
@@ -43,8 +44,8 @@ int DBOpBEPACSFetch::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(db);
 
     MsgDcmInfoCollection msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        MI_DBSERVER_LOG(MI_ERROR) << "parse DICOM info collection message failed!";
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse PACS fetch message send by BE failed.";
         return -1;
     }
 
@@ -126,6 +127,7 @@ int DBOpBEPACSFetch::execute() {
         }
     }
 
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEPACSFetch.";
     return 0;
 }
 

@@ -1,6 +1,6 @@
 #include "mi_be_operation_fe_switch_preset_vrt.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_color_transfer_function.h"
 #include "renderalgo/mi_opacity_transfer_function.h"
@@ -22,8 +22,9 @@ int BEOpFESwitchPresetVRT::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse switch preset windowing message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse switch preset VRT message failed.";
+        return -1;
     }
 
     const std::string context = msg.context();

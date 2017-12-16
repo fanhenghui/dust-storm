@@ -1,6 +1,6 @@
 #include "mi_db_operation_ai_send_evaluation.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_db_server_controller.h"
 #include "mi_db_evaluatiion_dispatcher.h"
@@ -16,6 +16,7 @@ DBOpAISendEvaluation::~DBOpAISendEvaluation() {
 }
 
 int DBOpAISendEvaluation::execute() {
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpAISendEvaluation.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
@@ -24,9 +25,11 @@ int DBOpAISendEvaluation::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(dispatcher);
 
     MsgEvaluationResponse msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        DBSERVER_THROW_EXCEPTION("parse evaluation response message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse evaluation message send by AI server failed.";
+        return -1;
     }
+
     if (-1 == dispatcher->receive_evaluation(&msg)) {
         MI_DBSERVER_LOG(MI_DEBUG) << "receive evaluation failed."; 
         msg.Clear();
@@ -36,7 +39,7 @@ int DBOpAISendEvaluation::execute() {
     
 
     MI_DBSERVER_LOG(MI_DEBUG) << "receive AIS result and send to BE.";
-
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpAISendEvaluation.";
     return 0;
 }
 

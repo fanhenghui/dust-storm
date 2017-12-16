@@ -18,11 +18,9 @@ BECmdHandlerFEOperation::~BECmdHandlerFEOperation() {
 }
 
 int BECmdHandlerFEOperation::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN operation cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEOperation.";
     std::shared_ptr<AppController> controller = _controller.lock();
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     const unsigned int op_id = ipcheader.op_id;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
@@ -38,7 +36,7 @@ int BECmdHandlerFEOperation::handle_command(const IPCDataHeader& ipcheader , cha
         }
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT operation cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEOperation.";
     return 0;
 }
 

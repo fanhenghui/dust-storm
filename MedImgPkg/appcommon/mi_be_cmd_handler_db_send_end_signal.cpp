@@ -21,7 +21,8 @@ BECmdHandlerDBSendEndSignal::~BECmdHandlerDBSendEndSignal() {
 }
 
 int BECmdHandlerDBSendEndSignal::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerDBSendEndSignal.";
+    
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -31,7 +32,7 @@ int BECmdHandlerDBSendEndSignal::handle_command(const IPCDataHeader& ipcheader ,
 
     model_dbs_status->unlock();
 
-    MI_APPCOMMON_LOG(MI_DEBUG) << "OUT recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_DEBUG) << "OUT BECmdHandlerDBSendEndSignal.";
     return -1;
 }
 

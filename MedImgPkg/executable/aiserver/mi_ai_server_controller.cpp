@@ -52,7 +52,7 @@ void AIServerController::initialize() {
         std::shared_ptr<CmdHandlerAIOperating>(new CmdHandlerAIOperating(shared_from_this())));
 
     OperationFactory::instance()->register_operation(OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION, 
-    std::shared_ptr<AIODBRequestEvaluation>(new AIODBRequestEvaluation()));
+    std::shared_ptr<AIOpDBRequestEvaluation>(new AIOpDBRequestEvaluation()));
 
     //register event for on connect to DB Server
     _client_proxy->register_on_connection_event(std::shared_ptr<ReadyEvent>(new ReadyEvent(_thread_model)));

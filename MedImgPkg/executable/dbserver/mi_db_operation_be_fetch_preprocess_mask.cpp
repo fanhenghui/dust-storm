@@ -4,7 +4,7 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "io/mi_db.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_db_server_controller.h"
 
@@ -19,11 +19,13 @@ DBOpBEFetchPreprocessMask::~DBOpBEFetchPreprocessMask() {
 }
 
 int DBOpBEFetchPreprocessMask::execute() {
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEFetchPreprocessMask.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        DBSERVER_THROW_EXCEPTION("parse series message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse fetch preprocess mask message send by BE failed.";
+        return -1;
     }
     const std::string series_id = msg.context();
     msg.Clear();
@@ -64,6 +66,7 @@ int DBOpBEFetchPreprocessMask::execute() {
         MI_DBSERVER_LOG(MI_WARNING) << "send preprocess mask to client failed.(client disconnected)";
     }
 
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEFetchPreprocessMask.";
     return 0;
 }
 

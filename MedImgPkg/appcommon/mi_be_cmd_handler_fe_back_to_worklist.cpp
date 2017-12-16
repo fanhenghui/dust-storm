@@ -70,9 +70,9 @@ BECmdHandlerFEBackToWorklist::BECmdHandlerFEBackToWorklist(
 BECmdHandlerFEBackToWorklist::~BECmdHandlerFEBackToWorklist() {}
 
 int BECmdHandlerFEBackToWorklist::handle_command(const IPCDataHeader& ipcheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN back to worklist cmd handler.";
-    MemShield shield(buffer);
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEBackToWorklist.";
 
+    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     if (nullptr == controller) {
         APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
@@ -87,7 +87,7 @@ int BECmdHandlerFEBackToWorklist::handle_command(const IPCDataHeader& ipcheader,
     boost::mutex::scoped_lock locker(_mutex);
     _condition.wait(_mutex);
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT back to worklist cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEBackToWorklist.";
     return 0;
 }
 

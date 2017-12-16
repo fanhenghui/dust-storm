@@ -6,7 +6,7 @@
 
 #include "io/mi_image_data.h"
 #include "io/mi_configure.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_mask_label_store.h"
@@ -31,17 +31,14 @@ public:
 
     virtual int execute() {
         MI_APPCOMMON_LOG(MI_TRACE) << "IN OpReceiveAnnotation.";
-        if (_buffer == nullptr || _header.data_len < 0) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation message from DBS.";
-            return -1;
-        }
+        APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
         MsgAnnotationCollectionDB msg;
-        if (!msg.ParseFromArray(_buffer, _header.data_len)) {
+        if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "parse annotation message from DBS failed.";
             return -1;
         }
-
+        
         std::shared_ptr<AppController> controller = get_controller<AppController>();
         APPCOMMON_CHECK_NULL_EXCEPTION(controller);
         std::shared_ptr<ModelAnnotation> model_annotation = AppCommonUtil::get_model_annotation(controller);
@@ -119,10 +116,11 @@ BECmdHandlerDBSendAIEvaluation::~BECmdHandlerDBSendAIEvaluation() {
 }
 
 int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerDBSendAIEvaluation.";
+    
+    APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
-
     std::shared_ptr<ModelDBSStatus> model_dbs_status = AppCommonUtil::get_model_dbs_status(controller);
     APPCOMMON_CHECK_NULL_EXCEPTION(model_dbs_status);
 
@@ -132,7 +130,7 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
     }
 
     MsgAnnotationCollectionDB msg;
-    if (!msg.ParseFromArray(buffer,ipcheader.data_len)) {
+    if (0 != protobuf_parse(buffer, ipcheader.data_len, msg)) {
         model_dbs_status->push_error_info("parse recv dbs AI annotation message failed.");
         return -1;
     }
@@ -193,7 +191,7 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
         }
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerDBSendAIEvaluation.";
     return 0;
 }
 

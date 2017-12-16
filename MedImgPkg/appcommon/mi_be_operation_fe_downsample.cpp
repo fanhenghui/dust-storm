@@ -1,7 +1,7 @@
 #include "mi_be_operation_fe_downsample.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_scene_base.h"
@@ -22,12 +22,14 @@ int BEOpFEDownsample::execute() {
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
     MsgFlag msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse down sample message failed.";
+        return -1;
     }
 
     const bool flag = msg.flag();
     msg.Clear();
+
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 

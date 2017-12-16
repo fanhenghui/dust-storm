@@ -2,7 +2,7 @@
 
 #include "arithmetic/mi_circle.h"
 #include "util/mi_ipc_client_proxy.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mask_label_store.h"
 #include "renderalgo/mi_mpr_scene.h"
@@ -33,20 +33,21 @@ int BEOpFEAnnotation::execute() {
         return -1;
     }
 
-    MsgAnnotationUnit msgAnnotation;
-    if (!msgAnnotation.ParseFromArray(_buffer, _header.data_len)) {
+    MsgAnnotationUnit msg;
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse annotation message failed.";
         return -1;
     }
-    //const int anno_type = msgAnnotation.type();
-    const std::string anno_id = msgAnnotation.id();
+
+    //const int anno_type = msg.type();
+    const std::string anno_id = msg.id();
     //MI_APPCOMMON_LOG(MI_DEBUG) << "annotation ID: " << anno_id;
-    const int anno_status = msgAnnotation.status();
-    const float anno_para0 = msgAnnotation.para0();
-    const float anno_para1 = msgAnnotation.para1();
-    const float anno_para2 = msgAnnotation.para2(); 
-    const float probability = msgAnnotation.probability(); 
-    msgAnnotation.Clear();
+    const int anno_status = msg.status();
+    const float anno_para0 = msg.para0();
+    const float anno_para1 = msg.para1();
+    const float anno_para2 = msg.para2(); 
+    const float probability = msg.probability(); 
+    msg.Clear();
     
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);

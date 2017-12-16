@@ -15,7 +15,7 @@
 #include "io/mi_cache_db.h"
 #include "io/mi_db.h"
 #include "io/mi_configure.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "glresource/mi_gl_context.h"
 #include "glresource/mi_gl_utils.h"
@@ -67,7 +67,7 @@ int OpInit::execute() {
 
     REVIEW_CHECK_NULL_EXCEPTION(_buffer);
     MsgInit msg_init;
-    if (!msg_init.ParseFromArray(_buffer, _header.data_len)) {
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg_init)) {
         MI_REVIEW_LOG(MI_ERROR) << "parse init message failed.";
         return -1;
     }

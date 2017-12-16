@@ -19,6 +19,8 @@ BECmdHandlerFEAnonymization::BECmdHandlerFEAnonymization(
 BECmdHandlerFEAnonymization::~BECmdHandlerFEAnonymization() {}
 
 int BECmdHandlerFEAnonymization::handle_command(const IPCDataHeader &header, char *buffer) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEAnonymization.";
+    
     MemShield shield(buffer);
     APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -39,7 +41,7 @@ int BECmdHandlerFEAnonymization::handle_command(const IPCDataHeader &header, cha
         model->set_changed();
         model->notify();
     }
-
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEAnonymization.";
     return 0;
 }
 

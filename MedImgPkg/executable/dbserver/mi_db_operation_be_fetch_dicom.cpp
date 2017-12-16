@@ -6,7 +6,7 @@
 #include "util/mi_ipc_server_proxy.h"
 
 #include "io/mi_db.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "appcommon/mi_app_common_define.h"
 
@@ -23,13 +23,16 @@ DBOpBEFetchDICOM::~DBOpBEFetchDICOM() {
 }
 
 int DBOpBEFetchDICOM::execute() {
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEFetchDICOM.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     clock_t _start = clock();
 
     MsgString msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        DBSERVER_THROW_EXCEPTION("parse series message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse fetch DICOM message send by BE failed.";
+        return -1;
     }
+
     const std::string series_id = msg.context();
     msg.Clear();
     
@@ -87,6 +90,7 @@ int DBOpBEFetchDICOM::execute() {
     clock_t _end = clock();
     MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_id << ", slice:" << files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "s}.";
 
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEFetchDICOM.";
     return 0;
 }
 

@@ -3,7 +3,7 @@
 #include "arithmetic/mi_ortho_camera.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -20,12 +20,13 @@ BEOpFEResize::BEOpFEResize() {}
 BEOpFEResize::~BEOpFEResize() {}
 
 int BEOpFEResize::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEResize.";
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgResize msg;
-
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse resize message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse resize message failed.";
+        return -1;
     }
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
@@ -47,6 +48,7 @@ int BEOpFEResize::execute() {
     }
     msg.Clear();
 
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEResize.";
     return 0;
 }
 

@@ -16,11 +16,11 @@ BECmdHandlerFEHeartbeat::BECmdHandlerFEHeartbeat(
 BECmdHandlerFEHeartbeat::~BECmdHandlerFEHeartbeat() {}
 
 int BECmdHandlerFEHeartbeat::handle_command(const IPCDataHeader &ipcheader, char *buffer) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEHeartbeat";
+
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_FE_BE_HEARTBEAT;
@@ -28,6 +28,7 @@ int BECmdHandlerFEHeartbeat::handle_command(const IPCDataHeader &ipcheader, char
     MI_APPCOMMON_LOG(MI_INFO) << "BE reveive heartbeat.";
     controller->get_client_proxy()->sync_send_data(header, nullptr);
 
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEHeartbeat";
     return 0;
 }
 

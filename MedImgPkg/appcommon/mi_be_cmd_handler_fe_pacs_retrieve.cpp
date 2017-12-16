@@ -18,7 +18,8 @@ BECmdHandlerFEPACSRetrieve::BECmdHandlerFEPACSRetrieve(std::shared_ptr<AppContro
 BECmdHandlerFEPACSRetrieve::~BECmdHandlerFEPACSRetrieve() {}
 
 int BECmdHandlerFEPACSRetrieve::handle_command(const IPCDataHeader& dataheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN CmdHandler PACS retrieve";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEPACSRetrieve";
+
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -34,7 +35,7 @@ int BECmdHandlerFEPACSRetrieve::handle_command(const IPCDataHeader& dataheader, 
         return -1;
     }
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS retrieve";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEPACSRetrieve";
     return 0;
 }
 

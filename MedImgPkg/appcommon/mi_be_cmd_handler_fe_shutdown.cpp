@@ -4,6 +4,7 @@
 #include "util/mi_memory_shield.h"
 
 #include "mi_app_controller.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -17,15 +18,13 @@ BECmdHandlerFEShutdown::~BECmdHandlerFEShutdown() {
 }
 
 int BECmdHandlerFEShutdown::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MemShield shield(buffer);
-    std::shared_ptr<AppController> controller = _controller.lock();
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEShutdown";
 
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    MemShield shield(buffer);
 
     //TODO return shutdown ID
     const int quit_id = CLIENT_QUIT_ID;
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEShutdown";
     return quit_id;
 }
 

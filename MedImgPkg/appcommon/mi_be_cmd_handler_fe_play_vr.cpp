@@ -37,10 +37,7 @@ int BECmdHandlerFEPlayVR::handle_command(const IPCDataHeader& ipcheader , char* 
     }
 
     std::shared_ptr<AppController> controller = _controller.lock();
-
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     boost::thread th(boost::bind(&BECmdHandlerFEPlayVR::logic_i , this, ipcheader));
     th.detach();
@@ -52,9 +49,7 @@ int BECmdHandlerFEPlayVR::handle_command(const IPCDataHeader& ipcheader , char* 
 void BECmdHandlerFEPlayVR::logic_i(IPCDataHeader header) {
     _playing = true;
     std::shared_ptr<AppController> controller = _controller.lock();
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     for (int i = 0 ; i < 2000 ; ++i) {
         if (!_playing) {

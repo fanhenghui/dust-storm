@@ -5,14 +5,14 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class AIODBRequestEvaluation: public IOperation {
+class AIOpDBRequestEvaluation: public IOperation {
 public:
-    AIODBRequestEvaluation();
-    virtual ~AIODBRequestEvaluation();
+    AIOpDBRequestEvaluation();
+    virtual ~AIOpDBRequestEvaluation();
 
     virtual int execute();
 
-    CREATE_EXTENDS_OP(AIODBRequestEvaluation)
+    CREATE_EXTENDS_OP(AIOpDBRequestEvaluation)
 };
 
 MED_IMG_END_NAMESPACE

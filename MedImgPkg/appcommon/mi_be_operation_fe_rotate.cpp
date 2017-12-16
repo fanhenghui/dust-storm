@@ -5,7 +5,7 @@
 #include "arithmetic/mi_ortho_camera.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -36,7 +36,8 @@ int BEOpFERotate::execute() {
     APPCOMMON_CHECK_NULL_EXCEPTION(scene);
 
     MsgMouse msg;
-    if (msg.ParseFromArray(_buffer, _header.data_len)) {
+    //if (msg.ParseFromArray(_buffer, _header.data_len)) {
+    if (0 == protobuf_parse(_buffer, _header.data_len, msg)) {
         const float pre_x = msg.pre().x();
         const float pre_y = msg.pre().y();
         const float cur_x = msg.cur().x();
@@ -47,7 +48,7 @@ int BEOpFERotate::execute() {
     } else {
         //second change to parse to rotation message
         MsgRotation msg;    
-        if(msg.ParseFromArray(_buffer , _header.data_len)) {
+        if(0 == protobuf_parse(_buffer, _header.data_len, msg)) {
             const double angle = static_cast<double>(msg.angle());
             const double axis_x = static_cast<double>(msg.axis_x());
             const double axis_y = static_cast<double>(msg.axis_y());
@@ -56,9 +57,9 @@ int BEOpFERotate::execute() {
             scene->get_camera()->rotate(quat);
             scene->set_dirty(true);   
         } else {
-            APPCOMMON_THROW_EXCEPTION("parser rotation message failed!");
+            MI_APPCOMMON_LOG(MI_ERROR) << "parse rotation message failed.";
+            msg.Clear();
         }
-        msg.Clear();
     }
     
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFERotate";

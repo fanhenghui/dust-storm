@@ -21,9 +21,9 @@ BECmdHandlerFEReady::BECmdHandlerFEReady(
 BECmdHandlerFEReady::~BECmdHandlerFEReady() {}
 
 int BECmdHandlerFEReady::handle_command(const IPCDataHeader& ipcheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN ready cmd handler.";
-    MemShield shield(buffer);
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEReady.";
 
+    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
@@ -41,7 +41,7 @@ int BECmdHandlerFEReady::handle_command(const IPCDataHeader& ipcheader, char* bu
     controller->get_client_proxy()->sync_send_data(header, msg_buffer);
 
     MI_APPCOMMON_LOG(MI_INFO) << "sending ready to FE.";
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT ready cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEReady";
     return 0;
 }
 

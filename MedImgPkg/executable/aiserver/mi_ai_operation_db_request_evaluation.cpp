@@ -8,7 +8,7 @@
 #include "io/mi_nodule_set.h"
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_db.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 
 #include "appcommon/mi_app_common_define.h"
@@ -19,11 +19,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-AIODBRequestEvaluation::AIODBRequestEvaluation() {
+AIOpDBRequestEvaluation::AIOpDBRequestEvaluation() {
 
 }
 
-AIODBRequestEvaluation::~AIODBRequestEvaluation() {
+AIOpDBRequestEvaluation::~AIOpDBRequestEvaluation() {
 
 }
 
@@ -62,8 +62,8 @@ int notify_dbs(MsgEvaluationResponse& msg, std::shared_ptr<AIServerController> c
     }
 }
 
-int AIODBRequestEvaluation::execute() {
-    MI_AISERVER_LOG(MI_TRACE) << "IN Inference operation.";
+int AIOpDBRequestEvaluation::execute() {
+    MI_AISERVER_LOG(MI_TRACE) << "IN AIOpDBRequestEvaluation.";
 
     AISERVER_CHECK_NULL_EXCEPTION(_buffer);
 
@@ -75,7 +75,7 @@ int AIODBRequestEvaluation::execute() {
 
     //parse request message
     MsgEvaluationRequest msg_req;
-    if (!msg_req.ParseFromArray(_buffer, _header.data_len)) {
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg_req)) {
         MI_AISERVER_LOG(MI_ERROR) << "parse evaluation request message failed.";
         msg_res.set_status(-1);
         msg_res.set_err_msg("parse request message failed.");
@@ -195,7 +195,7 @@ int AIODBRequestEvaluation::execute() {
     
     msg_res.set_status(0);
     if(0 == notify_dbs(msg_res, controller) ) {
-        MI_AISERVER_LOG(MI_TRACE) << "OUT Inference operation.";
+        MI_AISERVER_LOG(MI_TRACE) << "OUT AIOpDBRequestEvaluation.";
         return 0;
     } else {
         return -1;

@@ -1,6 +1,6 @@
 #include "mi_db_operation_be_fetch_ai_evaluation.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_db_server_controller.h"
 #include "mi_db_evaluatiion_dispatcher.h"
@@ -16,12 +16,15 @@ DBOpBEFetchAIEvaluation::~DBOpBEFetchAIEvaluation() {
 }
 
 int DBOpBEFetchAIEvaluation::execute() {
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEFetchAIEvaluation.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgString msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        DBSERVER_THROW_EXCEPTION("parse series message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse fetch evaluation message send by BE failed.";
+        return -1;
     }
+
     const std::string series_id = msg.context();
     msg.Clear();
     
@@ -35,6 +38,7 @@ int DBOpBEFetchAIEvaluation::execute() {
         return -1;
     }
 
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEFetchAIEvaluation.";
     return 0;
 }
 

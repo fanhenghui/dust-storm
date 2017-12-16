@@ -30,7 +30,8 @@ BECmdHandlerDBSendPreprocessMask::~BECmdHandlerDBSendPreprocessMask() {
 }
 
 int BECmdHandlerDBSendPreprocessMask::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerDBSendPreprocessMask.";
+
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
@@ -68,7 +69,7 @@ int BECmdHandlerDBSendPreprocessMask::handle_command(const IPCDataHeader& ipchea
     //set preprocess mask tag
     model_dbs_status->set_preprocess_mask();
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT recveive DB server DICOM series cmd handler.";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerDBSendPreprocessMask.";
     return 0;
 }
 

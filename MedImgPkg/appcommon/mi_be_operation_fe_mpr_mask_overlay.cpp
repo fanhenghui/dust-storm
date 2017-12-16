@@ -1,6 +1,6 @@
 #include "mi_be_operation_fe_mpr_mask_overlay.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 
@@ -21,13 +21,10 @@ BEOpFEMPRMaskOverlay::~BEOpFEMPRMaskOverlay() {
 
 int BEOpFEMPRMaskOverlay::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEMPRMaskOverlay.";
-    if (_buffer == nullptr || _header.data_len < 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "incompleted mask overlay message.";
-        return -1;
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgMPRMaskOverlay msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse MPR mask overlay message failed.";
         return -1;
     }

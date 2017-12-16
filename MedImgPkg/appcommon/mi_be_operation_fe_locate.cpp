@@ -7,7 +7,7 @@
 #include "arithmetic/mi_vector3.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "glresource/mi_gl_context.h"
 
@@ -33,24 +33,17 @@ BEOpFELocate::BEOpFELocate() {}
 BEOpFELocate::~BEOpFELocate() {}
 
 int BEOpFELocate::execute() {
-    if (_buffer == nullptr || _header.data_len < 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "incompleted locate message.";
-        return -1;
-    }
+    APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
-    MsgCrosshair msgCrosshair;
-    if (!msgCrosshair.ParseFromArray(_buffer, _header.data_len)) {
+    MsgCrosshair msg;
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse crosshair message failed.";
         return -1;
     }
+    const float cx = msg.cx();
+    const float cy = msg.cy();
+    msg.Clear();
 
-    const float cx = msgCrosshair.cx();
-    const float cy = msgCrosshair.cy();
-    //const float l0_a = msgCrosshair.l0_a();
-    //const float l0_b = msgCrosshair.l0_b();
-    //const float l1_a = msgCrosshair.l1_a();
-    //const float l1_b = msgCrosshair.l1_b();
-    msgCrosshair.Clear();
     const Point2 pt_cross(cx, cy);
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();

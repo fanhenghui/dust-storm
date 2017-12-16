@@ -2,7 +2,7 @@
 
 #include "arithmetic/mi_circle.h"
 #include "util/mi_ipc_client_proxy.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "mi_model_annotation.h"
 #include "mi_app_common_logger.h"
@@ -17,13 +17,10 @@ BEOpFEAdjustEvaluationProbability::~BEOpFEAdjustEvaluationProbability() {}
 
 int BEOpFEAdjustEvaluationProbability::execute() {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEAdjustEvaluationProbability.";
-    if (_buffer == nullptr || _header.data_len < 0) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "incompleted annotation message.";
-        return -1;
-    }
 
+    APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
     MsgFloat msg;
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse adjust annotation probability msg failed.";
         return -1;
     }

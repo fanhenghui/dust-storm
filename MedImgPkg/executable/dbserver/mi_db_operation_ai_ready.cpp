@@ -16,6 +16,8 @@ DBOpAIReady::~DBOpAIReady() {
 }
 
 int DBOpAIReady::execute() {    
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpAIReady.";
+
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     controller->set_ais_client(_header.receiver);
@@ -24,6 +26,7 @@ int DBOpAIReady::execute() {
         return -1;
     } else {
         MI_DBSERVER_LOG(MI_INFO) << "AIS ready.";
+        MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpAIReady.";
         return 0;
     }
 }

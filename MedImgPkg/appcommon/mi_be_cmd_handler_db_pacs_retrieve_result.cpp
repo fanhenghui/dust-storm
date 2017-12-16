@@ -4,7 +4,7 @@
 #include "util/mi_memory_shield.h"
 #include "util/mi_operation_interface.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 
 #include "mi_app_controller.h"
@@ -51,17 +51,19 @@ BECmdHandlerDBPACSRetrieveResult::BECmdHandlerDBPACSRetrieveResult(std::shared_p
 BECmdHandlerDBPACSRetrieveResult::~BECmdHandlerDBPACSRetrieveResult() {}
 
 int BECmdHandlerDBPACSRetrieveResult::handle_command(const IPCDataHeader& dataheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN CmdHandler PACS retrieve response";
-    APPCOMMON_CHECK_NULL_EXCEPTION(buffer); 
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerDBPACSRetrieveResult";
     
+    APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
     //parse PACS result and save to model
     MsgDcmInfoCollection msg;
-    if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
+    if (0 != protobuf_parse(buffer, dataheader.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse dicom info collection msg from DBS failed(PCAS retrieve).";
+        return -1;
     }
+
     std::vector<DcmInfo> dcm_infos(msg.dcminfo_size());
     int id=0;
     for (int i=0; i<msg.dcminfo_size(); ++i) {
@@ -107,7 +109,7 @@ int BECmdHandlerDBPACSRetrieveResult::handle_command(const IPCDataHeader& datahe
     op->set_data(header , buffer);//transmit buffer from DB to FE(no need to shield)
     controller->get_thread_model()->push_operation_fe(op);
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS retrieve response";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerDBPACSRetrieveResult";
     return 0;
 }
 

@@ -22,6 +22,7 @@ BECmdHandlerFEDBRetrieve::~BECmdHandlerFEDBRetrieve() {}
 
 int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEDBRetrieve";
+    
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);

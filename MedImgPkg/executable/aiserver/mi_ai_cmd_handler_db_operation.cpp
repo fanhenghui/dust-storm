@@ -19,11 +19,9 @@ CmdHandlerAIOperating::~CmdHandlerAIOperating() {
 }
 
 int CmdHandlerAIOperating::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_AISERVER_LOG(MI_TRACE) << "IN operation cmd handler.";
+    MI_AISERVER_LOG(MI_TRACE) << "IN CmdHandlerAIOperating.";
     std::shared_ptr<AIServerController> controller = _controller.lock();
-    if (nullptr == controller) {
-        APPCOMMON_THROW_EXCEPTION("controller pointer is null!");
-    }
+    AISERVER_CHECK_NULL_EXCEPTION(controller);
 
     const unsigned int op_id = ipcheader.op_id;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
@@ -43,7 +41,7 @@ int CmdHandlerAIOperating::handle_command(const IPCDataHeader& ipcheader , char*
         }
     }
 
-    MI_AISERVER_LOG(MI_TRACE) << "OUT operation cmd handler.";
+    MI_AISERVER_LOG(MI_TRACE) << "OUT CmdHandlerAIOperating.";
     return 0;
 }
 

@@ -18,11 +18,12 @@ DBOpBEPACSRetrieve::~DBOpBEPACSRetrieve() {
 }
 
 int DBOpBEPACSRetrieve::execute() {    
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEPACSRetrieve.";
+
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
     DBSERVER_CHECK_NULL_EXCEPTION(server_proxy);
-
     std::shared_ptr<PACSCommunicator> pacs_commu = controller->get_pacs_communicator();
     DBSERVER_CHECK_NULL_EXCEPTION(pacs_commu);
 
@@ -92,6 +93,7 @@ int DBOpBEPACSRetrieve::execute() {
         MI_DBSERVER_LOG(MI_WARNING) << "send PACS retrieve result to client failed.(client disconnected)";
     }
     
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEPACSRetrieve.";
     return 0;
 }
 

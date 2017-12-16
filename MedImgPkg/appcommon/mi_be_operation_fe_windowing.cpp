@@ -3,7 +3,7 @@
 #include "arithmetic/mi_ortho_camera.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
@@ -11,6 +11,7 @@
 
 #include "mi_app_cell.h"
 #include "mi_app_controller.h"
+#include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,15 +20,15 @@ BEOpFEWindowing::BEOpFEWindowing() {}
 BEOpFEWindowing::~BEOpFEWindowing() {}
 
 int BEOpFEWindowing::execute() {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BEOpFEWindowing.";
     const unsigned int cell_id = _header.cell_id;
     APPCOMMON_CHECK_NULL_EXCEPTION(_buffer);
 
     MsgMouse msg;
-
-    if (!msg.ParseFromArray(_buffer, _header.data_len)) {
-        APPCOMMON_THROW_EXCEPTION("parse mouse message failed!");
+    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse windowing mouse message failed.";
+        return -1;
     }
-
     const float pre_x = msg.pre().x();
     const float pre_y = msg.pre().y();
     const float cur_x = msg.cur().x();
@@ -48,7 +49,6 @@ int BEOpFEWindowing::execute() {
 
     if (scene_ext) {
         float ww, wl;
-
         if (scene_ext->get_composite_mode() == COMPOSITE_DVR) {
             // TODO consider when has mask
             scene_ext->get_window_level(ww, wl, 0);
@@ -79,6 +79,7 @@ int BEOpFEWindowing::execute() {
         scene_ext->set_global_window_level(ww, wl);
     }
 
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BEOpFEWindowing.";
     return 0;
 }
 

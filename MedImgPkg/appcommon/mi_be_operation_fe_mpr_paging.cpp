@@ -3,7 +3,7 @@
 #include "arithmetic/mi_ortho_camera.h"
 
 #include "io/mi_image_data.h"
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
@@ -30,9 +30,9 @@ int BEOpFEMPRPaging::execute() {
     const unsigned int cell_id = _header.cell_id;
     int page_step = 1;
 
-    if (_buffer != nullptr) {
+    if (_buffer != nullptr && _header.data_len > 0) {
         MsgMouse msg;
-        if (!msg.ParseFromArray(_buffer , _header.data_len)) {
+        if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "parse mouse message failed in mpr paging.";
             return -1;
         }

@@ -5,7 +5,7 @@
 #include "util/mi_ipc_client_proxy.h"
 #include "util/mi_memory_shield.h"
 
-#include "io/mi_message.pb.h"
+#include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 
 #include "mi_app_controller.h"
@@ -22,8 +22,10 @@ BECmdHandlerFEPACSFetch::BECmdHandlerFEPACSFetch(std::shared_ptr<AppController> 
 BECmdHandlerFEPACSFetch::~BECmdHandlerFEPACSFetch() {}
 
 int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN CmdHandler PACS fetch";
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEPACSFetch";
+
     MemShield shield(buffer);
+    APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<ModelPACS> model_pacs = AppCommonUtil::get_model_pacs(controller);
@@ -31,12 +33,11 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
 
     //check msg
     MsgString msg;
-    if (!msg.ParseFromArray(buffer, dataheader.data_len)) {
+    if (0 != protobuf_parse(buffer, dataheader.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse series message from FE PACS fetch failed.";
-        MemShield shield(buffer);
-        msg.Clear();
         return -1;
     }
+
     const std::string series_idx_str = msg.context();
     msg.Clear();
 
@@ -104,7 +105,7 @@ int BECmdHandlerFEPACSFetch::handle_command(const IPCDataHeader& dataheader, cha
         return -1;
     }    
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT CmdHandler PACS fetch";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEPACSFetch";
     return 0;
 }
 

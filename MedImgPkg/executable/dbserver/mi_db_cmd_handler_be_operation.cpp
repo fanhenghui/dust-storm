@@ -18,11 +18,9 @@ DBCmdHandlerBEOperation::~DBCmdHandlerBEOperation() {
 }
 
 int DBCmdHandlerBEOperation::handle_command(const IPCDataHeader& ipcheader , char* buffer) {
-    MI_DBSERVER_LOG(MI_TRACE) << "IN operation cmd handler.";
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBCmdHandlerBEOperation.";
     std::shared_ptr<DBServerController> controller = _controller.lock();
-    if (nullptr == controller) {
-        DBSERVER_THROW_EXCEPTION("controller pointer is null!");
-    }
+    DBSERVER_CHECK_NULL_EXCEPTION(controller);
 
     const unsigned int op_id = ipcheader.op_id;
     std::shared_ptr<IOperation> op = OperationFactory::instance()->get_operation(op_id);
@@ -42,9 +40,8 @@ int DBCmdHandlerBEOperation::handle_command(const IPCDataHeader& ipcheader , cha
         }
     }
 
-    MI_DBSERVER_LOG(MI_TRACE) << "OUT operation cmd handler.";
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBCmdHandlerBEOperation.";
     return 0;
 }
-
 
 MED_IMG_END_NAMESPACE
