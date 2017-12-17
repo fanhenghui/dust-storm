@@ -32,6 +32,8 @@ public:
     bool is_valid();
 
     bool reconnect();
+
+    bool try_connect();
     
 protected:
     sql::Connection* _connection;

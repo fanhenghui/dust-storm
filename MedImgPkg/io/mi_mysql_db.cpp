@@ -98,6 +98,15 @@ bool MySQLDB::reconnect() {
     }
 }
 
+bool MySQLDB::try_connect() {
+    if (!is_valid()) {
+        MI_IO_LOG(MI_INFO) << "sql connection is dead. try reconnect.";
+        return reconnect();
+    } else {
+        return true;
+    }
+}
+
 std::string MySQLDB::get_sql_exception_info(const sql::SQLException* e) {
     if (nullptr == e) {
         MI_IO_LOG(MI_ERROR) << "SQL exception is null.";

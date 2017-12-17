@@ -20,7 +20,7 @@ CacheDB::~CacheDB() {
 
 int CacheDB::insert_item(const ImgItem& item) {
     MI_IO_LOG(MI_TRACE) << "IN cache db inset item."; 
-    if (!this->is_valid()) {
+    if (!this->try_connect()) {
         MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
@@ -81,7 +81,7 @@ int CacheDB::insert_item(const ImgItem& item) {
 
 int CacheDB::delete_item(const std::string& series_id) {
     MI_IO_LOG(MI_TRACE) << "IN cache db query delete item."; 
-    if (!this->is_valid()) {
+    if (!this->try_connect()) {
         MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
@@ -127,7 +127,7 @@ int CacheDB::delete_item(const std::string& series_id) {
 
 int CacheDB::query_item(const std::string& series_id, bool& in_db) {
     MI_IO_LOG(MI_TRACE) << "IN cache db query item."; 
-    if (!this->is_valid()) {
+    if (!this->try_connect()) {
         MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
@@ -170,7 +170,7 @@ int CacheDB::query_item(const std::string& series_id, bool& in_db) {
 
 int CacheDB::get_item(const std::string& series_id, ImgItem& item) {
     MI_IO_LOG(MI_TRACE) << "IN cache db get item."; 
-    if (!this->is_valid()) {
+    if (!this->try_connect()) {
         MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }
@@ -215,7 +215,7 @@ int CacheDB::get_item(const std::string& series_id, ImgItem& item) {
 
 int CacheDB::get_all_items(std::vector<ImgItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN cache db get all items."; 
-    if (!this->is_valid()) {
+    if (!this->try_connect()) {
         MI_IO_LOG(MI_ERROR) << "cache db connection invalid.";
         return -1;
     }

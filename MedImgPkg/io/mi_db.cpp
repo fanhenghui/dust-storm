@@ -21,7 +21,7 @@ DB::~DB() {
 
 int DB::insert_dcm_item(const ImgItem& item) {
     MI_IO_LOG(MI_TRACE) << "IN db inset item."; 
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -80,7 +80,7 @@ int DB::insert_dcm_item(const ImgItem& item) {
 
 int DB::delete_dcm_item(const std::string& series_id) {
     MI_IO_LOG(MI_TRACE) << "IN db query delete item."; 
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -124,7 +124,7 @@ int DB::delete_dcm_item(const std::string& series_id) {
 
 int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
     MI_IO_LOG(MI_TRACE) << "IN db query item."; 
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -164,7 +164,7 @@ int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
 
 int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
     MI_IO_LOG(MI_TRACE) << "IN db get item."; 
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -209,7 +209,7 @@ int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
 
 int DB::get_ai_annotation_item(const std::string& series_id, std::string& annotation_ai_path) {
     MI_IO_LOG(MI_TRACE) << "IN db get AI annotation item."; 
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -245,7 +245,7 @@ int DB::get_ai_annotation_item(const std::string& series_id, std::string& annota
 
 int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::vector<AnnoItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by series id.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -283,7 +283,7 @@ int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::ve
 
 int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector<AnnoItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by usr.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -321,7 +321,7 @@ int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector
 
 int DB::get_usr_annotation_item(const std::string& series_id, const std::string& usr_name, std::vector<DB::AnnoItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation item.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -360,7 +360,7 @@ int DB::get_usr_annotation_item(const std::string& series_id, const std::string&
 
 int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN db get all dcm items."; 
-    if (!this->is_valid()) {;
+    if (!this->reconnect()) {;
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -408,7 +408,7 @@ int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
 
 int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
     MI_IO_LOG(MI_TRACE) << "IN db get all usr annotation items.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -446,7 +446,7 @@ int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
 
 int DB::update_preprocess_mask(const std::string& series_id, const std::string& preprocess_mask_path) {
     MI_IO_LOG(MI_TRACE) << "IN db update preprocess mask.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -472,7 +472,7 @@ int DB::update_preprocess_mask(const std::string& series_id, const std::string& 
 
 int DB::update_ai_annotation(const std::string& series_id, const std::string& annotation_ai_path) {
     MI_IO_LOG(MI_TRACE) << "IN db update AI annotation.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -498,7 +498,7 @@ int DB::update_ai_annotation(const std::string& series_id, const std::string& an
 
 int DB::update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data_path) {
     MI_IO_LOG(MI_TRACE) << "IN db update AI intermediate data.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
@@ -524,7 +524,7 @@ int DB::update_ai_intermediate_data(const std::string& series_id, const std::str
 
 int DB::update_usr_annotation(const std::string& series_id, const std::string& usr_name, const std::string& annotation_usr_path) {
     MI_IO_LOG(MI_TRACE) << "IN db update usr annotation.";
-    if (!this->is_valid()) {
+    if (!this->reconnect()) {
         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
         return -1;
     }
