@@ -72,12 +72,7 @@
         }
     }
 
-    function handleBEDBRetrieve(arrayBuffer) {
-        if (!socketClient.protocRoot) {
-            console.log('null protocbuf.');
-            return;
-        }
-            
+    function handleBEDBRetrieve(arrayBuffer) { 
         console.log('recv DB retrieve.');
         let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
         if (!message) {
@@ -85,7 +80,7 @@
         }
 
         let dcminfo = message.dcminfo;
-        if (!dcminfo) {
+        if (!dcminfo || dcminfo.length == 0) {
             return;
         }
 
@@ -113,20 +108,13 @@
     }
 
     function handleBEPACSRetrieve(arrayBuffer) {
-        if (!socketClient.protocRoot) {
-            console.log('null protocbuf.');
-            return;
+        let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
+        if (!message) {
+            reutrn;
         }
 
-        let MsgDcmInfosType = socketClient.protocRoot.lookup('medical_imaging.MsgDcmInfoCollection');
-        if (!MsgDcmInfosType) {
-            console.log('get DICOM info collection message type failed.');
-            return;
-        }
-        let diconInfoView = new Uint8Array(arrayBuffer);
-        let message = MsgDcmInfosType.decode(diconInfoView);
         let dcminfo = message.dcminfo;
-        if (!dcminfo) {
+        if (!dcminfo || dcminfo.length == 0) {
             console.log(`can't get dcminfo.`);
             return;
         }
@@ -205,17 +193,7 @@
 
     
     function handleEvaluationResult(arrayBuffer) {
-        if (!socketClient.protocRoot) {
-            console.log('null protocbuf.');
-            return;
-        }
-
-        let MsgAnnotationListType = socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgAnnotations');
-        if (!MsgAnnotationListType) {
-            console.log('get annotation list message type failed.');
-        }
-        let annotationListView = new Uint8Array(arrayBuffer);
-        let annotationList = MsgAnnotationListType.decode(annotationListView);
+        let annotationList = Protobuf.decode(socketClient, 'MsgNoneImgAnnotations', arrayBuffer);
         if (annotationList) {
             let listItems = annotationList.annotation;
             for (let i = 0; i < listItems.length; ++i) {
@@ -235,7 +213,6 @@
                 } else if (status == 2) {// modifying
                     annoListModify(id, cx, cy, cz, diameter, probability);
                 }
-
             }
         }            
     }
@@ -256,15 +233,8 @@
 
         revcBEReady = true;
 
-        let MsgType = socketClient.protocRoot.lookup('medical_imaging.MsgFloat');
-        if (!MsgType) {
-            console.log('get message type: MsgFloat failed.');
-            return;
-        }
-        let arrayMap = new Uint8Array(arrayBuffer);
-        let msg = MsgType.decode(arrayMap);
+        let msg = Protobuf.decode(socketClient, 'MsgFloat', arrayBuffer);
         if (msg) {
-            console.log(msg);
             let probabilityThreshol = msg.value;
             let evaluationProbabilityRange = document.getElementById('range-probability');
             if (evaluationProbabilityRange) {

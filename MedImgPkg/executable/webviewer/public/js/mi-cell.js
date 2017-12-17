@@ -87,27 +87,11 @@ Cell.prototype.handleJpegBuffer = function(buffer, bufferOffset, dataLen, restDa
 }
 
 Cell.prototype.handleNongImgBuffer = function (arrayBuffer) {
-    //console.log('receive Nong Img Buffer.');
-    let MsgNoneImgCollection = this.socketClient.protocRoot.lookup('medical_imaging.MsgNoneImgCollection');
-    if (!MsgNoneImgCollection) {
-        console.log('get MsgNoneImgCollection type failed.');
-    }
-    //decode the byte array with protobuffer
-    let noneImgBufView = new Uint8Array(arrayBuffer);
-    let receivedMsg = null;
-    try {
-        receivedMsg = MsgNoneImgCollection.decode(noneImgBufView);
-    } catch (e) {
-        if (e instanceof protobuf.util.ProtocolError) {
-            console.log('decode none image message failed.');
-            console.log('e.instance holds the so far decoded message with missing required fields');
-        } else {
-            console.log('decode none image message failed.');
-            console.log('wire format is invalid');
-            console.log(arrayBuffer.byteLength);
-        }
+    let receivedMsg = Protobuf.decode(this.socketClient, 'MsgNoneImgCollection', arrayBuffer);
+    if (!receivedMsg) {
         return;
     }
+
     if (receivedMsg.hasOwnProperty('cornerInfos')) {
         let txt = receivedMsg.cornerInfos.infos;//MSG Format "LT|1:patientName|2:patientID\nLB....\nRT|....\nRB|....\n"
         let corners = txt.split('\n');

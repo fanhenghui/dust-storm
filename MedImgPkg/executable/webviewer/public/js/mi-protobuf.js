@@ -40,6 +40,11 @@ class Protobuf {
     }
 
     static decode(socketClient, msgType, buffer) {
+        if (!socketClient) {
+            console.log('socket client is null.')
+            return null;
+        }
+        
         if (!buffer) {
             console.log(`can't decode ${msgType} from null buffer.`);
             return null;
@@ -51,7 +56,7 @@ class Protobuf {
             return null;
         }
         
-        let msg;
+        let msg = null;
         try {
             let buffer8Uint = new Uint8Array(buffer);
             msg = MsgType.decode(buffer8Uint);
