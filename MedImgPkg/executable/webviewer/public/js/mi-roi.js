@@ -1,5 +1,6 @@
 function ROICircle(key, svg, cx, cy, r){
     this.svg = svg;
+    //data
     this.cx = cx;
     this.cy = cy;
     this.r = r;
@@ -15,12 +16,6 @@ function ROICircle(key, svg, cx, cy, r){
     this.dragEndCallback = null;
 
     this.key = key;
-    this.keyMain = key+'-main';
-    this.keyCtrlLT = key+'-lt';
-    this.keyCtrlLB = key+'-lb';
-    this.keyCtrlRT = key+'-rt';
-    this.keyCtrlRB = key+'-rb';
-    this.keyCtrlMove = key+'-move';
     this.hovering = false;
     this.ctrlSize = 4;
     this.winSize = {width: 0, height: 0};
@@ -70,24 +65,10 @@ function ROICircle(key, svg, cx, cy, r){
     
     //SVG circles
     //main contour (selected as hovering area)
-    this.roiMain = d3.select(svg).selectAll('circle')
-        .data([{
-            key: this.keyMain,
-            cx: cx,
-            cy: cy,
-            r: r
-        }], function (d) {
-            return d.key;
-        }).enter().append('circle')
-        .attr('cx', function (d) {
-            return d.cx;
-        })
-        .attr('cy', function (d) {
-            return d.cy;
-        })
-        .attr('r', function (d) {
-            return d.r;
-        })
+    this.roiMain = d3.select(svg).append('circle')
+        .attr('cx', this.cx)
+        .attr('cy', this.cy)
+        .attr('r', this.r)
         // .style('fill', 'none')
         .style('fill-opacity', 0.0)
         .style('stroke', ROICircle.mainColor)
@@ -97,48 +78,36 @@ function ROICircle(key, svg, cx, cy, r){
         .on("mouseout", hoveringDoneFunc);
 
     //4 ctrl circle for stretching (selected whole circle)
-    this.roiCtrlLT = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyCtrlLT, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
-    .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
+    this.roiCtrlLT = d3.select(svg).append('circle')
+    .attr('cx', Math.floor(this.cx - 0.707*this.r))
+    .attr('cy', Math.floor(this.cy - 0.707*this.r))
     .attr('r', this.ctrlSize)
     .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     //.style('cursor', 'move');
 
-    this.roiCtrlLB = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyCtrlLB, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return Math.floor(d.cx - 0.707*d.r);})
-    .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
+    this.roiCtrlLB = d3.select(svg).append('circle')
+    .attr('cx', Math.floor(this.cx - 0.707*this.r))
+    .attr('cy', Math.floor(this.cy + 0.707*this.r))
     .attr('r', this.ctrlSize)
     .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('cursor', 'move');
 
-    this.roiCtrlRT = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyCtrlRT, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
-    .attr('cy', function(d) { return Math.floor(d.cy - 0.707*d.r);})
+    this.roiCtrlRT = d3.select(svg).append('circle')
+    .attr('cx', Math.floor(this.cx + 0.707*this.r))
+    .attr('cy', Math.floor(this.cy - 0.707*this.r))
     .attr('r', this.ctrlSize)
     .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
     .on("mouseout", hoveringDoneFunc);
     // .style('cursor', 'move');
 
-    this.roiCtrlRB = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyCtrlRB, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return Math.floor(d.cx + 0.707*d.r);})
-    .attr('cy', function(d) { return Math.floor(d.cy + 0.707*d.r);})
+    this.roiCtrlRB = d3.select(svg).append('circle')
+    .attr('cx', Math.floor(this.cx + 0.707*this.r))
+    .attr('cy', Math.floor(this.cy + 0.707*this.r))
     .attr('r', this.ctrlSize)
     .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
@@ -146,12 +115,9 @@ function ROICircle(key, svg, cx, cy, r){
     // .style('cursor', 'move');
 
     //1 ctrl circle for moving (selected loop)
-    this.roiCtrlMove = d3.select(svg).selectAll('circle')
-    .data([{key:this.keyCtrlMove, cx:cx, cy:cy, r:r}], function(d) {
-        return d.key;
-    }).enter().append('circle')
-    .attr('cx', function(d) { return d.cx;})
-    .attr('cy', function(d) { return d.cy;})
+    this.roiCtrlMove = d3.select(svg).append('circle')
+    .attr('cx', this.cx)
+    .attr('cy', this.cy)
     .attr('r', this.ctrlSize)
     .style('fill', ROICircle.ctrlColor)
     .on("mouseover", hoveringFunc)
@@ -345,32 +311,20 @@ ROICircle.prototype.creating = function(x, y) {
 }
 
 ROICircle.prototype.release = function () {
-    let data = d3.select(this.svg).selectAll('circle').data();
-    let newData = [];
-    for (let i = 0; i < data.length; ++i) {
-        if (data[i].key != this.keyMain &&
-            data[i].key != this.keyCtrlLB &&
-            data[i].key != this.keyCtrlLT &&
-            data[i].key != this.keyCtrlRB &&
-            data[i].key != this.keyCtrlRT &&
-            data[i].key != this.keyCtrlMove) {
-            newData.push(data[i]);
-        }
-    }
+    this.roiMain.remove();
+    this.roiCtrlLT.remove();
+    this.roiCtrlLB.remove();
+    this.roiCtrlRT.remove();
+    this.roiCtrlRB.remove();
+    this.roiCtrlMove.remove();
 
-    d3.select(this.svg).selectAll('circle')
-        .data(newData, function (d) {
-            return d.key;
-        }).exit().remove();
-    
     if(this.roiLabel != null) {
         this.roiLabel.release();
     }
 }
 
 ROICircle.prototype.addAnnotationLabel = function(str) {
-    if (this.roiLabel == null)
-    {
+    if (this.roiLabel == null) {
         this.roiLabel = new AnnotationLabel(this.key, this.svg, this.roiMain, str);
     }
 }
@@ -384,7 +338,6 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     this.contextFontSize = 11;
 
     this.content = null;
-    this.border = null;
     this.arrow = null;
 
     const src_x = parseFloat(this.src.attr('cx'));
@@ -392,57 +345,49 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
     const src_r = parseFloat(this.src.attr('r'));
     
     // text drag listener
-    dragListener = d3.drag()
-        .on("start", function (d) {
-            // it's important that we suppress the mouseover event on the node being dragged.
-            // Otherwise it will absorb the mouseover event and the underlying node will not detect it d3.select(this).attr('pointer-events', 'none');
-            d3.event.sourceEvent.stopPropagation();
-            preloc = {
-                x: d3.event.x,
-                y: d3.event.y
-            };
-        })
-        .on("drag", (function (d) {
-            const delta = {
-                x: d3.event.x - preloc.x,
-                y: d3.event.y - preloc.y
-            };
-            // update the text location
-            let newX = parseFloat(this.content.attr('x')) + delta.x;
-            let newY = parseFloat(this.content.attr('y')) + delta.y;
-            this.content.attr('x', newX).attr('y', newY);
-
-            // update the line (aka the arrow) location
-            const centerX = parseFloat(this.src.attr('cx'));
-            const centerY = parseFloat(this.src.attr('cy'));
-            const centerR = parseFloat(this.src.attr('r'));
-            let mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
-            if(mag < 0.01) {
-                mag = 0.001;
-                newX = centerX + 0.01 * 0.707;
-                newY = centerY - 0.01 * 0.707;
-            }
-            this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
-                .attr('y1', centerY + centerR * (newY - centerY) / mag)
-                .attr('x2', newX)
-                .attr('y2', newY);
-            this.content.selectAll('tspan').attr('x', function(){return this.parentNode.getAttribute('x');})
-            
-            // record previous location
-            preloc.x = d3.event.x;
-            preloc.y = d3.event.y;
-        }).bind(this)).on("end", function (d) {
-            preloc = null;
-        });
+    let dragListener = d3.drag()
+    .on("start", function (d) {
+        // it's important that we suppress the mouseover event on the node being dragged.
+        // Otherwise it will absorb the mouseover event and the underlying node will not detect it d3.select(this).attr('pointer-events', 'none');
+        d3.event.sourceEvent.stopPropagation();
+        preloc = {
+            x: d3.event.x,
+            y: d3.event.y
+        };
+    })
+    .on("drag", (function (d) {
+        const delta = {
+            x: d3.event.x - preloc.x,
+            y: d3.event.y - preloc.y
+        };
+        // update the text location
+        let newX = parseFloat(this.content.attr('x')) + delta.x;
+        let newY = parseFloat(this.content.attr('y')) + delta.y;
+        this.content.attr('x', newX).attr('y', newY);
+        // update the line (aka the arrow) location
+        const centerX = parseFloat(this.src.attr('cx'));
+        const centerY = parseFloat(this.src.attr('cy'));
+        const centerR = parseFloat(this.src.attr('r'));
+        let mag = Math.sqrt((newX - centerX) * (newX - centerX) + (newY - centerY) * (newY - centerY));
+        if(mag < 0.01) {
+            mag = 0.001;
+            newX = centerX + 0.01 * 0.707;
+            newY = centerY - 0.01 * 0.707;
+        }
+        this.arrow.attr('x1', centerX + centerR * (newX - centerX) / mag)
+            .attr('y1', centerY + centerR * (newY - centerY) / mag)
+            .attr('x2', newX)
+            .attr('y2', newY);
+        this.content.selectAll('tspan').attr('x', function(){return this.parentNode.getAttribute('x');})
+        
+        // record previous location
+        preloc.x = d3.event.x;
+        preloc.y = d3.event.y;
+    }).bind(this)).on("end", function (d) {
+        preloc = null;
+    });
 
     this.content = d3.select(this.svg)
-        .selectAll('text')
-        .data(
-            [{ key: this.annotationKey, }],
-            function (d) {
-                return d? d.key : null;
-            })
-        .enter()
         .append('text')
         .attr('font-family', 'monospace')
         .attr('font-size', this.contextFontSize)
@@ -456,28 +401,30 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
         .call(dragListener);
 
     if (contentStr != null && contentStr != '') {
-      const multiLine = contentStr.split('|');
-      let contentArray = [];
-      for (let i = 0; i < multiLine.length; ++i) {
-        contentArray.push(multiLine[i]);
-      }
+        const multiLine = contentStr.split('|');
+        let contentArray = [];
+        for (let i = 0; i < multiLine.length; ++i) {
+            contentArray.push(multiLine[i]);
+        }
 
-      this.content.selectAll('tspan')
-          .data(contentArray)
-          .enter()
-          .append('tspan')
-          .attr('x', function(d){return this.parentNode.getAttribute('x');})
-          .attr(
-              'dy', function(d, i) { return (i>0) * this.parentNode.getAttribute('font-size'); })
-          .text(function(d, i) { return d; })
-    }
-
-    this.arrow =
-        d3.select(this.svg)
-            .selectAll('line')
-            .data([{key: this.annotationKey}], function(d) { return d? d.key : null; })
+        this.content.selectAll('tspan')
+            .data(contentArray)
             .enter()
-            .append('line')
+            .append('tspan')
+            .attr('x', function (d) {
+                return this.parentNode.getAttribute('x');
+            })
+            .attr(
+                'dy',
+                function (d, i) {
+                    return (i > 0) * this.parentNode.getAttribute('font-size');
+                })
+            .text(function (d, i) {
+                return d;
+            })
+    }
+          
+    this.arrow = d3.select(this.svg).append('line')
             .attr('x1', src_x + 0.707 * src_r)
             .attr('y1', src_y - 0.707 * src_r)
             .attr('x2', this.content.attr('x'))
@@ -485,21 +432,6 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
             .attr('stroke-width', 2)
             .attr('stroke', 'red')
             .attr('stroke-dasharray', '5, 5');
-    
-    // let textWidth = this.content._groups[0][0].getComputedTextLength();
-    // let textHeight = parseFloat(this.content.attr('font-size'));
-    // this.border = d3.select(this.svg)
-    // .selectAll('rect')
-    // .data([{key: this.annotationKey}], function(d) { return d.key; })
-    // .enter()
-    // .append('rect')
-    // .attr('x', src_x + 2*src_r)
-    // .attr('y', src_y - 2*src_r-2)
-    // .attr('width', textWidth)
-    // .attr('height', textHeight+4)
-    // .style('fill-opacity', 0.0)
-    // .attr('stroke-width', 2)
-    // .attr('stroke', '#dcdcdc');
 
     this.updateVisibility();
 }
@@ -507,18 +439,8 @@ function AnnotationLabel(key, svg, selectedCircle, contentStr) {
 
 
 AnnotationLabel.prototype.release = function () {
-    const key = this.annotationKey;
-    d3.select(this.svg).selectAll('text').filter(function (d) {
-        return d? d.key == key : false;
-    }).selectAll('tspan').remove();
-
-    d3.select(this.svg).selectAll('text').filter(function (d) {
-        return d? d.key == key : false;
-    }).remove();
-
-    d3.select(this.svg).selectAll('line').filter(function (d) {
-        return d ? d.key == key : false;
-    }).remove();
+    this.arrow.remove();
+    this.content.remove();
 }
 
 AnnotationLabel.prototype.updateContent = function (contentStr) {
@@ -537,7 +459,7 @@ AnnotationLabel.prototype.updateContent = function (contentStr) {
         .filter(function (d) {
             return d ? d.key == key : false;
         }).each(function (d) {
-            statisticTxt = d3.select(this).selectAll('tspan');
+            let statisticTxt = contentStr.selectAll('tspan');
             if (statisticTxt.empty()) {
                 statisticTxt.data(contentArray)
                     .enter()
