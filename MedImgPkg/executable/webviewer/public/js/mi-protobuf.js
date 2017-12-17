@@ -1,5 +1,9 @@
 class Protobuf {
     static encode(socketClient, msgType, data) {
+        if (!socketClient) {
+            console.log('socket client is null.')
+            return null;
+        }
         let MsgType = socketClient.protocRoot.lookup(`medical_imaging.${msgType}`);
         if (!MsgType) {
             console.log(`get ${msgType} type failed.`);
@@ -19,6 +23,10 @@ class Protobuf {
                 console.log(`encode ${msgType} failed with data: ${data}.`);
                 return null;
             }
+            if (buffer.byteLength == 0) {
+                console.log(`encode ${msgType} failed with data: ${data}. 0 bytelength.`);
+                return null;
+            }
         } catch(e) {
             if (e instanceof protobuf.util.ProtocolError) {
                 console.log(`exception ProtocolError: encode ${msgType} failed with data: ${data}.`);
@@ -27,6 +35,7 @@ class Protobuf {
             }
             return null;
         }
+        
         return buffer;
     }
 

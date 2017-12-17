@@ -241,27 +241,11 @@
     }
 
     function adjustEvaluationProbabilityThreshold(probability) {
-        if (!socketClient.protocRoot) {
-            console.log('null protobuf.');
-            return;
+        let buffer = Protobuf.encode(socketClient, 'MsgFloat', {value:probability});
+        if (buffer) {
+            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, 
+                OPERATION_ID_BE_FE_ADJUST_EVALUATION_PROBABILITY_THRESHOLD, 0, buffer.byteLength, buffer);
         }
-        let MsgFloatType = socketClient.protocRoot.lookup('medical_imaging.MsgFloat');
-        if (!MsgFloatType) {
-            console.log('get MsgFloatType type failed.');
-            return;
-        }
-        let msg = MsgFloatType.create({value:probability});
-        if (!msg) {
-            console.log('create switch vrt message failed.');
-            return;
-        }
-        let msgBuffer = MsgFloatType.encode(msg).finish();
-        if (!msgBuffer) {
-            console.log('encode switch vrt message failed.');
-        }
-
-        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, 
-            OPERATION_ID_BE_FE_ADJUST_EVALUATION_PROBABILITY_THRESHOLD, 0, msgBuffer.byteLength, msgBuffer);
     }
     
     function handleBEReady(arrayBuffer) {
@@ -636,26 +620,10 @@
             reutrn;
         }
 
-        if (!socketClient.protocRoot) {
-            console.log('null protobuf.');
-            return;
-        }
-        let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
-        if (!MsgStringType) {
-            console.log('get MsgMsgStringType type failed.');
-            return;
-        }
-        let msg = MsgStringType.create({context:choosedIndex});
-        if (!msg) {
-            console.log('create PCAS fetch message failed.');
-            return;
-        }
-        let msgBuffer = MsgStringType.encode(msg).finish();
-        if (!msgBuffer) {
-            console.log('encode PCAS fetch message failed.');
-        }
-        socketClient.sendData(COMMAND_ID_BE_FE_PACS_FETCH, 0, 0, msgBuffer.byteLength, msgBuffer);
-        
+        let buffer = Protobuf.encode(socketClient, 'MsgString', {context:choosedIndex});
+        if (buffer) {
+            socketClient.sendData(COMMAND_ID_BE_FE_PACS_FETCH, 0, 0, buffer.byteLength, buffer);
+        }        
     }
 
     function playVR() {
@@ -757,26 +725,11 @@
             if (document.getElementById('range-mpr-overlay-opacity')) {
                 opacity = document.getElementById('range-mpr-overlay-opacity').value;
             } 
-            
-            if (!socketClient.protocRoot) {
-                console.log('null protobuf.');
-                return;
+
+            let buffer = Protobuf.encode(socketClient, 'MsgMPRMaskOverlay', {flag:flag, opacity:opacity});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, 0, buffer.byteLength, buffer);
             }
-            let MsgMPRMaskOverlayType = socketClient.protocRoot.lookup('medical_imaging.MsgMPRMaskOverlay');
-            if (!MsgMPRMaskOverlayType) {
-                console.log('get MsgMPRMaskOverlay type failed.');
-                return;
-            }
-            let msg = MsgMPRMaskOverlayType.create({flag:flag, opacity:opacity});
-            if (!msg) {
-                console.log('create mpr mask overlay message failed.');
-                return;
-            }
-            let msgBuffer = MsgMPRMaskOverlayType.encode(msg).finish();
-            if (!msgBuffer) {
-                console.log('encode mpr mask overlay message failed.');
-            }
-            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_MPR_MASK_OVERLAY, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         let annotationOverlayCBox = document.getElementById('cbox-overlay-annotation');
@@ -833,25 +786,10 @@
 
         let switchPresetWLFunc = function(obj) {
             document.getElementById('btn-preset-wl').innerHTML = obj.innerHTML + '<span class="caret"></span>';
-            if (!socketClient.protocRoot) {
-                console.log('null protobuf.');
-                return;
+            let buffer = Protobuf.encode(socketClient, 'MsgString', {context:obj.innerHTML});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, 0, buffer.byteLength, buffer);
             }
-            let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
-            if (!MsgStringType) {
-                console.log('get MsgMsgStringType type failed.');
-                return;
-            }
-            let msg = MsgStringType.create({context:obj.innerHTML});
-            if (!msg) {
-                console.log('create switch preset WL message failed.');
-                return;
-            }
-            let msgBuffer = MsgStringType.encode(msg).finish();
-            if (!msgBuffer) {
-                console.log('encode switch preset WL message failed.');
-            }
-            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_WINDOWING, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         document.getElementById('a-preset-wl-abdomen').onclick = function(event) {switchPresetWLFunc(this);return false;}
@@ -896,25 +834,10 @@
         });
         
         let switchVRTFunc = function(context) {
-            if (!socketClient.protocRoot) {
-                console.log('null protobuf.');
-                return;
+            let buffer = Protobuf.encode(socketClient, 'MsgString', {context:context});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, 0, buffer.byteLength, buffer);
             }
-            let MsgStringType = socketClient.protocRoot.lookup('medical_imaging.MsgString');
-            if (!MsgStringType) {
-                console.log('get MsgMsgStringType type failed.');
-                return;
-            }
-            let msg = MsgStringType.create({context:context});
-            if (!msg) {
-                console.log('create switch vrt message failed.');
-                return;
-            }
-            let msgBuffer = MsgStringType.encode(msg).finish();
-            if (!msgBuffer) {
-                console.log('encode switch vrt message failed.');
-            }
-            socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_SWITCH_PRESET_VRT, 0, msgBuffer.byteLength, msgBuffer);
         }
 
         let presetVRTTable = document.getElementById('table-preset-vrt');
@@ -929,8 +852,6 @@
                 }
             }
         }
-        // document.getElementById('img-preset-vrt-cta').onclick = function(event) {switchVRTFunc('ct_cta');}
-        // document.getElementById('img-preset-vrt-lung-glass').onclick = function(event) {switchVRTFunc('ct_lung_glass');}
 
         ///For testing
         const TEST_INTERVAL = MOUSE_MSG_INTERVAL;

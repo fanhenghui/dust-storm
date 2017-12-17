@@ -1,17 +1,7 @@
 
 
 function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
-    if(!socketClient.protocRoot) {
-        console.log('null protocbuf.');
-        return;
-    }
-
-    let MsgCrosshair = socketClient.protocRoot.lookup('medical_imaging.MsgCrosshair');
-    if(!MsgCrosshair) {
-        console.log('get crosshair message type failed.');
-        return;
-    }
-    let msgCrosshair = MsgCrosshair.create({
+    let buffer = Protobuf.encode(socketClient, 'MsgCrosshair', {
         cx: cx,
         cy: cy,
         l0a: line0Para.a,
@@ -19,12 +9,9 @@ function sendCrosshairMSG(cellID, cx, cy, line0Para, line1Para, socketClient) {
         l1a: line1Para.a,
         l1b: line1Para.b,
     });
-    if(!msgCrosshair) {
-        console.log('create crosshair message failed.');
-        return;
+    if (buffer) {
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_LOCATE, cellID, buffer.byteLength, buffer);
     }
-    let msgBuffer = MsgCrosshair.encode(msgCrosshair).finish();
-    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_LOCATE, cellID, msgBuffer.byteLength, msgBuffer);
 }
 
 function Crosshair(svg, cellID, cx, cy, line0Para, line1Para, socketClient, style) {

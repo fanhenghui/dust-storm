@@ -12,25 +12,10 @@ function ActionCommon(socketClient, cellID) {
 };
 
 function sendDownsampleMSG(cellID, flag, socketClient) {
-    if(!socketClient.protocRoot) {
-        console.log('null protocbuf.');
-        return;
-    }
-
-    let MsgFlag = socketClient.protocRoot.lookup('medical_imaging.MsgFlag');
-    if(!MsgFlag) {
-        console.log('get flag message type failed.');
-        return;
-    }
-    let msgFlag = MsgFlag.create({
-        flag: flag
-    });
-    if(!msgFlag) {
-        console.log('create flag message failed.');
-        return;
-    }
-    let msgBuffer = MsgFlag.encode(msgFlag).finish();
-    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_DOWNSAMPLE, cellID, msgBuffer.byteLength, msgBuffer);
+    let buffer = Protobuf.encode(socketClient, 'MsgFlag', {flag:flag});
+    if (buffer) {
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, OPERATION_ID_BE_FE_DOWNSAMPLE, cellID, buffer.byteLength, buffer);
+    }    
 }
 
 ActionCommon.prototype.registerOpID = function(left, right, mid, hold) {
@@ -57,25 +42,12 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
     this.mouseClock = curClock;
 
     //send msg to BE
-    if(!this.socketClient.protocRoot) {
-        console.log('null protocbuf.');
-        return;
-    }
-    let MsgMouse = this.socketClient.protocRoot.lookup('medical_imaging.MsgMouse');
-    if(!MsgMouse) {
-        console.log('get mouse message type failed.');
-        return;
-    }
-    let msgMouse = MsgMouse.create({
-      pre: {x: preX, y: preY},
-      cur: {x: x, y: y},
-      tag: 0
-    });
-    if(!msgMouse) {
-        console.log('create mouse message failed.');
-        return;
-    }
-    let msgBuffer = MsgMouse.encode(msgMouse).finish();
+    let buffer = Protobuf.encode(this.socketClient, 'MsgMouse', {
+        pre: {x: preX, y: preY},
+        cur: {x: x, y: y},
+        tag: 0
+      });
+
     let opID = this.leftOpBtnID;
     if (mouseBtn == BTN_LEFT) {
         opID = this.leftOpBtnID;
@@ -89,7 +61,7 @@ ActionCommon.prototype.mouseMove = function(mouseBtn, mouseStatus, x, y, preX, p
         return;
     }
 
-    this.socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, opID, this.cellID, msgBuffer.byteLength, msgBuffer);
+    this.socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, opID, this.cellID, buffer.byteLength, buffer);
 
     return true;
 }
@@ -108,17 +80,7 @@ const ANNOTATION_MODIFYCOMPLETED = 3;
 const ANNOTATION_FOCUS = 4;
 
 function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0, para1, para2, probability, socketClient) {
-    if(!socketClient.protocRoot) {
-        console.log('null protocbuf.');
-        return;
-    }
-
-    let MsgAnnotationUnit = socketClient.protocRoot.lookup('medical_imaging.MsgAnnotationUnit');
-    if(!MsgAnnotationUnit) {
-        console.log('get annotation unit message type failed.');
-        return;
-    }
-    let msgAnnoUnit = MsgAnnotationUnit.create({
+    let buffer = Protobuf.encode(socketClient, 'MsgAnnotationUnit', {
         type: annoType,
         id: annoID,
         status: annoStatus,
@@ -128,12 +90,9 @@ function sendAnnotationMSG(cellID, annoType, annoID, annoStatus, annoVis, para0,
         para2: para2,
         probability: probability, 
     });
-    if(!msgAnnoUnit) {
-        console.log('create annotation unit message failed.');
-        return;
-    }
-    let msgBuffer = MsgAnnotationUnit.encode(msgAnnoUnit).finish();
-    socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, ACTION_ID_MRP_ANNOTATION, cellID, msgBuffer.byteLength, msgBuffer);
+    if (buffer) {
+        socketClient.sendData(COMMAND_ID_BE_FE_OPERATION, ACTION_ID_MRP_ANNOTATION, cellID, buffer.byteLength, buffer);
+    }    
 }
 
 function ActionAnnotation(socketClient, cellID) {
