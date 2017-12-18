@@ -72,35 +72,50 @@ void DBServerThreadModel::stop() {
         _thread_be_sending.interrupt();
         _thread_be_sending.join();
     }
+
+    MI_DBSERVER_LOG(MI_INFO) << "BE sending thread quit.";
     
     if (_thread_be_operating.joinable()) {
         _thread_be_operating.interrupt();
         _thread_be_operating.join();
     }
 
+    MI_DBSERVER_LOG(MI_INFO) << "BE operating thread quit.";
+
     if (_thread_be_recving.joinable()) {
         _thread_be_recving.interrupt();
         _thread_be_recving.join();
     }
+
+    MI_DBSERVER_LOG(MI_INFO) << "BE recving thread quit.";
 
     if (_thread_ais_sending.joinable()) {
         _thread_ais_sending.interrupt();
         _thread_ais_sending.join();
     }
 
+    MI_DBSERVER_LOG(MI_INFO) << "AIS sending thread quit.";
+
     if (_thread_ais_operating.joinable()) {
         _thread_ais_operating.interrupt();
         _thread_ais_operating.join();
     }
+
+    MI_DBSERVER_LOG(MI_INFO) << "AIS operating thread quit.";
 
     if (_thread_ais_recving.joinable()) {
         _thread_ais_recving.interrupt();
         _thread_ais_recving.join();
     }
 
+    MI_DBSERVER_LOG(MI_INFO) << "AIS recving thread quit.";
+
     if (_thread_ais_run.joinable()) {
+        _thread_ais_run.interrupt();
         _thread_ais_run.join();
     }    
+
+    MI_DBSERVER_LOG(MI_INFO) << "AIS run thread quit.";
 
     _op_msg_queue_ais.deactivate();
     _op_msg_queue_be.deactivate();

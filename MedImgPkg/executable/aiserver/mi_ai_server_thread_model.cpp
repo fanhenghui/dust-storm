@@ -45,10 +45,16 @@ void AIServerThreadModel::run() {
 }
 
 void AIServerThreadModel::stop() {
-    _thread_operating.interrupt();
-    _thread_operating.join();
-    _thread_sending.interrupt();
-    _thread_sending.join();
+    if (_thread_operating.joinable()) {
+        _thread_operating.interrupt();
+        _thread_operating.join();
+    }
+
+    if (_thread_sending.joinable()) {
+        _thread_sending.interrupt();
+        _thread_sending.join();
+    }
+    
     _client_proxy->stop();
     _op_msg_queue.deactivate();
 }

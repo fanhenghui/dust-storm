@@ -18,7 +18,7 @@ DBOpBERequestEnd::~DBOpBERequestEnd() {
 }
 
 int DBOpBERequestEnd::execute() {
-    MI_DBSERVER_LOG(MI_INFO) << "IN DBOpBERequestEnd.";
+    MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBERequestEnd.";
 
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
@@ -32,7 +32,7 @@ int DBOpBERequestEnd::execute() {
 
     server_proxy->async_send_data(new IPCPackage(header));
 
-    MI_DBSERVER_LOG(MI_INFO) << "OUT DBOpBERequestEnd.";
+    MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBERequestEnd.";
 
     return 0;
 }

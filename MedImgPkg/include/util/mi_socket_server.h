@@ -11,6 +11,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
+#include <boost/atomic.hpp>
 
 #include "util/mi_ipc_common.h"
 
@@ -62,12 +63,14 @@ private:
     std::string _path;
     //address for AF_INET
     std::string _server_port;
+    //info for debug/log
+    std::string _server_info;
 
     std::shared_ptr<IPCDataRecvHandler> _handler;
-    int _fd_server;
+    boost::atomic_int _fd_server;
     int _max_clients; // TODO add client limit
     
-    bool _alive;
+    boost::atomic_bool _alive;
 
     //client socket fd
     std::shared_ptr<SocketList> _client_sockets;

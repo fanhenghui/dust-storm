@@ -34,7 +34,6 @@ public:
     void run();
     void stop();
 
-    int sync_post(const IPCDataHeader& post_header, char* post_data, IPCDataHeader& result_header, char*& result_data);
     int sync_post(const std::vector<IPCPackage*>& packages);
 
     void on_connect(std::shared_ptr<IEvent> ev);
@@ -49,6 +48,8 @@ private:
     //address for AF_INET
     std::string _server_ip;
     std::string _server_port;
+    //info for debug/log
+    std::string _server_info;
 
     int _fd_server;
 
