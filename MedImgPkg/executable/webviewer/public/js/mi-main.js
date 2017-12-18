@@ -102,7 +102,7 @@
             if ($(this).hasClass('success')) {
                 $(this).removeClass('success');
             } else {
-                $(this).addClass('success');
+                $(this).addClass('success').siblings().removeClass('success');
             }
         });
     }
