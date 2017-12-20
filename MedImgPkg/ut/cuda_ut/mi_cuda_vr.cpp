@@ -31,6 +31,7 @@
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_brick_pool.h"
 #include "renderalgo/mi_render_algo_logger.h"
+#include "renderalgo/mi_vr_entry_exit_points.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -50,10 +51,11 @@ using namespace medical_imaging;
 namespace {
     std::shared_ptr<ImageDataHeader> _data_header;
     std::shared_ptr<ImageData> _volume_data;
-    std::shared_ptr<VolumeInfos> _volumeinfos;
+    std::shared_ptr<VolumeInfos> _volume_infos;
+    std::shared_ptr<VREntryExitPoints> _entry_exit_points;
 
-    int _ww;
-    int _wl;
+    float _ww = 1500.0f;
+    float _wl = -400.0f;
 
     int _width = 1024;
     int _height = 1024;
@@ -62,8 +64,9 @@ namespace {
     int _iTestCode = 0;
     bool _pan_status = false;
 
-    int _act_label_idx = 0;
     std::vector<unsigned char> _vis_labels;
+    std::shared_ptr<GLTexture2D> _tex_entry_points;
+
 
 #ifdef WIN32
     const std::string root = "E:/data/MyData/demo/lung/";
@@ -82,9 +85,8 @@ namespace {
     void Finalize() {
         _data_header.reset();
         _volume_data.reset();
-        _volumeinfos.reset();
+        _volume_infos.reset();
     }
-
 
     void Init() {
         Configure::instance()->set_processing_unit_type(GPU);
@@ -101,9 +103,35 @@ namespace {
         DICOMLoader loader;
         loader.load_series(files, _volume_data, _data_header);
         const unsigned int data_len = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
-        _volumeinfos.reset(new VolumeInfos());
-        _volumeinfos->set_data_header(_data_header);
-        _volumeinfos->set_volume(_volume_data);
+        _volume_infos.reset(new VolumeInfos());
+        _volume_infos->set_data_header(_data_header);
+        _volume_infos->set_volume(_volume_data);
+    }
+
+    void InitGL() {
+        _entry_exit_points.reset(new VREntryExitPoints());
+        _entry_exit_points->set_display_size(_width,_height);
+        _entry_exit_points->set_strategy(GPU_BASE);
+        _entry_exit_points->initialize();
+        _entry_exit_points->set_proxy_geometry(PG_BRICKS);
+
+        std::shared_ptr<ImageData> volume = _volume_infos->get_volume();
+        _entry_exit_points->set_volume_data(volume);
+        _entry_exit_points->set_brick_pool(_volume_infos->get_brick_pool());
+        AABB default_aabb;
+        default_aabb._min = Point3::S_ZERO_POINT;
+        default_aabb._max.x = static_cast<double>(volume->_dim[0]);
+        default_aabb._max.y = static_cast<double>(volume->_dim[1]);
+        default_aabb._max.z = static_cast<double>(volume->_dim[2]);
+        _entry_exit_points->set_bounding_box(default_aabb);
+        _entry_exit_points->set_brick_pool(_volume_infos->get_brick_pool());
+
+        _entry_exit_points->set_brick_filter_item(BF_WL);
+        _entry_exit_points->set_window_level(_ww, _wl, 0, true);
+
+        _tex_entry_points = _entry_exit_points->get_entry_points_texture();
+
+        glEnable(GL_TEXTURE_2D);
     }
 
     void Display() {
@@ -117,6 +145,21 @@ namespace {
             glViewport(0, 0, _width, _height);
             glClearColor(0.0, 0.0, 0.0, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
+            _entry_exit_points->calculate_entry_exit_points();
+            glBindTexture(GL_TEXTURE_2D, _tex_entry_points->get_id());
+            glBegin(GL_QUADS);
+            glTexCoord2d(0,0);
+            glVertex2d(-1.0,-1.0);
+            glTexCoord2d(1,0);
+            glVertex2d(1.0,-1.0);
+            glTexCoord2d(1,1);
+            glVertex2d(1.0,1.0);
+            glTexCoord2d(0,1);
+            glVertex2d(-1.0,1.0);
+            glEnd();
+
+
+
 
             glutSwapBuffers();
         } catch (Exception& e) {
@@ -163,9 +206,6 @@ int mi_cuda_vr(int argc, char* argv[]) {
 #endif
 
     try {
-
-        Init();
-
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0, 0);
@@ -181,6 +221,9 @@ int mi_cuda_vr(int argc, char* argv[]) {
         GLEnvironment env;
         int major, minor;
         env.get_gl_version(major, minor);
+
+        Init();
+        InitGL();
 
         glutDisplayFunc(Display);
         glutReshapeFunc(resize);
