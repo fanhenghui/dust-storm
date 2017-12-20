@@ -90,7 +90,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\include\glresource\mi_gl_buffer.h" />
-    <ClInclude Include="..\include\glresource\mi_gl_buffer_cache.h" />
     <ClInclude Include="..\include\glresource\mi_gl_context.h" />
     <ClInclude Include="..\include\glresource\mi_gl_environment.h" />
     <ClInclude Include="..\include\glresource\mi_gl_fbo.h" />
@@ -120,13 +119,11 @@
     <ClCompile Include="..\glresource\mi_gl_environment.cpp" />
     <ClCompile Include="..\glresource\mi_gl_fbo.cpp" />
     <ClCompile Include="..\glresource\mi_gl_program.cpp" />
-    <ClCompile Include="..\glresource\mi_gl_resource_manager.cpp" />
     <ClCompile Include="..\glresource\mi_gl_resource_manager_container.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_1d.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_1d_array.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_2d.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_3d.cpp" />
-    <ClCompile Include="..\glresource\mi_gl_texture_base.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_cache.cpp" />
     <ClCompile Include="..\glresource\mi_gl_time_query.cpp" />
     <ClCompile Include="..\glresource\mi_gl_utils.cpp" />

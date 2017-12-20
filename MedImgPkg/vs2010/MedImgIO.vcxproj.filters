@@ -121,5 +121,8 @@
     <ClCompile Include="..\io\mi_targa_parser.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\io\mi_configure.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

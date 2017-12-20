@@ -35,6 +35,7 @@
     <ClInclude Include="..\include\io\mi_zlib_utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\io\mi_configure.cpp" />
     <ClCompile Include="..\io\mi_dcm_scp.cpp" />
     <ClCompile Include="..\io\mi_dcm_scu.cpp" />
     <ClCompile Include="..\io\mi_dicom_exporter.cpp" />

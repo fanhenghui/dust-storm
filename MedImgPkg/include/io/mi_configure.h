@@ -12,7 +12,7 @@ enum ProcessingUnitType {
     GPU,
 };
 
-class Configure {
+class IO_Export Configure {
 public:
     static Configure* instance();
     ~Configure();

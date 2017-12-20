@@ -104,6 +104,8 @@
     <ClInclude Include="..\include\renderalgo\mi_camera_interactor.h" />
     <ClInclude Include="..\include\renderalgo\mi_color_transfer_function.h" />
     <ClInclude Include="..\include\renderalgo\mi_entry_exit_points.h" />
+    <ClInclude Include="..\include\renderalgo\mi_graphic_object_interface.h" />
+    <ClInclude Include="..\include\renderalgo\mi_graphic_object_navigator.h" />
     <ClInclude Include="..\include\renderalgo\mi_mask_label_store.h" />
     <ClInclude Include="..\include\renderalgo\mi_mpr_entry_exit_points.h" />
     <ClInclude Include="..\include\renderalgo\mi_mpr_scene.h" />
@@ -144,6 +146,7 @@
     <ClCompile Include="..\renderalgo\mi_camera_interactor.cpp" />
     <ClCompile Include="..\renderalgo\mi_color_transfer_function.cpp" />
     <ClCompile Include="..\renderalgo\mi_entry_exit_points.cpp" />
+    <ClCompile Include="..\renderalgo\mi_graphic_object_navigator.cpp" />
     <ClCompile Include="..\renderalgo\mi_mask_label_store.cpp" />
     <ClCompile Include="..\renderalgo\mi_mpr_entry_exit_points.cpp" />
     <ClCompile Include="..\renderalgo\mi_mpr_scene.cpp" />

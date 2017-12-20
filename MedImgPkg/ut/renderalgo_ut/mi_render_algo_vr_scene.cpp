@@ -95,7 +95,12 @@ void Finalize() {
 void Init() {
     Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
+#ifdef WIN32
+    Logger::instance()->bind_config_file("./config/log_config");
+#else
     Logger::instance()->bind_config_file("../config/log_config");
+#endif
+    
     Logger::instance()->initialize();
 
     std::vector<std::string> files = GetFiles();

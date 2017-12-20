@@ -2,6 +2,11 @@
 #include "mi_util_logger.h"
 
 #include <fstream>
+
+#ifdef WIN32
+#include <io.h>
+#endif
+
 #include "boost/filesystem.hpp"
 #include "boost/exception/exception.hpp"
 
@@ -224,7 +229,7 @@ int FileUtil::read_raw_ext(const std::string& path, char*& buffer, unsigned int&
 int FileUtil::check_direction(const std::string& path) {
 #ifdef WIN32
     //TODO Windows function
-    return -1;
+    return access(path.c_str(), 0);
 #else
     return access(path.c_str(), F_OK);
 #endif

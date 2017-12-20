@@ -401,17 +401,18 @@ void SceneBase::get_image_buffer(unsigned char*& buffer, int& size) {
     size = _image_buffer_size[_front_buffer_id];
 }
 
-float SceneBase::get_compressing_duration() const
-{
-   return _gpujpeg_encoding_duration;
-}
-
 void SceneBase::set_downsample(bool flag) {
     _downsample = flag;
 }
 
 bool SceneBase::get_downsample() const {
     return _downsample;
+}
+
+#ifndef WIN32
+float SceneBase::get_compressing_duration() const
+{
+    return _gpujpeg_encoding_duration;
 }
 
 void SceneBase::set_compress_hd_quality(int quality) {
@@ -421,5 +422,6 @@ void SceneBase::set_compress_hd_quality(int quality) {
 void SceneBase::set_compress_ld_quality(int quality) {
     _compress_ld_quality  = quality;
 }
+#endif
 
 MED_IMG_END_NAMESPACE

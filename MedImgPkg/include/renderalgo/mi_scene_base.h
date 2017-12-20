@@ -42,7 +42,6 @@ public:
     void download_image_buffer(bool jpeg = true);
     void swap_image_buffer();
     void get_image_buffer(unsigned char*& buffer, int& size);
-    float get_compressing_duration() const;
 
     void set_dirty(bool flag);
     bool get_dirty() const;
@@ -50,8 +49,11 @@ public:
     virtual void set_downsample(bool flag);
     bool get_downsample() const;
 
+#ifndef WIN32
     void set_compress_hd_quality(int quality = 80);
     void set_compress_ld_quality(int quality = 15);
+    float get_compressing_duration() const;
+#endif
 
 protected:
     virtual void pre_render();
@@ -93,9 +95,9 @@ protected:
     // cudaEvent_t _gpujpeg_encoding_start;
     // cudaEvent_t _gpujpeg_encoding_stop;
     bool _gpujpeg_encoder_dirty;
+#endif
 
     GLTimeQueryPtr _gl_time_query;
-#endif
 
 private:
     DISALLOW_COPY_AND_ASSIGN(SceneBase);

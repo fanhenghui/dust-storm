@@ -81,10 +81,10 @@ private:
     unsigned int _rotation_size;
     struct TimeHMS {
         unsigned char hour;
-        unsigned char min;
+        unsigned char minute;
         unsigned char sec;
-        TimeHMS(unsigned char h , unsigned char m , unsigned char s ) : hour(h), min(m), sec(s) {}
-        TimeHMS() : hour(0), min(0), sec(0) {}
+        TimeHMS(unsigned char h , unsigned char m , unsigned char s ) : hour(h), minute(m), sec(s) {}
+        TimeHMS() : hour(0), minute(0), sec(0) {}
     };
     TimeHMS _rotation_time;
 

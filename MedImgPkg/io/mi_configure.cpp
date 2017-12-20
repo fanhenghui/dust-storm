@@ -38,7 +38,11 @@ void Configure::init() {
 }
 
 void Configure::refresh() {
+#ifdef WIN32
+    std::ifstream in("./config/app_config");
+#else
     std::ifstream in("../config/app_config");
+#endif
     if (!in.is_open()) {
         MI_IO_LOG(MI_ERROR) << "can't open configure file.";
         return;
