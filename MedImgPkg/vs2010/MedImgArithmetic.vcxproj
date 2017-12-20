@@ -15,15 +15,11 @@
     <ClCompile Include="..\arithmetic\mi_arithmetic_utils.cpp" />
     <ClCompile Include="..\arithmetic\mi_camera_base.cpp" />
     <ClCompile Include="..\arithmetic\mi_connected_domain_analysis.cpp" />
-    <ClCompile Include="..\arithmetic\mi_ellipsoid.cpp" />
     <ClCompile Include="..\arithmetic\mi_intersection_test.cpp" />
-    <ClCompile Include="..\arithmetic\mi_line.cpp" />
-    <ClCompile Include="..\arithmetic\mi_line_segment.cpp" />
     <ClCompile Include="..\arithmetic\mi_matrix4.cpp" />
     <ClCompile Include="..\arithmetic\mi_matrix4f.cpp" />
     <ClCompile Include="..\arithmetic\mi_ortho_camera.cpp" />
     <ClCompile Include="..\arithmetic\mi_perspective_camera.cpp" />
-    <ClCompile Include="..\arithmetic\mi_plane.cpp" />
     <ClCompile Include="..\arithmetic\mi_point2.cpp" />
     <ClCompile Include="..\arithmetic\mi_point3.cpp" />
     <ClCompile Include="..\arithmetic\mi_rsa_utils.cpp" />
@@ -43,8 +39,10 @@
     <ClInclude Include="..\include\arithmetic\mi_arithmetic_logger.h" />
     <ClInclude Include="..\include\arithmetic\mi_arithmetic_utils.h" />
     <ClInclude Include="..\include\arithmetic\mi_camera_base.h" />
+    <ClInclude Include="..\include\arithmetic\mi_circle.h" />
     <ClInclude Include="..\include\arithmetic\mi_color_unit.h" />
     <ClInclude Include="..\include\arithmetic\mi_connected_domain_analysis.h" />
+    <ClInclude Include="..\include\arithmetic\mi_ct_table_removal.h" />
     <ClInclude Include="..\include\arithmetic\mi_ellipsoid.h" />
     <ClInclude Include="..\include\arithmetic\mi_intersection_test.h" />
     <ClInclude Include="..\include\arithmetic\mi_line.h" />
@@ -78,6 +76,7 @@
     <ClInclude Include="..\include\arithmetic\mi_volume_statistician.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\include\arithmetic\mi_ct_table_removal.inl" />
     <None Include="..\include\arithmetic\mi_sampler.inl" />
     <None Include="..\include\arithmetic\mi_segment_threshold.inl" />
     <None Include="..\include\arithmetic\mi_volume_statistician.inl" />

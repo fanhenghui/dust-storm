@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include "mi_socket_server.h"
 
 #include <stdio.h> 
@@ -578,3 +580,4 @@ ServerStatus SocketServer::get_current_status() {
 }
 
 MED_IMG_END_NAMESPACE
+#endif

@@ -41,9 +41,6 @@
     <ClInclude Include="..\include\io\mi_voi.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\io\mi_worklist_info.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\io\mi_zlib_utils.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -69,6 +66,15 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\io\mi_io_logger.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_configure.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_info.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_targa_parser.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -103,19 +109,16 @@
     <ClCompile Include="..\io\mi_meta_object_loader.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\io\mi_nodule_set.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\io\mi_nodule_set_parser.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\io\mi_pacs_communicator.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\io\mi_worklist_info.cpp">
+    <ClCompile Include="..\io\mi_mask_voi_converter.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\io\mi_mask_voi_converter.cpp">
+    <ClCompile Include="..\io\mi_targa_parser.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

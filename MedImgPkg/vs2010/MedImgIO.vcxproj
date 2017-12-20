@@ -11,9 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\io\mi_configure.h" />
     <ClInclude Include="..\include\io\mi_dcm_scp.h" />
     <ClInclude Include="..\include\io\mi_dcm_scu.h" />
     <ClInclude Include="..\include\io\mi_dicom_exporter.h" />
+    <ClInclude Include="..\include\io\mi_dicom_info.h" />
     <ClInclude Include="..\include\io\mi_dicom_loader.h" />
     <ClInclude Include="..\include\io\mi_dicom_rt_struct.h" />
     <ClInclude Include="..\include\io\mi_dicom_rt_struct_loader.h" />
@@ -28,8 +30,8 @@
     <ClInclude Include="..\include\io\mi_nodule_set.h" />
     <ClInclude Include="..\include\io\mi_nodule_set_parser.h" />
     <ClInclude Include="..\include\io\mi_pacs_communicator.h" />
+    <ClInclude Include="..\include\io\mi_targa_parser.h" />
     <ClInclude Include="..\include\io\mi_voi.h" />
-    <ClInclude Include="..\include\io\mi_worklist_info.h" />
     <ClInclude Include="..\include\io\mi_zlib_utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -43,10 +45,9 @@
     <ClCompile Include="..\io\mi_jpeg_parser.cpp" />
     <ClCompile Include="..\io\mi_mask_voi_converter.cpp" />
     <ClCompile Include="..\io\mi_meta_object_loader.cpp" />
-    <ClCompile Include="..\io\mi_nodule_set.cpp" />
     <ClCompile Include="..\io\mi_nodule_set_parser.cpp" />
     <ClCompile Include="..\io\mi_pacs_communicator.cpp" />
-    <ClCompile Include="..\io\mi_worklist_info.cpp" />
+    <ClCompile Include="..\io\mi_targa_parser.cpp" />
     <ClCompile Include="..\io\mi_zlib_utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

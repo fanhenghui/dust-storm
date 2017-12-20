@@ -11,9 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\util\mi_configuration.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\util\mi_exception.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -50,6 +47,27 @@
     <ClInclude Include="..\include\util\mi_util_logger.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\util\mi_controller_interface.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_ipc_server_proxy.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_memory_shield.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_operation_factory.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_operation_interface.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_socket_list.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_socket_server.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\util\mi_message_queue.inl">
@@ -57,9 +75,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\util\mi_configuration.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\util\mi_file_util.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -70,6 +85,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\util\mi_socket_client.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_socket_server.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_operation_factory.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
