@@ -14,6 +14,7 @@
 #include "glresource/mi_gl_environment.h"
 #include "glresource/mi_gl_fbo.h"
 #include "glresource/mi_gl_resource_manager_container.h"
+#include "glresource/mi_gl_resource_manager.h"
 #include "glresource/mi_gl_texture_1d.h"
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_time_query.h"
@@ -44,8 +45,19 @@
 #include <unistd.h>
 #endif
 
+#include <cuda_runtime.h>
+#include <cuda.h>  
+#include <cuda_gl_interop.h>
+#include <cuda_texture_types.h>
+
+
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
+
+#include "mi_cuda_vr.h"
+
+extern "C" int bind_gl_texture(cudaGLTexture& tex);
+extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, unsigned char* d_result, unsigned char* h_result);
 
 using namespace medical_imaging;
 namespace {
@@ -55,6 +67,14 @@ namespace {
     std::shared_ptr<VREntryExitPoints> _entry_exit_points;
     std::shared_ptr<OrthoCamera> _camera;
     std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
+    std::shared_ptr<GLTexture2D> _canvas_tex;
+
+    //CUDA resource
+    cudaVolumeInfos _cuda_volume_infos;
+    cudaGLTexture _cuda_entry_points;
+    cudaGLTexture _cuda_exit_points;
+    unsigned char* _cuda_d_canvas = nullptr;
+    unsigned char* _cuda_h_canvas = nullptr;
 
     float _ww = 1500.0f;
     float _wl = -400.0f;
@@ -107,11 +127,18 @@ namespace {
         _volume_infos->set_data_header(_data_header);
         _volume_infos->set_volume(_volume_data);
         _volume_infos->refresh();
+
+        _cuda_volume_infos.dim.x = _volume_data->_dim[0];
+        _cuda_volume_infos.dim.y = _volume_data->_dim[1];
+        _cuda_volume_infos.dim.z = _volume_data->_dim[2];
     }
 
     void InitGL() {
+        //Global GL state
         GLUtils::set_check_gl_flag(true);
+        GLUtils::set_pixel_pack_alignment(1);
 
+        //Entry exit points
         _camera.reset(new OrthoCamera());
         std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
         camera_cal->init_vr_placement(_camera);
@@ -143,22 +170,66 @@ namespace {
 
         _tex_entry_points = _entry_exit_points->get_entry_points_texture();
 
+
+        //Canvas texture
         glEnable(GL_TEXTURE_2D);
+
+        UIDType tex_uid = 0;
+        _canvas_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(tex_uid);
+        _canvas_tex->set_description("CUDA GL UT canvas texture.");
+        _canvas_tex->initialize();
+        _canvas_tex->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+        _canvas_tex->load(GL_RGBA8, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+        
+        //generate cuda texture
+        _entry_exit_points->get_entry_points_texture()->bind();
+        _cuda_entry_points.gl_tex_id = _entry_exit_points->get_entry_points_texture()->get_id();
+        _cuda_entry_points.target = GL_TEXTURE_2D;
+        _cuda_entry_points.width = _width;
+        _cuda_entry_points.height = _height;
+        if(0 != bind_gl_texture(_cuda_entry_points)) {
+            MI_LOG(MI_ERROR) << "[CUDA] " << "bind GL texture failed."; 
+        }
+
+        _entry_exit_points->get_exit_points_texture()->bind();
+        _cuda_exit_points.gl_tex_id = _entry_exit_points->get_exit_points_texture()->get_id();
+        _cuda_exit_points.target = GL_TEXTURE_2D;
+        _cuda_exit_points.width = _width;
+        _cuda_exit_points.height = _height;
+        if(0 != bind_gl_texture(_cuda_exit_points)) {
+            MI_LOG(MI_ERROR) << "[CUDA] " << "bind GL texture failed.";
+        }
+
+        _cuda_h_canvas = new unsigned char[_width*_height*4];
+        if(cudaSuccess != cudaMalloc(&_cuda_d_canvas, _width*_height*4) ) {
+            MI_LOG(MI_ERROR) << "[CUDA] " << "malloc canvas device memory failed.";
+        }
+        
     }
 
     void Display() {
         try {
             CHECK_GL_ERROR;
 
-            GLUtils::set_pixel_pack_alignment(1);
+            //calcualte entry exit pionts
+            _entry_exit_points->calculate_entry_exit_points();
 
+            //CUDA process
+            ray_cast(_cuda_entry_points, _cuda_entry_points, _cuda_volume_infos, _cuda_d_canvas, _cuda_h_canvas);
             CHECK_GL_ERROR;
 
+            //update texture
+            _canvas_tex->update(0,0,_width,_height, GL_RGBA, GL_UNSIGNED_BYTE, _cuda_h_canvas,0);
+            
             glViewport(0, 0, _width, _height);
             glClearColor(0.0, 0.0, 0.0, 1.0);
             glClear(GL_COLOR_BUFFER_BIT);
-            _entry_exit_points->calculate_entry_exit_points();
-            glBindTexture(GL_TEXTURE_2D, _tex_entry_points->get_id());
+
+            glBindTexture(GL_TEXTURE_2D, _canvas_tex->get_id());
+            //glBindTexture(GL_TEXTURE_2D, _entry_exit_points->get_entry_points_texture()->get_id());
             glBegin(GL_QUADS);
             glTexCoord2d(0,0);
             glVertex2d(-1.0,-1.0);
@@ -197,7 +268,7 @@ namespace {
     }
 
     void Idle() {
-        //glutPostRedisplay();
+        glutPostRedisplay();
     }
 
     void MouseClick(int button, int status, int x, int y) {

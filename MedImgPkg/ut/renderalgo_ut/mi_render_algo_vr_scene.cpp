@@ -59,8 +59,8 @@ int _wl;
 std::shared_ptr<GLTimeQuery> _time_query;
 std::shared_ptr<GLTimeQuery> _time_query2;
 
-int _width = 1033;
-int _height = 618;
+int _width = 1024;
+int _height = 1024;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
@@ -452,7 +452,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
