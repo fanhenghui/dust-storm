@@ -7,6 +7,7 @@
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
+#include "io/mi_io_define.h"
 
 #include "arithmetic/mi_ortho_camera.h"
 #include "arithmetic/mi_run_length_operator.h"
@@ -57,7 +58,8 @@
 #include "mi_cuda_vr.h"
 
 extern "C" int bind_gl_texture(cudaGLTexture& tex);
-extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, unsigned char* d_result, unsigned char* h_result);
+extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result);
+extern "C" int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
 
 using namespace medical_imaging;
 namespace {
@@ -70,7 +72,8 @@ namespace {
     std::shared_ptr<GLTexture2D> _canvas_tex;
 
     //CUDA resource
-    cudaVolumeInfos _cuda_volume_infos;
+    cudaVolumeInfos  _cuda_volume_infos;
+    cudaRayCastInfos _ray_cast_infos;
     cudaGLTexture _cuda_entry_points;
     cudaGLTexture _cuda_exit_points;
     unsigned char* _cuda_d_canvas = nullptr;
@@ -108,7 +111,22 @@ namespace {
         _volume_infos.reset();
     }
 
-    void Init() {
+    template <typename SrcType, typename DstType>
+    std::unique_ptr<DstType[]> signed_to_unsigned(unsigned int length,
+        double min_gray, void* data_src) {
+            std::unique_ptr<DstType[]> data_dst(new DstType[length]);
+            SrcType* data_src0 = (SrcType*)(data_src);
+
+            for (unsigned int i = 0; i < length; ++i) {
+                data_dst[i] =
+                    static_cast<DstType>(static_cast<double>(data_src0[i]) - min_gray);
+            }
+
+            return std::move(data_dst);
+        }
+    }
+
+    void init_data() {
         Configure::instance()->set_processing_unit_type(GPU);
         GLUtils::set_check_gl_flag(true);
 #ifdef WIN32
@@ -131,9 +149,17 @@ namespace {
         _cuda_volume_infos.dim.x = _volume_data->_dim[0];
         _cuda_volume_infos.dim.y = _volume_data->_dim[1];
         _cuda_volume_infos.dim.z = _volume_data->_dim[2];
+
+        if (_volume_data->_data_type == DataType::SHORT) {
+            std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
+                data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
+            init_data(_cuda_volume_infos, dst_data.get(), _volume_data->_dim);
+        }
+
+
     }
 
-    void InitGL() {
+    void init_gl() {
         //Global GL state
         GLUtils::set_check_gl_flag(true);
         GLUtils::set_pixel_pack_alignment(1);
@@ -218,7 +244,7 @@ namespace {
             _entry_exit_points->calculate_entry_exit_points();
 
             //CUDA process
-            ray_cast(_cuda_entry_points, _cuda_entry_points, _cuda_volume_infos, _cuda_d_canvas, _cuda_h_canvas);
+            ray_cast(_cuda_entry_points, _cuda_entry_points, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_h_canvas);
             CHECK_GL_ERROR;
 
             //update texture
@@ -296,7 +322,6 @@ namespace {
         _pre_pos = pt;
         glutPostRedisplay();
     }
-}
 
 int mi_cuda_vr(int argc, char* argv[]) {
 #ifndef WIN32
@@ -320,8 +345,8 @@ int mi_cuda_vr(int argc, char* argv[]) {
         int major, minor;
         env.get_gl_version(major, minor);
 
-        Init();
-        InitGL();
+        init_data();
+        init_gl();
 
         glutDisplayFunc(Display);
         glutReshapeFunc(resize);

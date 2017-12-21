@@ -71,7 +71,7 @@ __global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit
     unsigned int idx = y*entry_tex.width + x;
 
     float4 entry = tex2D<float4>(entry_tex.cuda_tex_obj, x, y);
-    float4 exit = tex2D<float4>(exit_tex.cuda_tex_obj, x, y);
+    float4 exit  = tex2D<float4>(exit_tex.cuda_tex_obj, x, y);
 
     float3 entry3 = make_float3(entry);
     float3 exit3 = make_float3(exit);
@@ -101,7 +101,7 @@ int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos vo
     int height = entry_tex.height;
 
     cudaGraphicsMapResources(1, &entry_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&entry_tex.cuda_array, entry_tex.cuda_res, 0,0);
+    cudaGraphicsMapResources(1, &exit_tex.cuda_res);
 
     CHECK_CUDA_ERROR; 
     #define BLOCK_SIZE 16
@@ -115,6 +115,7 @@ int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos vo
     //3 Memcpy device result to host, and return
     cudaThreadSynchronize();
     cudaGraphicsUnmapResources(1, &entry_tex.cuda_res);
+    cudaGraphicsUnmapResources(1, &exit_tex.cuda_res);
 
     cudaMemcpy(h_result, d_result, width*height*4, cudaMemcpyDeviceToHost);
     CHECK_CUDA_ERROR; 
@@ -131,9 +132,9 @@ int bind_gl_texture(cudaGLTexture& gl_cuda_tex) {
     CHECK_CUDA_ERROR;
 
     //2 map the graphic resource to CUDA array
-    gl_cuda_tex.cuda_array = NULL;
+    gl_cuda_tex.d_cuda_array = NULL;
     cudaGraphicsMapResources(1, &gl_cuda_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&gl_cuda_tex.cuda_array, gl_cuda_tex.cuda_res, 0,0);
+    cudaGraphicsSubResourceGetMappedArray(&gl_cuda_tex.d_cuda_array, gl_cuda_tex.cuda_res, 0,0);
     CHECK_CUDA_ERROR;
 
     //3 create CUDA texture by CUDA array
@@ -141,7 +142,7 @@ int bind_gl_texture(cudaGLTexture& gl_cuda_tex) {
     struct cudaResourceDesc res_desc;
     memset(&res_desc, 0, sizeof(cudaResourceDesc));
     res_desc.resType = cudaResourceTypeArray;
-    res_desc.res.array.array = gl_cuda_tex.cuda_array;
+    res_desc.res.array.array = gl_cuda_tex.d_cuda_array;
 
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
@@ -156,6 +157,59 @@ int bind_gl_texture(cudaGLTexture& gl_cuda_tex) {
     CHECK_CUDA_ERROR;
 
     cudaGraphicsUnmapResources(1, &gl_cuda_tex.cuda_res);
+
+    CHECK_CUDA_ERROR;
+
+    return 0;
+}
+
+extern "C"
+int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim) {
+    const unsigned int size = dim[0]*dim[1]*dim[2]*sizeof(unsigned short);
+
+    cuda_volume_infos.dim[0] = dim[0];
+    cuda_volume_infos.dim[1] = dim[1];
+    cuda_volume_infos.dim[2] = dim[2];
+
+    cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc(16,0,0,0,cudaChannelFormatKindUnsigned);
+    CHECK_CUDA_ERROR;
+
+    cudaExtent extent;
+    extent.width = dim[0];
+    extent.height = dim[1];
+    extent.depth = dim[2];
+    cudaMalloc3DArray(&cuda_volume_infos.d_volume_array, &channel_desc, extent);
+
+    CHECK_CUDA_ERROR;
+
+    cudaMemcpy3DParms copyParams = {0};
+    copyParams.srcPtr = make_cudaPitchedPtr((void *)data,extent.width*sizeof(unsigned short), extent.width, extent.height);
+    copyParams.dstArray = cuda_volume_infos.d_volume_array;
+    copyParams.extent   = extent;
+    copyParams.kind     = cudaMemcpyHostToDevice;
+    cudaMemcpy3D(&copyParams);
+
+    CHECK_CUDA_ERROR;
+
+    //Cuda resource
+    struct cudaResourceDesc  res_desc;
+    memset(&res_desc, 0, sizeof(cudaResourceDesc));
+    res_desc.resType = cudaResourceTypeArray;
+    res_desc.res.array.array = cuda_volume_infos.d_volume_array;
+    
+    //Texture parameter (like GL's glTexParameteri)
+    struct cudaTextureDesc tex_desc;
+    memset(&tex_desc,0, sizeof(cudaTextureDesc));
+    tex_desc.addressMode[0] = cudaAddressModeWrap;
+    tex_desc.addressMode[1] = cudaAddressModeWrap;
+    tex_desc.addressMode[2] = cudaAddressModeWrap;
+    tex_desc.filterMode = cudaFilterModePoint;
+    tex_desc.readMode = cudaReadModeNormalizedFloat;
+    tex_desc.normalizedCoords = 1;
+
+    //create texture
+    cudaTextureObject_t tex_obj = 0;
+    cudaCreateTextureObject(&cuda_volume_infos.volume_tex_obj, &res_desc, &tex_desc, NULL);
 
     CHECK_CUDA_ERROR;
 

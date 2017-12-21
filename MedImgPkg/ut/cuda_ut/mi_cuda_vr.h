@@ -15,25 +15,27 @@ struct cudaGLTexture {
     GLenum target;
     int width;
     int height;
-    cudaTextureObject_t cuda_tex_obj;
+    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
     cudaGraphicsResource *cuda_res;
-    cudaArray* cuda_array;
+    cudaArray* d_cuda_array;
 };
 
 struct cudaRayCastInfos {
     float sample_step;
-    cudaArray* lut_array;
-    cudaTextureObject_t lut_tex_obj;//后续需要考虑Array
-    float lut_length;
-    float WL;
+    int mask_level;//8 ->16 ->32 ->64 ->128
+    cudaArray* d_lut_array;
+    cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
+    float lut_length;//lenth of one CUDA texture 1D
+    float* d_wl_array;//mask_level * 2
+    float* d_material_array;//mask_level * 2
 };
 
 struct cudaVolumeInfos 
 {
-    cudaArray* volume_array;
-    cudaTextureObject_t volume_tex_obj;
-    cudaArray* mask_array;
-    cudaTextureObject_t mask_tex_obj;
+    cudaArray* d_volume_array;
+    cudaTextureObject_t volume_tex_obj;//cudaTextureType3D
+    cudaArray* d_mask_array;
+    cudaTextureObject_t mask_tex_obj;//cudaTextureType3D
     uint3 dim;
 };
 
