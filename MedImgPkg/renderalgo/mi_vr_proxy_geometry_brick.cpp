@@ -133,14 +133,15 @@ void ProxyGeometryBrick::calculate_entry_exit_points() {
 
     CHECK_GL_ERROR;
 
-    const Matrix4 mat_vp =
-        entry_exit_points->get_camera()->get_view_projection_matrix();
-    const Matrix4 mat_m =
-        entry_exit_points->get_camera_calculator()->get_volume_to_world_matrix();
+    std::shared_ptr<CameraBase> camera = entry_exit_points->get_camera();
+    RENDERALGO_CHECK_NULL_EXCEPTION(camera);
+    std::shared_ptr<CameraCalculator> camera_cal = entry_exit_points->get_camera_calculator();
+    RENDERALGO_CHECK_NULL_EXCEPTION(camera_cal);
+    const Matrix4 mat_vp = camera->get_view_projection_matrix();
+    const Matrix4 mat_m = camera_cal->get_volume_to_world_matrix();
     const Matrix4 mat_mvp = mat_vp * mat_m;
 
     int loc = _gl_program->get_uniform_location("mat_mvp");
-
     if (-1 == loc) {
         RENDERALGO_THROW_EXCEPTION("get uniform mat_mvp failed!");
     }

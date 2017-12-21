@@ -53,18 +53,18 @@ namespace {
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<VREntryExitPoints> _entry_exit_points;
+    std::shared_ptr<OrthoCamera> _camera;
+    std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
 
     float _ww = 1500.0f;
     float _wl = -400.0f;
 
     int _width = 1024;
     int _height = 1024;
-    int _iButton = -1;
-    Point2 _ptPre;
-    int _iTestCode = 0;
-    bool _pan_status = false;
+    int _button = -1;
+    int _button_status = -1;
+    Point2 _pre_pos;
 
-    std::vector<unsigned char> _vis_labels;
     std::shared_ptr<GLTexture2D> _tex_entry_points;
 
 
@@ -106,14 +106,26 @@ namespace {
         _volume_infos.reset(new VolumeInfos());
         _volume_infos->set_data_header(_data_header);
         _volume_infos->set_volume(_volume_data);
+        _volume_infos->refresh();
     }
 
     void InitGL() {
+        GLUtils::set_check_gl_flag(true);
+
+        _camera.reset(new OrthoCamera());
+        std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
+        camera_cal->init_vr_placement(_camera);
+        _camera_interactor.reset(new OrthoCameraInteractor(_camera));
+        _camera_interactor->reset_camera();
+        _camera_interactor->resize(_width, _height);
+
         _entry_exit_points.reset(new VREntryExitPoints());
         _entry_exit_points->set_display_size(_width,_height);
         _entry_exit_points->set_strategy(GPU_BASE);
         _entry_exit_points->initialize();
         _entry_exit_points->set_proxy_geometry(PG_BRICKS);
+        _entry_exit_points->set_camera(_camera);
+        _entry_exit_points->set_camera_calculator(camera_cal);
 
         std::shared_ptr<ImageData> volume = _volume_infos->get_volume();
         _entry_exit_points->set_volume_data(volume);
@@ -158,9 +170,6 @@ namespace {
             glVertex2d(-1.0,1.0);
             glEnd();
 
-
-
-
             glutSwapBuffers();
         } catch (Exception& e) {
             MI_RENDERALGO_LOG(MI_ERROR) << e.what();
@@ -192,10 +201,28 @@ namespace {
     }
 
     void MouseClick(int button, int status, int x, int y) {
+        _button = button;
+        _button_status = status;
+        _pre_pos = Point2(x,y);
         glutPostRedisplay();
     }
 
     void MouseMotion(int x, int y) {
+        Point2 pt(x,y);
+        if (_button_status == GLUT_DOWN) {
+            if (_button == GLUT_LEFT_BUTTON) {
+                _camera_interactor->rotate(_pre_pos, pt, _width, _height);
+            } else if (_button == GLUT_RIGHT_BUTTON) {
+                _camera_interactor->zoom(_pre_pos, pt, _width, _height);
+            } else if (_button == GLUT_MIDDLE_BUTTON) {
+                _ww += (float)(x - _pre_pos.x);
+                _wl += (float)(_pre_pos.y - y);
+                _ww = _ww < 1.0f ? 1.0f : _ww;
+                _entry_exit_points->set_window_level(_ww, _wl, 0, true);
+            }
+        }
+        
+        _pre_pos = pt;
         glutPostRedisplay();
     }
 }
