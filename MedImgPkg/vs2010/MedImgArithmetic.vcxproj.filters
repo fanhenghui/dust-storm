@@ -194,6 +194,9 @@
     <ClInclude Include="..\include\arithmetic\mi_ct_table_removal.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_cuda_math.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\arithmetic\mi_sampler.inl">

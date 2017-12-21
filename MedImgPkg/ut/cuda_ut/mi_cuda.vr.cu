@@ -6,12 +6,15 @@
 #include <cuda_gl_interop.h>
 #include <cuda_texture_types.h>
 #include <vector_types.h>
+#include <math_functions.h>
+#include <vector_functions.h>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include "mi_cuda_vr.h"
+#include "arithmetic/mi_cuda_math.h"
 
 //-------------------------------------------//
 //Global Parameter Define
@@ -26,7 +29,39 @@ if (err != cudaSuccess) {\
 //-------------------------------------------//
 
 
-__global__ void kernel_ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, unsigned char* result) {
+__device__ void composite() { 
+
+}
+
+__device__ void kernel_ray_cast(float3 ray_dir, float start_step, float end_step, cudaVolumeInfos volume_infos, float4* color_norm) {
+    float3 sample_pos;
+    for (float i = start_step; i < end_step; i+=1.0) {
+        sample_pos = start_step + ray_dir*i;
+        //composite();
+        if ((*color_norm).w > 0.95) {
+            (*color_norm).w = 1.0;
+            break;
+        }
+    }
+}
+
+__device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, float3* ray_start, float3* ray_dir, float* start_step, float* end_step) {
+    float3 ray_dir0 = entry - exit;
+    float3 ray_dir_norm = normalize(ray_dir0);
+    float ray_length = length(ray_dir0);
+    if(ray_length < 1e-5) {
+        return -1;
+    } 
+
+    *ray_start = entry;
+    *ray_dir = ray_dir0*make_float3(sample_step);
+    *start_step = 0;
+    *end_step = ray_length/sample_step;
+
+    return 0;
+}
+
+__global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* result) {
     unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -37,6 +72,20 @@ __global__ void kernel_ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex,
 
     float4 entry = tex2D<float4>(entry_tex.cuda_tex_obj, x, y);
     float4 exit = tex2D<float4>(exit_tex.cuda_tex_obj, x, y);
+
+    float3 entry3 = make_float3(entry);
+    float3 exit3 = make_float3(exit);
+
+    float3 ray_start, ray_dir;
+    float start_step, end_step;
+
+    if(0 != kernel_preprocess(entry3, exit3, ray_cast_info.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
+        result[idx*4] = 0;
+        result[idx*4+1] = 0;
+        result[idx*4+2] = 0;
+        result[idx*4] = 0;
+        return;
+    }
     
     result[idx*4] = entry.x/volume_info.dim.x*255;
     result[idx*4+1] = entry.y/volume_info.dim.y*255;
@@ -46,7 +95,7 @@ __global__ void kernel_ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex,
 
 //result will be one of color, JEPG buffer.
 extern "C"  
-int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, unsigned char* d_result, unsigned char* h_result) {
+int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result) {
     //1 launch ray cast kernel
     int width = entry_tex.width;
     int height = entry_tex.height;
@@ -58,7 +107,7 @@ int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos vo
     #define BLOCK_SIZE 16
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
-    kernel_ray_cast<<<grid, block>>>(entry_tex, exit_tex, volume_info, d_result);
+    kernel_ray_cast_main<<<grid, block>>>(entry_tex, exit_tex, volume_info, ray_cast_info, d_result);
 
     //2 JPEG compress(optional)
 

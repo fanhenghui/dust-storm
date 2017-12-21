@@ -20,8 +20,20 @@ struct cudaGLTexture {
     cudaArray* cuda_array;
 };
 
+struct cudaRayCastInfos {
+    float sample_step;
+    cudaArray* lut_array;
+    cudaTextureObject_t lut_tex_obj;//后续需要考虑Array
+    float lut_length;
+    float WL;
+};
+
 struct cudaVolumeInfos 
 {
+    cudaArray* volume_array;
+    cudaTextureObject_t volume_tex_obj;
+    cudaArray* mask_array;
+    cudaTextureObject_t mask_tex_obj;
     uint3 dim;
 };
 

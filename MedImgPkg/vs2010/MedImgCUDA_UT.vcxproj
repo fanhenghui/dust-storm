@@ -75,7 +75,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <Include>%(AdditionalIncludeDirectories)</Include>
+      <Include>..\Include\;%(AdditionalIncludeDirectories)</Include>
       <CodeGeneration>compute_60,sm_60</CodeGeneration>
       <Warning>W0</Warning>
     </CudaCompile>
