@@ -37,7 +37,9 @@ __device__ void composite(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_c
     float3 sample_norm = sample_pos/make_float3(volume_infos->dim);
     float gray= tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x,sample_norm.y,sample_norm.z);
     gray = (gray - min_gray)/ww;
+    gray = clamp(gray,0.0,1.0);
     float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
+    //float4 color_ori = make_float4(gray,gray,gray,0.2);
     if (color_ori.w > 0.0) {
         (*integral_color).x += color_ori.x * color_ori.w*(1-(*integral_color).w);
         (*integral_color).y += color_ori.y * color_ori.w*(1-(*integral_color).w);
@@ -46,10 +48,10 @@ __device__ void composite(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_c
     }
 }
 
-__device__ void kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float start_step, float end_step, float4* integral_color) {
+__device__ void kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4* integral_color) {
     float3 sample_pos;
     for (float i = start_step; i < end_step; i+=1.0) {
-        sample_pos = start_step + ray_dir*i;
+        sample_pos = ray_start + ray_dir*i;
         composite(volume_infos, ray_cast_infos, sample_pos, ray_dir, 0, integral_color);
         if ((*integral_color).w > 0.95) {
             (*integral_color).w = 1.0;
@@ -59,7 +61,7 @@ __device__ void kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos*
 }
 
 __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, float3* ray_start, float3* ray_dir, float* start_step, float* end_step) {
-    float3 ray_dir0 = entry - exit;
+    float3 ray_dir0 = exit - entry;
     float3 ray_dir_norm = normalize(ray_dir0);
     float ray_length = length(ray_dir0);
     if(ray_length < 1e-5) {
@@ -67,7 +69,7 @@ __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, f
     } 
 
     *ray_start = entry;
-    *ray_dir = ray_dir0*make_float3(sample_step);
+    *ray_dir = ray_dir_norm*make_float3(sample_step);
     *start_step = 0;
     *end_step = ray_length/sample_step;
 
@@ -92,6 +94,16 @@ __global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit
     float3 ray_start, ray_dir;
     float start_step, end_step;
 
+    /////////////////////////////////////////
+    //debug
+    /*result[idx*4] = exit3.x/volume_infos.dim.x*255;
+    result[idx*4+1] = exit3.y/volume_infos.dim.y*255;
+    result[idx*4+2] = exit3.z/volume_infos.dim.z*255;
+    result[idx*4+3] = 255;
+
+    return;*/
+    /////////////////////////////////////////
+
     if(0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
         result[idx*4] = 0;
         result[idx*4+1] = 0;
@@ -99,10 +111,14 @@ __global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit
         result[idx*4] = 0;
         return;
     }
+
+    __syncthreads();
+
     float4 integral_color = make_float4(0);
-    kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, start_step, end_step, &integral_color);
+    kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, &integral_color);
     
-    clamp(integral_color,0,1);
+    __syncthreads();
+    clamp(integral_color,0.0,1.0);
     result[idx*4] = integral_color.x*255;
     result[idx*4+1] = integral_color.y*255;
     result[idx*4+2] = integral_color.z*255;
@@ -117,7 +133,10 @@ int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos vo
     int height = entry_tex.height;
 
     cudaGraphicsMapResources(1, &entry_tex.cuda_res);
+    cudaGraphicsSubResourceGetMappedArray(&entry_tex.d_cuda_array, entry_tex.cuda_res, 0,0);
     cudaGraphicsMapResources(1, &exit_tex.cuda_res);
+    cudaGraphicsSubResourceGetMappedArray(&exit_tex.d_cuda_array, exit_tex.cuda_res, 0,0);
+
 
     CHECK_CUDA_ERROR; 
     #define BLOCK_SIZE 16
@@ -162,8 +181,8 @@ int bind_gl_texture(cudaGLTexture& gl_cuda_tex) {
 
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeWrap;
-    tex_desc.addressMode[1] = cudaAddressModeWrap;
+    tex_desc.addressMode[0] = cudaAddressModeClamp;
+    tex_desc.addressMode[1] = cudaAddressModeClamp;
     tex_desc.filterMode = cudaFilterModePoint;
     tex_desc.readMode = cudaReadModeElementType;
     tex_desc.normalizedCoords = 0;
@@ -216,10 +235,10 @@ int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned
     //Texture parameter (like GL's glTexParameteri)
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc,0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeWrap;
-    tex_desc.addressMode[1] = cudaAddressModeWrap;
-    tex_desc.addressMode[2] = cudaAddressModeWrap;
-    tex_desc.filterMode = cudaFilterModePoint;
+    tex_desc.addressMode[0] = cudaAddressModeClamp;
+    tex_desc.addressMode[1] = cudaAddressModeClamp;
+    tex_desc.addressMode[2] = cudaAddressModeClamp;
+    tex_desc.filterMode = cudaFilterModeLinear;
     tex_desc.readMode = cudaReadModeNormalizedFloat;
     tex_desc.normalizedCoords = 1;
 
@@ -247,7 +266,7 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
     //CUDA array
     cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc(
         8, 8, 8, 8, cudaChannelFormatKindUnsigned);
-    cudaMallocArray(&ray_cast_infos.d_lut_array, &channel_desc, lut_length);
+    cudaMallocArray(&ray_cast_infos.d_lut_array, &channel_desc, lut_length, 1);
 
     CHECK_CUDA_ERROR;
 
@@ -265,7 +284,8 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
     //Texture parameter (like GL's glTexParameteri)
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc,0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeWrap;
+    tex_desc.addressMode[0] = cudaAddressModeClamp;
+    tex_desc.addressMode[1] = cudaAddressModeClamp;
     tex_desc.filterMode = cudaFilterModeLinear;
     tex_desc.readMode = cudaReadModeNormalizedFloat;
     tex_desc.normalizedCoords = 1;

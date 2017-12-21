@@ -211,6 +211,9 @@ namespace {
         float wl_array[2] = {ww,wl};
         init_wl_nonmask(_ray_cast_infos, wl_array);
 
+        //Sample Step
+        _ray_cast_infos.sample_step = 0.5f;
+
 
         MI_LOG(MI_INFO) << "init data success.";
     }
@@ -296,11 +299,11 @@ namespace {
         try {
             CHECK_GL_ERROR;
 
-            //calcualte entry exit pionts
+            //calculate entry exit points
             _entry_exit_points->calculate_entry_exit_points();
 
             //CUDA process
-            ray_cast(_cuda_entry_points, _cuda_entry_points, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_h_canvas);
+            ray_cast(_cuda_entry_points, _cuda_exit_points, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_h_canvas);
             CHECK_GL_ERROR;
 
             //update texture
