@@ -60,6 +60,9 @@
 extern "C" int bind_gl_texture(cudaGLTexture& tex);
 extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result);
 extern "C" int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
+extern "C" int init_wl_nonmask(cudaRayCastInfos& ray_cast_infos, float* wl_array_norm);
+extern "C" int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array, int lut_length);
+extern "C" int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array);
 
 using namespace medical_imaging;
 namespace {
@@ -137,6 +140,7 @@ namespace {
 
         Logger::instance()->initialize();
 
+        //volume data
         std::vector<std::string> files = GetFiles();
         DICOMLoader loader;
         loader.load_series(files, _volume_data, _data_header);
@@ -154,9 +158,61 @@ namespace {
             std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
                 data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
             init_data(_cuda_volume_infos, dst_data.get(), _volume_data->_dim);
+        } else {
+            init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer(), _volume_data->_dim);
         }
 
+        //LUT
+        std::shared_ptr<ColorTransFunc> color;
+        std::shared_ptr<OpacityTransFunc> opacity;
+        float ww, wl;   
+        RGBAUnit background;
+        Material material;
+#ifdef WIN32
+        std::string color_opacity_xml = "../../../config/lut/3d/ct_lung_glass.xml";
+#else
+        std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
+#endif
+        if (IO_SUCCESS !=
+            TransferFuncLoader::load_color_opacity(color_opacity_xml, color, opacity,
+            ww, wl, background, material)) {
+                MI_LOG(MI_ERROR) << "load LUT : " << color_opacity_xml << " failed.";
+        }
+        _ww = ww;
+        _wl = wl;
 
+        std::vector<ColorTFPoint> color_pts;
+        color->set_width(S_TRANSFER_FUNC_WIDTH);
+        color->get_point_list(color_pts);
+
+        std::vector<OpacityTFPoint> opacity_pts;
+        opacity->set_width(S_TRANSFER_FUNC_WIDTH);
+        opacity->get_point_list(opacity_pts);
+
+        unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * 4];
+
+        for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
+            rgba[i * 4] = static_cast<unsigned char>(color_pts[i].x);
+            rgba[i * 4 + 1] = static_cast<unsigned char>(color_pts[i].y);
+            rgba[i * 4 + 2] = static_cast<unsigned char>(color_pts[i].z);
+            rgba[i * 4 + 3] = static_cast<unsigned char>(opacity_pts[i].a);
+        }
+        init_lut_nonmask(_ray_cast_infos, rgba, S_TRANSFER_FUNC_WIDTH);
+
+        //Materials
+        float material_array[12] = {
+            material.diffuse[0],material.diffuse[1],material.diffuse[2],material.diffuse[3],
+            material.specular[0],material.specular[1],material.specular[2],material.specular[3],
+            material.specular_shiness,0,0,0};
+        init_material_nonmask(_ray_cast_infos, material_array);
+
+        //WL
+        _volume_data->regulate_normalize_wl(ww,wl);
+        float wl_array[2] = {ww,wl};
+        init_wl_nonmask(_ray_cast_infos, wl_array);
+
+
+        MI_LOG(MI_INFO) << "init data success.";
     }
 
     void init_gl() {

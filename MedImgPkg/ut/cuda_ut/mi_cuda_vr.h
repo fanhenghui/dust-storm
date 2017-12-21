@@ -25,9 +25,9 @@ struct cudaRayCastInfos {
     int mask_level;//8 ->16 ->32 ->64 ->128
     cudaArray* d_lut_array;
     cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
-    float lut_length;//lenth of one CUDA texture 1D
+    float lut_length;//length of one CUDA texture 1D
     float* d_wl_array;//mask_level * 2
-    float* d_material_array;//mask_level * 2
+    float* d_material_array;//mask_level * 2 {float4(diffuse) float4(specular) float4(shininess reserve0/1/2)}
 };
 
 struct cudaVolumeInfos 
