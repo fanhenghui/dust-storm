@@ -130,9 +130,9 @@ void GraphicObjectNavigator::render(int code) {
     glVertex3f(w, -w, w);
 
     //posterior
-    glTexCoord2f(x_step*2.0, 0);
+    glTexCoord2f(x_step*2.0f, 0);
     glVertex3f(-w, w, -w);
-    glTexCoord2f(x_step*2.0, y_step);
+    glTexCoord2f(x_step*2.0f, y_step);
     glVertex3f(-w, w, w);
     glTexCoord2f(x_step, y_step);
     glVertex3f(w, w, w);
@@ -142,11 +142,11 @@ void GraphicObjectNavigator::render(int code) {
     //anterior
     glTexCoord2f(x_step, y_step);
     glVertex3f(-w, -w, -w);
-    glTexCoord2f(x_step*2.0, y_step);
+    glTexCoord2f(x_step*2.0f, y_step);
     glVertex3f(w, -w, -w);
-    glTexCoord2f(x_step*2.0, y_step*2.0);
+    glTexCoord2f(x_step*2.0f, y_step*2.0f);
     glVertex3f(w, -w, w);
-    glTexCoord2f(x_step, y_step*2.0);
+    glTexCoord2f(x_step, y_step*2.0f);
     glVertex3f(-w, -w, w);
     
     glEnd();  
