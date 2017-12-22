@@ -69,6 +69,8 @@ bool _pan_status = false;
 int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
 
+MaskMode _mask_mode = MASK_NONE;
+
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
 #else
@@ -168,14 +170,11 @@ void Init() {
     _scene->set_global_window_level(_ww, _wl);
     _scene->set_window_level(_ww, _wl, 0);
     _scene->set_window_level(_ww, _wl, 1);
-    _scene->set_composite_mode(COMPOSITE_MIP);
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
-    _scene->set_mask_mode(MASK_MULTI_LABEL);
-
+    _scene->set_mask_mode(_mask_mode);
     _scene->set_interpolation_mode(LINEAR);
+    _scene->set_composite_mode(COMPOSITE_DVR);
     _scene->set_shading_mode(SHADING_NONE);
-
-    //_scene->set_proxy_geometry(PG_CUBE);
     _scene->set_proxy_geometry(PG_BRICKS);
     _scene->set_test_code(_iTestCode);
     _scene->set_navigator_visibility(true);
@@ -236,9 +235,6 @@ void Init() {
     _ww = ww;
     _wl = wl;
 
-    _scene->set_composite_mode(COMPOSITE_DVR);
-    _scene->set_shading_mode(SHADING_PHONG);
-
 #ifdef WIN32
     color_opacity_xml = "../../../config/lut/3d/ct_lung_nodule.xml";
 #else
@@ -263,6 +259,10 @@ void Init() {
     printf("\n");
     _scene->set_visible_labels(vis_labels);
     _vis_labels = vis_labels;
+
+    if (_mask_mode == MASK_NONE) {
+        _scene->set_global_window_level(ww, wl);
+    }
 }
 
 void Display() {
@@ -281,9 +281,9 @@ void Display() {
         // ds = !ds;
         // _scene->set_downsample(ds);
 
-        // std::shared_ptr<CameraBase> camera = _scene->get_camera();
-        // Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
-        // camera->rotate(q);
+         std::shared_ptr<CameraBase> camera = _scene->get_camera();
+         Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
+         camera->rotate(q);
 
         CHECK_GL_ERROR;
 
@@ -499,10 +499,13 @@ void MouseMotion(int x, int y) {
             _ww += (x - (int)_ptPre.x);
             _wl += ((int)_ptPre.y - y);
             _ww = _ww < 0 ? 1 : _ww;
-            //_scene->set_global_window_level(_ww, _wl);
-            //_scene->set_window_level(_ww, _wl, 0);
-            _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
+            if (_mask_mode == MASK_NONE) {
+                _scene->set_global_window_level(_ww, _wl);
+            } else {
+                _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
+            }
             MI_RENDERALGO_LOG(MI_DEBUG) << "wl : " << _ww << " " << _wl << std::endl;
+            
         }
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
