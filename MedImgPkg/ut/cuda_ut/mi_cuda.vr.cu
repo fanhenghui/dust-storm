@@ -29,34 +29,40 @@ if (err != cudaSuccess) {\
 //-------------------------------------------//
 
 
-__device__ void composite(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 sample_pos, float3 ray_dir, int label, float4* integral_color) { 
-    float ww = ray_cast_infos->d_wl_array[0];
-    float wl = ray_cast_infos->d_wl_array[1];
-    float min_gray = wl - ww*0.5;
-
-    float3 sample_norm = sample_pos/make_float3(volume_infos->dim);
-    float gray= tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x,sample_norm.y,sample_norm.z);
-    gray = (gray - min_gray)/ww;
-    gray = clamp(gray,0.0,1.0);
-    float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
-    if (color_ori.w > 0.0) {
-        integral_color->x += color_ori.x * color_ori.w*(1-integral_color->w);
-        integral_color->y += color_ori.y * color_ori.w*(1-integral_color->w);
-        integral_color->z += color_ori.z * color_ori.w*(1-integral_color->w);
-        integral_color->w += color_ori.w *(1-integral_color->w);
-    }
-}
-
-__device__ void kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4* integral_color) {
+__device__ float4 kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
+    float4 integral_color = input_color;
     float3 sample_pos;
+    float3 sample_norm;
+    float4 color_ori;
+    const float3 dim3_r = make_float3(1.0/volume_infos->dim.x, 1.0/volume_infos->dim.y, 1.0/volume_infos->dim.z);
+    float ww,wl,min_gray,gray;
     for (float i = start_step; i < end_step; i+=1.0) {
         sample_pos = ray_start + ray_dir*i;
-        composite(volume_infos, ray_cast_infos, sample_pos, ray_dir, 0, integral_color);
-        if ((*integral_color).w > 0.95) {
-            (*integral_color).w = 1.0;
+        sample_norm = sample_pos*dim3_r;
+
+        ww = ray_cast_infos->d_wl_array[0];
+        wl = ray_cast_infos->d_wl_array[1];
+        min_gray = wl - ww*0.5;
+
+        ///Composite
+        gray= tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x,sample_norm.y,sample_norm.z);
+        gray = (gray - min_gray)/ww;
+        gray = clamp(gray,0.0,1.0);
+        color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
+        if (color_ori.w > 0.0) {
+            integral_color.x += color_ori.x * color_ori.w*(1-integral_color.w);
+            integral_color.y += color_ori.y * color_ori.w*(1-integral_color.w);
+            integral_color.z += color_ori.z * color_ori.w*(1-integral_color.w);
+            integral_color.w += color_ori.w *(1-integral_color.w);
+        }
+
+        if (integral_color.w > 0.95) {
+            integral_color.w = 1.0;
             break;
         }
     }
+
+    return integral_color;
 }
 
 __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, float3* ray_start, float3* ray_dir, float* start_step, float* end_step) {
@@ -113,8 +119,8 @@ __global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit
 
     //__syncthreads();
 
-    float4 integral_color = make_float4(0);
-    kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, &integral_color);
+    float4 input_color = make_float4(0);
+    float4 integral_color = kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, input_color );
     
     //__syncthreads();
     clamp(integral_color,0.0,1.0);
@@ -179,12 +185,13 @@ __global__ void kernel_ray_cast_main_whole(cudaGLTexture entry_tex, cudaGLTextur
     float3 sample_pos;
     float3 sample_norm;
     float4 color_ori;
+    float gray;
     for (float i = start_step; i < end_step; i+=1.0) {
         sample_pos = ray_start + ray_dir*i;
         sample_norm = sample_pos*dim3_r;
 
         ///Composite
-        float gray= tex3D<float>(volume_infos.volume_tex_obj, sample_norm.x,sample_norm.y,sample_norm.z);
+        gray= tex3D<float>(volume_infos.volume_tex_obj, sample_norm.x,sample_norm.y,sample_norm.z);
         gray = (gray - min_gray)/ww;
         gray = clamp(gray,0.0,1.0);
         color_ori = tex1D<float4>(ray_cast_infos.lut_tex_obj, gray);
@@ -227,7 +234,7 @@ int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos vo
     #define BLOCK_SIZE 16
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
-    kernel_ray_cast_main_whole<<<grid, block>>>(entry_tex, exit_tex, volume_info, ray_cast_info, d_result);
+    kernel_ray_cast_main<<<grid, block>>>(entry_tex, exit_tex, volume_info, ray_cast_info, d_result);
 
     //2 JPEG compress(optional)
 
@@ -371,7 +378,6 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc,0, sizeof(cudaTextureDesc));
     tex_desc.addressMode[0] = cudaAddressModeClamp;
-    tex_desc.addressMode[1] = cudaAddressModeClamp;
     tex_desc.filterMode = cudaFilterModeLinear;
     tex_desc.readMode = cudaReadModeNormalizedFloat;
     tex_desc.normalizedCoords = 1;
