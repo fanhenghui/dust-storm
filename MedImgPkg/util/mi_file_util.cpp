@@ -228,8 +228,7 @@ int FileUtil::read_raw_ext(const std::string& path, char*& buffer, unsigned int&
 
 int FileUtil::check_direction(const std::string& path) {
 #ifdef WIN32
-    //TODO Windows function
-    return access(path.c_str(), 0);
+    return _access(path.c_str(), 0);
 #else
     return access(path.c_str(), F_OK);
 #endif
