@@ -1,0 +1,344 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\renderalgo\mi_annotation_calculator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_brick_info_calculator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_brick_pool.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_camera_calculator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_camera_interactor.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_color_transfer_function.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_entry_exit_points.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_graphic_object_navigator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_mask_label_store.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_mpr_entry_exit_points.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_mpr_scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_opacity_transfer_function.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_cast_scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_caster.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_caster_canvas.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_caster_inner_buffer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_casting_cpu.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_color_inverse.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_composite.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_mask_overlay.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_mask_sampler.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_ray_casting.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_shading.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_rc_step_volume_sampler.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_scene_base.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_transfer_function_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_volume_infos.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_vr_entry_exit_points.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_vr_entry_exit_points_culling.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_vr_proxy_geometry_brick.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_vr_proxy_geometry_cube.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_vr_scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\renderalgo\mi_ray_caster_inner_buffer.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_casting_cpu.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_base.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_color_inverse.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_composite.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_main.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_mask_overlay.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_mask_sampler.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_ray_casting.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_shading.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_utils.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_rc_step_volume_sampler.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_shader_collection.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_vr_entry_exit_points_culling.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_camera_calculator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_camera_interactor.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_color_transfer_function.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_entry_exit_points.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_graphic_object_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_graphic_object_navigator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_mask_label_store.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_mpr_entry_exit_points.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_mpr_scene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_opacity_transfer_function.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_ray_cast_scene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_ray_caster.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_ray_caster_canvas.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_ray_caster_define.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_render_algo_export.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_render_algo_logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_scene_base.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_transfer_function_loader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_volume_infos.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_vr_entry_exit_points.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_vr_proxy_geometry_brick.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_vr_proxy_geometry_cube.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_vr_scene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_annotation_calculator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_brick_define.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_brick_info_calculator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_brick_pool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\renderalgo\shader\mpr_entry_exit_points.glsl">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_color_inverse_disable.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_color_inverse_enable.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_average.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_dvr.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_minip.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_composite_mip.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_main_test.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_linear_sampler.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_nearst_sampler.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_none_sampler.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_overlay_disable.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_mask_overlay_enable.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_average.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_dvr.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_ray_casting_mip_minip.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_shading_none.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_shading_phong.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_utils.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_volume_linear_samper.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\rc_volume_nearst_samper.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\shader_config">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\vr_entry_exit_points_culling.glsl">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_mask.glsl">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_utils.glsl">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\renderalgo\shader\brick_info_cal_volume.glsl">
+      <Filter>shader</Filter>
+    </None>
+  </ItemGroup>
+</Project>

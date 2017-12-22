@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>MedImgIO</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\binvs14\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\binvs14\$(Configuration)\$(Platform)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;MEDIMGIO_EXPORTS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;..\Include\io;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\Libvs14\$(Configuration)\$(Platform)\;..\Libvs14\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>..\Libvs14\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;dcmnet.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS_d.lib;mbedcrypto_d.lib;zlib.lib;libjpegd.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;MEDIMGIO_EXPORTS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;..\Include\io;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\Libvs14\$(Configuration)\$(Platform)\;..\Libvs14\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>..\Libvs14\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;dcmdata.lib;dcmimgle.lib;dcmimage.lib;dcmnet.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmjpeg.lib;mbedTLS.lib;mbedcrypto.lib;zlib.lib;libjpeg.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\io\mi_configure.h" />
+    <ClInclude Include="..\include\io\mi_dcm_scp.h" />
+    <ClInclude Include="..\include\io\mi_dcm_scu.h" />
+    <ClInclude Include="..\include\io\mi_dicom_exporter.h" />
+    <ClInclude Include="..\include\io\mi_dicom_info.h" />
+    <ClInclude Include="..\include\io\mi_dicom_loader.h" />
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct.h" />
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct_loader.h" />
+    <ClInclude Include="..\include\io\mi_image_data.h" />
+    <ClInclude Include="..\include\io\mi_image_data_header.h" />
+    <ClInclude Include="..\include\io\mi_io_define.h" />
+    <ClInclude Include="..\include\io\mi_io_export.h" />
+    <ClInclude Include="..\include\io\mi_io_logger.h" />
+    <ClInclude Include="..\include\io\mi_jpeg_parser.h" />
+    <ClInclude Include="..\include\io\mi_mask_voi_converter.h" />
+    <ClInclude Include="..\include\io\mi_meta_object_loader.h" />
+    <ClInclude Include="..\include\io\mi_nodule_set.h" />
+    <ClInclude Include="..\include\io\mi_nodule_set_parser.h" />
+    <ClInclude Include="..\include\io\mi_pacs_communicator.h" />
+    <ClInclude Include="..\include\io\mi_protobuf.h" />
+    <ClInclude Include="..\include\io\mi_targa_parser.h" />
+    <ClInclude Include="..\include\io\mi_voi.h" />
+    <ClInclude Include="..\include\io\mi_zlib_utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\io\mi_configure.cpp" />
+    <ClCompile Include="..\io\mi_dcm_scp.cpp" />
+    <ClCompile Include="..\io\mi_dcm_scu.cpp" />
+    <ClCompile Include="..\io\mi_dicom_exporter.cpp" />
+    <ClCompile Include="..\io\mi_dicom_loader.cpp" />
+    <ClCompile Include="..\io\mi_dicom_rt_struct.cpp" />
+    <ClCompile Include="..\io\mi_dicom_rt_struct_loader.cpp" />
+    <ClCompile Include="..\io\mi_image_data.cpp" />
+    <ClCompile Include="..\io\mi_jpeg_parser.cpp" />
+    <ClCompile Include="..\io\mi_mask_voi_converter.cpp" />
+    <ClCompile Include="..\io\mi_meta_object_loader.cpp" />
+    <ClCompile Include="..\io\mi_nodule_set_parser.cpp" />
+    <ClCompile Include="..\io\mi_pacs_communicator.cpp" />
+    <ClCompile Include="..\io\mi_targa_parser.cpp" />
+    <ClCompile Include="..\io\mi_zlib_utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\io\Makefile" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

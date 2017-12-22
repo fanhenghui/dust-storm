@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_rt_struct_loader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_image_data.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_image_data_header.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_io_define.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_io_export.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_io_logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_jpeg_parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_mask_voi_converter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_meta_object_loader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_nodule_set.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_nodule_set_parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_pacs_communicator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_protobuf.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_targa_parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_voi.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_zlib_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_configure.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dcm_scp.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dcm_scu.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_exporter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_info.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\io\mi_dicom_loader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\io\mi_targa_parser.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_zlib_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_configure.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dcm_scp.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dcm_scu.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dicom_exporter.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dicom_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dicom_rt_struct.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_dicom_rt_struct_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_image_data.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_jpeg_parser.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_mask_voi_converter.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_meta_object_loader.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_nodule_set_parser.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_pacs_communicator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\io\Makefile">
+      <Filter>source</Filter>
+    </None>
+  </ItemGroup>
+</Project>

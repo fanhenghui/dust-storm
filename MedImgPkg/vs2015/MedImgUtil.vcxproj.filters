@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\util\mi_file_util.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_ipc_client_proxy.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_ipc_server_proxy.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_model_interface.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_operation_factory.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_socket_client.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\mi_socket_server.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\util\mi_console_echo.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_controller_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_exception.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_file_util.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_ipc_client_proxy.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_ipc_common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_ipc_server_proxy.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_memory_shield.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_message_queue.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_model_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_model_progress.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_observer_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_operation_factory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_operation_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_socket_client.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_socket_list.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_socket_server.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_string_number_converter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_util_export.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\util\mi_util_logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\util\mi_message_queue.inl">
+      <Filter>include</Filter>
+    </None>
+  </ItemGroup>
+</Project>

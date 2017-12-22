@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\glresource\mi_gl_buffer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_context.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_environment.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_fbo.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_program.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_resource_manager_container.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_texture_1d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_texture_1d_array.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_texture_2d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_texture_3d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_texture_cache.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_time_query.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_vao.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\glresource\mi_gl_fbo.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_object.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_program.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_define.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_export.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_manager.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_resource_manager_container.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_1d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_1d_array.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_3d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_base.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_texture_cache.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_time_query.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_vao.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_buffer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_context.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\glresource\mi_gl_environment.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\glresource\mi_gl_resource_manager.inl">
+      <Filter>include</Filter>
+    </None>
+  </ItemGroup>
+</Project>

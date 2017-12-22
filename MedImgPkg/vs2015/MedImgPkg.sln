@@ -1,0 +1,89 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgArithmetic", "MedImgArithmetic.vcxproj", "{9505C55A-A544-416E-B6DE-B26E10EF1F03}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgCUDA_UT", "MedImgCUDA_UT.vcxproj", "{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgGLResource", "MedImgGLResource.vcxproj", "{64491D09-491B-4CE5-8445-A6563E762A74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA} = {4054C2E3-3429-47EB-9E39-7DF198FC64CA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgIO", "MedImgIO.vcxproj", "{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86996764-2ABF-424E-BECD-0F60C03A2551} = {86996764-2ABF-424E-BECD-0F60C03A2551}
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA} = {4054C2E3-3429-47EB-9E39-7DF198FC64CA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgLog", "MedImgLog.vcxproj", "{4054C2E3-3429-47EB-9E39-7DF198FC64CA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgRenderAlgorithm", "MedImgRenderAlgorithm.vcxproj", "{16769705-46FE-4094-BAA2-5B9064E11076}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgRenderAlgorithm_UT", "MedImgRenderAlgorithm_UT.vcxproj", "{7F8400F6-95D1-44CB-80D7-5A326570B0C4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgUtil", "MedImgUtil.vcxproj", "{86996764-2ABF-424E-BECD-0F60C03A2551}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA} = {4054C2E3-3429-47EB-9E39-7DF198FC64CA}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UT", "UT", "{BE54A40C-0483-4FCF-96B2-FF12CDB33AC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executable", "Executable", "{9CF489BC-53DA-48BB-8AB8-270D538F6693}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgShaderEncoder", "MedImgShaderEncoder.vcxproj", "{20F263BD-B714-4487-9FD1-F68C17837D2F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9505C55A-A544-416E-B6DE-B26E10EF1F03}.Debug|x64.ActiveCfg = Debug|x64
+		{9505C55A-A544-416E-B6DE-B26E10EF1F03}.Debug|x64.Build.0 = Debug|x64
+		{9505C55A-A544-416E-B6DE-B26E10EF1F03}.Release|x64.ActiveCfg = Release|x64
+		{9505C55A-A544-416E-B6DE-B26E10EF1F03}.Release|x64.Build.0 = Release|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Debug|x64.ActiveCfg = Debug|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Debug|x64.Build.0 = Debug|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Release|x64.ActiveCfg = Release|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Release|x64.Build.0 = Release|x64
+		{64491D09-491B-4CE5-8445-A6563E762A74}.Debug|x64.ActiveCfg = Debug|x64
+		{64491D09-491B-4CE5-8445-A6563E762A74}.Debug|x64.Build.0 = Debug|x64
+		{64491D09-491B-4CE5-8445-A6563E762A74}.Release|x64.ActiveCfg = Release|x64
+		{64491D09-491B-4CE5-8445-A6563E762A74}.Release|x64.Build.0 = Release|x64
+		{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}.Debug|x64.ActiveCfg = Debug|x64
+		{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}.Debug|x64.Build.0 = Debug|x64
+		{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}.Release|x64.ActiveCfg = Release|x64
+		{E9535DED-BAC7-499F-BEB1-BED1C1C0E95D}.Release|x64.Build.0 = Release|x64
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA}.Debug|x64.ActiveCfg = Debug|x64
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA}.Debug|x64.Build.0 = Debug|x64
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA}.Release|x64.ActiveCfg = Release|x64
+		{4054C2E3-3429-47EB-9E39-7DF198FC64CA}.Release|x64.Build.0 = Release|x64
+		{16769705-46FE-4094-BAA2-5B9064E11076}.Debug|x64.ActiveCfg = Debug|x64
+		{16769705-46FE-4094-BAA2-5B9064E11076}.Debug|x64.Build.0 = Debug|x64
+		{16769705-46FE-4094-BAA2-5B9064E11076}.Release|x64.ActiveCfg = Release|x64
+		{16769705-46FE-4094-BAA2-5B9064E11076}.Release|x64.Build.0 = Release|x64
+		{7F8400F6-95D1-44CB-80D7-5A326570B0C4}.Debug|x64.ActiveCfg = Debug|x64
+		{7F8400F6-95D1-44CB-80D7-5A326570B0C4}.Debug|x64.Build.0 = Debug|x64
+		{7F8400F6-95D1-44CB-80D7-5A326570B0C4}.Release|x64.ActiveCfg = Release|x64
+		{7F8400F6-95D1-44CB-80D7-5A326570B0C4}.Release|x64.Build.0 = Release|x64
+		{86996764-2ABF-424E-BECD-0F60C03A2551}.Debug|x64.ActiveCfg = Debug|x64
+		{86996764-2ABF-424E-BECD-0F60C03A2551}.Debug|x64.Build.0 = Debug|x64
+		{86996764-2ABF-424E-BECD-0F60C03A2551}.Release|x64.ActiveCfg = Release|x64
+		{86996764-2ABF-424E-BECD-0F60C03A2551}.Release|x64.Build.0 = Release|x64
+		{20F263BD-B714-4487-9FD1-F68C17837D2F}.Debug|x64.ActiveCfg = Debug|x64
+		{20F263BD-B714-4487-9FD1-F68C17837D2F}.Debug|x64.Build.0 = Debug|x64
+		{20F263BD-B714-4487-9FD1-F68C17837D2F}.Release|x64.ActiveCfg = Release|x64
+		{20F263BD-B714-4487-9FD1-F68C17837D2F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5} = {BE54A40C-0483-4FCF-96B2-FF12CDB33AC4}
+		{7F8400F6-95D1-44CB-80D7-5A326570B0C4} = {BE54A40C-0483-4FCF-96B2-FF12CDB33AC4}
+		{20F263BD-B714-4487-9FD1-F68C17837D2F} = {9CF489BC-53DA-48BB-8AB8-270D538F6693}
+	EndGlobalSection
+EndGlobal

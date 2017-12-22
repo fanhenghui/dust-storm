@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_export.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_arithmetic_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_camera_base.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_circle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_color_unit.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_connected_domain_analysis.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_ct_table_removal.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_cuda_math.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_ellipsoid.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_intersection_test.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_line.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_line_segment.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_matrix4.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_matrix4f.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_morphology.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_ortho_camera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_perspective_camera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_plane.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_point2.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_point3.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_quat4.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_rectangle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_rsa_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_run_length_operator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_sampler.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_scan_line_analysis.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_segment_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_segment_threshold.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_shape_interface.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_simd.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_sphere.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_track_ball.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_triangle.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector2.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector2f.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector3.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector3f.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_vector4f.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_volume_statistician.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\arithmetic\mi_aabb.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\arithmetic\mi_ct_table_removal.inl">
+      <Filter>include</Filter>
+    </None>
+    <None Include="..\include\arithmetic\mi_sampler.inl">
+      <Filter>include</Filter>
+    </None>
+    <None Include="..\include\arithmetic\mi_segment_threshold.inl">
+      <Filter>include</Filter>
+    </None>
+    <None Include="..\include\arithmetic\mi_volume_statistician.inl">
+      <Filter>include</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\arithmetic\mi_camera_base.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_connected_domain_analysis.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_intersection_test.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_matrix4.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_matrix4f.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_ortho_camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_perspective_camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_point2.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_point3.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_rsa_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_run_length_operator.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_track_ball.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_triangle.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector2.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector2f.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector3.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector3f.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_vector4f.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_volume_statistician.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_aabb.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\arithmetic\mi_arithmetic_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
