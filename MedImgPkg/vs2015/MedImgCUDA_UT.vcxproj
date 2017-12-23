@@ -14,6 +14,7 @@
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_ut.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_vr.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_entry_exit_points.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda.vr.cu" />
@@ -65,7 +66,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;WIN64;BOOST_ALL_DYN_LINK;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -89,7 +90,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;WIN64;BOOST_ALL_DYN_LINK;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;BOOST_ALL_DYN_LINK;BOOST_LOG_DYN_LINK;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
