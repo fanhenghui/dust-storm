@@ -56,6 +56,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgShaderEncoder", "MedI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgCUDA_UT", "..\vs2010\MedImgCUDA_UT.vcxproj", "{2A408E38-19C3-445D-89F6-3E937E91A08F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgCUDA_UT", "MedImgCUDA_UT.vcxproj", "{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -98,6 +100,10 @@ Global
 		{2A408E38-19C3-445D-89F6-3E937E91A08F}.Debug|x64.Build.0 = Debug|x64
 		{2A408E38-19C3-445D-89F6-3E937E91A08F}.Release|x64.ActiveCfg = Release|x64
 		{2A408E38-19C3-445D-89F6-3E937E91A08F}.Release|x64.Build.0 = Release|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Debug|x64.ActiveCfg = Debug|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Debug|x64.Build.0 = Debug|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Release|x64.ActiveCfg = Release|x64
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,5 +111,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{7F8400F6-95D1-44CB-80D7-5A326570B0C4} = {BE54A40C-0483-4FCF-96B2-FF12CDB33AC4}
 		{20F263BD-B714-4487-9FD1-F68C17837D2F} = {9CF489BC-53DA-48BB-8AB8-270D538F6693}
+		{F06328E3-85E6-4BC5-BD70-93888D8C8EB5} = {BE54A40C-0483-4FCF-96B2-FF12CDB33AC4}
 	EndGlobalSection
 EndGlobal

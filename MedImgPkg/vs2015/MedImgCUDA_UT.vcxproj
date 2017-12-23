@@ -14,7 +14,6 @@
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_ut.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_vr.cpp" />
-    <ClCompile Include="..\ut\cuda_ut\mi_entry_exit_points.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda.vr.cu" />

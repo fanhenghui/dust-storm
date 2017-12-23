@@ -18,9 +18,6 @@
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_vr.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\ut\cuda_ut\mi_entry_exit_points.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_texture.cu">
