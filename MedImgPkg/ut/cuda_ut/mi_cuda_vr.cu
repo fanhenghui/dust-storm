@@ -16,19 +16,6 @@
 #include "mi_cuda_vr.h"
 #include "arithmetic/mi_cuda_math.h"
 
-//-------------------------------------------//
-//Global Parameter Define
-
-#define CHECK_CUDA_ERROR {\
-cudaError_t err = cudaGetLastError(); \
-if (err != cudaSuccess) {\
-    std::cout << "CUDA error: " << err << " in function: " << __FUNCTION__ <<\
-    " line: " << __LINE__ << std::endl; \
-}}\
-
-//-------------------------------------------//
-
-
 __device__ float4 kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
     float4 integral_color = input_color;
     float3 sample_pos;
