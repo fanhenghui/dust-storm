@@ -14,12 +14,12 @@
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_vr.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_ut.cpp" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_texture.cu" />
-    <CudaCompile Include="..\ut\cuda_ut\mi_navigator_ray_tracing.cu" />
+    <CudaCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_vr.cpp" />
-    <ClCompile Include="..\ut\cuda_ut\mi_navigator_ray_tracing.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ut\cuda_ut\mi_cuda_vr.h" />

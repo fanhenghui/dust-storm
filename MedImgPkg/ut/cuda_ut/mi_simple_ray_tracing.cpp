@@ -37,16 +37,17 @@
 
 #include "mi_cuda_vr.h"
 
-extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result);
+extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result, cudaGLTextureWriteOnly& gl_cuda_tex);
 
 using namespace medical_imaging;
 namespace {
     std::shared_ptr<OrthoCamera> _camera;
     std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
     std::shared_ptr<GLTexture2D> _canvas_tex;
+    std::shared_ptr<GLTexture2D> _navigator_tex;
+    cudaGLTextureWriteOnly _canvas_cuda_tex;
 
     unsigned char* _cuda_d_canvas = nullptr;
-    unsigned char* _cuda_h_canvas = nullptr;
 
     int _width = 1024;
     int _height = 1024;
@@ -65,8 +66,8 @@ void init() {
 
     //Entry exit points
     _camera.reset(new OrthoCamera());
-    _camera->set_ortho(-1, 1, -1, 1, -1, 1);
-    _camera->set_eye(Point3(0, 0, -10));
+    _camera->set_ortho(-1, 1, -1, 1, 1, 5);
+    _camera->set_eye(Point3(0, 0, 3));
     _camera->set_look_at(Point3(0, 0, 0));
     _camera->set_up_direction(Vector3(0, 1, 0));
 
@@ -86,9 +87,137 @@ void init() {
     _canvas_tex->load(GL_RGBA8, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
     //CUDA canvas
+    _canvas_cuda_tex.gl_tex_id = _canvas_tex->get_id();
+    _canvas_cuda_tex.target = GL_TEXTURE_2D;
+    register_image(_canvas_cuda_tex);
     cudaMalloc(&_cuda_d_canvas, _width*_height * 4);
-    _cuda_h_canvas = new unsigned char[_width*_height * 4];
 
+    _canvas_tex->unbind();
+
+
+    //texture
+#ifdef WIN32
+    const std::string navi_img_file("./config/resource/navi_384_256_3.raw");
+#else
+    const std::string navi_img_file("../config/resource/navi_384_256_3.raw");
+#endif
+    const unsigned int img_size = 384 * 256 * 3;
+    unsigned char* img_buffer = new unsigned char[img_size];
+    if (0 != FileUtil::read_raw(navi_img_file, img_buffer, img_size)) {
+        MI_LOG(MI_FATAL) << "load navigator image failed.";
+    }
+    else {
+        UIDType uid = 0;
+        _navigator_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+        _navigator_tex->set_description("navigator texture");
+        _navigator_tex->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+        _navigator_tex->load(GL_RGB8, 384, 256, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);
+        _navigator_tex->unbind();
+    }
+
+}
+
+static void Display2() {
+    glViewport(0, 0, _width, _height);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClearDepth(1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glPushMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixd(_camera->get_view_projection_matrix()._m);
+//    glLoadIdentity();
+
+    CHECK_GL_ERROR;
+
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glDepthFunc(GL_LEQUAL);
+
+    CHECK_GL_ERROR;
+
+    const float w = 0.6f;
+    const float x_step = 0.33333f;
+    const float y_step = 0.5f;
+
+    _navigator_tex->bind();
+    glBegin(GL_QUADS);
+
+    //patient coordinate
+    //head 
+    glTexCoord2f(x_step*2.0f, y_step);
+    glVertex3f(-w, -w, w);
+    glTexCoord2f(x_step*3.0f, y_step);
+    glVertex3f(w, -w, w);
+    glTexCoord2f(x_step*3.0f, 0);
+    glVertex3f(w, w, w);
+    glTexCoord2f(x_step*2.0f, 0);
+    glVertex3f(-w, w, w);
+
+    //foot
+    glTexCoord2f(x_step*2.0f, y_step*2.0f);
+    glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step*2.0f, y_step);
+    glVertex3f(-w, w, -w);
+    glTexCoord2f(x_step*3.0f, y_step);
+    glVertex3f(w, w, -w);
+    glTexCoord2f(x_step*3.0f, y_step*2.0f);
+    glVertex3f(w, -w, -w);
+
+    //left
+    glTexCoord2f(x_step, 0);
+    glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step, y_step);
+    glVertex3f(-w, -w, w);
+    glTexCoord2f(0, y_step);
+    glVertex3f(-w, w, w);
+    glTexCoord2f(0, 0);
+    glVertex3f(-w, w, -w);
+
+    //right
+    glTexCoord2f(0, y_step);
+    glVertex3f(w, -w, -w);
+    glTexCoord2f(x_step, y_step);
+    glVertex3f(w, w, -w);
+    glTexCoord2f(x_step, y_step * 2);
+    glVertex3f(w, w, w);
+    glTexCoord2f(0, y_step * 2);
+    glVertex3f(w, -w, w);
+
+    //posterior
+    glTexCoord2f(x_step*2.0f, 0);
+    glVertex3f(-w, w, -w);
+    glTexCoord2f(x_step*2.0f, y_step);
+    glVertex3f(-w, w, w);
+    glTexCoord2f(x_step, y_step);
+    glVertex3f(w, w, w);
+    glTexCoord2f(x_step, 0);
+    glVertex3f(w, w, -w);
+
+    //anterior
+    glTexCoord2f(x_step, y_step);
+    glVertex3f(-w, -w, -w);
+    glTexCoord2f(x_step*2.0f, y_step);
+    glVertex3f(w, -w, -w);
+    glTexCoord2f(x_step*2.0f, y_step*2.0f);
+    glVertex3f(w, -w, w);
+    glTexCoord2f(x_step, y_step*2.0f);
+    glVertex3f(-w, -w, w);
+
+    glEnd();
+    CHECK_GL_ERROR;
+
+    glPopMatrix();
+    glPopAttrib();
+
+    CHECK_GL_ERROR;
+
+    glutSwapBuffers();
 }
 
 static void Display() {
@@ -103,49 +232,14 @@ static void Display() {
         mat4 mat4_pi = matrix4_to_mat4(mat_projection_inv);
         Viewport view_port(0, 0, _width, _height);
 
-        {
-            //test
-            float w = 0.6;
-            Point3 p000 = mat_view*Point3(-w, -w, -w);
-            Point3 p001 = mat_view*Point3(-w, -w, w);
-            Point3 p010 = mat_view*Point3(-w, w, -w);
-            Point3 p011 = mat_view*Point3(-w, w, w);
-            Point3 p100 = mat_view*Point3(w, -w, -w);
-            Point3 p101 = mat_view*Point3(w, -w, w);
-            Point3 p110 = mat_view*Point3(w, w, -w);
-            Point3 p111 = mat_view*Point3(w, w, w);
-
-            std::cout << "test done.";
-        }
-
-        {
-            mat4 mat_viewmodel = matrix4_to_mat4(mat_view);
-            float w = 0.6;
-            float3 p000 = mat_viewmodel*make_float3(-w, -w, -w);
-            float3 p001 = mat_viewmodel*make_float3(-w, -w, w);
-            float3 p010 = mat_viewmodel*make_float3(-w, w, -w);
-            float3 p011 = mat_viewmodel*make_float3(-w, w, w);
-            float3 p100 = mat_viewmodel*make_float3(w, -w, -w);
-            float3 p101 = mat_viewmodel*make_float3(w, -w, w);
-            float3 p110 = mat_viewmodel*make_float3(w, w, -w);
-            float3 p111 = mat_viewmodel*make_float3(w, w, w);
-
-            std::cout << "test done.";
-
-        }
-
-        ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas);
-        cudaMemcpy(_cuda_h_canvas, _cuda_d_canvas, _width*_height * 4, cudaMemcpyDeviceToHost);
+        ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
 
         //update texture
-        glBindTexture(GL_TEXTURE_2D, _canvas_tex->get_id());
-        _canvas_tex->update(0, 0, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, _cuda_h_canvas, 0);
-
         glViewport(0, 0, _width, _height);
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        
+        glBindTexture(GL_TEXTURE_2D, _canvas_tex->get_id());
         glBegin(GL_QUADS);
         glTexCoord2d(0, 0);
         glVertex2d(-1.0, -1.0);
@@ -209,7 +303,13 @@ static void MouseMotion(int x, int y) {
     glutPostRedisplay();
 }
 
-int mi_navigator_ray_tracing(int argc, char* argv[]) {
+static void Finalize() {
+    unmap_image(_canvas_cuda_tex);
+    cudaFree(_cuda_d_canvas);
+    _cuda_d_canvas = NULL;
+}
+
+int mi_simple_ray_tracing(int argc, char* argv[]) {
 #ifndef WIN32
     chdir(dirname(argv[0]));
 #endif
@@ -220,7 +320,7 @@ int mi_navigator_ray_tracing(int argc, char* argv[]) {
         glutInitWindowPosition(0, 0);
         glutInitWindowSize(_width, _height);
 
-        glutCreateWindow("Navigator Ray Tracing");
+        glutCreateWindow("Simple Ray Tracing");
 
         if (GLEW_OK != glewInit()) {
             MI_LOG(MI_FATAL) << "Init GLEW failed!\n";

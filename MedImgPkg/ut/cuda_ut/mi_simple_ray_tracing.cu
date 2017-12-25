@@ -9,8 +9,8 @@
 #include "arithmetic/mi_cuda_math.h"
 #include "mi_cuda_vr.h"
 
-__device__ float ray_intersext_rectangle(float3 ray_start, float3 ray_dir, Rectangle& rect, float3* out) {
-    return ray_intersext_rectangle(ray_start, ray_dir, rect.p0, rect.p1, rect.p2, rect.p3, out);
+__device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, Rectangle& rect, float3* out) {
+    return ray_intersect_rectangle(ray_start, ray_dir, rect.p0, rect.p1, rect.p2, rect.p3, out);
 }
 
 __global__ void kernel_ray_tracing(Viewport viewport, int width , int height, mat4 mat_viewmodel, mat4 mat_projection_inv, unsigned char* result ) {
@@ -32,11 +32,11 @@ __global__ void kernel_ray_tracing(Viewport viewport, int width , int height, ma
     
 
     //hit 6 rectangle( easy to calcuate texture coordinate)
-    if (x != 512 || y != 512) {
-        return;
-    }
+    //if (x != 512 || y != 512) {
+    //    return;
+    //}
     float ndc_x = ( x / (float)viewport.width - 0.5) * 2.0;
-    float ndc_y = ( (viewport.height - y) / (float)viewport.height - 0.5 ) * 2.0;
+    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
     float3 ray_start = make_float3(ndc_x, ndc_y, -1.0);
     float3 ray_end = make_float3(ndc_x, ndc_y, 1.0);
     ray_start = mat_projection_inv*ray_start;
@@ -66,7 +66,7 @@ __global__ void kernel_ray_tracing(Viewport viewport, int width , int height, ma
         Rectangle(p000,p010,p110,p100,
         make_float2(x_step * 2,y_step * 2),make_float2(x_step * 2,y_step),make_float2(x_step * 3,y_step),make_float2(x_step * 3,y_step * 2)),//foot
 
-        Rectangle(p001,p101,p111,p011,
+        Rectangle(p000,p001,p011,p010,
         make_float2(x_step,0),make_float2(x_step,y_step),make_float2(0,y_step),make_float2(0,0)),//left
 
         Rectangle(p100,p110,p111,p101,
@@ -84,22 +84,22 @@ __global__ void kernel_ray_tracing(Viewport viewport, int width , int height, ma
     int hit = -1;
     float3 hit_pos;
 
-    float dis0 = ray_intersext_rectangle(ray_start, ray_dir, rects[0], &hit_pos);
-    float dis1 = ray_intersext_rectangle(ray_start, ray_dir, rects[1], &hit_pos);
-    float dis2 = ray_intersext_rectangle(ray_start, ray_dir, rects[2], &hit_pos);
-    float dis3 = ray_intersext_rectangle(ray_start, ray_dir, rects[3], &hit_pos);
-    float dis4 = ray_intersext_rectangle(ray_start, ray_dir, rects[4], &hit_pos);
-    float dis5 = ray_intersext_rectangle(ray_start, ray_dir, rects[5], &hit_pos);
+    /*float dis0 = ray_intersect_rectangle(ray_start, ray_dir, rects[0], &hit_pos);
+    float dis1 = ray_intersect_rectangle(ray_start, ray_dir, rects[1], &hit_pos);
+    float dis2 = ray_intersect_rectangle(ray_start, ray_dir, rects[2], &hit_pos);
+    float dis3 = ray_intersect_rectangle(ray_start, ray_dir, rects[3], &hit_pos);
+    float dis4 = ray_intersect_rectangle(ray_start, ray_dir, rects[4], &hit_pos);
+    float dis5 = ray_intersect_rectangle(ray_start, ray_dir, rects[5], &hit_pos);*/
 
     for (int i = 0; i < 6; ++i) {
-        dis = ray_intersext_rectangle(ray_start, ray_dir, rects[i], &hit_pos);
-        if (dis < min_dis) {
+        dis = ray_intersect_rectangle(ray_start, ray_dir, rects[i], &hit_pos);
+        if (dis < min_dis && dis > -INF) {
             min_dis = dis;
             hit = i;
         }
     }
 
-    if (min_dis > -INF) {
+    if (hit != -1) {
         //use out to interpolate texture coordinate
         result[idx * 4 + 0] = 255;
         result[idx * 4 + 1] = 0;
@@ -113,17 +113,25 @@ __global__ void kernel_ray_tracing(Viewport viewport, int width , int height, ma
     }
 }
 
-extern "C" void init_navigator() {
-
-}
-
-extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result) {
+extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result, cudaGLTextureWriteOnly& cuda_tex) {
 #define BLOCK_SIZE 16
     CHECK_CUDA_ERROR;
     dim3 block_size(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid_size(viewport.width / BLOCK_SIZE, viewport.height / BLOCK_SIZE);
     kernel_ray_tracing <<<grid_size, block_size >>> (viewport, width, height, mat_viewmodel, mat_projection_inv, result);
+    
     cudaThreadSynchronize();
     CHECK_CUDA_ERROR;
     
+    map_image(cuda_tex);
+
+    CHECK_CUDA_ERROR;
+
+    write_image(cuda_tex, result, width*height*4);
+
+    CHECK_CUDA_ERROR;
+
+    unmap_image(cuda_tex);
+
+    CHECK_CUDA_ERROR;
 }

@@ -27,6 +27,68 @@ if (err != cudaSuccess) {\
     " line: " << __LINE__ << std::endl; \
 }}\
 
+struct cudaGLTextureWriteOnly {
+    GLuint gl_tex_id;
+    GLenum target;
+    cudaGraphicsResource *cuda_res;
+    cudaArray* d_cuda_array;    
+};
+
+inline  __host__ void register_image(cudaGLTextureWriteOnly& cuda_tex) {
+    cudaGraphicsGLRegisterImage(&cuda_tex.cuda_res, cuda_tex.gl_tex_id, cuda_tex.target, cudaGraphicsRegisterFlagsWriteDiscard);
+    CHECK_CUDA_ERROR;
+}
+
+inline __host__ void map_image(cudaGLTextureWriteOnly& cuda_tex) {
+    cuda_tex.d_cuda_array = NULL;
+    cudaGraphicsMapResources(1, &cuda_tex.cuda_res);
+    cudaGraphicsSubResourceGetMappedArray(&cuda_tex.d_cuda_array, cuda_tex.cuda_res, 0, 0);
+}
+
+inline __host__ void write_image(cudaGLTextureWriteOnly& cuda_tex, void* d_buffer, size_t count) {
+    if (cuda_tex.d_cuda_array) {
+        cudaMemcpyToArray(cuda_tex.d_cuda_array, 0, 0, d_buffer, count, cudaMemcpyDeviceToDevice);
+        CHECK_CUDA_ERROR;
+    }
+}
+
+inline  __host__  void release_image(cudaGLTextureWriteOnly& cuda_tex) {
+    cudaGraphicsUnregisterResource(cuda_tex.cuda_res);
+    cuda_tex.cuda_res = NULL;
+}
+
+inline __host__ void unmap_image(cudaGLTextureWriteOnly& cuda_tex) {
+    cudaGraphicsUnmapResources(1, &cuda_tex.cuda_res);
+}
+
+//struct cudaGLTextureReadOnly {
+//    GLuint gl_tex_id;
+//    GLenum target;
+//    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
+//    cudaGraphicsResource *cuda_res;
+//    cudaArray* d_cuda_array;
+//
+//    __host__ cudaGLTextureReadOnly() :gl_tex_id(0), target(GL_TEXTURE_2D), cuda_res(NULL), d_cuda_array(NULL) {
+//
+//    }
+//
+//    __host__ void register_image() {
+//        cuda_res = NULL;
+//        cudaGraphicsGLRegisterImage(&cuda_res, gl_tex_id, target, cudaGraphicsRegisterFlagsReadOnly);
+//        CHECK_CUDA_ERROR;
+//    }
+//
+//    __host__ void map() {
+//        d_cuda_array = NULL;
+//        cudaGraphicsMapResources(1, &cuda_res);
+//        cudaGraphicsSubResourceGetMappedArray(&d_cuda_array, cuda_res, 0, 0);
+//    }
+//
+//    __host__ void unmap() {
+//        cudaGraphicsUnmapResources(1, &cuda_res);
+//    }
+//};
+
 struct cudaGLTexture {
     GLuint gl_tex_id;
     GLenum target;
@@ -139,7 +201,7 @@ inline __device__ float scalar_triple(float3 u, float3 v, float3 w) {
     return dot(cross(u, v), w);
 }
 
-inline __device__ float ray_intersext_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3* out) {
+inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3* out) {
     float3 pq = ray_dir*INF;
     float3 pa = p0 - ray_start;
     float3 pb = p1 - ray_start;
@@ -149,7 +211,7 @@ inline __device__ float ray_intersext_triangle(float3 ray_start, float3 ray_dir,
     float v = scalar_triple(pq, pa, pc);
     float w = scalar_triple(pq, pb, pa);
 
-    if ((u < 0.0 && v < 0.0 && w < 0.0) || (u >= 0.0 && v >= 0.0 && w >= 0.0)) {
+    if ((u <= 0.0 && v <= 0.0 && w <= 0.0) || (u >= 0.0 && v >= 0.0 && w >= 0.0)) {
         float denom = 1.0f / (u + v + w);
         u *= denom;
         v *= denom;
@@ -162,13 +224,13 @@ inline __device__ float ray_intersext_triangle(float3 ray_start, float3 ray_dir,
     }
 }
 
-inline __device__ float ray_intersext_rectangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 p3, float3* out) {
-    float dis = ray_intersext_triangle(ray_start, ray_dir, p0, p1, p2, out);
+inline __device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 p3, float3* out) {
+    float dis = ray_intersect_triangle(ray_start, ray_dir, p0, p1, p2, out);
     if (dis > -INF) {
         return dis;
     }
     else {
-        return ray_intersext_triangle(ray_start, ray_dir, p0, p2, p3, out);
+        return ray_intersect_triangle(ray_start, ray_dir, p0, p2, p3, out);
     }
 }
 
