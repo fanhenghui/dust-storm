@@ -12,6 +12,6 @@
     <ClCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ut\cuda_ut\mi_cuda_vr.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_graphic.h" />
   </ItemGroup>
 </Project>

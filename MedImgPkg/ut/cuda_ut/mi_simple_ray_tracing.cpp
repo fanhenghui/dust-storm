@@ -35,9 +35,14 @@
 #include <cuda_gl_interop.h>
 #include <cuda_texture_types.h>
 
-#include "mi_cuda_vr.h"
+#include "mi_cuda_graphic.h"
 
 extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result, cudaGLTextureWriteOnly& gl_cuda_tex);
+
+extern "C" void ray_tracing_vertex_color(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, int ele_count, int* d_element, float4* d_color,
+    unsigned char* d_result, cudaGLTextureWriteOnly& cuda_tex);
 
 using namespace medical_imaging;
 namespace {
@@ -48,6 +53,12 @@ namespace {
     cudaGLTextureWriteOnly _canvas_cuda_tex;
 
     unsigned char* _cuda_d_canvas = nullptr;
+
+    //grcphic device memory(Global memory)
+    float* _d_vertex = nullptr;
+    float* _d_color = nullptr;
+    float* _d_tex_coordinate = nullptr;
+    int* _d_element = nullptr;
 
     int _width = 1024;
     int _height = 1024;
@@ -116,7 +127,59 @@ void init() {
         _navigator_tex->load(GL_RGB8, 384, 256, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);
         _navigator_tex->unbind();
     }
+}
 
+static void init_graphic() {
+    int triangle_count = 12;
+    float w = 0.6;
+    float x_step = 0.33333;
+    float y_step = 0.5;
+    float vertex[] = {
+        -w, -w, -w,
+        -w, -w, w,
+        -w, w, -w,
+        -w, w, w,
+        w, -w, -w,
+        w, -w, w,
+        w, w, -w,
+        w, w, w
+    };
+    float color[] = {
+        0, 0, 0, 1,//0
+        0, 0, 1, 1,//1
+        0, 1, 0, 1,//2
+        0, 1, 1, 1,//3
+        1, 0, 0, 1,//4
+        1, 0, 1, 1,//5
+        1, 1, 0, 1,//6
+        1, 1, 1, 1//7
+    };
+
+    int element[] = {
+        1,5,7,
+        1,7,3,
+        0,2,6,
+        0,6,4,
+        0,1,3,
+        0,3,2,
+        4,6,7,
+        4,7,5,
+        2,3,7,
+        2,7,6,
+        0,4,5,
+        0,5,1
+    };
+
+    cudaMalloc(&_d_vertex, sizeof(vertex));
+    cudaMemcpy(_d_vertex, vertex, sizeof(vertex), cudaMemcpyHostToDevice);
+
+    cudaMalloc(&_d_color, sizeof(color));
+    cudaMemcpy(_d_color, color, sizeof(color), cudaMemcpyHostToDevice);
+
+    cudaMalloc(&_d_element, sizeof(element));
+    cudaMemcpy(_d_element, element, sizeof(element), cudaMemcpyHostToDevice);
+
+    
 }
 
 static void Display2() {
@@ -232,7 +295,8 @@ static void Display() {
         mat4 mat4_pi = matrix4_to_mat4(mat_projection_inv);
         Viewport view_port(0, 0, _width, _height);
 
-        ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
+        //ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
+        ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
 
         //update texture
         glViewport(0, 0, _width, _height);
@@ -332,6 +396,7 @@ int mi_simple_ray_tracing(int argc, char* argv[]) {
         env.get_gl_version(major, minor);
 
         init();
+        init_graphic();
 
         glutDisplayFunc(Display);
         glutReshapeFunc(Resize);

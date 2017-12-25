@@ -132,6 +132,37 @@ struct mat4 {
     }
 };
 
+//struct Triangle {
+//    float3 p0, p1, p2;//position coordiante(Model)
+//    float4 c0, c1, c2;//vertex color
+//    float2 t0, t1, t2;//texture coordinat
+//};
+//
+//__host__ __device__ inline void make_triangle(Triangle& tri, float3 p0, float3 p1, float3 p2) {
+//    tri.p0 = p0;
+//    tri.p1 = p1;
+//    tri.p2 = p2;
+//}
+//
+//__host__ __device__ inline void make_triangle(Triangle& tri, float3 p0, float3 p1, float3 p2, float4 c0, float4 c1, float4 c2) {
+//    tri.p0 = p0;
+//    tri.p1 = p1;
+//    tri.p2 = p2;
+//    tri.c0 = c0;
+//    tri.c1 = c1;
+//    tri.c2 = c2;
+//}
+//
+//__host__ __device__ inline void make_triangle(Triangle& tri, float3 p0, float3 p1, float3 p2, float2 t0, float2 t1, float2 t2) {
+//    tri.p0 = p0;
+//    tri.p1 = p1;
+//    tri.p2 = p2;
+//    tri.t0 = t0;
+//    tri.t1 = t1;
+//    tri.t2 = t2;
+//}
+
+
 struct Rectangle {
     float3 p0, p1, p2, p3;//position world coordinate
     float2 c0, c1, c2, c3;//texture coordinate
@@ -195,10 +226,52 @@ inline __host__ __device__ float3 operator*(mat4 &m0, float3 v) {
     return make_float3(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
 }
 
-//__constant__ Rectangle rect[6];
+inline __host__ __device__ float det(mat4 &m) {
+    float v0 = m.col0.z * m.col1.w - m.col1.z * m.col0.w;
+    float v1 = m.col0.z * m.col2.w - m.col2.z * m.col0.w;
+    float v2 = m.col0.z * m.col3.w - m.col3.z * m.col0.w;
+    float v3 = m.col1.z * m.col2.w - m.col2.z * m.col1.w;
+    float v4 = m.col1.z * m.col3.w - m.col3.z * m.col1.w;
+    float v5 = m.col2.z * m.col3.w - m.col3.z * m.col2.w;
+
+    float t00 = +(v5 * m.col1.y - v4 * m.col2.y + v3 * m.col3.y);
+    float t10 = -(v5 * m.col0.y - v2 * m.col2.y + v1 * m.col3.y);
+    float t20 = +(v4 * m.col0.y - v2 * m.col1.y + v0 * m.col3.y);
+    float t30 = -(v3 * m.col0.y - v1 * m.col1.y + v0 * m.col2.y);
+
+    return (t00 * m.col0.x + t10 * m.col1.x + t20 * m.col2.x + t30 * m.col3.x);
+};
+
+
+inline __host__ __device__ float triangle_area(float3 p0, float3 p1, float3 p2) {
+    
+}
 
 inline __device__ float scalar_triple(float3 u, float3 v, float3 w) {
     return dot(cross(u, v), w);
+}
+
+inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) {
+    float3 pq = ray_dir*INF;
+    float3 pa = p0 - ray_start;
+    float3 pb = p1 - ray_start;
+    float3 pc = p2 - ray_start;
+
+    uvw->x = scalar_triple(pq, pc, pb);
+    uvw->y = scalar_triple(pq, pa, pc);
+    uvw->z = scalar_triple(pq, pb, pa);
+
+    if ((uvw->x <= 0.0 && uvw->y <= 0.0 && uvw->z <= 0.0) || (uvw->x >= 0.0 && uvw->y >= 0.0 && uvw->z >= 0.0)) {
+        float denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        uvw->x *= denom;
+        uvw->y *= denom;
+        uvw->z *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        return -INF;
+    }
 }
 
 inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3* out) {

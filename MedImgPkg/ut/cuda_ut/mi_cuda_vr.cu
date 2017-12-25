@@ -13,7 +13,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "mi_cuda_vr.h"
+#include "mi_cuda_graphic.h"
 #include "arithmetic/mi_cuda_math.h"
 
 __device__ float4 kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfos* ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {

@@ -55,7 +55,7 @@
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 
-#include "mi_cuda_vr.h"
+#include "mi_cuda_graphic.h"
 
 extern "C" int bind_gl_texture(cudaGLTexture& tex);
 extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result);
