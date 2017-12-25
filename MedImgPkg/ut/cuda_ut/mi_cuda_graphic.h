@@ -61,33 +61,51 @@ inline __host__ void unmap_image(cudaGLTextureWriteOnly& cuda_tex) {
     cudaGraphicsUnmapResources(1, &cuda_tex.cuda_res);
 }
 
-//struct cudaGLTextureReadOnly {
-//    GLuint gl_tex_id;
-//    GLenum target;
-//    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
-//    cudaGraphicsResource *cuda_res;
-//    cudaArray* d_cuda_array;
-//
-//    __host__ cudaGLTextureReadOnly() :gl_tex_id(0), target(GL_TEXTURE_2D), cuda_res(NULL), d_cuda_array(NULL) {
-//
-//    }
-//
-//    __host__ void register_image() {
-//        cuda_res = NULL;
-//        cudaGraphicsGLRegisterImage(&cuda_res, gl_tex_id, target, cudaGraphicsRegisterFlagsReadOnly);
-//        CHECK_CUDA_ERROR;
-//    }
-//
-//    __host__ void map() {
-//        d_cuda_array = NULL;
-//        cudaGraphicsMapResources(1, &cuda_res);
-//        cudaGraphicsSubResourceGetMappedArray(&d_cuda_array, cuda_res, 0, 0);
-//    }
-//
-//    __host__ void unmap() {
-//        cudaGraphicsUnmapResources(1, &cuda_res);
-//    }
-//};
+struct cudaGLTextureReadOnly {
+    GLuint gl_tex_id;
+    GLenum target;
+    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
+    cudaGraphicsResource *cuda_res;
+    cudaArray* d_cuda_array;
+};
+
+inline  __host__ void register_image(cudaGLTextureReadOnly& cuda_tex) {
+    cudaGraphicsGLRegisterImage(&cuda_tex.cuda_res, cuda_tex.gl_tex_id, cuda_tex.target, cudaGraphicsRegisterFlagsReadOnly);
+    CHECK_CUDA_ERROR;
+}
+
+inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, bool normalized_coords) {
+    struct cudaResourceDesc res_desc;
+    memset(&res_desc, 0, sizeof(cudaResourceDesc));
+    res_desc.resType = cudaResourceTypeArray;
+    res_desc.res.array.array = cuda_tex.d_cuda_array;
+
+    struct cudaTextureDesc tex_desc;
+    memset(&tex_desc, 0, sizeof(cudaTextureDesc));
+    tex_desc.addressMode[0] = cudaAddressModeClamp;
+    tex_desc.addressMode[1] = cudaAddressModeClamp;
+    tex_desc.filterMode = cudaFilterModePoint;
+    tex_desc.readMode = cudaReadModeNormalizedFloat;
+    tex_desc.normalizedCoords = normalized_coords;
+
+    cudaCreateTextureObject(&cuda_tex.cuda_tex_obj, &res_desc, &tex_desc, NULL);
+}
+
+inline __host__ void map_image(cudaGLTextureReadOnly& cuda_tex) {
+    cuda_tex.d_cuda_array = NULL;
+    cudaGraphicsMapResources(1, &cuda_tex.cuda_res);
+    cudaGraphicsSubResourceGetMappedArray(&cuda_tex.d_cuda_array, cuda_tex.cuda_res, 0, 0);
+}
+
+inline  __host__  void release_image(cudaGLTextureReadOnly& cuda_tex) {
+    cudaGraphicsUnregisterResource(cuda_tex.cuda_res);
+    cudaDestroyTextureObject(cuda_tex.cuda_tex_obj);
+    cuda_tex.cuda_res = NULL;
+}
+
+inline __host__ void unmap_image(cudaGLTextureReadOnly& cuda_tex) {
+    cudaGraphicsUnmapResources(1, &cuda_tex.cuda_res);
+}
 
 struct cudaGLTexture {
     GLuint gl_tex_id;
@@ -241,11 +259,6 @@ inline __host__ __device__ float det(mat4 &m) {
 
     return (t00 * m.col0.x + t10 * m.col1.x + t20 * m.col2.x + t30 * m.col3.x);
 };
-
-
-inline __host__ __device__ float triangle_area(float3 p0, float3 p1, float3 p2) {
-    
-}
 
 inline __device__ float scalar_triple(float3 u, float3 v, float3 w) {
     return dot(cross(u, v), w);

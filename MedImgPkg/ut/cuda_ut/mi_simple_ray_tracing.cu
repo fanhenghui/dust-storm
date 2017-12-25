@@ -81,44 +81,78 @@ __global__ void kernel_ray_tracing_vertex_color(Viewport viewport, int width, in
     result[idx * 4 + 3] = 255;   
 }
 
-//just support triangle
-//__global__ void kernel_ray_tracing_vertex_color(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-//    uint vertex_count, float3* vertex, uint ele_count,  uint* element, float2* texture_coordinate, unsigned char* result) {
-//    uint x = blockIdx.x * blockDim.x + threadIdx.x;
-//    uint y = blockIdx.y * blockDim.y + threadIdx.y;   
-//
-//    if (x > viewport.width || y > viewport.height) {
-//        return;
-//    }
-//    uint idx = y*width + x;
-//
-//    float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
-//    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
-//    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0);
-//    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0);
-//    ray_start = mat_projection_inv*ray_start;
-//    ray_end = mat_projection_inv*ray_end;
-//    float3 ray_dir = ray_end - ray_start;
-//    ray_dir = normalize(ray_dir);
-//
-//    
-//    uint tri_count = ele_count/3;
-//    float3 p0,p1,p2;
-//    float4 c0,c1,c2;
-//    uint ele0, ele1, ele2;
-//    for (uint i = 0; i < tri_count; ++i) {
-//        ele0 = element[i * 3];
-//        ele1 = element[i * 3 + 1];
-//        ele2 = element[i * 3 + 2];
-//        p0 = vertex[ele0];
-//        p1 = vertex[ele1];
-//        p2 = vertex[ele2];
-//        c0 = color[ele0];
-//        c1 = color[ele1];
-//        c2 = color[ele2];
-//    }
-//
-//}
+__global__ void kernel_ray_tracing_texture_mapping(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* vertex, int ele_count, int* element, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    uint x = blockIdx.x * blockDim.x + threadIdx.x;
+    uint y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x > viewport.width || y > viewport.height) {
+        return;
+    }
+
+    //if (x != 255 || y != 255) {
+    //    return;
+    //}
+
+    uint idx = y*width + x;
+
+    float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
+    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
+    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0);
+    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0);
+    ray_start = mat_projection_inv*ray_start;
+    ray_end = mat_projection_inv*ray_end;
+    float3 ray_dir = ray_end - ray_start;
+    ray_dir = normalize(ray_dir);
+
+
+    int tri_count = ele_count / 3;
+    float3 p0, p1, p2;
+    float2 t0, t1, t2;
+    float3 uvw, cur_uvw;
+    int ele0, ele1, ele2;
+    int hit = -1;
+    float min_dis = INF;
+    float cur_dis = 0;
+    float3 out;
+    for (int i = 0; i < tri_count; ++i) {
+        ele0 = element[i * 3];
+        ele1 = element[i * 3 + 1];
+        ele2 = element[i * 3 + 2];
+        p0 = mat_viewmodel*vertex[ele0];
+        p1 = mat_viewmodel*vertex[ele1];
+        p2 = mat_viewmodel*vertex[ele2];
+
+        cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0,p1,p2, &cur_uvw, &out);
+        if (cur_dis > -INF && cur_dis < min_dis) {
+            min_dis = cur_dis;
+            hit = i;
+            uvw = cur_uvw;
+            t0 = tex_coordinate[ele0];
+            t1 = tex_coordinate[ele1];
+            t2 = tex_coordinate[ele2];
+        }
+    }
+
+    if (hit == -1) {
+        result[idx * 4 + 0] = 0;
+        result[idx * 4 + 1] = 0;
+        result[idx * 4 + 2] = 0;
+        result[idx * 4 + 3] = 0;
+        return;
+    }
+
+    //triangle interpolate
+    float2 tex_coord = t0*uvw.x + t1*uvw.y + t2*uvw.z;
+    float4 color = tex2D<float4>(tex, tex_coord.x, tex_coord.y);
+    clamp(color, 0, 1);
+    
+    result[idx * 4] = color.x*255;
+    result[idx * 4 + 1] = color.y * 255;
+    result[idx * 4 + 2] = color.z * 255;
+    result[idx * 4 + 3] = 255;   
+
+}
 
 
 
@@ -249,7 +283,7 @@ extern "C"
 void ray_tracing_vertex_color(Viewport viewport, int width, int height, 
                               mat4 mat_viewmodel, mat4 mat_projection_inv,
                               int vertex_count, float3* d_vertex, int ele_count, int* d_element, float4* d_color, 
-                              unsigned char* d_result, cudaGLTextureWriteOnly& cuda_tex) 
+                              unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex)
 {
     const int BLOCK_SIZE=16;
     CHECK_CUDA_ERROR;
@@ -261,11 +295,36 @@ void ray_tracing_vertex_color(Viewport viewport, int width, int height,
     cudaThreadSynchronize();
     CHECK_CUDA_ERROR;
 
-    map_image(cuda_tex);
+    map_image(canvas_tex);
 
-    write_image(cuda_tex, d_result, width*height * 4);
+    write_image(canvas_tex, d_result, width*height * 4);
 
-    unmap_image(cuda_tex);
+    unmap_image(canvas_tex);
+
+    CHECK_CUDA_ERROR;
+}
+
+extern "C"
+void ray_tracing_texture_mapping(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, int ele_count, int* d_element, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex)
+{
+    const int BLOCK_SIZE = 16;
+    CHECK_CUDA_ERROR;
+
+    dim3 block_size(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 grid_size(viewport.width / BLOCK_SIZE, viewport.height / BLOCK_SIZE);
+    kernel_ray_tracing_texture_mapping << <grid_size, block_size >> > (viewport, width, height, mat_viewmodel, mat_projection_inv, vertex_count, d_vertex, ele_count, d_element, d_tex_coordinate, mapping_tex.cuda_tex_obj, d_result);
+
+    cudaThreadSynchronize();
+    CHECK_CUDA_ERROR;
+
+    map_image(canvas_tex);
+
+    write_image(canvas_tex, d_result, width*height * 4);
+
+    unmap_image(canvas_tex);
 
     CHECK_CUDA_ERROR;
 }

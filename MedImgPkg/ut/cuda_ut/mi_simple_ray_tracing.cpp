@@ -44,6 +44,12 @@ extern "C" void ray_tracing_vertex_color(Viewport viewport, int width, int heigh
     int vertex_count, float3* d_vertex, int ele_count, int* d_element, float4* d_color,
     unsigned char* d_result, cudaGLTextureWriteOnly& cuda_tex);
 
+extern "C"
+void ray_tracing_texture_mapping(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, int ele_count, int* d_element, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
+    unsigned char* d_result,  cudaGLTextureWriteOnly& canvas_tex);
+
 using namespace medical_imaging;
 namespace {
     std::shared_ptr<OrthoCamera> _camera;
@@ -51,10 +57,11 @@ namespace {
     std::shared_ptr<GLTexture2D> _canvas_tex;
     std::shared_ptr<GLTexture2D> _navigator_tex;
     cudaGLTextureWriteOnly _canvas_cuda_tex;
+    cudaGLTextureReadOnly _cuda_navagator_tex;
 
     unsigned char* _cuda_d_canvas = nullptr;
 
-    //grcphic device memory(Global memory)
+    //graphic device memory(Global memory)
     float* _d_vertex = nullptr;
     float* _d_color = nullptr;
     float* _d_tex_coordinate = nullptr;
@@ -120,11 +127,30 @@ void init() {
     else {
         UIDType uid = 0;
         _navigator_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+        _navigator_tex->initialize();
         _navigator_tex->set_description("navigator texture");
         _navigator_tex->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
         GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-        _navigator_tex->load(GL_RGB8, 384, 256, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);
+        unsigned char* rgba4 = new unsigned char[384 * 256 * 4];
+        for (int i = 0; i < 384 * 256; ++i) {
+            rgba4[i * 4] = img_buffer[i * 3];
+            rgba4[i * 4 + 1] = img_buffer[i * 3 + 1];
+            rgba4[i * 4 + 2] = img_buffer[i * 3 + 2];
+            rgba4[i * 4 + 3] = 255;
+        }
+        delete[] img_buffer;
+        img_buffer = nullptr;
+        _navigator_tex->load(GL_RGBA8, 384, 256, GL_RGBA, GL_UNSIGNED_BYTE, (char*)rgba4);
+        delete[] rgba4;
+        rgba4 = nullptr;
+
+        _cuda_navagator_tex.target = GL_TEXTURE_2D;
+        _cuda_navagator_tex.gl_tex_id = _navigator_tex->get_id();
+        register_image(_cuda_navagator_tex);
+        map_image(_cuda_navagator_tex);
+        bind_texture(_cuda_navagator_tex,true);
+        unmap_image(_cuda_navagator_tex);
         _navigator_tex->unbind();
     }
 }
@@ -155,6 +181,17 @@ static void init_graphic() {
         1, 1, 1, 1//7
     };
 
+    float tex_coordinate[] = {
+        x_step, 0, 
+        x_step*2.0f, y_step,
+        0, 0,
+        x_step*2.0f, 0,
+        x_step*3.0f, y_step*2.0f,
+        0, y_step * 2,
+        x_step, 0,
+        x_step, y_step * 2
+    };
+
     int element[] = {
         1,5,7,
         1,7,3,
@@ -179,7 +216,9 @@ static void init_graphic() {
     cudaMalloc(&_d_element, sizeof(element));
     cudaMemcpy(_d_element, element, sizeof(element), cudaMemcpyHostToDevice);
 
-    
+    cudaMalloc(&_d_tex_coordinate, sizeof(tex_coordinate));
+    cudaMemcpy(_d_tex_coordinate, tex_coordinate, sizeof(tex_coordinate), cudaMemcpyHostToDevice);
+  
 }
 
 static void Display2() {
@@ -296,7 +335,11 @@ static void Display() {
         Viewport view_port(0, 0, _width, _height);
 
         //ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
-        ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
+        //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
+
+        map_image(_cuda_navagator_tex);
+        ray_tracing_texture_mapping(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
+        unmap_image(_cuda_navagator_tex);
 
         //update texture
         glViewport(0, 0, _width, _height);
