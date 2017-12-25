@@ -22,9 +22,6 @@ __global__ void kernel_ray_tracing_vertex_color(Viewport viewport, int width, in
     if (x > viewport.width || y > viewport.height) {
         return;
     }
-    //if (x != 512 || y != 512) {
-    //    return;
-    //}
 
     uint idx = y*width + x;
 
@@ -54,14 +51,15 @@ __global__ void kernel_ray_tracing_vertex_color(Viewport viewport, int width, in
         p0 = mat_viewmodel*vertex[ele0];
         p1 = mat_viewmodel*vertex[ele1];
         p2 = mat_viewmodel*vertex[ele2];
-        c0 = color[ele0];
-        c1 = color[ele1];
-        c2 = color[ele2];
+
         cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0,p1,p2, &cur_uvw, &out);
         if (cur_dis > -INF && cur_dis < min_dis) {
             min_dis = cur_dis;
             hit = i;
             uvw = cur_uvw;
+            c0 = color[ele0];
+            c1 = color[ele1];
+            c2 = color[ele2];
         }
     }
 
