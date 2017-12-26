@@ -63,7 +63,7 @@ void ray_tracing_triangle_vertex_mapping(Viewport viewport, int width, int heigh
 
 extern "C"
 void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
-    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    mat4 mat_viewmodel, mat4 mat_projection_inv, mat4 matmvp,
     int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
     unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
 
@@ -398,15 +398,44 @@ static void Display() {
         Matrix4 mat_view = _camera->get_view_matrix();
         Matrix4 mat_projection = _camera->get_projection_matrix();
         Matrix4 mat_projection_inv = mat_projection.get_inverse();
+        Matrix4 mat_mvp = mat_projection*mat_view;
         mat4 mat4_v = matrix4_to_mat4(mat_view);
         mat4 mat4_pi = matrix4_to_mat4(mat_projection_inv);
+        mat4 mat4_mvp = matrix4_to_mat4(mat_mvp);
         Viewport view_port(0, 0, _width, _height);
+
+        //debug
+        {
+            
+            const float w = 0.6f;
+            Point3 vertexs[] = {
+                Point3(-w, -w, -w),
+                Point3(-w, -w, w),
+                Point3(-w, w, -w),
+                Point3(-w, w, w),
+                Point3(w, -w, -w),
+                Point3(w, -w, w),
+                Point3(w, w, -w),
+                Point3(w, w, w)
+            };
+            std::cout << "{\n";
+            for (int i = 0; i < 8; ++i) {
+                Point3 tmp = mat_mvp.transform(vertexs[i]);
+                std::cout << " pt: " << tmp << std::endl;
+            }
+            std::cout << std::endl;
+            for (int i = 0; i < 8; ++i) {
+                float3 tmp = mat4_mvp*make_float3(vertexs[i].x, vertexs[i].y, vertexs[i].z);
+                std::cout << " pt: " << tmp.x << " , " << tmp.y << " , " << tmp.z  << std::endl;
+            }
+            std::cout << "}\n";
+        }
 
         //ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
         //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
 
         map_image(_cuda_navagator_tex);
-        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
+        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
         unmap_image(_cuda_navagator_tex);
 
         //update texture
@@ -454,7 +483,7 @@ static void Resize(int x, int y) {
 }
 
 static void Idle() {
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 static void MouseClick(int button, int status, int x, int y) {

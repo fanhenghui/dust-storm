@@ -264,6 +264,106 @@ inline __device__ float scalar_triple(float3 u, float3 v, float3 w) {
     return dot(cross(u, v), w);
 }
 
+//calculate d00 d01 d11 denom
+inline __device__ bool triangle_barycentric(float3 p0, float3 p1, float3 p2, float3 p, float3& uvw) {
+    float3 v0 = p1 - p0;
+    float3 v1 = p2 - p0;
+    float3 v2 = p - p0;
+    float d00 = dot(v0, v0);
+    float d01 = dot(v0, v1);
+    float d11 = dot(v1, v1);
+    float d20 = dot(v2, v0);
+    float d21 = dot(v2, v1);
+    float denom = d00*d11 - d01*d01;
+    if (fabs(denom) < 1e-5) {
+        return false;
+    }
+    
+    float v = (d11*d20 - d01*d21) / denom;
+    float w = (d00*d21 - d01*d20) / denom;
+    float u = 1.0 - w - v;
+    uvw.x = u;
+    uvw.y = v;
+    uvw.z = w;
+    return uvw.x >= 0 && uvw.y >= 0 && uvw.z >= 0;
+}
+
+inline __device__ bool triangle_barycentric_2d(float2 p0, float2 p1, float2 p2, float2 p, float3& uvw) {
+    float depth = 10;
+    float2 v0 = p1 * depth - p0 * depth;
+    float2 v1 = p2 * depth - p0 * depth;
+    float2 v2 = p * depth - p0 * depth;
+    float d00 = dot(v0, v0);
+    float d01 = dot(v0, v1);
+    float d11 = dot(v1, v1);
+    float d20 = dot(v2, v0);
+    float d21 = dot(v2, v1);
+    float denom = d00*d11 - d01*d01;
+    if (fabs(denom) < 1e-5) {
+        return false;
+    }
+
+    float v = (d11*d20 - d01*d21) / denom;
+    float w = (d00*d21 - d01*d20) / denom;
+    float u = 1.0 - w - v;  
+    uvw.x = u;
+    uvw.y = v;
+    uvw.z = w;
+    return uvw.x >= 0 && uvw.y >= 0 && uvw.z >= 0;
+}
+
+//d00 d11 d11 denom
+inline __device__ void triangle_barycentric_cache(float3 p0, float3 p1, float3 p2, float4& cache_param) {
+    float3 v0 = p1 - p0;
+    float3 v1 = p2 - p0;
+    float d00 = dot(v0, v0);
+    float d01 = dot(v0, v1);
+    float d11 = dot(v1, v1);
+    float denom = d00*d11 - d01*d01;
+    cache_param.x = d00;
+    cache_param.y = d01;
+    cache_param.z = d11;
+    cache_param.w = denom;
+}
+
+inline __device__ void triangle_barycentric_cache_2d(float2 p0, float2 p1, float2 p2, float4& cache_param) {
+    float2 v0 = p1 - p0;
+    float2 v1 = p2 - p0;
+    float d00 = dot(v0, v0);
+    float d01 = dot(v0, v1);
+    float d11 = dot(v1, v1);
+    float denom = d00*d11 - d01*d01;
+    cache_param.x = d00;
+    cache_param.y = d01;
+    cache_param.z = d11;
+    cache_param.w = denom;
+}
+
+inline __device__ float3 triangle_barycentric_ext(float3 p0, float3 p1, float3 p2, float3 p, float4 cache_param, float3& uvw) {
+    float3 v0 = p1 - p0;
+    float3 v1 = p2 - p0;
+    float3 v2 = p - p0;
+    float d20 = dot(v2, v0);
+    float d21 = dot(v2, v1);
+
+    uvw.x = (cache_param.z*d20 - cache_param.y*d21) / cache_param.w;
+    uvw.y = (cache_param.x*d21 - cache_param.y*d20) / cache_param.w;
+    uvw.z = 1.0 - uvw.x - uvw.y;
+}
+
+inline __device__ float3 triangle_barycentric_ext_2d(float2 p0, float2 p1, float2 p2, float2 p, float4 cache_param, float3& uvw) {
+    float2 v0 = p1 - p0;
+    float2 v1 = p2 - p0;
+    float2 v2 = p - p0;
+    float d20 = dot(v2, v0);
+    float d21 = dot(v2, v1);
+
+    uvw.x = (cache_param.z*d20 - cache_param.y*d21) / cache_param.w;
+    uvw.y = (cache_param.x*d21 - cache_param.y*d20) / cache_param.w;
+    uvw.z = 1.0 - uvw.x - uvw.y;
+}
+
+
 inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) {
     float3 pq = ray_dir*INF;
     float3 pa = p0 - ray_start;
