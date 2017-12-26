@@ -84,7 +84,7 @@ inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, bool normaliz
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
     tex_desc.addressMode[0] = cudaAddressModeClamp;
     tex_desc.addressMode[1] = cudaAddressModeClamp;
-    tex_desc.filterMode = cudaFilterModePoint;
+    tex_desc.filterMode = cudaFilterModeLinear;
     tex_desc.readMode = cudaReadModeNormalizedFloat;
     tex_desc.normalizedCoords = normalized_coords;
 

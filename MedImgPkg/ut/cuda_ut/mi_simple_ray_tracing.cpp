@@ -37,18 +37,36 @@
 
 #include "mi_cuda_graphic.h"
 
-extern "C" void ray_tracing(Viewport& viewport, int width, int height, mat4& mat_viewmodel, mat4& mat_projection_inv, unsigned char* result, cudaGLTextureWriteOnly& gl_cuda_tex);
-
-extern "C" void ray_tracing_vertex_color(Viewport viewport, int width, int height,
+extern "C"
+void ray_tracing_element_vertex_color(Viewport viewport, int width, int height,
     mat4 mat_viewmodel, mat4 mat_projection_inv,
     int vertex_count, float3* d_vertex, int ele_count, int* d_element, float4* d_color,
-    unsigned char* d_result, cudaGLTextureWriteOnly& cuda_tex);
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
 
 extern "C"
-void ray_tracing_texture_mapping(Viewport viewport, int width, int height,
+void ray_tracing_element_vertex_mapping(Viewport viewport, int width, int height,
     mat4 mat_viewmodel, mat4 mat_projection_inv,
     int vertex_count, float3* d_vertex, int ele_count, int* d_element, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
-    unsigned char* d_result,  cudaGLTextureWriteOnly& canvas_tex);
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+
+extern "C"
+void ray_tracing_triangle_vertex_color(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, float4* d_color,
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+
+extern "C"
+void ray_tracing_triangle_vertex_mapping(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+
+extern "C"
+void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv,
+    int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+
 
 using namespace medical_imaging;
 namespace {
@@ -156,11 +174,13 @@ void init() {
 }
 
 static void init_graphic() {
-    int triangle_count = 12;
-    float w = 0.6;
-    float x_step = 0.33333;
-    float y_step = 0.5;
-    float vertex[] = {
+    const float w = 0.6;
+    const float x_step = 0.33333;
+    const float y_step = 0.5;
+
+    //---------------------------------//
+    //element
+    float ele_vertex[] = {
         -w, -w, -w,
         -w, -w, w,
         -w, w, -w,
@@ -170,7 +190,8 @@ static void init_graphic() {
         w, w, -w,
         w, w, w
     };
-    float color[] = {
+
+    float ele_color[] = {
         0, 0, 0, 1,//0
         0, 0, 1, 1,//1
         0, 1, 0, 1,//2
@@ -179,17 +200,6 @@ static void init_graphic() {
         1, 0, 1, 1,//5
         1, 1, 0, 1,//6
         1, 1, 1, 1//7
-    };
-
-    float tex_coordinate[] = {
-        x_step, 0, 
-        x_step*2.0f, y_step,
-        0, 0,
-        x_step*2.0f, 0,
-        x_step*3.0f, y_step*2.0f,
-        0, y_step * 2,
-        x_step, 0,
-        x_step, y_step * 2
     };
 
     int element[] = {
@@ -207,14 +217,72 @@ static void init_graphic() {
         0,5,1
     };
 
+    //---------------------------------//
+    //triangle
+    float vertex[] = {
+        -w, -w, w,
+        w, -w, w,
+        w, w, w,
+        -w, w, w,
+        -w, -w, -w,
+        -w, w, -w,
+        w, w, -w,
+        w, -w, -w,
+        -w, -w, -w,
+        -w, -w, w,
+        -w, w, w,
+        -w, w, -w,
+        w, -w, -w,
+        w, w, -w,
+        w, w, w,
+        w, -w, w,
+        -w, w, -w,
+        -w, w, w,
+        w, w, w,
+        w, w, -w,
+        -w, -w, -w,
+        w, -w, -w,
+        w, -w, w,
+        -w, -w, w
+    };
+
+    float tex_coordinate[] = {
+        x_step*2.0f, y_step,
+        x_step*3.0f, y_step,
+        x_step*3.0f, 0,
+        x_step*2.0f, 0,
+        x_step*2.0f, y_step*2.0f,
+        x_step*2.0f, y_step,
+        x_step*3.0f, y_step,
+        x_step*3.0f, y_step*2.0f,
+        x_step, 0,
+        x_step, y_step,
+        0, y_step,
+        0, 0,
+        0, y_step,
+        x_step, y_step,
+        x_step, y_step * 2,
+        0, y_step * 2,
+        x_step*2.0f, 0,
+        x_step*2.0f, y_step,
+        x_step, y_step,
+        x_step, 0,
+        x_step, y_step,
+        x_step*2.0f, y_step,
+        x_step*2.0f, y_step*2.0f,
+        x_step, y_step*2.0f
+    };
+
+    
+
     cudaMalloc(&_d_vertex, sizeof(vertex));
     cudaMemcpy(_d_vertex, vertex, sizeof(vertex), cudaMemcpyHostToDevice);
 
-    cudaMalloc(&_d_color, sizeof(color));
-    cudaMemcpy(_d_color, color, sizeof(color), cudaMemcpyHostToDevice);
+    //cudaMalloc(&_d_color, sizeof(color));
+    //cudaMemcpy(_d_color, color, sizeof(color), cudaMemcpyHostToDevice);
 
-    cudaMalloc(&_d_element, sizeof(element));
-    cudaMemcpy(_d_element, element, sizeof(element), cudaMemcpyHostToDevice);
+    //cudaMalloc(&_d_element, sizeof(element));
+    //cudaMemcpy(_d_element, element, sizeof(element), cudaMemcpyHostToDevice);
 
     cudaMalloc(&_d_tex_coordinate, sizeof(tex_coordinate));
     cudaMemcpy(_d_tex_coordinate, tex_coordinate, sizeof(tex_coordinate), cudaMemcpyHostToDevice);
@@ -338,7 +406,7 @@ static void Display() {
         //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
 
         map_image(_cuda_navagator_tex);
-        ray_tracing_texture_mapping(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
+        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
         unmap_image(_cuda_navagator_tex);
 
         //update texture
