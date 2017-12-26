@@ -74,7 +74,7 @@ namespace {
     std::shared_ptr<OrthoCameraInteractor> _camera_interactor;
     std::shared_ptr<GLTexture2D> _canvas_tex;
     std::shared_ptr<GLTexture2D> _navigator_tex;
-    cudaGLTextureWriteOnly _canvas_cuda_tex;
+    cudaGLTextureWriteOnly _cuda_canvas_tex;
     cudaGLTextureReadOnly _cuda_navagator_tex;
 
     unsigned char* _cuda_d_canvas = nullptr;
@@ -123,9 +123,9 @@ void init() {
     _canvas_tex->load(GL_RGBA8, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
     //CUDA canvas
-    _canvas_cuda_tex.gl_tex_id = _canvas_tex->get_id();
-    _canvas_cuda_tex.target = GL_TEXTURE_2D;
-    register_image(_canvas_cuda_tex);
+    _cuda_canvas_tex.gl_tex_id = _canvas_tex->get_id();
+    _cuda_canvas_tex.target = GL_TEXTURE_2D;
+    register_image(_cuda_canvas_tex);
     cudaMalloc(&_cuda_d_canvas, _width*_height * 4);
 
     _canvas_tex->unbind();
@@ -167,7 +167,7 @@ void init() {
         _cuda_navagator_tex.gl_tex_id = _navigator_tex->get_id();
         register_image(_cuda_navagator_tex);
         map_image(_cuda_navagator_tex);
-        bind_texture(_cuda_navagator_tex,true);
+        bind_texture(_cuda_navagator_tex, cudaReadModeNormalizedFloat, cudaFilterModeLinear, true);
         unmap_image(_cuda_navagator_tex);
         _navigator_tex->unbind();
     }
@@ -405,8 +405,8 @@ static void Display() {
         Viewport view_port(0, 0, _width, _height);
 
         //debug
-        {
-            
+       /* {
+
             const float w = 0.6f;
             Point3 vertexs[] = {
                 Point3(-w, -w, -w),
@@ -429,13 +429,13 @@ static void Display() {
                 std::cout << " pt: " << tmp.x << " , " << tmp.y << " , " << tmp.z  << std::endl;
             }
             std::cout << "}\n";
-        }
+        }*/
 
-        //ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _canvas_cuda_tex);
-        //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _canvas_cuda_tex);
+        //ray_tracing(view_port, _width, _height, mat4_v, mat4_pi, _cuda_d_canvas, _cuda_canvas_tex);
+        //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _cuda_canvas_tex);
 
         map_image(_cuda_navagator_tex);
-        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _canvas_cuda_tex);
+        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _cuda_canvas_tex);
         unmap_image(_cuda_navagator_tex);
 
         //update texture
@@ -483,7 +483,7 @@ static void Resize(int x, int y) {
 }
 
 static void Idle() {
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 static void MouseClick(int button, int status, int x, int y) {
@@ -508,7 +508,7 @@ static void MouseMotion(int x, int y) {
 }
 
 static void Finalize() {
-    unmap_image(_canvas_cuda_tex);
+    unmap_image(_cuda_canvas_tex);
     cudaFree(_cuda_d_canvas);
     _cuda_d_canvas = NULL;
 }

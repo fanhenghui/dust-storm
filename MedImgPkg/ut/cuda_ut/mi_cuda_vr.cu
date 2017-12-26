@@ -29,6 +29,7 @@ __device__ float4 kernel_ray_cast(cudaVolumeInfos* volume_infos, cudaRayCastInfo
 
         ww = ray_cast_infos->d_wl_array[0];
         wl = ray_cast_infos->d_wl_array[1];
+
         min_gray = wl - ww*0.5;
 
         ///Composite
@@ -68,17 +69,17 @@ __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, f
     return 0;
 }
 
-__global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_infos, cudaRayCastInfos ray_cast_infos, unsigned char* result) {
+__global__ void kernel_ray_cast_main(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height, cudaVolumeInfos volume_infos, cudaRayCastInfos ray_cast_infos, unsigned char* result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (x > entry_tex.width-1 || y > entry_tex.height-1) {
+    if (x > width-1 || y > height-1) {
         return;
     }
-    uint idx = y*entry_tex.width + x;
+    uint idx = y*width + x;
 
-    float4 entry = tex2D<float4>(entry_tex.cuda_tex_obj, x, y);
-    float4 exit  = tex2D<float4>(exit_tex.cuda_tex_obj, x, y);
+    float4 entry = tex2D<float4>(entry_tex, x, y);
+    float4 exit  = tex2D<float4>(exit_tex, x, y);
 
     float3 entry3 = make_float3(entry);
     float3 exit3 = make_float3(exit);
@@ -117,17 +118,17 @@ __global__ void kernel_ray_cast_main(cudaGLTexture entry_tex, cudaGLTexture exit
     result[idx*4+3] = 255;
 }
 
-__global__ void kernel_ray_cast_main_whole(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_infos, cudaRayCastInfos ray_cast_infos, unsigned char* result) {
+__global__ void kernel_ray_cast_main_whole(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,  cudaVolumeInfos volume_infos, cudaRayCastInfos ray_cast_infos, unsigned char* result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (x > entry_tex.width-1 || y > entry_tex.height-1) {
+    if (x > width-1 || y > height-1) {
         return;
     }
-    uint idx = y*entry_tex.width + x;
+    uint idx = y*width + x;
 
-    float4 entry = tex2D<float4>(entry_tex.cuda_tex_obj, x, y);
-    float4 exit  = tex2D<float4>(exit_tex.cuda_tex_obj, x, y);
+    float4 entry = tex2D<float4>(entry_tex, x, y);
+    float4 exit  = tex2D<float4>(exit_tex, x, y);
 
     float3 entry3 = make_float3(entry);
     float3 exit3 = make_float3(exit);
@@ -206,72 +207,36 @@ __global__ void kernel_ray_cast_main_whole(cudaGLTexture entry_tex, cudaGLTextur
 
 //result will be one of color, JEPG buffer.
 extern "C"  
-int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result) {
+int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, int width , int height, 
+             cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex) {
     //1 launch ray cast kernel
-    int width = entry_tex.width;
-    int height = entry_tex.height;
+    
+    CHECK_CUDA_ERROR;
+    map_image(entry_tex);
+    map_image(exit_tex);
+    CHECK_CUDA_ERROR;
 
-    cudaGraphicsMapResources(1, &entry_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&entry_tex.d_cuda_array, entry_tex.cuda_res, 0,0);
-    cudaGraphicsMapResources(1, &exit_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&exit_tex.d_cuda_array, exit_tex.cuda_res, 0,0);
-
-
-    CHECK_CUDA_ERROR; 
     #define BLOCK_SIZE 16
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
-    kernel_ray_cast_main<<<grid, block>>>(entry_tex, exit_tex, volume_info, ray_cast_info, d_result);
+    kernel_ray_cast_main<<<grid, block>>>(entry_tex.cuda_tex_obj, exit_tex.cuda_tex_obj, width, height, volume_info, ray_cast_info, d_result);
 
     //2 JPEG compress(optional)
 
 
-    //3 Memcpy device result to host, and return
+    //3 Memcpy device result to device GL texture
     cudaThreadSynchronize();
+    CHECK_CUDA_ERROR;
+
+    unmap_image(entry_tex);
+    unmap_image(exit_tex);
     CHECK_CUDA_ERROR; 
-    cudaGraphicsUnmapResources(1, &entry_tex.cuda_res);
-    cudaGraphicsUnmapResources(1, &exit_tex.cuda_res);
 
-    cudaMemcpy(h_result, d_result, width*height*4, cudaMemcpyDeviceToHost);
-    CHECK_CUDA_ERROR; 
+    map_image(canvas_tex);
 
-    return 0;
-}
+    write_image(canvas_tex, d_result, width*height * 4);
 
-extern "C"
-int bind_gl_texture(cudaGLTexture& gl_cuda_tex) {
-    //1 register GL texture to CUDA Graphic resource
-    gl_cuda_tex.cuda_res = NULL;
-    cudaGraphicsGLRegisterImage(&gl_cuda_tex.cuda_res, gl_cuda_tex.gl_tex_id, gl_cuda_tex.target, cudaGraphicsRegisterFlagsReadOnly);
-
-    CHECK_CUDA_ERROR;
-
-    //2 map the graphic resource to CUDA array
-    gl_cuda_tex.d_cuda_array = NULL;
-    cudaGraphicsMapResources(1, &gl_cuda_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&gl_cuda_tex.d_cuda_array, gl_cuda_tex.cuda_res, 0,0);
-    CHECK_CUDA_ERROR;
-
-    //3 create CUDA texture by CUDA array
-    //CUDA resource
-    struct cudaResourceDesc res_desc;
-    memset(&res_desc, 0, sizeof(cudaResourceDesc));
-    res_desc.resType = cudaResourceTypeArray;
-    res_desc.res.array.array = gl_cuda_tex.d_cuda_array;
-
-    struct cudaTextureDesc tex_desc;
-    memset(&tex_desc, 0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeClamp;
-    tex_desc.addressMode[1] = cudaAddressModeClamp;
-    tex_desc.filterMode = cudaFilterModePoint;
-    tex_desc.readMode = cudaReadModeElementType;
-    tex_desc.normalizedCoords = 0;
-    
-    cudaCreateTextureObject(&gl_cuda_tex.cuda_tex_obj, &res_desc, &tex_desc, NULL);
-
-    CHECK_CUDA_ERROR;
-
-    cudaGraphicsUnmapResources(1, &gl_cuda_tex.cuda_res);
+    unmap_image(canvas_tex);
 
     CHECK_CUDA_ERROR;
 

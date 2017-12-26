@@ -74,7 +74,7 @@ inline  __host__ void register_image(cudaGLTextureReadOnly& cuda_tex) {
     CHECK_CUDA_ERROR;
 }
 
-inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, bool normalized_coords) {
+inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, cudaTextureReadMode read_mode,  cudaTextureFilterMode filter_mode,  bool normalized_coords) {
     struct cudaResourceDesc res_desc;
     memset(&res_desc, 0, sizeof(cudaResourceDesc));
     res_desc.resType = cudaResourceTypeArray;
@@ -84,8 +84,8 @@ inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, bool normaliz
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
     tex_desc.addressMode[0] = cudaAddressModeClamp;
     tex_desc.addressMode[1] = cudaAddressModeClamp;
-    tex_desc.filterMode = cudaFilterModeLinear;
-    tex_desc.readMode = cudaReadModeNormalizedFloat;
+    tex_desc.filterMode = filter_mode;
+    tex_desc.readMode = read_mode;
     tex_desc.normalizedCoords = normalized_coords;
 
     cudaCreateTextureObject(&cuda_tex.cuda_tex_obj, &res_desc, &tex_desc, NULL);

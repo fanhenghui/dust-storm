@@ -57,12 +57,21 @@
 
 #include "mi_cuda_graphic.h"
 
-extern "C" int bind_gl_texture(cudaGLTexture& tex);
-extern "C" int ray_cast(cudaGLTexture entry_tex, cudaGLTexture exit_tex, cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, unsigned char* h_result);
-extern "C" int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
-extern "C" int init_wl_nonmask(cudaRayCastInfos& ray_cast_infos, float* wl_array_norm);
-extern "C" int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array, int lut_length);
-extern "C" int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array);
+extern "C"
+int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, int width, int height,
+    cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+
+extern "C" 
+int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
+
+extern "C" 
+int init_wl_nonmask(cudaRayCastInfos& ray_cast_infos, float* wl_array_norm);
+
+extern "C" 
+int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array, int lut_length);
+
+extern "C" 
+int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array);
 
 using namespace medical_imaging;
 namespace {
@@ -77,10 +86,12 @@ namespace {
     //CUDA resource
     cudaVolumeInfos  _cuda_volume_infos;
     cudaRayCastInfos _ray_cast_infos;
-    cudaGLTexture _cuda_entry_points;
-    cudaGLTexture _cuda_exit_points;
+
+    cudaGLTextureWriteOnly _cuda_canvas_tex;
+    cudaGLTextureReadOnly _cuda_entry_points;
+    cudaGLTextureReadOnly _cuda_exit_points;
+
     unsigned char* _cuda_d_canvas = nullptr;
-    unsigned char* _cuda_h_canvas = nullptr;
 
     float _ww = 1500.0f;
     float _wl = -400.0f;
@@ -269,27 +280,30 @@ void init_gl() {
     GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
     _canvas_tex->load(GL_RGBA8, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
+    //CUDA canvas
+    _cuda_canvas_tex.gl_tex_id = _canvas_tex->get_id();
+    _cuda_canvas_tex.target = GL_TEXTURE_2D;
+    register_image(_cuda_canvas_tex);
+    cudaMalloc(&_cuda_d_canvas, _width*_height * 4);
+    _canvas_tex->unbind();
 
-    //generate cuda texture
+    //generate CUDA texture
     _entry_exit_points->get_entry_points_texture()->bind();
     _cuda_entry_points.gl_tex_id = _entry_exit_points->get_entry_points_texture()->get_id();
     _cuda_entry_points.target = GL_TEXTURE_2D;
-    _cuda_entry_points.width = _width;
-    _cuda_entry_points.height = _height;
-    if (0 != bind_gl_texture(_cuda_entry_points)) {
-        MI_LOG(MI_ERROR) << "[CUDA] " << "bind GL texture failed.";
-    }
+    register_image(_cuda_entry_points);
+    map_image(_cuda_entry_points);
+    bind_texture(_cuda_entry_points, cudaReadModeElementType, cudaFilterModePoint, false);
+    unmap_image(_cuda_entry_points);
 
     _entry_exit_points->get_exit_points_texture()->bind();
     _cuda_exit_points.gl_tex_id = _entry_exit_points->get_exit_points_texture()->get_id();
     _cuda_exit_points.target = GL_TEXTURE_2D;
-    _cuda_exit_points.width = _width;
-    _cuda_exit_points.height = _height;
-    if (0 != bind_gl_texture(_cuda_exit_points)) {
-        MI_LOG(MI_ERROR) << "[CUDA] " << "bind GL texture failed.";
-    }
+    register_image(_cuda_exit_points);
+    map_image(_cuda_exit_points);
+    bind_texture(_cuda_exit_points, cudaReadModeElementType, cudaFilterModePoint, false);
+    unmap_image(_cuda_exit_points);
 
-    _cuda_h_canvas = new unsigned char[_width*_height * 4];
     if (cudaSuccess != cudaMalloc(&_cuda_d_canvas, _width*_height * 4)) {
         MI_LOG(MI_ERROR) << "[CUDA] " << "malloc canvas device memory failed.";
     }
@@ -307,11 +321,8 @@ void Display() {
         _entry_exit_points->calculate_entry_exit_points();
 
         //CUDA process
-        ray_cast(_cuda_entry_points, _cuda_exit_points, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_h_canvas);
+        ray_cast(_cuda_entry_points, _cuda_exit_points, _width, _height, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_canvas_tex);
         CHECK_GL_ERROR;
-
-        //update texture
-        _canvas_tex->update(0, 0, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, _cuda_h_canvas, 0);
 
         glViewport(0, 0, _width, _height);
         glClearColor(0.0, 0.0, 0.0, 1.0);
