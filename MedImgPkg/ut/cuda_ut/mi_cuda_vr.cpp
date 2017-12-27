@@ -59,7 +59,7 @@
 
 extern "C"
 int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, int width, int height,
-    cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+    cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool d_cpy);
 
 extern "C" 
 int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
@@ -73,7 +73,181 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
 extern "C" 
 int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array);
 
+extern "C"
+void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
+    mat4 mat_viewmodel, mat4 mat_projection_inv, mat4 matmvp,
+    int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool blend);
+
 using namespace medical_imaging;
+
+class Navigator {
+public:
+    Navigator() {
+
+    }
+
+    ~Navigator() {
+
+    }
+
+    void set_vr_camera(std::shared_ptr<CameraBase> camera) {
+        _camera = camera;
+    }
+
+    void init() {
+        init_texture();
+        init_graphic();
+    }
+
+    void init_graphic() {
+        const float w = 0.6f;
+        const float x_step = 0.33333f;
+        const float y_step = 0.5f;
+
+        //---------------------------------//
+        //triangle
+        float vertex[] = {
+            -w, -w, w,
+            w, -w, w,
+            w, w, w,
+            -w, w, w,
+            -w, -w, -w,
+            -w, w, -w,
+            w, w, -w,
+            w, -w, -w,
+            -w, -w, -w,
+            -w, -w, w,
+            -w, w, w,
+            -w, w, -w,
+            w, -w, -w,
+            w, w, -w,
+            w, w, w,
+            w, -w, w,
+            -w, w, -w,
+            -w, w, w,
+            w, w, w,
+            w, w, -w,
+            -w, -w, -w,
+            w, -w, -w,
+            w, -w, w,
+            -w, -w, w
+        };
+
+        float tex_coordinate[] = {
+            x_step*2.0f, y_step,
+            x_step*3.0f, y_step,
+            x_step*3.0f, 0,
+            x_step*2.0f, 0,
+            x_step*2.0f, y_step*2.0f,
+            x_step*2.0f, y_step,
+            x_step*3.0f, y_step,
+            x_step*3.0f, y_step*2.0f,
+            x_step, 0,
+            x_step, y_step,
+            0, y_step,
+            0, 0,
+            0, y_step,
+            x_step, y_step,
+            x_step, y_step * 2,
+            0, y_step * 2,
+            x_step*2.0f, 0,
+            x_step*2.0f, y_step,
+            x_step, y_step,
+            x_step, 0,
+            x_step, y_step,
+            x_step*2.0f, y_step,
+            x_step*2.0f, y_step*2.0f,
+            x_step, y_step*2.0f
+        };
+
+        cudaMalloc(&_d_vertex, sizeof(vertex));
+        cudaMemcpy(_d_vertex, vertex, sizeof(vertex), cudaMemcpyHostToDevice);
+
+        cudaMalloc(&_d_tex_coordinate, sizeof(tex_coordinate));
+        cudaMemcpy(_d_tex_coordinate, tex_coordinate, sizeof(tex_coordinate), cudaMemcpyHostToDevice);
+    }
+
+    void init_texture() {
+        //texture
+#ifdef WIN32
+        const std::string navi_img_file("./config/resource/navi_384_256_3.raw");
+#else
+        const std::string navi_img_file("../config/resource/navi_384_256_3.raw");
+#endif
+        const unsigned int img_size = 384 * 256 * 3;
+        unsigned char* img_buffer = new unsigned char[img_size];
+        if (0 != FileUtil::read_raw(navi_img_file, img_buffer, img_size)) {
+            MI_LOG(MI_FATAL) << "load navigator image failed.";
+        }
+        else {
+            UIDType uid = 0;
+            _navigator_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+            _navigator_tex->initialize();
+            _navigator_tex->set_description("navigator texture");
+            _navigator_tex->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            unsigned char* rgba4 = new unsigned char[384 * 256 * 4];
+            for (int i = 0; i < 384 * 256; ++i) {
+                rgba4[i * 4] = img_buffer[i * 3];
+                rgba4[i * 4 + 1] = img_buffer[i * 3 + 1];
+                rgba4[i * 4 + 2] = img_buffer[i * 3 + 2];
+                rgba4[i * 4 + 3] = 255;
+            }
+            delete[] img_buffer;
+            img_buffer = nullptr;
+            _navigator_tex->load(GL_RGBA8, 384, 256, GL_RGBA, GL_UNSIGNED_BYTE, (char*)rgba4);
+            delete[] rgba4;
+            rgba4 = nullptr;
+
+            _cuda_navagator_tex.target = GL_TEXTURE_2D;
+            _cuda_navagator_tex.gl_tex_id = _navigator_tex->get_id();
+            register_image(_cuda_navagator_tex);
+            map_image(_cuda_navagator_tex);
+            bind_texture(_cuda_navagator_tex, cudaReadModeNormalizedFloat, cudaFilterModeLinear, true);
+            unmap_image(_cuda_navagator_tex);
+            _navigator_tex->unbind();
+        }
+    }
+
+    void render(Viewport view_port, int canvas_width, int canvas_height, unsigned char* d_canvas, cudaGLTextureWriteOnly cuda_canvas_tex) {
+
+        OrthoCamera camera;
+        if (_camera) {
+            Vector3 view = _camera->get_view_direction();
+            Vector3 up = _camera->get_up_direction();
+            camera.set_look_at(Point3::S_ZERO_POINT);
+            Point3 eye = Point3::S_ZERO_POINT - view*3;
+            camera.set_eye(eye);
+            camera.set_up_direction(up);
+            camera.set_ortho(-1, 1, -1, 1, 1, 5);
+        }
+
+        Matrix4 mat_v = camera.get_view_matrix();
+        Matrix4 mat_p = camera.get_projection_matrix(); 
+        Matrix4 mat_mvp = mat_p*mat_v;
+        Matrix4 mat_pi = mat_p.get_inverse();
+        mat4 mat4_v = matrix4_to_mat4(mat_v);
+        mat4 mat4_pi = matrix4_to_mat4(mat_pi);
+        mat4 mat4_mvp = matrix4_to_mat4(mat_mvp);
+
+        map_image(_cuda_navagator_tex);
+        ray_tracing_quad_vertex_mapping(view_port, canvas_width, canvas_height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, d_canvas, cuda_canvas_tex, true);
+        unmap_image(_cuda_navagator_tex);
+
+    }
+
+private:
+    std::shared_ptr<GLTexture2D> _navigator_tex;
+    cudaGLTextureReadOnly _cuda_navagator_tex;
+    std::shared_ptr<CameraBase> _camera;
+
+    float3* _d_vertex;
+    float2* _d_tex_coordinate;
+};
+
+
 namespace {
     std::shared_ptr<ImageDataHeader> _data_header;
     std::shared_ptr<ImageData> _volume_data;
@@ -91,6 +265,8 @@ namespace {
     cudaGLTextureReadOnly _cuda_entry_points;
     cudaGLTextureReadOnly _cuda_exit_points;
 
+    Navigator _navigator;
+
     unsigned char* _cuda_d_canvas = nullptr;
 
     float _ww = 1500.0f;
@@ -103,6 +279,8 @@ namespace {
     Point2 _pre_pos;
 
     std::shared_ptr<GLTexture2D> _tex_entry_points;
+
+    bool _show_navigator = true;
 
 
 #ifdef WIN32
@@ -226,6 +404,8 @@ void init_data() {
     //Sample Step
     _ray_cast_infos.sample_step = 0.5f;
 
+    //navigator
+    _navigator.init();
 
     MI_LOG(MI_INFO) << "init data success.";
 }
@@ -321,8 +501,18 @@ void Display() {
         _entry_exit_points->calculate_entry_exit_points();
 
         //CUDA process
-        ray_cast(_cuda_entry_points, _cuda_exit_points, _width, _height, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_canvas_tex);
+        ray_cast(_cuda_entry_points, _cuda_exit_points, _width, _height, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_canvas_tex, !_show_navigator);
+        
         CHECK_GL_ERROR;
+
+        if(_show_navigator) {
+            const int navigator_margin = 20; 
+            const float navigator_window_ratio = 4.5f;
+            const int min_size = int((std::min)(_width, _height) / navigator_window_ratio);
+            Viewport view_port(_width - min_size - navigator_margin, navigator_margin, min_size, min_size);
+            _navigator.set_vr_camera(_camera);
+            _navigator.render(view_port, _width, _height, _cuda_d_canvas, _cuda_canvas_tex);
+        }
 
         glViewport(0, 0, _width, _height);
         glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -351,6 +541,11 @@ void Display() {
 
 void Keyboard(unsigned char key, int x, int y) {
     switch (key) {
+        case 'n' :
+        {
+            _show_navigator = !_show_navigator;
+           break;
+        }
     default:
         break;
     }

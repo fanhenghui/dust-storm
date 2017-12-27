@@ -16,9 +16,17 @@
 #include <cuda_gl_interop.h>
 #include <cuda_texture_types.h>
 #include <vector_types.h>
+#include <device_functions.h>
 
 #include "arithmetic/mi_cuda_math.h"
 #include "arithmetic/mi_matrix4.h"
+
+
+//inline  __device__ float3 operator*(float3 a, float3 b)
+//{
+//    return make_float3(__fmul_ru(a.x, b.x), __fmul_ru(a.y * b.y), __fmul_ru(a.z * b.z));
+//}
+
 
 #define CHECK_CUDA_ERROR {\
 cudaError_t err = cudaGetLastError(); \
@@ -82,8 +90,8 @@ inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, cudaTextureRe
 
     struct cudaTextureDesc tex_desc;
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeClamp;
-    tex_desc.addressMode[1] = cudaAddressModeClamp;
+    tex_desc.addressMode[0] = cudaAddressModeMirror;
+    tex_desc.addressMode[1] = cudaAddressModeMirror;
     tex_desc.filterMode = filter_mode;
     tex_desc.readMode = read_mode;
     tex_desc.normalizedCoords = normalized_coords;
@@ -134,6 +142,7 @@ struct cudaVolumeInfos
     cudaArray* d_mask_array;
     cudaTextureObject_t mask_tex_obj;//cudaTextureType3D
     uint3 dim;
+    float3 dim_r;
 };
 
 struct Viewport {
@@ -275,21 +284,21 @@ inline __device__ bool triangle_barycentric(float3 p0, float3 p1, float3 p2, flo
     float d20 = dot(v2, v0);
     float d21 = dot(v2, v1);
     float denom = d00*d11 - d01*d01;
-    if (fabs(denom) < 1e-5) {
+    if (fabs(denom) < 1e-5f) {
         return false;
     }
     
     float v = (d11*d20 - d01*d21) / denom;
     float w = (d00*d21 - d01*d20) / denom;
-    float u = 1.0 - w - v;
+    float u = 1.0f - w - v;
     uvw.x = u;
     uvw.y = v;
     uvw.z = w;
-    return uvw.x >= 0 && uvw.y >= 0 && uvw.z >= 0;
+    return uvw.x >= 0.0f && uvw.y >= 0.0f && uvw.z >= 0.0f;
 }
 
 inline __device__ bool triangle_barycentric_2d(float2 p0, float2 p1, float2 p2, float2 p, float3& uvw) {
-    float depth = 10;
+    float depth = 10.0f;
     float2 v0 = p1 * depth - p0 * depth;
     float2 v1 = p2 * depth - p0 * depth;
     float2 v2 = p * depth - p0 * depth;
@@ -299,17 +308,17 @@ inline __device__ bool triangle_barycentric_2d(float2 p0, float2 p1, float2 p2, 
     float d20 = dot(v2, v0);
     float d21 = dot(v2, v1);
     float denom = d00*d11 - d01*d01;
-    if (fabs(denom) < 1e-5) {
+    if (fabs(denom) < 1e-5f) {
         return false;
     }
 
     float v = (d11*d20 - d01*d21) / denom;
     float w = (d00*d21 - d01*d20) / denom;
-    float u = 1.0 - w - v;  
+    float u = 1.0f - w - v;  
     uvw.x = u;
     uvw.y = v;
     uvw.z = w;
-    return uvw.x >= 0 && uvw.y >= 0 && uvw.z >= 0;
+    return uvw.x >= 0.0f && uvw.y >= 0.0f && uvw.z >= 0.0f;
 }
 
 //d00 d11 d11 denom
@@ -348,7 +357,7 @@ inline __device__ float3 triangle_barycentric_ext(float3 p0, float3 p1, float3 p
 
     uvw.x = (cache_param.z*d20 - cache_param.y*d21) / cache_param.w;
     uvw.y = (cache_param.x*d21 - cache_param.y*d20) / cache_param.w;
-    uvw.z = 1.0 - uvw.x - uvw.y;
+    uvw.z = 1.0f - uvw.x - uvw.y;
 }
 
 inline __device__ float3 triangle_barycentric_ext_2d(float2 p0, float2 p1, float2 p2, float2 p, float4 cache_param, float3& uvw) {
@@ -360,11 +369,10 @@ inline __device__ float3 triangle_barycentric_ext_2d(float2 p0, float2 p1, float
 
     uvw.x = (cache_param.z*d20 - cache_param.y*d21) / cache_param.w;
     uvw.y = (cache_param.x*d21 - cache_param.y*d20) / cache_param.w;
-    uvw.z = 1.0 - uvw.x - uvw.y;
+    uvw.z = 1.0f - uvw.x - uvw.y;
 }
 
-
-inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) {
+inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) { 
     float3 pq = ray_dir*INF;
     float3 pa = p0 - ray_start;
     float3 pb = p1 - ray_start;
@@ -374,7 +382,8 @@ inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir,
     uvw->y = scalar_triple(pq, pa, pc);
     uvw->z = scalar_triple(pq, pb, pa);
 
-    if ((uvw->x <= 0.0 && uvw->y <= 0.0 && uvw->z <= 0.0) || (uvw->x >= 0.0 && uvw->y >= 0.0 && uvw->z >= 0.0)) {
+    float epsilon = 0.0f;
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
         float denom = 1.0f / (uvw->x + uvw->y + uvw->z);
         uvw->x *= denom;
         uvw->y *= denom;
@@ -397,7 +406,7 @@ inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir,
     float v = scalar_triple(pq, pa, pc);
     float w = scalar_triple(pq, pb, pa);
 
-    if ((u <= 0.0 && v <= 0.0 && w <= 0.0) || (u >= 0.0 && v >= 0.0 && w >= 0.0)) {
+    if ((u <= 0.0f && v <= 0.0f && w <= 0.0f) || (u >= 0.0f && v >= 0.0f && w >= 0.0f)) {
         float denom = 1.0f / (u + v + w);
         u *= denom;
         v *= denom;
@@ -410,14 +419,112 @@ inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir,
     }
 }
 
-inline __device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 p3, float3* out) {
-    float dis = ray_intersect_triangle(ray_start, ray_dir, p0, p1, p2, out);
-    if (dis > -INF) {
-        return dis;
+inline __device__ float ray_intersect_triangle_ext(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) {
+    float3 pq = ray_dir*INF;
+    float3 pa = p0 - ray_start;
+    float3 pb = p1 - ray_start;
+    float3 pc = p2 - ray_start;
+
+    uvw->x = scalar_triple(pq, pc, pb);
+    uvw->y = scalar_triple(pq, pa, pc);
+    uvw->z = scalar_triple(pq, pb, pa);
+
+    float denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+    *uvw *= denom;
+    *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+    return length(*out - ray_start);
+}
+
+inline __device__ bool in_line(float3 p0, float3 p1, float3 p) {
+    if (fabs(length(p1 - p0) - length(p0 - p) - length(p1 - p)) < 1e-4f) {
+        return true;
     }
     else {
-        return ray_intersect_triangle(ray_start, ray_dir, p0, p2, p3, out);
+        return false;
     }
+}
+
+inline __device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 p3, float3* __restrict__ uvw, float3* __restrict__ out, int& tri_type) {
+    float3 pq = ray_dir*INF;
+    float3 pp0 = p0 - ray_start;
+    float3 pp1 = p1 - ray_start;
+    float3 pp2 = p2 - ray_start;
+    float3 pp3 = p3 - ray_start;
+    float denom;
+    float epsilon = 0.0f;
+    float epsilon2 = 0.1f;
+
+    //triangle p0p1p2
+    uvw->x = scalar_triple(pq, pp2, pp1);//21
+    uvw->y = scalar_triple(pq, pp0, pp2);//02
+    uvw->z = scalar_triple(pq, pp1, pp0);//10
+    //restrict in triangle(without border)
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+        tri_type = 0;
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        if (in_line(p0, p2, *out)) {
+            tri_type = 0;
+            return length(*out - ray_start);
+        }
+    }
+
+    //triangle p0p2p3
+    uvw->x = scalar_triple(pq, pp3, pp2);
+    uvw->y = scalar_triple(pq, pp0, pp3);
+    uvw->z = scalar_triple(pq, pp2, pp0);
+    //restrict in triangle(without border)
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+        tri_type = 1;
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p2*uvw->y + p3*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p2*uvw->y + p3*uvw->z;
+        if (in_line(p0, p2, *out)) {
+            tri_type = 1;
+            return length(*out - ray_start);
+        }
+    }
+
+    //triangle 012
+    //float epsilon = 0.0f;
+    //float dis012 = ray_intersect_triangle_ext(ray_start, ray_dir, p0, p1, p2, uvw, out);
+    //if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+    //    tri_type = 0;
+    //    return dis012;
+    //}
+    //else {
+    //    if (in_line(p0, p2, *out)) {
+    //        tri_type = 0;
+    //        return dis012;
+    //    }
+    //}
+
+    //float dis023 = ray_intersect_triangle_ext(ray_start, ray_dir, p0, p2, p3, uvw, out);
+    //if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+    //    tri_type = 1;
+    //    return dis023;
+    //}
+    //else {
+    //    if (in_line(p0, p2, *out)) {
+    //        tri_type = 1;
+    //        return dis023;
+    //    }
+    //}
+
+    return -INF;
 }
 
 #endif

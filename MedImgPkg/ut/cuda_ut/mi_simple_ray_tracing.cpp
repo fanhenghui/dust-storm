@@ -65,7 +65,7 @@ extern "C"
 void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
     mat4 mat_viewmodel, mat4 mat_projection_inv, mat4 matmvp,
     int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
-    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex);
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool blend);
 
 
 using namespace medical_imaging;
@@ -174,9 +174,9 @@ void init() {
 }
 
 static void init_graphic() {
-    const float w = 0.6;
-    const float x_step = 0.33333;
-    const float y_step = 0.5;
+    const float w = 0.6f;
+    const float x_step = 0.33333f;
+    const float y_step = 0.5f;
 
     //---------------------------------//
     //element
@@ -402,6 +402,7 @@ static void Display() {
         mat4 mat4_v = matrix4_to_mat4(mat_view);
         mat4 mat4_pi = matrix4_to_mat4(mat_projection_inv);
         mat4 mat4_mvp = matrix4_to_mat4(mat_mvp);
+        //Viewport view_port(_width/3*2, _height/3*2, _width/3, _height/3);
         Viewport view_port(0, 0, _width, _height);
 
         //debug
@@ -435,7 +436,7 @@ static void Display() {
         //ray_tracing_vertex_color(view_port, _width, _height, mat4_v, mat4_pi, 8, (float3*)_d_vertex, 36, _d_element, (float4*)_d_color, _cuda_d_canvas, _cuda_canvas_tex);
 
         map_image(_cuda_navagator_tex);
-        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _cuda_canvas_tex);
+        ray_tracing_quad_vertex_mapping(view_port, _width, _height, mat4_v, mat4_pi, mat4_mvp, 24, (float3*)_d_vertex, (float2*)_d_tex_coordinate, _cuda_navagator_tex, _cuda_d_canvas, _cuda_canvas_tex, false);
         unmap_image(_cuda_navagator_tex);
 
         //update texture

@@ -9,12 +9,8 @@
 #include "arithmetic/mi_cuda_math.h"
 #include "mi_cuda_graphic.h"
 
-__device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, Rectangle& rect, float3* out) {
-    return ray_intersect_rectangle(ray_start, ray_dir, rect.p0, rect.p1, rect.p2, rect.p3, out);
-}
-
 __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, int ele_count, int* element, float4* color, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, int ele_count, int* __restrict__  element, float4* __restrict__  color, unsigned char* __restrict__ result) {
 
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -23,12 +19,12 @@ __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int w
         return;
     }
 
-    uint idx = y*width + x;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
 
-    float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
-    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
-    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0);
-    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0);
+    float ndc_x = (x / (float)viewport.width - 0.5f) * 2.0f;
+    float ndc_y = (y / (float)viewport.height - 0.5f) * 2.0f;
+    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0f);
+    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0f);
     ray_start = mat_projection_inv*ray_start;
     ray_end = mat_projection_inv*ray_end;
     float3 ray_dir = ray_end - ray_start;
@@ -42,7 +38,7 @@ __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int w
     int ele0, ele1, ele2;
     int hit = -1;
     float min_dis = INF;
-    float cur_dis = 0;
+    float cur_dis = 0.0f;
     float3 out;
     for (int i = 0; i < tri_count; ++i) {
         ele0 = element[i * 3];
@@ -73,7 +69,7 @@ __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int w
 
     //triangle interpolate
     float4 p_color = c0*uvw.x + c1*uvw.y + c2*uvw.z;
-    clamp(p_color, 0, 1);
+    clamp(p_color, 0.0f, 1.0f);
     
     result[idx * 4] = p_color.x*255;
     result[idx * 4 + 1] = p_color.y * 255;
@@ -82,7 +78,7 @@ __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int w
 }
 
 __global__ void kernel_ray_tracing_element_vertex_mapping(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, int ele_count, int* element, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, int ele_count, int* __restrict__ element, float2* __restrict__ tex_coordinate, cudaTextureObject_t tex, unsigned char* __restrict__ result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -94,12 +90,12 @@ __global__ void kernel_ray_tracing_element_vertex_mapping(Viewport viewport, int
     //    return;
     //}
 
-    uint idx = y*width + x;
+    uint idx = (y+viewport.y)*width + x+viewport.x;
 
-    float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
-    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
-    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0);
-    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0);
+    float ndc_x = (x / (float)viewport.width - 0.5f) * 2.0f;
+    float ndc_y = (y / (float)viewport.height - 0.5f) * 2.0f;
+    float3 ray_start = make_float3(ndc_x, ndc_y, -1.0f);
+    float3 ray_end = make_float3(ndc_x, ndc_y, 1.0f);
     ray_start = mat_projection_inv*ray_start;
     ray_end = mat_projection_inv*ray_end;
     float3 ray_dir = ray_end - ray_start;
@@ -155,7 +151,7 @@ __global__ void kernel_ray_tracing_element_vertex_mapping(Viewport viewport, int
 }
 
 __global__ void kernel_ray_tracing_triangle_vertex_color(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, float4* color, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, float4* __restrict__ color, unsigned char* __restrict__ result) {
 
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -164,7 +160,7 @@ __global__ void kernel_ray_tracing_triangle_vertex_color(Viewport viewport, int 
         return;
     }
 
-    uint idx = y*width + x;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
 
     float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
     float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
@@ -219,7 +215,7 @@ __global__ void kernel_ray_tracing_triangle_vertex_color(Viewport viewport, int 
 }
 
 __global__ void kernel_ray_tracing_triangle_vertex_mapping(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, float2* __restrict__ tex_coordinate, cudaTextureObject_t tex, unsigned char* __restrict__ result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -231,7 +227,7 @@ __global__ void kernel_ray_tracing_triangle_vertex_mapping(Viewport viewport, in
     //    return;
     //}
 
-    uint idx = y*width + x;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
 
     float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
     float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
@@ -287,7 +283,7 @@ __global__ void kernel_ray_tracing_triangle_vertex_mapping(Viewport viewport, in
 }
 
 __global__ void kernel_ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, float2* __restrict__ tex_coordinate, cudaTextureObject_t tex, unsigned char* __restrict__ result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -299,7 +295,7 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping(Viewport viewport, int wi
     //    return;
     //}
 
-    uint idx = y*width + x;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
 
     float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
     float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
@@ -366,11 +362,20 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping(Viewport viewport, int wi
     result[idx * 4 + 3] = 255;
 }
 
+
+inline __device__ float4 blend(float4 src, float4 dst) {
+    return make_float4(
+        dst.w * dst.x + (1 - dst.w)*src.w * src.x,
+        dst.w * dst.y + (1 - dst.w)*src.w * src.y,
+        dst.w * dst.z + (1 - dst.w)*src.w * src.z,
+        dst.w + (1 - dst.w)*src.w);
+}
+
 extern __shared__ float s_array[];//vertex(f3) , tex_coordinate(f2)
 
 //use shared memory to replace global memory
 __global__ void kernel_ray_tracing_quad_vertex_mapping_shared_memory(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
-    int vertex_count, float3* vertex, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, float2* __restrict__ tex_coordinate, cudaTextureObject_t tex, unsigned char* __restrict__ result, bool is_blend) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
     
@@ -414,7 +419,7 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_shared_memory(Viewport vi
         return;
     }
 
-    uint idx = y*width + x;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
 
     float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
     float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
@@ -431,6 +436,7 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_shared_memory(Viewport vi
     float3 uvw, cur_uvw;
     int hit = -1;
     int tri_type = -1;
+    int cur_tri_type;
     float min_dis = INF;
     float cur_dis = 0;
     float3 out;
@@ -440,32 +446,45 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_shared_memory(Viewport vi
         p2 = s_vertex[i * 4 + 2];
         p3 = s_vertex[i * 4 + 3];
 
-        cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0, p1, p2, &cur_uvw, &out);
-        if (cur_dis > -INF && cur_dis < min_dis) {
-            min_dis = cur_dis;
-            hit = i;
-            uvw = cur_uvw;
-            tri_type = 0;
-            continue;
-        }
+        //cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0, p1, p2, &cur_uvw, &out);
+        //if (cur_dis > -INF && cur_dis < min_dis) {
+        //    min_dis = cur_dis;
+        //    hit = i;
+        //    uvw = cur_uvw;
+        //    tri_type = 0;
+        //    continue;
+        //}
 
-        cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0, p2, p3, &cur_uvw, &out);
+        //cur_dis = ray_intersect_triangle(ray_start, ray_dir, p0, p2, p3, &cur_uvw2, &out);
+        //if (cur_dis > -INF && cur_dis < min_dis) {
+        //    min_dis = cur_dis;
+        //    hit = i;
+        //    uvw = cur_uvw2;
+        //    tri_type = 1;
+        //}
+
+        
+        //to remove a gap between two triangles
+        cur_dis = ray_intersect_rectangle(ray_start, ray_dir, p0, p1, p2, p3, &cur_uvw, &out, cur_tri_type);
         if (cur_dis > -INF && cur_dis < min_dis) {
             min_dis = cur_dis;
             hit = i;
             uvw = cur_uvw;
-            tri_type = 1;
+            tri_type = cur_tri_type;
         }
     }
 
     //__syncthreads(); no need
 
     if (hit == -1) {
-        result[idx * 4 + 0] = 0;
-        result[idx * 4 + 1] = 0;
-        result[idx * 4 + 2] = 0;
-        result[idx * 4 + 3] = 0;
+        if (!is_blend) {
+            result[idx * 4] = 0;
+            result[idx * 4 + 1] = 0;
+            result[idx * 4 + 2] = 0;
+            result[idx * 4 + 3] = 0;
+        }
         return;
+        
     }
 
     //triangle interpolate
@@ -480,18 +499,27 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_shared_memory(Viewport vi
         t2 = s_tex_coordinate[hit * 4 + 3];
     }
     float2 tex_coord = t0*uvw.x + t1*uvw.y + t2*uvw.z;
-    float4 color = tex2D<float4>(tex, tex_coord.x, tex_coord.y);
-    clamp(color, 0, 1);
+    float4 color_dst = tex2D<float4>(tex, tex_coord.x, tex_coord.y);
 
+    float4 color;
+    if (is_blend) {
+        float4 color_src = make_float4(result[idx * 4] * 0.003921f, result[idx * 4 + 1] * 0.003921f, result[idx * 4 + 2] * 0.003921f, result[idx * 4 + 3] * 0.003921f);
+        color = blend(color_src, color_dst);
+    }
+    else {
+        color = color_dst;
+    }
+    clamp(color, 0.0f, 1.0f);
+    
     result[idx * 4] = color.x * 255;
     result[idx * 4 + 1] = color.y * 255;
     result[idx * 4 + 2] = color.z * 255;
     result[idx * 4 + 3] = 255;
 }
 
-//use shared memory and resterization
+//use shared memory and resterization (TODO with bug !! Z-fighting ??)
 __global__ void kernel_ray_tracing_quad_vertex_mapping_resterization(Viewport viewport, int width, int height, mat4 matmvp,
-    int vertex_count, float3* vertex, float2* tex_coordinate, cudaTextureObject_t tex, unsigned char* result) {
+    int vertex_count, float3* __restrict__ vertex, float2* __restrict__ tex_coordinate, cudaTextureObject_t tex, unsigned char* __restrict__ result) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
     const int quad_count = vertex_count / 4;
@@ -555,9 +583,9 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_resterization(Viewport vi
     //}
 
 
-    uint idx = y*width + x;
-    float ndc_x = (x / (float)viewport.width - 0.5) * 2.0;
-    float ndc_y = (y / (float)viewport.height - 0.5) * 2.0;
+    uint idx = (y + viewport.y)*width + x + viewport.x;
+    float ndc_x = (x / (float)viewport.width - 0.5f) * 2.0f;
+    float ndc_y = (y / (float)viewport.height - 0.5f) * 2.0f;
     float2 p = make_float2(ndc_x, ndc_y);
     float3 uvw, cur_uvw;
     int hit = -1;
@@ -634,7 +662,7 @@ __global__ void kernel_ray_tracing_quad_vertex_mapping_resterization(Viewport vi
     }
     float2 tex_coord = t0*uvw.x + t1*uvw.y + t2*uvw.z;
     float4 color = tex2D<float4>(tex, tex_coord.x, tex_coord.y);
-    clamp(color, 0, 1);
+    clamp(color, 0.0f, 1.0f);
 
     result[idx * 4] = color.x * 255;
     result[idx * 4 + 1] = color.y * 255;
@@ -749,7 +777,7 @@ extern "C"
 void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
     mat4 mat_viewmodel, mat4 mat_projection_inv, mat4 mat_mvp,
     int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
-    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex)
+    unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool is_blend)
 {
     const int BLOCK_SIZE = 16;
     CHECK_CUDA_ERROR;
@@ -758,7 +786,7 @@ void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
     dim3 grid_size(viewport.width / BLOCK_SIZE, viewport.height / BLOCK_SIZE);
     //kernel_ray_tracing_quad_vertex_mapping << <grid_size, block_size >> > (viewport, width, height, mat_viewmodel, mat_projection_inv, vertex_count, d_vertex, d_tex_coordinate, mapping_tex.cuda_tex_obj, d_result);
     
-    kernel_ray_tracing_quad_vertex_mapping_shared_memory << <grid_size, block_size, vertex_count*20 >> > (viewport, width, height, mat_viewmodel, mat_projection_inv, vertex_count, d_vertex, d_tex_coordinate, mapping_tex.cuda_tex_obj, d_result);
+    kernel_ray_tracing_quad_vertex_mapping_shared_memory << <grid_size, block_size, vertex_count*20 >> > (viewport, width, height, mat_viewmodel, mat_projection_inv, vertex_count, d_vertex, d_tex_coordinate, mapping_tex.cuda_tex_obj, d_result, is_blend);
 
     //kernel_ray_tracing_quad_vertex_mapping_resterization << <grid_size, block_size, vertex_count * 20  >> > (viewport, width, height, mat_mvp, vertex_count, d_vertex, d_tex_coordinate, mapping_tex.cuda_tex_obj, d_result);
 
