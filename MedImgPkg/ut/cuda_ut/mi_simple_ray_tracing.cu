@@ -6,8 +6,8 @@
 #include <cuda_texture_types.h>
 #include <vector_types.h>
 
-#include "arithmetic/mi_cuda_math.h"
 #include "mi_cuda_graphic.h"
+#include "mi_cuda_vr_common.h"
 
 __global__ void kernel_ray_tracing_element_vertex_color(Viewport viewport, int width, int height, mat4 mat_viewmodel, mat4 mat_projection_inv,
     int vertex_count, float3* __restrict__ vertex, int ele_count, int* __restrict__  element, float4* __restrict__  color, unsigned char* __restrict__ result) {

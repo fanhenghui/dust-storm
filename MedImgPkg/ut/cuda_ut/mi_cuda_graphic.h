@@ -1,5 +1,5 @@
-#ifndef MEDIMG_UT_MI_CUDA_VR_H
-#define MEDIMG_UT_MI_CUDA_VR_H
+#ifndef MEDIMG_UT_MI_CUDA_GRAPHIC_H
+#define MEDIMG_UT_MI_CUDA_GRAPHIC_H
 
 #ifdef WIN32
 #include "gl/glew.h"
@@ -8,7 +8,6 @@
 #endif
 
 #include <stdio.h>
-#include <GL/glew.h>
 #include <iostream>
 
 #include <cuda_runtime.h>
@@ -27,124 +26,6 @@
 //    return make_float3(__fmul_ru(a.x, b.x), __fmul_ru(a.y * b.y), __fmul_ru(a.z * b.z));
 //}
 
-
-#define CHECK_CUDA_ERROR {\
-cudaError_t err = cudaGetLastError(); \
-if (err != cudaSuccess) {\
-    std::cout << "CUDA error: " << err << " in function: " << __FUNCTION__ <<\
-    " line: " << __LINE__ << std::endl; \
-}}\
-
-struct cudaGLTextureWriteOnly {
-    GLuint gl_tex_id;
-    GLenum target;
-    cudaGraphicsResource *cuda_res;
-    cudaArray* d_cuda_array;    
-};
-
-inline  __host__ void register_image(cudaGLTextureWriteOnly& cuda_tex) {
-    cudaGraphicsGLRegisterImage(&cuda_tex.cuda_res, cuda_tex.gl_tex_id, cuda_tex.target, cudaGraphicsRegisterFlagsWriteDiscard);
-    CHECK_CUDA_ERROR;
-}
-
-inline __host__ void map_image(cudaGLTextureWriteOnly& cuda_tex) {
-    cuda_tex.d_cuda_array = NULL;
-    cudaGraphicsMapResources(1, &cuda_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&cuda_tex.d_cuda_array, cuda_tex.cuda_res, 0, 0);
-}
-
-inline __host__ void write_image(cudaGLTextureWriteOnly& cuda_tex, void* d_buffer, size_t count) {
-    if (cuda_tex.d_cuda_array) {
-        cudaMemcpyToArray(cuda_tex.d_cuda_array, 0, 0, d_buffer, count, cudaMemcpyDeviceToDevice);
-        CHECK_CUDA_ERROR;
-    }
-}
-
-inline  __host__  void release_image(cudaGLTextureWriteOnly& cuda_tex) {
-    cudaGraphicsUnregisterResource(cuda_tex.cuda_res);
-    cuda_tex.cuda_res = NULL;
-}
-
-inline __host__ void unmap_image(cudaGLTextureWriteOnly& cuda_tex) {
-    cudaGraphicsUnmapResources(1, &cuda_tex.cuda_res);
-}
-
-struct cudaGLTextureReadOnly {
-    GLuint gl_tex_id;
-    GLenum target;
-    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
-    cudaGraphicsResource *cuda_res;
-    cudaArray* d_cuda_array;
-};
-
-inline  __host__ void register_image(cudaGLTextureReadOnly& cuda_tex) {
-    cudaGraphicsGLRegisterImage(&cuda_tex.cuda_res, cuda_tex.gl_tex_id, cuda_tex.target, cudaGraphicsRegisterFlagsReadOnly);
-    CHECK_CUDA_ERROR;
-}
-
-inline __host__ void bind_texture(cudaGLTextureReadOnly& cuda_tex, cudaTextureReadMode read_mode,  cudaTextureFilterMode filter_mode,  bool normalized_coords) {
-    struct cudaResourceDesc res_desc;
-    memset(&res_desc, 0, sizeof(cudaResourceDesc));
-    res_desc.resType = cudaResourceTypeArray;
-    res_desc.res.array.array = cuda_tex.d_cuda_array;
-
-    struct cudaTextureDesc tex_desc;
-    memset(&tex_desc, 0, sizeof(cudaTextureDesc));
-    tex_desc.addressMode[0] = cudaAddressModeMirror;
-    tex_desc.addressMode[1] = cudaAddressModeMirror;
-    tex_desc.filterMode = filter_mode;
-    tex_desc.readMode = read_mode;
-    tex_desc.normalizedCoords = normalized_coords;
-
-    cudaCreateTextureObject(&cuda_tex.cuda_tex_obj, &res_desc, &tex_desc, NULL);
-}
-
-inline __host__ void map_image(cudaGLTextureReadOnly& cuda_tex) {
-    cuda_tex.d_cuda_array = NULL;
-    cudaGraphicsMapResources(1, &cuda_tex.cuda_res);
-    cudaGraphicsSubResourceGetMappedArray(&cuda_tex.d_cuda_array, cuda_tex.cuda_res, 0, 0);
-}
-
-inline  __host__  void release_image(cudaGLTextureReadOnly& cuda_tex) {
-    cudaGraphicsUnregisterResource(cuda_tex.cuda_res);
-    cudaDestroyTextureObject(cuda_tex.cuda_tex_obj);
-    cuda_tex.cuda_res = NULL;
-}
-
-inline __host__ void unmap_image(cudaGLTextureReadOnly& cuda_tex) {
-    cudaGraphicsUnmapResources(1, &cuda_tex.cuda_res);
-}
-
-struct cudaGLTexture {
-    GLuint gl_tex_id;
-    GLenum target;
-    int width;
-    int height;
-    cudaTextureObject_t cuda_tex_obj;//GLTexture2D->cudaTextureType2D
-    cudaGraphicsResource *cuda_res;
-    cudaArray* d_cuda_array;
-};
-
-struct cudaRayCastInfos {
-    float sample_step;
-    int mask_level;//8 ->16 ->32 ->64 ->128
-    cudaArray* d_lut_array;
-    cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
-    float lut_length;//length of one CUDA texture 1D
-    float* d_wl_array;//mask_level * 2
-    float* d_material_array;//mask_level * 2 {float4(diffuse) float4(specular) float4(shininess reserve0/1/2)}
-};
-
-struct cudaVolumeInfos 
-{
-    cudaArray* d_volume_array;
-    cudaTextureObject_t volume_tex_obj;//cudaTextureType3D
-    cudaArray* d_mask_array;
-    cudaTextureObject_t mask_tex_obj;//cudaTextureType3D
-    uint3 dim;
-    float3 dim_r;
-};
-
 struct Viewport {
     int x, y, width, height;
     __host__ __device__ Viewport(int x_, int y_, int width_, int height_) : x(x_), y(y_), width(width_), height(height_) {}
@@ -157,7 +38,9 @@ struct mat4 {
     float4 col0, col1, col2, col3;
     __host__ __device__ mat4(float4 col0_, float4 col1_, float4 col2_, float4 col3_) :col0(col0_), col1(col1_), col2(col2_), col3(col3_) {
     }
+    __host__ __device__ mat4() {}
 };
+
 
 //struct Triangle {
 //    float3 p0, p1, p2;//position coordiante(Model)
@@ -190,15 +73,16 @@ struct mat4 {
 //}
 
 
-struct Rectangle {
-    float3 p0, p1, p2, p3;//position world coordinate
-    float2 c0, c1, c2, c3;//texture coordinate
-    __host__ __device__  Rectangle(float3 p0_, float3 p1_, float3 p2_, float3 p3_,
-        float2 c0_, float2 c1_, float2 c2_, float2 c3_) :
-        p0(p0_), p1(p1_), p2(p2_), p3(p3_),
-        c0(c0_), c1(c1_), c2(c2_), c3(c3_) {
-    }
-};
+//struct Rectangle {
+//    float3 p0, p1, p2, p3;//position world coordinate
+//    float2 c0, c1, c2, c3;//texture coordinate
+//    __host__ __device__  Rectangle(float3 p0_, float3 p1_, float3 p2_, float3 p3_,
+//        float2 c0_, float2 c1_, float2 c2_, float2 c3_) :
+//        p0(p0_), p1(p1_), p2(p2_), p3(p3_),
+//        c0(c0_), c1(c1_), c2(c2_), c3(c3_) {
+//    }
+//};
+
 
 inline mat4 matrix4_to_mat4(const medical_imaging::Matrix4& mat44) {
     return mat4(
@@ -452,7 +336,6 @@ inline __device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir
     float3 pp3 = p3 - ray_start;
     float denom;
     float epsilon = 0.0f;
-    float epsilon2 = 0.1f;
 
     //triangle p0p1p2
     uvw->x = scalar_triple(pq, pp2, pp1);//21

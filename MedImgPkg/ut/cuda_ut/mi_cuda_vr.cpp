@@ -55,7 +55,7 @@
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 
-#include "mi_cuda_graphic.h"
+#include "mi_cuda_vr_common.h"
 
 extern "C"
 int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, int width, int height,
@@ -347,9 +347,13 @@ void init_data() {
         std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
             data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
         init_data(_cuda_volume_infos, dst_data.get(), _volume_data->_dim);
+        _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r * 
+            make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
     }
     else {
         init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer(), _volume_data->_dim);
+        _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r *
+            make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
     }
 
     //LUT

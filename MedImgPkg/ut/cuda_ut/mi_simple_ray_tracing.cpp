@@ -36,6 +36,7 @@
 #include <cuda_texture_types.h>
 
 #include "mi_cuda_graphic.h"
+#include "mi_cuda_vr_common.h"
 
 extern "C"
 void ray_tracing_element_vertex_color(Viewport viewport, int width, int height,

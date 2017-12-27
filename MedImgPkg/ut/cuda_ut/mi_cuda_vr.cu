@@ -15,14 +15,39 @@
 #include <sstream>
 
 #include "mi_cuda_graphic.h"
-#include "arithmetic/mi_cuda_math.h"
+#include "mi_cuda_vr_common.h"
 
 inline __device__ float3 f3_mul_f3(float3 a, float3 b) {
     return make_float3(__fmul_ru(a.x,b.x), __fmul_ru(a.y, b.y), __fmul_ru(a.z, b.z));
 }
 
+inline __device__ float3 cal_gradient(cudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos_norm) {
+    float3 x_s = sample_pos_norm + volume_infos->sample_shift;
+    float x = tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x + volume_infos->sample_shift.x, sample_pos_norm.y, sample_pos_norm.z) -
+              tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x - volume_infos->sample_shift.x, sample_pos_norm.y, sample_pos_norm.z);
 
-inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos, float3 sample_pos, float3 ray_dir, float4* __restrict__ integral_color) {
+    float y = tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x, sample_pos_norm.y + volume_infos->sample_shift.y, sample_pos_norm.z) -
+              tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x, sample_pos_norm.y - volume_infos->sample_shift.y, sample_pos_norm.z);
+
+    float z = tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x, sample_pos_norm.y, sample_pos_norm.z + volume_infos->sample_shift.z) -
+              tex3D<float>(volume_infos->volume_tex_obj, sample_pos_norm.x, sample_pos_norm.y, sample_pos_norm.z - volume_infos->sample_shift.z);
+
+    return make_float3(x, y, z);
+}
+
+inline __device__ float4 shade(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos,
+    float3 sample_pos, float3 sample_pos_norm, float4 color, int label)
+{
+    float3 norm = cal_gradient(volume_infos, sample_pos_norm);
+    
+    float4 norm4 = ray_cast_infos->mat_normal * make_float4(norm);
+
+    return color;
+}
+
+inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos, 
+    float3 sample_pos, float3 ray_dir, float4* __restrict__ integral_color) 
+{
     float3 sample_norm = sample_pos*volume_infos->dim_r;
     //sample_norm = f3_mul_f3(sample_pos,dim3_r);
     
@@ -93,10 +118,10 @@ __device__ float4 kernel_ray_cast(cudaVolumeInfos* __restrict__ volume_infos, cu
     for (float i = start_step; i < end_step; i += 1.0f) {
         sample_pos = ray_start + ray_dir*i;
         composite(volume_infos, ray_cast_infos, sample_pos, ray_dir, &integral_color);
-        /*if (integral_color.w > 0.95f) {
+        if (integral_color.w > 0.95f) {
             integral_color.w = 1.0f;
             break;
-        }*/
+        }
     }
 
     return integral_color;

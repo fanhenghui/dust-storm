@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ut\cuda_ut\mi_cuda_graphic.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_vr_common.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2A408E38-19C3-445D-89F6-3E937E91A08F}</ProjectGuid>
