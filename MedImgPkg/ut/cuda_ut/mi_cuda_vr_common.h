@@ -123,7 +123,7 @@ inline __host__ void unmap_image(cudaGLTextureReadOnly& cuda_tex) {
 
 struct cudaRayCastInfos {
     float sample_step;
-    int mask_level;//8 ->16 ->32 ->64 ->128
+    int mask_level;//1(non-mask)->8 ->16 ->32 ->64 ->128
     cudaArray* d_lut_array;
     cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
     mat4 mat_normal;//transpose(inverse(mat_m2v))
@@ -136,7 +136,7 @@ struct cudaRayCastInfos {
 
     cudaRayCastInfos() {
         sample_step = 0.5f;
-        mask_level = 32;
+        mask_level = 1;
         d_lut_array = NULL;
         lut_tex_obj = NULL;
         lut_length = 512;

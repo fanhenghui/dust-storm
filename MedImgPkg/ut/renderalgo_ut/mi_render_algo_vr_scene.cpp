@@ -174,7 +174,7 @@ void Init() {
     _scene->set_mask_mode(_mask_mode);
     _scene->set_interpolation_mode(LINEAR);
     _scene->set_composite_mode(COMPOSITE_DVR);
-    _scene->set_shading_mode(SHADING_NONE);
+    _scene->set_shading_mode(SHADING_PHONG);
     _scene->set_proxy_geometry(PG_BRICKS);
     _scene->set_test_code(_iTestCode);
     _scene->set_navigator_visibility(true);
@@ -212,7 +212,7 @@ void Init() {
     RGBAUnit background;
     Material material;
 #ifdef WIN32
-    std::string color_opacity_xml = "../../../config/lut/3d/ct_lung_glass.xml";
+    std::string color_opacity_xml = "../../../config/lut/3d/ct_cta.xml";
 #else
     std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
 #endif
@@ -281,9 +281,9 @@ void Display() {
         // ds = !ds;
         // _scene->set_downsample(ds);
 
-         std::shared_ptr<CameraBase> camera = _scene->get_camera();
-         Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
-         camera->rotate(q);
+         //std::shared_ptr<CameraBase> camera = _scene->get_camera();
+         //Quat4 q(5.0 / 360.0 * 2.0 * 3.1415926, Vector3(0, 1, 0));
+         //camera->rotate(q);
 
         CHECK_GL_ERROR;
 
@@ -304,7 +304,7 @@ void Display() {
         //_time_query2->begin();
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
-        _scene->download_image_buffer();
+        /*_scene->download_image_buffer();
 
         CHECK_GL_ERROR;
         _scene->swap_image_buffer();
@@ -321,7 +321,7 @@ void Display() {
         FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
 #else
         FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-#endif
+#endif*/
         // MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
         // ", buffer size: " << buffer_size;
 
