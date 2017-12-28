@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <list>
 
 #include <cuda_runtime.h>
 #include <cuda.h>
@@ -18,6 +19,7 @@
 #include <device_functions.h>
 
 #include "mi_cuda_graphic.h"
+#include "med_img_pkg_config.h"
 
 #define CHECK_CUDA_ERROR {\
 cudaError_t err = cudaGetLastError(); \
@@ -25,6 +27,44 @@ if (err != cudaSuccess) {\
     std::cout << "CUDA error: " << err << " in function: " << __FUNCTION__ <<\
     " line: " << __LINE__ << std::endl; \
 }}\
+
+class CudaMemShield {
+public:
+    CudaMemShield() {
+
+    }
+    
+    ~CudaMemShield() {
+        for (auto it = _shields.begin(); it != _shields.end(); ++it) {
+            if (*it) {
+                cudaFree(*it);
+            }
+        }
+        _shields.clear();
+    }
+    
+    void add_shield(void* mem) {
+        if (mem) {
+            _shields.push_back(mem);
+        }
+        
+    }
+
+    void remove_shield(void* mem) {
+        for (auto it = _shields.begin(); it != _shields.end(); ++it) {
+            if ((*it) == mem) {
+                _shields.erase(it);
+                break;
+            }
+        }
+    }
+private:
+    std::list<void*> _shields;
+private:
+    DISALLOW_COPY_AND_ASSIGN(CudaMemShield);
+};
+
+
 
 struct cudaGLTextureWriteOnly {
     GLuint gl_tex_id;
@@ -125,7 +165,7 @@ struct cudaRayCastInfos {
     float sample_step;
     int mask_level;//1(non-mask)->8 ->16 ->32 ->64 ->128
     cudaArray* d_lut_array;
-    cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
+    cudaTextureObject_t lut_tex_obj[128];//cudaTextureType1DArray
     mat4 mat_normal;//transpose(inverse(mat_m2v))
     float3 light_position;
     float3 ambient_color;//RGB norm
@@ -138,7 +178,7 @@ struct cudaRayCastInfos {
         sample_step = 0.5f;
         mask_level = 1;
         d_lut_array = NULL;
-        lut_tex_obj = NULL;
+        //lut_tex_obj = NULL;
         lut_length = 512;
         d_wl_array = NULL;
         d_material_array = NULL;

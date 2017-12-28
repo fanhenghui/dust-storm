@@ -64,6 +64,9 @@ int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, 
 extern "C" 
 int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data);
 
+extern "C"
+int init_mask(cudaVolumeInfos& cuda_volume_infos, unsigned char* data);
+
 extern "C" 
 int init_wl_nonmask(cudaRayCastInfos& ray_cast_infos, float* wl_array_norm);
 
@@ -329,7 +332,7 @@ void init_data() {
 
     Logger::instance()->initialize();
 
-    //volume data
+    //Volume Data
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
     loader.load_series(files, _volume_data, _data_header);
@@ -355,6 +358,52 @@ void init_data() {
     else {
         init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer());
     }
+
+    //Mask Data
+    // Create empty mask
+    std::shared_ptr<ImageData> mask_data(new ImageData());
+    _volume_data->shallow_copy(mask_data.get());
+    mask_data->_channel_num = 1;
+    mask_data->_data_type = medical_imaging::UCHAR;
+    mask_data->mem_allocate();
+    char* mask_raw = (char*)mask_data->get_pixel_pointer();
+    std::ifstream in(root + "/mask.raw", std::ios::in);
+    if (in.is_open()) {
+        in.read(mask_raw, data_len);
+        in.close();
+    }
+    else {
+        memset(mask_raw, 1, data_len);
+    }
+
+    std::set<unsigned char> target_label_set;
+    RunLengthOperator run_length_op;
+    std::ifstream in2(root + "/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle", std::ios::binary | std::ios::in);
+    if (in2.is_open()) {
+        in2.seekg(0, in2.end);
+        const int code_len = in2.tellg();
+        in2.seekg(0, in2.beg);
+        unsigned int *code_buffer = new unsigned int[code_len];
+        in2.read((char*)code_buffer, code_len);
+        in2.close();
+        unsigned char* mask_target = new unsigned char[data_len];
+
+        if (0 == run_length_op.decode(code_buffer, code_len / sizeof(unsigned int), mask_target, data_len)) {
+            FileUtil::write_raw(root + "./nodule.raw", mask_target, data_len);
+            printf("load target mask done.\n");
+            for (unsigned int i = 0; i < data_len; ++i) {
+                if (mask_target[i] != 0) {
+                    mask_raw[i] = mask_target[i] + 1;
+                    target_label_set.insert(mask_target[i] + 1);
+                }
+            }
+        }
+        delete[] mask_target;
+    }
+
+    FileUtil::write_raw(root + "/target_mask.raw", mask_raw, data_len);
+
+    init_mask(_cuda_volume_infos, (unsigned char*)mask_data->get_pixel_pointer());
 
     //LUT
     std::shared_ptr<ColorTransFunc> color;

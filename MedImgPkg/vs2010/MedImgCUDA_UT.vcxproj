@@ -11,18 +11,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="..\ut\cuda_ut\mi_cuda_brick_info_calculator.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_vr.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_ut.cpp" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_texture.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ut\cuda_ut\mi_cuda_brick_info_calculator.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_cuda_brick_pool.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_cuda_global_memory.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture_3d.cpp" />
+    <ClCompile Include="..\ut\cuda_ut\mi_cuda_volume_infos.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_vr.cpp" />
     <ClCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_brick_info_calculator.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_brick_pool.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_global_memory.h" />
     <ClInclude Include="..\ut\cuda_ut\mi_cuda_graphic.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_texture_3d.h" />
+    <ClInclude Include="..\ut\cuda_ut\mi_cuda_volume_infos.h" />
     <ClInclude Include="..\ut\cuda_ut\mi_cuda_vr_common.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

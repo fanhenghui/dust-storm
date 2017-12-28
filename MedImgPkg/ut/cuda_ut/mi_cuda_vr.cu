@@ -189,6 +189,10 @@ inline __device__ float4 shade_ext(cudaVolumeInfos* __restrict__ volume_infos, c
     return make_float4(output_color, alpha);
 }
 
+inline __device__ int access_mask(cudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos) {
+    return (int)tex3D<unsigned char>(volume_infos->mask_tex_obj, sample_pos.x, sample_pos.y, sample_pos.z);
+}
+
 inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos, 
     float3 sample_pos, float3 ray_dir, float4* __restrict__ integral_color) 
 {
@@ -203,7 +207,7 @@ inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cud
     float gray = tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x, sample_norm.y, sample_norm.z);
     gray = (gray - min_gray) / ww;
     //gray = clamp(gray,0.0f,1.0f);
-    float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
+    float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj[0], gray);
     float alpha;
     if (color_ori.w > 0.0f) {
         color_ori = shade(volume_infos, ray_cast_infos, sample_pos, sample_norm, ray_dir, color_ori, label);
@@ -231,7 +235,7 @@ inline __device__ void composite_ext(cudaVolumeInfos* __restrict__ volume_infos,
     float gray = tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x, sample_norm.y, sample_norm.z);
     gray = (gray - min_gray) / ww;
     //gray = clamp(gray,0.0f,1.0f);
-    float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
+    float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj[0], gray);
     float alpha;
     if (color_ori.w > 0.0f) {
         color_ori = shade_ext(volume_infos, ray_cast_infos, sample_pos, sample_norm, ray_dir, color_ori, label);
@@ -577,6 +581,53 @@ int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, 
     return 0;
 }
 
+extern "C" 
+int init_mask(cudaVolumeInfos& cuda_volume_infos, unsigned char* data) {
+    cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc(8, 0, 0, 0, cudaChannelFormatKindUnsigned);
+    CHECK_CUDA_ERROR;
+
+    cudaExtent extent;
+    extent.width = cuda_volume_infos.dim.x;
+    extent.height = cuda_volume_infos.dim.y;
+    extent.depth = cuda_volume_infos.dim.z;
+    cudaMalloc3DArray(&cuda_volume_infos.d_mask_array, &channel_desc, extent);
+
+    CHECK_CUDA_ERROR;
+
+    cudaMemcpy3DParms copyParams = { 0 };
+    copyParams.srcPtr = make_cudaPitchedPtr((void *)data, extent.width * sizeof(unsigned char), extent.width, extent.height);
+    copyParams.dstArray = cuda_volume_infos.d_mask_array;
+    copyParams.extent = extent;
+    copyParams.kind = cudaMemcpyHostToDevice;
+    cudaMemcpy3D(&copyParams);
+
+    CHECK_CUDA_ERROR;
+
+    //Cuda resource
+    struct cudaResourceDesc  res_desc;
+    memset(&res_desc, 0, sizeof(cudaResourceDesc));
+    res_desc.resType = cudaResourceTypeArray;
+    res_desc.res.array.array = cuda_volume_infos.d_mask_array;
+
+    //Texture parameter (like GL's glTexParameteri)
+    struct cudaTextureDesc tex_desc;
+    memset(&tex_desc, 0, sizeof(cudaTextureDesc));
+    tex_desc.addressMode[0] = cudaAddressModeClamp;
+    tex_desc.addressMode[1] = cudaAddressModeClamp;
+    tex_desc.addressMode[2] = cudaAddressModeClamp;
+    tex_desc.filterMode = cudaFilterModePoint;
+    tex_desc.readMode = cudaReadModeElementType;
+    tex_desc.normalizedCoords = 1;
+
+    //create texture
+    cudaTextureObject_t tex_obj = 0;
+    cudaCreateTextureObject(&cuda_volume_infos.mask_tex_obj, &res_desc, &tex_desc, NULL);
+
+    CHECK_CUDA_ERROR;
+
+    return 0;
+}
+
 extern "C"
 int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data) {
     cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc(16,0,0,0,cudaChannelFormatKindUnsigned);
@@ -663,7 +714,7 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
     tex_desc.normalizedCoords = 1;
 
     //create texture
-    cudaCreateTextureObject(&ray_cast_infos.lut_tex_obj, &res_desc, &tex_desc, NULL);
+    cudaCreateTextureObject(&ray_cast_infos.lut_tex_obj[0], &res_desc, &tex_desc, NULL);
 
     CHECK_CUDA_ERROR; 
 
