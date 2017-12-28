@@ -35,14 +35,72 @@ inline __device__ float3 cal_gradient(cudaVolumeInfos* __restrict__ volume_infos
     return make_float3(x, y, z);
 }
 
+//Phong illumination get material from global memory
 inline __device__ float4 shade(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos,
-    float3 sample_pos, float3 sample_pos_norm, float4 color, int label)
+    float3 sample_pos, float3 sample_pos_norm, float3 ray_dir, float4 input_color, int label)
 {
-    float3 norm = cal_gradient(volume_infos, sample_pos_norm);
-    
-    float4 norm4 = ray_cast_infos->mat_normal * make_float4(norm);
+    float4 tmp;
+    float3 color = make_float3(input_color);
 
-    return color;
+    float3 diffuse_color = make_float3(
+        ray_cast_infos->d_material_array[label * 9], 
+        ray_cast_infos->d_material_array[label * 9 + 1],
+        ray_cast_infos->d_material_array[label * 9 + 2]);
+    float diffuse_intensity = ray_cast_infos->d_material_array[label * 9 + 3];
+
+    float3 specular_color = make_float3(
+        ray_cast_infos->d_material_array[label * 9 + 4],
+        ray_cast_infos->d_material_array[label * 9 + 5],
+        ray_cast_infos->d_material_array[label * 9 + 6]);
+
+    float specular_intensity = ray_cast_infos->d_material_array[label * 9 + 7];
+
+    float shineness = ray_cast_infos->d_material_array[label * 9 + 8];
+
+    float3 normal = cal_gradient(volume_infos, sample_pos_norm);
+    tmp = ray_cast_infos->mat_normal * make_float4(normal);
+    normal = normalize(make_float3(tmp));
+
+    tmp = ray_cast_infos->mat_normal * make_float4(-ray_dir);
+    float3 view_dir = normalize(make_float3(tmp));
+
+    float3 light_dir = ray_cast_infos->light_position - sample_pos;
+    light_dir = normalize(light_dir);
+    tmp = ray_cast_infos->mat_normal * make_float4(light_dir);
+    light_dir = normalize(make_float3(tmp));
+
+    //ambient
+    float3 ambient_part = ray_cast_infos->ambient_color * ray_cast_infos->ambient_intensity * color;
+    
+    //diffuse
+    float ln = dot(light_dir, normal);
+    if (ln < 0.0f) {
+        normal = -normal;
+        ln = -ln;
+    }
+    float diffuse = max(ln, 0.0f);
+    float3 diffuse_part = diffuse * diffuse_color * diffuse_intensity * color;
+
+    //specular(classic phong)
+    float3 r = reflect(-light_dir, normal);
+    r = normalize(r);
+    float specular = max(dot(r, view_dir), 0.0f);
+
+    specular = pow(specular, shineness);
+    float3 specular_part = specular * specular_color * specular_intensity * color;
+    
+    float3 output_color = ambient_part + diffuse_part + specular_part;
+
+    //silhouettes enhance alpha
+    float fn = 1.0f - ln;
+    float kss = 1.0f;
+    float kse = 0.5f;
+    float ksc = 0.0f;
+    float alpha = input_color.w*(0.5f + kss * pow(fn, kse));
+    alpha = clamp(alpha, 0.0f, 1.0f);
+
+    output_color = clamp(output_color, 0.0f, 1.0f);
+    return make_float4(output_color, alpha);
 }
 
 inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos, 
@@ -62,7 +120,7 @@ inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cud
     float4 color_ori = tex1D<float4>(ray_cast_infos->lut_tex_obj, gray);
     float alpha;
     if (color_ori.w > 0.0f) {
-        //TODO shading
+        color_ori = shade(volume_infos, ray_cast_infos, sample_pos, sample_norm, ray_dir, color_ori, 0);
         alpha = color_ori.w*(1.0f - integral_color->w);
         integral_color->x += color_ori.x * alpha;
         integral_color->y += color_ori.y * alpha;
@@ -71,6 +129,7 @@ inline __device__ void composite(cudaVolumeInfos* __restrict__ volume_infos, cud
     }
 }
 
+////Composite inline ray cast(FPS is the same with use inline composite sub function)
 //__device__ float4 kernel_ray_cast(cudaVolumeInfos* __restrict__ volume_infos, cudaRayCastInfos* __restrict__ ray_cast_infos, float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
 //    float4 integral_color = input_color;
 //    float3 sample_pos;
@@ -321,22 +380,14 @@ int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, 
 }
 
 extern "C"
-int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim) {
-    const unsigned int size = dim[0]*dim[1]*dim[2]*sizeof(unsigned short);
-
-    cuda_volume_infos.dim.x = dim[0];
-    cuda_volume_infos.dim.y = dim[1];
-    cuda_volume_infos.dim.z = dim[2];
-
-    cuda_volume_infos.dim_r = make_float3(1.0f / (float)dim[0], 1.0f / (float)dim[1], 1.0f / (float)dim[2]);
-
+int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data) {
     cudaChannelFormatDesc channel_desc = cudaCreateChannelDesc(16,0,0,0,cudaChannelFormatKindUnsigned);
     CHECK_CUDA_ERROR;
 
     cudaExtent extent;
-    extent.width = dim[0];
-    extent.height = dim[1];
-    extent.depth = dim[2];
+    extent.width = cuda_volume_infos.dim.x;
+    extent.height = cuda_volume_infos.dim.y;
+    extent.depth = cuda_volume_infos.dim.z;
     cudaMalloc3DArray(&cuda_volume_infos.d_volume_array, &channel_desc, extent);
 
     CHECK_CUDA_ERROR;
@@ -425,10 +476,16 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
 }
 
 extern "C"
-int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array) {
-    cudaMalloc(&ray_cast_infos.d_material_array, 4*sizeof(float)*3);
-    CHECK_CUDA_ERROR; 
-    cudaMemcpy(ray_cast_infos.d_material_array, material_array, 4*sizeof(float)*3, cudaMemcpyHostToDevice);
-    CHECK_CUDA_ERROR; 
+int init_material(cudaRayCastInfos& ray_cast_infos, float* material_array, int mask_level) {
+    cudaMalloc(&ray_cast_infos.d_material_array, mask_level * 9 * sizeof(float));
+    CHECK_CUDA_ERROR;
+    cudaMemcpy(ray_cast_infos.d_material_array, material_array, mask_level * 9 * sizeof(float), cudaMemcpyHostToDevice);
+    CHECK_CUDA_ERROR;
     return 0;
 }
+
+extern "C"
+int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_array) {
+    return init_material(ray_cast_infos, material_array, 1);
+}
+

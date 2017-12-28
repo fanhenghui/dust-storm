@@ -62,7 +62,7 @@ int ray_cast(cudaGLTextureReadOnly& entry_tex, cudaGLTextureReadOnly& exit_tex, 
     cudaVolumeInfos volume_info, cudaRayCastInfos ray_cast_info, unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool d_cpy);
 
 extern "C" 
-int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data, unsigned int* dim);
+int init_data(cudaVolumeInfos& cuda_volume_infos, unsigned short* data);
 
 extern "C" 
 int init_wl_nonmask(cudaRayCastInfos& ray_cast_infos, float* wl_array_norm);
@@ -342,18 +342,18 @@ void init_data() {
     _cuda_volume_infos.dim.x = _volume_data->_dim[0];
     _cuda_volume_infos.dim.y = _volume_data->_dim[1];
     _cuda_volume_infos.dim.z = _volume_data->_dim[2];
+    _cuda_volume_infos.dim_r = make_float3(1.0f / (float)_volume_data->_dim[0], 1.0f / (float)_volume_data->_dim[1], 1.0f / (float)_volume_data->_dim[2]);
+    _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r *
+        make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
+    
 
     if (_volume_data->_data_type == DataType::SHORT) {
         std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
             data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
-        init_data(_cuda_volume_infos, dst_data.get(), _volume_data->_dim);
-        _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r * 
-            make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
+        init_data(_cuda_volume_infos, dst_data.get());
     }
     else {
-        init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer(), _volume_data->_dim);
-        _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r *
-            make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
+        init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer());
     }
 
     //LUT
@@ -363,7 +363,7 @@ void init_data() {
     RGBAUnit background;
     Material material;
 #ifdef WIN32
-    std::string color_opacity_xml = "../../../config/lut/3d/ct_lung_glass.xml";
+    std::string color_opacity_xml = "../../../config/lut/3d/ct_cta.xml";
 #else
     std::string color_opacity_xml = "../config/lut/3d/ct_cta.xml";
 #endif
@@ -394,10 +394,10 @@ void init_data() {
     init_lut_nonmask(_ray_cast_infos, rgba, S_TRANSFER_FUNC_WIDTH);
 
     //Materials
-    float material_array[12] = {
+    float material_array[9] = {
         material.diffuse[0],material.diffuse[1],material.diffuse[2],material.diffuse[3],
         material.specular[0],material.specular[1],material.specular[2],material.specular[3],
-        material.specular_shiness,0,0,0 };
+        material.specular_shiness};
     init_material_nonmask(_ray_cast_infos, material_array);
 
     //WL
@@ -505,6 +505,26 @@ void Display() {
         _entry_exit_points->calculate_entry_exit_points();
 
         //CUDA process
+        //calculate normal matrix
+        std::shared_ptr<CameraCalculator> camera_cal = _volume_infos->get_camera_calculator();
+        const Matrix4 mat_v2w = camera_cal->get_volume_to_world_matrix();
+        const Matrix4 mat_view = _camera->get_view_matrix();
+        const Matrix4 mat_normal = (mat_view * mat_v2w).get_inverse().get_transpose();
+        _ray_cast_infos.mat_normal = matrix4_to_mat4(mat_normal);
+        //calculate light position
+        Point3 eye = _camera->get_eye();
+        Point3 lookat = _camera->get_look_at();
+        Vector3 view = _camera->get_view_direction();
+        const static double max_dim =
+            (std::max)((std::max)(_volume_infos->get_volume()->_dim[0] * _volume_infos->get_volume()->_spacing[0],
+                _volume_infos->get_volume()->_dim[1] * _volume_infos->get_volume()->_spacing[1]),
+                _volume_infos->get_volume()->_dim[2] * _volume_infos->get_volume()->_spacing[2]);
+        const static float magic_num = 1.5f;
+        Point3 light_pos = lookat - view * max_dim * magic_num;
+        light_pos = camera_cal->get_world_to_volume_matrix().transform(light_pos);
+        _ray_cast_infos.light_position = make_float3(light_pos.x, light_pos.y, light_pos.z);
+
+        //ray cast
         ray_cast(_cuda_entry_points, _cuda_exit_points, _width, _height, _cuda_volume_infos, _ray_cast_infos, _cuda_d_canvas, _cuda_canvas_tex, !_show_navigator);
         
         CHECK_GL_ERROR;

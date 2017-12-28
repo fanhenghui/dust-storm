@@ -126,10 +126,13 @@ struct cudaRayCastInfos {
     int mask_level;//8 ->16 ->32 ->64 ->128
     cudaArray* d_lut_array;
     cudaTextureObject_t lut_tex_obj;//cudaTextureType1DArray
-    mat4 mat_normal;
+    mat4 mat_normal;//transpose(inverse(mat_m2v))
+    float3 light_position;
+    float3 ambient_color;//RGB norm
+    float ambient_intensity;//intensity
     float lut_length;//length of one CUDA texture 1D
     float* d_wl_array;//mask_level * 2
-    float* d_material_array;//mask_level * 2 {float4(diffuse) float4(specular) float4(shininess reserve0/1/2)}
+    float* d_material_array;//mask_level * 9float {diffuseRGB&intensity ; sepcular RGB&intensity&shininess}
 
     cudaRayCastInfos() {
         sample_step = 0.5f;
@@ -139,6 +142,8 @@ struct cudaRayCastInfos {
         lut_length = 512;
         d_wl_array = NULL;
         d_material_array = NULL;
+        ambient_color = make_float3(1.0f,1.0f,1.0f);
+        ambient_intensity = 0.3f;
     }
 };
 
