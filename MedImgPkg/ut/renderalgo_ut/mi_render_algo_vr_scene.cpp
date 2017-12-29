@@ -69,7 +69,7 @@ bool _pan_status = false;
 int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
 
-MaskMode _mask_mode = MASK_NONE;
+MaskMode _mask_mode = MASK_MULTI_LABEL;
 
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
@@ -131,7 +131,7 @@ void Init() {
     }
 
     std::set<unsigned char> target_label_set;
-    RunLengthOperator run_length_op;
+    /*RunLengthOperator run_length_op;
     std::ifstream in2(root+"/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle" , std::ios::binary | std::ios::in);
     if (in2.is_open()) {
         in2.seekg (0, in2.end);
@@ -141,7 +141,7 @@ void Init() {
         in2.read((char*)code_buffer ,code_len);
         in2.close();
         unsigned char* mask_target = new unsigned char[data_len];
-        
+
         if(0 == run_length_op.decode(code_buffer , code_len/sizeof(unsigned int) , mask_target , data_len) ) {
             FileUtil::write_raw(root+"./nodule.raw" , mask_target , data_len);
             printf("load target mask done.\n");
@@ -155,7 +155,7 @@ void Init() {
         delete [] mask_target;
     }
 
-    FileUtil::write_raw(root+"/target_mask.raw" , mask_raw, data_len);
+    FileUtil::write_raw(root+"/target_mask.raw" , mask_raw, data_len);*/
 
     _volumeinfos->set_mask(mask_data);
 
@@ -184,12 +184,12 @@ void Init() {
     _time_query = GLResourceManagerContainer::instance()
                   ->get_time_query_manager()
                   ->create_object(uid);
-    //_time_query->initialize();
+    _time_query->initialize();
 
     _time_query2 = GLResourceManagerContainer::instance()
                    ->get_time_query_manager()
                    ->create_object(uid);
-    //_time_query2->initialize();
+    _time_query2->initialize();
 
     // Transfer function
     std::shared_ptr<ColorTransFunc> pseudo_color;
@@ -287,8 +287,8 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-        // _time_query->initialize();
-        // _time_query->begin();
+        //_time_query->initialize();
+        //_time_query->begin();
         _scene->set_dirty(true);
 
         CHECK_GL_ERROR;
@@ -302,10 +302,11 @@ void Display() {
         CHECK_GL_ERROR;
 
         //_time_query2->begin();
-        // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
+         glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
-        /*_scene->download_image_buffer();
-
+        //_scene->set_downsample(true);
+        _scene->download_image_buffer();
+        //_scene->set_downsample(false);
         CHECK_GL_ERROR;
         _scene->swap_image_buffer();
         unsigned char* buffer = nullptr;
@@ -317,19 +318,18 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-#ifdef WIN32
-        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
-#else
-        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-#endif*/
-        // MI_RENDERALGO_LOG(MI_DEBUG) << "compressing time : " << _scene->get_compressing_duration() <<
-        // ", buffer size: " << buffer_size;
+//#ifdef WIN32
+//        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
+//#else
+//        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+//#endif
+         /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
+         ", buffer size: " << buffer_size;*/
 
-        // MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() <<
-        // std::endl;
+         //MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() << std::endl;
 
-        // const double render_time  = _time_query->end();
-        // MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;
+         /*const double render_time  = _time_query->end();
+         MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;*/
 
         glutSwapBuffers();
     } catch (Exception& e) {
@@ -524,7 +524,7 @@ int TE_VRScene(int argc, char* argv[]) {
 
     try {
 
-        Init();
+        //Init();
 
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -549,7 +549,7 @@ int TE_VRScene(int argc, char* argv[]) {
         glutMouseFunc(MouseClick);
         glutMotionFunc(MouseMotion);
 
-        // Init();
+        Init();
 
         glutMainLoop();
 

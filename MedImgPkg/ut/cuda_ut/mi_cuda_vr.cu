@@ -225,11 +225,15 @@ inline __device__ void composite_ext(cudaVolumeInfos* __restrict__ volume_infos,
     float3 sample_norm = sample_pos*volume_infos->dim_r;
     //sample_norm = f3_mul_f3(sample_pos,dim3_r);
 
-    int label = 0;
-    int wl_start = ray_cast_infos->mask_level;
+    int label = access_mask(volume_infos, sample_pos);
+    if (label == 0) {
+        return;
+    }
 
-    float ww = ray_cast_infos->d_wl_array[label*2];
-    float wl = ray_cast_infos->d_wl_array[label*2+1];
+    label = 0;
+    int wl_start = ray_cast_infos->mask_level;
+    float ww = ray_cast_infos->d_wl_array[label * 2];
+    float wl = ray_cast_infos->d_wl_array[label * 2 + 1];
     float min_gray = wl - ww*0.5f;
 
     float gray = tex3D<float>(volume_infos->volume_tex_obj, sample_norm.x, sample_norm.y, sample_norm.z);
@@ -380,10 +384,10 @@ __global__ void kernel_ray_cast_main(cudaTextureObject_t entry_tex, cudaTextureO
     
     //__syncthreads();
     clamp(integral_color,0.0f,1.0f);
-    result[idx*4] = integral_color.x*255;
-    result[idx*4+1] = integral_color.y*255;
-    result[idx*4+2] = integral_color.z*255;
-    result[idx*4+3] = 255;
+    result[idx * 4] = integral_color.x * 255;
+    result[idx * 4 + 1] = integral_color.y * 255;
+    result[idx * 4 + 2] = integral_color.z * 255;
+    result[idx * 4 + 3] = 255;
 }
 
 __global__ void kernel_ray_cast_main_ext(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height, cudaVolumeInfos volume_infos, cudaRayCastInfos ray_cast_infos, unsigned char* __restrict__ result) {
@@ -448,6 +452,7 @@ __global__ void kernel_ray_cast_main_ext(cudaTextureObject_t entry_tex, cudaText
     result[idx * 4 + 1] = integral_color.y * 255;
     result[idx * 4 + 2] = integral_color.z * 255;
     result[idx * 4 + 3] = 255;
+    
 }
 
 
@@ -617,7 +622,7 @@ int init_mask(cudaVolumeInfos& cuda_volume_infos, unsigned char* data) {
     tex_desc.addressMode[2] = cudaAddressModeClamp;
     tex_desc.filterMode = cudaFilterModePoint;
     tex_desc.readMode = cudaReadModeElementType;
-    tex_desc.normalizedCoords = 1;
+    tex_desc.normalizedCoords = 0;
 
     //create texture
     cudaTextureObject_t tex_obj = 0;
@@ -716,6 +721,7 @@ int init_lut_nonmask(cudaRayCastInfos& ray_cast_infos, unsigned char* lut_array,
     //create texture
     cudaCreateTextureObject(&ray_cast_infos.lut_tex_obj[0], &res_desc, &tex_desc, NULL);
 
+    ray_cast_infos.lut_tex_obj[1] = ray_cast_infos.lut_tex_obj[0];
     CHECK_CUDA_ERROR; 
 
     ray_cast_infos.lut_length = lut_length;
@@ -738,3 +744,65 @@ int init_material_nonmask(cudaRayCastInfos& ray_cast_infos, float* material_arra
     return init_material(ray_cast_infos, material_array, 1);
 }
 
+
+
+__global__ void kernel_rgba8_to_rgb8(uint width, uint height, unsigned char* __restrict__ d_rgba, unsigned char* __restrict__ d_rgb) {
+    uint x = blockIdx.x * blockDim.x + threadIdx.x;
+    uint y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x > width || y > height) {
+        return;
+    }
+    uint idx = y*width + x;
+
+    d_rgb[idx * 3] = d_rgba[idx * 4];
+    d_rgb[idx * 3 + 1] = d_rgba[idx * 4 + 1];
+    d_rgb[idx * 3 + 2] = d_rgba[idx * 4 + 2];
+}
+
+extern "C"
+int rgba8_to_rgb8(int width , int height ,  unsigned char*  d_rgba , unsigned char*  d_rgb) {
+    CHECK_CUDA_ERROR;
+
+    const int BLOCKDIM = 16;
+    dim3 block_dim(BLOCKDIM, BLOCKDIM);
+    dim3 grid_dim(width/BLOCKDIM, height/BLOCKDIM);
+    kernel_rgba8_to_rgb8<<<grid_dim , block_dim>>>(width, height, d_rgba, d_rgb);
+
+
+    cudaThreadSynchronize();
+    CHECK_CUDA_ERROR;
+
+    return 0;
+}
+
+__global__ void kernel_rgba8_to_rgb8_mirror(uint width, uint height, unsigned char* __restrict__ d_rgba, unsigned char* __restrict__ d_rgb) {
+    uint x = blockIdx.x * blockDim.x + threadIdx.x;
+    uint y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x > width || y > height) {
+        return;
+    }
+    uint idx = y*width + x;
+    uint idx2 = (height-1-y)*width + x;
+
+    d_rgb[idx * 3] = d_rgba[idx2 * 4];
+    d_rgb[idx * 3 + 1] = d_rgba[idx2 * 4 + 1];
+    d_rgb[idx * 3 + 2] = d_rgba[idx2 * 4 + 2];
+}
+
+extern "C"
+int rgba8_to_rgb8_mirror(int width, int height, unsigned char*  d_rgba, unsigned char*  d_rgb) {
+    CHECK_CUDA_ERROR;
+
+    const int BLOCKDIM = 16;
+    dim3 block_dim(BLOCKDIM, BLOCKDIM);
+    dim3 grid_dim(width / BLOCKDIM, height / BLOCKDIM);
+    kernel_rgba8_to_rgb8_mirror << <grid_dim, block_dim >> >(width, height, d_rgba, d_rgb);
+
+
+    cudaThreadSynchronize();
+    CHECK_CUDA_ERROR;
+
+    return 0;
+}

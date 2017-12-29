@@ -344,6 +344,10 @@ void ProxyGeometryBrick::brick_flitering_mask() {
     const BrickGeometry& brick_geometry = brick_pool->get_brick_geometry();
     VolumeBrickInfo* volume_brick_info = brick_pool->get_volume_brick_info();
     RENDERALGO_CHECK_NULL_EXCEPTION(volume_brick_info);
+    if (_last_vis_labels.empty()) {
+        RENDERALGO_THROW_EXCEPTION("empty visible labels when filter mask brick.");
+    }
+
     MaskBrickInfo* mask_brick_info = brick_pool->get_mask_brick_info(_last_vis_labels);
     RENDERALGO_CHECK_NULL_EXCEPTION(mask_brick_info);
 

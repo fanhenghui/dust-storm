@@ -54,6 +54,7 @@
 
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
+#include "libgpujpeg/gpujpeg_encoder.h"
 
 #include "mi_cuda_vr_common.h"
 
@@ -81,6 +82,12 @@ void ray_tracing_quad_vertex_mapping(Viewport viewport, int width, int height,
     mat4 mat_viewmodel, mat4 mat_projection_inv, mat4 matmvp,
     int vertex_count, float3* d_vertex, float2* d_tex_coordinate, cudaGLTextureReadOnly& mapping_tex,
     unsigned char* d_result, cudaGLTextureWriteOnly& canvas_tex, bool blend);
+
+extern "C"
+int rgba8_to_rgb8(int width, int height, unsigned char* d_rgba, unsigned char* d_rgb);
+
+extern "C"
+int rgba8_to_rgb8_mirror(int width, int height, unsigned char*  d_rgba, unsigned char*  d_rgb);
 
 using namespace medical_imaging;
 
@@ -267,8 +274,16 @@ namespace {
     cudaGLTextureWriteOnly _cuda_canvas_tex;
     cudaGLTextureReadOnly _cuda_entry_points;
     cudaGLTextureReadOnly _cuda_exit_points;
-
+    
+    //Ray tracing navigator
     Navigator _navigator;
+
+    //GPUJPEG for encode result to JPEG
+    gpujpeg_encoder* _gpujpeg_encoder_hd = nullptr;             // jpeg encoder HD
+    gpujpeg_encoder* _gpujpeg_encoder_ld = nullptr;             // jpeg encoder LD
+    gpujpeg_encoder_input _gpujpeg_encoder_input_hd;  // jpeg encoding input HD
+    gpujpeg_encoder_input _gpujpeg_encoder_input_ld;  // jpeg encoding input LD
+
 
     unsigned char* _cuda_d_canvas = nullptr;
 
@@ -284,6 +299,8 @@ namespace {
     std::shared_ptr<GLTexture2D> _tex_entry_points;
 
     bool _show_navigator = true;
+
+    unsigned char* _image_buffer_jpeg = new unsigned char[_width*_height * 4];
 
 
 #ifdef WIN32
@@ -321,6 +338,33 @@ namespace {
     }
 }
 
+void set_wl(cudaRayCastInfos& ray_cast_infos, int mask_level, float* h_wl_array) {
+    if (!ray_cast_infos.d_wl_array) {
+        cudaMalloc(&ray_cast_infos.d_wl_array, sizeof(float)*mask_level*2);
+    }
+    cudaMemcpy(ray_cast_infos.d_wl_array, h_wl_array, sizeof(float)*mask_level*2, cudaMemcpyHostToDevice);
+}
+
+//cudaTextureObject_t create_lut(std::shared_ptr<ColorTransFunc> color, std::shared_ptr<OpacityTransFunc> opacity) {
+//    std::vector<ColorTFPoint> color_pts;
+//    color->set_width(S_TRANSFER_FUNC_WIDTH);
+//    color->get_point_list(color_pts);
+//
+//    std::vector<OpacityTFPoint> opacity_pts;
+//    opacity->set_width(S_TRANSFER_FUNC_WIDTH);
+//    opacity->get_point_list(opacity_pts);
+//
+//    unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * 4];
+//
+//    for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
+//        rgba[i * 4] = static_cast<unsigned char>(color_pts[i].x);
+//        rgba[i * 4 + 1] = static_cast<unsigned char>(color_pts[i].y);
+//        rgba[i * 4 + 2] = static_cast<unsigned char>(color_pts[i].z);
+//        rgba[i * 4 + 3] = static_cast<unsigned char>(opacity_pts[i].a);
+//    }
+//    
+//}
+
 void init_data() {
     Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
@@ -337,27 +381,6 @@ void init_data() {
     DICOMLoader loader;
     loader.load_series(files, _volume_data, _data_header);
     const unsigned int data_len = _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
-    _volume_infos.reset(new VolumeInfos());
-    _volume_infos->set_data_header(_data_header);
-    _volume_infos->set_volume(_volume_data);
-    _volume_infos->refresh();
-
-    _cuda_volume_infos.dim.x = _volume_data->_dim[0];
-    _cuda_volume_infos.dim.y = _volume_data->_dim[1];
-    _cuda_volume_infos.dim.z = _volume_data->_dim[2];
-    _cuda_volume_infos.dim_r = make_float3(1.0f / (float)_volume_data->_dim[0], 1.0f / (float)_volume_data->_dim[1], 1.0f / (float)_volume_data->_dim[2]);
-    _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r *
-        make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
-    
-
-    if (_volume_data->_data_type == DataType::SHORT) {
-        std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
-            data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
-        init_data(_cuda_volume_infos, dst_data.get());
-    }
-    else {
-        init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer());
-    }
 
     //Mask Data
     // Create empty mask
@@ -375,35 +398,36 @@ void init_data() {
     else {
         memset(mask_raw, 1, data_len);
     }
+    
+    _volume_infos.reset(new VolumeInfos());
+    _volume_infos->set_data_header(_data_header);
+    _volume_infos->set_volume(_volume_data);
+    _volume_infos->set_mask(mask_data);
+    std::vector<unsigned char> visible_labels;
+    visible_labels.push_back(1);
+    _volume_infos->get_brick_pool()->add_visible_labels_cache(visible_labels);
+    _volume_infos->refresh();
 
-    std::set<unsigned char> target_label_set;
-    RunLengthOperator run_length_op;
-    std::ifstream in2(root + "/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle", std::ios::binary | std::ios::in);
-    if (in2.is_open()) {
-        in2.seekg(0, in2.end);
-        const int code_len = in2.tellg();
-        in2.seekg(0, in2.beg);
-        unsigned int *code_buffer = new unsigned int[code_len];
-        in2.read((char*)code_buffer, code_len);
-        in2.close();
-        unsigned char* mask_target = new unsigned char[data_len];
+    _cuda_volume_infos.dim.x = _volume_data->_dim[0];
+    _cuda_volume_infos.dim.y = _volume_data->_dim[1];
+    _cuda_volume_infos.dim.z = _volume_data->_dim[2];
+    _cuda_volume_infos.dim_r = make_float3(1.0f / (float)_volume_data->_dim[0], 1.0f / (float)_volume_data->_dim[1], 1.0f / (float)_volume_data->_dim[2]);
+    _cuda_volume_infos.sample_shift = 0.5f *  _cuda_volume_infos.dim_r *
+        make_float3(_volume_data->_spacing[0], _volume_data->_spacing[1], _volume_data->_spacing[2]);
+    
 
-        if (0 == run_length_op.decode(code_buffer, code_len / sizeof(unsigned int), mask_target, data_len)) {
-            FileUtil::write_raw(root + "./nodule.raw", mask_target, data_len);
-            printf("load target mask done.\n");
-            for (unsigned int i = 0; i < data_len; ++i) {
-                if (mask_target[i] != 0) {
-                    mask_raw[i] = mask_target[i] + 1;
-                    target_label_set.insert(mask_target[i] + 1);
-                }
-            }
-        }
-        delete[] mask_target;
+    //Create CUDA Texture
+    if (_volume_data->_data_type == DataType::SHORT) {
+        std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
+            data_len, _volume_data->get_min_scalar(), _volume_data->get_pixel_pointer());
+        init_data(_cuda_volume_infos, dst_data.get());
     }
-
-    FileUtil::write_raw(root + "/target_mask.raw", mask_raw, data_len);
-
+    else {
+        init_data(_cuda_volume_infos, (unsigned short*)_volume_data->get_pixel_pointer());
+    }
     init_mask(_cuda_volume_infos, (unsigned char*)mask_data->get_pixel_pointer());
+
+    
 
     //LUT
     std::shared_ptr<ColorTransFunc> color;
@@ -483,6 +507,9 @@ void init_gl() {
     _entry_exit_points->set_proxy_geometry(PG_BRICKS);
     _entry_exit_points->set_camera(_camera);
     _entry_exit_points->set_camera_calculator(camera_cal);
+    std::vector<unsigned char> visible_labels;
+    visible_labels.push_back(1);
+    _entry_exit_points->set_visible_labels(visible_labels);
 
     std::shared_ptr<ImageData> volume = _volume_infos->get_volume();
     _entry_exit_points->set_volume_data(volume);
@@ -495,8 +522,8 @@ void init_gl() {
     _entry_exit_points->set_bounding_box(default_aabb);
     _entry_exit_points->set_brick_pool(_volume_infos->get_brick_pool());
 
-    _entry_exit_points->set_brick_filter_item(BF_WL);
-    _entry_exit_points->set_window_level(_ww, _wl, 0, true);
+    _entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
+    _entry_exit_points->set_window_level(_ww, _wl, 1);
 
     _tex_entry_points = _entry_exit_points->get_entry_points_texture();
 
@@ -540,7 +567,82 @@ void init_gl() {
     if (cudaSuccess != cudaMalloc(&_cuda_d_canvas, _width*_height * 4)) {
         MI_LOG(MI_ERROR) << "[CUDA] " << "malloc canvas device memory failed.";
     }
+}
 
+void init_gpujpeg() {
+    //gpujpeg_init_device(0,0);
+
+    const int _compress_hd_quality = 80;
+    const int _compress_ld_quality = 15;
+
+    gpujpeg_parameters gpujpeg_param_hd;
+    gpujpeg_set_default_parameters(&gpujpeg_param_hd);        //默认参数
+    gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_hd); //默认采样参数;
+    gpujpeg_param_hd.quality = _compress_hd_quality;
+
+    gpujpeg_parameters gpujpeg_param_ld;
+    gpujpeg_set_default_parameters(&gpujpeg_param_ld);        //默认参数
+    gpujpeg_parameters_chroma_subsampling(&gpujpeg_param_ld); //默认采样参数;
+    gpujpeg_param_ld.quality = _compress_ld_quality;
+
+    gpujpeg_image_parameters gpujpeg_image_param;
+    gpujpeg_image_set_default_parameters(&gpujpeg_image_param);
+    gpujpeg_image_param.width = _width;
+    gpujpeg_image_param.height = _height;
+    gpujpeg_image_param.comp_count = 3;
+    gpujpeg_image_param.color_space = GPUJPEG_RGB;
+    gpujpeg_image_param.sampling_factor = GPUJPEG_4_4_4;
+
+    _gpujpeg_encoder_hd = gpujpeg_encoder_create(&gpujpeg_param_hd, &gpujpeg_image_param);
+    _gpujpeg_encoder_ld = gpujpeg_encoder_create(&gpujpeg_param_ld, &gpujpeg_image_param);
+    gpujpeg_image_destroy(_gpujpeg_encoder_input_hd.image);
+    gpujpeg_image_destroy(_gpujpeg_encoder_input_ld.image);
+
+    _gpujpeg_encoder_input_ld.type = GPUJPEG_ENCODER_INPUT_INTERNAL_BUFFER;
+    _gpujpeg_encoder_input_hd.type = GPUJPEG_ENCODER_INPUT_INTERNAL_BUFFER;
+}
+
+inline void jpeg_encode(unsigned char* d_array_rgba8, bool downsample) {
+    if (downsample) {
+        unsigned char* rgb = (unsigned char*)gpujpeg_encoder_get_inner_device_image_data(_gpujpeg_encoder_ld);
+        rgba8_to_rgb8_mirror(_width, _height, d_array_rgba8, rgb);
+
+        uint8_t* image_compressed = nullptr;
+        int image_compressed_size = 0;
+        if(0 !=  gpujpeg_encoder_encode(_gpujpeg_encoder_ld, &_gpujpeg_encoder_input_ld,
+            &image_compressed, &image_compressed_size) ) {
+            MI_LOG(MI_ERROR) << "GPUJPEG encode failed.";
+            return;
+        }
+
+        memcpy((char*)_image_buffer_jpeg, image_compressed, image_compressed_size);
+//#ifdef WIN32
+//        FileUtil::write_raw("D:/temp/cuda_output_ut_ld.jpeg", image_compressed, image_compressed_size);
+//#else
+//        FileUtil::write_raw("/home/wangrui22/data/cuda_output_ut_ld.jpeg", image_compressed, image_compressed_size);
+//#endif
+    }
+    else {
+        unsigned char* rgb = (unsigned char*)gpujpeg_encoder_get_inner_device_image_data(_gpujpeg_encoder_hd);
+        rgba8_to_rgb8_mirror(_width, _height, d_array_rgba8, rgb);
+
+        uint8_t* image_compressed = nullptr;
+        int image_compressed_size = 0;
+        if (0 != gpujpeg_encoder_encode(_gpujpeg_encoder_hd, &_gpujpeg_encoder_input_hd,
+            &image_compressed, &image_compressed_size)) {
+            MI_LOG(MI_ERROR) << "GPUJPEG encode failed.";
+            return;
+        }
+
+        memcpy((char*)_image_buffer_jpeg, image_compressed, image_compressed_size);
+//#ifdef WIN32
+//        FileUtil::write_raw("D:/temp/cuda_output_ut_hd.jpeg", image_compressed, image_compressed_size);
+//#else
+//        FileUtil::write_raw("/home/wangrui22/data/cuda_output_ut_hd.jpeg", image_compressed, image_compressed_size);
+//#endif
+    }
+
+    
 }
 
 void Display() {
@@ -586,6 +688,8 @@ void Display() {
             _navigator.set_vr_camera(_camera);
             _navigator.render(view_port, _width, _height, _cuda_d_canvas, _cuda_canvas_tex);
         }
+
+        jpeg_encode(_cuda_d_canvas, true);
 
         glViewport(0, 0, _width, _height);
         glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -690,6 +794,7 @@ int mi_cuda_vr(int argc, char* argv[]) {
 
         init_data();
         init_gl();
+        init_gpujpeg();
 
         glutDisplayFunc(Display);
         glutReshapeFunc(Resize);

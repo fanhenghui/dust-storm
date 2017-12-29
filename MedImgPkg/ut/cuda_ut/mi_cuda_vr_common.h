@@ -28,6 +28,8 @@ if (err != cudaSuccess) {\
     " line: " << __LINE__ << std::endl; \
 }}\
 
+#define MAX_MASK_LEVEL 128
+
 class CudaMemShield {
 public:
     CudaMemShield() {
@@ -165,7 +167,7 @@ struct cudaRayCastInfos {
     float sample_step;
     int mask_level;//1(non-mask)->8 ->16 ->32 ->64 ->128
     cudaArray* d_lut_array;
-    cudaTextureObject_t lut_tex_obj[128];//cudaTextureType1DArray
+    cudaTextureObject_t lut_tex_obj[MAX_MASK_LEVEL];//cudaTextureType1DArray
     mat4 mat_normal;//transpose(inverse(mat_m2v))
     float3 light_position;
     float3 ambient_color;//RGB norm
@@ -179,6 +181,7 @@ struct cudaRayCastInfos {
         mask_level = 1;
         d_lut_array = NULL;
         //lut_tex_obj = NULL;
+        memset(lut_tex_obj , 0 , sizeof(cudaTextureObject_t)*MAX_MASK_LEVEL);
         lut_length = 512;
         d_wl_array = NULL;
         d_material_array = NULL;

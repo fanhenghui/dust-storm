@@ -9,7 +9,11 @@
 
 #include "boost/thread/mutex.hpp"
 
-#ifndef WIN32
+//#ifndef WIN32
+#define GPUJPEG
+//#endif
+
+#ifdef GPUJPEG
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
 #endif
@@ -49,7 +53,7 @@ public:
     virtual void set_downsample(bool flag);
     bool get_downsample() const;
 
-#ifndef WIN32
+#ifdef GPUJPEG
     void set_compress_hd_quality(int quality = 80);
     void set_compress_ld_quality(int quality = 15);
     float get_compressing_duration() const;
@@ -82,7 +86,7 @@ protected:
     int _compress_hd_quality;
     int _compress_ld_quality;
 
-#ifndef WIN32
+#ifdef GPUJPEG
     // GPU JPEG
     gpujpeg_opengl_texture* _gpujpeg_texture;      // input gpujpeg texture
     gpujpeg_encoder* _gpujpeg_encoder_hd;             // jpeg encoder HD

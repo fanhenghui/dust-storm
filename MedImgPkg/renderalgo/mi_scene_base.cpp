@@ -7,7 +7,7 @@
 #include "glresource/mi_gl_time_query.h"
 #include "util/mi_file_util.h"
 
-#ifndef WIN32
+#ifdef GPUJPEG
 #include "libgpujpeg/gpujpeg_encoder_internal.h"
 #endif
 
@@ -26,7 +26,7 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _compress_hd_quality = 80;
     _compress_ld_quality  = 15;
 
-#ifndef WIN32
+#ifdef GPUJPEG
     // init gpujepg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
@@ -49,7 +49,7 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
     _compress_hd_quality = 80;
     _compress_ld_quality  = 15;
 
-#ifndef WIN32
+#ifdef GPUJPEG
     // init gpujepg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
@@ -136,7 +136,7 @@ void SceneBase::initialize() {
 
         CHECK_GL_ERROR;
 
-#ifndef WIN32
+#ifdef GPUJPEG
         // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in multi-scene)
         gpujpeg_init_device(0, 0);
 
@@ -216,7 +216,7 @@ void SceneBase::set_display_size(int width, int height) {
         GL_DEPTH_COMPONENT16, _width, _height, 0, GL_DEPTH_COMPONENT,
         GL_UNSIGNED_SHORT, nullptr);
 
-#ifndef WIN32
+#ifdef GPUJPEG
     _gpujpeg_encoder_dirty = true;
 #endif
     set_dirty(true);
@@ -244,7 +244,7 @@ bool SceneBase::get_dirty() const {
 }
 
 void SceneBase::pre_render() {
-#ifndef WIN32
+#ifdef GPUJPEG
     if (_gpujpeg_encoder_hd && _gpujpeg_encoder_dirty) {
         //release previous
         gpujpeg_opengl_texture_unregister(_gpujpeg_texture);
@@ -306,7 +306,7 @@ const std::string& SceneBase::get_name() const {
 
 void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
     boost::mutex::scoped_lock locker(_write_mutex);
-#ifndef WIN32
+#ifdef GPUJPEG
     if (jpeg) 
     {
         uint8_t* image_compressed = nullptr;
@@ -318,6 +318,8 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
         CHECK_GL_ERROR;
 
         _gl_time_query->begin();
+
+        CHECK_GL_ERROR;
 
         int err = 0;
         if (_downsample) {
@@ -409,7 +411,7 @@ bool SceneBase::get_downsample() const {
     return _downsample;
 }
 
-#ifndef WIN32
+#ifdef GPUJPEG
 float SceneBase::get_compressing_duration() const
 {
     return _gpujpeg_encoding_duration;

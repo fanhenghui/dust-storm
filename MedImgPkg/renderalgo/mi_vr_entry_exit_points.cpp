@@ -103,7 +103,7 @@ void VREntryExitPoints::set_clipping_plane(std::vector<Plane> planes) {
     // TODO vr cull logic
 }
 
-void VREntryExitPoints::set_visible_labels(std::vector<unsigned char>& labels) {
+void VREntryExitPoints::set_visible_labels(const std::vector<unsigned char>& labels) {
     _vis_labels = labels;
 }
 
