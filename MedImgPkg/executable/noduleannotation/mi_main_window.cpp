@@ -1091,8 +1091,8 @@ void NoduleAnnotation::slot_save_nodule_file_i()
     }
 
     QString file_name = NoduleAnnoConfig::instance()->get_nodule_file_rsa() ?
-        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw)")) :
-        QFileDialog::getSaveFileName(this, tr("Save Nodule") , QString(_volume_infos->get_data_header()->series_uid.c_str()), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , (NoduleAnnoConfig::instance()->get_last_open_direction() + "/" +_volume_infos->get_data_header()->series_uid).c_str(), tr("NoduleSet(*.nraw)")) :
+        QFileDialog::getSaveFileName(this, tr("Save Nodule") , (NoduleAnnoConfig::instance()->get_last_open_direction() + "/" +_volume_infos->get_data_header()->series_uid).c_str(), tr("NoduleSet(*.nraw);;NoduleSet(*.csv)"));
 
     if (!file_name.isEmpty())
     {
