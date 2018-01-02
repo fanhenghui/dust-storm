@@ -49,3 +49,10 @@ PACSServerHost = 192.168.199.107
 PACSServerPort = 11112
 PACSClientAETitle = DBS
 PACSClientPort = 11115
+
+#NoduleAnotation config(work on windows)
+ProcessingUnit = GPU
+DoubleClickInterval = 300
+#hidden option
+NoduleOutput = TEXT
+LastOpenDirection = D:\

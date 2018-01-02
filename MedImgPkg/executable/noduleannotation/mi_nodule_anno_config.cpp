@@ -4,6 +4,7 @@
 
 #include "io/mi_configure.h"
 #include "util/mi_string_number_converter.h"
+#include "mi_nodule_anno_logger.h"
 
 using namespace medical_imaging;
 
@@ -102,43 +103,65 @@ void NoduleAnnoConfig::finalize()
         return;
     }
 
-    std::ofstream output_file(_config_file.c_str() , std::ios::out);    
-    if (output_file.is_open()) {
-
-        output_file << "ProcessingUnit = ";
-        if (Configure::instance()->get_processing_unit_type() == CPU) {
-            output_file << "CPU\n";
-        } else {
-            output_file << "GPU\n";
-        }
-
-        if (this->get_nodule_file_rsa()) {
-            //output_file << "NoduleOutput = ";
-            //output_file << "RSA\n";
-        } else {
-            output_file << "NoduleOutput = ";
-            output_file << "TEXT\n";
-        }
-
-        output_file<< "LastOpenDirection = " << _last_open_direction << std::endl; 
-
-        output_file << "PresetCTAbdomenWW = " << _preset_windowing[CT_ABDOMEN].first << std::endl;
-        output_file << "PresetCTAbdomenWL = " << _preset_windowing[CT_ABDOMEN].second << std::endl;
-        output_file << "PresetCTLungsWW = " << _preset_windowing[CT_LUNGS].first << std::endl;
-        output_file << "PresetCTLungsWL = " << _preset_windowing[CT_LUNGS].second << std::endl;
-        output_file << "PresetCTBrainWW = " << _preset_windowing[CT_BRAIN].first << std::endl;
-        output_file << "PresetCTBrainWL = " << _preset_windowing[CT_BRAIN].second << std::endl;
-        output_file << "PresetCTAngioWW = " << _preset_windowing[CT_ANGIO].first << std::endl;
-        output_file << "PresetCTAngioWL = " << _preset_windowing[CT_ANGIO].second << std::endl;
-        output_file << "PresetCTBoneWW = " << _preset_windowing[CT_BONE].first << std::endl;
-        output_file << "PresetCTBoneWL = " << _preset_windowing[CT_BONE].second << std::endl;
-        output_file << "PresetCTChestWW = " << _preset_windowing[CT_CHEST].first << std::endl;
-        output_file << "PresetCTChestWL = " << _preset_windowing[CT_CHEST].second << std::endl;
-
-        output_file << "DoubleClickInterval = " << _double_click_interval << std::endl;
-
-        output_file.close();
+    //read again
+    std::fstream input_file(_config_file.c_str() , std::ios::in);   
+    if (!input_file.is_open())  {
+        MI_NODULEANNO_LOG(MI_ERROR) << "update configure file failed 1.";
+        return;
     }
+    std::string line;
+    std::vector<std::string> lines;
+    while(std::getline(input_file,line)) {
+        lines.push_back(line);
+    }
+    input_file.close();
+
+    //update LastOpenDirection , Preset WL. and write back 
+    std::ofstream output_file(_config_file.c_str() , std::ios::out);    
+    if (!output_file.is_open()) {
+        MI_NODULEANNO_LOG(MI_ERROR) << "update configure file failed 2.";
+        return;
+    }
+    std::string tag, equal, context;
+    for (int i=0; i<lines.size(); ++i) {
+        if (lines[i].empty() || lines[i][0] == '#') {
+            output_file << lines[i] << std::endl;
+            continue;
+        }
+        std::stringstream ss(lines[i]);
+        ss >> tag >> equal >> context;
+        
+        if (tag == "LastOpenDirection") {
+            output_file<< "LastOpenDirection = " << _last_open_direction << std::endl; 
+        } else if (tag == "PresetCTAbdomenWW") {
+            output_file << "PresetCTAbdomenWW = " << _preset_windowing[CT_ABDOMEN].first << std::endl;
+        } else if (tag == "PresetCTAbdomenWL") {
+            output_file << "PresetCTAbdomenWL = " << _preset_windowing[CT_ABDOMEN].second << std::endl;
+        } else if (tag == "PresetCTLungsWW") {
+            output_file << "PresetCTLungsWW = " << _preset_windowing[CT_LUNGS].first << std::endl;
+        } else if (tag == "PresetCTLungsWL") {
+            output_file << "PresetCTLungsWL = " << _preset_windowing[CT_LUNGS].second << std::endl;
+        } else if (tag == "PresetCTBrainWW") {
+            output_file << "PresetCTBrainWW = " << _preset_windowing[CT_BRAIN].first << std::endl;
+        } else if (tag == "PresetCTBrainWL") {
+            output_file << "PresetCTBrainWL = " << _preset_windowing[CT_BRAIN].second << std::endl;
+        } else if (tag == "PresetCTAngioWW") {
+            output_file << "PresetCTAngioWW = " << _preset_windowing[CT_ANGIO].first << std::endl;
+        } else if (tag == "PresetCTAngioWL") {
+            output_file << "PresetCTAngioWL = " << _preset_windowing[CT_ANGIO].second << std::endl;
+        } else if (tag == "PresetCTBoneWW") {
+            output_file << "PresetCTBoneWW = " << _preset_windowing[CT_BONE].first << std::endl;
+        } else if (tag == "PresetCTBoneWL") {
+            output_file << "PresetCTBoneWL = " << _preset_windowing[CT_BONE].second << std::endl;
+        } else if (tag == "PresetCTChestWW") {
+            output_file << "PresetCTChestWW = " << _preset_windowing[CT_CHEST].first << std::endl;
+        } else if (tag == "PresetCTChestWL") {
+            output_file << "PresetCTChestWL = " << _preset_windowing[CT_CHEST].second << std::endl;
+        } else {
+            output_file << lines[i] << std::endl;
+        }
+    }
+    output_file.close();
 }
 
 NoduleAnnoConfig::NoduleAnnoConfig() {

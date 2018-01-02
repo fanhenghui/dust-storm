@@ -49,7 +49,7 @@ private:
     bool _is_nodule_file_rsa;
     std::map<PreSetWLType , std::pair<float , float>> _preset_windowing;
     std::string _last_open_direction;
-    int _double_click_interval; 
+    int _double_click_interval;
 };
 
 #endif
