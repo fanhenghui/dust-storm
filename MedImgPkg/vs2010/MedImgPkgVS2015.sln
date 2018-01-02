@@ -65,6 +65,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgUtil", "MedImgUtil.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgIO_UT", "MedImgIO_UT.vcxproj", "{42E32450-189A-42D6-AD62-CBB3D2B691B5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MedImgCudaResource", "MedImgCudaResource.vcxproj", "{AB44033A-28DB-4292-A629-F6B27FCFC415}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CUDA_Debug|x64 = CUDA_Debug|x64
@@ -153,6 +155,14 @@ Global
 		{42E32450-189A-42D6-AD62-CBB3D2B691B5}.Debug|x64.Build.0 = Debug|x64
 		{42E32450-189A-42D6-AD62-CBB3D2B691B5}.Release|x64.ActiveCfg = Release|x64
 		{42E32450-189A-42D6-AD62-CBB3D2B691B5}.Release|x64.Build.0 = Release|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.CUDA_Debug|x64.ActiveCfg = Debug|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.CUDA_Debug|x64.Build.0 = Debug|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.CUDA_Release|x64.ActiveCfg = Release|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.CUDA_Release|x64.Build.0 = Release|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.Debug|x64.ActiveCfg = Debug|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.Debug|x64.Build.0 = Debug|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.Release|x64.ActiveCfg = Release|x64
+		{AB44033A-28DB-4292-A629-F6B27FCFC415}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
