@@ -15,12 +15,17 @@ struct IntensityInfo {
     double var;
     double std;
 
-    IntensityInfo() : num(0), min(0), max(0), mean(0), var(0), std(0) {};
+    IntensityInfo() : num(0), mean(0), var(0), std(0) {
+        min = 0;
+        max = 0;
+    };
 
     IntensityInfo(unsigned int num0, double min0, double max0, double mean0,
                   double var0, double std0)
-        : num(num0), min(min0), max(max0), mean(mean0), var(var0),
-          std(std0) {};
+        : num(num0), mean(mean0), var(var0),std(std0) {
+        min = min0;
+        max = max0;
+    };
 };
 
 bool Arithmetic_Export operator==(const IntensityInfo& l,
