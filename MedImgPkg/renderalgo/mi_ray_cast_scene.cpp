@@ -426,7 +426,8 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
         }
     }
 
-    if (_volume_infos) {
+    if (_volume_infos && !labels.empty()) {
+        //here can't update empty visibile labels(none-mask)
         _volume_infos->get_brick_pool()->add_visible_labels_cache(labels);
     }
 
