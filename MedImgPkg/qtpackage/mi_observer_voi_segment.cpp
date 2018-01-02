@@ -383,12 +383,12 @@ void VOISegmentObserver::segment(const Ellipsoid& ellipsoid , const AABBUI& aabb
 {
     std::shared_ptr<ImageData> volume_data = _volume_infos->get_volume();
     std::shared_ptr<ImageData> mask_data = _volume_infos->get_mask();
-    const DataType data_type = volume_data->_data_type;
 
     unsigned int begin[3] = {0,0,0};
     unsigned int end[3] = {0,0,0};
     ArithmeticUtils::get_valid_region(volume_data->_dim, ellipsoid, begin, end);
 
+    const DataType data_type = volume_data->_data_type;
     switch(data_type)
     {
     case SHORT:
@@ -407,7 +407,7 @@ void VOISegmentObserver::segment(const Ellipsoid& ellipsoid , const AABBUI& aabb
             cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             cd_analy.set_dim(volume_data->_dim);
             cd_analy.set_target_label(label);
-            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.set_roi(aabb._min , aabb._max, nullptr);
             cd_analy.keep_major();
             break;
         }
@@ -427,7 +427,7 @@ void VOISegmentObserver::segment(const Ellipsoid& ellipsoid , const AABBUI& aabb
             cd_analy.set_mask_ref((unsigned char*)mask_data->get_pixel_pointer());
             cd_analy.set_dim(volume_data->_dim);
             cd_analy.set_target_label(label);
-            cd_analy.set_roi(aabb._min , aabb._max);
+            cd_analy.set_roi(aabb._min , aabb._max, nullptr);
             cd_analy.keep_major();
 
             break;

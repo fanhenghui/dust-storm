@@ -156,7 +156,12 @@ void ConnectedDomainAnalysis::keep_major() {
                     _mask_ref[idx1] = _target_label;
                     ++curidx;
                 } else {
-                    _mask_ref[idx1] = _roi_cache_original_mask[idx0];
+                    if (_roi_cache_original_mask) {
+                        _mask_ref[idx1] = _roi_cache_original_mask[idx0];
+                    } else {
+                        _mask_ref[idx1] = 0;
+                    }
+                    
                 }
 
             }
