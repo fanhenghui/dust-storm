@@ -18,5 +18,17 @@
     <ClCompile Include="..\ut\io_ut\mi_io_ut.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\ut\io_ut\mi_pacs_ut.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ut\io_ut\mi_targa_ut.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ut\io_ut\mi_dicom_loader_ut.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ut\ai_ut\mi_md5_ut.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

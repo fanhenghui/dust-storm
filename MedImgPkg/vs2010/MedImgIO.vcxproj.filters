@@ -77,6 +77,9 @@
     <ClInclude Include="..\include\io\mi_targa_parser.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\io\mi_md5.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\io\mi_zlib_utils.cpp">
@@ -122,6 +125,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\io\mi_configure.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\io\mi_md5.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

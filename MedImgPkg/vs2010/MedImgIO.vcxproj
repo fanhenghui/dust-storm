@@ -26,6 +26,7 @@
     <ClInclude Include="..\include\io\mi_io_logger.h" />
     <ClInclude Include="..\include\io\mi_jpeg_parser.h" />
     <ClInclude Include="..\include\io\mi_mask_voi_converter.h" />
+    <ClInclude Include="..\include\io\mi_md5.h" />
     <ClInclude Include="..\include\io\mi_meta_object_loader.h" />
     <ClInclude Include="..\include\io\mi_nodule_set.h" />
     <ClInclude Include="..\include\io\mi_nodule_set_parser.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="..\io\mi_image_data.cpp" />
     <ClCompile Include="..\io\mi_jpeg_parser.cpp" />
     <ClCompile Include="..\io\mi_mask_voi_converter.cpp" />
+    <ClCompile Include="..\io\mi_md5.cpp" />
     <ClCompile Include="..\io\mi_meta_object_loader.cpp" />
     <ClCompile Include="..\io\mi_nodule_set_parser.cpp" />
     <ClCompile Include="..\io\mi_pacs_communicator.cpp" />

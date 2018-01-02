@@ -11,7 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ut\ai_ut\mi_md5_ut.cpp" />
+    <ClCompile Include="..\ut\io_ut\mi_dicom_loader_ut.cpp" />
     <ClCompile Include="..\ut\io_ut\mi_io_ut.cpp" />
+    <ClCompile Include="..\ut\io_ut\mi_pacs_ut.cpp" />
+    <ClCompile Include="..\ut\io_ut\mi_targa_ut.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{42E32450-189A-42D6-AD62-CBB3D2B691B5}</ProjectGuid>
@@ -65,7 +69,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -86,7 +90,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;netapi32.lib;wsock32.lib;ws2_32.lib;oflog.lib;ofstd.lib;MedImgLog.lib;MedImgUtil.lib;MedImgArithmetic.lib;MedImgIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
