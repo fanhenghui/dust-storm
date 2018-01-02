@@ -80,13 +80,15 @@ public:
             }
         }
 
-        _roi_cache_original_mask.reset(new unsigned char[_roi_dim[0]*_roi_dim[1]*_roi_dim[2]]);
-        for (unsigned int z = 0  ; z < _roi_dim[2] ; ++z) {
-            for (unsigned int y = 0 ; y < _roi_dim[1] ; ++y) {
-                int zz = z + _min[2];
-                int yy = y + _min[1];
-                memcpy(_roi_cache_original_mask.get() + z * _roi_dim[0]*_roi_dim[1] + y * _roi_dim[0],
-                    original_mask + zz * _dim[0]*_dim[1] + yy * _dim[0] + _min[0] , _roi_dim[0]);
+        if (original_mask) {
+            _roi_cache_original_mask.reset(new unsigned char[_roi_dim[0]*_roi_dim[1]*_roi_dim[2]]);
+            for (unsigned int z = 0  ; z < _roi_dim[2] ; ++z) {
+                for (unsigned int y = 0 ; y < _roi_dim[1] ; ++y) {
+                    int zz = z + _min[2];
+                    int yy = y + _min[1];
+                    memcpy(_roi_cache_original_mask.get() + z * _roi_dim[0]*_roi_dim[1] + y * _roi_dim[0],
+                        original_mask + zz * _dim[0]*_dim[1] + yy * _dim[0] + _min[0] , _roi_dim[0]);
+                }
             }
         }
 
