@@ -57,7 +57,6 @@ int _ww;
 int _wl;
 
 std::shared_ptr<GLTimeQuery> _time_query;
-std::shared_ptr<GLTimeQuery> _time_query2;
 
 int _width = 1024;
 int _height = 1024;
@@ -91,7 +90,6 @@ void Finalize() {
     _volumeinfos.reset();
     _scene.reset();
     _time_query.reset();
-    _time_query2.reset();
 }
 
 void Init() {
@@ -185,11 +183,6 @@ void Init() {
                   ->get_time_query_manager()
                   ->create_object(uid);
     _time_query->initialize();
-
-    _time_query2 = GLResourceManagerContainer::instance()
-                   ->get_time_query_manager()
-                   ->create_object(uid);
-    _time_query2->initialize();
 
     // Transfer function
     std::shared_ptr<ColorTransFunc> pseudo_color;
@@ -301,12 +294,14 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-        //_time_query2->begin();
+        // download result
+#ifdef GPUJPEG
          glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
         //_scene->set_downsample(true);
         _scene->download_image_buffer();
         //_scene->set_downsample(false);
+
         CHECK_GL_ERROR;
         _scene->swap_image_buffer();
         unsigned char* buffer = nullptr;
@@ -318,18 +313,17 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-//#ifdef WIN32
-//        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
-//#else
-//        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-//#endif
+#ifdef WIN32
+        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
+#else
+        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+#endif
          /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
          ", buffer size: " << buffer_size;*/
 
-         //MI_RENDERALGO_LOG(MI_TRACE) << "gl compressing time : " << _time_query2->end() << std::endl;
-
          /*const double render_time  = _time_query->end();
          MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;*/
+#endif
 
         glutSwapBuffers();
     } catch (Exception& e) {

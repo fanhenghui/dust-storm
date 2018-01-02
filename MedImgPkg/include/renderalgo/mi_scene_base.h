@@ -9,10 +9,6 @@
 
 #include "boost/thread/mutex.hpp"
 
-//#ifndef WIN32
-#define GPUJPEG
-//#endif
-
 #ifdef GPUJPEG
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
