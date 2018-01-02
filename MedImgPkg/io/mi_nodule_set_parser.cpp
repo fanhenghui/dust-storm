@@ -160,7 +160,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
     nodule_set->clear_nodule();
     for (auto it = items.begin(); it != items.end(); ++it) {
         const InnerItem& item = *it;
-        VOISphere voi(Point3(item.cx, item.cy, item.cz), item.diameter, item.type);\
+        VOISphere voi(Point3(item.cx, item.cy, item.cz), item.diameter, item.type);
         voi.probability = item.probability;
         nodule_set->add_nodule(voi);
     }
@@ -273,7 +273,7 @@ IOStatus NoduleSetParser::load_as_rsa_binary(const std::string& file_path,
             }
 
             size_t j = 0;
-            for (; j < 512 && j < _series_id.size(); ++i) {
+            for (; j < 512 && j < _series_id.size(); ++j) {
                 if (nodule_unit.series_id[j] == '\0' ||
                         nodule_unit.series_id[j] != _series_id[j]) {
                     break;
