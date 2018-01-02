@@ -78,17 +78,17 @@ void RayCaster::render() {
                 const double para0 = 1.5;
                 const double para1 = 1.6;
                 if (_pre_rendering_duration > 0 ) {
-                    const double exp_fps = static_cast<double>(_expected_fps);
+                    const double exp_fps = (double)_expected_fps;
                     const double pre_fps = 1000.0/_pre_rendering_duration;
                     if (pre_fps < exp_fps) {
                         if (pre_fps < exp_fps/para1) {
                             if (_map_quarter_canvas) {
-                                _sample_rate = _sample_rate*para0;
+                                _sample_rate = (float)(_sample_rate*para0);
                             } else {
                                 _map_quarter_canvas = true;
                             }
                         } else {
-                            _sample_rate = _sample_rate*para0;
+                            _sample_rate = (float)(_sample_rate*para0);
                         }
                     }
                 }
