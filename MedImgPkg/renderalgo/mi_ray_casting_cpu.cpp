@@ -382,6 +382,7 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
         ray_caster->get_visible_labels();
     const std::map<unsigned char, RGBAUnit>& mask_overlay_color =
         ray_caster->get_mask_overlay_color();
+    const float overlay_opacity = ray_caster->get_mask_overlay_opacity();
 
 #ifndef _DEBUG
     #pragma omp parallel for
@@ -435,8 +436,8 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
         }
 
         // 3 Apply mask overlay color
-        Vector3f current_color(0, 0, 0);
-        float current_alpha = 0;
+        RGBAUnit& previous_rgba = _canvas_array[idx];
+        Vector3f current_color((float)previous_rgba.r, (float)previous_rgba.g, (float)previous_rgba.b);
 
         for (auto it = visible_labels.begin(); it != visible_labels.end(); ++it) {
             unsigned char vis_label = *it;
@@ -447,19 +448,13 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
                 if (it != mask_overlay_color.end()) {
                     Vector3f label_color((float)it->second.r, (float)it->second.g,
                                          (float)it->second.b);
-                    float label_alpha = (float)it->second.a / 255.0f;
 
-                    current_color += label_color * ((1 - current_alpha) * label_alpha);
-                    current_alpha += (1 - current_alpha) * label_alpha;
+                    current_color = current_color*(1.0f - overlay_opacity) + label_color * overlay_opacity;
                 }
             }
         }
 
-        // 4 Blend
-        RGBAUnit& previous_rgba = _canvas_array[idx];
-        current_color = Vector3f((float)previous_rgba.r, (float)previous_rgba.g,
-                                 (float)previous_rgba.b) + current_color * current_alpha;
-
+        // 4 Clmap
         RGBAUnit current_rgba;
         current_rgba.r = current_color._m[0] > 255.0f
                          ? 255
