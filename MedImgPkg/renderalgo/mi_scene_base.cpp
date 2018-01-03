@@ -27,7 +27,7 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _compress_ld_quality  = 15;
 
 #ifdef GPUJPEG
-    // init gpujepg parameter
+    // init gpujpeg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;
@@ -50,7 +50,7 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
     _compress_ld_quality  = 15;
 
 #ifdef GPUJPEG
-    // init gpujepg parameter
+    // init gpujpeg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;

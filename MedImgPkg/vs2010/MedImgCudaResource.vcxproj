@@ -11,12 +11,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\cudaresource\mi_cuda_texture.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_device_memory.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_gl_texture_2d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_1d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_2d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_3d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_base.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_device_memory.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_gl_texture_2d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_object.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_export.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_logger.h" />
-    <ClInclude Include="..\include\cudaresource\mi_cuda_texture.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_2d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_3d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_base.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AB44033A-28DB-4292-A629-F6B27FCFC415}</ProjectGuid>
@@ -58,13 +71,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;MEDIMGCUDARESOURCE_EXPORTS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;..\Include\cudaresource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;MedImgLog.lib;MedImgGLResource.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
     </Link>
@@ -82,7 +95,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;MEDIMGCUDARESOURCE_EXPORTS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Include\;..\Include\Ext;..\Include\cudaresource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -90,7 +103,7 @@ copy "$(CudaToolkitBinDir)\cudart*.dll" "$(OutDir)"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;MedImgLog.lib;MedImgGLResource.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Lib\$(Configuration)\$(Platform)\;..\Lib\$(Configuration)\$(Platform)\Ext;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>..\Lib\$(Configuration)\$(Platform)\$(TargetName).lib</ImportLibrary>
     </Link>

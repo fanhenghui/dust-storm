@@ -121,6 +121,9 @@
     <ClInclude Include="..\include\renderalgo\mi_graphic_object_navigator.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_gpu_image_compressor.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Include">
@@ -234,6 +237,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_graphic_object_navigator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_gpu_image_compressor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -68,6 +68,9 @@
     <ClInclude Include="..\include\util\mi_socket_server.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\util\mi_uid.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\util\mi_message_queue.inl">

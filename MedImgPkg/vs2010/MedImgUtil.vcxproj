@@ -108,6 +108,7 @@
     <ClInclude Include="..\include\util\mi_socket_list.h" />
     <ClInclude Include="..\include\util\mi_socket_server.h" />
     <ClInclude Include="..\include\util\mi_string_number_converter.h" />
+    <ClInclude Include="..\include\util\mi_uid.h" />
     <ClInclude Include="..\include\util\mi_util_export.h" />
     <ClInclude Include="..\include\util\mi_util_logger.h" />
   </ItemGroup>

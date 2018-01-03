@@ -1,17 +1,17 @@
-#ifndef MEDIMGRESOURCE_GL_OBJECT_H_
-#define MEDIMGRESOURCE_GL_OBJECT_H_
+#ifndef MED_IMG_CUDARESOUECE_MI_CUDA_OBJECT_H
+#define MED_IMG_CUDARESOUECE_MI_CUDA_OBJECT_H
 
-#include "GL/glew.h"
-#include "boost/thread/mutex.hpp"
-#include "glresource/mi_gl_resource_export.h"
+#include <string>
+#include "cudaresource/mi_cuda_resource_export.h"
 #include "util/mi_uid.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-class GLObject {
+class CUDAResource_Export CudaObject {
 public:
-    explicit GLObject(UIDType uid) : m_uid(uid) {}
-    virtual  ~GLObject() {}
+    explicit CudaObject(UIDType uid, const std::string& type) : m_uid(uid), m_type(type) {}
+    virtual ~CudaObject() {}
+
     UIDType get_uid() const {
         return m_uid;
     }
@@ -32,12 +32,12 @@ public:
         _description = des;
     }
 
-    friend std::ostream& operator << (std::ostream& strm ,const GLObject& obj) {
+    friend std::ostream& operator << (std::ostream& strm, const CudaObject& obj) {
         strm << "GLOBJ type: " << obj.get_type() << ", uid: " << obj.get_uid() << ", des: " << obj.get_description();
         return strm;
     }
 
-    friend std::ostream& operator << (std::ostream& strm ,const std::shared_ptr<GLObject>& obj) {
+    friend std::ostream& operator << (std::ostream& strm, const std::shared_ptr<CudaObject>& obj) {
         strm << "GLOBJ type: " << obj->get_type() << ", uid: " << obj->get_uid() << ", des: " << obj->get_description();
         return strm;
     }
@@ -52,5 +52,4 @@ private:
 };
 
 MED_IMG_END_NAMESPACE
-
 #endif

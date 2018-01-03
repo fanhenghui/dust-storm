@@ -1,7 +1,7 @@
 
 template <class ResourceType>
 GLResourceManager<ResourceType>::GLResourceManager()
-    : _uid_generator(new GLUIDGenerator()) {}
+    : _uid_generator(new UIDGenerator()) {}
 
 template <class ResourceType> void GLResourceManager<ResourceType>::update() {
     boost::unique_lock<boost::mutex> locker(_mutex);

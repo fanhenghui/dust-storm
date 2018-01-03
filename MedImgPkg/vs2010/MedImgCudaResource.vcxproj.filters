@@ -12,7 +12,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\cudaresource\mi_cuda_texture.cpp">
+    <ClCompile Include="..\cudaresource\mi_cuda_device_memory.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_base.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_2d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_3d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_1d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_utils.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_gl_texture_2d.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -23,7 +41,28 @@
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_logger.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\cudaresource\mi_cuda_texture.h">
+    <ClInclude Include="..\include\cudaresource\mi_cuda_device_memory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_base.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_3d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_object.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_gl_texture_2d.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

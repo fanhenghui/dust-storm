@@ -31,7 +31,7 @@ public:
 private:
     std::map<UIDType, std::shared_ptr<ResourceType>> _objects;
     std::vector<std::shared_ptr<ResourceType>> _discard;
-    std::unique_ptr<GLUIDGenerator> _uid_generator;
+    std::unique_ptr<UIDGenerator> _uid_generator;
     boost::mutex _mutex;
 };
 
