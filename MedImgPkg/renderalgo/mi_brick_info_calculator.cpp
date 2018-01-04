@@ -5,14 +5,34 @@
 #include "glresource/mi_gl_texture_3d.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "cudaresource/mi_cuda_resource_manager.h"
+#include "cudaresource/mi_cuda_device_memory.h"
+
 #include "io/mi_image_data.h"
 
 #include "mi_shader_collection.h"
 
+#include <vector_types.h>
+#include <cuda_runtime.h>
+
 MED_IMG_BEGIN_NAMESPACE
 
-BrickInfoCalculator::BrickInfoCalculator()
-    : _info_array(nullptr), _brick_size(16), _brick_margin(2) {
+//-------------------------------------------------//
+//CUDA method
+extern "C"
+cudaError_t cuda_calculate_volume_brick_info(cudaTextureObject_t volume_tex, dim3 volume_dim, float volume_min_scalar,
+    int brick_size, dim3 brick_dim, dim3 brick_margin, VolumeBrickInfo* d_data);
+
+extern "C"
+cudaError_t cuda_calculate_mask_brick_info(cudaTextureObject_t mask_tex, dim3 mask_dim,
+    int brick_size, dim3 brick_dim, dim3 brick_margin,
+    dim3 brick_range_min, dim3 brick_range_dim,
+    int* d_visible_lables, int visible_label_count,
+    MaskBrickInfo* d_data);
+//-------------------------------------------------//
+
+BrickInfoCalculator::BrickInfoCalculator(GPUPlatform p)
+    : _gpu_platform(p), _info_array(nullptr), _brick_size(16), _brick_margin(2) {
     _brick_dim[0] = 1;
     _brick_dim[1] = 1;
     _brick_dim[2] = 1;
@@ -36,11 +56,11 @@ void BrickInfoCalculator::set_brick_info_array(char* info_array) {
     _info_array = info_array;
 }
 
-void BrickInfoCalculator::set_brick_info_buffer(GLBufferPtr info_buffer) {
+void BrickInfoCalculator::set_brick_info_buffer(GPUMemoryPairPtr info_buffer) {
     _info_buffer = info_buffer;
 }
 
-void BrickInfoCalculator::set_data_texture(GLTexture3DPtr tex) {
+void BrickInfoCalculator::set_data_texture(GPUTexture3DPairPtr tex) {
     _img_texture = tex;
 }
 
@@ -48,26 +68,40 @@ void BrickInfoCalculator::set_data(std::shared_ptr<ImageData> img) {
     _img_data = img;
 }
 
-VolumeBrickInfoCalculator::VolumeBrickInfoCalculator() {}
+VolumeBrickInfoCalculator::VolumeBrickInfoCalculator(GPUPlatform p):BrickInfoCalculator(p) {}
 
 VolumeBrickInfoCalculator::~VolumeBrickInfoCalculator() {}
 
 void VolumeBrickInfoCalculator::calculate() {
     initialize();
-    calculate_gpu();
-    download();
+
+    if (GL_BASE == _gpu_platform) {
+        calculate_gl();
+        download_gl();
+    } else {
+        calculate_cuda();
+        download_cuda();
+    }
 }
 
-void VolumeBrickInfoCalculator::download() {
-    _info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-    _info_buffer->bind();
-    _info_buffer->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
+void VolumeBrickInfoCalculator::calculate_cuda() {
+    //TODO CUDA
+}
+
+void VolumeBrickInfoCalculator::download_cuda() {
+    //TODO CUDA
+}
+
+void VolumeBrickInfoCalculator::download_gl() {
+    _info_buffer->get_gl_resource()->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+    _info_buffer->get_gl_resource()->bind();
+    _info_buffer->get_gl_resource()->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
                            sizeof(VolumeBrickInfo),
                            _info_array);
-    _info_buffer->unbind();
+    _info_buffer->get_gl_resource()->unbind();
 }
 
-void VolumeBrickInfoCalculator::calculate_gpu() {
+void VolumeBrickInfoCalculator::calculate_gl() {
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_data);
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_texture);
     RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
@@ -111,13 +145,13 @@ void VolumeBrickInfoCalculator::calculate_gpu() {
 
     glProgramUniform1f(program_id, VOLUME_REGULATE_PARAMETER, volume_reg_param);
 
-    _img_texture->bind();
+    _img_texture->get_gl_resource()->bind();
     glActiveTexture(GL_TEXTURE0);
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_3D, GL_LINEAR);
     glProgramUniform1i(program_id, VOLUME_TEXTURE, 0);
 
-    _info_buffer->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
+    _info_buffer->get_gl_resource()->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                    BRICK_VOLUME_INFO_BUFFER);
 
     const unsigned int local_group_size[3] = {
@@ -153,52 +187,50 @@ void VolumeBrickInfoCalculator::calculate_gpu() {
 }
 
 void VolumeBrickInfoCalculator::initialize() {
-    if (nullptr == _gl_program) {
-        UIDType uid;
-        _gl_program = GLResourceManagerContainer::instance()
-                      ->get_program_manager()
-                      ->create_object(uid);
-        _gl_program->set_description("volume brick info calculator program");
-        _gl_program->initialize();
+    if (GL_BASE == _gpu_platform) {
+        if (nullptr == _gl_program) {
+            UIDType uid;
+            _gl_program = GLResourceManagerContainer::instance()
+                ->get_program_manager()
+                ->create_object(uid);
+            _gl_program->set_description("volume brick info calculator program");
+            _gl_program->initialize();
 
-        std::vector<GLShaderInfo> shaders;
-        shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_VOLUME,
-                                       "brick info cal volume compute shader"));
-        shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_UTILS,
-                                       "brick info cal utils compute shader"));
-        _gl_program->set_shaders(shaders);
-        _gl_program->compile();
+            std::vector<GLShaderInfo> shaders;
+            shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_VOLUME,
+                "brick info cal volume compute shader"));
+            shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_UTILS,
+                "brick info cal utils compute shader"));
+            _gl_program->set_shaders(shaders);
+            _gl_program->compile();
 
-        _res_shield.add_shield<GLProgram>(_gl_program);
+            _res_shield.add_shield<GLProgram>(_gl_program);
+        }
+    } else {
+        //TODO CUDA
     }
 }
 
-MaskBrickInfoCalculator::MaskBrickInfoCalculator() {}
+MaskBrickInfoCalculator::MaskBrickInfoCalculator(GPUPlatform p) :BrickInfoCalculator(p) {}
 
 MaskBrickInfoCalculator::~MaskBrickInfoCalculator() {}
 
 void MaskBrickInfoCalculator::update(const AABBUI& aabb) {
     initialize();
-    update_gpu(aabb);
-    download();
+
+    if (GL_BASE == _gpu_platform) {
+        update_gl(aabb);
+        download_gl();
+    } else {
+        update_cuda(aabb);
+        download_cuda();
+    }
+    
 }
 
 void MaskBrickInfoCalculator::calculate() {
     initialize();
-    calculate_gpu();
-    download();
-}
 
-void MaskBrickInfoCalculator::download() {
-    _info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-    _info_buffer->bind();
-    _info_buffer->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
-                           sizeof(MaskBrickInfo),
-                           _info_array);
-    _info_buffer->unbind();
-}
-
-void MaskBrickInfoCalculator::calculate_gpu() {
     AABBUI aabb;
     aabb._min[0] = 0;
     aabb._min[1] = 0;
@@ -208,10 +240,34 @@ void MaskBrickInfoCalculator::calculate_gpu() {
     aabb._max[1] = _img_data->_dim[1];
     aabb._max[2] = _img_data->_dim[2];
 
-    this->update_gpu(aabb);
+    if (GL_BASE == _gpu_platform) {
+        update_gl(aabb);
+        download_gl();
+    }
+    else {
+        update_cuda(aabb);
+        download_cuda();
+    }
 }
 
-void MaskBrickInfoCalculator::update_gpu(const AABBUI& aabb) {
+void MaskBrickInfoCalculator::download_cuda() {
+    //TODO CUDA
+}
+
+void MaskBrickInfoCalculator::update_cuda(const AABBUI& aabb) {
+    //TODO CUDA
+}
+
+void MaskBrickInfoCalculator::download_gl() {
+    _info_buffer->get_gl_resource()->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+    _info_buffer->get_gl_resource()->bind();
+    _info_buffer->get_gl_resource()->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
+                           sizeof(MaskBrickInfo),
+                           _info_array);
+    _info_buffer->get_gl_resource()->unbind();
+}
+
+void MaskBrickInfoCalculator::update_gl(const AABBUI& aabb) {
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_data);
     RENDERALGO_CHECK_NULL_EXCEPTION(_img_texture);
     RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
@@ -248,13 +304,13 @@ void MaskBrickInfoCalculator::update_gpu(const AABBUI& aabb) {
                        static_cast<GLint>(_img_data->_dim[1]),
                        static_cast<GLint>(_img_data->_dim[2]));
 
-    _img_texture->bind();
+    _img_texture->get_gl_resource()->bind();
     glActiveTexture(GL_TEXTURE0);
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_3D, GL_NEAREST);
     glProgramUniform1i(program_id, MASK_TEXTURE, 0);
 
-    _info_buffer->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
+    _info_buffer->get_gl_resource()->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                    BRICK_MASK_INFO_BUFFER);
 
     glProgramUniform3i(program_id, BRICK_RANGE_MIN, aabb._min[0], aabb._min[1],
@@ -311,32 +367,39 @@ void MaskBrickInfoCalculator::update_gpu(const AABBUI& aabb) {
 }
 
 void MaskBrickInfoCalculator::initialize() {
-    if (nullptr == _gl_program) {
-        UIDType uid;
-        _gl_program = GLResourceManagerContainer::instance()
-                      ->get_program_manager()
-                      ->create_object(uid);
-        _gl_program->set_description("mask brick info calculator program");
-        _gl_program->initialize();
+    if (GL_BASE == _gpu_platform) {
+        if (nullptr == _gl_program) {
+            UIDType uid;
+            _gl_program = GLResourceManagerContainer::instance()
+                ->get_program_manager()
+                ->create_object(uid);
+            _gl_program->set_description("mask brick info calculator program");
+            _gl_program->initialize();
 
-        std::vector<GLShaderInfo> shaders;
-        shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_MASK,
-                                       "brick info cal mask compute shader"));
-        shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_UTILS,
-                                       "brick info cal utils compute shader"));
-        _gl_program->set_shaders(shaders);
-        _gl_program->compile();
+            std::vector<GLShaderInfo> shaders;
+            shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_MASK,
+                "brick info cal mask compute shader"));
+            shaders.push_back(GLShaderInfo(GL_COMPUTE_SHADER, S_BRICK_INFO_CAL_UTILS,
+                "brick info cal utils compute shader"));
+            _gl_program->set_shaders(shaders);
+            _gl_program->compile();
 
-        _gl_buffer_visible_labels = GLResourceManagerContainer::instance()
-                                    ->get_buffer_manager()
-                                    ->create_object(uid);
-        _gl_buffer_visible_labels->set_description(
-            "visible label buffer count in mask brick info calculator program");
-        _gl_buffer_visible_labels->initialize();
-        _gl_buffer_visible_labels->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+            _gl_buffer_visible_labels = GLResourceManagerContainer::instance()
+                ->get_buffer_manager()
+                ->create_object(uid);
+            _gl_buffer_visible_labels->set_description(
+                "visible label buffer in mask brick info calculator program");
+            _gl_buffer_visible_labels->initialize();
+            _gl_buffer_visible_labels->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
 
-        _res_shield.add_shield<GLProgram>(_gl_program);
-        _res_shield.add_shield<GLBuffer>(_gl_buffer_visible_labels);
+            _res_shield.add_shield<GLProgram>(_gl_program);
+            _res_shield.add_shield<GLBuffer>(_gl_buffer_visible_labels);
+        }
+    } else {
+        //TODO CUDA
+        if (nullptr == _cuda_memory) {
+            _cuda_memory = CudaResourceManager::instance()->create_device_memory("visible label memory in mask brick info calculator program");
+        }
     }
 }
 

@@ -27,8 +27,8 @@ public:
     void set_volume(std::shared_ptr<ImageData> image_data);
     void set_mask(std::shared_ptr<ImageData> mask_data);
 
-    void set_volume_texture(GLTexture3DPtr tex);
-    void set_mask_texture(GLTexture3DPtr tex);
+    void set_volume_texture(GPUTexture3DPairPtr tex);
+    void set_mask_texture(GPUTexture3DPairPtr tex);
 
     unsigned int get_brick_size() const;
     unsigned int get_brick_margin() const;
@@ -71,8 +71,8 @@ private:
 
     std::shared_ptr<ImageData> _volume;
     std::shared_ptr<ImageData> _mask;
-    GLTexture3DPtr _volume_texture;
-    GLTexture3DPtr _mask_texture;
+    GPUTexture3DPairPtr _volume_texture;
+    GPUTexture3DPairPtr _mask_texture;
 
     unsigned int _brick_size;
     unsigned int _brick_margin;
@@ -82,11 +82,11 @@ private:
     BrickGeometry _brick_geometry; // For GL rendering
 
     std::unique_ptr<VolumeBrickInfo[]> _volume_brick_info_array;
-    GLBufferPtr _volume_brick_info_buffer;
+    GPUMemoryPairPtr _volume_brick_info_buffer;
 
     std::map<LabelKey, std::unique_ptr<MaskBrickInfo[]>>
             _mask_brick_info_array_set;
-    std::map<LabelKey, GLBufferPtr> _mask_brick_info_buffer_set;
+    std::map<LabelKey, GPUMemoryPairPtr> _mask_brick_info_buffer_set;
 
     GLResourceShield _res_shield;
 

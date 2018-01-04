@@ -125,6 +125,9 @@
     <None Include="..\renderalgo\shader\vr_entry_exit_points.vert" />
     <None Include="..\renderalgo\shader\vr_entry_exit_points_culling.glsl" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\renderalgo\kernel\kernel_brick_info_calculator.cu" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF3C3577-A42A-42C9-9C19-AF2DA66448C2}</ProjectGuid>
     <RootNamespace>MedImgRenderAlgorithm</RootNamespace>

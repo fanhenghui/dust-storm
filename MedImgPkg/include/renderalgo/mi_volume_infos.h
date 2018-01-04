@@ -35,8 +35,8 @@ public:
 
     std::shared_ptr<CameraCalculator> get_camera_calculator();
 
-    std::vector<GLTexture3DPtr> get_volume_texture();
-    std::vector<GLTexture3DPtr> get_mask_texture();
+    GPUTexture3DPairPtr get_volume_texture();
+    GPUTexture3DPairPtr get_mask_texture();
 
     std::shared_ptr<ImageData> get_volume();
     std::shared_ptr<ImageData> get_mask();
@@ -64,8 +64,9 @@ private:
 
     std::shared_ptr<ImageData> _cache_original_mask;//cache for recover
 
-    std::vector<GLTexture3DPtr> _volume_textures; // P.S here use vector for separate volume later
-    std::vector<GLTexture3DPtr> _mask_textures;
+    // P.S here will use vector for separate volume later
+    GPUTexture3DPairPtr _volume_texture; 
+    GPUTexture3DPairPtr _mask_texture;
 
     std::shared_ptr<BrickPool> _brick_pool;
 

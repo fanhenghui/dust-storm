@@ -2,9 +2,12 @@
 
 #include <fstream>
 
+#include "glresource/mi_gl_buffer.h"
+#include "cudaresource/mi_cuda_resource_manager.h"
+#include "cudaresource/mi_cuda_device_memory.h"
+
 #include "io/mi_configure.h"
 #include "io/mi_image_data.h"
-#include "glresource/mi_gl_buffer.h"
 
 #include "mi_brick_info_calculator.h"
 #include "mi_render_algo_logger.h"
@@ -16,8 +19,8 @@ BrickPool::BrickPool(GPUPlatform p, unsigned int brick_size , unsigned int brick
     _brick_size(brick_size),
     _brick_margin(brick_margin),
     _brick_count(0),
-    _volume_brick_info_cal(new VolumeBrickInfoCalculator()),
-    _mask_brick_info_cal(new MaskBrickInfoCalculator()) {
+    _volume_brick_info_cal(new VolumeBrickInfoCalculator(p)),
+    _mask_brick_info_cal(new MaskBrickInfoCalculator(p)) {
     _brick_dim[0] = 1;
     _brick_dim[1] = 1;
     _brick_dim[2] = 1;
@@ -35,11 +38,11 @@ void BrickPool::set_mask(std::shared_ptr<ImageData> image_data) {
     _mask = image_data;
 }
 
-void BrickPool::set_volume_texture(GLTexture3DPtr tex) {
+void BrickPool::set_volume_texture(GPUTexture3DPairPtr tex) {
     _volume_texture = tex;
 }
 
-void BrickPool::set_mask_texture(GLTexture3DPtr tex) {
+void BrickPool::set_mask_texture(GPUTexture3DPairPtr tex) {
     _mask_texture = tex;
 }
 
@@ -62,20 +65,29 @@ unsigned int BrickPool::get_brick_margin() const {
 void BrickPool::calculate_volume_brick_info() {
     if (nullptr == _volume_brick_info_array) {
         _volume_brick_info_array.reset(new VolumeBrickInfo[this->get_brick_count()]);
-        UIDType uid;
-        _volume_brick_info_buffer =
-            GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        _volume_brick_info_buffer->set_description("volume brick info buffer");
-        _volume_brick_info_buffer->initialize();
-        _volume_brick_info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-        _volume_brick_info_buffer->bind();
-        _volume_brick_info_buffer->load(this->get_brick_count()*sizeof(VolumeBrickInfo) , NULL ,
-                                        GL_STATIC_DRAW);
-        _volume_brick_info_buffer->unbind();
-
-        _res_shield.add_shield<GLBuffer>(_volume_brick_info_buffer);
     }
 
+    if (GL_BASE == _gpu_platform) {
+        if (nullptr == _volume_brick_info_buffer) {
+            UIDType uid;
+            GLBufferPtr buf = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+            buf->set_description("volume brick info buffer");
+            buf->initialize();
+            buf->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+            buf->bind();
+            buf->load(this->get_brick_count() * sizeof(VolumeBrickInfo), NULL, GL_STATIC_DRAW);
+            buf->unbind();
+            _res_shield.add_shield<GLBuffer>(buf);
+
+            _volume_brick_info_buffer.reset(new GPUMemoryPair(buf));
+        }
+    } else {
+        //TODO CUDA
+        if (nullptr == _volume_brick_info_buffer) {
+
+        }
+    }
+    
     _volume_brick_info_cal->set_data(_volume);
     _volume_brick_info_cal->set_data_texture(_volume_texture);
     _volume_brick_info_cal->set_brick_info_array((char*)_volume_brick_info_array.get());
@@ -84,6 +96,12 @@ void BrickPool::calculate_volume_brick_info() {
     _volume_brick_info_cal->set_brick_margin(_brick_margin);
     _volume_brick_info_cal->set_brick_dim(_brick_dim);
     _volume_brick_info_cal->calculate();
+
+    //Delete GPU memory
+    if (GL_BASE == _gpu_platform) {
+        _res_shield.remove_shield(_volume_brick_info_buffer->get_gl_resource());
+    }
+    _volume_brick_info_buffer = nullptr;
 }
 
 VolumeBrickInfo* BrickPool::get_volume_brick_info() const {
@@ -137,6 +155,7 @@ std::vector<std::vector<unsigned char>> BrickPool::get_stored_visible_labels() {
 
 void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_labels) {
     MI_RENDERALGO_LOG(MI_TRACE) << "IN brick pool calculate mask brick info";
+
     LabelKey key(vis_labels);
     MaskBrickInfo* brick_info = this->get_mask_brick_info(vis_labels);
 
@@ -145,18 +164,20 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
         brick_info = info_array.get();
         _mask_brick_info_array_set.insert(std::make_pair(key, std::move(info_array)));
 
-        UIDType uid;
-        GLBufferPtr info_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-        info_buffer->set_description("mask brick info buffer " + key.key);
-        info_buffer->initialize();
-        info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
-        info_buffer->bind();
-        info_buffer->load(this->get_brick_count()*sizeof(MaskBrickInfo) , NULL , GL_STATIC_DRAW);
-        info_buffer->unbind();
-
-        _mask_brick_info_buffer_set.insert(std::make_pair(key, info_buffer));
-
-        _res_shield.add_shield<GLBuffer>(info_buffer);
+        if (GL_BASE == _gpu_platform) {
+            UIDType uid;
+            GLBufferPtr info_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
+            info_buffer->set_description("mask brick info buffer " + key.key);
+            info_buffer->initialize();
+            info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
+            info_buffer->bind();
+            info_buffer->load(this->get_brick_count() * sizeof(MaskBrickInfo), NULL, GL_STATIC_DRAW);
+            info_buffer->unbind();
+            _res_shield.add_shield<GLBuffer>(info_buffer);
+            _mask_brick_info_buffer_set.insert(std::make_pair(key, GPUMemoryPairPtr(new GPUMemoryPair(info_buffer))));
+        } else {
+            //TODO CUDA
+        }
     }
 
     _mask_brick_info_cal->set_data(_mask);
@@ -168,6 +189,7 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
     _mask_brick_info_cal->set_brick_dim(_brick_dim);
     _mask_brick_info_cal->set_visible_labels(vis_labels);
     _mask_brick_info_cal->calculate();
+
     MI_RENDERALGO_LOG(MI_TRACE) << "OUT brick pool calculate mask brick info";
 }
 
@@ -236,8 +258,11 @@ void BrickPool::remove_mask_brick_info(const std::vector<unsigned char>& vis_lab
         _mask_brick_info_buffer_set.erase(it_buffer);
 
         //release resource immediately
-        _res_shield.remove_shield<GLBuffer>(it_buffer->second);
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it_buffer->second);
+        if (GL_BASE == _gpu_platform) {
+            _res_shield.remove_shield<GLBuffer>(it_buffer->second->get_gl_resource());
+            GLResourceManagerContainer::instance()->get_buffer_manager()->
+                remove_object(it_buffer->second->get_gl_resource());
+        }
     }
 }
 
@@ -247,8 +272,11 @@ void BrickPool::remove_all_mask_brick_info() {
     for (auto it_buffer = _mask_brick_info_buffer_set.begin() ;
             it_buffer != _mask_brick_info_buffer_set.end() ; ++it_buffer) {
         //release resource immediately
-        _res_shield.remove_shield<GLBuffer>(it_buffer->second);
-        GLResourceManagerContainer::instance()->get_buffer_manager()->remove_object(it_buffer->second);
+        if (GL_BASE == _gpu_platform) {
+            _res_shield.remove_shield<GLBuffer>(it_buffer->second->get_gl_resource());
+            GLResourceManagerContainer::instance()->get_buffer_manager()->
+                remove_object(it_buffer->second->get_gl_resource());
+        }
     }
 
     _mask_brick_info_buffer_set.clear();
@@ -298,7 +326,7 @@ void BrickPool::calculate_brick_geometry() {
         }
     }
 
-    //set vertex coordinate as color (not nomalized)
+    //set vertex coordinate as color (not normalized)
     for (unsigned int i = 0; i < vertex_count ; ++i) {
         color_array[i * 4] = vertex_array[i * 3];
         color_array[i * 4 + 1] = vertex_array[i * 3 + 1];

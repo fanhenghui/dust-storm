@@ -42,6 +42,10 @@ typedef GPUResourcePair<GLTexture1D, CudaTexture1D> GPUTexture1DPair;
 typedef GPUResourcePair<GLTexture3D, CudaTexture3D> GPUTexture3DPair;
 typedef GPUResourcePair<GLBuffer, CudaDeviceMemory> GPUMemoryPair;
 
+typedef std::shared_ptr<GPUTexture1DPair> GPUTexture1DPairPtr;
+typedef std::shared_ptr<GPUTexture3DPair> GPUTexture3DPairPtr;
+typedef std::shared_ptr<GPUMemoryPair> GPUMemoryPairPtr;
+
 MED_IMG_END_NAMESPACE
 
 #endif
