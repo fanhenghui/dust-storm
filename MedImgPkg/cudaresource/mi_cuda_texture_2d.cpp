@@ -22,6 +22,11 @@ void CudaTexture2D::finalize() {
 
 }
 
+float CudaTexture2D::memory_used() const {
+    return _width*_height*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+}
+
+
 int CudaTexture2D::load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int width, int height,  void* data) {
     //malloc and load, or update all
     if (_cuda_array) {

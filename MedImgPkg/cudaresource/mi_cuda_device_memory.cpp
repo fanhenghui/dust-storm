@@ -23,6 +23,14 @@ void CudaDeviceMemory::finalize() {
     }
 }
 
+float CudaDeviceMemory::memory_used() const {
+    if (_d_array) {
+        return _size/1024.0f;
+    } else {
+        return 0.0f;
+    }
+}
+
 void CudaDeviceMemory::load(size_t size, const void* h_array) {
     if (_d_array) {
         if (_size == size) {
@@ -30,8 +38,7 @@ void CudaDeviceMemory::load(size_t size, const void* h_array) {
                 cudaMemcpy(_d_array, h_array, size, cudaMemcpyHostToDevice);
             }
             return;
-        }
-        else {
+        } else {
             cudaFree(_d_array);
             _d_array = nullptr;
             _size = 0;

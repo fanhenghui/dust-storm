@@ -33,6 +33,12 @@
     <ClCompile Include="..\cudaresource\mi_cuda_gl_texture_2d.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_resource_manager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_object.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_export.h">
@@ -63,6 +69,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cudaresource\mi_cuda_gl_texture_2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_resource_manager.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

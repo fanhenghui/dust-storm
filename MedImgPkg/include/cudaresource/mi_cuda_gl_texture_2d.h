@@ -15,6 +15,7 @@ public:
     virtual ~CudaGLTexture2D();
 
     virtual void finalize();
+    virtual float memory_used() const;
 
     int register_gl_texture(std::shared_ptr<GLTexture2D> tex, cudaGraphicsRegisterFlags register_flag);
 

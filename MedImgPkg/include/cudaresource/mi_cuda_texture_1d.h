@@ -12,6 +12,7 @@ public:
     virtual ~CudaTexture1D();
     
     virtual void finalize();
+    virtual float memory_used() const;
 
     int load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int length, void* data);
 

@@ -21,6 +21,10 @@ void CudaTexture1D::finalize() {
     
 }
 
+float CudaTexture1D::memory_used() const {
+    return _length*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+}
+
 int CudaTexture1D::load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int length, void* data) {
     //malloc and load, or update all
     if (_cuda_array) {

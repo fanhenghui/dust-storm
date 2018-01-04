@@ -5,6 +5,7 @@
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_texture.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_vr.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_simple_ray_tracing.cu" />
+    <CudaCompile Include="..\ut\cuda_ut\mi_cuda_test_resource.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ut\cuda_ut\mi_cuda_texture.cpp" />

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="..\ut\cuda_ut\mi_cuda_test_resource.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_vr.cu" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_ut.cpp" />
     <CudaCompile Include="..\ut\cuda_ut\mi_cuda_texture.cu" />

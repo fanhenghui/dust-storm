@@ -27,6 +27,10 @@ void CudaGLTexture2D::finalize() {
     }
 }
 
+float CudaGLTexture2D::memory_used() const {
+    return _width*_height*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+}
+
 cudaTextureObject_t CudaGLTexture2D::create_object(
     cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
     cudaTextureReadMode read_mode, bool normalized_coords) {

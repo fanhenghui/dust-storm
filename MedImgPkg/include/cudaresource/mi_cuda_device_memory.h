@@ -13,6 +13,7 @@ public:
 
     virtual void initialize();
     virtual void finalize();
+    virtual float memory_used() const;
 
     void load(size_t size, const void* h_array);
     void download(void* h_array, size_t size);
