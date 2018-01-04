@@ -16,6 +16,7 @@
     <ClCompile Include="..\cudaresource\mi_cuda_object.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_resource_manager.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_1d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_texture_1d_array.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_2d.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_3d.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_base.cpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_logger.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_manager.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d_array.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_2d.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_3d.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_base.h" />

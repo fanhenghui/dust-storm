@@ -8,11 +8,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CUDAResource_Export CUDATextureBase : public CudaObject
+class CUDAResource_Export CudaTextureBase : public CudaObject
 {
 public:
-    CUDATextureBase(UIDType uid, const std::string& type);
-    virtual ~CUDATextureBase();
+    CudaTextureBase(UIDType uid, const std::string& type);
+    virtual ~CudaTextureBase();
 
     virtual void initialize();
     virtual void finalize();
@@ -29,7 +29,7 @@ protected:
     std::map<int, cudaTextureObject_t> _tex_objs;
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(CUDATextureBase);
+    DISALLOW_COPY_AND_ASSIGN(CudaTextureBase);
 };
 
 MED_IMG_END_NAMESPACE

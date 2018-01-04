@@ -30,6 +30,8 @@ public:
 private:
     struct InnerParams;
     std::unique_ptr<InnerParams> _inner_param;
+private:
+    DISALLOW_COPY_AND_ASSIGN(CudaObject);
 };
 
 inline std::ostream& operator << (std::ostream& strm, const CudaObject& obj) {

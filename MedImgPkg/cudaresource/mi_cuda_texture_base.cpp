@@ -4,19 +4,19 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-CUDATextureBase::CUDATextureBase(UIDType uid, const std::string& type): CudaObject(uid, type), _cuda_array(nullptr){
+CudaTextureBase::CudaTextureBase(UIDType uid, const std::string& type): CudaObject(uid, type), _cuda_array(nullptr){
 
 }
 
-CUDATextureBase::~CUDATextureBase() {
+CudaTextureBase::~CudaTextureBase() {
     finalize();
 }
 
-void CUDATextureBase::initialize() {
+void CudaTextureBase::initialize() {
 
 }
 
-void CUDATextureBase::finalize() {
+void CudaTextureBase::finalize() {
     cudaError_t err = cudaSuccess;
     if (_cuda_array) {
         err = cudaFreeArray(_cuda_array);
@@ -30,7 +30,7 @@ void CUDATextureBase::finalize() {
     _tex_objs.clear();
 }
 
-cudaTextureObject_t CUDATextureBase::get_object(cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
+cudaTextureObject_t CudaTextureBase::get_object(cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
     cudaTextureReadMode read_mode, bool normalized_coords) {
     //cudaTextureAddressMode : bit 7~ ...
     //cudaTextureFilterMode : bit 4~6

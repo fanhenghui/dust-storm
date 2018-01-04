@@ -4,7 +4,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-CudaTexture3D::CudaTexture3D(UIDType uid) : CUDATextureBase(uid, "CudaTexture3D") {
+CudaTexture3D::CudaTexture3D(UIDType uid) : CudaTextureBase(uid, "CudaTexture3D") {
     _channel[0] = 0;
     _channel[1] = 0;
     _channel[2] = 0;
@@ -29,6 +29,10 @@ float CudaTexture3D::memory_used() const {
 
 
 int CudaTexture3D::load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int width, int height, int depth, void* data) {
+    if (width <= 0 || height <= 0 || depth <= 0) {
+        MI_CUDARESOURCE_LOG(MI_ERROR) << "load invalid size " << width << " " << height << " " << depth << " to texture 3D.";
+        return -1;
+    }
     //malloc and load, or update all
     if (_cuda_array) {
         if (_channel[0] != channel_x || _channel[1] != channel_y ||

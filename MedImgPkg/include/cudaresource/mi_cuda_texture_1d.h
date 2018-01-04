@@ -5,7 +5,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CUDAResource_Export CudaTexture1D : public CUDATextureBase
+class CUDAResource_Export CudaTexture1D : public CudaTextureBase
 {
 public:
     explicit CudaTexture1D(UIDType uid);

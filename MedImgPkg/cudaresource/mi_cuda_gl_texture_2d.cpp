@@ -5,7 +5,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-CudaGLTexture2D::CudaGLTexture2D(UIDType uid) : CUDATextureBase(uid, "CudaGLTexture2D"), _cuda_graphic_resource(nullptr){
+CudaGLTexture2D::CudaGLTexture2D(UIDType uid) : CudaTextureBase(uid, "CudaGLTexture2D"), _cuda_graphic_resource(nullptr){
     _channel[0] = 0;
     _channel[1] = 0;
     _channel[2] = 0;
