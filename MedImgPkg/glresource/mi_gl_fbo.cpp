@@ -4,8 +4,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-GLFBO::GLFBO(UIDType uid) : GLObject(uid), _fbo_id(0), _target(GL_FRAMEBUFFER) {
-    set_type("GLFBO");
+GLFBO::GLFBO(UIDType uid) : GLObject(uid, "GLFBO"), _fbo_id(0), _target(GL_FRAMEBUFFER) {
 }
 
 GLFBO::~GLFBO() {}

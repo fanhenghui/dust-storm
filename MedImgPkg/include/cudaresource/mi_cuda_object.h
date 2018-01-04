@@ -9,7 +9,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class CUDAResource_Export CudaObject {
 public:
-    explicit CudaObject(UIDType uid, const std::string& type);
+    CudaObject(UIDType uid, const std::string& type);
     virtual ~CudaObject();
 
     virtual void initialize() = 0;
@@ -33,12 +33,12 @@ private:
 };
 
 inline std::ostream& operator << (std::ostream& strm, const CudaObject& obj) {
-    strm << "GLOBJ type: " << obj.get_type() << ", uid: " << obj.get_uid() << ", des: " << obj.get_description();
+    strm << "CUDAOBJ type: " << obj.get_type() << ", uid: " << obj.get_uid() << ", des: " << obj.get_description();
     return strm;
 }
 
 inline std::ostream& operator << (std::ostream& strm, const std::shared_ptr<CudaObject>& obj) {
-    strm << "GLOBJ type: " << obj->get_type() << ", uid: " << obj->get_uid() << ", des: " << obj->get_description();
+    strm << "CUDAOBJ type: " << obj->get_type() << ", uid: " << obj->get_uid() << ", des: " << obj->get_description();
     return strm;
 }
 

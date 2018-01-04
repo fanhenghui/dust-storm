@@ -3,7 +3,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-GLTimeQuery::GLTimeQuery(UIDType uid) : GLObject(uid), _is_first_query(true) {
+GLTimeQuery::GLTimeQuery(UIDType uid) : GLObject(uid, "GLTimeQuery"), _is_first_query(true) {
     _query[0] = 0;
     _query[1] = 0;
 }

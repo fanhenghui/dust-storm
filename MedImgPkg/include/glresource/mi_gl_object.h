@@ -10,18 +10,19 @@ MED_IMG_BEGIN_NAMESPACE
 
 class GLObject {
 public:
-    explicit GLObject(UIDType uid) : m_uid(uid) {}
+    GLObject(UIDType uid, const std::string& type) : _uid(uid), _type(type) {}
     virtual  ~GLObject() {}
+
     UIDType get_uid() const {
-        return m_uid;
+        return _uid;
     }
 
     void set_type(const std::string& type) {
-        m_type = type;
+        _type = type;
     }
 
     std::string get_type() const {
-        return m_type;
+        return _type;
     }
 
     std::string get_description() const {
@@ -46,8 +47,8 @@ public:
     virtual void finalize() = 0;
 
 private:
-    UIDType m_uid;
-    std::string m_type;
+    UIDType _uid;
+    std::string _type;
     std::string _description;
 };
 

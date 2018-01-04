@@ -2,8 +2,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-GLVAO::GLVAO(UIDType uid) : GLObject(uid), _vao_id(0) {
-    set_type("GLVAO");
+GLVAO::GLVAO(UIDType uid) : GLObject(uid, "GLVAO"), _vao_id(0) {
 }
 
 GLVAO::~GLVAO() {}

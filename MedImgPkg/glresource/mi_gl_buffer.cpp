@@ -3,8 +3,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 GLBuffer::GLBuffer(UIDType uid)
-    : GLObject(uid), _target(GL_ARRAY_BUFFER), _buffer_id(0) {
-    set_type("GLBuffer");
+    : GLObject(uid, "GLBuffer"), _target(GL_ARRAY_BUFFER), _buffer_id(0) {
 }
 
 GLBuffer::~GLBuffer() {}

@@ -13,7 +13,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 #ifdef WIN32
 
-MSGLContext::MSGLContext(UIDType uid) : GLObject(uid) {}
+MSGLContext::MSGLContext(UIDType uid) : GLObject(uid, "MSGLContext") {}
 
 MSGLContext::~MSGLContext() {}
 
@@ -30,7 +30,7 @@ void MSGLContext::create_shared_context(int id) {}
 #else
 
 XGLContext::XGLContext(UIDType uid)
-    : GLObject(uid), _ctx(NULL), _dpy(nullptr), _vis(nullptr),
+    : GLObject(uid, "XGLContext"), _ctx(NULL), _dpy(nullptr), _vis(nullptr),
       _win((Window)NULL) {}
 
 XGLContext::~XGLContext() {}

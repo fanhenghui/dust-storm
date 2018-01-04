@@ -11,7 +11,7 @@ MED_IMG_BEGIN_NAMESPACE
 class CUDAResource_Export CUDATextureBase : public CudaObject
 {
 public:
-    explicit CUDATextureBase(UIDType uid, const std::string& type);
+    CUDATextureBase(UIDType uid, const std::string& type);
     virtual ~CUDATextureBase();
 
     virtual void initialize();

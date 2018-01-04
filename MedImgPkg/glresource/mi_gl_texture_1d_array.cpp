@@ -3,9 +3,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 GLTexture1DArray::GLTexture1DArray(UIDType uid)
-    : GLTextureBase(uid), _width(0), _array_size(0), _format(GL_RGBA),
+    : GLTextureBase(uid, "GLTexture1DArray"), _width(0), _array_size(0), _format(GL_RGBA),
       _internal_format(GL_RGBA8), _type(GL_UNSIGNED_BYTE) {
-    set_type("GLTexture1DArray");
 }
 
 GLTexture1DArray::~GLTexture1DArray() {}

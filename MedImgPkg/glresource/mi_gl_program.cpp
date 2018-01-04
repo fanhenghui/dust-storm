@@ -37,8 +37,7 @@ std::string GetShaderTypeString(GLenum type) {
 }
 }
 
-GLProgram::GLProgram(UIDType uid) : GLObject(uid), _program_id(0) {
-    set_type("GLProgram");
+GLProgram::GLProgram(UIDType uid) : GLObject(uid, "GLProgram"), _program_id(0) {
 }
 
 GLProgram::~GLProgram() {}

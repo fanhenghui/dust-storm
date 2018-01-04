@@ -3,9 +3,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 GLTexture3D::GLTexture3D(UIDType uid)
-    : GLTextureBase(uid), _width(0), _height(0), _depth(0), _format(GL_RGBA),
+    : GLTextureBase(uid, "GLTexture3D"), _width(0), _height(0), _depth(0), _format(GL_RGBA),
       _internal_format(GL_RGBA8), _type(GL_UNSIGNED_BYTE) {
-    set_type("GLTexture3D");
 }
 
 GLTexture3D::~GLTexture3D() {}
