@@ -26,14 +26,12 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _compress_hd_quality = 80;
     _compress_ld_quality  = 15;
 
-#ifdef GPUJPEG
     // init gpujpeg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
     _gpujpeg_encoding_duration = 0;
-#endif
 }
 
 SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
@@ -49,14 +47,12 @@ SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
     _compress_hd_quality = 80;
     _compress_ld_quality  = 15;
 
-#ifdef GPUJPEG
     // init gpujpeg parameter
     _gpujpeg_encoder_hd = nullptr;
     _gpujpeg_encoder_ld = nullptr;
     _gpujpeg_texture = nullptr;
     _gpujpeg_encoder_dirty = false;
     _gpujpeg_encoding_duration = 0;
-#endif
 }
 
 SceneBase::~SceneBase() {}
@@ -136,7 +132,7 @@ void SceneBase::initialize() {
 
         CHECK_GL_ERROR;
 
-#ifdef GPUJPEG
+
         // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in multi-scene)
         gpujpeg_init_device(0, 0);
 
@@ -172,7 +168,7 @@ void SceneBase::initialize() {
 
         // cudaEventCreate(&_gpujpeg_encoding_start);
         // cudaEventCreate(&_gpujpeg_encoding_stop);
-#endif
+
 
         //time query
         UIDType time_id = 0;
@@ -216,9 +212,8 @@ void SceneBase::set_display_size(int width, int height) {
         GL_DEPTH_COMPONENT16, _width, _height, 0, GL_DEPTH_COMPONENT,
         GL_UNSIGNED_SHORT, nullptr);
 
-#ifdef GPUJPEG
     _gpujpeg_encoder_dirty = true;
-#endif
+
     set_dirty(true);
 }
 
@@ -244,7 +239,7 @@ bool SceneBase::get_dirty() const {
 }
 
 void SceneBase::pre_render() {
-#ifdef GPUJPEG
+
     if (_gpujpeg_encoder_hd && _gpujpeg_encoder_dirty) {
         //release previous
         gpujpeg_opengl_texture_unregister(_gpujpeg_texture);
@@ -293,7 +288,7 @@ void SceneBase::pre_render() {
 
         _gpujpeg_encoder_dirty = false;
     }
-#endif
+
 }
 
 void SceneBase::set_name(const std::string& name) {
@@ -306,7 +301,7 @@ const std::string& SceneBase::get_name() const {
 
 void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
     boost::mutex::scoped_lock locker(_write_mutex);
-#ifdef GPUJPEG
+
     if (jpeg) 
     {
         uint8_t* image_compressed = nullptr;
@@ -374,7 +369,7 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
         // - _front_buffer_id].get() , image_compressed_size);
     }
     else 
-#endif
+
     {
         // download FBO to back buffer directly
         CHECK_GL_ERROR;
@@ -411,7 +406,6 @@ bool SceneBase::get_downsample() const {
     return _downsample;
 }
 
-#ifdef GPUJPEG
 float SceneBase::get_compressing_duration() const
 {
     return _gpujpeg_encoding_duration;
@@ -424,6 +418,5 @@ void SceneBase::set_compress_hd_quality(int quality) {
 void SceneBase::set_compress_ld_quality(int quality) {
     _compress_ld_quality  = quality;
 }
-#endif
 
 MED_IMG_END_NAMESPACE

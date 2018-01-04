@@ -295,7 +295,7 @@ void Display() {
         CHECK_GL_ERROR;
 
         // download result
-#ifdef GPUJPEG
+
          glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
         //_scene->set_downsample(true);
@@ -323,7 +323,7 @@ void Display() {
 
          /*const double render_time  = _time_query->end();
          MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;*/
-#endif
+
 
         glutSwapBuffers();
     } catch (Exception& e) {

@@ -9,10 +9,9 @@
 
 #include "boost/thread/mutex.hpp"
 
-#ifdef GPUJPEG
 #include "libgpujpeg/gpujpeg.h"
 #include "libgpujpeg/gpujpeg_common.h"
-#endif
+
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -49,11 +48,9 @@ public:
     virtual void set_downsample(bool flag);
     bool get_downsample() const;
 
-#ifdef GPUJPEG
     void set_compress_hd_quality(int quality = 80);
     void set_compress_ld_quality(int quality = 15);
     float get_compressing_duration() const;
-#endif
 
 protected:
     virtual void pre_render();
@@ -63,7 +60,7 @@ protected:
 
     GLFBOPtr _scene_fbo;
     GLTexture2DPtr _scene_color_attach_0;
-    GLTexture2DPtr _scene_color_attach_1;//for fliping verticalily
+    GLTexture2DPtr _scene_color_attach_1;//for flip vertical
     GLTexture2DPtr _scene_depth_attach;
     GLResourceShield _res_shield;
 
@@ -82,7 +79,6 @@ protected:
     int _compress_hd_quality;
     int _compress_ld_quality;
 
-#ifdef GPUJPEG
     // GPU JPEG
     gpujpeg_opengl_texture* _gpujpeg_texture;      // input gpujpeg texture
     gpujpeg_encoder* _gpujpeg_encoder_hd;             // jpeg encoder HD
@@ -95,7 +91,6 @@ protected:
     // cudaEvent_t _gpujpeg_encoding_start;
     // cudaEvent_t _gpujpeg_encoding_stop;
     bool _gpujpeg_encoder_dirty;
-#endif
 
     GLTimeQueryPtr _gl_time_query;
 
