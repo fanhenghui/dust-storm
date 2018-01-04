@@ -34,7 +34,7 @@ std::unique_ptr<DstType[]> signed_to_unsigned(unsigned int length,
 }
 }
 
-VolumeInfos::VolumeInfos() : _volume_dirty(false), _mask_dirty(false) {
+VolumeInfos::VolumeInfos(GPUPlatform p) : _gpu_platform(p), _volume_dirty(false), _mask_dirty(false) {
     _brick_pool.reset(new BrickPool(16, 2));
 }
 

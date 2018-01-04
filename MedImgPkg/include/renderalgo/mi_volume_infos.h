@@ -1,10 +1,13 @@
 #ifndef MEDIMGRENDERALGO_VOLUME_INFOS_H
 #define MEDIMGRENDERALGO_VOLUME_INFOS_H
 
-#include "arithmetic/mi_aabb.h"
-#include "glresource/mi_gl_resource_define.h"
-#include "renderalgo/mi_brick_define.h"
 #include "renderalgo/mi_render_algo_export.h"
+
+#include "arithmetic/mi_aabb.h"
+
+#include "renderalgo/mi_gpu_resource_pair.h"
+#include "renderalgo/mi_brick_define.h"
+#include "renderalgo/mi_ray_caster_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -16,7 +19,7 @@ class CameraCalculator;
 // Volume info for upload/update volume&mask(brick & brick info ) to CPU&GPU
 class RenderAlgo_Export VolumeInfos {
 public:
-    VolumeInfos();
+    explicit VolumeInfos(GPUPlatform p);
     ~VolumeInfos();
 
     void refresh();
@@ -53,6 +56,8 @@ private:
     void refresh_cache_mask_brick_info();
 
 private:
+    GPUPlatform _gpu_platform;
+
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<ImageData> _mask_data;
     std::shared_ptr<ImageDataHeader> _data_header;

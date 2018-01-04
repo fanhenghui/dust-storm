@@ -11,7 +11,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-BrickPool::BrickPool(unsigned int brick_size , unsigned int brick_margin):
+BrickPool::BrickPool(GPUPlatform p, unsigned int brick_size , unsigned int brick_margin):
+    _gpu_platform(p),
     _brick_size(brick_size),
     _brick_margin(brick_margin),
     _brick_count(0),

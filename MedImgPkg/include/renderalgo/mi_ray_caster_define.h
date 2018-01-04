@@ -7,9 +7,15 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+//Branch Master is all GPU
 enum RayCastingStrategy {
     CPU_BASE,
     GPU_BASE,
+};
+
+enum GPUPlatform {
+    GL_BASE,
+    CUDA_BASE,
 };
 
 enum LabelLevel {

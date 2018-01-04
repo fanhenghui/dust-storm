@@ -74,5 +74,8 @@
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_manager.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_resource_define.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

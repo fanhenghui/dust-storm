@@ -5,11 +5,13 @@
 #include <memory>
 #include <string>
 
-#include "arithmetic/mi_aabb.h"
-#include "glresource/mi_gl_resource_define.h"
-#include "glresource/mi_gl_resource_manager_container.h"
-#include "renderalgo/mi_brick_define.h"
 #include "renderalgo/mi_render_algo_export.h"
+
+#include "arithmetic/mi_aabb.h"
+#include "glresource/mi_gl_resource_manager_container.h"
+#include "renderalgo/mi_gpu_resource_pair.h"
+#include "renderalgo/mi_brick_define.h"
+#include "renderalgo/mi_ray_caster_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,7 +21,7 @@ class VolumeBrickInfoCalculator;
 class MaskBrickInfoCalculator;
 class RenderAlgo_Export BrickPool {
 public:
-    BrickPool(unsigned int brick_size, unsigned int brick_margin);
+    BrickPool(GPUPlatform p, unsigned int brick_size, unsigned int brick_margin);
     ~BrickPool();
 
     void set_volume(std::shared_ptr<ImageData> image_data);
@@ -65,6 +67,8 @@ public:
     void debug_save_mask_info(const std::string& path);
 
 private:
+    GPUPlatform _gpu_platform;
+
     std::shared_ptr<ImageData> _volume;
     std::shared_ptr<ImageData> _mask;
     GLTexture3DPtr _volume_texture;

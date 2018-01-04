@@ -141,6 +141,9 @@
     <ClInclude Include="..\renderalgo\mi_vr_entry_exit_points_culling.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_gpu_resource_pair.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\renderalgo\mi_annotation_calculator.cpp">
