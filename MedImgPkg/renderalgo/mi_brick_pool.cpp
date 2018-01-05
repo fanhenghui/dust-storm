@@ -69,9 +69,7 @@ void BrickPool::calculate_volume_brick_info() {
 
     if (GL_BASE == _gpu_platform) {
         if (nullptr == _volume_brick_info_buffer) {
-            UIDType uid;
-            GLBufferPtr buf = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-            buf->set_description("volume brick info buffer");
+            GLBufferPtr buf = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object("volume brick info buffer");
             buf->initialize();
             buf->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
             buf->bind();
@@ -165,9 +163,7 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
         _mask_brick_info_array_set.insert(std::make_pair(key, std::move(info_array)));
 
         if (GL_BASE == _gpu_platform) {
-            UIDType uid;
-            GLBufferPtr info_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object(uid);
-            info_buffer->set_description("mask brick info buffer " + key.key);
+            GLBufferPtr info_buffer = GLResourceManagerContainer::instance()->get_buffer_manager()->create_object("mask brick info buffer " + key.key);
             info_buffer->initialize();
             info_buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
             info_buffer->bind();

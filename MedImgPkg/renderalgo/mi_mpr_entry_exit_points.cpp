@@ -397,14 +397,10 @@ void MPREntryExitPoints::initialize() {
 
     if (GPU_BASE == _strategy) {
         if (!_program) {
-            UIDType uid = 0;
             _program = GLResourceManagerContainer::instance()
-                       ->get_program_manager()
-                       ->create_object(uid);
-            _program->set_description("MPR entry exit program");
-            _program->set_shaders(std::vector<GLShaderInfo>(
-                                      1, GLShaderInfo(GL_COMPUTE_SHADER, S_MPR_ENTRY_EXIT_POINTS_COMP,
-                                              "MPR entry exit compute shader")));
+                       ->get_program_manager()->create_object("MPR entry exit program");
+            _program->set_shaders(std::vector<GLShaderInfo>(1, 
+                GLShaderInfo(GL_COMPUTE_SHADER, S_MPR_ENTRY_EXIT_POINTS_COMP,"MPR entry exit compute shader")));
             _program->initialize();
             _program->compile();
 

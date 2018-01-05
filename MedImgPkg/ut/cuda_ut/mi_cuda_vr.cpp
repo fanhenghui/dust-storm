@@ -191,8 +191,7 @@ public:
             MI_LOG(MI_FATAL) << "load navigator image failed.";
         }
         else {
-            UIDType uid = 0;
-            _navigator_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
+            _navigator_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object("navigator");
             _navigator_tex->initialize();
             _navigator_tex->set_description("navigator texture");
             _navigator_tex->bind();
@@ -399,7 +398,7 @@ void init_data() {
         memset(mask_raw, 1, data_len);
     }
     
-    _volume_infos.reset(new VolumeInfos());
+    _volume_infos.reset(new VolumeInfos(GL_BASE));
     _volume_infos->set_data_header(_data_header);
     _volume_infos->set_volume(_volume_data);
     _volume_infos->set_mask(mask_data);
@@ -530,9 +529,7 @@ void init_gl() {
 
     //Canvas texture
     glEnable(GL_TEXTURE_2D);
-
-    UIDType tex_uid = 0;
-    _canvas_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(tex_uid);
+    _canvas_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object("canvas");
     _canvas_tex->set_description("CUDA GL UT canvas texture.");
     _canvas_tex->initialize();
     _canvas_tex->bind();

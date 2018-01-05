@@ -25,29 +25,20 @@ ProxyGeometryCube::~ProxyGeometryCube() {}
 
 void ProxyGeometryCube::initialize() {
     if (nullptr == _gl_program) {
-        UIDType uid;
         _gl_program = GLResourceManagerContainer::instance()
-                      ->get_program_manager()
-                      ->create_object(uid);
-        _gl_program->set_description("proxy geometry cube program");
+            ->get_program_manager()->create_object("proxy geometry cube program");
         _gl_program->initialize();
 
         _gl_vao = GLResourceManagerContainer::instance()
-                  ->get_vao_manager()
-                  ->create_object(uid);
-        _gl_vao->set_description("proxy geometry cube VAO");
+            ->get_vao_manager()->create_object("proxy geometry cube VAO");
         _gl_vao->initialize();
 
         _gl_vertex_buffer = GLResourceManagerContainer::instance()
-                            ->get_buffer_manager()
-                            ->create_object(uid);
-        _gl_vertex_buffer->set_description("proxy geometry cube vertex buffer");
+            ->get_buffer_manager()->create_object("proxy geometry cube vertex buffer");
         _gl_vertex_buffer->initialize();
 
         _gl_color_buffer = GLResourceManagerContainer::instance()
-                           ->get_buffer_manager()
-                           ->create_object(uid);
-        _gl_color_buffer->set_description("proxy geometry cube vertex buffer");
+            ->get_buffer_manager()->create_object("proxy geometry cube color buffer");
         _gl_color_buffer->initialize();
 
         // program

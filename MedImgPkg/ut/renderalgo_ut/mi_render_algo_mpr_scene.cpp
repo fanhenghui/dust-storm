@@ -102,15 +102,14 @@ void Init() {
     //_scene->initialize();
 
     // Time query
-    UIDType uid = 0;
     _time_query = GLResourceManagerContainer::instance()
                   ->get_time_query_manager()
-                  ->create_object(uid);
+                  ->create_object("TQ 1");
     //_time_query->initialize();
 
     _time_query2 = GLResourceManagerContainer::instance()
                    ->get_time_query_manager()
-                   ->create_object(uid);
+                   ->create_object("TQ 2");
     //_time_query2->initialize();
 }
 

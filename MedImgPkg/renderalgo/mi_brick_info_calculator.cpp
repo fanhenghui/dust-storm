@@ -189,11 +189,8 @@ void VolumeBrickInfoCalculator::calculate_gl() {
 void VolumeBrickInfoCalculator::initialize() {
     if (GL_BASE == _gpu_platform) {
         if (nullptr == _gl_program) {
-            UIDType uid;
-            _gl_program = GLResourceManagerContainer::instance()
-                ->get_program_manager()
-                ->create_object(uid);
-            _gl_program->set_description("volume brick info calculator program");
+            _gl_program = GLResourceManagerContainer::instance()->get_program_manager()
+                ->create_object("volume brick info calculator program");
             _gl_program->initialize();
 
             std::vector<GLShaderInfo> shaders;
@@ -369,11 +366,8 @@ void MaskBrickInfoCalculator::update_gl(const AABBUI& aabb) {
 void MaskBrickInfoCalculator::initialize() {
     if (GL_BASE == _gpu_platform) {
         if (nullptr == _gl_program) {
-            UIDType uid;
             _gl_program = GLResourceManagerContainer::instance()
-                ->get_program_manager()
-                ->create_object(uid);
-            _gl_program->set_description("mask brick info calculator program");
+                ->get_program_manager()->create_object("mask brick info calculator program");
             _gl_program->initialize();
 
             std::vector<GLShaderInfo> shaders;
@@ -385,10 +379,7 @@ void MaskBrickInfoCalculator::initialize() {
             _gl_program->compile();
 
             _gl_buffer_visible_labels = GLResourceManagerContainer::instance()
-                ->get_buffer_manager()
-                ->create_object(uid);
-            _gl_buffer_visible_labels->set_description(
-                "visible label buffer in mask brick info calculator program");
+                ->get_buffer_manager()->create_object("visible label buffer in mask brick info calculator program");
             _gl_buffer_visible_labels->initialize();
             _gl_buffer_visible_labels->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
 

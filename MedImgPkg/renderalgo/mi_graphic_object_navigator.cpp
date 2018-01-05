@@ -33,9 +33,7 @@ void GraphicObjectNavigator::initialize() {
         if( 0 != FileUtil::read_raw(navi_img_file, img_buffer, img_size) ) {
             MI_RENDERALGO_LOG(MI_FATAL) << "load navigator image failed.";
         } else {
-            UIDType uid = 0;
-            _navi_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object(uid);
-            _navi_tex->set_description("navigator texture");
+            _navi_tex = GLResourceManagerContainer::instance()->get_texture_2d_manager()->create_object("navigator map");
             _res_shield.add_shield<GLTexture2D>(_navi_tex);
             GLTextureCache::instance()->cache_load(GL_TEXTURE_2D, _navi_tex, GL_CLAMP_TO_BORDER, 
                 GL_LINEAR, GL_RGB8, 384, 256, 1, GL_RGB, GL_UNSIGNED_BYTE, (char*)img_buffer);

@@ -54,12 +54,8 @@ struct RayCasterInnerBuffer::GLResource {
         if (it != buffer_ids.end()) {
             return it->second;
         } else {
-            UIDType buffer_id = 0;
-            GLBufferPtr buffer = GLResourceManagerContainer::instance()
-                                 ->get_buffer_manager()
-                                 ->create_object(buffer_id);
-            buffer->set_description("ray caster inner buffer : " +
-                                    get_buffer_type_name(type));
+            GLBufferPtr buffer = GLResourceManagerContainer::instance()->get_buffer_manager()
+                ->create_object("ray caster inner buffer : " + get_buffer_type_name(type));
             buffer->initialize();
             buffer->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
             buffer_ids[type] = buffer;

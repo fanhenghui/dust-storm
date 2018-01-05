@@ -178,10 +178,9 @@ void Init() {
     _scene->set_navigator_visibility(true);
 
     // Time query
-    UIDType uid = 0;
     _time_query = GLResourceManagerContainer::instance()
                   ->get_time_query_manager()
-                  ->create_object(uid);
+                  ->create_object("TQ");
     _time_query->initialize();
 
     // Transfer function

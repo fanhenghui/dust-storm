@@ -14,7 +14,7 @@ public:
 
     ~GLResourceManager();
 
-    std::shared_ptr<ResourceType> create_object(UIDType& uid);
+    std::shared_ptr<ResourceType> create_object(const std::string& desc);
 
     std::shared_ptr<ResourceType> get_object(UIDType uid);
 

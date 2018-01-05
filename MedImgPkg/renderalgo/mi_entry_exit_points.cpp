@@ -19,15 +19,10 @@ EntryExitPoints::EntryExitPoints()
     _entry_points_buffer.reset(new Vector4f[_width * _height]);
     _exit_points_buffer.reset(new Vector4f[_width * _height]);
 
-    UIDType uid;
-    _entry_points_texture = GLResourceManagerContainer::instance()
-                            ->get_texture_2d_manager()
-                            ->create_object(uid);
-    _entry_points_texture->set_description("entry points texture");
-    _exit_points_texture = GLResourceManagerContainer::instance()
-                           ->get_texture_2d_manager()
-                           ->create_object(uid);
-    _exit_points_texture->set_description("exit points texture");
+    _entry_points_texture = GLResourceManagerContainer::instance()->
+        get_texture_2d_manager()->create_object("entry points");
+    _exit_points_texture = GLResourceManagerContainer::instance()->
+        get_texture_2d_manager()->create_object("exit points");
 
     _res_shield.add_shield<GLTexture2D>(_entry_points_texture);
     _res_shield.add_shield<GLTexture2D>(_exit_points_texture);

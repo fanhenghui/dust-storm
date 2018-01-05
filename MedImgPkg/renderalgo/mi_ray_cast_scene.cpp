@@ -121,10 +121,10 @@ void RayCastScene::pre_render() {
     // GL resource update (discard)
     GLResourceManagerContainer::instance()->update_all();
 
-    // GL texture udpate
+    // GL texture update
     GLTextureCache::instance()->process_cache();
 
-    // scene base prerender to recreate jpeg encoder(this must be call after gl
+    // scene base pre-render to recreate jpeg encoder(this must be call after gl
     // resource update)
     SceneBase::pre_render();
 
@@ -135,11 +135,8 @@ void RayCastScene::init_default_color_texture() {
     if (GPU == Configure::instance()->get_processing_unit_type()) {
         // initialize gray pseudo color texture
         if (!_pseudo_color_texture) {
-            UIDType uid;
-            _pseudo_color_texture = GLResourceManagerContainer::instance()
-                                    ->get_texture_1d_manager()
-                                    ->create_object(uid);
-            _pseudo_color_texture->set_description("pseudo color texture");
+            _pseudo_color_texture = GLResourceManagerContainer::instance()->
+                get_texture_1d_manager()->create_object("pseudo color");
             _res_shield.add_shield<GLTexture1D>(_pseudo_color_texture);
 
             unsigned char* gray_array = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
@@ -152,17 +149,12 @@ void RayCastScene::init_default_color_texture() {
 
             GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_1D, _pseudo_color_texture, GL_CLAMP_TO_EDGE, GL_LINEAR,
-                GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                (char*)gray_array);
+                GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, (char*)gray_array);
         }
 
         if (!_color_opacity_texture_array) {
-            UIDType uid;
-            _color_opacity_texture_array = GLResourceManagerContainer::instance()
-                                           ->get_texture_1d_array_manager()
-                                           ->create_object(uid);
-            _color_opacity_texture_array->set_description(
-                "color opacity texture array");
+            _color_opacity_texture_array = GLResourceManagerContainer::instance()->
+                get_texture_1d_array_manager()->create_object("color opacity texture array");
 
             const int tex_num = 8; // default mask level
             unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
@@ -173,9 +165,7 @@ void RayCastScene::init_default_color_texture() {
                 GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
                 GL_UNSIGNED_BYTE, (char*)rgba);
         }
-    }
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
+    } else {
         // TODO gray pseudo array
     }
 }
@@ -298,8 +288,8 @@ void RayCastScene::render() {
     //     if (_canvas->get_color_attach_texture(1)) {
     //         std::stringstream ss;
     //         ss << "/home/wangrui22/data/output_para_" << _width << "_" << _height << ".raw";
-    //         _canvas->debug_output_color1(ss.str());
-    //         _canvas->debug_output_color(ss.str() + "_color");
+    //         _canvas->debug_output_color_1(ss.str());
+    //         _canvas->debug_output_color_0(ss.str() + "_color");
     //     }
     // }
     // CHECK_GL_ERROR;
@@ -390,15 +380,6 @@ void RayCastScene::set_mask_label_level(LabelLevel label_level) {
     _ray_caster->set_mask_label_level(label_level);
 
     if (GPU == Configure::instance()->get_processing_unit_type()) {
-        if (!_color_opacity_texture_array) {
-            UIDType uid;
-            _color_opacity_texture_array = GLResourceManagerContainer::instance()
-                                           ->get_texture_1d_array_manager()
-                                           ->create_object(uid);
-            _color_opacity_texture_array->set_description(
-                "color opacity texture array");
-        }
-
         const int tex_num = static_cast<int>(label_level);
         unsigned char* rgba =
             new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];

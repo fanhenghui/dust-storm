@@ -65,15 +65,16 @@ GLResourceManager<ResourceType>::get_object(UIDType uid) {
 
 template <class ResourceType>
 std::shared_ptr<ResourceType>
-GLResourceManager<ResourceType>::create_object(UIDType& uid) {
+GLResourceManager<ResourceType>::create_object(const std::string& desc) {
     boost::unique_lock<boost::mutex> locker(_mutex);
-    uid = _uid_generator->tick();
+    UIDType uid = _uid_generator->tick();
 
     if (_objects.find(uid) != _objects.end()) {
         GLRESOURCE_THROW_EXCEPTION("Generated UID invalid!");
     }
 
     std::shared_ptr<ResourceType> new_res(new ResourceType(uid));
+    new_res->set_description(desc);
     _objects[uid] = new_res;
 
     std::stringstream ss;

@@ -29,12 +29,10 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
         // 1 Create color array for CPU writing
         _color_array.reset(new RGBAUnit[_width * _height]);
         // 2 Create a texture for mapping in ray cast scene
-        UIDType texture_color_id = 0;
         GLTexture2DPtr gl_color_attach_0 = GLResourceManagerContainer::instance()
-            ->get_texture_2d_manager()->create_object(texture_color_id);
+            ->get_texture_2d_manager()->create_object("ray caster canvas FBO color attachment 0");
         _color_attach_0.reset(new GPUCanvasPair(gl_color_attach_0));
 
-        gl_color_attach_0->set_description("ray caster canvas FBO color attachment 0 texture");
         gl_color_attach_0->initialize();
         gl_color_attach_0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -48,18 +46,14 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
             //FBO with 2 color attachment and 1 depth attachment
             CHECK_GL_ERROR
 
-            UIDType fbo_id = 0;
             _gl_fbo = GLResourceManagerContainer::instance()
-                ->get_fbo_manager()->create_object(fbo_id);
-            _gl_fbo->set_description("ray caster canvas FBO");
+                ->get_fbo_manager()->create_object("ray caster canvas FBO");
             _gl_fbo->initialize();
             _gl_fbo->set_target(GL_FRAMEBUFFER);
 
-            UIDType texture_color_id = 0;
             GLTexture2DPtr gl_color_attach_0 = GLResourceManagerContainer::instance()
-                ->get_texture_2d_manager()->create_object(texture_color_id);
+                ->get_texture_2d_manager()->create_object("ray caster canvas FBO color attachment 0");
             _color_attach_0.reset(new GPUCanvasPair(gl_color_attach_0));
-            gl_color_attach_0->set_description("ray caster canvas FBO color attachment 0 texture");
             gl_color_attach_0->initialize();
             gl_color_attach_0->bind();
             GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -68,9 +62,8 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
 
             if (multi_color_attach) {
                 GLTexture2DPtr gl_color_attach_1 = GLResourceManagerContainer::instance()
-                    ->get_texture_2d_manager()->create_object(texture_color_id);
+                    ->get_texture_2d_manager()->create_object("ray caster canvas FBO color attachment 1");
                 _color_attach_1.reset(new GPUCanvasPair(gl_color_attach_1));
-                gl_color_attach_1->set_description("ray caster canvas FBO color attachment 1 texture");
                 gl_color_attach_1->initialize();
                 gl_color_attach_1->bind();
                 GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -78,10 +71,8 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
                 gl_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
             }
 
-            UIDType depth_color_id = 0;
             _gl_depth_attach = GLResourceManagerContainer::instance()
-                ->get_texture_2d_manager()->create_object(depth_color_id);
-            _gl_depth_attach->set_description("ray caster canvas FBO depth attachment texture");
+                ->get_texture_2d_manager()->create_object("ray caster canvas FBO depth attachment");
             _gl_depth_attach->initialize();
             _gl_depth_attach->bind();
             GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);

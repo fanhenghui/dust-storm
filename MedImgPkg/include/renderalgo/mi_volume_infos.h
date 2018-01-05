@@ -16,10 +16,10 @@ class ImageDataHeader;
 class BrickPool;
 class CameraCalculator;
 
-// Volume info for upload/update volume&mask(brick & brick info ) to CPU&GPU
+// Volume info for upload/update volume&mask(brick & brick info ) to host&device
 class RenderAlgo_Export VolumeInfos {
 public:
-    explicit VolumeInfos(GPUPlatform p);
+    explicit VolumeInfos(RayCastingStrategy strategy,  GPUPlatform p);
     ~VolumeInfos();
 
     void refresh();
@@ -43,7 +43,7 @@ public:
     std::shared_ptr<ImageDataHeader> get_data_header();
     std::shared_ptr<BrickPool> get_brick_pool();
 
-    // update(should update to CPU and GPU)
+    // update(should update to host and device)
     void update_mask(const unsigned int (&begin)[3], const unsigned int (&end)[3],
                      unsigned char* data_updated,
                      bool has_data_array_changed = true);
@@ -56,6 +56,7 @@ private:
     void refresh_cache_mask_brick_info();
 
 private:
+    RayCastingStrategy _strategy;
     GPUPlatform _gpu_platform;
 
     std::shared_ptr<ImageData> _volume_data;
@@ -80,6 +81,9 @@ private:
     // mask update
     std::vector<AABBUI> _mask_aabb_to_be_update;
     std::vector<unsigned char*> _mask_array_to_be_update;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(VolumeInfos);
 };
 
 MED_IMG_END_NAMESPACE

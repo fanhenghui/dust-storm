@@ -1,7 +1,5 @@
 #include "mi_volume_infos.h"
 
-#include "io/mi_configure.h"
-
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
 
@@ -34,7 +32,7 @@ std::unique_ptr<DstType[]> signed_to_unsigned(unsigned int length,
 }
 }
 
-VolumeInfos::VolumeInfos(GPUPlatform p) : _gpu_platform(p), _volume_dirty(false), _mask_dirty(false) {
+VolumeInfos::VolumeInfos(RayCastingStrategy s, GPUPlatform p) : _strategy(s), _gpu_platform(p), _volume_dirty(false), _mask_dirty(false) {
     _brick_pool.reset(new BrickPool(p, 16, 2));
 }
 
@@ -60,44 +58,40 @@ void VolumeInfos::finialize() {
 }
 
 void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
-    try {
-        RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
+    RENDERALGO_CHECK_NULL_EXCEPTION(image_data);
 
-        _volume_data = image_data;
-        _volume_dirty = true;
+    _volume_data = image_data;
+    _volume_dirty = true;
 
-        if (GL_BASE == _gpu_platform) {
-            // release textures
-            if (nullptr != _volume_texture) {
-                GLResourceManagerContainer::instance()->get_texture_3d_manager()->
-                    remove_object(_volume_texture->get_gl_resource());
-            }
+    // create camera calculator
+    _camera_calculator.reset(new CameraCalculator(_volume_data));
 
-            // create texture
-            UIDType uid(0);
-            GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-            if (_data_header) {
-                tex->set_description("volume : " + _data_header->series_uid);
-            }
-            else {
-                tex->set_description("volume : undefined series UID");
-            }
-            _volume_texture.reset(new GPUTexture3DPair(tex));
-        } else {
-            //TODO CUDA
+    if (CPU_BASE == _strategy) {
+        return;
+    }
+
+    //----------------------------------------------------//
+    // GPU Resource: texture and brick-pool
+    //----------------------------------------------------//
+    if (GL_BASE == _gpu_platform) {
+        // release textures
+        if (nullptr != _volume_texture) {
+            GLResourceManagerContainer::instance()->get_texture_3d_manager()->
+                remove_object(_volume_texture->get_gl_resource());
         }
 
-        // brick pool
-        _brick_pool->set_volume(_volume_data);
-        _brick_pool->set_volume_texture(_volume_texture);
-
-        // Create camera calculator
-        _camera_calculator.reset(new CameraCalculator(_volume_data));
-
-    } catch (const Exception& e) {
-        MI_RENDERALGO_LOG(MI_FATAL) << "set volume failed with exception: " << e.what();
-        assert(false);
+        // create texture
+        const std::string info = _data_header ? ("volume : " + _data_header->series_uid) : "volume : undefined series UID";
+        GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(info);
+        _volume_texture.reset(new GPUTexture3DPair(tex));
     }
+    else {
+        //TODO CUDA
+    }
+
+    // brick pool
+    _brick_pool->set_volume(_volume_data);
+    _brick_pool->set_volume_texture(_volume_texture);
 }
 
 void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
@@ -107,6 +101,13 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
         _mask_data = image_data;
         _mask_dirty = true;
 
+        if (CPU_BASE == _strategy) {
+            return;
+        }
+    
+        //----------------------------------------------------//
+        // GPU Resource: texture and brick-pool
+        //----------------------------------------------------//
         if (GL_BASE == _gpu_platform) {
             // release textures
             if (nullptr != _mask_texture) {
@@ -115,14 +116,8 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
             }
 
             // create texture
-            UIDType uid(0);
-            GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(uid);
-            if (_data_header) {
-                tex->set_description("mask : " + _data_header->series_uid);
-            }
-            else {
-                tex->set_description("mask : undefined series UID");
-            }
+            const std::string info = _data_header ? ("mask : " + _data_header->series_uid) : "mask : undefined series UID";
+            GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(info);
             _mask_texture.reset(new GPUTexture3DPair(tex));
         } else {
             //TODO CUDA
@@ -162,7 +157,7 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3],
                               const unsigned int (&end)[3],
                               unsigned char* data_updated,
                               bool has_data_array_changed /*= true*/) {
-    // update mask CPU
+    // update mask in host memory
     const unsigned int dim_brick[3] = { end[0] - begin[0], 
                                         end[1] - begin[1],
                                         end[2] - begin[2]};
@@ -182,8 +177,11 @@ void VolumeInfos::update_mask(const unsigned int (&begin)[3],
         }
     }
 
-    _mask_aabb_to_be_update.push_back(AABBUI(begin, end));
-    _mask_array_to_be_update.push_back(data_updated);
+    if (GPU_BASE == _strategy) {
+        //update to device when has context
+        _mask_aabb_to_be_update.push_back(AABBUI(begin, end));
+        _mask_array_to_be_update.push_back(data_updated);
+    }
 }
 
 void VolumeInfos::refresh_update_mask() {
@@ -331,7 +329,7 @@ std::shared_ptr<CameraCalculator> VolumeInfos::get_camera_calculator() {
 }
 
 void VolumeInfos::refresh() {
-    if (Configure::instance()->get_processing_unit_type() == CPU) {
+    if (CPU_BASE == _strategy) {
         return;
     }
 

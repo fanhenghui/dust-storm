@@ -18,18 +18,12 @@ void VREntryExitPoints::initialize() {
     EntryExitPoints::initialize();
 
     if (nullptr == _gl_fbo) {
-        UIDType uid;
         _gl_fbo = GLResourceManagerContainer::instance()
-                  ->get_fbo_manager()
-                  ->create_object(uid);
-        _gl_fbo->set_description("VR entry exit points FBO");
+            ->get_fbo_manager()->create_object("VR entry exit points FBO");
         _gl_fbo->initialize();
 
         _gl_depth_texture = GLResourceManagerContainer::instance()
-                            ->get_texture_2d_manager()
-                            ->create_object(uid);
-        _gl_depth_texture->set_description(
-            "VR entry exit points FBO depth texture");
+            ->get_texture_2d_manager()->create_object("VR entry exit points FBO depth texture");
         _gl_depth_texture->initialize();
 
         _gl_fbo->bind();

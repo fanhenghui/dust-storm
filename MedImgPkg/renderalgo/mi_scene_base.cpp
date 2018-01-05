@@ -77,19 +77,13 @@ void SceneBase::initialize() {
 
         GLUtils::set_pixel_pack_alignment(1);
 
-        UIDType fbo_id = 0;
         _scene_fbo = GLResourceManagerContainer::instance()
-                     ->get_fbo_manager()
-                     ->create_object(fbo_id);
-        _scene_fbo->set_description("scene base FBO");
+            ->get_fbo_manager()->create_object("scene base FBO");
         _scene_fbo->initialize();
         _scene_fbo->set_target(GL_FRAMEBUFFER);
 
-        UIDType texture_color_id = 0;
         _scene_color_attach_0 = GLResourceManagerContainer::instance()
-                                ->get_texture_2d_manager()
-                                ->create_object(texture_color_id);
-        _scene_color_attach_0->set_description("scene base color attachment 0");
+            ->get_texture_2d_manager()->create_object("scene base color attachment 0");
         _scene_color_attach_0->initialize();
         _scene_color_attach_0->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -99,9 +93,7 @@ void SceneBase::initialize() {
 
 
         _scene_color_attach_1 = GLResourceManagerContainer::instance()
-                                ->get_texture_2d_manager()
-                                ->create_object(texture_color_id);
-        _scene_color_attach_1->set_description("scene base color attachment 1 <flip verticalily>");
+            ->get_texture_2d_manager()->create_object("scene base color attachment 1 <flip verticalily>");
         _scene_color_attach_1->initialize();
         _scene_color_attach_1->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -109,11 +101,8 @@ void SceneBase::initialize() {
         _scene_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB,
                                     GL_UNSIGNED_BYTE, nullptr);
 
-        UIDType depth_color_id = 0;
         _scene_depth_attach = GLResourceManagerContainer::instance()
-                              ->get_texture_2d_manager()
-                              ->create_object(depth_color_id);
-        _scene_depth_attach->set_description("scene base depth attachment");
+            ->get_texture_2d_manager()->create_object("scene base depth attachment");
         _scene_depth_attach->initialize();
         _scene_depth_attach->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
@@ -123,11 +112,9 @@ void SceneBase::initialize() {
 
         // bind texture to FBO
         _scene_fbo->bind();
-
         _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _scene_color_attach_0);
         _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _scene_color_attach_1);
         _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT, _scene_depth_attach);
-
         _scene_fbo->unbind();
 
         CHECK_GL_ERROR;
@@ -171,9 +158,8 @@ void SceneBase::initialize() {
 
 
         //time query
-        UIDType time_id = 0;
-        _gl_time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object(time_id);
-        _gl_time_query->set_description("scene base time query");
+        _gl_time_query = GLResourceManagerContainer::instance()
+            ->get_time_query_manager()->create_object("scene base time query");
         _gl_time_query->initialize();
 
         _res_shield.add_shield<GLFBO>(_scene_fbo);
