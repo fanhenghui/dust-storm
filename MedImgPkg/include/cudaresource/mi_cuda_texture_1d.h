@@ -5,18 +5,20 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CUDAResource_Export CudaTexture1D : public CudaTextureBase
-{
+class CUDAResource_Export CudaTexture1D : public CudaTextureBase {
 public:
     explicit CudaTexture1D(UIDType uid);
     virtual ~CudaTexture1D();
     
-    virtual void finalize();
     virtual float memory_used() const;
 
-    int load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int length, void* data);
+    int get_length() const;
 
-    int update(int offset, int length, void* data);
+    int load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int length, void* h_data);
+
+    int update(int offset, int length, void* h_data);
+
+    int download(unsigned int size, void* h_data);
 
 protected:
 

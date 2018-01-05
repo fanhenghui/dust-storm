@@ -8,8 +8,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CUDAResource_Export CudaTexture1DArray : public CudaObject
-{
+class CUDAResource_Export CudaTexture1DArray : public CudaObject {
 public:
     explicit CudaTexture1DArray(UIDType uid, const int array_length);
 

@@ -11,10 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\cudaresource\mi_cuda_device_memory.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_global_memory.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_gl_texture_2d.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_object.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_resource_manager.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_surface_2d.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_surface_base.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_1d.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_1d_array.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_texture_2d.cpp" />
@@ -23,13 +25,15 @@
     <ClCompile Include="..\cudaresource\mi_cuda_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\cudaresource\mi_cuda_device_memory.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_global_memory.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_gl_texture_2d.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_object.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_define.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_export.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_logger.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_manager.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_surface_2d.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_surface_base.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d_array.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_2d.h" />

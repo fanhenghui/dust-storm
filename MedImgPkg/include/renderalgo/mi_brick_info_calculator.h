@@ -93,7 +93,7 @@ private:
 private:
     GLProgramPtr _gl_program;
     GLBufferPtr _gl_buffer_visible_labels;
-    CudaDeviceMemoryPtr _cuda_memory;
+    CudaGlobalMemoryPtr _cuda_buffer_visible_labels;
     std::vector<unsigned char> _visible_labels;
 };
 

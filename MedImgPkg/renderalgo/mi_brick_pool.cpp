@@ -4,7 +4,7 @@
 
 #include "glresource/mi_gl_buffer.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
-#include "cudaresource/mi_cuda_device_memory.h"
+#include "cudaresource/mi_cuda_global_memory.h"
 
 #include "io/mi_configure.h"
 #include "io/mi_image_data.h"

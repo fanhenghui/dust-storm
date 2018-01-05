@@ -4,7 +4,8 @@
 #include "mi_cuda_texture_2d.h"
 #include "mi_cuda_texture_3d.h"
 #include "mi_cuda_gl_texture_2d.h"
-#include "mi_cuda_device_memory.h"
+#include "mi_cuda_global_memory.h"
+#include "mi_cuda_surface_2d.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -37,48 +38,56 @@ void CudaResourceManager::release() {
     }
 }
 
-std::shared_ptr<CudaDeviceMemory> CudaResourceManager::create_device_memory(const std::string& desc) {
+CudaGlobalMemoryPtr CudaResourceManager::create_device_memory(const std::string& desc) {
     UIDType uid = 0;
-    std::shared_ptr<CudaDeviceMemory> ptr(new CudaDeviceMemory(uid));
+    CudaGlobalMemoryPtr ptr(new CudaGlobalMemory(uid));
     ptr->set_description(desc);
-    _record_device_memory.insert(uid, ptr);
+    _record_global_memory.insert(uid, ptr);
     return ptr;
 }
 
-std::shared_ptr<CudaTexture1D> CudaResourceManager::create_cuda_texture_1d(const std::string& desc) {
+CudaTexture1DPtr CudaResourceManager::create_cuda_texture_1d(const std::string& desc) {
     UIDType uid = 0;
-    std::shared_ptr<CudaTexture1D> ptr(new CudaTexture1D(uid));
+    CudaTexture1DPtr ptr(new CudaTexture1D(uid));
     ptr->set_description(desc);
     _record_tex_1d.insert(uid, ptr);
     return ptr;
 }
 
-std::shared_ptr<CudaTexture2D> CudaResourceManager::create_cuda_texture_2d(const std::string& desc) {
+CudaTexture2DPtr CudaResourceManager::create_cuda_texture_2d(const std::string& desc) {
     UIDType uid = 0;
-    std::shared_ptr<CudaTexture2D> ptr(new CudaTexture2D(uid));
+    CudaTexture2DPtr  ptr(new CudaTexture2D(uid));
     ptr->set_description(desc);
     _record_tex_2d.insert(uid, ptr);
     return ptr;
 }
 
-std::shared_ptr<CudaTexture3D> CudaResourceManager::create_cuda_texture_3d(const std::string& desc) {
+CudaTexture3DPtr CudaResourceManager::create_cuda_texture_3d(const std::string& desc) {
     UIDType uid = 0;
-    std::shared_ptr<CudaTexture3D> ptr(new CudaTexture3D(uid));
+    CudaTexture3DPtr ptr(new CudaTexture3D(uid));
     ptr->set_description(desc);
     _record_tex_3d.insert(uid, ptr);
     return ptr;
 }
 
-std::shared_ptr<CudaGLTexture2D> CudaResourceManager::create_cuda_gl_texture_2d(const std::string& desc) {
+CudaGLTexture2DPtr CudaResourceManager::create_cuda_gl_texture_2d(const std::string& desc) {
     UIDType uid = 0;
-    std::shared_ptr<CudaGLTexture2D> ptr(new CudaGLTexture2D(uid));
+    CudaGLTexture2DPtr ptr(new CudaGLTexture2D(uid));
     ptr->set_description(desc);
     _record_gl_tex_2d.insert(uid, ptr);
     return ptr;
 }
 
+CudaSurface2DPtr CudaResourceManager::create_cuda_surface_2d(const std::string& desc) {
+    UIDType uid = 0;
+    CudaSurface2DPtr ptr(new CudaSurface2D(uid));
+    ptr->set_description(desc);
+    _record_surface_2d.insert(uid, ptr);
+    return ptr;
+}
+
 float CudaResourceManager::get_device_memory_memory_used() {
-    return _record_device_memory.get_memory_used();
+    return _record_global_memory.get_memory_used();
 }
 
 float CudaResourceManager::get_cuda_texture_1d_memory_used() {
@@ -100,7 +109,7 @@ float CudaResourceManager::get_cuda_gl_texture_2d_memory_used() {
 std::string CudaResourceManager::get_specification(const std::string& split) {
     std::stringstream ss;
     ss << "CUDA Resources: [" << split << 
-        _record_device_memory.get_specification(split) << ", " << split <<
+        _record_global_memory.get_specification(split) << ", " << split <<
         _record_tex_1d.get_specification(split) << ", " << split <<
         _record_tex_2d.get_specification(split) << ", " << split <<
         _record_tex_3d.get_specification(split) << ", " << split <<
@@ -109,8 +118,8 @@ std::string CudaResourceManager::get_specification(const std::string& split) {
 }
 
 template<>
-const char* CudaResoueceRecord<CudaDeviceMemory>::get_type_desc() const {
-    return "CudaDeviceMemory";
+const char* CudaResoueceRecord<CudaGlobalMemory>::get_type_desc() const {
+    return "CudaGlobalMemory";
 }
 
 template<>
@@ -131,6 +140,16 @@ const char* CudaResoueceRecord<CudaTexture3D>::get_type_desc() const {
 template<>
 const char* CudaResoueceRecord<CudaGLTexture2D>::get_type_desc() const {
     return "CudaGLTexture2D";
+}
+
+template<>
+const char* CudaResoueceRecord<CudaTexture1DArray>::get_type_desc() const {
+    return "CudaTexture1DArray";
+}
+
+template<>
+const char* CudaResoueceRecord<CudaSurface2D>::get_type_desc() const {
+    return "CudaSurface2D";
 }
 
 MED_IMG_END_NAMESPACE

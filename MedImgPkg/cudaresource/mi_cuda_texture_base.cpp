@@ -4,8 +4,12 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-CudaTextureBase::CudaTextureBase(UIDType uid, const std::string& type): CudaObject(uid, type), _cuda_array(nullptr){
-
+CudaTextureBase::CudaTextureBase(UIDType uid, const std::string& type): 
+    CudaObject(uid, type), _d_array(nullptr), _format(cudaChannelFormatKindNone){
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
 }
 
 CudaTextureBase::~CudaTextureBase() {
@@ -18,16 +22,20 @@ void CudaTextureBase::initialize() {
 
 void CudaTextureBase::finalize() {
     cudaError_t err = cudaSuccess;
-    if (_cuda_array) {
-        err = cudaFreeArray(_cuda_array);
+    if (_d_array) {
+        err = cudaFreeArray(_d_array);
         CHECK_CUDA_ERROR(err);
-        _cuda_array = nullptr;
+        _d_array = nullptr;
     }
     for (auto it = _tex_objs.begin(); it != _tex_objs.end(); ++it) {
         err = cudaDestroyTextureObject(it->second);
         CHECK_CUDA_ERROR(err);
     }
     _tex_objs.clear();
+}
+
+void CudaTextureBase::get_channel(int(&channel)[4]) const {
+    memcpy(channel, _channel, sizeof(int) * 4);
 }
 
 cudaTextureObject_t CudaTextureBase::get_object(cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
@@ -45,7 +53,7 @@ cudaTextureObject_t CudaTextureBase::get_object(cudaTextureAddressMode address_m
     if (it != _tex_objs.end()) {
         return it->second;
     } else {
-        if (nullptr == _cuda_array) {
+        if (nullptr == _d_array) {
             MI_CUDARESOURCE_LOG(MI_ERROR) << "try get null CUDA array's texture object.";
             return 0;
         }

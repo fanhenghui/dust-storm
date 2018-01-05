@@ -2,6 +2,7 @@
 #define MED_IMG_CUDARESOUECE_MI_CUDA_RESOURCE_MANANGER_H
 
 #include "cudaresource/mi_cuda_resource_export.h"
+#include "cudaresource/mi_cuda_resource_define.h"
 #include "util/mi_uid.h"
 #include <memory>
 #include <map>
@@ -15,7 +16,7 @@ class CudaTexture1D;
 class CudaTexture2D;
 class CudaTexture3D;
 class CudaGLTexture2D;
-class CudaDeviceMemory;
+class CudaGlobalMemory;
 
 template<class T>
 class CudaResoueceRecord {
@@ -78,19 +79,19 @@ private:
     boost::mutex _mutex;
 };
 
-class CUDAResource_Export CudaResourceManager
-{
+class CUDAResource_Export CudaResourceManager {
 public:
     ~CudaResourceManager();
 
     static CudaResourceManager* instance();
     static void release();
     
-    std::shared_ptr<CudaDeviceMemory> create_device_memory(const std::string& desc);
-    std::shared_ptr<CudaTexture1D> create_cuda_texture_1d(const std::string& desc);
-    std::shared_ptr<CudaTexture2D> create_cuda_texture_2d(const std::string& desc);
-    std::shared_ptr<CudaTexture3D> create_cuda_texture_3d(const std::string& desc);
-    std::shared_ptr<CudaGLTexture2D> create_cuda_gl_texture_2d(const std::string& desc);
+    CudaGlobalMemoryPtr create_device_memory(const std::string& desc);
+    CudaTexture1DPtr create_cuda_texture_1d(const std::string& desc);
+    CudaTexture2DPtr create_cuda_texture_2d(const std::string& desc);
+    CudaTexture3DPtr create_cuda_texture_3d(const std::string& desc);
+    CudaGLTexture2DPtr create_cuda_gl_texture_2d(const std::string& desc);
+    CudaSurface2DPtr create_cuda_surface_2d(const std::string& desc);
 
     float get_device_memory_memory_used();
     float get_cuda_texture_1d_memory_used();
@@ -110,11 +111,12 @@ private:
     static CudaResourceManager *_instance;
     static boost::mutex _mutex;
 
-    CudaResoueceRecord<CudaDeviceMemory> _record_device_memory;
+    CudaResoueceRecord<CudaGlobalMemory> _record_global_memory;
     CudaResoueceRecord<CudaTexture1D>    _record_tex_1d;
     CudaResoueceRecord<CudaTexture2D>    _record_tex_2d;
     CudaResoueceRecord<CudaTexture3D>    _record_tex_3d;
     CudaResoueceRecord<CudaGLTexture2D>  _record_gl_tex_2d;
+    CudaResoueceRecord<CudaSurface2D>    _record_surface_2d;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CudaResourceManager);    

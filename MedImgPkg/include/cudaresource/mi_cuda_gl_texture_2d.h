@@ -8,8 +8,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class GLTexture2D;
-class CUDAResource_Export CudaGLTexture2D : public CudaTextureBase
-{
+class CUDAResource_Export CudaGLTexture2D : public CudaTextureBase {
 public:
     explicit CudaGLTexture2D(UIDType uid);
     virtual ~CudaGLTexture2D();

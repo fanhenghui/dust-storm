@@ -17,7 +17,7 @@
 #include "cudaresource/mi_cuda_texture_2d.h"
 #include "cudaresource/mi_cuda_texture_3d.h"
 #include "cudaresource/mi_cuda_gl_texture_2d.h"
-#include "cudaresource/mi_cuda_device_memory.h"
+#include "cudaresource/mi_cuda_global_memory.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
 #include <memory>
 

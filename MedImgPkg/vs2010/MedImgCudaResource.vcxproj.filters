@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\cudaresource\mi_cuda_device_memory.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="..\cudaresource\mi_cuda_texture_base.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -42,15 +39,21 @@
     <ClCompile Include="..\cudaresource\mi_cuda_texture_1d_array.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_global_memory.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_surface_base.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_surface_2d.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_export.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_logger.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\cudaresource\mi_cuda_device_memory.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_base.h">
@@ -81,6 +84,15 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cudaresource\mi_cuda_texture_1d_array.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_global_memory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_surface_2d.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_surface_base.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

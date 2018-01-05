@@ -40,9 +40,9 @@ private:
 
 typedef GPUResourcePair<GLTexture1D, CudaTexture1D> GPUTexture1DPair;
 typedef GPUResourcePair<GLTexture3D, CudaTexture3D> GPUTexture3DPair;
-typedef GPUResourcePair<GLBuffer, CudaDeviceMemory> GPUMemoryPair;
+typedef GPUResourcePair<GLBuffer, CudaGlobalMemory> GPUMemoryPair;
 typedef GPUResourcePair<GLTexture1DArray, CudaTexture1DArray> GPUTexture1DArrayPair;
-typedef GPUResourcePair<GLTexture2D, CudaDeviceMemory> GPUCanvasPair;
+typedef GPUResourcePair<GLTexture2D, CudaSurface2D> GPUCanvasPair;
 
 typedef std::shared_ptr<GPUTexture1DPair> GPUTexture1DPairPtr;
 typedef std::shared_ptr<GPUTexture3DPair> GPUTexture3DPairPtr;

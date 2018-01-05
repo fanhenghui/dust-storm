@@ -38,7 +38,7 @@ cudaTextureObject_t CudaGLTexture2D::create_object(
     struct cudaResourceDesc res_desc;
     memset(&res_desc, 0, sizeof(cudaResourceDesc));
     res_desc.resType = cudaResourceTypeArray;
-    res_desc.res.array.array = _cuda_array;
+    res_desc.res.array.array = _d_array;
 
     cudaTextureDesc tex_desc;
     memset(&tex_desc, 0, sizeof(cudaTextureDesc));
@@ -89,7 +89,7 @@ int CudaGLTexture2D::map_gl_texture() {
     } else {
         return 0;
     }
-    err = cudaGraphicsSubResourceGetMappedArray(&_cuda_array, _cuda_graphic_resource, 0,0);
+    err = cudaGraphicsSubResourceGetMappedArray(&_d_array, _cuda_graphic_resource, 0,0);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;
@@ -114,7 +114,7 @@ int CudaGLTexture2D::write_to_gl_texture(void* array, size_t count, cudaMemcpyKi
         return -1;
     }
 
-    cudaError_t err = cudaMemcpyToArray(_cuda_array, 0, 0, array, count, memcpy_kind);
+    cudaError_t err = cudaMemcpyToArray(_d_array, 0, 0, array, count, memcpy_kind);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;

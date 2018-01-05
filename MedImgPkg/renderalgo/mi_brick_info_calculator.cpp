@@ -6,7 +6,7 @@
 #include "glresource/mi_gl_utils.h"
 
 #include "cudaresource/mi_cuda_resource_manager.h"
-#include "cudaresource/mi_cuda_device_memory.h"
+#include "cudaresource/mi_cuda_global_memory.h"
 
 #include "io/mi_image_data.h"
 
@@ -379,7 +379,7 @@ void MaskBrickInfoCalculator::initialize() {
             _gl_program->compile();
 
             _gl_buffer_visible_labels = GLResourceManagerContainer::instance()
-                ->get_buffer_manager()->create_object("visible label buffer in mask brick info calculator program");
+                ->get_buffer_manager()->create_object("visible label buffer in mask brick info calculator");
             _gl_buffer_visible_labels->initialize();
             _gl_buffer_visible_labels->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
 
@@ -388,8 +388,8 @@ void MaskBrickInfoCalculator::initialize() {
         }
     } else {
         //TODO CUDA
-        if (nullptr == _cuda_memory) {
-            _cuda_memory = CudaResourceManager::instance()->create_device_memory("visible label memory in mask brick info calculator program");
+        if (nullptr == _cuda_buffer_visible_labels) {
+            _cuda_buffer_visible_labels = CudaResourceManager::instance()->create_device_memory("visible label memory in mask brick info calculator");
         }
     }
 }

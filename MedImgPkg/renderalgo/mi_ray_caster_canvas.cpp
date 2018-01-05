@@ -7,7 +7,7 @@
 #include "glresource/mi_gl_texture_cache.h"
 #include "glresource/mi_gl_utils.h"
 
-#include "cudaresource/mi_cuda_device_memory.h"
+#include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
 
 #include "mi_render_algo_logger.h"
@@ -99,14 +99,14 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
             }
         } else {
             //two device memory as canvas color attachment
-            CudaDeviceMemoryPtr cuda_mem_0 = CudaResourceManager::instance()->create_device_memory("ray caster canvas color-0");
-            cuda_mem_0->load(_width*_height * 4, nullptr);
-            _color_attach_0.reset(new GPUCanvasPair(cuda_mem_0));
+            CudaSurface2DPtr surface0 = CudaResourceManager::instance()->create_cuda_surface_2d("ray caster canvas color-0");
+            surface0->load(8,8,8,8,cudaChannelFormatKindUnsigned, _width, _height, nullptr);
+            _color_attach_0.reset(new GPUCanvasPair(surface0));
             
             if (multi_color_attach) {
-                CudaDeviceMemoryPtr cuda_mem_1 = CudaResourceManager::instance()->create_device_memory("ray caster canvas color-1");
-                cuda_mem_1->load(_width*_height * 4, nullptr);
-                _color_attach_1.reset(new GPUCanvasPair(cuda_mem_1));
+                CudaSurface2DPtr surface1 = CudaResourceManager::instance()->create_cuda_surface_2d("ray caster canvas color-1");
+                surface1->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
+                _color_attach_1.reset(new GPUCanvasPair(surface1));
             }
         }
     }
@@ -140,9 +140,9 @@ void RayCasterCanvas::set_display_size(int width, int height) {
                         _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
                 }
             } else {
-                _color_attach_0->get_cuda_resource()->load(_width*_height*4, nullptr);
+                _color_attach_0->get_cuda_resource()->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
                 if (_color_attach_1) {
-                    _color_attach_1->get_cuda_resource()->load(_width*_height * 4, nullptr);
+                    _color_attach_1->get_cuda_resource()->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
                 }
             }
         }
@@ -186,7 +186,7 @@ void RayCasterCanvas::debug_output_color_0(const std::string& file_name) {
         _color_attach_0->get_gl_resource()->unbind();
     } else {
         std::unique_ptr<unsigned char[]> rgba(new unsigned char[_width * _height * 4]);
-        _color_attach_0->get_cuda_resource()->download(rgba.get(), _width*_height*4);
+        _color_attach_0->get_cuda_resource()->download(_width*_height * 4, rgba.get());
         for (int i = 0; i < _width*_height; ++i) {
             color_array[i * 3 + 0] = rgba[i * 4 + 0];
             color_array[i * 3 + 1] = rgba[i * 4 + 1];
@@ -213,7 +213,7 @@ void RayCasterCanvas::debug_output_color_1(const std::string& file_name) {
         _color_attach_1->get_gl_resource()->unbind();
     } else {
         std::unique_ptr<unsigned char[]> rgba(new unsigned char[_width * _height * 4]);
-        _color_attach_1->get_cuda_resource()->download(rgba.get(), _width*_height * 4);
+        _color_attach_1->get_cuda_resource()->download(_width*_height * 4, rgba.get());
         for (int i = 0; i < _width*_height; ++i) {
             color_array[i * 3 + 0] = rgba[i * 4 + 0];
             color_array[i * 3 + 1] = rgba[i * 4 + 1];
