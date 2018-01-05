@@ -161,7 +161,7 @@ IOStatus NoduleSetParser::load_as_csv(const std::string& file_path,
     for (auto it = items.begin(); it != items.end(); ++it) {
         const InnerItem& item = *it;
         VOISphere voi(Point3(item.cx, item.cy, item.cz), item.diameter, item.type);
-        voi.probability = item.probability;
+        voi.probability = (float)item.probability;
         nodule_set->add_nodule(voi);
     }
 

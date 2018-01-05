@@ -616,7 +616,7 @@ IOStatus DICOMLoader::sort_series(DcmFileFormatSet& file_format_set) {
             return IO_DATA_DAMAGE;
         }
 
-        locs[sl] = i;
+        locs[sl] = (int)i;
     }
 
     DcmFileFormatSet new_set(file_format_set.size());

@@ -101,7 +101,7 @@ int FileUtil::get_all_file_recursion(
         try {
             get_files(root , postfix, files);
             return 0;
-        } catch(const boost::exception& ex) {
+        } catch(const boost::exception& ) {
             MI_UTIL_LOG(MI_ERROR) << "get all file failed.";
             return -1;
         } catch(const std::exception& ex) {
