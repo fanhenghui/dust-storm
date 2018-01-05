@@ -42,7 +42,7 @@
     <ClInclude Include="..\include\renderalgo\mi_vr_scene.h" />
     <ClInclude Include="..\renderalgo\mi_ray_caster_inner_buffer.h" />
     <ClInclude Include="..\renderalgo\mi_ray_casting_cpu.h" />
-    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu.h" />
+    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_gl.h" />
     <ClInclude Include="..\renderalgo\mi_rc_step_base.h" />
     <ClInclude Include="..\renderalgo\mi_rc_step_color_inverse.h" />
     <ClInclude Include="..\renderalgo\mi_rc_step_composite.h" />
@@ -73,7 +73,7 @@
     <ClCompile Include="..\renderalgo\mi_ray_caster_canvas.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_caster_inner_buffer.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_casting_cpu.cpp" />
-    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu.cpp" />
+    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_gl.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_cast_scene.cpp" />
     <ClCompile Include="..\renderalgo\mi_rc_step_color_inverse.cpp" />
     <ClCompile Include="..\renderalgo\mi_rc_step_composite.cpp" />

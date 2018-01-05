@@ -18,9 +18,9 @@ void RCStepRayCastingMIPBase::set_gpu_parameter() {
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
 
     // Pseudo color
-    unsigned int uiLength(1);
+    unsigned int lut_length(1);
     GLTexture1DPtr pPseudoColorTex =
-        ray_caster->get_pseudo_color_texture(uiLength);
+        ray_caster->get_pseudo_color_texture(lut_length)->get_gl_resource();
     RENDERALGO_CHECK_NULL_EXCEPTION(pPseudoColorTex);
 
     glEnable(GL_TEXTURE_1D);
@@ -33,8 +33,8 @@ void RCStepRayCastingMIPBase::set_gpu_parameter() {
     glDisable(GL_TEXTURE_1D);
 
     // Linear change: discrete array (0 ~ length -1) to texture coordinate(0 ~ 1)
-    glUniform1f(_loc_pseudo_color_slope, (uiLength - 1.0f) / uiLength);
-    glUniform1f(_loc_pseudo_color_intercept, 0.5f / uiLength);
+    glUniform1f(_loc_pseudo_color_slope, (lut_length - 1.0f) / lut_length);
+    glUniform1f(_loc_pseudo_color_intercept, 0.5f / lut_length);
 
     // Global window level
     std::shared_ptr<ImageData> pVolume = ray_caster->get_volume_data();

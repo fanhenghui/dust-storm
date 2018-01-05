@@ -1,14 +1,14 @@
 #ifndef MEDIMGRENDERALGO_RAY_CASTER_H
 #define MEDIMGRENDERALGO_RAY_CASTER_H
 
-#include "renderalgo/mi_brick_define.h"
-#include "renderalgo/mi_ray_caster_define.h"
 #include "renderalgo/mi_render_algo_export.h"
 
 #include "arithmetic/mi_matrix4.h"
 #include "arithmetic/mi_vector4f.h"
 
-#include "glresource/mi_gl_resource_define.h"
+#include "renderalgo/mi_ray_caster_define.h"
+#include "renderalgo/mi_brick_define.h"
+#include "renderalgo/mi_gpu_resource_pair.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -19,17 +19,17 @@ class CameraCalculator;
 class RayCasterInnerBuffer;
 class RayCasterCanvas;
 class RayCastingCPU;
-class RayCastingGPU;
+class RayCastingGPUGL;
 class RayCastingCPUBrickAcc;
 
 class RenderAlgo_Export RayCaster
         : public std::enable_shared_from_this<RayCaster> {
     friend class RayCastingCPU;
     friend class RayCastingCPUBrickAcc;
-    friend class RayCastingGPU;
+    friend class RayCastingGPUGL;
 
 public:
-    RayCaster();
+    RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform);
 
     ~RayCaster();
 
@@ -37,9 +37,6 @@ public:
 
     void set_test_code(int test_code);
     int get_test_code() const;
-
-    // Ray casting strategy
-    void set_strategy(RayCastingStrategy strategy);
 
     void set_canvas(std::shared_ptr<RayCasterCanvas> canvas);
 
@@ -58,11 +55,11 @@ public:
     void set_mask_data(std::shared_ptr<ImageData> image_data);
     std::shared_ptr<ImageData> get_mask_data();
 
-    void set_volume_data_texture(std::vector<GLTexture3DPtr> volume_textures);
-    std::vector<GLTexture3DPtr> get_volume_data_texture();
+    void set_volume_data_texture(GPUTexture3DPairPtr volume_textures);
+    GPUTexture3DPairPtr get_volume_data_texture();
 
-    void set_mask_data_texture(std::vector<GLTexture3DPtr> mask_textures);
-    std::vector<GLTexture3DPtr> get_mask_data_texture();
+    void set_mask_data_texture(GPUTexture3DPairPtr mask_textures);
+    GPUTexture3DPairPtr get_mask_data_texture();
 
     // Entry exit points
     void
@@ -97,12 +94,12 @@ public:
     void get_global_window_level(float& ww, float& wl) const;
 
     // Pseudo color parameter
-    void set_pseudo_color_texture(GLTexture1DPtr tex, unsigned int length);
-    GLTexture1DPtr get_pseudo_color_texture(unsigned int& length) const;
+    void set_pseudo_color_texture(GPUTexture1DPairPtr tex, unsigned int length);
+    GPUTexture1DPairPtr get_pseudo_color_texture(unsigned int& length) const;
     void set_pseudo_color_array(unsigned char* color_array, unsigned int length);
 
-    void set_color_opacity_texture_array(GLTexture1DArrayPtr tex_array);
-    GLTexture1DArrayPtr get_color_opacity_texture_array() const;
+    void set_color_opacity_texture_array(GPUTexture1DArrayPairPtr tex_array);
+    GPUTexture1DArrayPairPtr get_color_opacity_texture_array() const;
 
     // Mask overlay color
     void set_mask_overlay_color(std::map<unsigned char, RGBAUnit> colors);
@@ -156,13 +153,22 @@ public:
     int  get_expected_fps() const;
     bool map_quarter_canvas() const;
 
-protected:
+private:
+    void render_cpu();
+    void render_gpu_gl();
+    void render_gpu_cuda();
+private:
+    // Processing unit type
+    RayCastingStrategy _strategy;
+    //GPU platform
+    GPUPlatform _gpu_platform;
+
     // Input data
     std::shared_ptr<ImageData> _volume_data;
-    std::vector<GLTexture3DPtr> _volume_textures;
+    GPUTexture3DPairPtr _volume_textures;
 
     std::shared_ptr<ImageData> _mask_data;
-    std::vector<GLTexture3DPtr> _mask_textures;
+    GPUTexture3DPairPtr _mask_textures;
 
     // Entry exit points
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
@@ -179,8 +185,8 @@ protected:
     float _global_wl;
 
     // Transfer function & pseudo color
-    GLTexture1DArrayPtr _color_opacity_texture_array;
-    GLTexture1DPtr _pseudo_color_texture;
+    GPUTexture1DArrayPairPtr _color_opacity_texture_array;
+    GPUTexture1DPairPtr _pseudo_color_texture;
     unsigned char* _pseudo_color_array;
     unsigned int _pseudo_color_length;
 
@@ -214,11 +220,8 @@ protected:
     // Ambient
     float _ambient_color[4];
 
-    // Processing unit type
-    RayCastingStrategy _strategy;
-
     std::shared_ptr<RayCastingCPU> _ray_casting_cpu;
-    std::shared_ptr<RayCastingGPU> _ray_casting_gpu;
+    std::shared_ptr<RayCastingGPUGL> _ray_casting_gpu;
 
     // Canvas for rendering
     std::shared_ptr<RayCasterCanvas> _canvas;

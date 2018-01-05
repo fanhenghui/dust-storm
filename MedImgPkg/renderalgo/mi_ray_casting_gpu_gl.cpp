@@ -1,4 +1,4 @@
-#include "mi_ray_casting_gpu.h"
+#include "mi_ray_casting_gpu_gl.h"
 
 #include "glresource/mi_gl_buffer.h"
 #include "glresource/mi_gl_program.h"
@@ -20,13 +20,13 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastingGPU::RayCastingGPU(std::shared_ptr<RayCaster> ray_caster)
+RayCastingGPUGL::RayCastingGPUGL(std::shared_ptr<RayCaster> ray_caster)
     : _ray_caster(ray_caster), _gl_act_tex_counter(new GLActiveTextureCounter()), 
     _render_duration(0), _last_test_code(-1) {}
 
-RayCastingGPU::~RayCastingGPU() {}
+RayCastingGPUGL::~RayCastingGPUGL() {}
 
-void RayCastingGPU::render() {
+void RayCastingGPUGL::render() {
     update_i();
 
     CHECK_GL_ERROR;
@@ -58,7 +58,7 @@ void RayCastingGPU::render() {
     CHECK_GL_ERROR;
 }
 
-void RayCastingGPU::update_i() {
+void RayCastingGPUGL::update_i() {
     CHECK_GL_ERROR;
 
     // Create VAO
@@ -216,7 +216,7 @@ void RayCastingGPU::update_i() {
     CHECK_GL_ERROR;
 }
 
-double RayCastingGPU::get_rendering_duration() const {
+double RayCastingGPUGL::get_rendering_duration() const {
     return _render_duration;
 }
 

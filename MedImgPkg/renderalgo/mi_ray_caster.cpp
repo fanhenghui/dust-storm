@@ -9,13 +9,14 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_ray_caster_inner_buffer.h"
 #include "mi_ray_casting_cpu.h"
-#include "mi_ray_casting_gpu.h"
+#include "mi_ray_casting_gpu_gl.h"
 #include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCaster::RayCaster()
-    :  _sample_rate(0.5f), _custom_sample_rate(0.5f), 
+RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
+    : _strategy(strategy), _gpu_platform(gpu_platform), 
+      _sample_rate(0.5f), _custom_sample_rate(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
       _inner_buffer(new RayCasterInnerBuffer()),
@@ -28,7 +29,6 @@ RayCaster::RayCaster()
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
       _mask_overlay_mode(MASK_OVERLAY_DISABLE), 
       _mask_overlay_opacity(0.5f),
-      _strategy(CPU_BASE),
       _pre_rendering_duration(0),
       _downsample(false), 
       _expected_fps(30), 
@@ -43,77 +43,95 @@ RayCaster::RayCaster()
 RayCaster::~RayCaster() {}
 
 void RayCaster::render() {
-    
     if (CPU_BASE == _strategy) {
-        if (!_ray_casting_cpu) {
-            _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));
-        }
-        // clock_t t0 = clock();
-        _ray_casting_cpu->render();
-        // clock_t t1 = clock();
-        // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0)/CLOCKS_PER_SEC << "ms.";
+        render_cpu();
     } else if (GPU_BASE == _strategy) {
-        if (!_ray_casting_gpu) {
-            _ray_casting_gpu.reset(new RayCastingGPU(shared_from_this()));
-        }
+        if (GL_BASE == _gpu_platform) {
+            render_gpu_gl();
+        } else {
+            render_gpu_cuda();
+        }   
+    }
+}
 
-        {
-            CHECK_GL_ERROR;
-            FBOStack fboStack;
-            _canvas->get_fbo()->bind();
-            if (this->get_composite_mode() == COMPOSITE_DVR) {
-                GLenum buffers[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-                glDrawBuffers(2, buffers);
-            } else {
-                glDrawBuffer(GL_COLOR_ATTACHMENT0);    
-            }
+void RayCaster::render_cpu() {
+    if (!_ray_casting_cpu) {
+        _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));
+    }
+    // clock_t t0 = clock();
+    _ray_casting_cpu->render();
+    // clock_t t1 = clock();
+    // MI_RENDERALGO_LOG(MI_DEBUG) << "Ray casting cost : " << double(t1-t0)/CLOCKS_PER_SEC << "ms.";
+}
 
-            // Clear
-            glClearColor(0, 0, 0, 0);
-            glClearDepth(1.0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void RayCaster::render_gpu_gl() {
+    if (!_ray_casting_gpu) {
+        _ray_casting_gpu.reset(new RayCastingGPUGL(shared_from_this()));
+    }
 
-            // downsample strategy
-            if (_downsample) {
-                const double para0 = 1.5;
-                const double para1 = 1.6;
-                if (_pre_rendering_duration > 0 ) {
-                    const double exp_fps = (double)_expected_fps;
-                    const double pre_fps = 1000.0/_pre_rendering_duration;
-                    if (pre_fps < exp_fps) {
-                        if (pre_fps < exp_fps/para1) {
-                            if (_map_quarter_canvas) {
-                                _sample_rate = (float)(_sample_rate*para0);
-                            } else {
-                                _map_quarter_canvas = true;
-                            }
-                        } else {
-                            _sample_rate = (float)(_sample_rate*para0);
-                        }
+    CHECK_GL_ERROR;
+    FBOStack fboStack;
+    _canvas->get_fbo()->bind();
+    if (this->get_composite_mode() == COMPOSITE_DVR) {
+        GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, buffers);
+    }
+    else {
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    }
+
+    // Clear
+    glClearColor(0, 0, 0, 0);
+    glClearDepth(1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // downsample strategy
+    if (_downsample) {
+        const double para0 = 1.5;
+        const double para1 = 1.6;
+        if (_pre_rendering_duration > 0) {
+            const double exp_fps = (double)_expected_fps;
+            const double pre_fps = 1000.0 / _pre_rendering_duration;
+            if (pre_fps < exp_fps) {
+                if (pre_fps < exp_fps / para1) {
+                    if (_map_quarter_canvas) {
+                        _sample_rate = (float)(_sample_rate*para0);
+                    }
+                    else {
+                        _map_quarter_canvas = true;
                     }
                 }
-            } else {
-                _map_quarter_canvas = false;
-                _sample_rate = _custom_sample_rate;
+                else {
+                    _sample_rate = (float)(_sample_rate*para0);
+                }
             }
-
-            // Viewport
-            int width, height;
-            _canvas->get_display_size(width, height);
-            if (_map_quarter_canvas) {
-                glViewport(0, 0, width/2, height/2);
-            } else {
-                glViewport(0, 0, width, height);
-            }
-            
-            CHECK_GL_ERROR;
-
-            _ray_casting_gpu->render();
-
-            _pre_rendering_duration = _ray_casting_gpu->get_rendering_duration();
-            //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
         }
     }
+    else {
+        _map_quarter_canvas = false;
+        _sample_rate = _custom_sample_rate;
+    }
+
+    // Viewport
+    int width, height;
+    _canvas->get_display_size(width, height);
+    if (_map_quarter_canvas) {
+        glViewport(0, 0, width / 2, height / 2);
+    }
+    else {
+        glViewport(0, 0, width, height);
+    }
+
+    CHECK_GL_ERROR;
+
+    _ray_casting_gpu->render();
+
+    _pre_rendering_duration = _ray_casting_gpu->get_rendering_duration();
+    //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
+}
+
+void RayCaster::render_gpu_cuda() {
+
 }
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {
@@ -124,13 +142,11 @@ void RayCaster::set_mask_data(std::shared_ptr<ImageData> image_data) {
     _mask_data = image_data;
 }
 
-void RayCaster::set_volume_data_texture(
-    std::vector<GLTexture3DPtr> volume_textures) {
+void RayCaster::set_volume_data_texture( GPUTexture3DPairPtr volume_textures) {
     _volume_textures = volume_textures;
 }
 
-void RayCaster::set_mask_data_texture(
-    std::vector<GLTexture3DPtr> mask_textures) {
+void RayCaster::set_mask_data_texture( GPUTexture3DPairPtr mask_textures) {
     _mask_textures = mask_textures;
 }
 
@@ -182,13 +198,12 @@ void RayCaster::set_global_window_level(float ww, float wl) {
     _global_wl = wl;
 }
 
-void RayCaster::set_pseudo_color_texture(GLTexture1DPtr tex,
-        unsigned int length) {
+void RayCaster::set_pseudo_color_texture(GPUTexture1DPairPtr tex, unsigned int length) {
     _pseudo_color_texture = tex;
     _pseudo_color_length = length;
 }
 
-GLTexture1DPtr RayCaster::get_pseudo_color_texture(unsigned int& length) const {
+GPUTexture1DPairPtr  RayCaster::get_pseudo_color_texture(unsigned int& length) const {
     length = _pseudo_color_length;
     return _pseudo_color_texture;
 }
@@ -199,11 +214,11 @@ void RayCaster::set_pseudo_color_array(unsigned char* color_array,
     _pseudo_color_length = length;
 }
 
-void RayCaster::set_color_opacity_texture_array(GLTexture1DArrayPtr tex_array) {
+void RayCaster::set_color_opacity_texture_array(GPUTexture1DArrayPairPtr tex_array) {
     _color_opacity_texture_array = tex_array;
 }
 
-GLTexture1DArrayPtr RayCaster::get_color_opacity_texture_array() const {
+GPUTexture1DArrayPairPtr RayCaster::get_color_opacity_texture_array() const {
     return _color_opacity_texture_array;
 }
 
@@ -268,10 +283,6 @@ void RayCaster::set_canvas(std::shared_ptr<RayCasterCanvas> canvas) {
     _canvas = canvas;
 }
 
-void RayCaster::set_strategy(RayCastingStrategy strategy) {
-    _strategy = strategy;
-}
-
 std::shared_ptr<ImageData> RayCaster::get_volume_data() {
     return _volume_data;
 }
@@ -280,8 +291,12 @@ std::shared_ptr<ImageData> RayCaster::get_mask_data() {
     return _mask_data;
 }
 
-std::vector<GLTexture3DPtr> RayCaster::get_volume_data_texture() {
+GPUTexture3DPairPtr RayCaster::get_volume_data_texture() {
     return _volume_textures;
+}
+
+GPUTexture3DPairPtr RayCaster::get_mask_data_texture() {
+    return _mask_textures;
 }
 
 float RayCaster::get_sample_rate() const {
@@ -343,10 +358,6 @@ MaskOverlayMode RayCaster::get_mask_overlay_mode() const {
     return _mask_overlay_mode;
 }
 
-std::vector<GLTexture3DPtr> RayCaster::get_mask_data_texture() {
-    return _mask_textures;
-}
-
 void RayCaster::set_test_code(int test_code) {
     _test_code = test_code;
 }
@@ -384,3 +395,5 @@ bool RayCaster::map_quarter_canvas() const {
 }
 
 MED_IMG_END_NAMESPACE
+
+

@@ -105,9 +105,6 @@
     <ClInclude Include="..\renderalgo\mi_ray_casting_cpu.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="..\renderalgo\mi_rc_step_base.h">
       <Filter>source</Filter>
     </ClInclude>
@@ -143,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="..\include\renderalgo\mi_gpu_resource_pair.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_gl.h">
+      <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -200,9 +200,6 @@
     <ClCompile Include="..\renderalgo\mi_ray_casting_cpu.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="..\renderalgo\mi_rc_step_color_inverse.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_vr_scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_gl.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,7 +13,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-SceneBase::SceneBase() : _width(128), _height(128) {
+SceneBase::SceneBase(bool off_screen) : 
+    _width(128), _height(128), _off_screen(off_screen) {
     _image_buffer[0].reset(new unsigned char[_width * _height * 3]);
     _image_buffer[1].reset(new unsigned char[_width * _height * 3]);
     _image_buffer_size[0] = _width * _height * 3;
@@ -34,7 +35,8 @@ SceneBase::SceneBase() : _width(128), _height(128) {
     _gpujpeg_encoding_duration = 0;
 }
 
-SceneBase::SceneBase(int width, int height) : _width(width), _height(height) {
+SceneBase::SceneBase(int width, int height, bool off_screen) : 
+    _width(width), _height(height), _off_screen(off_screen) {
     _image_buffer[0].reset(new unsigned char[_width * _height * 3]);
     _image_buffer[1].reset(new unsigned char[_width * _height * 3]);
     _image_buffer_size[0] = _width * _height * 3;
@@ -62,8 +64,7 @@ void SceneBase::render_to_back() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
     glDrawBuffer(GL_BACK);
-    glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST); // flip vertically copy
+    glBlitFramebuffer(0, 0, _width, _height, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
 std::shared_ptr<CameraBase> SceneBase::get_camera() {
@@ -72,6 +73,15 @@ std::shared_ptr<CameraBase> SceneBase::get_camera() {
 
 void SceneBase::initialize() {
     if (!_scene_fbo) {
+        if (!_off_screen) {
+            //TODO CUDA
+            //---------------------------------------//
+            // off-screen status
+            // 1. GL : FBO
+            // 2. CUDA VR without graphics & MPR: no-FBO
+            // 3. CUDA VR with graphics : FBO
+            //---------------------------------------//
+        }
         // Init FBO
         CHECK_GL_ERROR;
 
@@ -91,16 +101,6 @@ void SceneBase::initialize() {
         _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGB,
                                     GL_UNSIGNED_BYTE, nullptr);
 
-
-        _scene_color_attach_1 = GLResourceManagerContainer::instance()
-            ->get_texture_2d_manager()->create_object("scene base color attachment 1 <flip verticalily>");
-        _scene_color_attach_1->initialize();
-        _scene_color_attach_1->bind();
-        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-        _scene_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB,
-                                    GL_UNSIGNED_BYTE, nullptr);
-
         _scene_depth_attach = GLResourceManagerContainer::instance()
             ->get_texture_2d_manager()->create_object("scene base depth attachment");
         _scene_depth_attach->initialize();
@@ -113,12 +113,10 @@ void SceneBase::initialize() {
         // bind texture to FBO
         _scene_fbo->bind();
         _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _scene_color_attach_0);
-        _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _scene_color_attach_1);
         _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT, _scene_depth_attach);
         _scene_fbo->unbind();
 
         CHECK_GL_ERROR;
-
 
         // init gpujpeg device(TODO multi-gpu situation!!!!!!!! especially in multi-scene)
         gpujpeg_init_device(0, 0);
@@ -156,7 +154,6 @@ void SceneBase::initialize() {
         // cudaEventCreate(&_gpujpeg_encoding_start);
         // cudaEventCreate(&_gpujpeg_encoding_stop);
 
-
         //time query
         _gl_time_query = GLResourceManagerContainer::instance()
             ->get_time_query_manager()->create_object("scene base time query");
@@ -164,7 +161,6 @@ void SceneBase::initialize() {
 
         _res_shield.add_shield<GLFBO>(_scene_fbo);
         _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
-        _res_shield.add_shield<GLTexture2D>(_scene_color_attach_1);
         _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
         _res_shield.add_shield<GLTimeQuery>(_gl_time_query);
     }
@@ -187,10 +183,6 @@ void SceneBase::set_display_size(int width, int height) {
 
     GLTextureCache::instance()->cache_load(
         GL_TEXTURE_2D, _scene_color_attach_0, GL_CLAMP_TO_EDGE, GL_LINEAR,
-        GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-
-    GLTextureCache::instance()->cache_load(
-        GL_TEXTURE_2D, _scene_color_attach_1, GL_CLAMP_TO_EDGE, GL_LINEAR,
         GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     GLTextureCache::instance()->cache_load(

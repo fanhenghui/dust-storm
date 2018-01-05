@@ -10,10 +10,10 @@ MED_IMG_BEGIN_NAMESPACE
 class RayCaster;
 class RCStepBase;
 class GLActiveTextureCounter;
-class RayCastingGPU {
+class RayCastingGPUGL {
 public:
-    RayCastingGPU(std::shared_ptr<RayCaster> ray_caster);
-    ~RayCastingGPU();
+    RayCastingGPUGL(std::shared_ptr<RayCaster> ray_caster);
+    ~RayCastingGPUGL();
 
     double get_rendering_duration() const;
 

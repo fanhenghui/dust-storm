@@ -35,8 +35,8 @@ void RCStepMainFrag::set_gpu_parameter() {
         ray_caster->get_entry_exit_points();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
-    GLTexture2DPtr entry_texture = entry_exit_points->get_entry_points_texture();
-    GLTexture2DPtr exit_texture = entry_exit_points->get_exit_points_texture();
+    GLTexture2DPtr entry_texture = entry_exit_points->get_entry_points_texture()->get_gl_resource();
+    GLTexture2DPtr exit_texture = entry_exit_points->get_exit_points_texture()->get_gl_resource();
 
 #define IMG_BINDING_ENTRY_POINTS 0
 #define IMG_BINDING_EXIT_POINTS 1
@@ -50,17 +50,17 @@ void RCStepMainFrag::set_gpu_parameter() {
 #undef IMG_BINDING_EXIT_POINTS
 
     // 2 Volume texture
-    std::vector<GLTexture3DPtr> volume_textures =
-        ray_caster->get_volume_data_texture();
+    GLTexture3DPtr volume_textures = 
+        ray_caster->get_volume_data_texture()->get_gl_resource();
 
-    if (volume_textures.empty()) {
+    if (nullptr == volume_textures) {
         RENDERALGO_THROW_EXCEPTION("Volume texture is empty!");
     }
 
     glEnable(GL_TEXTURE_3D);
     int act_tex = _act_tex_counter->tick();
     glActiveTexture(GL_TEXTURE0 + act_tex);
-    volume_textures[0]->bind();
+    volume_textures->bind();
     GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
     GLTextureUtils::set_filter(GL_TEXTURE_3D, GL_LINEAR);
     glUniform1i(_loc_volume_data, act_tex);
@@ -78,14 +78,14 @@ void RCStepMainFrag::set_gpu_parameter() {
     glUniform1i(_loc_quarter_canvas, quarter_canvas);
 
     // 6 Mask texture
-    std::vector<GLTexture3DPtr> mask_textures =
-        ray_caster->get_mask_data_texture();
+    GLTexture3DPtr mask_textures =
+        ray_caster->get_mask_data_texture()->get_gl_resource();
 
-    if (!mask_textures.empty()) {
+    if (nullptr != mask_textures) {
         glEnable(GL_TEXTURE_3D);
         act_tex = _act_tex_counter->tick();
         glActiveTexture(GL_TEXTURE0 + act_tex);
-        mask_textures[0]->bind();
+        mask_textures->bind();
         GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_3D, GL_NEAREST);
         glUniform1i(_loc_mask_data, act_tex);
@@ -129,8 +129,8 @@ void RCStepMainTestFrag::set_gpu_parameter() {
         ray_caster->get_entry_exit_points();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
-    GLTexture2DPtr entry_texture = entry_exit_points->get_entry_points_texture();
-    GLTexture2DPtr exit_texture = entry_exit_points->get_exit_points_texture();
+    GLTexture2DPtr entry_texture = entry_exit_points->get_entry_points_texture()->get_gl_resource();
+    GLTexture2DPtr exit_texture = entry_exit_points->get_exit_points_texture()->get_gl_resource();
 
 #define IMG_BINDING_ENTRY_POINTS 0
 #define IMG_BINDING_EXIT_POINTS 1

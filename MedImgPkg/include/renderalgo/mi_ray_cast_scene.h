@@ -1,12 +1,14 @@
 #ifndef MEDIMGRENDERALGO_RAY_CAST_SCENE_H
 #define MEDIMGRENDERALGO_RAY_CAST_SCENE_H
 
+#include <map>
+#include "renderalgo/mi_scene_base.h"
+
 #include "arithmetic/mi_vector2f.h"
 #include "arithmetic/mi_point2.h"
 #include "arithmetic/mi_point3.h"
 #include "renderalgo/mi_ray_caster_define.h"
-#include "renderalgo/mi_scene_base.h"
-#include <map>
+#include "renderalgo/mi_gpu_resource_pair.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -23,8 +25,8 @@ class GraphicObjectNavigator;
 
 class RenderAlgo_Export RayCastScene : public SceneBase {
 public:
-    RayCastScene();
-    RayCastScene(int width, int height);
+    RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom);
+    RayCastScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom);
     virtual ~RayCastScene();
 
     virtual void initialize();
@@ -32,6 +34,7 @@ public:
     virtual void set_display_size(int width, int height);
 
     virtual void render();
+    virtual void render_to_back();
 
     virtual void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
     std::shared_ptr<VolumeInfos> get_volume_infos() const;
@@ -100,6 +103,8 @@ protected:
     void init_default_color_texture();
 
 protected:
+    RayCastingStrategy _strategy;
+    GPUPlatform _gpu_platform;
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
     std::shared_ptr<RayCaster> _ray_caster;
@@ -114,11 +119,14 @@ protected:
     float _global_wl;
     std::map<unsigned char, Vector2f> _window_levels;
 
+    //scene FBO extend color-attachment for flip vertical(make texture as compressor input directly)
+    GLTexture2DPtr _scene_color_attach_1;
+
     //////////////////////////////////////////////////////////////////////////
     // should design a wrap to contain global pseudo colors because its
     // constant
-    GLTexture1DPtr _pseudo_color_texture;
-    GLTexture1DArrayPtr _color_opacity_texture_array;
+    GPUTexture1DPairPtr _pseudo_color_texture;
+    GPUTexture1DArrayPairPtr _color_opacity_texture_array;
 
     //graphic object
     std::shared_ptr<GraphicObjectNavigator> _navigator;

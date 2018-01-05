@@ -57,7 +57,7 @@ void RCStepCompositeDVR::set_gpu_parameter() {
                                 BUFFER_BINDING_WINDOW_LEVEL_BUCKET);
 
     GLTexture1DArrayPtr color_opacity_tex_array =
-        ray_caster->get_color_opacity_texture_array();
+        ray_caster->get_color_opacity_texture_array()->get_gl_resource();
     const int act_tex = _act_tex_counter->tick();
     glActiveTexture(GL_TEXTURE0 + act_tex);
     color_opacity_tex_array->bind();

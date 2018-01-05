@@ -17,8 +17,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export SceneBase {
 public:
-    SceneBase();
-    SceneBase(int width, int height);
+    SceneBase(bool off_screen = false);
+    SceneBase(int width, int height, bool off_screen = false);
     virtual ~SceneBase();
 
     void set_name(const std::string& name);
@@ -36,7 +36,7 @@ public:
     std::shared_ptr<CameraBase> get_camera();
 
     virtual void render();
-    void render_to_back();
+    virtual void render_to_back();
 
     void download_image_buffer(bool jpeg = true);
     void swap_image_buffer();
@@ -57,10 +57,10 @@ protected:
 
 protected:
     int _width, _height;
+    bool _off_screen;
 
     GLFBOPtr _scene_fbo;
     GLTexture2DPtr _scene_color_attach_0;
-    GLTexture2DPtr _scene_color_attach_1;//for flip vertical
     GLTexture2DPtr _scene_depth_attach;
     GLResourceShield _res_shield;
 

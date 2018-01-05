@@ -32,21 +32,16 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
+RayCastScene::RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom) : SceneBase(), 
+    _strategy(strategy), _gpu_platform(platfrom), _global_ww(0), _global_wl(0) {
     _ray_cast_camera.reset(new OrthoCamera());
     _camera = _ray_cast_camera;
 
     _camera_interactor.reset(new OrthoCameraInteractor(_ray_cast_camera));
 
-    _ray_caster.reset(new RayCaster());
+    _ray_caster.reset(new RayCaster(strategy, platfrom));
 
-    _canvas.reset(new RayCasterCanvas());
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _ray_caster->set_strategy(CPU_BASE);
-    } else {
-        _ray_caster->set_strategy(GPU_BASE);
-    }
+    _canvas.reset(new RayCasterCanvas(strategy, platfrom));
 
     init_default_color_texture();
 
@@ -59,23 +54,17 @@ RayCastScene::RayCastScene() : SceneBase(), _global_ww(0), _global_wl(0) {
     _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
 
-RayCastScene::RayCastScene(int width, int height)
-    : SceneBase(width, height), _global_ww(0), _global_wl(0) {
+RayCastScene::RayCastScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom)
+    : SceneBase(width, height), _strategy(strategy), _gpu_platform(platfrom), _global_ww(0), _global_wl(0) {
     _ray_cast_camera.reset(new OrthoCamera());
     _camera = _ray_cast_camera;
 
     _camera_interactor.reset(new OrthoCameraInteractor(_ray_cast_camera));
 
-    _ray_caster.reset(new RayCaster());
+    _ray_caster.reset(new RayCaster(strategy, platfrom));
 
-    _canvas.reset(new RayCasterCanvas());
+    _canvas.reset(new RayCasterCanvas(strategy, platfrom));
     _canvas->set_display_size(_width, _height);
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _ray_caster->set_strategy(CPU_BASE);
-    } else {
-        _ray_caster->set_strategy(GPU_BASE);
-    }
 
     init_default_color_texture();
 
@@ -93,6 +82,23 @@ RayCastScene::~RayCastScene() {}
 void RayCastScene::initialize() {
     SceneBase::initialize();     
 
+    if (GL_BASE == _gpu_platform) {
+        //TODO this texture will just used in GL based ray-casting
+        _scene_color_attach_1 = GLResourceManagerContainer::instance()
+            ->get_texture_2d_manager()->create_object("scene base color attachment 1 <flip verticalily>");
+        _scene_color_attach_1->initialize();
+        _scene_color_attach_1->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+        _scene_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+        _scene_fbo->bind();
+        _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _scene_color_attach_1);
+        _scene_fbo->unbind();
+
+        _res_shield.add_shield<GLTexture2D>(_scene_color_attach_1);
+    }
+
     _canvas->initialize();
     _entry_exit_points->initialize();
     _navigator->initialize();
@@ -106,6 +112,26 @@ void RayCastScene::set_display_size(int width, int height) {
 
     const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
     _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
+
+    if (GL_BASE) {
+        GLTextureCache::instance()->cache_load(
+            GL_TEXTURE_2D, _scene_color_attach_1, GL_CLAMP_TO_EDGE, GL_LINEAR,
+            GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    }
+}
+
+void RayCastScene::render_to_back() {
+    if (GL_BASE == _gpu_platform) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        glDrawBuffer(GL_BACK);
+        glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST); // flip vertically copy
+    } else {
+        //TODO CUDA
+        //kernel memcpy ray-casting result back to FBO color-attachment0, and copy to BACK
+    }
 }
 
 void RayCastScene::pre_render() {
@@ -132,39 +158,47 @@ void RayCastScene::pre_render() {
 }
 
 void RayCastScene::init_default_color_texture() {
-    if (GPU == Configure::instance()->get_processing_unit_type()) {
+    if (GPU == _strategy) {
         // initialize gray pseudo color texture
-        if (!_pseudo_color_texture) {
-            _pseudo_color_texture = GLResourceManagerContainer::instance()->
-                get_texture_1d_manager()->create_object("pseudo color");
-            _res_shield.add_shield<GLTexture1D>(_pseudo_color_texture);
+        if (GL_BASE == _gpu_platform) {
+            if (!_pseudo_color_texture) {
+                GLTexture1DPtr pseudo_color_texture = GLResourceManagerContainer::instance()->
+                    get_texture_1d_manager()->create_object("pseudo color");
+                _pseudo_color_texture.reset(new GPUTexture1DPair(pseudo_color_texture));
+                _res_shield.add_shield<GLTexture1D>(pseudo_color_texture);
+                
+                unsigned char* gray_array = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
 
-            unsigned char* gray_array = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
+                for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
+                    gray_array[i * 3] = static_cast<unsigned char>(255.0f * (float)i / (float)S_TRANSFER_FUNC_WIDTH);
+                    gray_array[i * 3 + 1] = gray_array[i * 3];
+                    gray_array[i * 3 + 2] = gray_array[i * 3];
+                }
 
-            for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
-                gray_array[i * 3] = static_cast<unsigned char>(255.0f * (float)i / (float)S_TRANSFER_FUNC_WIDTH);
-                gray_array[i * 3 + 1] = gray_array[i * 3];
-                gray_array[i * 3 + 2] = gray_array[i * 3];
+                GLTextureCache::instance()->cache_load(
+                    GL_TEXTURE_1D, pseudo_color_texture, GL_CLAMP_TO_EDGE, GL_LINEAR,
+                    GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, (char*)gray_array);
             }
 
-            GLTextureCache::instance()->cache_load(
-                GL_TEXTURE_1D, _pseudo_color_texture, GL_CLAMP_TO_EDGE, GL_LINEAR,
-                GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, (char*)gray_array);
+            if (!_color_opacity_texture_array) {
+                GLTexture1DArrayPtr color_opacity_texture_array = GLResourceManagerContainer::instance()->
+                    get_texture_1d_array_manager()->create_object("color opacity texture array");
+                _color_opacity_texture_array.reset(new GPUTexture1DArrayPair(color_opacity_texture_array));
+                _res_shield.add_shield<GLTexture1DArray>(color_opacity_texture_array);
+
+                const int tex_num = 8; // default mask level
+                unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
+                memset(rgba, 0, S_TRANSFER_FUNC_WIDTH * tex_num * 4);
+
+                GLTextureCache::instance()->cache_load(
+                    GL_TEXTURE_1D_ARRAY, color_opacity_texture_array, GL_CLAMP_TO_EDGE,
+                    GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
+                    GL_UNSIGNED_BYTE, (char*)rgba);
+            }
+        } else {
+            //TODO CUDA
         }
-
-        if (!_color_opacity_texture_array) {
-            _color_opacity_texture_array = GLResourceManagerContainer::instance()->
-                get_texture_1d_array_manager()->create_object("color opacity texture array");
-
-            const int tex_num = 8; // default mask level
-            unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
-            memset(rgba, 0, S_TRANSFER_FUNC_WIDTH * tex_num * 4);
-
-            GLTextureCache::instance()->cache_load(
-                GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array, GL_CLAMP_TO_EDGE,
-                GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, (char*)rgba);
-        }
+        
     } else {
         // TODO gray pseudo array
     }
@@ -178,8 +212,6 @@ void RayCastScene::render() {
         return;
     }
 
-    MI_RENDERALGO_LOG(MI_TRACE) << "IN ray cast scene render.";
-
     CHECK_GL_ERROR;
 
     //////////////////////////////////////////////////////////////////////////
@@ -187,140 +219,114 @@ void RayCastScene::render() {
 
     //////////////////////////////////////////////////////////////////////////
     // 1 Ray casting
-    // glPushAttrib(GL_ALL_ATTRIB_BITS);
-
-    // glViewport(0, 0, _width, _height);
-    // glClearColor(0, 0, 0, 0);
-    // glClearDepth(1.0);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     _entry_exit_points->calculate_entry_exit_points();
-
     _ray_caster->render();
-    // glPopAttrib();
 
     //////////////////////////////////////////////////////////////////////////
-    // 2 Mapping ray casting result to Scene FBO (<><>flip vertically<><>)
-    // glPushAttrib(GL_ALL_ATTRIB_BITS);
+    // 2 Mapping ray casting result to Scene FBO
+    if (GL_BASE == _gpu_platform) {
+        //----------------------------------------------------------------//
+        // GL based : 
+        // 1. render graphic (scene FBO)
+        // 2. ray-casting 
+        // 3. mapping and flip vertically rc-result to scene FBO
+        // 4. render navigator (scene FBO)
+        //----------------------------------------------------------------//
 
-    glViewport(0, 0, _width, _height);
+        glViewport(0, 0, _width, _height);
 
-    _scene_fbo->bind();
-    glDrawBuffer(GL_COLOR_ATTACHMENT1);
-    
-    glViewport(0, 0, _width, _height);
-    glClearColor(0, 0, 0, 0);
-    glClearDepth(1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        _scene_fbo->bind();
+        glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
-    glEnable(GL_TEXTURE_2D);
-    _canvas->get_color_attach_texture()->bind();
-    if (_ray_caster->map_quarter_canvas()) {
-        // glBegin(GL_QUADS);
-        // glTexCoord2f(0.0, 0.5);
-        // glVertex2f(-1.0, -1.0);
-        // glTexCoord2f(0.5, 0.5);
-        // glVertex2f(1.0, -1.0);
-        // glTexCoord2f(0.5, 0.0);
-        // glVertex2f(1.0, 1.0);
-        // glTexCoord2f(0.0, 0.0);
-        // glVertex2f(-1.0, 1.0);
-        // glEnd();
+        glViewport(0, 0, _width, _height);
+        glClearColor(0, 0, 0, 0);
+        glClearDepth(1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0);
-        glVertex2f(-1.0, -1.0);
-        glTexCoord2f(0.5, 0.0);
-        glVertex2f(1.0, -1.0);
-        glTexCoord2f(0.5, 0.5);
-        glVertex2f(1.0, 1.0);
-        glTexCoord2f(0.0, 0.5);
-        glVertex2f(-1.0, 1.0);
-        glEnd();
+        //glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glEnable(GL_TEXTURE_2D);
+        _canvas->get_color_attach_texture()->get_gl_resource()->bind();
+        if (_ray_caster->map_quarter_canvas()) {
+            // glBegin(GL_QUADS);
+            // glTexCoord2f(0.0, 0.5);
+            // glVertex2f(-1.0, -1.0);
+            // glTexCoord2f(0.5, 0.5);
+            // glVertex2f(1.0, -1.0);
+            // glTexCoord2f(0.5, 0.0);
+            // glVertex2f(1.0, 1.0);
+            // glTexCoord2f(0.0, 0.0);
+            // glVertex2f(-1.0, 1.0);
+            // glEnd();
+
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0);
+            glVertex2f(-1.0, -1.0);
+            glTexCoord2f(0.5, 0.0);
+            glVertex2f(1.0, -1.0);
+            glTexCoord2f(0.5, 0.5);
+            glVertex2f(1.0, 1.0);
+            glTexCoord2f(0.0, 0.5);
+            glVertex2f(-1.0, 1.0);
+            glEnd();
+        }
+        else {
+            // glBegin(GL_QUADS);
+            // glTexCoord2f(0.0, 1.0);
+            // glVertex2f(-1.0, -1.0);
+            // glTexCoord2f(1.0, 1.0);
+            // glVertex2f(1.0, -1.0);
+            // glTexCoord2f(1.0, 0.0);
+            // glVertex2f(1.0, 1.0);
+            // glTexCoord2f(0.0, 0.0);
+            // glVertex2f(-1.0, 1.0);
+            // glEnd();
+
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0);
+            glVertex2f(-1.0, -1.0);
+            glTexCoord2f(1.0, 0.0);
+            glVertex2f(1.0, -1.0);
+            glTexCoord2f(1.0, 1.0);
+            glVertex2f(1.0, 1.0);
+            glTexCoord2f(0.0, 1.0);
+            glVertex2f(-1.0, 1.0);
+            glEnd();
+        }
+        _canvas->get_color_attach_texture()->get_gl_resource()->unbind();
+
+        //render navigator in the end
+        if (_navigator_vis) {
+            _navigator->render();
+        }
+
+        // CHECK_GL_ERROR;
+        // glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
+        // CHECK_GL_ERROR;
+
+        _scene_fbo->unbind();
+
+        //flip vertically for download
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _scene_fbo->get_id());
+        glReadBuffer(GL_COLOR_ATTACHMENT1);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        CHECK_GL_ERROR;
     } else {
-        // glBegin(GL_QUADS);
-        // glTexCoord2f(0.0, 1.0);
-        // glVertex2f(-1.0, -1.0);
-        // glTexCoord2f(1.0, 1.0);
-        // glVertex2f(1.0, -1.0);
-        // glTexCoord2f(1.0, 0.0);
-        // glVertex2f(1.0, 1.0);
-        // glTexCoord2f(0.0, 0.0);
-        // glVertex2f(-1.0, 1.0);
-        // glEnd();
-
-        glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0);
-        glVertex2f(-1.0, -1.0);
-        glTexCoord2f(1.0, 0.0);
-        glVertex2f(1.0, -1.0);
-        glTexCoord2f(1.0, 1.0);
-        glVertex2f(1.0, 1.0);
-        glTexCoord2f(0.0, 1.0);
-        glVertex2f(-1.0, 1.0);
-        glEnd();
+        //-------------------------------------------------------------------------------//
+        // CUDA based (skip mapping): 
+        // 1. render graphic(scene FBO)
+        // 2. do ray-casting with graphic(kernel blend)
+        // 3. kernel navigator ray tracing
+        // *. render to back should do mapping, off-screen render skip it.
+        // *. GPU compressor will use rc-canvas's result(RGBA->fliped RGB) as input.
+        //-------------------------------------------------------------------------------//
+        
+        //TODO CUDA (maybe do nothing)
     }
-    _canvas->get_color_attach_texture()->unbind();
-
-    //render navigator
-    if (_navigator_vis) {
-        _navigator->render();
-    }
-
-    // CHECK_GL_ERROR;
-    // glPopAttrib();//TODO Here will give a GL_INVALID_OPERATION error !!!
-    // CHECK_GL_ERROR;
-
-    _scene_fbo->unbind();
-
-    //flip vertically for download
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _scene_fbo->get_id());
-    glReadBuffer(GL_COLOR_ATTACHMENT1);
-    glDrawBuffer(GL_COLOR_ATTACHMENT0);
-    glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-    CHECK_GL_ERROR;
-
-    // CHECK_GL_ERROR;
-    // {
-    //     if (_canvas->get_color_attach_texture(1)) {
-    //         std::stringstream ss;
-    //         ss << "/home/wangrui22/data/output_para_" << _width << "_" << _height << ".raw";
-    //         _canvas->debug_output_color_1(ss.str());
-    //         _canvas->debug_output_color_0(ss.str() + "_color");
-    //     }
-    // }
-    // CHECK_GL_ERROR;
-
-    // Test code
-    // {
-    //         FBOStack fbo_stack;
-    //         _scene_color_attach_0->bind();
-    //         unsigned char *color_array = new unsigned char[_width * _height * 3];
-    //         _scene_color_attach_0->download(GL_RGB, GL_UNSIGNED_BYTE,
-    //         color_array);
-    //     #ifdef WIN32
-    //         std::stringstream ss;
-    //         ss << "D:/temp/scene_img_" << _name << "_" << _width << "_" <<
-    //         _height
-    //            << ".rgb";
-    //         FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height *
-    //         3);
-    //     #else
-    //         std::stringstream ss;
-    //         ss << "/home/wangrui22/data/scene_img_" << _name << "_" << _width << "_" <<
-    //         _height
-    //            << ".rgb";
-    //         FileUtil::write_raw(ss.str(), (char *)color_array, _width * _height *
-    //         3);
-    //     #endif
-    // }
-
 
     set_dirty(false);
-    MI_RENDERALGO_LOG(MI_TRACE) << "OUT ray cast scene render.";
 }
 
 void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
@@ -355,10 +361,9 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
         _ray_caster->set_volume_data(volume);
         _ray_caster->set_mask_data(mask);
 
-        if (GPU == Configure::instance()->get_processing_unit_type()) {
+        if (GPU == _strategy) {
             // set texture
-            _ray_caster->set_pseudo_color_texture(_pseudo_color_texture,
-                                                  S_TRANSFER_FUNC_WIDTH);
+            _ray_caster->set_pseudo_color_texture(_pseudo_color_texture, S_TRANSFER_FUNC_WIDTH);
             _ray_caster->set_color_opacity_texture_array(
                 _color_opacity_texture_array);
             _ray_caster->set_volume_data_texture(volume_infos->get_volume_texture());
@@ -366,7 +371,6 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
         }
 
         _navigator->set_volume_info(volume_infos);
-
 
         set_dirty(true);
     } catch (const Exception& e) {
@@ -379,17 +383,19 @@ void RayCastScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
 void RayCastScene::set_mask_label_level(LabelLevel label_level) {
     _ray_caster->set_mask_label_level(label_level);
 
-    if (GPU == Configure::instance()->get_processing_unit_type()) {
+    if (GPU == _strategy) {
         const int tex_num = static_cast<int>(label_level);
-        unsigned char* rgba =
-            new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
+        unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * tex_num * 4];
         memset(rgba, 0, S_TRANSFER_FUNC_WIDTH * tex_num * 4);
 
-        // reshape color opacity texture array
-        GLTextureCache::instance()->cache_load(
-            GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array, GL_CLAMP_TO_EDGE,
-            GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
-            GL_UNSIGNED_BYTE, (char*)rgba);
+        if (GL_BASE == _gpu_platform) {
+            // reshape color opacity texture array
+            GLTextureCache::instance()->cache_load(
+                GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array->get_gl_resource(), GL_CLAMP_TO_EDGE,
+                GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
+                GL_UNSIGNED_BYTE, (char*)rgba);
+        }
+        
     }
 
     set_dirty(true);
@@ -408,7 +414,7 @@ void RayCastScene::set_visible_labels(std::vector<unsigned char> labels) {
     }
 
     if (_volume_infos && !labels.empty()) {
-        //here can't update empty visibile labels(none-mask)
+        //here can't update empty visible labels(none-mask)
         _volume_infos->get_brick_pool()->add_visible_labels_cache(labels);
     }
 
@@ -531,23 +537,28 @@ void RayCastScene::set_material(const Material& m, unsigned char label) {
 }
 
 void RayCastScene::set_pseudo_color(std::shared_ptr<ColorTransFunc> color) {
-    if (GPU == Configure::instance()->get_processing_unit_type()) {
-        RENDERALGO_CHECK_NULL_EXCEPTION(_pseudo_color_texture);
+    if (GPU == _strategy) {
+        if (GL_BASE == _gpu_platform) {
+            RENDERALGO_CHECK_NULL_EXCEPTION(_pseudo_color_texture);
 
-        std::vector<ColorTFPoint> pts;
-        color->set_width(S_TRANSFER_FUNC_WIDTH);
-        color->get_point_list(pts);
-        unsigned char* rgb = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
+            std::vector<ColorTFPoint> pts;
+            color->set_width(S_TRANSFER_FUNC_WIDTH);
+            color->get_point_list(pts);
+            unsigned char* rgb = new unsigned char[S_TRANSFER_FUNC_WIDTH * 3];
 
-        for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
-            rgb[i * 3] = static_cast<unsigned char>(pts[i].x);
-            rgb[i * 3 + 1] = static_cast<unsigned char>(pts[i].y);
-            rgb[i * 3 + 2] = static_cast<unsigned char>(pts[i].z);
+            for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
+                rgb[i * 3] = static_cast<unsigned char>(pts[i].x);
+                rgb[i * 3 + 1] = static_cast<unsigned char>(pts[i].y);
+                rgb[i * 3 + 2] = static_cast<unsigned char>(pts[i].z);
+            }
+
+            GLTextureCache::instance()->cache_update(
+                GL_TEXTURE_1D, _pseudo_color_texture->get_gl_resource(), 0, 0, 0, S_TRANSFER_FUNC_WIDTH, 0,
+                0, GL_RGB, GL_UNSIGNED_BYTE, (char*)rgb);
+
+        } else {
+            //TODO CUDA
         }
-
-        GLTextureCache::instance()->cache_update(
-            GL_TEXTURE_1D, _pseudo_color_texture, 0, 0, 0, S_TRANSFER_FUNC_WIDTH, 0,
-            0, GL_RGB, GL_UNSIGNED_BYTE, (char*)rgb);
     }
 
     set_dirty(true);
@@ -556,27 +567,32 @@ void RayCastScene::set_pseudo_color(std::shared_ptr<ColorTransFunc> color) {
 void RayCastScene::set_color_opacity(std::shared_ptr<ColorTransFunc> color,
                                      std::shared_ptr<OpacityTransFunc> opacity,
                                      unsigned char label) {
-    if (GPU == Configure::instance()->get_processing_unit_type()) {
-        std::vector<ColorTFPoint> color_pts;
-        color->set_width(S_TRANSFER_FUNC_WIDTH);
-        color->get_point_list(color_pts);
+    if (GPU == _strategy) {
+        if (GL_BASE == _gpu_platform) {
+            std::vector<ColorTFPoint> color_pts;
+            color->set_width(S_TRANSFER_FUNC_WIDTH);
+            color->get_point_list(color_pts);
 
-        std::vector<OpacityTFPoint> opacity_pts;
-        opacity->set_width(S_TRANSFER_FUNC_WIDTH);
-        opacity->get_point_list(opacity_pts);
+            std::vector<OpacityTFPoint> opacity_pts;
+            opacity->set_width(S_TRANSFER_FUNC_WIDTH);
+            opacity->get_point_list(opacity_pts);
 
-        unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * 4];
+            unsigned char* rgba = new unsigned char[S_TRANSFER_FUNC_WIDTH * 4];
 
-        for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
-            rgba[i * 4] = static_cast<unsigned char>(color_pts[i].x);
-            rgba[i * 4 + 1] = static_cast<unsigned char>(color_pts[i].y);
-            rgba[i * 4 + 2] = static_cast<unsigned char>(color_pts[i].z);
-            rgba[i * 4 + 3] = static_cast<unsigned char>(opacity_pts[i].a);
+            for (int i = 0; i < S_TRANSFER_FUNC_WIDTH; ++i) {
+                rgba[i * 4] = static_cast<unsigned char>(color_pts[i].x);
+                rgba[i * 4 + 1] = static_cast<unsigned char>(color_pts[i].y);
+                rgba[i * 4 + 2] = static_cast<unsigned char>(color_pts[i].z);
+                rgba[i * 4 + 3] = static_cast<unsigned char>(opacity_pts[i].a);
+            }
+
+            GLTextureCache::instance()->cache_update(
+                GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array->get_gl_resource(), 0, label, 0,
+                S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, (char*)rgba);
+
+        } else {
+            //TODO CUDA
         }
-
-        GLTextureCache::instance()->cache_update(
-            GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array, 0, label, 0,
-            S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, (char*)rgba);
     }
 
     set_dirty(true);
