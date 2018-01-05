@@ -7,15 +7,27 @@
 
 #include "mi_vr_proxy_geometry_brick.h"
 #include "mi_vr_proxy_geometry_cube.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
-VREntryExitPoints::VREntryExitPoints() : EntryExitPoints() {}
+VREntryExitPoints::VREntryExitPoints(RayCastingStrategy s, GPUPlatform p) : EntryExitPoints(s,p) {
+    if (CPU_BASE == s) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "VR entry exit points can't support CPU ray cast.";
+    }
+    if (CUDA_BASE == p) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "VR entry exit points can't support CUDA calculation.";
+    }
+}
 
 VREntryExitPoints::~VREntryExitPoints() {}
 
 void VREntryExitPoints::initialize() {
     EntryExitPoints::initialize();
+    //JUST support GL now.    
+    if (CUDA_BASE == _gpu_platform) {
+        RENDERALGO_THROW_EXCEPTION("VR entry exit points can't support CUDA calculation.");
+    }
 
     if (nullptr == _gl_fbo) {
         _gl_fbo = GLResourceManagerContainer::instance()
@@ -29,19 +41,19 @@ void VREntryExitPoints::initialize() {
         _gl_fbo->bind();
         _gl_fbo->set_target(GL_FRAMEBUFFER);
 
-        _entry_points_texture->bind();
+        _entry_points_texture->get_gl_resource()->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-        _entry_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
+        _entry_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
                                     NULL);
-        _gl_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _entry_points_texture);
+        _gl_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _entry_points_texture->get_gl_resource());
 
-        _exit_points_texture->bind();
+        _exit_points_texture->get_gl_resource()->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
         GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-        _exit_points_texture->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
+        _exit_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT,
                                    NULL);
-        _gl_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _exit_points_texture);
+        _gl_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _exit_points_texture->get_gl_resource());
 
         _gl_depth_texture->bind();
         GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);

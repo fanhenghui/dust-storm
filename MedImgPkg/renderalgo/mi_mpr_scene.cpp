@@ -158,15 +158,4 @@ void MPRScene::set_mask_overlay_opacity(float opacity) {
     _ray_caster->set_mask_overlay_opacity(opacity);
 }
 
-Point3 MPRScene::get_entry_point(int x, int y) {
-    Vector4f* entry_array = _entry_exit_points->get_entry_points_array();
-
-    if (entry_array) {
-        Vector4f v = entry_array[(_height - 1 - y) * _width + x];
-        return Point3(v._m[0], v._m[1], v._m[2]);
-    } else {
-        return Point3::S_ZERO_POINT;
-    }
-}
-
 MED_IMG_END_NAMESPACE

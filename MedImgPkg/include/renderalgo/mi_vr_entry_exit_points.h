@@ -29,7 +29,7 @@ class RenderAlgo_Export VREntryExitPoints : public EntryExitPoints {
     friend class ProxyGeometryBrick;
 
 public:
-    VREntryExitPoints();
+    VREntryExitPoints(RayCastingStrategy s, GPUPlatform p);
     virtual ~VREntryExitPoints();
 
     virtual void initialize();

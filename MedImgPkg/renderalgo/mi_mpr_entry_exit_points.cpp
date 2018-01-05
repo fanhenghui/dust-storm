@@ -78,8 +78,8 @@ bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound, Ve
 }
 }
 
-MPREntryExitPoints::MPREntryExitPoints()
-    : _thickness(1.0f), _sample_rate(1.0), 
+MPREntryExitPoints::MPREntryExitPoints(RayCastingStrategy s, GPUPlatform p)
+    : EntryExitPoints(s, p), _thickness(1.0f), _sample_rate(1.0), 
     _entry_plane(1,0,0,0), _exit_plane(1,0,0,0),_ray_dir_norm(0,0,0),
     _standard_steps(0) {}
 
@@ -94,18 +94,20 @@ void MPREntryExitPoints::set_thickness(float thickness) {
 }
 
 void MPREntryExitPoints::calculate_entry_exit_points() {
-    MI_RENDERALGO_LOG(MI_TRACE) << "IN calculate MPR entry exit points.";
     _standard_steps = float(int(_thickness / _sample_rate + 0.5f));
 
     // clock_t t0 = clock();
     if (CPU_BASE == _strategy) {
         cal_entry_exit_points_cpu();
     } else if (GPU_BASE == _strategy) {
-        cal_entry_exit_points_gpu();
+        if (GL_BASE == _gpu_platform) {
+            cal_entry_exit_points_gl();
+        } else {
+            cal_entry_exit_points_cuda();
+        }
     }
     // clock_t t1 = clock();
     // MI_RENDERALGO_LOG(MI_DEBUG) << "Calculate entry exit points cost : " << double(t1 - t0)/CLOCKS_PER_SEC;
-    MI_RENDERALGO_LOG(MI_TRACE) << "OUT calculate MPR entry exit points.";
 }
 
 void MPREntryExitPoints::cal_entry_exit_points_cpu() {
@@ -248,27 +250,9 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu() {
             entry_points_array[idx] = Vector4f(entry_intersection, 0.0f); // Entry step is 0 , the first sample
             // position is on entry plane
             exit_points_array[idx] = Vector4f(exit_intersection, fStep); // Exit step is integer step which
-            // represent the integeration path
 
             //////////////////////////////////////////////////////////////////////////
         }
-
-        //initialize();
-        //_entry_points_texture->bind();
-        //_entry_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-        //    GL_FLOAT , _entry_points_buffer.get());
-
-        //_exit_points_texture->bind();
-        //_exit_points_texture->load(GL_RGBA32F , _width , _height , GL_RGBA ,
-        //    GL_FLOAT , _exit_points_buffer.get());
-
-        /*_entry_points_texture->bind();
-        _entry_points_texture->download(GL_RGBA , GL_FLOAT ,
-        _entry_points_buffer.get());
-
-        _exit_points_texture->bind();
-        _exit_points_texture->download(GL_RGBA , GL_FLOAT ,
-        _exit_points_buffer.get());*/
     } catch (const Exception& e) {
         MI_RENDERALGO_LOG(MI_FATAL) << "calculate CPU MPR entry exit points failed with exception: " << e.what();
         assert(false);
@@ -284,7 +268,7 @@ void MPREntryExitPoints::get_entry_exit_plane(Vector4f& entry_point,
     ray_dir_norm = _ray_dir_norm;
 }
 
-void MPREntryExitPoints::cal_entry_exit_points_gpu() {
+void MPREntryExitPoints::cal_entry_exit_points_gl() {
     try {
 #define IMAGE_ENTRY_POINT 0
 #define IMAGE_EXIT_POINT 1
@@ -308,9 +292,9 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu() {
 
         _program->bind();
 
-        _entry_points_texture->bind_image(IMAGE_ENTRY_POINT, 0, false, 0,
+        _entry_points_texture->get_gl_resource()->bind_image(IMAGE_ENTRY_POINT, 0, false, 0,
                                           GL_READ_WRITE, GL_RGBA32F);
-        _exit_points_texture->bind_image(IMAGE_EXIT_POINT, 0, false, 0,
+        _exit_points_texture->get_gl_resource()->bind_image(IMAGE_EXIT_POINT, 0, false, 0,
                                          GL_READ_WRITE, GL_RGBA32F);
 
         glProgramUniform2ui(uiProgram, DISPLAY_SIZE, (GLuint)_width,
@@ -390,6 +374,11 @@ void MPREntryExitPoints::cal_entry_exit_points_gpu() {
         assert(false);
         throw e;
     }
+}
+
+void MPREntryExitPoints::cal_entry_exit_points_cuda()
+{
+
 }
 
 void MPREntryExitPoints::initialize() {

@@ -1,5 +1,5 @@
-#ifndef MEDIMGRENDERALGO_ENTRY_EXIT_POINTS_H
-#define MEDIMGRENDERALGO_ENTRY_EXIT_POINTS_H
+#ifndef MEDIMGRENDERALGO_MPR_ENTRY_EXIT_POINTS_H
+#define MEDIMGRENDERALGO_MPR_ENTRY_EXIT_POINTS_H
 
 #include "arithmetic/mi_vector3f.h"
 #include "arithmetic/mi_vector4f.h"
@@ -12,7 +12,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export MPREntryExitPoints : public EntryExitPoints {
 public:
-    MPREntryExitPoints();
+    MPREntryExitPoints(RayCastingStrategy s, GPUPlatform);
 
     virtual ~MPREntryExitPoints();
 
@@ -39,7 +39,9 @@ public:
 private:
     void cal_entry_exit_points_cpu();
 
-    void cal_entry_exit_points_gpu();
+    void cal_entry_exit_points_gl();
+
+    void cal_entry_exit_points_cuda();
 
 private:
     float _thickness;
