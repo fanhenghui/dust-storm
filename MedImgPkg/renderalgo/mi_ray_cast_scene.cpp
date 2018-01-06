@@ -32,8 +32,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-RayCastScene::RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom) : SceneBase(), 
-    _strategy(strategy), _gpu_platform(platfrom), _global_ww(0), _global_wl(0) {
+RayCastScene::RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom) : SceneBase(platfrom),
+    _strategy(strategy), _global_ww(0), _global_wl(0) {
     _ray_cast_camera.reset(new OrthoCamera());
     _camera = _ray_cast_camera;
 
@@ -55,7 +55,7 @@ RayCastScene::RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
 }
 
 RayCastScene::RayCastScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom)
-    : SceneBase(width, height), _strategy(strategy), _gpu_platform(platfrom), _global_ww(0), _global_wl(0) {
+    : SceneBase(platfrom, width, height), _strategy(strategy), _global_ww(0), _global_wl(0) {
     _ray_cast_camera.reset(new OrthoCamera());
     _camera = _ray_cast_camera;
 
@@ -80,28 +80,18 @@ RayCastScene::RayCastScene(int width, int height, RayCastingStrategy strategy, G
 RayCastScene::~RayCastScene() {}
 
 void RayCastScene::initialize() {
-    SceneBase::initialize();     
-
     if (GL_BASE == _gpu_platform) {
-        //TODO this texture will just used in GL based ray-casting
-        _scene_color_attach_1 = GLResourceManagerContainer::instance()
-            ->get_texture_2d_manager()->create_object("scene base color attachment 1 <flip verticalily>");
-        _scene_color_attach_1->initialize();
-        _scene_color_attach_1->bind();
-        GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
-        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-        _scene_color_attach_1->load(GL_RGB8, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        SceneBase::initialize();
 
-        _scene_fbo->bind();
-        _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT1, _scene_color_attach_1);
-        _scene_fbo->unbind();
+        _canvas->initialize();
+        _entry_exit_points->initialize();
+        _navigator->initialize();
 
-        _res_shield.add_shield<GLTexture2D>(_scene_color_attach_1);
+    } else {
+        //TODO CUDA
+        //remove color-attach-1(flip vertical in kernel)
+        //re-set input(rc-canvas's color-attach-0) to compressor 
     }
-
-    _canvas->initialize();
-    _entry_exit_points->initialize();
-    _navigator->initialize();
 }
 
 void RayCastScene::set_display_size(int width, int height) {
@@ -121,17 +111,11 @@ void RayCastScene::set_display_size(int width, int height) {
 }
 
 void RayCastScene::render_to_back() {
-    if (GL_BASE == _gpu_platform) {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glReadBuffer(GL_COLOR_ATTACHMENT0);
-        glDrawBuffer(GL_BACK);
-        glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height,
-            GL_COLOR_BUFFER_BIT, GL_NEAREST); // flip vertically copy
-    } else {
+    if (CUDA_BASE == _gpu_platform) {
         //TODO CUDA
-        //kernel memcpy ray-casting result back to FBO color-attachment0, and copy to BACK
+        //kernel memcpy ray-casting result back to FBO color-attachment0
     }
+    SceneBase::render_to_back();
 }
 
 void RayCastScene::pre_render() {
@@ -227,16 +211,16 @@ void RayCastScene::render() {
     if (GL_BASE == _gpu_platform) {
         //----------------------------------------------------------------//
         // GL based : 
-        // 1. render graphic (scene FBO)
-        // 2. ray-casting 
-        // 3. mapping and flip vertically rc-result to scene FBO
-        // 4. render navigator (scene FBO)
+        // 1. render graphic (scene FBO color-attach-0)
+        // 2. ray-casting (scene FBO color-attach-0)
+        // 3. render navigator (scene FBO color-attach-0)
+        // 4. mapping and flip vertically color-attach-0 to color-attach-1 for next compressing 
         //----------------------------------------------------------------//
 
         glViewport(0, 0, _width, _height);
 
         _scene_fbo->bind();
-        glDrawBuffer(GL_COLOR_ATTACHMENT1);
+        glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
         glViewport(0, 0, _width, _height);
         glClearColor(0, 0, 0, 0);
@@ -247,17 +231,6 @@ void RayCastScene::render() {
         glEnable(GL_TEXTURE_2D);
         _canvas->get_color_attach_texture()->get_gl_resource()->bind();
         if (_ray_caster->map_quarter_canvas()) {
-            // glBegin(GL_QUADS);
-            // glTexCoord2f(0.0, 0.5);
-            // glVertex2f(-1.0, -1.0);
-            // glTexCoord2f(0.5, 0.5);
-            // glVertex2f(1.0, -1.0);
-            // glTexCoord2f(0.5, 0.0);
-            // glVertex2f(1.0, 1.0);
-            // glTexCoord2f(0.0, 0.0);
-            // glVertex2f(-1.0, 1.0);
-            // glEnd();
-
             glBegin(GL_QUADS);
             glTexCoord2f(0.0, 0.0);
             glVertex2f(-1.0, -1.0);
@@ -270,17 +243,6 @@ void RayCastScene::render() {
             glEnd();
         }
         else {
-            // glBegin(GL_QUADS);
-            // glTexCoord2f(0.0, 1.0);
-            // glVertex2f(-1.0, -1.0);
-            // glTexCoord2f(1.0, 1.0);
-            // glVertex2f(1.0, -1.0);
-            // glTexCoord2f(1.0, 0.0);
-            // glVertex2f(1.0, 1.0);
-            // glTexCoord2f(0.0, 0.0);
-            // glVertex2f(-1.0, 1.0);
-            // glEnd();
-
             glBegin(GL_QUADS);
             glTexCoord2f(0.0, 0.0);
             glVertex2f(-1.0, -1.0);
@@ -308,15 +270,15 @@ void RayCastScene::render() {
         //flip vertically for download
         glBindFramebuffer(GL_READ_FRAMEBUFFER, _scene_fbo->get_id());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _scene_fbo->get_id());
-        glReadBuffer(GL_COLOR_ATTACHMENT1);
-        glDrawBuffer(GL_COLOR_ATTACHMENT0);
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        glDrawBuffer(GL_COLOR_ATTACHMENT1);
         glBlitFramebuffer(0, _height, _width, 0, 0, 0, _width, _height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         CHECK_GL_ERROR;
     } else {
         //-------------------------------------------------------------------------------//
         // CUDA based (skip mapping): 
-        // 1. render graphic(scene FBO)
+        // 1. render graphic(scene FBO color-attach-0)
         // 2. do ray-casting with graphic(kernel blend)
         // 3. kernel navigator ray tracing
         // *. render to back should do mapping, off-screen render skip it.
@@ -395,7 +357,6 @@ void RayCastScene::set_mask_label_level(LabelLevel label_level) {
                 GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
                 GL_UNSIGNED_BYTE, (char*)rgba);
         }
-        
     }
 
     set_dirty(true);
@@ -445,8 +406,7 @@ void RayCastScene::set_window_level(float ww, float wl, unsigned char label) {
     set_dirty(true);
 }
 
-int RayCastScene::get_window_level(float& ww, float& wl,
-                                   unsigned char label) const {
+int RayCastScene::get_window_level(float& ww, float& wl, unsigned char label) const {
     const std::map<unsigned char, Vector2f>::const_iterator it =
         _window_levels.find(label);
 

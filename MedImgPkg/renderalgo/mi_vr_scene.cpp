@@ -47,30 +47,22 @@ struct VRScene::RayEnd
     }
 };
 
-VRScene::VRScene() : RayCastScene(), _cache_ray_end(new RayEnd()) {
+VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
+    RayCastScene(strategy, platfrom), _cache_ray_end(new RayEnd()) {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
-        new VREntryExitPoints());
+        new VREntryExitPoints(strategy, platfrom));
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _entry_exit_points->set_strategy(CPU_BASE);
-    } else {
-        _entry_exit_points->set_strategy(GPU_BASE);
-    }
+    _name = "VR Scene";
 }
 
-VRScene::VRScene(int width, int height) : RayCastScene(width, height), _cache_ray_end(new RayEnd()) {
+VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
+    RayCastScene(width, height, strategy, platfrom), _cache_ray_end(new RayEnd()) {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
-        new VREntryExitPoints());
+        new VREntryExitPoints(strategy, platfrom));
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _entry_exit_points->set_strategy(CPU_BASE);
-    } else {
-        _entry_exit_points->set_strategy(GPU_BASE);
-    }
+    _name = "VR Scene";
 }
 
 VRScene::~VRScene() {}
@@ -117,7 +109,7 @@ void VRScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
     // current ratio may not.
     _camera_interactor->resize(_width, _height);
 
-    // initialize vr ee
+    // initialize vr entry exit points
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
         std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
 
@@ -197,39 +189,45 @@ void VRScene::set_color_opacity(std::shared_ptr<ColorTransFunc> color,
 }
 
 void VRScene::cache_ray_end() {
-    GLTexture2DPtr ray_end_tex = _canvas->get_color_attach_texture(1);
-    if (!ray_end_tex) {
-        MI_RENDERALGO_LOG(MI_ERROR) << "ray end texture is null.";
-        RENDERALGO_THROW_EXCEPTION("ray end texture is null.");
-    }
+    if (GL_BASE == _gpu_platform) {
+        GLTexture2DPtr ray_end_tex = _canvas->get_color_attach_texture(1)->get_gl_resource();
+        if (!ray_end_tex) {
+            MI_RENDERALGO_LOG(MI_ERROR) << "ray end texture is null.";
+            RENDERALGO_THROW_EXCEPTION("ray end texture is null.");
+        }
 
-    bool cache_diety = false;
-    if (nullptr == _cache_ray_end->array) {
-        _cache_ray_end->reset(_width, _height);
-        _cache_ray_end->camera = *_ray_cast_camera;
-        _cache_ray_end->lut_dirty = false;
-        cache_diety = true;
-    } else if (_cache_ray_end->width != _width || _cache_ray_end->height != _height) {
-        _cache_ray_end->reset(_width, _height);
-        _cache_ray_end->camera = *_ray_cast_camera;
-        _cache_ray_end->lut_dirty = false;
-        cache_diety = true;
-    } else if (_cache_ray_end->camera != *_ray_cast_camera) {
-        _cache_ray_end->camera = *_ray_cast_camera;
-        _cache_ray_end->lut_dirty = false;
-        cache_diety = true;
-    } else if (_cache_ray_end->lut_dirty) {
-        _cache_ray_end->lut_dirty = false;
-        cache_diety = true;
-    }
+        bool cache_diety = false;
+        if (nullptr == _cache_ray_end->array) {
+            _cache_ray_end->reset(_width, _height);
+            _cache_ray_end->camera = *_ray_cast_camera;
+            _cache_ray_end->lut_dirty = false;
+            cache_diety = true;
+        }
+        else if (_cache_ray_end->width != _width || _cache_ray_end->height != _height) {
+            _cache_ray_end->reset(_width, _height);
+            _cache_ray_end->camera = *_ray_cast_camera;
+            _cache_ray_end->lut_dirty = false;
+            cache_diety = true;
+        }
+        else if (_cache_ray_end->camera != *_ray_cast_camera) {
+            _cache_ray_end->camera = *_ray_cast_camera;
+            _cache_ray_end->lut_dirty = false;
+            cache_diety = true;
+        }
+        else if (_cache_ray_end->lut_dirty) {
+            _cache_ray_end->lut_dirty = false;
+            cache_diety = true;
+        }
 
-    if (cache_diety) {
-        GLUtils::set_pixel_pack_alignment(1);
-        GLUtils::set_pixel_unpack_alignment(1);
-        ray_end_tex->bind();
-        ray_end_tex->download(GL_RGB, GL_UNSIGNED_BYTE, _cache_ray_end->array);
-        ray_end_tex->unbind();
+        if (cache_diety) {
+            GLUtils::set_pixel_pack_alignment(1);
+            GLUtils::set_pixel_unpack_alignment(1);
+            ray_end_tex->bind();
+            ray_end_tex->download(GL_RGB, GL_UNSIGNED_BYTE, _cache_ray_end->array);
+            ray_end_tex->unbind();
+        }
     }
+    
 }
 
 bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {

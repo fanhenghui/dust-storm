@@ -15,6 +15,8 @@ public:
     virtual void initialize();
     virtual void finalize();
 
+    void get_channel(int(&channel)[4]) const;
+
     cudaSurfaceObject_t get_object();
 
 protected:

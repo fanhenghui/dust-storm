@@ -42,7 +42,7 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
         _res_shield.add_shield<GLTexture2D>(gl_color_attach_0);
 
     } else {
-        if (GPU_BASE == _gpu_platform) {
+        if (GL_BASE == _gpu_platform) {
             //FBO with 2 color attachment and 1 depth attachment
             CHECK_GL_ERROR
 

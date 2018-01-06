@@ -104,7 +104,6 @@ protected:
 
 protected:
     RayCastingStrategy _strategy;
-    GPUPlatform _gpu_platform;
     std::shared_ptr<VolumeInfos> _volume_infos;
     std::shared_ptr<EntryExitPoints> _entry_exit_points;
     std::shared_ptr<RayCaster> _ray_caster;
@@ -118,9 +117,6 @@ protected:
     float _global_ww;
     float _global_wl;
     std::map<unsigned char, Vector2f> _window_levels;
-
-    //scene FBO extend color-attachment for flip vertical(make texture as compressor input directly)
-    GLTexture2DPtr _scene_color_attach_1;
 
     //////////////////////////////////////////////////////////////////////////
     // should design a wrap to contain global pseudo colors because its

@@ -54,9 +54,9 @@ int _iTestCode = 0;
 
 std::vector<std::string> GetFiles() {
 #ifdef WIN32
-    const std::string root = "E:/data/MyData/AB_CTA_01/";
+    const std::string root = "E:/data/MyData/demo/lung/";
 #else
-    const std::string root = "/home/wr/data/AB_CTA_01/";
+    const std::string root = "/home/wangrui22/data/demo/lung/";
 #endif
 
     std::vector<std::string> files;
@@ -74,7 +74,7 @@ void Init() {
     DICOMLoader loader;
     loader.load_series(files, _volume_data, _data_header);
 
-    _volumeinfos.reset(new VolumeInfos());
+    _volumeinfos.reset(new VolumeInfos(GPU_BASE, GL_BASE));
     _volumeinfos->set_data_header(_data_header);
     _volumeinfos->set_volume(_volume_data);
 
@@ -86,7 +86,7 @@ void Init() {
     mask_data->mem_allocate();
     _volumeinfos->set_mask(mask_data);
 
-    _scene.reset(new MPRScene(_width, _height));
+    _scene.reset(new MPRScene(_width, _height, GPU_BASE, GL_BASE));
     const float PRESET_CT_LUNGS_WW = 1500;
     const float PRESET_CT_LUNGS_WL = -400;
 

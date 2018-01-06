@@ -31,6 +31,10 @@ void CudaSurfaceBase::finalize() {
     CHECK_CUDA_ERROR(err);
 }
 
+void CudaSurfaceBase::get_channel(int(&channel)[4]) const {
+    memcpy(channel, _channel, sizeof(int) * 4);
+}
+
 cudaSurfaceObject_t CudaSurfaceBase::get_object() {
     if (nullptr == _d_array) {
         MI_CUDARESOURCE_LOG(MI_ERROR) << "try get null CUDA array's surface object.";
@@ -50,6 +54,8 @@ cudaSurfaceObject_t CudaSurfaceBase::get_object() {
         } else {
             return _surface_obj;
         }
+    } else {
+        return _surface_obj;
     }
 }
 

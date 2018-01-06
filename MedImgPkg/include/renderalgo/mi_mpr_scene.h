@@ -9,9 +9,12 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export MPRScene : public RayCastScene {
 public:
-    MPRScene();
-    MPRScene(int width, int height);
+    MPRScene(RayCastingStrategy strategy, GPUPlatform platfrom);
+    MPRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom);
     virtual ~MPRScene();
+
+    virtual void initialize();
+    virtual void render_to_back();
 
     void set_mask_overlay_mode(MaskOverlayMode mode);
 

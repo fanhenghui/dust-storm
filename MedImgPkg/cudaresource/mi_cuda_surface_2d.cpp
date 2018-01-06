@@ -13,6 +13,14 @@ float CudaSurface2D::memory_used() const {
     return _width*_height*CudaUtils::get_componet_byte(_channel) / 1024.0f;
 }
 
+int CudaSurface2D::get_width() const {
+    return _width;
+}
+
+int CudaSurface2D::get_height() const {
+    return _height;
+}
+
 int CudaSurface2D::load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int width, int height, void* h_data) {
     if (width <= 0 || height <= 0) {
         MI_CUDARESOURCE_LOG(MI_ERROR) << "load invalid size " << width << " " << height << " to texture 2D.";

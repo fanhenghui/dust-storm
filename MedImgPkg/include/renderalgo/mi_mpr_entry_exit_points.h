@@ -12,7 +12,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export MPREntryExitPoints : public EntryExitPoints {
 public:
-    MPREntryExitPoints(RayCastingStrategy s, GPUPlatform);
+    MPREntryExitPoints(RayCastingStrategy s, GPUPlatform p);
 
     virtual ~MPREntryExitPoints();
 

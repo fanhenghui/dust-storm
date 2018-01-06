@@ -351,5 +351,8 @@
     <CudaCompile Include="..\renderalgo\kernel\kernel_brick_info_calculator.cu">
       <Filter>kernel</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\renderalgo\kernel\kernel_canvas_transformer.cu">
+      <Filter>kernel</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

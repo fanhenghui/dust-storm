@@ -13,8 +13,8 @@ MED_IMG_BEGIN_NAMESPACE
 
 class RenderAlgo_Export VRScene : public RayCastScene {
 public:
-    VRScene();
-    VRScene(int width, int height);
+    VRScene(RayCastingStrategy strategy, GPUPlatform platfrom);
+    VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom);
     virtual ~VRScene();
 
     virtual void initialize();

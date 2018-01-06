@@ -12,6 +12,10 @@ public:
 
     virtual float memory_used() const;
 
+    int get_width() const;
+
+    int get_height() const;
+
     int load(int channel_x, int channel_y, int channel_z, int channel_w, cudaChannelFormatKind format, int width, int height, void* h_data);
 
     int update(int offset_x, int offset_y, int width, int height, void* h_data);

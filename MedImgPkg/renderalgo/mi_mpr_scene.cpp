@@ -15,31 +15,38 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-MPRScene::MPRScene() : RayCastScene() {
-    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(
-        new MPREntryExitPoints());
+MPRScene::MPRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : RayCastScene(strategy, platfrom) {
+    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints(strategy, platfrom));
     _entry_exit_points = mpr_entry_exit_points;
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _entry_exit_points->set_strategy(CPU_BASE);
-    } else {
-        _entry_exit_points->set_strategy(GPU_BASE);
-    }
+    _name = "MPR Scene";
 }
 
-MPRScene::MPRScene(int width, int height) : RayCastScene(width, height) {
-    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(
-        new MPREntryExitPoints());
+MPRScene::MPRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
+    RayCastScene(width, height, strategy, platfrom) {
+    std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints(strategy, platfrom));
     _entry_exit_points = mpr_entry_exit_points;
-
-    if (CPU == Configure::instance()->get_processing_unit_type()) {
-        _entry_exit_points->set_strategy(CPU_BASE);
-    } else {
-        _entry_exit_points->set_strategy(GPU_BASE);
-    }
+    _name = "MPR Scene";
 }
 
 MPRScene::~MPRScene() {}
+
+void MPRScene::initialize() {
+    if (GL_BASE == _gpu_platform) {
+        RayCastScene::initialize();
+    } else {
+        //TODO CUDA
+        //rewrite scene-base initialize(without scene FBO)
+    }
+}
+
+void MPRScene::render_to_back() {
+    if (GL_BASE == _gpu_platform) {
+        SceneBase::render_to_back();
+    } else {
+        //TODO CUDA
+        //memcpy rc-canvas result to host, and draw pixel to BACK
+    }
+}
 
 void MPRScene::place_mpr(ScanSliceType eType) {
     RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
@@ -83,9 +90,7 @@ bool MPRScene::get_volume_position(const Point2& pt_dc, Point3& pos_v) {
     Point3 pos_v_temp = mat_mvp.transform(Point3(pt.x, pt.y, 0.0));
 
     if (ArithmeticUtils::check_in_bound(pos_v_temp,
-                                        Point3(volume_data->_dim[0] - 1.0,
-                                                volume_data->_dim[1] - 1,
-                                                volume_data->_dim[2] - 1))) {
+        Point3(volume_data->_dim[0] - 1.0, volume_data->_dim[1] - 1, volume_data->_dim[2] - 1))) {
         pos_v = pos_v_temp;
         return true;
     } else {
