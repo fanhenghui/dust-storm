@@ -14,8 +14,8 @@ public:
     virtual void finalize();
     virtual float memory_used() const;
 
-    void load(size_t size, const void* h_array);
-    void download(size_t size, void* h_array);
+    int load(size_t size, const void* h_array);
+    int download(size_t size, void* h_array);
     void* get_pointer();
 
 private:

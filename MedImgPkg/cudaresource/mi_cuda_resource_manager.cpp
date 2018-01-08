@@ -38,7 +38,7 @@ void CudaResourceManager::release() {
     }
 }
 
-CudaGlobalMemoryPtr CudaResourceManager::create_device_memory(const std::string& desc) {
+CudaGlobalMemoryPtr CudaResourceManager::create_global_memory(const std::string& desc) {
     UIDType uid = 0;
     CudaGlobalMemoryPtr ptr(new CudaGlobalMemory(uid));
     ptr->set_description(desc);

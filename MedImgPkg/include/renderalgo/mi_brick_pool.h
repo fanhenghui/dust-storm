@@ -64,7 +64,8 @@ public:
                                      float* brick_color);
 
 public:
-    void debug_save_mask_info(const std::string& path);
+    void debug_save_mask_brick_infos(const std::string& path);
+    void debug_save_volume_brick_info(const std::string& file_name);
 
 private:
     GPUPlatform _gpu_platform;

@@ -7,6 +7,9 @@
 #include "glresource/mi_gl_texture_3d.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "cudaresource/mi_cuda_texture_3d.h"
+#include "cudaresource/mi_cuda_resource_manager.h"
+
 #include "mi_brick_info_calculator.h"
 #include "mi_brick_pool.h"
 #include "mi_camera_calculator.h"
@@ -73,6 +76,7 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
     //----------------------------------------------------//
     // GPU Resource: texture and brick-pool
     //----------------------------------------------------//
+    const std::string info = _data_header ? ("volume : " + _data_header->series_uid) : "volume : undefined series UID";
     if (GL_BASE == _gpu_platform) {
         // release textures
         if (nullptr != _volume_texture) {
@@ -81,12 +85,18 @@ void VolumeInfos::set_volume(std::shared_ptr<ImageData> image_data) {
         }
 
         // create texture
-        const std::string info = _data_header ? ("volume : " + _data_header->series_uid) : "volume : undefined series UID";
         GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(info);
         _volume_texture.reset(new GPUTexture3DPair(tex));
     }
     else {
-        //TODO CUDA
+        //release texture 
+        if (nullptr != _volume_texture) {
+            _volume_texture = nullptr;
+        }
+
+        //create texture
+        CudaTexture3DPtr tex = CudaResourceManager::instance()->create_cuda_texture_3d(info);
+        _volume_texture.reset(new GPUTexture3DPair(tex));
     }
 
     // brick pool
@@ -108,6 +118,7 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
         //----------------------------------------------------//
         // GPU Resource: texture and brick-pool
         //----------------------------------------------------//
+        const std::string info = _data_header ? ("mask : " + _data_header->series_uid) : "mask : undefined series UID";
         if (GL_BASE == _gpu_platform) {
             // release textures
             if (nullptr != _mask_texture) {
@@ -116,11 +127,17 @@ void VolumeInfos::set_mask(std::shared_ptr<ImageData> image_data) {
             }
 
             // create texture
-            const std::string info = _data_header ? ("mask : " + _data_header->series_uid) : "mask : undefined series UID";
             GLTexture3DPtr tex = GLResourceManagerContainer::instance()->get_texture_3d_manager()->create_object(info);
             _mask_texture.reset(new GPUTexture3DPair(tex));
         } else {
-            //TODO CUDA
+            //release texture 
+            if (nullptr != _mask_texture) {
+                _mask_texture = nullptr;
+            }
+
+            //create texture
+            CudaTexture3DPtr tex = CudaResourceManager::instance()->create_cuda_texture_3d(info);
+            _mask_texture.reset(new GPUTexture3DPair(tex));
         }
 
         // brick pool
@@ -192,18 +209,19 @@ void VolumeInfos::refresh_update_mask() {
     if (GL_BASE == _gpu_platform) {
         CHECK_GL_ERROR;
 
-        unsigned int dim_brick[3]={0,0,0};
         GLUtils::set_pixel_pack_alignment(1);
         GLUtils::set_pixel_unpack_alignment(1);
-        _mask_texture->get_gl_resource()->bind();
-
+        GLTexture3DPtr tex = _mask_texture->get_gl_resource();
+        
+        tex->bind();
+        unsigned int dim_brick[3] = { 0,0,0 };
         for (size_t i = 0; i < _mask_aabb_to_be_update.size(); ++i) {
             for (int j = 0; j < 3; ++j) {
                 dim_brick[j] = _mask_aabb_to_be_update[i]._max[j] -
                                _mask_aabb_to_be_update[i]._min[j];
             }
 
-            _mask_texture->get_gl_resource()->update(
+            tex->update(
                 _mask_aabb_to_be_update[i]._min[0],
                 _mask_aabb_to_be_update[i]._min[1],
                 _mask_aabb_to_be_update[i]._min[2], dim_brick[0], dim_brick[1],
@@ -213,13 +231,33 @@ void VolumeInfos::refresh_update_mask() {
             delete[] _mask_array_to_be_update[i];
         }
 
-        _mask_texture->get_gl_resource()->unbind();
+        tex->unbind();
         _mask_aabb_to_be_update.clear();
         _mask_array_to_be_update.clear();
 
         refresh_stored_mask_brick_info();
+
     } else {
-        //TODO CUDA
+
+        CudaTexture3DPtr tex = _mask_texture->get_cuda_resource();
+        unsigned int dim_brick[3] = { 0,0,0 };
+        for (size_t i = 0; i < _mask_aabb_to_be_update.size(); ++i) {
+            for (int j = 0; j < 3; ++j) {
+                dim_brick[j] = _mask_aabb_to_be_update[i]._max[j] -
+                    _mask_aabb_to_be_update[i]._min[j];
+            }
+
+            tex->update(
+                _mask_aabb_to_be_update[i]._min[0],
+                _mask_aabb_to_be_update[i]._min[1],
+                _mask_aabb_to_be_update[i]._min[2], dim_brick[0], dim_brick[1],
+                dim_brick[2], _mask_array_to_be_update[i]);
+
+            delete[] _mask_array_to_be_update[i];
+        }
+
+        _mask_aabb_to_be_update.clear();
+        _mask_array_to_be_update.clear();
     }
 }
 
@@ -256,7 +294,9 @@ void VolumeInfos::refresh_upload_mask() {
         tex->unbind();
         CHECK_GL_ERROR;
     } else {
-        //TODO CUDA
+        CudaTexture3DPtr tex = _volume_texture->get_cuda_resource();
+        tex->load(8, 0, 0, 0, cudaChannelFormatKindUnsigned, _volume_data->_dim[0],
+            _volume_data->_dim[1], _volume_data->_dim[2], _volume_data->get_pixel_pointer());
     }
     
     refresh_stored_mask_brick_info();
@@ -279,26 +319,21 @@ void VolumeInfos::refresh_upload_volume() {
         GLUtils::get_gray_texture_format(_volume_data->_data_type, internal_format,
             format, type);
 
-        const unsigned int length =
-            _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
+        const unsigned int length = _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
         const double min_gray = _volume_data->get_min_scalar();
 
         // signed integer should convert to unsigned
         if (_volume_data->_data_type == SHORT) {
-            std::unique_ptr<unsigned short[]> dst_data =
-                signed_to_unsigned<short, unsigned short>(
+            std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
                     length, min_gray, _volume_data->get_pixel_pointer());
             tex->load(internal_format, _volume_data->_dim[0], _volume_data->_dim[1],
                 _volume_data->_dim[2], format, type, dst_data.get());
-        }
-        else if (_volume_data->_data_type == CHAR) {
-            std::unique_ptr<unsigned char[]> dst_data =
-                signed_to_unsigned<char, unsigned char>(
+        } else if (_volume_data->_data_type == CHAR) {
+            std::unique_ptr<unsigned char[]> dst_data = signed_to_unsigned<char, unsigned char>(
                     length, min_gray, _volume_data->get_pixel_pointer());
             tex->load(internal_format, _volume_data->_dim[0], _volume_data->_dim[1],
                 _volume_data->_dim[2], format, type, dst_data.get());
-        }
-        else {
+        } else {
             tex->load(internal_format, _volume_data->_dim[0], _volume_data->_dim[1],
                 _volume_data->_dim[2], format, type,
                 _volume_data->get_pixel_pointer());
@@ -307,7 +342,29 @@ void VolumeInfos::refresh_upload_volume() {
         tex->unbind();
         CHECK_GL_ERROR;
     } else {
-        //TODO CUDA
+        CudaTexture3DPtr tex = _volume_texture->get_cuda_resource();
+        
+        const unsigned int length = _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
+        const double min_gray = _volume_data->get_min_scalar();
+
+        // signed integer should convert to unsigned
+        if (_volume_data->_data_type == SHORT) {
+            std::unique_ptr<unsigned short[]> dst_data = signed_to_unsigned<short, unsigned short>(
+                    length, min_gray, _volume_data->get_pixel_pointer());
+            tex->load(16,0,0,0,cudaChannelFormatKindUnsigned, _volume_data->_dim[0], 
+                _volume_data->_dim[1], _volume_data->_dim[2], dst_data.get());
+        } else if (_volume_data->_data_type == CHAR) {
+            std::unique_ptr<unsigned char[]> dst_data = signed_to_unsigned<char, unsigned char>(
+                    length, min_gray, _volume_data->get_pixel_pointer());
+            tex->load(8, 0, 0, 0, cudaChannelFormatKindUnsigned, _volume_data->_dim[0], 
+                _volume_data->_dim[1], _volume_data->_dim[2], dst_data.get());
+        } else if (_volume_data->_data_type == USHORT) {
+            tex->load(16, 0, 0, 0, cudaChannelFormatKindUnsigned, _volume_data->_dim[0], 
+                _volume_data->_dim[1], _volume_data->_dim[2], _volume_data->get_pixel_pointer());
+        } else if (_volume_data->_data_type == UCHAR) {
+            tex->load(8, 0, 0, 0, cudaChannelFormatKindUnsigned, _volume_data->_dim[0],
+                _volume_data->_dim[1], _volume_data->_dim[2], _volume_data->get_pixel_pointer());
+        }
     }
 
     _brick_pool->calculate_brick_geometry();

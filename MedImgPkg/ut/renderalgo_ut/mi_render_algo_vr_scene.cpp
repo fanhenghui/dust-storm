@@ -43,9 +43,6 @@
 #include <unistd.h>
 #endif
 
-#include "libgpujpeg/gpujpeg.h"
-#include "libgpujpeg/gpujpeg_common.h"
-
 using namespace medical_imaging;
 namespace {
 std::shared_ptr<ImageDataHeader> _data_header;
@@ -375,9 +372,9 @@ void Keyboard(unsigned char key, int x, int y) {
         }
     case 'k' : {
 #ifdef WIN32
-        _volumeinfos->get_brick_pool()->debug_save_mask_info("D:/temp/");
+        _volumeinfos->get_brick_pool()->debug_save_mask_brick_infos("D:/temp/");
 #else
-        _volumeinfos->get_brick_pool()->debug_save_mask_info("/home/wangrui22/data/");
+        _volumeinfos->get_brick_pool()->debug_save_mask_brick_infos("/home/wangrui22/data/");
 #endif
         break;
                }

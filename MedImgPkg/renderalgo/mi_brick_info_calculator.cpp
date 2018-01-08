@@ -7,6 +7,7 @@
 
 #include "cudaresource/mi_cuda_resource_manager.h"
 #include "cudaresource/mi_cuda_global_memory.h"
+#include "cudaresource/mi_cuda_texture_3d.h"
 
 #include "io/mi_image_data.h"
 
@@ -20,8 +21,8 @@ MED_IMG_BEGIN_NAMESPACE
 //-------------------------------------------------//
 //CUDA method
 extern "C"
-cudaError_t cuda_calculate_volume_brick_info(cudaTextureObject_t volume_tex, dim3 volume_dim, float volume_min_scalar,
-    int brick_size, dim3 brick_dim, dim3 brick_margin, VolumeBrickInfo* d_data);
+cudaError_t cuda_calculate_volume_brick_info(cudaTextureObject_t volume_tex, dim3 volume_dim,
+    int brick_size, dim3 brick_dim, int brick_margin, VolumeBrickInfo* d_data);
 
 extern "C"
 cudaError_t cuda_calculate_mask_brick_info(cudaTextureObject_t mask_tex, dim3 mask_dim,
@@ -84,20 +85,64 @@ void VolumeBrickInfoCalculator::calculate() {
     }
 }
 
-void VolumeBrickInfoCalculator::calculate_cuda() {
-    //TODO CUDA
+void VolumeBrickInfoCalculator::download_cuda() {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
+    if (!_info_buffer->cuda()) {
+        RENDERALGO_THROW_EXCEPTION("invalid brick info array platform");
+    }
+    if (0 != _info_buffer->get_cuda_resource()->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
+        sizeof(VolumeBrickInfo), _info_array)) {
+        RENDERALGO_THROW_EXCEPTION("download brick info array failed.");
+    }
 }
 
-void VolumeBrickInfoCalculator::download_cuda() {
-    //TODO CUDA
+void VolumeBrickInfoCalculator::calculate_cuda() {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_img_data);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_img_texture);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_info_array);
+
+    if (!_img_texture->cuda()) {
+        RENDERALGO_THROW_EXCEPTION("invalid texture platform");
+    }
+
+    if (!_info_buffer->cuda()) {
+        RENDERALGO_THROW_EXCEPTION("invalid brick info array platform");
+    }
+
+    const dim3 volume_dim(int(_img_data->_dim[0]),
+        int(_img_data->_dim[1]),
+        int(_img_data->_dim[2]));
+
+    const dim3 brick_dim((int)_brick_dim[0], (int)_brick_dim[1], (int)_brick_dim[2]);
+
+    cudaTextureObject_t tex = _img_texture->get_cuda_resource()->get_object(
+        cudaAddressModeClamp, cudaFilterModePoint, cudaReadModeElementType, false);
+    if (0 == tex) {
+        RENDERALGO_THROW_EXCEPTION("0 cuda texture object");
+    }
+    
+    void* gpu_brick_info_array = _info_buffer->get_cuda_resource()->get_pointer();
+    RENDERALGO_CHECK_NULL_EXCEPTION(gpu_brick_info_array);
+    
+    cudaError_t err = cuda_calculate_volume_brick_info(tex, volume_dim, _brick_size, brick_dim, _brick_margin, (VolumeBrickInfo*)gpu_brick_info_array);
+    if (err != cudaSuccess) {
+        std::stringstream ss;
+        ss << "CUDA calculate volume brick info failed with CUDA err: " << err;
+        RENDERALGO_THROW_EXCEPTION(ss.str());
+    }
 }
 
 void VolumeBrickInfoCalculator::download_gl() {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_info_buffer);
+    if (!_info_buffer->gl()) {
+        RENDERALGO_THROW_EXCEPTION("invalid brick info array platform");
+    }
+
     _info_buffer->get_gl_resource()->set_buffer_target(GL_SHADER_STORAGE_BUFFER);
     _info_buffer->get_gl_resource()->bind();
     _info_buffer->get_gl_resource()->download(_brick_dim[0] * _brick_dim[1] * _brick_dim[2] *
-                           sizeof(VolumeBrickInfo),
-                           _info_array);
+                           sizeof(VolumeBrickInfo), _info_array);
     _info_buffer->get_gl_resource()->unbind();
 }
 
@@ -252,7 +297,7 @@ void MaskBrickInfoCalculator::download_cuda() {
 }
 
 void MaskBrickInfoCalculator::update_cuda(const AABBUI& aabb) {
-    //TODO CUDA
+    //TODO CUDA    
 }
 
 void MaskBrickInfoCalculator::download_gl() {
@@ -389,7 +434,7 @@ void MaskBrickInfoCalculator::initialize() {
     } else {
         //TODO CUDA
         if (nullptr == _cuda_buffer_visible_labels) {
-            _cuda_buffer_visible_labels = CudaResourceManager::instance()->create_device_memory("visible label memory in mask brick info calculator");
+            _cuda_buffer_visible_labels = CudaResourceManager::instance()->create_global_memory("visible label memory in mask brick info calculator");
         }
     }
 }

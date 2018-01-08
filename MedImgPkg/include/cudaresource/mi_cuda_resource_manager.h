@@ -86,7 +86,7 @@ public:
     static CudaResourceManager* instance();
     static void release();
     
-    CudaGlobalMemoryPtr create_device_memory(const std::string& desc);
+    CudaGlobalMemoryPtr create_global_memory(const std::string& desc);
     CudaTexture1DPtr create_cuda_texture_1d(const std::string& desc);
     CudaTexture2DPtr create_cuda_texture_2d(const std::string& desc);
     CudaTexture3DPtr create_cuda_texture_3d(const std::string& desc);
