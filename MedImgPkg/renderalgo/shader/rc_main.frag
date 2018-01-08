@@ -12,10 +12,10 @@ layout (binding = IMG_BINDING_EXIT_POINTS, rgba32f) readonly uniform image2D ima
 uniform vec3 volume_dim;
 uniform sampler3D volume_sampler;
 uniform sampler3D mask_sampler;
-uniform float sample_rate;
+uniform float sample_step;
 uniform int quarter_canvas;
 
-void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_rate, out float start_step, out float end_step)
+void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_step, out float start_step, out float end_step)
 {
     ivec2 frag_coord = ivec2(0,0);
     if(quarter_canvas == 1) {
@@ -37,9 +37,9 @@ void preprocess(out vec3 ray_start,out vec3 ray_dir_sample_rate, out float start
     }
 
     ray_start = start_point;
-    ray_dir_sample_rate = ray_dir_norm* sample_rate;
+    ray_dir_sample_step = ray_dir_norm* sample_step;
     start_step = 0;
-    end_step = ray_length/ sample_rate;
+    end_step = ray_length/ sample_step;
 }
 
 //Ray cast step code : 
@@ -56,17 +56,17 @@ vec4 mask_overlay(vec3 ray_start, vec3 ray_dir, float start_step, float end_step
 void main()
 {
     vec3 ray_start = vec3(0,0,0);
-    vec3 ray_dir_sample_rate = vec3(1,0,0);
+    vec3 ray_dir_sample_step = vec3(1,0,0);
     float end_step = 0;
     float start_step = 0;
     vec3 ray_end = vec3(0,0,0);
     vec4 integral_color = vec4(0,0,0,0);
 
-    preprocess(ray_start, ray_dir_sample_rate, start_step, end_step);
+    preprocess(ray_start, ray_dir_sample_step, start_step, end_step);
 
     integral_color = ray_cast(
         ray_start, 
-        ray_dir_sample_rate, 
+        ray_dir_sample_step, 
         start_step, 
         end_step, 
         integral_color , 
@@ -80,7 +80,7 @@ void main()
 
     oFragColor = mask_overlay(
         ray_start, 
-        ray_dir_sample_rate, 
+        ray_dir_sample_step, 
         start_step, 
         end_step, 
         integral_color , 

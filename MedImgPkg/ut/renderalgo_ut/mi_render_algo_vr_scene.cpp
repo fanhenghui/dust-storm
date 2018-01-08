@@ -164,7 +164,7 @@ void Init() {
     _wl = PRESET_CT_LUNGS_WL;
 
     _scene->set_volume_infos(_volumeinfos);
-    _scene->set_sample_rate(0.5);
+    _scene->set_sample_step(0.5);
     _scene->set_global_window_level(_ww, _wl);
     _scene->set_window_level(_ww, _wl, 0);
     _scene->set_window_level(_ww, _wl, 1);
@@ -297,26 +297,26 @@ void Display() {
 
          glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
-        ////_scene->set_downsample(true);
-        //_scene->download_image_buffer();
-        ////_scene->set_downsample(false);
+        //_scene->set_downsample(true);
+        _scene->download_image_buffer();
+        //_scene->set_downsample(false);
 
-        //CHECK_GL_ERROR;
-        //_scene->swap_image_buffer();
-        //unsigned char* buffer = nullptr;
-        //int buffer_size = 0;
+        CHECK_GL_ERROR;
+        _scene->swap_image_buffer();
+        unsigned char* buffer = nullptr;
+        int buffer_size = 0;
 
-        //CHECK_GL_ERROR;
+        CHECK_GL_ERROR;
 
-        //_scene->get_image_buffer(buffer, buffer_size);
+        _scene->get_image_buffer(buffer, buffer_size);
 
-        //CHECK_GL_ERROR;
+        CHECK_GL_ERROR;
 
-//#ifdef WIN32
-//        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
-//#else
-//        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-//#endif
+#ifdef WIN32
+        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
+#else
+        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+#endif
          /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
          ", buffer size: " << buffer_size;*/
 
@@ -347,7 +347,7 @@ void Keyboard(unsigned char key, int x, int y) {
         _wl = PRESET_CT_LUNGS_WL;
 
         _scene->set_volume_infos(_volumeinfos);
-        _scene->set_sample_rate(1.0);
+        _scene->set_sample_step(1.0);
         _scene->set_global_window_level(_ww, _wl);
         _scene->set_window_level(_ww, _wl, 0);
         _scene->set_composite_mode(COMPOSITE_MIP);

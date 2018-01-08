@@ -67,7 +67,7 @@ void RCStepCompositeDVR::set_gpu_parameter() {
 
     glUniform1f(_loc_color_opacity_texture_shift, 0.5f / S_TRANSFER_FUNC_WIDTH);
 
-    glUniform1f(_loc_sample_rate, ray_caster->get_sample_rate());
+    glUniform1f(_loc_sample_step, ray_caster->get_sample_step());
 
     std::shared_ptr<ImageData> volume_img = ray_caster->get_volume_data();
     RENDERALGO_CHECK_NULL_EXCEPTION(volume_img);
@@ -86,11 +86,11 @@ void RCStepCompositeDVR::get_uniform_location() {
     _loc_color_opacity_texture_shift =
         program->get_uniform_location("color_opacity_texture_shift");
     _loc_opacity_correction = program->get_uniform_location("opacity_correction");
-    _loc_sample_rate = program->get_uniform_location("sample_rate");
+    _loc_sample_step = program->get_uniform_location("sample_step");
 
     if (-1 == _loc_color_opacity_array ||
             -1 == _loc_color_opacity_texture_shift || -1 == _loc_opacity_correction ||
-            -1 == _loc_sample_rate) {
+            -1 == _loc_sample_step) {
         RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
     }
 }

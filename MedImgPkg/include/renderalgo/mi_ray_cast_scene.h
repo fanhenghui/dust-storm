@@ -49,7 +49,7 @@ public:
     void set_mask_label_level(LabelLevel label_level);
 
     // Sample rate
-    void set_sample_rate(float sample_rate);
+    void set_sample_step(float sample_step);
 
     // Label parameter
     virtual void set_visible_labels(std::vector<unsigned char> labels);

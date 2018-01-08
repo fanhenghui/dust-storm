@@ -362,8 +362,8 @@ void RayCastScene::set_mask_label_level(LabelLevel label_level) {
     set_dirty(true);
 }
 
-void RayCastScene::set_sample_rate(float sample_rate) {
-    _ray_caster->set_sample_rate(sample_rate);
+void RayCastScene::set_sample_step(float sample_step) {
+    _ray_caster->set_sample_step(sample_step);
     set_dirty(true);
 }
 

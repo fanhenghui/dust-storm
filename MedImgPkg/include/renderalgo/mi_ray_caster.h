@@ -79,8 +79,8 @@ public:
     std::shared_ptr<CameraCalculator> get_camera_calculator() const;
 
     // Sample rate
-    void set_sample_rate(float sample_rate);
-    float get_sample_rate() const;
+    void set_sample_step(float sample_step);
+    float get_sample_step() const;
 
     // Label parameter
     void set_visible_labels(std::vector<unsigned char> labels);
@@ -176,9 +176,9 @@ private:
     std::shared_ptr<CameraBase> _camera;
     std::shared_ptr<CameraCalculator> _camera_cal;
 
-    // Data sample rate(DVR 0.5 , MIPs 1.0)
-    float _sample_rate;
-    float _custom_sample_rate;
+    // Data sample step(DVR 0.5 voxel , MIPs 1.0 voxel)
+    float _sample_step;
+    float _custom_sample_step;
 
     // Global window level for MIPs mode
     float _global_ww;

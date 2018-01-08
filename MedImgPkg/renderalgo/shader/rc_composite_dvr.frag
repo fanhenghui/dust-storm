@@ -6,7 +6,7 @@
 uniform sampler1DArray color_opacity_array;
 uniform float color_opacity_texture_shift;
 uniform float opacity_correction; 
-uniform float sample_rate;
+uniform float sample_step;
 
 //Window level buffer
 layout (std430 , binding = BUFFER_BINDING_WINDOW_LEVEL_BUCKET) buffer WindowLevelBucket
@@ -38,7 +38,7 @@ sampler3D volume_sampler , sampler3D mask_sampler , vec3 sub_data_dim , vec3 sub
         if(current_color.a >0.0)
         {
             vec4 shading_color = shade(actual_sample_pos, current_color, ray_dir , volume_sampler , sample_pos , sample_shift , label);
-            shading_color.a = 1 - pow(1 - shading_color.a, sample_rate/opacity_correction);
+            shading_color.a = 1 - pow(1 - shading_color.a, sample_step/opacity_correction);
             integral_color.rgb += shading_color.rgb * (1.0 - integral_color.a) * shading_color.a;
             integral_color.a += shading_color.a * (1.0 - integral_color.a);
          }

@@ -71,7 +71,7 @@ void RCStepMainFrag::set_gpu_parameter() {
                 (float)volume_img->_dim[1], (float)volume_img->_dim[2]);
 
     // 4 Sample rate
-    glUniform1f(_loc_sample_rate, ray_caster->get_sample_rate());
+    glUniform1f(_loc_sample_step, ray_caster->get_sample_step());
 
     // 5 quarter canvas flag
     const int quarter_canvas = ray_caster->map_quarter_canvas() ? 1: 0;
@@ -100,12 +100,12 @@ void RCStepMainFrag::get_uniform_location() {
     _loc_volume_dim = program->get_uniform_location("volume_dim");
     _loc_volume_data = program->get_uniform_location("volume_sampler");
     _loc_mask_data = program->get_uniform_location("mask_sampler");
-    _loc_sample_rate = program->get_uniform_location("sample_rate");
+    _loc_sample_step = program->get_uniform_location("sample_step");
     _loc_quarter_canvas = program->get_uniform_location("quarter_canvas");
 
     if (-1 == _loc_volume_dim || -1 == _loc_volume_data ||
             //-1 == m_iLocMaskData ||
-            -1 == _loc_sample_rate || -1 == _loc_quarter_canvas) {
+            -1 == _loc_sample_step || -1 == _loc_quarter_canvas) {
         RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
     }
 }

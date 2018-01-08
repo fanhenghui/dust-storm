@@ -79,14 +79,14 @@ bool ray_intersect_aabb_acc(Vector3f ray_start, Vector3f min, Vector3f bound, Ve
 }
 
 MPREntryExitPoints::MPREntryExitPoints(RayCastingStrategy s, GPUPlatform p)
-    : EntryExitPoints(s, p), _thickness(1.0f), _sample_rate(1.0), 
+    : EntryExitPoints(s, p), _thickness(1.0f), _sample_step(1.0), 
     _entry_plane(1,0,0,0), _exit_plane(1,0,0,0),_ray_dir_norm(0,0,0),
     _standard_steps(0) {}
 
 MPREntryExitPoints::~MPREntryExitPoints() {}
 
-void MPREntryExitPoints::set_sample_rate(float sample_rate) {
-    _sample_rate = sample_rate;
+void MPREntryExitPoints::set_sample_step(float sample_step) {
+    _sample_step = sample_step;
 }
 
 void MPREntryExitPoints::set_thickness(float thickness) {
@@ -94,7 +94,7 @@ void MPREntryExitPoints::set_thickness(float thickness) {
 }
 
 void MPREntryExitPoints::calculate_entry_exit_points() {
-    _standard_steps = float(int(_thickness / _sample_rate + 0.5f));
+    _standard_steps = float(int(_thickness / _sample_step + 0.5f));
 
     // clock_t t0 = clock();
     if (CPU_BASE == _strategy) {
@@ -239,7 +239,7 @@ void MPREntryExitPoints::cal_entry_exit_points_cpu() {
 
             //////////////////////////////////////////////////////////////////////////
             // alpha value : ray step
-            float fStep = (float)(int)((exit_intersection - entry_intersection).magnitude() / _sample_rate + 0.5f);
+            float fStep = (float)(int)((exit_intersection - entry_intersection).magnitude() / _sample_step + 0.5f);
             if (fStep > _standard_steps) // Adjust step to prevent  fStep = standard
                 // step + epsilon which it's ceil equals (
                 // standard cell + 1)

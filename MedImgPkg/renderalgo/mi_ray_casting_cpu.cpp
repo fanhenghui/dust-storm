@@ -156,8 +156,8 @@ void RayCastingCPU::ray_casting_average_i(
 
         const Vector3f dir = end_point - start_point;
         const float length = dir.magnitude();
-        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_rate;
-        const float step_float = length / ray_caster->_sample_rate;
+        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_step;
+        const float step_float = length / ray_caster->_sample_step;
         int step = (int)step_float;
 
         if (step == 0) { //to make sure integrate at least once
@@ -223,8 +223,8 @@ void RayCastingCPU::ray_casting_mip_i(std::shared_ptr<RayCaster> ray_caster) {
 
         const Vector3f dir = end_point - start_point;
         const float length = dir.magnitude();
-        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_rate;
-        const float step_float = length / ray_caster->_sample_rate;
+        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_step;
+        const float step_float = length / ray_caster->_sample_step;
         int step = (int)step_float;
 
         if (step == 0) { //to make sure integrate at least once
@@ -286,8 +286,8 @@ void RayCastingCPU::ray_casting_minip_i(std::shared_ptr<RayCaster> ray_caster) {
 
         const Vector3f dir = end_point - start_point;
         const float length = dir.magnitude();
-        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_rate;
-        const float step_float = length / ray_caster->_sample_rate;
+        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_step;
+        const float step_float = length / ray_caster->_sample_step;
         int step = (int)step_float;
 
         if (step == 0) { //to make sure integrate at least once
@@ -407,8 +407,8 @@ void RayCastingCPU::mask_overlay_i(std::shared_ptr<RayCaster> ray_caster) {
 
         const Vector3f dir = end_point - start_point;
         const float length = dir.magnitude();
-        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_rate;
-        const float step_float = length / ray_caster->_sample_rate;
+        const Vector3f dir_step = dir.get_normalize() * ray_caster->_sample_step;
+        const float step_float = length / ray_caster->_sample_step;
         int step = (int)step_float;
 
         if (step == 0) { //to make sure integrate at least once

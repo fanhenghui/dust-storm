@@ -91,7 +91,7 @@ void Init() {
     const float PRESET_CT_LUNGS_WL = -400;
 
     _scene->set_volume_infos(_volumeinfos);
-    _scene->set_sample_rate(1.0);
+    _scene->set_sample_step(1.0);
     _scene->set_global_window_level(PRESET_CT_LUNGS_WW, PRESET_CT_LUNGS_WL);
     _scene->set_composite_mode(COMPOSITE_AVERAGE);
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);

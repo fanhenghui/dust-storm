@@ -20,7 +20,7 @@ public:
 
     void set_thickness(float thickness); // In volume coordinate
 
-    void set_sample_rate(float sample_rate);
+    void set_sample_step(float sample_step);
 
     virtual void calculate_entry_exit_points();
 
@@ -45,7 +45,7 @@ private:
 
 private:
     float _thickness;
-    float _sample_rate;
+    float _sample_step;
 
     // Entry exit plane(orthogonal)
     Vector4f _entry_plane;

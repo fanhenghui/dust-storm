@@ -55,7 +55,7 @@ public:
                        std::shared_ptr<GLProgram> program)
         : RCStepBase(ray_caster, program), _loc_color_opacity_array(-1),
           _loc_color_opacity_texture_shift(-1), _loc_opacity_correction(-1),
-          _loc_sample_rate(-1) {};
+          _loc_sample_step(-1) {};
 
     virtual ~RCStepCompositeDVR() {};
 
@@ -69,7 +69,7 @@ private:
     int _loc_color_opacity_array;
     int _loc_color_opacity_texture_shift;
     int _loc_opacity_correction;
-    int _loc_sample_rate;
+    int _loc_sample_step;
 };
 
 MED_IMG_END_NAMESPACE

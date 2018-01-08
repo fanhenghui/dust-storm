@@ -16,7 +16,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
     : _strategy(strategy), _gpu_platform(gpu_platform), 
-      _sample_rate(0.5f), _custom_sample_rate(0.5f), 
+      _sample_step(0.5f), _custom_sample_step(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
       _inner_buffer(new RayCasterInnerBuffer()),
@@ -95,21 +95,21 @@ void RayCaster::render_gpu_gl() {
             if (pre_fps < exp_fps) {
                 if (pre_fps < exp_fps / para1) {
                     if (_map_quarter_canvas) {
-                        _sample_rate = (float)(_sample_rate*para0);
+                        _sample_step = (float)(_sample_step*para0);
                     }
                     else {
                         _map_quarter_canvas = true;
                     }
                 }
                 else {
-                    _sample_rate = (float)(_sample_rate*para0);
+                    _sample_step = (float)(_sample_step*para0);
                 }
             }
         }
     }
     else {
         _map_quarter_canvas = false;
-        _sample_rate = _custom_sample_rate;
+        _sample_step = _custom_sample_step;
     }
 
     // Viewport
@@ -172,9 +172,9 @@ std::shared_ptr<CameraCalculator> RayCaster::get_camera_calculator() const {
     return _camera_cal;
 }
 
-void RayCaster::set_sample_rate(float sample_rate) {
-    _sample_rate = sample_rate;
-    _custom_sample_rate = sample_rate;
+void RayCaster::set_sample_step(float sample_step) {
+    _sample_step = sample_step;
+    _custom_sample_step = sample_step;
 }
 
 void RayCaster::set_mask_label_level(LabelLevel label_level) {
@@ -299,8 +299,8 @@ GPUTexture3DPairPtr RayCaster::get_mask_data_texture() {
     return _mask_textures;
 }
 
-float RayCaster::get_sample_rate() const {
-    return _sample_rate;
+float RayCaster::get_sample_step() const {
+    return _sample_step;
 }
 
 void RayCaster::get_global_window_level(float& ww, float& wl) const {
