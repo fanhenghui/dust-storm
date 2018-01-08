@@ -144,6 +144,9 @@
     <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_gl.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_cuda.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\renderalgo\mi_annotation_calculator.cpp">
@@ -252,6 +255,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_gl.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_cuda.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

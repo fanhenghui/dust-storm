@@ -4,7 +4,6 @@
 #include "glresource/mi_gl_resource_define.h"
 #include "glresource/mi_gl_resource_manager_container.h"
 #include "renderalgo/mi_ray_caster_define.h"
-#include "renderalgo/mi_render_algo_export.h"
 
 MED_IMG_BEGIN_NAMESPACE
 class RayCaster;
