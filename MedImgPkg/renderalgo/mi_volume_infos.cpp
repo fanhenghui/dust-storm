@@ -294,9 +294,9 @@ void VolumeInfos::refresh_upload_mask() {
         tex->unbind();
         CHECK_GL_ERROR;
     } else {
-        CudaTexture3DPtr tex = _volume_texture->get_cuda_resource();
-        tex->load(8, 0, 0, 0, cudaChannelFormatKindUnsigned, _volume_data->_dim[0],
-            _volume_data->_dim[1], _volume_data->_dim[2], _volume_data->get_pixel_pointer());
+        CudaTexture3DPtr tex = _mask_texture->get_cuda_resource();
+        tex->load(8, 0, 0, 0, cudaChannelFormatKindUnsigned, _mask_data->_dim[0],
+            _mask_data->_dim[1], _mask_data->_dim[2], _mask_data->get_pixel_pointer());
     }
     
     refresh_stored_mask_brick_info();

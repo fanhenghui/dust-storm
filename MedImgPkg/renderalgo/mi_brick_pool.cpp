@@ -173,7 +173,9 @@ void BrickPool::calculate_mask_brick_info(const std::vector<unsigned char>& vis_
             _res_shield.add_shield<GLBuffer>(info_buffer);
             _mask_brick_info_buffer_set.insert(std::make_pair(key, GPUMemoryPairPtr(new GPUMemoryPair(info_buffer))));
         } else {
-            //TODO CUDA
+            CudaGlobalMemoryPtr mem = CudaResourceManager::instance()->create_global_memory("mask brick info buffer " + key.key);
+            mem->load(this->get_brick_count() * sizeof(MaskBrickInfo), nullptr);
+            _mask_brick_info_buffer_set.insert(std::make_pair(key, GPUMemoryPairPtr(new GPUMemoryPair(mem))));
         }
     }
 
@@ -529,7 +531,7 @@ void BrickPool::debug_save_mask_brick_infos(const std::string& path) {
         out << "volume dim "  << _volume->_dim[0] << " " << _volume->_dim[1] << " " << _volume->_dim[2] << std::endl;
         out << "brick dim " << _brick_dim[0] << " " << _brick_dim[1] << " " << " " << _brick_dim[2] << std::endl;
         for (unsigned int i = 0; i < _brick_count; ++i ) {
-            out << i << " _" << info[i].label << std::endl;
+            out << i << " " << info[i].label << std::endl;
         }
         out.close();
         MI_RENDERALGO_LOG(MI_WARNING) << "save file " << file_name << " to debug save mask info done.";
