@@ -99,9 +99,6 @@
     <ClInclude Include="..\include\renderalgo\mi_vr_scene.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\renderalgo\mi_ray_caster_inner_buffer.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="..\renderalgo\mi_ray_casting_cpu.h">
       <Filter>source</Filter>
     </ClInclude>
@@ -145,6 +142,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_cuda.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_caster_inner_resource.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,9 +195,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_ray_caster_canvas.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\renderalgo\mi_ray_caster_inner_buffer.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_ray_casting_cpu.cpp">
@@ -258,6 +255,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_cuda.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_ray_caster_inner_resource.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -358,6 +358,9 @@
       <Filter>kernel</Filter>
     </CudaCompile>
     <CudaCompile Include="..\renderalgo\kernel\kernel_canvas_transformer.cu">
+      <Filter>kernel</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\renderalgo\kernel\kernel_ray_casting.cu">
       <Filter>kernel</Filter>
     </CudaCompile>
   </ItemGroup>

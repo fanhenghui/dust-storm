@@ -40,7 +40,7 @@
     <ClInclude Include="..\include\renderalgo\mi_vr_proxy_geometry_brick.h" />
     <ClInclude Include="..\include\renderalgo\mi_vr_proxy_geometry_cube.h" />
     <ClInclude Include="..\include\renderalgo\mi_vr_scene.h" />
-    <ClInclude Include="..\renderalgo\mi_ray_caster_inner_buffer.h" />
+    <ClInclude Include="..\renderalgo\mi_ray_caster_inner_resource.h" />
     <ClInclude Include="..\renderalgo\mi_ray_casting_cpu.h" />
     <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_cuda.h" />
     <ClInclude Include="..\renderalgo\mi_ray_casting_gpu_gl.h" />
@@ -72,7 +72,7 @@
     <ClCompile Include="..\renderalgo\mi_opacity_transfer_function.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_caster.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_caster_canvas.cpp" />
-    <ClCompile Include="..\renderalgo\mi_ray_caster_inner_buffer.cpp" />
+    <ClCompile Include="..\renderalgo\mi_ray_caster_inner_resource.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_casting_cpu.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_cuda.cpp" />
     <ClCompile Include="..\renderalgo\mi_ray_casting_gpu_gl.cpp" />
@@ -130,6 +130,7 @@
   <ItemGroup>
     <CudaCompile Include="..\renderalgo\kernel\kernel_brick_info_calculator.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_canvas_transformer.cu" />
+    <CudaCompile Include="..\renderalgo\kernel\kernel_ray_casting.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF3C3577-A42A-42C9-9C19-AF2DA66448C2}</ProjectGuid>

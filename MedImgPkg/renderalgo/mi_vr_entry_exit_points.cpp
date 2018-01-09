@@ -24,7 +24,7 @@ VREntryExitPoints::~VREntryExitPoints() {}
 
 void VREntryExitPoints::initialize() {
     EntryExitPoints::initialize();
-    //JUST support GL now.    
+    //JUST support GL rendering. But CUDA_BASE's rc can use the result  
     if (CUDA_BASE == _gpu_platform) {
         RENDERALGO_THROW_EXCEPTION("VR entry exit points can't support CUDA calculation.");
     }

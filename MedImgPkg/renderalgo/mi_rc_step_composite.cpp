@@ -8,7 +8,7 @@
 #include "io/mi_image_data.h"
 
 #include "mi_ray_caster.h"
-#include "mi_ray_caster_inner_buffer.h"
+#include "mi_ray_caster_inner_resource.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -48,11 +48,11 @@ void RCStepCompositeDVR::set_gpu_parameter() {
     CHECK_GL_ERROR;
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
-    std::shared_ptr<RayCasterInnerBuffer> inner_buffer =
-        ray_caster->get_inner_buffer();
+    std::shared_ptr<RayCasterInnerResource> inner_buffer =
+        ray_caster->get_inner_resource();
 
     GLBufferPtr buffer_wl =
-        inner_buffer->get_buffer(RayCasterInnerBuffer::WINDOW_LEVEL_BUCKET);
+        inner_buffer->get_buffer(RayCasterInnerResource::WINDOW_LEVEL_BUCKET);
     buffer_wl->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                 BUFFER_BINDING_WINDOW_LEVEL_BUCKET);
 

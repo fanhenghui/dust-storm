@@ -44,6 +44,7 @@
     <ClInclude Include="..\include\arithmetic\mi_connected_domain_analysis.h" />
     <ClInclude Include="..\include\arithmetic\mi_ct_table_removal.h" />
     <ClInclude Include="..\include\arithmetic\mi_cuda_math.h" />
+    <ClInclude Include="..\include\arithmetic\mi_cuda_graphic.h" />
     <ClInclude Include="..\include\arithmetic\mi_ellipsoid.h" />
     <ClInclude Include="..\include\arithmetic\mi_intersection_test.h" />
     <ClInclude Include="..\include\arithmetic\mi_line.h" />

@@ -46,6 +46,9 @@ private:
     double _render_duration;
     // For Testing
     int _last_test_code;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(RayCastingGPUGL);
 };
 
 MED_IMG_END_NAMESPACE

@@ -20,6 +20,8 @@ public:
     EntryExitPoints(RayCastingStrategy s, GPUPlatform p);
     virtual ~EntryExitPoints();
 
+    GPUPlatform get_gpu_platform() const;
+
     virtual void set_display_size(int width, int height);
     void get_display_size(int& width, int& height);
 

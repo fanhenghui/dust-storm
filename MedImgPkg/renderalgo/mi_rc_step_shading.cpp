@@ -6,7 +6,7 @@
 
 #include "mi_camera_calculator.h"
 #include "mi_ray_caster.h"
-#include "mi_ray_caster_inner_buffer.h"
+#include "mi_ray_caster_inner_resource.h"
 #include "mi_shader_collection.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -38,8 +38,8 @@ void RCStepShadingPhong::set_gpu_parameter() {
     CHECK_GL_ERROR;
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
-    std::shared_ptr<RayCasterInnerBuffer> inner_buffer =
-        ray_caster->get_inner_buffer();
+    std::shared_ptr<RayCasterInnerResource> inner_buffer =
+        ray_caster->get_inner_resource();
     std::shared_ptr<CameraCalculator> camera_cal =
         ray_caster->get_camera_calculator();
     std::shared_ptr<CameraBase> camera = ray_caster->get_camera();
@@ -78,7 +78,7 @@ void RCStepShadingPhong::set_gpu_parameter() {
                 ambient_color[2], ambient_color[3]);
 
     GLBufferPtr buffer =
-        inner_buffer->get_buffer(RayCasterInnerBuffer::MATERIAL_BUCKET);
+        inner_buffer->get_buffer(RayCasterInnerResource::MATERIAL_BUCKET);
     buffer->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                              BUFFER_BINDING_MATERIAL_BUCKET);
 

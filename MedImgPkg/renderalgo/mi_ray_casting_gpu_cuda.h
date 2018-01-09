@@ -17,7 +17,18 @@ public:
     void render();
 
 private:
+    void fill_paramters(std::shared_ptr<RayCaster> , CudaVolumeInfos&  , CudaRayCastInfos&);
+
+private:
     std::weak_ptr<RayCaster> _ray_caster;
+    
+    double _duration;
+
+    struct InnerEntryExitPointsExt;
+    std::unique_ptr<InnerEntryExitPointsExt> _inner_ee_ext;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(RayCastingGPUCUDA);
 };
 
 MED_IMG_END_NAMESPACE

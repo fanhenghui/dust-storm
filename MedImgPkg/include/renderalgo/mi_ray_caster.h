@@ -16,7 +16,7 @@ class EntryExitPoints;
 class ImageData;
 class CameraBase;
 class CameraCalculator;
-class RayCasterInnerBuffer;
+class RayCasterInnerResource;
 class RayCasterCanvas;
 class RayCastingCPU;
 class RayCastingGPUGL;
@@ -39,10 +39,12 @@ public:
     int get_test_code() const;
 
     void set_canvas(std::shared_ptr<RayCasterCanvas> canvas);
+    std::shared_ptr<RayCasterCanvas> get_canvas();
 
     // Mask label level
     // Default is L_8
     void set_mask_label_level(LabelLevel label_level);
+    LabelLevel get_mask_label_level() const;
 
     //////////////////////////////////////////////////////////////////////////
     // Input data
@@ -62,8 +64,7 @@ public:
     GPUTexture3DPairPtr get_mask_data_texture();
 
     // Entry exit points
-    void
-    set_entry_exit_points(std::shared_ptr<EntryExitPoints> entry_exit_points);
+    void set_entry_exit_points(std::shared_ptr<EntryExitPoints> entry_exit_points);
 
     std::shared_ptr<EntryExitPoints> get_entry_exit_points() const;
 
@@ -145,7 +146,7 @@ public:
     MaskOverlayMode get_mask_overlay_mode() const;
 
     // Inner buffer
-    std::shared_ptr<RayCasterInnerBuffer> get_inner_buffer();
+    std::shared_ptr<RayCasterInnerResource> get_inner_resource();
 
     void set_downsample(bool flag);
     bool get_downsample() const;
@@ -162,6 +163,9 @@ private:
     RayCastingStrategy _strategy;
     //GPU platform
     GPUPlatform _gpu_platform;
+
+    //Mask label
+    LabelLevel _mask_label_level;
 
     // Input data
     std::shared_ptr<ImageData> _volume_data;
@@ -191,7 +195,7 @@ private:
     unsigned int _pseudo_color_length;
 
     // Inner buffer to contain label based parameter
-    std::shared_ptr<RayCasterInnerBuffer> _inner_buffer;
+    std::shared_ptr<RayCasterInnerResource> _inner_buffer;
 
     // SSD gray value
     float _ssd_gray;

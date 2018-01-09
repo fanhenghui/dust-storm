@@ -32,6 +32,10 @@ float CudaGlobalMemory::memory_used() const {
     }
 }
 
+size_t CudaGlobalMemory::get_size() const {
+    return _size;
+}
+
 int CudaGlobalMemory::load(size_t size, const void* h_array) {
     cudaError_t err = cudaSuccess;
     if (_d_array) {
@@ -74,6 +78,25 @@ int CudaGlobalMemory::load(size_t size, const void* h_array) {
         }
     }
 
+    return 0;
+}
+
+int CudaGlobalMemory::update(size_t offset, size_t size, const void* h_array) {
+    if (nullptr == _d_array) {
+        MI_CUDARESOURCE_LOG(MI_ERROR) << "can't update empty global memory.";
+        return -1;
+    }
+
+    if (offset + size > _size) {
+        MI_CUDARESOURCE_LOG(MI_ERROR) << "global memory update overflow.";
+        return -1;
+    }
+
+    cudaError_t err = cudaMemcpy(((char*)_d_array + offset), h_array, size, cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) {
+        LOG_CUDA_ERROR(err);
+        return -1;
+    }
     return 0;
 }
 

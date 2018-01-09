@@ -118,9 +118,6 @@ protected:
     float _global_wl;
     std::map<unsigned char, Vector2f> _window_levels;
 
-    //////////////////////////////////////////////////////////////////////////
-    // should design a wrap to contain global pseudo colors because its
-    // constant
     GPUTexture1DPairPtr _pseudo_color_texture;
     GPUTexture1DArrayPairPtr _color_opacity_texture_array;
 

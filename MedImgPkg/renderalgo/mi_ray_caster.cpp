@@ -7,7 +7,7 @@
 #include "glresource/mi_gl_utils.h"
 
 #include "mi_ray_caster_canvas.h"
-#include "mi_ray_caster_inner_buffer.h"
+#include "mi_ray_caster_inner_resource.h"
 #include "mi_ray_casting_cpu.h"
 #include "mi_ray_casting_gpu_gl.h"
 #include "mi_render_algo_logger.h"
@@ -15,11 +15,11 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
-    : _strategy(strategy), _gpu_platform(gpu_platform), 
+    : _strategy(strategy), _gpu_platform(gpu_platform), _mask_label_level(L_8),
       _sample_step(0.5f), _custom_sample_step(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
-      _inner_buffer(new RayCasterInnerBuffer()),
+      _inner_buffer(new RayCasterInnerResource(gpu_platform)),
       _ssd_gray(1.0f), _enable_jittering(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
       _mask_mode(MASK_NONE), 
@@ -178,8 +178,15 @@ void RayCaster::set_sample_step(float sample_step) {
 }
 
 void RayCaster::set_mask_label_level(LabelLevel label_level) {
+    _mask_label_level = label_level;
     _inner_buffer->set_mask_label_level(label_level);
 }
+
+
+LabelLevel RayCaster::get_mask_label_level() const {
+    return _mask_label_level;
+}
+
 
 void RayCaster::set_visible_labels(std::vector<unsigned char> labels) {
     _inner_buffer->set_visible_labels(labels);
@@ -283,6 +290,10 @@ void RayCaster::set_canvas(std::shared_ptr<RayCasterCanvas> canvas) {
     _canvas = canvas;
 }
 
+std::shared_ptr<RayCasterCanvas> RayCaster::get_canvas() {
+    return _canvas;
+}
+
 std::shared_ptr<ImageData> RayCaster::get_volume_data() {
     return _volume_data;
 }
@@ -330,7 +341,7 @@ RayCaster::get_mask_overlay_color() const {
     return _inner_buffer->get_mask_overlay_color();
 }
 
-std::shared_ptr<RayCasterInnerBuffer> RayCaster::get_inner_buffer() {
+std::shared_ptr<RayCasterInnerResource> RayCaster::get_inner_resource() {
     return _inner_buffer;
 }
 
@@ -395,5 +406,3 @@ bool RayCaster::map_quarter_canvas() const {
 }
 
 MED_IMG_END_NAMESPACE
-
-

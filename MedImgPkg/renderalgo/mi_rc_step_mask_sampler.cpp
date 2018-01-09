@@ -4,7 +4,7 @@
 #include "glresource/mi_gl_buffer.h"
 
 #include "mi_ray_caster.h"
-#include "mi_ray_caster_inner_buffer.h"
+#include "mi_ray_caster_inner_resource.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -20,11 +20,11 @@ GLShaderInfo RCStepMaskNearstSampler::get_shader_info() {
 
 void RCStepMaskNearstSampler::set_gpu_parameter() {
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
-    std::shared_ptr<RayCasterInnerBuffer> inner_buffer =
-        ray_caster->get_inner_buffer();
+    std::shared_ptr<RayCasterInnerResource> inner_buffer =
+        ray_caster->get_inner_resource();
 
     GLBufferPtr buffer_visible_label =
-        inner_buffer->get_buffer(RayCasterInnerBuffer::VISIBLE_LABEL_BUCKET);
+        inner_buffer->get_buffer(RayCasterInnerResource::VISIBLE_LABEL_BUCKET);
     buffer_visible_label->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                            BUFFER_BINDING_VISIBLE_LABEL_BUCKET);
 }
@@ -36,16 +36,16 @@ GLShaderInfo RCStepMaskLinearSampler::get_shader_info() {
 
 void RCStepMaskLinearSampler::set_gpu_parameter() {
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
-    std::shared_ptr<RayCasterInnerBuffer> inner_buffer =
-        ray_caster->get_inner_buffer();
+    std::shared_ptr<RayCasterInnerResource> inner_buffer =
+        ray_caster->get_inner_resource();
 
     GLBufferPtr buffer_visible_label =
-        inner_buffer->get_buffer(RayCasterInnerBuffer::VISIBLE_LABEL_BUCKET);
+        inner_buffer->get_buffer(RayCasterInnerResource::VISIBLE_LABEL_BUCKET);
     buffer_visible_label->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
                                            BUFFER_BINDING_VISIBLE_LABEL_BUCKET);
 
     GLBufferPtr buffer_visible_label_array =
-        inner_buffer->get_buffer(RayCasterInnerBuffer::VISIBLE_LABEL_ARRAY);
+        inner_buffer->get_buffer(RayCasterInnerResource::VISIBLE_LABEL_ARRAY);
     buffer_visible_label_array->bind_buffer_base(GL_SHADER_STORAGE_BUFFER,
         BUFFER_BINDING_VISIBLE_LABEL_ARRAY);
 

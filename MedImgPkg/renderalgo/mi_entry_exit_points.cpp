@@ -81,6 +81,10 @@ void EntryExitPoints::initialize() {
 
 EntryExitPoints::~EntryExitPoints() {}
 
+GPUPlatform EntryExitPoints::get_gpu_platform() const {
+    return _gpu_platform;
+}
+
 void EntryExitPoints::set_display_size(int width, int height) {
     _width = width;
     _height = height;

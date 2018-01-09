@@ -5,5 +5,5 @@ extern int TE_VRScene(int argc, char* argv[]);
 extern int TE_BrickInfo(int argc, char* argv[]);
 
 int main(int argc, char* argv[]) {
-    return TE_BrickInfo(argc, argv);
+    return TE_VRScene(argc, argv);
 }
