@@ -34,6 +34,7 @@
     <ClInclude Include="..\include\renderalgo\mi_render_algo_logger.h" />
     <ClInclude Include="..\include\renderalgo\mi_gpu_resource_pair.h" />
     <ClInclude Include="..\include\renderalgo\mi_scene_base.h" />
+    <ClInclude Include="..\include\renderalgo\mi_transfer_function_texture.h" />
     <ClInclude Include="..\include\renderalgo\mi_transfer_function_loader.h" />
     <ClInclude Include="..\include\renderalgo\mi_volume_infos.h" />
     <ClInclude Include="..\include\renderalgo\mi_vr_entry_exit_points.h" />
@@ -88,6 +89,7 @@
     <ClCompile Include="..\renderalgo\mi_rc_step_volume_sampler.cpp" />
     <ClCompile Include="..\renderalgo\mi_scene_base.cpp" />
     <ClCompile Include="..\renderalgo\mi_transfer_function_loader.cpp" />
+    <ClCompile Include="..\renderalgo\mi_transfer_function_texture.cpp" />
     <ClCompile Include="..\renderalgo\mi_volume_infos.cpp" />
     <ClCompile Include="..\renderalgo\mi_vr_entry_exit_points.cpp" />
     <ClCompile Include="..\renderalgo\mi_vr_entry_exit_points_culling.cpp" />

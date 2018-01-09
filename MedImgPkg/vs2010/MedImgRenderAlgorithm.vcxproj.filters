@@ -147,6 +147,9 @@
     <ClInclude Include="..\renderalgo\mi_ray_caster_inner_resource.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_transfer_function_texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\renderalgo\mi_annotation_calculator.cpp">
@@ -258,6 +261,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\renderalgo\mi_ray_caster_inner_resource.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_transfer_function_texture.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

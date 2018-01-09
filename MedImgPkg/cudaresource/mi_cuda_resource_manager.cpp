@@ -6,6 +6,7 @@
 #include "mi_cuda_gl_texture_2d.h"
 #include "mi_cuda_global_memory.h"
 #include "mi_cuda_surface_2d.h"
+#include "mi_cuda_texture_1d_array.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -32,7 +33,7 @@ void CudaResourceManager::release() {
     if (_instance) {
         boost::mutex::scoped_lock locker(_mutex);
         if (nullptr == _instance) {
-            delete [] _instance;
+            delete[] _instance;
             _instance = nullptr;
         }
     }
@@ -86,6 +87,14 @@ CudaSurface2DPtr CudaResourceManager::create_cuda_surface_2d(const std::string& 
     return ptr;
 }
 
+CudaTexture1DArrayPtr CudaResourceManager::create_cuda_texture_1d_array(const std::string& desc, int length) {
+    UIDType uid = 0;
+    CudaTexture1DArrayPtr ptr(new CudaTexture1DArray(uid, length));
+    ptr->set_description(desc);
+    _record_texture_1d_array.insert(uid, ptr);
+    return ptr;
+}
+
 float CudaResourceManager::get_device_memory_memory_used() {
     return _record_global_memory.get_memory_used();
 }
@@ -106,9 +115,13 @@ float CudaResourceManager::get_cuda_gl_texture_2d_memory_used() {
     return _record_gl_tex_2d.get_memory_used();
 }
 
+float CudaResourceManager::get_ccuda_texture_1d_array_memory_used() {
+    return _record_texture_1d_array.get_memory_used();
+}
+
 std::string CudaResourceManager::get_specification(const std::string& split) {
     std::stringstream ss;
-    ss << "CUDA Resources: [" << split << 
+    ss << "CUDA Resources: [" << split <<
         _record_global_memory.get_specification(split) << ", " << split <<
         _record_tex_1d.get_specification(split) << ", " << split <<
         _record_tex_2d.get_specification(split) << ", " << split <<

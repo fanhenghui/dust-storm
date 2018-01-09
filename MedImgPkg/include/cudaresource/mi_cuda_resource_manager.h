@@ -92,12 +92,14 @@ public:
     CudaTexture3DPtr create_cuda_texture_3d(const std::string& desc);
     CudaGLTexture2DPtr create_cuda_gl_texture_2d(const std::string& desc);
     CudaSurface2DPtr create_cuda_surface_2d(const std::string& desc);
+    CudaTexture1DArrayPtr create_cuda_texture_1d_array(const std::string& desc, int length);
 
     float get_device_memory_memory_used();
     float get_cuda_texture_1d_memory_used();
     float get_cuda_texture_2d_memory_used();
     float get_cuda_texture_3d_memory_used();
     float get_cuda_gl_texture_2d_memory_used();
+    float get_ccuda_texture_1d_array_memory_used();
 
     friend std::ostream& operator << (std::ostream& strm, CudaResourceManager& cuda_res_m) {
         strm << cuda_res_m.get_specification(" ");
@@ -111,12 +113,13 @@ private:
     static CudaResourceManager *_instance;
     static boost::mutex _mutex;
 
-    CudaResoueceRecord<CudaGlobalMemory> _record_global_memory;
-    CudaResoueceRecord<CudaTexture1D>    _record_tex_1d;
-    CudaResoueceRecord<CudaTexture2D>    _record_tex_2d;
-    CudaResoueceRecord<CudaTexture3D>    _record_tex_3d;
-    CudaResoueceRecord<CudaGLTexture2D>  _record_gl_tex_2d;
-    CudaResoueceRecord<CudaSurface2D>    _record_surface_2d;
+    CudaResoueceRecord<CudaGlobalMemory>     _record_global_memory;
+    CudaResoueceRecord<CudaTexture1D>        _record_tex_1d;
+    CudaResoueceRecord<CudaTexture2D>        _record_tex_2d;
+    CudaResoueceRecord<CudaTexture3D>        _record_tex_3d;
+    CudaResoueceRecord<CudaGLTexture2D>      _record_gl_tex_2d;
+    CudaResoueceRecord<CudaSurface2D>        _record_surface_2d;
+    CudaResoueceRecord<CudaTexture1DArray>   _record_texture_1d_array;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CudaResourceManager);    

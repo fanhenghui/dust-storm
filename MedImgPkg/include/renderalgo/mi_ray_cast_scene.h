@@ -22,6 +22,7 @@ class OrthoCamera;
 class ColorTransFunc;
 class OpacityTransFunc;
 class GraphicObjectNavigator;
+class TransferFunctionTexture;
 
 class RenderAlgo_Export RayCastScene : public SceneBase {
 public:
@@ -100,7 +101,6 @@ public:
 
 protected:
     virtual void pre_render();
-    void init_default_color_texture();
 
 protected:
     RayCastingStrategy _strategy;
@@ -118,8 +118,7 @@ protected:
     float _global_wl;
     std::map<unsigned char, Vector2f> _window_levels;
 
-    GPUTexture1DPairPtr _pseudo_color_texture;
-    GPUTexture1DArrayPairPtr _color_opacity_texture_array;
+    std::shared_ptr<TransferFunctionTexture> _transfer_funcion_texture;
 
     //graphic object
     std::shared_ptr<GraphicObjectNavigator> _navigator;
