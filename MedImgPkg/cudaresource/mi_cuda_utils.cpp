@@ -12,6 +12,7 @@ int CudaUtils::get_componet_byte(const int(&channel)[4]) {
     x += channel[0]>0 ? channel[0] / 8 : 0;
     x += channel[1]>0 ? channel[1] / 8 : 0;
     x += channel[2]>0 ? channel[2] / 8 : 0;
+    x += channel[3]>0 ? channel[3] / 8 : 0;
    return x;
 }
 

@@ -398,7 +398,7 @@ void init_data() {
         memset(mask_raw, 1, data_len);
     }
     
-    _volume_infos.reset(new VolumeInfos(GL_BASE));
+    _volume_infos.reset(new VolumeInfos(GPU_BASE, GL_BASE));
     _volume_infos->set_data_header(_data_header);
     _volume_infos->set_volume(_volume_data);
     _volume_infos->set_mask(mask_data);
@@ -499,9 +499,8 @@ void init_gl() {
     _camera_interactor->reset_camera();
     _camera_interactor->resize(_width, _height);
 
-    _entry_exit_points.reset(new VREntryExitPoints());
+    _entry_exit_points.reset(new VREntryExitPoints(GPU_BASE, GL_BASE));
     _entry_exit_points->set_display_size(_width, _height);
-    _entry_exit_points->set_strategy(GPU_BASE);
     _entry_exit_points->initialize();
     _entry_exit_points->set_proxy_geometry(PG_BRICKS);
     _entry_exit_points->set_camera(_camera);
@@ -524,7 +523,7 @@ void init_gl() {
     _entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
     _entry_exit_points->set_window_level(_ww, _wl, 1);
 
-    _tex_entry_points = _entry_exit_points->get_entry_points_texture();
+    _tex_entry_points = _entry_exit_points->get_entry_points_texture()->get_gl_resource();
 
 
     //Canvas texture
@@ -545,16 +544,16 @@ void init_gl() {
     _canvas_tex->unbind();
 
     //generate CUDA texture
-    _entry_exit_points->get_entry_points_texture()->bind();
-    _cuda_entry_points.gl_tex_id = _entry_exit_points->get_entry_points_texture()->get_id();
+    _entry_exit_points->get_entry_points_texture()->get_gl_resource()->bind();
+    _cuda_entry_points.gl_tex_id = _entry_exit_points->get_entry_points_texture()->get_gl_resource()->get_id();
     _cuda_entry_points.target = GL_TEXTURE_2D;
     register_image(_cuda_entry_points);
     map_image(_cuda_entry_points);
     bind_texture(_cuda_entry_points, cudaReadModeElementType, cudaFilterModePoint, false);
     unmap_image(_cuda_entry_points);
 
-    _entry_exit_points->get_exit_points_texture()->bind();
-    _cuda_exit_points.gl_tex_id = _entry_exit_points->get_exit_points_texture()->get_id();
+    _entry_exit_points->get_exit_points_texture()->get_gl_resource()->bind();
+    _cuda_exit_points.gl_tex_id = _entry_exit_points->get_exit_points_texture()->get_gl_resource()->get_id();
     _cuda_exit_points.target = GL_TEXTURE_2D;
     register_image(_cuda_exit_points);
     map_image(_cuda_exit_points);

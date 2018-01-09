@@ -33,6 +33,8 @@ public:
 
     GLenum get_format();
 
+    GLenum get_data_type() const;
+
 protected:
 private:
     GLsizei _width;

@@ -24,6 +24,8 @@ public:
 
     int write_to_gl_texture(void* array, size_t count, cudaMemcpyKind memcpy_kind);
 
+    int download(unsigned int size, void* h_data);
+
 protected:
     virtual cudaTextureObject_t create_object(cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
         cudaTextureReadMode read_mode, bool normalized_coords);

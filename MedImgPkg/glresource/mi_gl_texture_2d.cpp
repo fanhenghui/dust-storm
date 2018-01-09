@@ -60,4 +60,9 @@ GLenum GLTexture2D::get_format() {
     return _format;
 }
 
+
+GLenum GLTexture2D::get_data_type() const {
+    return _type;
+}
+
 MED_IMG_END_NAMESPACE

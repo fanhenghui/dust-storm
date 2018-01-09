@@ -27,5 +27,8 @@
     <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_brick_info.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\ut\renderalgo_ut\mi_render_algo_texture.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
