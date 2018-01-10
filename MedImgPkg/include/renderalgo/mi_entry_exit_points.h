@@ -11,6 +11,11 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+class IEntryExitPointsResizeCallback {
+public:
+    virtual void execute(int width, int height) = 0;
+};
+
 class CameraBase;
 class ImageData;
 class CameraCalculator;
@@ -44,6 +49,8 @@ public:
 
     virtual void calculate_entry_exit_points() = 0;
 
+    void register_resize_callback(std::shared_ptr<IEntryExitPointsResizeCallback>);
+
 public:
     void debug_output_entry_points(const std::string& file_name);
 
@@ -65,6 +72,8 @@ protected:
     std::shared_ptr<CameraBase> _camera;
     std::shared_ptr<ImageData> _volume_data;
     std::shared_ptr<CameraCalculator> _camera_calculator;
+
+    std::shared_ptr<IEntryExitPointsResizeCallback> _resize_callback;
 
     bool _has_init;    
 };

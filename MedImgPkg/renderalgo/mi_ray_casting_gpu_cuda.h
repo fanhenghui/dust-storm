@@ -16,6 +16,8 @@ public:
 
     void render();
 
+    void on_entry_exit_points_resize(int width, int height);
+
 private:
     void fill_paramters(std::shared_ptr<RayCaster> , CudaVolumeInfos&  , CudaRayCastInfos&);
 

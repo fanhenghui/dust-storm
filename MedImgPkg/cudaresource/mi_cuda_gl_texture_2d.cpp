@@ -191,8 +191,13 @@ int CudaGLTexture2D::unregister_gl_texture() {
     _format = cudaChannelFormatKindNone;
     _width = 0;
     _height = 0;
+    _d_array = nullptr;
 
     return 0;
+}
+
+bool CudaGLTexture2D::valid() {
+    return _cuda_graphic_resource != nullptr;
 }
 
 int CudaGLTexture2D::map_gl_texture() {

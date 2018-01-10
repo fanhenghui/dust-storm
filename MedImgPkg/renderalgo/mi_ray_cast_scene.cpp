@@ -260,7 +260,7 @@ void RayCastScene::render() {
     //////////////////////////////////////////////////////////////////////////
     // 1 Ray casting
     _entry_exit_points->calculate_entry_exit_points();
-    std::cout << "width: " << _width << ", height: " << _height;
+    //std::cout << "width: " << _width << ", height: " << _height;
     _entry_exit_points->debug_output_entry_points("d:/temp/entry_points.rgb");
     _ray_caster->render();
 

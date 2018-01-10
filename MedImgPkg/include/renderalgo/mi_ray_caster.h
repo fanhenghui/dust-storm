@@ -37,6 +37,8 @@ public:
 
     void render();
 
+    void on_entry_exit_points_resize(int width, int height);
+
     void set_test_code(int test_code);
     int get_test_code() const;
 

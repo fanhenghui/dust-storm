@@ -55,8 +55,8 @@ int _wl;
 
 std::shared_ptr<GLTimeQuery> _time_query;
 
-int _width = 1021;
-int _height = 1025;
+int _width = 1025;
+int _height = 1071;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;

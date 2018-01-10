@@ -57,6 +57,14 @@ void RayCaster::render() {
     }
 }
 
+void RayCaster::on_entry_exit_points_resize(int width, int height) {
+    if (GPU_BASE == _strategy && CUDA_BASE == _gpu_platform) {
+        if (_ray_casting_gpu_cuda) {
+            _ray_casting_gpu_cuda->on_entry_exit_points_resize(width, height);
+        }
+    }
+}
+
 void RayCaster::render_cpu() {
     if (!_ray_casting_cpu) {
         _ray_casting_cpu.reset(new RayCastingCPU(shared_from_this()));

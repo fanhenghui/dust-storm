@@ -93,6 +93,16 @@ void EntryExitPoints::set_display_size(int width, int height) {
     _width = width;
     _height = height;
 
+    //------------------------------------------------------//
+    // when GL texture change size(call glTexSubImage*D), CUDA's interoperated resouece will invalid. it will cause:
+    // 1. catch GL's errorr: GL_INVALID_OPERATION, when call glTexSubImage*D
+    // 2. catch CUDA's error : invalid resource handle(33), when access interoperated texture memory.
+    // solution: unregister CUDA's interoperated resource before call glTexSubImage, and re-register after call glTexSubImage
+    //------------------------------------------------------//
+    if (_resize_callback) {
+        _resize_callback->execute(width, height);
+    }
+
     if (CPU_BASE == _strategy) {
         _entry_points_buffer.reset(new Vector4f[_width * _height]);
         _exit_points_buffer.reset(new Vector4f[_width * _height]);
@@ -100,34 +110,14 @@ void EntryExitPoints::set_display_size(int width, int height) {
 
     if (GPU_BASE == _strategy && _has_init) {
         if (GL_BASE == _gpu_platform) {
-            _entry_points_texture->get_gl_resource()->finalize();
-            _exit_points_texture->get_gl_resource()->finalize();
 
-            _entry_points_texture->get_gl_resource()->initialize();
-            _exit_points_texture->get_gl_resource()->initialize();
-
-            _entry_points_texture->get_gl_resource()->bind();
-            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
-            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-            _entry_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT, NULL);
-            _entry_points_texture->get_gl_resource()->unbind();
-
-            _exit_points_texture->get_gl_resource()->bind();
-            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
-            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
-            _exit_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT, NULL);
-            _exit_points_texture->get_gl_resource()->unbind();
-
-            /*GLTextureCache::instance()->cache_load(
+            GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_2D, _entry_points_texture->get_gl_resource(), GL_CLAMP_TO_BORDER, GL_LINEAR,
                 GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
             GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_2D, _exit_points_texture->get_gl_resource(), GL_CLAMP_TO_BORDER, GL_LINEAR,
-                GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);*/
-
-            //TODO CUDA GL interop (改变了display size 后 直接upload会出GL_ERROR，cuda kernel 使用的时候会出 memory cudaError)
-            //try reason and solution
+                GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
         } else {
             //TODO CUDA for MPR
             _entry_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
@@ -178,9 +168,12 @@ void EntryExitPoints::set_camera_calculator(
     _camera_calculator = camera_cal;
 }
 
-std::shared_ptr<CameraCalculator>
-EntryExitPoints::get_camera_calculator() const {
+std::shared_ptr<CameraCalculator> EntryExitPoints::get_camera_calculator() const {
     return _camera_calculator;
+}
+
+void EntryExitPoints::register_resize_callback(std::shared_ptr<IEntryExitPointsResizeCallback> cb) {
+    _resize_callback = cb;
 }
 
 void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {

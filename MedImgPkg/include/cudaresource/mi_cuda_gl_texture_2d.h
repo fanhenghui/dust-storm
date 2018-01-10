@@ -20,6 +20,8 @@ public:
 
     int unregister_gl_texture();
 
+    bool valid();
+
     int map_gl_texture();
 
     int unmap_gl_texture();

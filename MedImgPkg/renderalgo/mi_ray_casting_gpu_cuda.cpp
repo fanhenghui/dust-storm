@@ -102,6 +102,7 @@ void RayCastingGPUCUDA::render() {
         RENDERALGO_CHECK_NULL_EXCEPTION(entry);
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
 
+        //register entry exit points GL texture
         if (nullptr == _inner_ee_ext) {
             _inner_ee_ext.reset(new InnerEntryExitPointsExt());
             if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
@@ -110,17 +111,19 @@ void RayCastingGPUCUDA::render() {
             if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
                 RENDERALGO_THROW_EXCEPTION("register exit points failed.");
             }
-        } else if (entry->get_width() != _inner_ee_ext->entry_points_tex->get_width() || 
-                   entry->get_height() != _inner_ee_ext->entry_points_tex->get_height()) {
-            _inner_ee_ext.reset(new InnerEntryExitPointsExt());
-            if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
-                RENDERALGO_THROW_EXCEPTION("register entry points failed.");
+        } else {
+            if (!_inner_ee_ext->entry_points_tex->valid()) {
+                if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
+                    RENDERALGO_THROW_EXCEPTION("register entry points failed.");
+                }
             }
-            if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
-                RENDERALGO_THROW_EXCEPTION("register exit points failed.");
+            if (!_inner_ee_ext->exit_points_tex->valid()) {
+                if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
+                    RENDERALGO_THROW_EXCEPTION("register entry points failed.");
+                }
             }
         }
-        
+           
         if (0 != _inner_ee_ext->entry_points_tex->map_gl_texture()) {
             RENDERALGO_THROW_EXCEPTION("map entry points failed.");
         }
@@ -148,6 +151,18 @@ void RayCastingGPUCUDA::render() {
         if (0 != _inner_ee_ext->exit_points_tex->unmap_gl_texture()) {
             RENDERALGO_THROW_EXCEPTION("unmap exit points failed.");
         }
+    }
+}
+
+void RayCastingGPUCUDA::on_entry_exit_points_resize(int width, int height) {
+    if (_inner_ee_ext) {
+        /*const int old_width = _inner_ee_ext->entry_points_tex->get_width();
+        const int old_height = _inner_ee_ext->entry_points_tex->get_height();
+        if (old_width == width && old_height == height) {
+            return;
+        }*/
+        _inner_ee_ext->entry_points_tex->unregister_gl_texture();
+        _inner_ee_ext->exit_points_tex->unregister_gl_texture();
     }
 }
 

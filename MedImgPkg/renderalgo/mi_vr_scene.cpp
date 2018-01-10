@@ -51,6 +51,19 @@ struct VRScene::RayEnd
     }
 };
 
+class EntryExitPointsResizeCallback : public IEntryExitPointsResizeCallback {
+public:
+    EntryExitPointsResizeCallback(std::shared_ptr<RayCaster> rc):_ray_caster(rc){}
+    virtual ~EntryExitPointsResizeCallback() {}
+    virtual void execute(int width, int height) {
+        if (_ray_caster) {
+            _ray_caster->on_entry_exit_points_resize(width, height);
+        }
+    }
+private:
+    std::shared_ptr<RayCaster> _ray_caster;
+};
+
 VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
     RayCastScene(strategy, platfrom), _cache_ray_end(new RayEnd()) {
     //--------------------------------------------------//
@@ -59,6 +72,10 @@ VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) :
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
+
+    //register entry exit points resize callback
+    _entry_exit_points->register_resize_callback(
+        std::shared_ptr<IEntryExitPointsResizeCallback>(new EntryExitPointsResizeCallback(_ray_caster)));
 }
 
 VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
@@ -69,6 +86,10 @@ VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
+
+    //register entry exit points resize callback
+    _entry_exit_points->register_resize_callback(
+        std::shared_ptr<IEntryExitPointsResizeCallback>(new EntryExitPointsResizeCallback(_ray_caster)));
 }
 
 VRScene::~VRScene() {}
