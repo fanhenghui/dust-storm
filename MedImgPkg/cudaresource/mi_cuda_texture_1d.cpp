@@ -25,22 +25,20 @@ int CudaTexture1D::load(int channel_x, int channel_y, int channel_z, int channel
         MI_CUDARESOURCE_LOG(MI_ERROR) << "load invalid length " << length << " to texture 1D.";
         return -1;
     }
-    //malloc and load, or update all
+
     if (_d_array) {
         if (_channel[0] != channel_x || _channel[1] != channel_y ||
             _channel[2] != channel_z || _channel[3] != channel_w || length != _length) {
-            MI_CUDARESOURCE_LOG(MI_ERROR) << "load different format array to CUDA texture 1D. init foramt {ch:"
-                << _channel[0] << " " << _channel[1] << " " << _channel[2] << " " << _channel[3] << ", format: " << _format << ", length: " << _length 
-                << "}. call load func foramt {ch: "
-                << channel_x << " " << channel_y << " " << channel_z << " " << channel_w << ", format: " << format << ", length: " << length << "}.";
-            return -1;
+            this->finalize();
         }
-    } else {
+    } 
+
+    if (nullptr == _d_array) {
         _channel[0] = channel_x;
         _channel[1] = channel_y;
         _channel[2] = channel_z;
         _channel[3] = channel_w;
-        _format = _format;
+        _format = format;
         _length = length;
         cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(channel_x, channel_y, channel_z, channel_w, format);
         cudaError_t err = cudaMallocArray(&_d_array, &format_desc, length, 1);

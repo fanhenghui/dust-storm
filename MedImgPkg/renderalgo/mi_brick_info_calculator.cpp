@@ -128,7 +128,7 @@ void VolumeBrickInfoCalculator::calculate_cuda() {
     cudaError_t err = cuda_calculate_volume_brick_info(tex, volume_dim, _brick_size, brick_dim, _brick_margin, (VolumeBrickInfo*)gpu_brick_info_array);
     if (err != cudaSuccess) {
         std::stringstream ss;
-        ss << "CUDA calculate volume brick info failed with CUDA err: " << err;
+        ss << "CUDA calculate volume brick info failed with CUDA err: " << cudaGetErrorString(err);
         RENDERALGO_THROW_EXCEPTION(ss.str());
     }
 }
@@ -360,7 +360,7 @@ void MaskBrickInfoCalculator::update_cuda(const AABBUI& aabb) {
         (unsigned char*)_cuda_buffer_visible_labels->get_pointer(), max_label+1, (MaskBrickInfo*)gpu_brick_info_array);
     if (err != cudaSuccess) {
         std::stringstream ss;
-        ss << "CUDA calculate mask brick info failed with CUDA err: " << err;
+        ss << "CUDA calculate mask brick info failed with CUDA err: " << cudaGetErrorString(err);
         RENDERALGO_THROW_EXCEPTION(ss.str());
     }
 }

@@ -37,19 +37,16 @@ int CudaTexture3D::load(int channel_x, int channel_y, int channel_z, int channel
         if (_channel[0] != channel_x || _channel[1] != channel_y ||
             _channel[2] != channel_z || _channel[3] != channel_w || 
             _width != width || _height != height || depth != _depth) {
-            MI_CUDARESOURCE_LOG(MI_ERROR) << "load different format array to CUDA texture 1D. init foramt {ch:"
-                << _channel[0] << " " << _channel[1] << " " << _channel[2] << " " << _channel[3] << ", format: " << _format << ", extent: " << _width << " " << _height << " " << _depth
-                << "}. call load func foramt {ch: "
-                << channel_x << " " << channel_y << " " << channel_z << " " << channel_w << ", format: " << format << ", extent: " << width << " " << height << " " << depth << "}.";
-            return -1;
+            this->finalize();
         }
     }
-    else {
+
+    if (nullptr == _d_array) {
         _channel[0] = channel_x;
         _channel[1] = channel_y;
         _channel[2] = channel_z;
         _channel[3] = channel_w;
-        _format = _format;
+        _format = format;
         _width = width;
         _height = height;
         _depth = depth;

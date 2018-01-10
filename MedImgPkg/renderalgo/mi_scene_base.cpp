@@ -148,6 +148,13 @@ void SceneBase::set_display_size(int width, int height) {
             GL_TEXTURE_2D, _scene_depth_attach, GL_CLAMP_TO_EDGE, GL_LINEAR,
             GL_DEPTH_COMPONENT16, _width, _height, 0, GL_DEPTH_COMPONENT,
             GL_UNSIGNED_SHORT, nullptr);
+
+        //color-attach-1 may be remove if use cuda platform do compress
+        if (_scene_color_attach_1) {
+            GLTextureCache::instance()->cache_load(
+                GL_TEXTURE_2D, _scene_color_attach_1, GL_CLAMP_TO_EDGE, GL_LINEAR,
+                GL_RGB8, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        }
     }
 
     _gpujpeg_encoder_dirty = true;

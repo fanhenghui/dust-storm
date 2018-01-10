@@ -6,10 +6,13 @@
 #include "glresource/mi_gl_texture_3d.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "cudaresource/mi_cuda_utils.h"
+
 #include "mi_ray_caster_canvas.h"
 #include "mi_ray_caster_inner_resource.h"
 #include "mi_ray_casting_cpu.h"
 #include "mi_ray_casting_gpu_gl.h"
+#include "mi_ray_casting_gpu_cuda.h"
 #include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -19,7 +22,7 @@ RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
       _sample_step(0.5f), _custom_sample_step(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
-      _inner_buffer(new RayCasterInnerResource(gpu_platform)),
+      _inner_resource(new RayCasterInnerResource(gpu_platform)),
       _ssd_gray(1.0f), _enable_jittering(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
       _mask_mode(MASK_NONE), 
@@ -65,8 +68,8 @@ void RayCaster::render_cpu() {
 }
 
 void RayCaster::render_gpu_gl() {
-    if (!_ray_casting_gpu) {
-        _ray_casting_gpu.reset(new RayCastingGPUGL(shared_from_this()));
+    if (!_ray_casting_gpu_gl) {
+        _ray_casting_gpu_gl.reset(new RayCastingGPUGL(shared_from_this()));
     }
 
     CHECK_GL_ERROR;
@@ -105,7 +108,7 @@ void RayCaster::render_gpu_gl() {
                     _sample_step = (float)(_sample_step*para0);
                 }
             }
-        }
+        }   
     }
     else {
         _map_quarter_canvas = false;
@@ -124,14 +127,19 @@ void RayCaster::render_gpu_gl() {
 
     CHECK_GL_ERROR;
 
-    _ray_casting_gpu->render();
+    _ray_casting_gpu_gl->render();
 
-    _pre_rendering_duration = _ray_casting_gpu->get_rendering_duration();
+    _pre_rendering_duration = _ray_casting_gpu_gl->get_rendering_duration();
     //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
 }
 
 void RayCaster::render_gpu_cuda() {
-
+    if (!_ray_casting_gpu_cuda) {
+        _ray_casting_gpu_cuda.reset(new RayCastingGPUCUDA(shared_from_this()));
+    }
+    CHECK_LAST_CUDA_ERROR
+    _ray_casting_gpu_cuda->render();
+    CHECK_LAST_CUDA_ERROR
 }
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {
@@ -179,7 +187,7 @@ void RayCaster::set_sample_step(float sample_step) {
 
 void RayCaster::set_mask_label_level(LabelLevel label_level) {
     _mask_label_level = label_level;
-    _inner_buffer->set_mask_label_level(label_level);
+    _inner_resource->set_mask_label_level(label_level);
 }
 
 
@@ -189,15 +197,15 @@ LabelLevel RayCaster::get_mask_label_level() const {
 
 
 void RayCaster::set_visible_labels(std::vector<unsigned char> labels) {
-    _inner_buffer->set_visible_labels(labels);
+    _inner_resource->set_visible_labels(labels);
 }
 
 const std::vector<unsigned char>& RayCaster::get_visible_labels() const {
-    return _inner_buffer->get_visible_labels();
+    return _inner_resource->get_visible_labels();
 }
 
 void RayCaster::set_window_level(float ww, float wl, unsigned char label) {
-    _inner_buffer->set_window_level(ww, wl, label);
+    _inner_resource->set_window_level(ww, wl, label);
 }
 
 void RayCaster::set_global_window_level(float ww, float wl) {
@@ -223,6 +231,7 @@ void RayCaster::set_pseudo_color_array(unsigned char* color_array,
 
 void RayCaster::set_color_opacity_texture_array(GPUTexture1DArrayPairPtr tex_array) {
     _color_opacity_texture_array = tex_array;
+    _inner_resource->set_color_opacity_texture_array(tex_array);
 }
 
 GPUTexture1DArrayPairPtr RayCaster::get_color_opacity_texture_array() const {
@@ -245,7 +254,7 @@ void RayCaster::get_ambient_color(float(&rgba)[4]) {
 }
 
 void RayCaster::set_material(const Material& m, unsigned char label) {
-    _inner_buffer->set_material(m, label);
+    _inner_resource->set_material(m, label);
 }
 
 void RayCaster::set_ssd_gray(float ssd_gray) {
@@ -329,20 +338,20 @@ void RayCaster::set_mask_overlay_mode(MaskOverlayMode mode) {
 
 void RayCaster::set_mask_overlay_color(
     std::map<unsigned char, RGBAUnit> colors) {
-    _inner_buffer->set_mask_overlay_color(colors);
+    _inner_resource->set_mask_overlay_color(colors);
 }
 
 void RayCaster::set_mask_overlay_color(RGBAUnit color, unsigned char label) {
-    _inner_buffer->set_mask_overlay_color(color, label);
+    _inner_resource->set_mask_overlay_color(color, label);
 }
 
 const std::map<unsigned char, RGBAUnit>&
 RayCaster::get_mask_overlay_color() const {
-    return _inner_buffer->get_mask_overlay_color();
+    return _inner_resource->get_mask_overlay_color();
 }
 
 std::shared_ptr<RayCasterInnerResource> RayCaster::get_inner_resource() {
-    return _inner_buffer;
+    return _inner_resource;
 }
 
 MaskMode RayCaster::get_mask_mode() const {

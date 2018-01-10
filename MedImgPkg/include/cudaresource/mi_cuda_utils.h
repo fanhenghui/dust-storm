@@ -17,12 +17,13 @@ public:
 #define CHECK_CUDA_ERROR(err) {\
     if (err != cudaSuccess) {\
         CudaUtils::log_cuda_error(err, __FUNCTION__, __FILE__, __LINE__); \
-}}\
+}}
 
-#define CHECK_LAST_CUDA_ERROR {\
-cudaError_t err = cudaGetLastError(); \
-CHECK_CUDA_ERROR(err) \
-}\ 
+#define CHECK_LAST_CUDA_ERROR \
+{\
+    cudaError_t err_inner = cudaGetLastError();\
+    CHECK_CUDA_ERROR(err_inner);\
+}
 
 MED_IMG_END_NAMESPACE
 

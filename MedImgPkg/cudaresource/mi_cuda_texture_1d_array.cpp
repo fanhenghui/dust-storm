@@ -74,7 +74,7 @@ int CudaTexture1DArray::load(int channel_x, int channel_y, int channel_z, int ch
         _channel[1] = channel_y;
         _channel[2] = channel_z;
         _channel[3] = channel_w;
-        _format = _format;
+        _format = format;
         _length = length;
         cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(channel_x, channel_y, channel_z, channel_w, format);
         cudaError_t err = cudaMallocArray(&cuda_array, &format_desc, length, 1);

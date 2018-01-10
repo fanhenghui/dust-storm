@@ -86,6 +86,10 @@ GPUPlatform EntryExitPoints::get_gpu_platform() const {
 }
 
 void EntryExitPoints::set_display_size(int width, int height) {
+    if (_width == width && _height == height) {
+        return;
+    }
+
     _width = width;
     _height = height;
 
@@ -96,14 +100,36 @@ void EntryExitPoints::set_display_size(int width, int height) {
 
     if (GPU_BASE == _strategy && _has_init) {
         if (GL_BASE == _gpu_platform) {
-            GLTextureCache::instance()->cache_load(
+            _entry_points_texture->get_gl_resource()->finalize();
+            _exit_points_texture->get_gl_resource()->finalize();
+
+            _entry_points_texture->get_gl_resource()->initialize();
+            _exit_points_texture->get_gl_resource()->initialize();
+
+            _entry_points_texture->get_gl_resource()->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _entry_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT, NULL);
+            _entry_points_texture->get_gl_resource()->unbind();
+
+            _exit_points_texture->get_gl_resource()->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_BORDER);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _exit_points_texture->get_gl_resource()->load(GL_RGBA32F, _width, _height, GL_RGBA, GL_FLOAT, NULL);
+            _exit_points_texture->get_gl_resource()->unbind();
+
+            /*GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_2D, _entry_points_texture->get_gl_resource(), GL_CLAMP_TO_BORDER, GL_LINEAR,
                 GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
 
             GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_2D, _exit_points_texture->get_gl_resource(), GL_CLAMP_TO_BORDER, GL_LINEAR,
-                GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
+                GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);*/
+
+            //TODO CUDA GL interop (改变了display size 后 直接upload会出GL_ERROR，cuda kernel 使用的时候会出 memory cudaError)
+            //try reason and solution
         } else {
+            //TODO CUDA for MPR
             _entry_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
             _exit_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
         }
@@ -165,9 +191,7 @@ void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
             new unsigned char[_width * _height * 3]);
         RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
         unsigned int* dim = _volume_data->_dim;
-        float dim_r[3] = { 1.0f / (float)dim[0], 1.0f / (float)dim[1],
-            1.0f / (float)dim[2]
-        };
+        float dim_r[3] = { 1.0f / (float)dim[0], 1.0f / (float)dim[1], 1.0f / (float)dim[2]};
         unsigned char r, g, b;
         float rr, gg, bb;
 
@@ -198,9 +222,15 @@ void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
 
     } else {
         if (GL_BASE == _gpu_platform) {
-            //TODO GL texture download to file
+            _entry_points_texture->get_gl_resource()->bind();
+            std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 3]);
+            _entry_points_texture->get_gl_resource()->download(GL_RGB, GL_UNSIGNED_BYTE, rgb_array.get());
+            _entry_points_texture->get_gl_resource()->unbind();
+            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 3);
         } else {
-            //TODO CUDA surface download to file
+            std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 4]);
+            _entry_points_texture->get_cuda_resource()->download(_width*_height*4, rgb_array.get());
+            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 4);
         }
     }
 }

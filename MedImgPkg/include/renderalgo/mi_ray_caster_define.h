@@ -154,6 +154,9 @@ struct CudaRayCastInfos {
     //transfer function parameters
     float color_opacity_texture_shift;
 
+    //pseudo color texture
+    cudaTextureObject_t pseudo_color_texture;
+
     //---------------------------------------------------------//
     //shared mapped global memory contains follows:
     // 1. visible label (int) : label_level * sizeof(int), label_level could be 1(none-mask) 8 16 32 64 ... 128
@@ -182,6 +185,8 @@ struct CudaRayCastInfos {
         ambient_intensity = 0.3f;
 
         color_opacity_texture_shift = 0.5f/512.0f;
+
+        pseudo_color_texture = 0; 
         d_shared_mapped_memory = nullptr;
     }
 };

@@ -7,6 +7,7 @@
 
 #include "glresource/mi_gl_texture_2d.h"
 #include "cudaresource/mi_cuda_surface_2d.h"
+#include "cudaresource/mi_cuda_utils.h"
 #include "renderalgo/mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -117,15 +118,14 @@ int GPUImgCompressor::set_image(GPUCanvasPairPtr canvas, const std::vector<int>&
                 MI_RENDERALGO_LOG(MI_ERROR) << "create GPU compressor failed.";
                 return -1;
             }
+
             // set texture as input
-            struct gpujpeg_encoder_input encoder_input;
-            gpujpeg_encoder_input_set_texture(&encoder_input, gpujpeg_texture);
-
             InnerParams inner_params;
-            inner_params.encoder = encoder;
-            inner_params.encoder_input = encoder_input;
-            inner_params.gpujpeg_texture = gpujpeg_texture;
+            gpujpeg_encoder_input_set_texture(&inner_params.encoder_input, gpujpeg_texture);
 
+            inner_params.encoder = encoder;
+            inner_params.gpujpeg_texture = gpujpeg_texture;
+            
             _params[*it] = inner_params;
         }
         
@@ -164,6 +164,7 @@ int GPUImgCompressor::set_image(GPUCanvasPairPtr canvas, const std::vector<int>&
             image_param.color_space = GPUJPEG_RGB;
             image_param.sampling_factor = GPUJPEG_4_4_4;
 
+            CHECK_LAST_CUDA_ERROR
             // create encoder
             gpujpeg_encoder* encoder = gpujpeg_encoder_create(&params, &image_param);
             if (nullptr == encoder) {
@@ -172,14 +173,11 @@ int GPUImgCompressor::set_image(GPUCanvasPairPtr canvas, const std::vector<int>&
             }
 
             // set empty input
-            gpujpeg_encoder_input encoder_input;
-            gpujpeg_image_destroy(encoder_input.image);
-            encoder_input.type = GPUJPEG_ENCODER_INPUT_INTERNAL_BUFFER;
-
             InnerParams inner_params;
+            CHECK_LAST_CUDA_ERROR
+            
+            inner_params.encoder_input.type = GPUJPEG_ENCODER_INPUT_INTERNAL_BUFFER;
             inner_params.encoder = encoder;
-            inner_params.encoder_input = encoder_input;
-
             _params[*it] = inner_params;
         }
     }

@@ -66,4 +66,8 @@ cudaTextureObject_t CudaTextureBase::get_object(cudaTextureAddressMode address_m
     }
 }
 
+cudaArray_t CudaTextureBase::get_inner_array() const {
+    return _d_array;
+}
+
 MED_IMG_END_NAMESPACE

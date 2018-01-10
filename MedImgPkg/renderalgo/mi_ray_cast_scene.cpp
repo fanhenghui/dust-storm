@@ -16,6 +16,10 @@
 #include "glresource/mi_gl_texture_cache.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "cudaresource/mi_cuda_gl_texture_2d.h"
+#include "cudaresource/mi_cuda_surface_2d.h"
+#include "cudaresource/mi_cuda_resource_manager.h"
+
 #include "mi_camera_calculator.h"
 #include "mi_camera_interactor.h"
 #include "mi_entry_exit_points.h"
@@ -25,6 +29,7 @@
 #include "mi_brick_pool.h"
 #include "mi_graphic_object_navigator.h"
 #include "mi_transfer_function_texture.h"
+#include "mi_gpu_image_compressor.h"
 
 #include "mi_render_algo_logger.h"
 
@@ -81,20 +86,79 @@ RayCastScene::~RayCastScene() {}
 
 void RayCastScene::initialize() {
     if (GL_BASE == _gpu_platform) {
-        SceneBase::initialize();
+        if (!_scene_fbo) {//as init flag
+            SceneBase::initialize();
 
-        _canvas->initialize();
-        _entry_exit_points->initialize();
-        _navigator->initialize();
-
+            _canvas->initialize();
+            _entry_exit_points->initialize();
+            _navigator->initialize();
+        }
     } else {
-        //TODO CUDA
-        //remove color-attach-1(flip vertical in kernel)
-        //re-set input(rc-canvas's color-attach-0) to compressor 
+        //-----------------------------------------------------------//
+        //forbid base's initialize, just create FBO with color-attach-0 (For graphic rendering)
+        if (!_scene_fbo) {//as init flag
+            CHECK_GL_ERROR;
+
+            GLUtils::set_pixel_pack_alignment(1);
+
+            _scene_fbo = GLResourceManagerContainer::instance()
+                ->get_fbo_manager()->create_object("scene base FBO");
+            _scene_fbo->initialize();
+            _scene_fbo->set_target(GL_FRAMEBUFFER);
+
+            _scene_color_attach_0 = GLResourceManagerContainer::instance()
+                ->get_texture_2d_manager()->create_object("scene base color attachment 0");
+            _scene_color_attach_0->initialize();
+            _scene_color_attach_0->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+            _scene_depth_attach = GLResourceManagerContainer::instance()
+                ->get_texture_2d_manager()->create_object("scene base depth attachment");
+            _scene_depth_attach->initialize();
+            _scene_depth_attach->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _scene_depth_attach->load(GL_DEPTH_COMPONENT16, _width, _height,
+                GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+
+            //bind texture to FBO
+            _scene_fbo->bind();
+            _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _scene_color_attach_0);
+            _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT, _scene_depth_attach);
+            _scene_fbo->unbind();
+
+            CHECK_GL_ERROR;
+
+            _res_shield.add_shield<GLFBO>(_scene_fbo);
+            _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
+            _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
+
+            //-----------------------------------------------------------//
+            //initialize others
+            _canvas->initialize();
+            _entry_exit_points->initialize();
+            _navigator->initialize();
+
+            //-------------------------------//
+            // GPU compressor (set rc-canvas's color-attach-0 as input)
+            //-------------------------------//
+            std::vector<int> qualitys(2);
+            qualitys[0] = _compress_ld_quality;
+            qualitys[1] = _compress_hd_quality;
+
+            _compressor->set_image(GPUCanvasPairPtr(new
+                GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
+        }        
     }
 }
 
 void RayCastScene::set_display_size(int width, int height) {
+    if (width == _width && height == _height) {
+        return;
+    }
+
     SceneBase::set_display_size(width, height);
     _canvas->set_display_size(width, height);
     _entry_exit_points->set_display_size(width, height);
@@ -112,9 +176,33 @@ void RayCastScene::set_display_size(int width, int height) {
 
 void RayCastScene::render_to_back() {
     if (CUDA_BASE == _gpu_platform) {
-        //TODO CUDA
         //kernel memcpy ray-casting result back to FBO color-attachment0
+        CudaSurface2DPtr canvas_color0 = _canvas->get_color_attach_texture()->get_cuda_resource();
+        std::unique_ptr<unsigned char[]> rgba(new unsigned char[_width * _height * 4]);
+        std::unique_ptr<unsigned char[]> rgb(new unsigned char[_width * _height * 3]);
+
+        if (0 != canvas_color0->download(_width*_height * 4, rgba.get())) {
+            MI_RENDERALGO_LOG(MI_ERROR) << "download cuda rc result failed when render to back.";
+            return;
+        }
+        for (int i = 0; i < _width*_height; ++i) {
+            rgb[i * 3] = rgba[i * 4];
+            rgb[i * 3 + 1] = rgba[i * 4 + 1];
+            rgb[i * 3 + 2] = rgba[i * 4 + 2];
+        }
+       
+        CHECK_GL_ERROR;
+
+        GLUtils::set_pixel_pack_alignment(1);
+        GLUtils::set_pixel_unpack_alignment(1);
+
+        _scene_color_attach_0->bind();
+        _scene_color_attach_0->update(0, 0, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, rgb.get());
+        _scene_color_attach_0->unbind();
+
+        CHECK_GL_ERROR;
     }
+
     SceneBase::render_to_back();
 }
 
@@ -125,18 +213,33 @@ void RayCastScene::pre_render() {
     // scene FBO , ray casting program ...
     initialize();
 
-    // entry exit points initialize
-    _entry_exit_points->initialize();
+    CHECK_GL_ERROR;
 
     // GL resource update (discard)
     GLResourceManagerContainer::instance()->update_all();
 
+    CHECK_GL_ERROR;
+
     // GL texture update
     GLTextureCache::instance()->process_cache();
 
-    // scene base pre-render to recreate jpeg encoder(this must be call after gl
-    // resource update)
-    SceneBase::pre_render();
+    CHECK_GL_ERROR;
+
+    // scene base pre-render to reset gpu compressor when display size changed
+    if (GL_BASE == _gpu_platform) {
+        SceneBase::pre_render();
+    }
+    else if (_gpujpeg_encoder_dirty) {
+        std::vector<int> qualitys(2);
+        qualitys[0] = _compress_ld_quality;
+        qualitys[1] = _compress_hd_quality;
+        _compressor->set_image(GPUCanvasPairPtr(new
+            GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
+        _gpujpeg_encoder_dirty = false;
+
+    }
+
+    CHECK_GL_ERROR;
 
     _navigator->set_camera(_camera);
 }
@@ -157,6 +260,8 @@ void RayCastScene::render() {
     //////////////////////////////////////////////////////////////////////////
     // 1 Ray casting
     _entry_exit_points->calculate_entry_exit_points();
+    std::cout << "width: " << _width << ", height: " << _height;
+    _entry_exit_points->debug_output_entry_points("d:/temp/entry_points.rgb");
     _ray_caster->render();
 
     //////////////////////////////////////////////////////////////////////////

@@ -59,5 +59,9 @@ cudaSurfaceObject_t CudaSurfaceBase::get_object() {
     }
 }
 
+cudaArray_t CudaSurfaceBase::get_inner_array() const {
+    return _d_array;
+}
+
 MED_IMG_END_NAMESPACE
 

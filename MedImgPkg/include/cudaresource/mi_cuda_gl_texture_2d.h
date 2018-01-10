@@ -24,6 +24,10 @@ public:
 
     int write_to_gl_texture(void* array, size_t count, cudaMemcpyKind memcpy_kind);
 
+    int get_width() const;
+
+    int get_height() const;
+
     int download(unsigned int size, void* h_data);
 
 protected:

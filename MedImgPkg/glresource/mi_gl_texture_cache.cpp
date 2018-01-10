@@ -132,6 +132,9 @@ void GLTextureCache::cache_update(GLenum target, GLTextureBasePtr texture,
 void GLTextureCache::process_cache() {
     boost::mutex::scoped_lock lock(_mutex);
 
+    GLUtils::set_pixel_pack_alignment(1);
+    GLUtils::set_pixel_unpack_alignment(1);
+
     for (auto it = _cache_list.begin(); it != _cache_list.end(); ++it) {
         std::shared_ptr<TextureUnit> unit = *it;
 
@@ -165,13 +168,18 @@ void GLTextureCache::process_cache() {
             GLRESOURCE_CHECK_NULL_EXCEPTION(cache_tex2d);
 
             if (0 == unit->cache_type) {
+                CHECK_GL_ERROR;
                 cache_tex2d->initialize();
+                CHECK_GL_ERROR;
                 cache_tex2d->bind();
+                CHECK_GL_ERROR;
                 GLTextureUtils::set_2d_wrap_s_t(unit->wrap_type);
                 GLTextureUtils::set_filter(GL_TEXTURE_2D, unit->filter_type);
                 cache_tex2d->load(unit->internalformat, unit->width, unit->height,
                                   unit->format, unit->type, unit->data, unit->level);
+                CHECK_GL_ERROR;
                 cache_tex2d->unbind();
+                CHECK_GL_ERROR;
             } else if (1 == unit->cache_type) {
                 cache_tex2d->bind();
                 cache_tex2d->update(unit->xoffset, unit->yoffset, unit->width,

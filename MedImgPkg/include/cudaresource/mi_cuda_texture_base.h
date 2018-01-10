@@ -19,6 +19,8 @@ public:
     cudaTextureObject_t get_object(cudaTextureAddressMode address_mode, cudaTextureFilterMode filter_mode,
         cudaTextureReadMode read_mode, bool normalized_coords);
 
+    cudaArray_t get_inner_array() const;
+
     void get_channel(int(&channel)[4]) const;
 
 protected:

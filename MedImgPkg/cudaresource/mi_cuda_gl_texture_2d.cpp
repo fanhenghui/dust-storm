@@ -216,6 +216,14 @@ int CudaGLTexture2D::write_to_gl_texture(void* array, size_t count, cudaMemcpyKi
     }
 }
 
+int CudaGLTexture2D::get_width() const {
+    return _width;
+}
+
+int CudaGLTexture2D::get_height() const {
+    return _height;
+}
+
 int CudaGLTexture2D::download(unsigned int size, void* h_data) {
     const unsigned int cur_size = (unsigned int)_width*(unsigned int)_height*(unsigned int)CudaUtils::get_component_byte(_channel);
     if (size != cur_size) {

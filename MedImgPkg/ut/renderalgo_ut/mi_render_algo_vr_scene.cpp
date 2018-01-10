@@ -55,8 +55,8 @@ int _wl;
 
 std::shared_ptr<GLTimeQuery> _time_query;
 
-int _width = 1024;
-int _height = 1024;
+int _width = 1021;
+int _height = 1025;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
@@ -66,6 +66,8 @@ int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
 
 MaskMode _mask_mode = MASK_MULTI_LABEL;
+
+GPUPlatform _gpu_platform = CUDA_BASE;
 
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
@@ -92,6 +94,10 @@ void Finalize() {
 void Init() {
     Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
+
+    GLUtils::set_pixel_pack_alignment(1);
+    GLUtils::set_pixel_unpack_alignment(1);
+
 #ifdef WIN32
     Logger::instance()->bind_config_file("./config/log_config");
 #else
@@ -106,7 +112,7 @@ void Init() {
     const unsigned int data_len = _volume_data->_dim[0]*_volume_data->_dim[1]*_volume_data->_dim[2];
     printf("spacing : %lf %lf %lf \n" , _volume_data->_spacing[0] , _volume_data->_spacing[1] , _volume_data->_spacing[2]);
 
-    _volumeinfos.reset(new VolumeInfos(GPU_BASE, GL_BASE));
+    _volumeinfos.reset(new VolumeInfos(GPU_BASE, _gpu_platform));
     _volumeinfos->set_data_header(_data_header);
     _volumeinfos->set_volume(_volume_data);
 
@@ -154,7 +160,7 @@ void Init() {
 
     _volumeinfos->set_mask(mask_data);
 
-    _scene.reset(new VRScene(_width, _height, GPU_BASE, GL_BASE));
+    _scene.reset(new VRScene(_width, _height, GPU_BASE, _gpu_platform));
     const float PRESET_CT_LUNGS_WW = 1500;
     const float PRESET_CT_LUNGS_WL = -400;
     _ww = PRESET_CT_LUNGS_WW;
@@ -256,9 +262,6 @@ void Init() {
 
 void Display() {
     try {
-        CHECK_GL_ERROR;
-
-        GLUtils::set_pixel_pack_alignment(1);
 
         CHECK_GL_ERROR;
 
@@ -295,25 +298,25 @@ void Display() {
          glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
         //_scene->set_downsample(true);
-        _scene->download_image_buffer();
-        //_scene->set_downsample(false);
-
-        CHECK_GL_ERROR;
-        _scene->swap_image_buffer();
-        unsigned char* buffer = nullptr;
-        int buffer_size = 0;
-
-        CHECK_GL_ERROR;
-
-        _scene->get_image_buffer(buffer, buffer_size);
-
-        CHECK_GL_ERROR;
-
-#ifdef WIN32
-        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
-#else
-        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-#endif
+//        _scene->download_image_buffer();
+//        //_scene->set_downsample(false);
+//
+//        CHECK_GL_ERROR;
+//        _scene->swap_image_buffer();
+//        unsigned char* buffer = nullptr;
+//        int buffer_size = 0;
+//
+//        CHECK_GL_ERROR;
+//
+//        _scene->get_image_buffer(buffer, buffer_size);
+//
+//        CHECK_GL_ERROR;
+//
+//#ifdef WIN32
+//        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
+//#else
+//        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
+//#endif
          /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
          ", buffer size: " << buffer_size;*/
 
@@ -337,7 +340,7 @@ void Keyboard(unsigned char key, int x, int y) {
     }
 
     case 'r': {
-        _scene.reset(new VRScene(_width, _height, GPU_BASE, GL_BASE));
+        _scene.reset(new VRScene(_width, _height, GPU_BASE, _gpu_platform));
         const float PRESET_CT_LUNGS_WW = 1500;
         const float PRESET_CT_LUNGS_WL = -400;
         _ww = PRESET_CT_LUNGS_WW;
@@ -442,7 +445,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {

@@ -6,6 +6,8 @@
 
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_utils.h"
+#include "glresource/mi_gl_fbo.h"
+#include "glresource/mi_gl_resource_manager_container.h"
 
 #include "io/mi_image_data.h"
 
@@ -18,6 +20,8 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_render_algo_logger.h"
 #include "mi_graphic_object_navigator.h"
+
+#include "mi_gpu_image_compressor.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -49,8 +53,9 @@ struct VRScene::RayEnd
 
 VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
     RayCastScene(strategy, platfrom), _cache_ray_end(new RayEnd()) {
-    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
-        new VREntryExitPoints(strategy, platfrom));
+    //--------------------------------------------------//
+    //VR entry exit just support GL platform
+    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points( new VREntryExitPoints(strategy, GL_BASE));
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
@@ -58,8 +63,9 @@ VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) :
 
 VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
     RayCastScene(width, height, strategy, platfrom), _cache_ray_end(new RayEnd()) {
-    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points(
-        new VREntryExitPoints(strategy, platfrom));
+    //--------------------------------------------------//
+    //VR entry exit just support GL platform
+    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points( new VREntryExitPoints(strategy, GL_BASE));
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
@@ -68,11 +74,73 @@ VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform
 VRScene::~VRScene() {}
 
 void VRScene::initialize() {
-    SceneBase::initialize();     
+    if (GL_BASE == _gpu_platform) {
+        if (!_scene_fbo) {//as init flag
+            SceneBase::initialize();
 
-    _canvas->initialize(true);
-    _entry_exit_points->initialize();
-    _navigator->initialize();
+            _canvas->initialize(true);
+            _entry_exit_points->initialize();
+            _navigator->initialize();
+        }
+    } else {
+        //-----------------------------------------------------------//
+        //forbid base's initialize, just create FBO with color-attach-0 (For graphic rendering)
+        if (!_scene_fbo) {//as init flag
+            CHECK_GL_ERROR;
+
+            GLUtils::set_pixel_pack_alignment(1);
+
+            _scene_fbo = GLResourceManagerContainer::instance()
+                ->get_fbo_manager()->create_object("scene base FBO");
+            _scene_fbo->initialize();
+            _scene_fbo->set_target(GL_FRAMEBUFFER);
+
+            _scene_color_attach_0 = GLResourceManagerContainer::instance()
+                ->get_texture_2d_manager()->create_object("scene base color attachment 0");
+            _scene_color_attach_0->initialize();
+            _scene_color_attach_0->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _scene_color_attach_0->load(GL_RGB8, _width, _height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+            _scene_depth_attach = GLResourceManagerContainer::instance()
+                ->get_texture_2d_manager()->create_object("scene base depth attachment");
+            _scene_depth_attach->initialize();
+            _scene_depth_attach->bind();
+            GLTextureUtils::set_2d_wrap_s_t(GL_CLAMP_TO_EDGE);
+            GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_LINEAR);
+            _scene_depth_attach->load(GL_DEPTH_COMPONENT16, _width, _height,
+                GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+
+            //bind texture to FBO
+            _scene_fbo->bind();
+            _scene_fbo->attach_texture(GL_COLOR_ATTACHMENT0, _scene_color_attach_0);
+            _scene_fbo->attach_texture(GL_DEPTH_ATTACHMENT, _scene_depth_attach);
+            _scene_fbo->unbind();
+
+            CHECK_GL_ERROR;
+
+            _res_shield.add_shield<GLFBO>(_scene_fbo);
+            _res_shield.add_shield<GLTexture2D>(_scene_color_attach_0);
+            _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
+
+            //-----------------------------------------------------------//
+            //initialize others
+            _canvas->initialize(true);
+            _entry_exit_points->initialize();
+            _navigator->initialize();
+
+            //-------------------------------//
+            // GPU compressor (set rc-canvas's color-attach-0 as input)
+            //-------------------------------//
+            std::vector<int> qualitys(2);
+            qualitys[0] = _compress_ld_quality;
+            qualitys[1] = _compress_hd_quality;
+
+            _compressor->set_image(GPUCanvasPairPtr(new
+                GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
+        }
+    }
 }
 
 void VRScene::rotate(const Point2& pre_pt, const Point2& cur_pt) {

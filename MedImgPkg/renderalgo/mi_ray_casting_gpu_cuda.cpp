@@ -11,6 +11,9 @@
 #include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_texture_3d.h"
 #include "cudaresource/mi_cuda_global_memory.h"
+#include "cudaresource/mi_cuda_utils.h"
+
+#include "glresource/mi_gl_texture_2d.h"
 
 #include "mi_ray_caster.h"
 #include "mi_entry_exit_points.h"
@@ -85,6 +88,7 @@ void RayCastingGPUCUDA::render() {
         
         cudaError_t err = ray_cast_surface(entry->get_object(), exit->get_object(), width, height, cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object());
         if (err != cudaSuccess) {
+            LOG_CUDA_ERROR(err);
             RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");
         }
         
@@ -98,7 +102,16 @@ void RayCastingGPUCUDA::render() {
         RENDERALGO_CHECK_NULL_EXCEPTION(entry);
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
 
-        if (_inner_ee_ext) {
+        if (nullptr == _inner_ee_ext) {
+            _inner_ee_ext.reset(new InnerEntryExitPointsExt());
+            if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
+                RENDERALGO_THROW_EXCEPTION("register entry points failed.");
+            }
+            if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
+                RENDERALGO_THROW_EXCEPTION("register exit points failed.");
+            }
+        } else if (entry->get_width() != _inner_ee_ext->entry_points_tex->get_width() || 
+                   entry->get_height() != _inner_ee_ext->entry_points_tex->get_height()) {
             _inner_ee_ext.reset(new InnerEntryExitPointsExt());
             if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
                 RENDERALGO_THROW_EXCEPTION("register entry points failed.");
@@ -123,6 +136,7 @@ void RayCastingGPUCUDA::render() {
         
         cudaError_t err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, width, height, cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object());
         if (err != cudaSuccess) {
+            LOG_CUDA_ERROR(err);
             _inner_ee_ext->entry_points_tex->unmap_gl_texture();
             _inner_ee_ext->exit_points_tex->unmap_gl_texture();
             RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");

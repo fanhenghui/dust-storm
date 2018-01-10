@@ -209,8 +209,6 @@ void VolumeInfos::refresh_update_mask() {
     if (GL_BASE == _gpu_platform) {
         CHECK_GL_ERROR;
 
-        GLUtils::set_pixel_pack_alignment(1);
-        GLUtils::set_pixel_unpack_alignment(1);
         GLTexture3DPtr tex = _mask_texture->get_gl_resource();
         
         tex->bind();

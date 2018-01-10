@@ -19,6 +19,8 @@ public:
 
     cudaSurfaceObject_t get_object();
 
+    cudaArray_t get_inner_array() const;
+
 protected:
     cudaArray_t _d_array;
     cudaSurfaceObject_t _surface_obj;

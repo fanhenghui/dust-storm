@@ -26,6 +26,10 @@ inline __device__ float3 intri_normalize(float3 a) {
 //---------------------------------------------------------//
 extern __shared__ float s_array[];
 
+inline __device__ __host__ int get_s_array_size(int label_level) {
+    return 56 * label_level;
+}
+
 inline __device__ int* get_s_visible_label_array(int label_level) {
     return (int*)(s_array);
 }
@@ -228,8 +232,8 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     //fill shared array 
     uint local_thread = threadIdx.y * blockDim.x + threadIdx.x;
-    fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, ray_cast_infos.label_level*56, memcpy_step);
-    __syncthreads();
+    //fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
+    //__syncthreads();
 
 
     if (x > width - 1 || y > height - 1) {
@@ -248,9 +252,10 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     /////////////////////////////////////////
     //debug
-    //uchar4 rgba_entry_exit(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
-    //surf2DWrite(rgba_entry_exit, canvas, x * 4, y);
-    //return;
+    float4 debug_color = entry;
+    uchar4 rgba_entry_exit = make_uchar4(debug_color.x / volume_infos.dim.x * 255, debug_color.y / volume_infos.dim.y * 255, debug_color.z / volume_infos.dim.z * 255, 255);
+    surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
+    return;
     /////////////////////////////////////////
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
@@ -278,7 +283,7 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
 
     //fill shared array
     uint local_thread = threadIdx.y * blockDim.x + threadIdx.x;
-    fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, ray_cast_infos.label_level * 56, memcpy_step);
+    fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
     __syncthreads();
 
 
@@ -331,7 +336,7 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
     
-    const int s_mem_size = ray_cast_info.label_level*56;
+    const int s_mem_size = get_s_array_size(ray_cast_info.label_level);
     int memcpy_step = s_mem_size / BLOCK_SIZE*BLOCK_SIZE;
     if (memcpy_step * BLOCK_SIZE * BLOCK_SIZE != s_mem_size) {
         memcpy_step += 1;
@@ -351,7 +356,7 @@ cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t 
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
 
-    const int s_mem_size = ray_cast_info.label_level * 56;
+    const int s_mem_size = get_s_array_size(ray_cast_info.label_level);
     int memcpy_step = s_mem_size / BLOCK_SIZE*BLOCK_SIZE;
     if (memcpy_step * BLOCK_SIZE * BLOCK_SIZE != s_mem_size) {
         memcpy_step += 1;

@@ -115,6 +115,10 @@ void RayCasterCanvas::initialize(bool multi_color_attach) {
 }
 
 void RayCasterCanvas::set_display_size(int width, int height) {
+    if (_width == width && _height == height) {
+        return;
+    }
+
     _width = width;
     _height = height;
     _color_array.reset(new RGBAUnit[_width * _height]);

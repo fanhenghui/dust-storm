@@ -20,6 +20,7 @@ class RayCasterInnerResource;
 class RayCasterCanvas;
 class RayCastingCPU;
 class RayCastingGPUGL;
+class RayCastingGPUCUDA;
 class RayCastingCPUBrickAcc;
 
 class RenderAlgo_Export RayCaster
@@ -27,6 +28,7 @@ class RenderAlgo_Export RayCaster
     friend class RayCastingCPU;
     friend class RayCastingCPUBrickAcc;
     friend class RayCastingGPUGL;
+    friend class RayCastingGPUCUDA;
 
 public:
     RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform);
@@ -195,7 +197,7 @@ private:
     unsigned int _pseudo_color_length;
 
     // Inner buffer to contain label based parameter
-    std::shared_ptr<RayCasterInnerResource> _inner_buffer;
+    std::shared_ptr<RayCasterInnerResource> _inner_resource;
 
     // SSD gray value
     float _ssd_gray;
@@ -225,7 +227,8 @@ private:
     float _ambient_color[4];
 
     std::shared_ptr<RayCastingCPU> _ray_casting_cpu;
-    std::shared_ptr<RayCastingGPUGL> _ray_casting_gpu;
+    std::shared_ptr<RayCastingGPUGL> _ray_casting_gpu_gl;
+    std::shared_ptr<RayCastingGPUCUDA> _ray_casting_gpu_cuda;
 
     // Canvas for rendering
     std::shared_ptr<RayCasterCanvas> _canvas;

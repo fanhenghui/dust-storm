@@ -27,24 +27,21 @@ int CudaSurface2D::load(int channel_x, int channel_y, int channel_z, int channel
         return -1;
     }
 
-    //malloc and load, or update all
     if (_d_array) {
         if (_channel[0] != channel_x || _channel[1] != channel_y ||
             _channel[2] != channel_z || _channel[3] != channel_w ||
             width != _width || height != _height) {
-            MI_CUDARESOURCE_LOG(MI_ERROR) << "load different format array to CUDA texture 1D. init foramt {ch:"
-                << _channel[0] << " " << _channel[1] << " " << _channel[2] << " " << _channel[3] << ", format: " << _format << ", size: " << _width << " " << _height
-                << "}. call load func foramt {ch: "
-                << channel_x << " " << channel_y << " " << channel_z << " " << channel_w << ", format: " << format << ", size: " << width << " " << height << "}.";
-            return -1;
+            //re-create
+            this->finalize();
         }
     }
-    else {
+
+    if (nullptr == _d_array) {
         _channel[0] = channel_x;
         _channel[1] = channel_y;
         _channel[2] = channel_z;
         _channel[3] = channel_w;
-        _format = _format;
+        _format = format;
         _width = width;
         _height = height;
         cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(channel_x, channel_y, channel_z, channel_w, format);
@@ -88,7 +85,7 @@ int CudaSurface2D::download(unsigned int size, void* h_data) {
     }
     cudaError_t err = cudaMemcpyFromArray(h_data, _d_array, 0, 0, cur_size, cudaMemcpyDeviceToHost);
     if (err != cudaSuccess) {
-        MI_CUDARESOURCE_LOG(MI_ERROR) << "download cuda 2D surface failed: " << err;
+        LOG_CUDA_ERROR(err);
         return -1;
     }
     else {

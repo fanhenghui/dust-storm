@@ -10,6 +10,43 @@
 #include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
+namespace {
+    inline size_t get_shared_mapped_memory_size(LabelLevel level) {
+        return (size_t)level * 56;
+    }
+
+    inline int* get_visible_label_array(void* s_array, int label_level) {
+        return (int*)(s_array);
+    }
+    inline size_t get_visible_label_offset(int label_level) {
+        return 0;
+    }
+
+    inline float* get_wl_array(void* s_array, int label_level) {
+        return (float*)((char*)(s_array)+4 * label_level);
+    }
+
+    inline size_t get_wl_offset(int label_level) {
+        return 4 * label_level;
+    }
+
+    inline cudaTextureObject_t* get_color_opacity_texture_array(void* s_array, int label_level) {
+        return (cudaTextureObject_t*)((char*)(s_array)+12 * label_level);
+    }
+
+    inline size_t get_color_opacity_texture_offset(int label_level) {
+        return 12 * label_level;
+    }
+
+    inline float* get_material_array(void* s_array, int label_level) {
+        return (float*)((char*)(s_array)+20 * label_level);
+    }
+
+    inline size_t get_material_offset(int label_level) {
+        return 20 * label_level;
+    }
+}
+
 struct RayCasterInnerResource::GLResource {
     std::map<RayCasterInnerResource::BufferType, GLBufferPtr> buffer_ids;
     bool dirty_flag[TYPE_END];
@@ -88,7 +125,7 @@ RayCasterInnerResource::RayCasterInnerResource(GPUPlatform gpu_platform)
         //---------------------------------------------//
         //CUDA set all data to global memory, then copy to shared memory
         _inner_cuda_resource.reset(new CudaResource());
-        _shared_buffer_array.reset(new char[(int)_label_level * 56]);//note 56 it the same with kernel
+        _shared_buffer_array.reset(new char[get_shared_mapped_memory_size(_label_level)]);
     }
 }
 
@@ -282,7 +319,7 @@ void RayCasterInnerResource::set_mask_label_level(LabelLevel level) {
             _shared_buffer_array.reset(new char[(int)_label_level * sizeof(Material)]);
         } else {
             memset(_inner_cuda_resource->dirty_flag, 1, sizeof(bool) * TYPE_END);
-            _shared_buffer_array.reset(new char[(int)_label_level * 56]);
+            _shared_buffer_array.reset(new char[get_shared_mapped_memory_size(_label_level)]);
         }
     }
 }
@@ -381,39 +418,6 @@ bool RayCasterInnerResource::check_dirty(BufferType type) {
     }
 }
 
-namespace {
-    inline int* get_visible_label_array(void* s_array, int label_level) {
-        return (int*)(s_array);
-    }
-    inline size_t get_visible_label_offset(int label_level) {
-        return 0;
-    }
-
-    inline float* get_wl_array(void* s_array, int label_level) {
-        return (float*)((char*)(s_array) + 4 * label_level);
-    }
-
-    inline size_t get_wl_offset(int label_level) {
-        return 4 * label_level;
-    }
-
-    inline cudaTextureObject_t* get_color_opacity_texture_array(void* s_array, int label_level) {
-        return (cudaTextureObject_t*)((char*)(s_array) + 12 * label_level);
-    }
-
-    inline size_t get_color_opacity_texture_offset(int label_level) {
-        return 12 * label_level;
-    }
-
-    inline float* get_material_array(void* s_array, int label_level) {
-        return (float*)((char*)(s_array) + 20 * label_level);
-    }
-
-    inline size_t get_material_offset(int label_level) {
-        return 20 * label_level;
-    }
-}
-
 void RayCasterInnerResource::set_color_opacity_texture_array(GPUTexture1DArrayPairPtr tex_array) {
     _color_opacity_tex_array = tex_array;
 }
@@ -423,8 +427,8 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
         RENDERALGO_THROW_EXCEPTION("invalid gpu platform.");
     }
     if (nullptr == _inner_cuda_resource->shared_map_memory) {
-        _inner_cuda_resource->shared_map_memory = 
-            CudaResourceManager::instance()->create_global_memory("ray-caster inner cuda resource");
+        _inner_cuda_resource->shared_map_memory = CudaResourceManager::instance()->create_global_memory("ray-caster inner cuda resource");
+        _inner_cuda_resource->shared_map_memory->load(get_shared_mapped_memory_size(_label_level), nullptr);
     }
 
     CudaGlobalMemoryPtr shared_map_memory = _inner_cuda_resource->shared_map_memory;
@@ -467,6 +471,7 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
 
     {
         //always update color opacity texture array(can't catch dirty)
+        RENDERALGO_CHECK_NULL_EXCEPTION(_color_opacity_tex_array);
         if (!_color_opacity_tex_array->cuda()) {
             RENDERALGO_THROW_EXCEPTION("invalid color opacity texture array platform.");
         }
