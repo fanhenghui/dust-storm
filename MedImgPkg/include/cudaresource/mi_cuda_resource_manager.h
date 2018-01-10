@@ -125,6 +125,5 @@ private:
     DISALLOW_COPY_AND_ASSIGN(CudaResourceManager);    
 };
 
-
 MED_IMG_END_NAMESPACE
 #endif

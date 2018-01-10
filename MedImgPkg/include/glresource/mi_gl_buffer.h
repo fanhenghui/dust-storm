@@ -1,5 +1,5 @@
-#ifndef MEDIMGRESOURCE_GL_BUFFER_H_
-#define MEDIMGRESOURCE_GL_BUFFER_H_
+#ifndef MEDIMGRESOURCE_MI_GL_BUFFER_H
+#define MEDIMGRESOURCE_MI_GL_BUFFER_H
 
 #include "glresource/mi_gl_object.h"
 
@@ -19,6 +19,8 @@ public:
 
     virtual void finalize();
 
+    virtual float memory_used() const;
+
     unsigned int get_id() const;
 
     void bind_buffer_base(GLenum target, GLuint index);
@@ -31,9 +33,12 @@ public:
 
     void download(GLsizei size, void* data);
 
+    size_t get_size() const;
+
 private:
     GLenum _target;
     unsigned int _buffer_id;
+    size_t _size;
 };
 
 MED_IMG_END_NAMESPACE

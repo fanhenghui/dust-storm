@@ -124,5 +124,8 @@
     <ClCompile Include="..\glresource\mi_gl_utils.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\glresource\mi_gl_resource_manager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

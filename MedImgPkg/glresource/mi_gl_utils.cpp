@@ -216,9 +216,62 @@ void GLUtils::set_pixel_unpack_alignment(int i) {
     glPixelStorei(GL_UNPACK_ALIGNMENT, i);
 }
 
-void GLUtils::log_gl_error(const std::string& err)
-{
+void GLUtils::log_gl_error(const std::string& err) {
     MI_GLRESOURCE_LOG(MI_ERROR) << err;
+}
+
+int GLUtils::get_component_byte(GLenum format, GLenum type) {
+    int byte = 1;
+    switch (format)
+    {
+    case GL_RED:
+    case GL_GREEN:
+    case GL_BLUE:
+    case GL_ALPHA:
+    case GL_LUMINANCE: {
+        break;
+    }
+    case GL_RGB: {
+        byte*=3;
+        break;
+    }
+    case GL_RGBA: {
+        byte *= 4;
+        break;
+    }
+    default:
+        MI_GLRESOURCE_LOG(MI_ERROR) << "get GL component byte failed. format: " << format;
+        break;
+    }
+
+    switch (type) 
+    {
+    case GL_UNSIGNED_BYTE:
+    case GL_BYTE: {
+        break;
+    }
+
+    case GL_UNSIGNED_SHORT:
+    case GL_SHORT: {
+        byte *=2;
+    }
+
+    case GL_FLOAT:
+    case GL_UNSIGNED_INT:
+    case GL_INT: {
+        byte *= 4;
+    }
+
+    case GL_DOUBLE:{
+        byte *= 8;
+    }
+
+    default:
+        MI_GLRESOURCE_LOG(MI_ERROR) << "get GL component byte failed. type: " << type;
+        break;
+    }
+
+    return byte;
 }
 
 DrawFBOStack::DrawFBOStack() {

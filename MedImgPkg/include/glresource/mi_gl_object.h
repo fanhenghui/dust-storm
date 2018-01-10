@@ -1,5 +1,5 @@
-#ifndef MEDIMGRESOURCE_GL_OBJECT_H_
-#define MEDIMGRESOURCE_GL_OBJECT_H_
+#ifndef MEDIMGRESOURCE_MI_GL_OBJECT_H
+#define MEDIMGRESOURCE_MI_GL_OBJECT_H
 
 #include "GL/glew.h"
 #include "boost/thread/mutex.hpp"
@@ -12,6 +12,10 @@ class GLObject {
 public:
     GLObject(UIDType uid, const std::string& type) : _uid(uid), _type(type) {}
     virtual  ~GLObject() {}
+
+    virtual void initialize() = 0;
+    virtual void finalize() = 0;
+    virtual float memory_used() const {return 0;}
 
     UIDType get_uid() const {
         return _uid;
@@ -42,9 +46,6 @@ public:
         strm << "GLOBJ type: " << obj->get_type() << ", uid: " << obj->get_uid() << ", des: " << obj->get_description();
         return strm;
     }
-
-    virtual void initialize() = 0;
-    virtual void finalize() = 0;
 
 private:
     UIDType _uid;

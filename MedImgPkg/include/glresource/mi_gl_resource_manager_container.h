@@ -131,6 +131,13 @@ public:
 
     void update_all();
 
+    friend std::ostream& operator << (std::ostream& strm, GLResourceManagerContainer& gl_res_container) {
+        strm << gl_res_container.get_specification(" ");
+        return strm;
+    }
+
+    std::string get_specification(const std::string& split = " ");
+
 private:
     GLResourceManagerContainer();
 

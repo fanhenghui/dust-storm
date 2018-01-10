@@ -1,5 +1,5 @@
-#ifndef MEDIMGRESOURCE_TEXTURE_1D_H
-#define MEDIMGRESOURCE_TEXTURE_1D_H
+#ifndef MEDIMGRESOURCE_MI_GL_TEXTURE_1D_H
+#define MEDIMGRESOURCE_MI_GL_TEXTURE_1D_H
 
 #include "glresource/mi_gl_texture_base.h"
 
@@ -15,6 +15,8 @@ public:
 
     virtual void unbind();
 
+    virtual float memory_used() const;
+
     void load(GLint internalformat, GLsizei width, GLenum format, GLenum type,
               const void* data, GLint level = 0);
 
@@ -24,16 +26,18 @@ public:
     void download(GLenum format, GLenum type, void* buffer,
                   GLint level = 0) const;
 
-    GLsizei get_width();
+    GLsizei get_width() const;
 
-    GLenum get_format();
+    GLenum get_format() const;
+
+    GLenum get_data_type() const;
 
 protected:
 private:
     GLsizei _width;
     GLenum _format;
     GLenum _internal_format;
-    GLenum _type;
+    GLenum _data_type;
 };
 
 MED_IMG_END_NAMESPACE

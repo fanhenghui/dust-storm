@@ -89,7 +89,7 @@ int CudaTexture1DArray::load(int channel_x, int channel_y, int channel_z, int ch
         return 0;
     }
 
-    cudaError_t err = cudaMemcpyToArray(cuda_array, 0, 0, data, length*CudaUtils::get_componet_byte(_channel), cudaMemcpyHostToDevice);
+    cudaError_t err = cudaMemcpyToArray(cuda_array, 0, 0, data, length*CudaUtils::get_component_byte(_channel), cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;

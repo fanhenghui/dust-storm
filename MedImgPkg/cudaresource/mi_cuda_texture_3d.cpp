@@ -12,7 +12,7 @@ CudaTexture3D::~CudaTexture3D() {
 }
 
 float CudaTexture3D::memory_used() const {
-    return _width*_height*_depth*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+    return _width*_height*_depth*CudaUtils::get_component_byte(_channel) / 1024.0f;
 }
 
 int CudaTexture3D::get_width() const {
@@ -70,7 +70,7 @@ int CudaTexture3D::load(int channel_x, int channel_y, int channel_z, int channel
     const cudaExtent extent = { width, height, depth };
     cudaMemcpy3DParms memcpy_3d_parms;
     memset(&memcpy_3d_parms, 0, sizeof(cudaMemcpy3DParms));
-    memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, _width*CudaUtils::get_componet_byte(_channel), _width, _height);
+    memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, _width*CudaUtils::get_component_byte(_channel), _width, _height);
     memcpy_3d_parms.extent = extent;
     memcpy_3d_parms.kind = cudaMemcpyHostToDevice;
     memcpy_3d_parms.dstArray = _d_array;
@@ -93,7 +93,7 @@ int CudaTexture3D::update(int offset_x, int offset_y, int offset_z, int width, i
     cudaExtent extent = { width, height, depth };
     cudaMemcpy3DParms memcpy_3d_parms;
     memset(&memcpy_3d_parms, 0, sizeof(cudaMemcpy3DParms));
-    memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, width*CudaUtils::get_componet_byte(_channel), width, height);
+    memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, width*CudaUtils::get_component_byte(_channel), width, height);
     memcpy_3d_parms.extent = extent;
     memcpy_3d_parms.kind = cudaMemcpyHostToDevice;
     memcpy_3d_parms.dstPos.x = offset_x;

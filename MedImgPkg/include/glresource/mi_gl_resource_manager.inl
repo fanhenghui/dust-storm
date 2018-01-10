@@ -86,7 +86,21 @@ GLResourceManager<ResourceType>::create_object(const std::string& desc) {
 template <class ResourceType>
 GLResourceManager<ResourceType>::~GLResourceManager() {}
 
-template <class ResourceType>
-std::string GLResourceManager<ResourceType>::get_type() const {
-    return typeid(ResourceType).name();
+template <class ResourceType> 
+std::string GLResourceManager<ResourceType>::get_specification(const std::string& split = " ") {
+    boost::mutex::scoped_lock locker(_mutex);
+    std::stringstream ss;
+    ss << get_type() << ": [" << split;
+    float sum(0.0f);
+    for (auto it = _objects.begin(); it != _objects.end(); ++it) {
+        std::shared_ptr<ResourceType> ptr = it->second;
+        if (ptr) {
+            sum += ptr->memory_used();
+            ss << "{" << ptr->get_description() << ", size: " << ptr->memory_used() << " KB }, " << split;
+        }
+    }
+
+    ss << "{total size: " << sum << " KB }";
+    ss << "]";
+    return ss.str();
 }

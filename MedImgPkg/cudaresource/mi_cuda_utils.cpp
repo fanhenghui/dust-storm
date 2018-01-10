@@ -7,7 +7,7 @@ void CudaUtils::log_cuda_error(cudaError_t err, const char* func, const char* fi
     MI_CUDARESOURCE_LOG(MI_ERROR) << "catch CUDA error ID: " << err << "in file: " << file << ", line: " << line << ", func: " << func;
 }
 
-int CudaUtils::get_componet_byte(const int(&channel)[4]) {
+int CudaUtils::get_component_byte(const int(&channel)[4]) {
     int x = 0;
     x += channel[0]>0 ? channel[0] / 8 : 0;
     x += channel[1]>0 ? channel[1] / 8 : 0;

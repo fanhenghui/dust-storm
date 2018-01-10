@@ -121,6 +121,7 @@
     <ClCompile Include="..\glresource\mi_gl_environment.cpp" />
     <ClCompile Include="..\glresource\mi_gl_fbo.cpp" />
     <ClCompile Include="..\glresource\mi_gl_program.cpp" />
+    <ClCompile Include="..\glresource\mi_gl_resource_manager.cpp" />
     <ClCompile Include="..\glresource\mi_gl_resource_manager_container.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_1d.cpp" />
     <ClCompile Include="..\glresource\mi_gl_texture_1d_array.cpp" />

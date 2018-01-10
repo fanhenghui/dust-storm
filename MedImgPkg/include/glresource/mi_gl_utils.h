@@ -1,5 +1,5 @@
-#ifndef MEDIMGRESOURCE_GL_UTILS_H_
-#define MEDIMGRESOURCE_GL_UTILS_H_
+#ifndef MEDIMGRESOURCE_MI_GL_UTILS_H
+#define MEDIMGRESOURCE_MI_GL_UTILS_H
 
 #include <sstream>
 #include "GL/glew.h"
@@ -72,6 +72,8 @@ public:
     static void set_pixel_unpack_alignment(int i);
 
     static void log_gl_error(const std::string& err);
+
+    static int get_component_byte(GLenum format , GLenum type);
 
 private:
     static bool _s_check_gl_flag;

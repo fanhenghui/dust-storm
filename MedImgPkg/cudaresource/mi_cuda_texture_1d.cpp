@@ -13,7 +13,7 @@ CudaTexture1D::~CudaTexture1D() {
 }
 
 float CudaTexture1D::memory_used() const {
-    return _length*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+    return _length*CudaUtils::get_component_byte(_channel) / 1024.0f;
 }
 
 int CudaTexture1D::get_length() const {
@@ -54,7 +54,7 @@ int CudaTexture1D::load(int channel_x, int channel_y, int channel_z, int channel
         return 0;
     }
 
-    cudaError_t err = cudaMemcpyToArray(_d_array, 0, 0, h_data, length*CudaUtils::get_componet_byte(_channel), cudaMemcpyHostToDevice);
+    cudaError_t err = cudaMemcpyToArray(_d_array, 0, 0, h_data, length*CudaUtils::get_component_byte(_channel), cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;
@@ -65,7 +65,7 @@ int CudaTexture1D::load(int channel_x, int channel_y, int channel_z, int channel
 }
 
 int CudaTexture1D::update(int offset, int length, void* h_data) {
-    cudaError_t err = cudaMemcpyToArray(_d_array, offset, 0, h_data, length*CudaUtils::get_componet_byte(_channel), cudaMemcpyHostToDevice);
+    cudaError_t err = cudaMemcpyToArray(_d_array, offset, 0, h_data, length*CudaUtils::get_component_byte(_channel), cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;
@@ -76,7 +76,7 @@ int CudaTexture1D::update(int offset, int length, void* h_data) {
 }
 
 int CudaTexture1D::download(unsigned int size, void* h_data) {
-    const unsigned int cur_size = (unsigned int)_length*(unsigned int)CudaUtils::get_componet_byte(_channel);
+    const unsigned int cur_size = (unsigned int)_length*(unsigned int)CudaUtils::get_component_byte(_channel);
     if (size != cur_size) {
         MI_CUDARESOURCE_LOG(MI_ERROR) << "invalid size: " << size << " when download cuda 1D texture with size: " << cur_size;
         return -1;

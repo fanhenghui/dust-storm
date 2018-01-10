@@ -3,7 +3,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 GLBuffer::GLBuffer(UIDType uid)
-    : GLObject(uid, "GLBuffer"), _target(GL_ARRAY_BUFFER), _buffer_id(0) {
+    : GLObject(uid, "GLBuffer"), _target(GL_ARRAY_BUFFER), _buffer_id(0), _size(0) {
 }
 
 GLBuffer::~GLBuffer() {}
@@ -29,6 +29,10 @@ void GLBuffer::finalize() {
     }
 }
 
+float GLBuffer::memory_used() const {
+    return 0 == _buffer_id ? 0.0f : _size/1024.0f;
+}
+
 unsigned int GLBuffer::get_id() const {
     return _buffer_id;
 }
@@ -46,6 +50,7 @@ void GLBuffer::unbind() {
 }
 
 void GLBuffer::load(GLsizei size, const void* data, GLenum usage) {
+    _size = size;
     glBufferData(_target, size, data, usage);
 }
 
@@ -53,6 +58,10 @@ void GLBuffer::download(GLsizei size, void* data) {
     void* buffer_data = glMapBuffer(_target, GL_READ_ONLY);
     memcpy(data, buffer_data, size);
     glUnmapBuffer(_target);
+}
+
+size_t GLBuffer::get_size() const {   
+    return _buffer_id == 0 ? 0 : _size;
 }
 
 void GLBuffer::bind_buffer_base(GLenum target, GLuint index) {

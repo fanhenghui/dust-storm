@@ -1,5 +1,5 @@
-#ifndef MEDIMGRESOURCE_TEXTURE_2D_H
-#define MEDIMGRESOURCE_TEXTURE_2D_H
+#ifndef MEDIMGRESOURCE_MI_GL_TEXTURE_2D_H
+#define MEDIMGRESOURCE_MI_GL_TEXTURE_2D_H
 
 #include "glresource/mi_gl_texture_base.h"
 
@@ -15,6 +15,8 @@ public:
 
     virtual void unbind();
 
+    virtual float memory_used() const;
+
     void load(GLint internalformat, GLsizei width, GLsizei height, GLenum format,
               GLenum type, const void* data, GLint level = 0);
 
@@ -27,11 +29,11 @@ public:
     void read_pixels(GLenum format, GLenum type, GLint x, GLint y, 
                      GLsizei width, GLsizei height, void* pixels);
 
-    GLsizei get_width();
+    GLsizei get_width() const;
 
-    GLsizei get_height();
+    GLsizei get_height() const;
 
-    GLenum get_format();
+    GLenum get_format() const;
 
     GLenum get_data_type() const;
 
@@ -41,7 +43,7 @@ private:
     GLsizei _height;
     GLenum _format;
     GLenum _internal_format;
-    GLenum _type;
+    GLenum _data_type;
 };
 
 MED_IMG_END_NAMESPACE

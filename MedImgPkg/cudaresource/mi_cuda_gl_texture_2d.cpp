@@ -116,7 +116,7 @@ void CudaGLTexture2D::finalize() {
 }
 
 float CudaGLTexture2D::memory_used() const {
-    return _width*_height*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+    return _width*_height*CudaUtils::get_component_byte(_channel) / 1024.0f;
 }
 
 cudaTextureObject_t CudaGLTexture2D::create_object(
@@ -217,7 +217,7 @@ int CudaGLTexture2D::write_to_gl_texture(void* array, size_t count, cudaMemcpyKi
 }
 
 int CudaGLTexture2D::download(unsigned int size, void* h_data) {
-    const unsigned int cur_size = (unsigned int)_width*(unsigned int)_height*(unsigned int)CudaUtils::get_componet_byte(_channel);
+    const unsigned int cur_size = (unsigned int)_width*(unsigned int)_height*(unsigned int)CudaUtils::get_component_byte(_channel);
     if (size != cur_size) {
         MI_CUDARESOURCE_LOG(MI_ERROR) << "invalid size: " << size << " when download cuda 2D texture with size: " << cur_size;
         return -1;

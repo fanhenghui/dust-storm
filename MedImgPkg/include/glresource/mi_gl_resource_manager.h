@@ -28,6 +28,8 @@ public:
 
     std::string get_type() const;
 
+    std::string get_specification(const std::string& split = " ");
+
 private:
     std::map<UIDType, std::shared_ptr<ResourceType>> _objects;
     std::vector<std::shared_ptr<ResourceType>> _discard;

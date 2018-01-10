@@ -10,7 +10,7 @@ CudaSurface2D::CudaSurface2D(UIDType uid) : CudaSurfaceBase(uid, "CudaSurface2D"
 CudaSurface2D::~CudaSurface2D() {}
 
 float CudaSurface2D::memory_used() const {
-    return _width*_height*CudaUtils::get_componet_byte(_channel) / 1024.0f;
+    return _width*_height*CudaUtils::get_component_byte(_channel) / 1024.0f;
 }
 
 int CudaSurface2D::get_width() const {
@@ -59,7 +59,7 @@ int CudaSurface2D::load(int channel_x, int channel_y, int channel_z, int channel
         return 0;
     }
 
-    cudaError_t err = cudaMemcpyToArray(_d_array, 0, 0, h_data, width*height*CudaUtils::get_componet_byte(_channel), cudaMemcpyHostToDevice);
+    cudaError_t err = cudaMemcpyToArray(_d_array, 0, 0, h_data, width*height*CudaUtils::get_component_byte(_channel), cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;
@@ -70,7 +70,7 @@ int CudaSurface2D::load(int channel_x, int channel_y, int channel_z, int channel
 }
 
 int CudaSurface2D::update(int offset_x, int offset_y, int width, int height, void* h_data) {
-    cudaError_t err = cudaMemcpyToArray(_d_array, offset_x, offset_y, h_data, width*height*CudaUtils::get_componet_byte(_channel), cudaMemcpyHostToDevice);
+    cudaError_t err = cudaMemcpyToArray(_d_array, offset_x, offset_y, h_data, width*height*CudaUtils::get_component_byte(_channel), cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
         LOG_CUDA_ERROR(err);
         return -1;
@@ -81,7 +81,7 @@ int CudaSurface2D::update(int offset_x, int offset_y, int width, int height, voi
 }
 
 int CudaSurface2D::download(unsigned int size, void* h_data) {
-    const unsigned int cur_size = (unsigned int)_width*(unsigned int)_height*(unsigned int)CudaUtils::get_componet_byte(_channel);
+    const unsigned int cur_size = (unsigned int)_width*(unsigned int)_height*(unsigned int)CudaUtils::get_component_byte(_channel);
     if (size != cur_size) {
         MI_CUDARESOURCE_LOG(MI_ERROR) << "invalid size: " << size << " when download cuda 2D surface with size: " << cur_size;
         return -1;

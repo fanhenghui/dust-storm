@@ -9,7 +9,7 @@ MED_IMG_BEGIN_NAMESPACE
 class CUDAResource_Export CudaUtils {
 public:
     static void log_cuda_error(cudaError_t err,  const char* func, const char* file, const int line);
-    static int get_componet_byte(const int (&channel)[4]);
+    static int get_component_byte(const int (&channel)[4]);
 };
 
 #define LOG_CUDA_ERROR(err) {CudaUtils::log_cuda_error(err, __FUNCTION__, __FILE__, __LINE__); }

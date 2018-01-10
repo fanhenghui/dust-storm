@@ -92,7 +92,8 @@ static void test_cuda_gl_texture() {
         _cuda_gl_tex_2ds.push_back(tex);
     }
 
-    std::cout << "DONE.";
+    //std::cout << *GLResourceManagerContainer::instance();
+    std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
 }
 
 static void display() {

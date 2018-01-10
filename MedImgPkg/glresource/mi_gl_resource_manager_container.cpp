@@ -43,6 +43,22 @@ void GLResourceManagerContainer::update_all() {
     _time_query_manager->update();
 }
 
+std::string GLResourceManagerContainer::get_specification(const std::string& split /*= " "*/) {
+    std::stringstream ss;
+    ss << "GL Resources: [" << split <<
+        _program_manager->get_specification(split) << ", " << split <<
+        _buffer_manager->get_specification(split) << ", " << split <<
+        _texture_1d_manager->get_specification(split) << ", " << split <<
+        _texture_2d_manager->get_specification(split) << ", " << split <<
+        _texture_3d_manager->get_specification(split) << ", " << split <<
+        _texture_1d_array_manager->get_specification(split) << ", " << split <<
+        _vao_manager->get_specification(split) << ", " << split <<
+        _fbo_manager->get_specification(split) << ", " << split <<
+        _context_manager->get_specification(split) << ", " << split <<
+        _time_query_manager->get_specification(split) << ", " << split << "]";
+    return ss.str();
+}
+
 GLResourceManagerContainer::GLResourceManagerContainer()
     : _program_manager(new GLProgramManager()),
       _buffer_manager(new GLBufferManager()),
