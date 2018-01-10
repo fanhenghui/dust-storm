@@ -92,8 +92,73 @@ static void test_cuda_gl_texture() {
         _cuda_gl_tex_2ds.push_back(tex);
     }
 
+    std::cout << "OK.";
+
+    _width += 3;
+    _height += 4;
+    delete [] _checkboard_data;
+    _checkboard_data = new unsigned char[_width*_height * 4];
+
+    tag_x = 0;
+    tag_y = 0;
+    idx = 0;
+    for (int y = 0; y < _height; ++y) {
+        for (int x = 0; x < _width; ++x) {
+            tag_x = x / 32;
+            tag_y = y / 32;
+            idx = y*_width + x;
+            if ((tag_x + tag_y) % 2 == 0) {
+                _checkboard_data[idx * 4] = 200;
+                _checkboard_data[idx * 4 + 1] = 200;
+                _checkboard_data[idx * 4 + 2] = 200;
+                _checkboard_data[idx * 4 + 3] = 255;
+            }
+            else {
+                _checkboard_data[idx * 4] = 20;
+                _checkboard_data[idx * 4 + 1] = 20;
+                _checkboard_data[idx * 4 + 2] = 20;
+                _checkboard_data[idx * 4 + 3] = 255;
+            }
+        }
+    }
+
+    for (int i = 0; i < _sum; ++i) {
+        CudaGLTexture2DPtr tex = _cuda_gl_tex_2ds[i];
+        tex->unregister_gl_texture();
+    }
+
+    for (int i = 0; i < _sum; ++i) {
+        CHECK_GL_ERROR;
+        GLTexture2DPtr tex = _gl_tex_2ds[i];
+        tex->bind();
+        tex->load(GL_RGBA8, _width, _height, GL_RGBA, GL_UNSIGNED_BYTE, _checkboard_data);
+        //tex->download(GL_RGBA, GL_UNSIGNED_BYTE, download);
+        //FileUtil::write_raw("D:/temp/check_board.rgba", download, _width*_height * 4);
+        tex->unbind();
+        CHECK_GL_ERROR;
+    }
+
+    delete[] download;
+    download = new unsigned char[_width*_height * 4];
+    for (int i = 0; i < _sum; ++i) {
+        CudaGLTexture2DPtr tex = _cuda_gl_tex_2ds[i];
+        tex->register_gl_texture(_gl_tex_2ds[i], cudaGraphicsRegisterFlagsReadOnly);
+        _gl_tex_2ds[i]->bind();
+        tex->map_gl_texture();
+        if (i == 0) {
+            tex->download(_width*_height * 4, download);
+            FileUtil::write_raw("D:/temp/check_board_cuda_2.rgba", download, _width*_height * 4);
+        }
+        tex->unmap_gl_texture();
+        _gl_tex_2ds[i]->unbind();
+    }
+
     //std::cout << *GLResourceManagerContainer::instance();
-    std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
+    //std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
+    std::cout << "OK 2.";
+
+    _width -= 3;
+    _height -= 4;
 }
 
 static void display() {

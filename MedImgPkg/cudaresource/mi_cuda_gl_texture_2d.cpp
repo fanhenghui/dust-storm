@@ -162,6 +162,7 @@ int CudaGLTexture2D::register_gl_texture(std::shared_ptr<GLTexture2D> tex, cudaG
         cudaError_t err = cudaGraphicsUnregisterResource(_cuda_graphic_resource);
         _cuda_graphic_resource = nullptr;
         CHECK_CUDA_ERROR(err);
+        return -1;
     }
 
     tex->bind();
@@ -173,6 +174,25 @@ int CudaGLTexture2D::register_gl_texture(std::shared_ptr<GLTexture2D> tex, cudaG
     } else {
         return 0;
     }
+}
+
+int CudaGLTexture2D::unregister_gl_texture() {
+    if (_cuda_graphic_resource) {
+        cudaError_t err = cudaGraphicsUnregisterResource(_cuda_graphic_resource);
+        _cuda_graphic_resource = nullptr;
+        CHECK_CUDA_ERROR(err);
+        return -1;
+    }
+
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
+    _format = cudaChannelFormatKindNone;
+    _width = 0;
+    _height = 0;
+
+    return 0;
 }
 
 int CudaGLTexture2D::map_gl_texture() {

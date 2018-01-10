@@ -18,6 +18,8 @@ public:
 
     int register_gl_texture(std::shared_ptr<GLTexture2D> tex, cudaGraphicsRegisterFlags register_flag);
 
+    int unregister_gl_texture();
+
     int map_gl_texture();
 
     int unmap_gl_texture();
