@@ -132,6 +132,7 @@
   <ItemGroup>
     <CudaCompile Include="..\renderalgo\kernel\kernel_brick_info_calculator.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_canvas_transformer.cu" />
+    <CudaCompile Include="..\renderalgo\kernel\kernel_mpr_entry_exit_points.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_ray_casting.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_ray_tracing.cu" />
   </ItemGroup>

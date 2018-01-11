@@ -372,5 +372,8 @@
     <CudaCompile Include="..\renderalgo\kernel\kernel_ray_tracing.cu">
       <Filter>kernel</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\renderalgo\kernel\kernel_mpr_entry_exit_points.cu">
+      <Filter>kernel</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
