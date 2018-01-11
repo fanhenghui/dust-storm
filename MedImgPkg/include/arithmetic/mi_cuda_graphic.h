@@ -6,6 +6,13 @@
 #include "arithmetic/mi_cuda_math.h"
 #include "arithmetic/mi_matrix4.h"
 
+#define INF     2e10f
+
+struct Viewport {
+    int x, y, width, height;
+    __host__ __device__ Viewport(int x_, int y_, int width_, int height_) : x(x_), y(y_), width(width_), height(height_) {}
+};
+
 struct mat4 {
     float4 col0, col1, col2, col3;
     __host__ __device__ mat4(float4 col0_, float4 col1_, float4 col2_, float4 col3_) :col0(col0_), col1(col1_), col2(col2_), col3(col3_) {
@@ -81,5 +88,98 @@ inline __host__ __device__ float det(mat4 &m) {
 
     return (t00 * m.col0.x + t10 * m.col1.x + t20 * m.col2.x + t30 * m.col3.x);
 };
+
+inline __device__ float scalar_triple(float3 u, float3 v, float3 w) {
+    return dot(cross(u, v), w);
+}
+
+inline __device__ float ray_intersect_triangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 *uvw, float3* out) {
+    float3 pq = ray_dir*INF;
+    float3 pa = p0 - ray_start;
+    float3 pb = p1 - ray_start;
+    float3 pc = p2 - ray_start;
+
+    uvw->x = scalar_triple(pq, pc, pb);
+    uvw->y = scalar_triple(pq, pa, pc);
+    uvw->z = scalar_triple(pq, pb, pa);
+
+    float epsilon = 0.0f;
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+        float denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        uvw->x *= denom;
+        uvw->y *= denom;
+        uvw->z *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        return -INF;
+    }
+}
+
+inline __device__ bool in_line(float3 p0, float3 p1, float3 p) {
+    if (fabs(length(p1 - p0) - length(p0 - p) - length(p1 - p)) < 1e-4f) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+inline __device__ float ray_intersect_rectangle(float3 ray_start, float3 ray_dir, float3 p0, float3 p1, float3 p2, float3 p3, float3* __restrict__ uvw, float3* __restrict__ out, int& tri_type) {
+    float3 pq = ray_dir*INF;
+    float3 pp0 = p0 - ray_start;
+    float3 pp1 = p1 - ray_start;
+    float3 pp2 = p2 - ray_start;
+    float3 pp3 = p3 - ray_start;
+    float denom;
+    float epsilon = 0.0f;
+
+    //triangle p0p1p2
+    uvw->x = scalar_triple(pq, pp2, pp1);//21
+    uvw->y = scalar_triple(pq, pp0, pp2);//02
+    uvw->z = scalar_triple(pq, pp1, pp0);//10
+                                         //restrict in triangle(without border)
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+        tri_type = 0;
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p1*uvw->y + p2*uvw->z;
+        if (in_line(p0, p2, *out)) {
+            tri_type = 0;
+            return length(*out - ray_start);
+        }
+    }
+
+    //triangle p0p2p3
+    uvw->x = scalar_triple(pq, pp3, pp2);
+    uvw->y = scalar_triple(pq, pp0, pp3);
+    uvw->z = scalar_triple(pq, pp2, pp0);
+    //restrict in triangle(without border)
+    if ((uvw->x <= epsilon && uvw->y <= epsilon && uvw->z <= epsilon) || (uvw->x >= -epsilon && uvw->y >= -epsilon && uvw->z >= -epsilon)) {
+        tri_type = 1;
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p2*uvw->y + p3*uvw->z;
+        return length(*out - ray_start);
+    }
+    else {
+        denom = 1.0f / (uvw->x + uvw->y + uvw->z);
+        *uvw *= denom;
+        *out = p0*uvw->x + p2*uvw->y + p3*uvw->z;
+        if (in_line(p0, p2, *out)) {
+            tri_type = 1;
+            return length(*out - ray_start);
+        }
+    }
+
+    return -INF;
+}
 
 #endif

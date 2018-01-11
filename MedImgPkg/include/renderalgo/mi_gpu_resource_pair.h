@@ -12,23 +12,23 @@ template<class GLType , class CudaType>
 class GPUResourcePair
 {
 public:
-    GPUResourcePair(std::shared_ptr<GLType> res):_gl_res(res) {}
+    explicit GPUResourcePair(std::shared_ptr<GLType> res):_gl_res(res) {}
 
-    GPUResourcePair(std::shared_ptr<CudaType> res) :_cuda_res(res) {}
+    explicit GPUResourcePair(std::shared_ptr<CudaType> res) :_cuda_res(res) {}
 
-    std::shared_ptr<GLType> get_gl_resource() const {
+    inline std::shared_ptr<GLType> get_gl_resource() const {
         return _gl_res;
     }
 
-    std::shared_ptr<CudaType> get_cuda_resource() const {
+    inline std::shared_ptr<CudaType> get_cuda_resource() const {
         return _cuda_res;
     }
 
-    bool gl() const {
+    inline bool gl() const {
         return _gl_res != nullptr;
     }
     
-    bool cuda() const {
+    inline bool cuda() const {
         return _cuda_res != nullptr;
     }
 
@@ -39,12 +39,14 @@ private:
 
 
 typedef GPUResourcePair<GLTexture1D, CudaTexture1D> GPUTexture1DPair;
+typedef GPUResourcePair<GLTexture2D, CudaTexture2D> GPUTexture2DPair;
 typedef GPUResourcePair<GLTexture3D, CudaTexture3D> GPUTexture3DPair;
 typedef GPUResourcePair<GLBuffer, CudaGlobalMemory> GPUMemoryPair;
 typedef GPUResourcePair<GLTexture1DArray, CudaTexture1DArray> GPUTexture1DArrayPair;
 typedef GPUResourcePair<GLTexture2D, CudaSurface2D> GPUCanvasPair;
 
 typedef std::shared_ptr<GPUTexture1DPair> GPUTexture1DPairPtr;
+typedef std::shared_ptr<GPUTexture2DPair> GPUTexture2DPairPtr;
 typedef std::shared_ptr<GPUTexture3DPair> GPUTexture3DPairPtr;
 typedef std::shared_ptr<GPUMemoryPair> GPUMemoryPairPtr;
 typedef std::shared_ptr<GPUTexture1DArrayPair> GPUTexture1DArrayPairPtr;

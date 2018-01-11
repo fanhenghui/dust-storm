@@ -133,6 +133,7 @@
     <CudaCompile Include="..\renderalgo\kernel\kernel_brick_info_calculator.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_canvas_transformer.cu" />
     <CudaCompile Include="..\renderalgo\kernel\kernel_ray_casting.cu" />
+    <CudaCompile Include="..\renderalgo\kernel\kernel_ray_tracing.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF3C3577-A42A-42C9-9C19-AF2DA66448C2}</ProjectGuid>

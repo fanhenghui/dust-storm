@@ -240,7 +240,6 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
 
     CudaGlobalMemoryPtr shared_mapped_memory = ray_caster->get_inner_resource()->get_shared_map_memory();
     cuda_ray_infos.d_shared_mapped_memory = shared_mapped_memory->get_pointer();
-
 }
 
 double RayCastingGPUCUDA::get_rendering_duration() const {

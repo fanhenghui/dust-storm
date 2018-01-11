@@ -53,7 +53,7 @@ RayCastScene::RayCastScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
     _navigator_margin[1] = 20;
     _navigator_window_ratio = 4.5f;
     _navigator_vis = false;
-    _navigator.reset(new GraphicObjectNavigator());
+    _navigator.reset(new GraphicObjectNavigator(platfrom));
     const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
     _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
@@ -77,7 +77,7 @@ RayCastScene::RayCastScene(int width, int height, RayCastingStrategy strategy, G
     _navigator_margin[1] = 20;
     _navigator_window_ratio = 4.5f;
     _navigator_vis = false;
-    _navigator.reset(new GraphicObjectNavigator());
+    _navigator.reset(new GraphicObjectNavigator(platfrom));
     const int min_size = int((std::min)(_width, _height)/_navigator_window_ratio);
     _navigator->set_navi_position(_width - min_size - _navigator_margin[0], _navigator_margin[1] , min_size, min_size);
 }
@@ -343,7 +343,10 @@ void RayCastScene::render() {
         // *. GPU compressor will use rc-canvas's result(RGBA->fliped RGB) as input.
         //-------------------------------------------------------------------------------//
         
-        //TODO CUDA (maybe do nothing)
+        //render navigator to rc-canvas in the end
+        if (_navigator_vis) {
+            _navigator->render_to_cuda_surface(_canvas->get_color_attach_texture()->get_cuda_resource());
+        }
     }
 
     set_dirty(false);

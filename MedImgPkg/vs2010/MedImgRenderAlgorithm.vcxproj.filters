@@ -369,5 +369,8 @@
     <CudaCompile Include="..\renderalgo\kernel\kernel_ray_casting.cu">
       <Filter>kernel</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\renderalgo\kernel\kernel_ray_tracing.cu">
+      <Filter>kernel</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

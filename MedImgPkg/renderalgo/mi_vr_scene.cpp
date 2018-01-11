@@ -158,8 +158,8 @@ void VRScene::initialize() {
             qualitys[0] = _compress_ld_quality;
             qualitys[1] = _compress_hd_quality;
 
-            _compressor->set_image(GPUCanvasPairPtr(new
-                GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
+            _compressor->set_image(GPUCanvasPairPtr(
+                new GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
         }
     }
 }
