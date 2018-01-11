@@ -10,6 +10,7 @@ public:
     explicit CudaTexture1D(UIDType uid);
     virtual ~CudaTexture1D();
     
+    virtual void finalize();
     virtual float memory_used() const;
 
     int get_length() const;
@@ -27,8 +28,6 @@ protected:
 
 private:
     int _length;
-    int _channel[4];
-    cudaChannelFormatKind _format;
 };
 
 MED_IMG_END_NAMESPACE

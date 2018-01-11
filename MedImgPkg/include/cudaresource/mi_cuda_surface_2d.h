@@ -10,6 +10,7 @@ public:
     explicit CudaSurface2D(UIDType uid);
     virtual ~CudaSurface2D();
 
+    virtual void finalize();
     virtual float memory_used() const;
 
     int get_width() const;

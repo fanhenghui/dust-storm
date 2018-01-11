@@ -41,8 +41,6 @@ protected:
 private:
     int _width;
     int _height;
-    int _channel[4];
-    cudaChannelFormatKind _format;
 
     //GL Interoperability
     cudaGraphicsResource_t _cuda_graphic_resource;

@@ -13,7 +13,7 @@ CudaSurfaceBase::CudaSurfaceBase(UIDType uid, const std::string& type) :
 }
 
 CudaSurfaceBase::~CudaSurfaceBase() {
-    finalize();
+
 }
 
 void CudaSurfaceBase::initialize() {
@@ -27,8 +27,18 @@ void CudaSurfaceBase::finalize() {
         CHECK_CUDA_ERROR(err);
         _d_array = nullptr;
     }
-    err = cudaDestroySurfaceObject(_surface_obj);
-    CHECK_CUDA_ERROR(err);
+    
+    if (0 != _surface_obj) {
+        err = cudaDestroySurfaceObject(_surface_obj);
+        CHECK_CUDA_ERROR(err);
+        _surface_obj = 0;
+    }
+    
+    _format = cudaChannelFormatKindNone;
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
 }
 
 void CudaSurfaceBase::get_channel(int(&channel)[4]) const {

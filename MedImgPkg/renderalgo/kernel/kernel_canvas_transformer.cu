@@ -16,11 +16,17 @@ __global__ void kernel_surface_2d_rgba8_flip_vertical_to_global_memory_rgb8(cuda
 
 extern "C"
 cudaError_t surface_2d_rgba8_flip_vertical_to_global_memory_rgb8(cudaSurfaceObject_t sur_rgba8, int width, int height, unsigned char* d_rgb_8) {
-    const int BLOCKDIM = 16;
-    dim3 block_dim(BLOCKDIM, BLOCKDIM);
-    dim3 grid_dim(width / BLOCKDIM, height / BLOCKDIM);
+    const int BLOCK_SIZE = 16;
+    dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != width) {
+        grid.x += 1;
+    }
+    if (grid.y * BLOCK_SIZE != height) {
+        grid.y += 1;
+    }
 
-    kernel_surface_2d_rgba8_flip_vertical_to_global_memory_rgb8 << <grid_dim, block_dim >> >(sur_rgba8, width, height, d_rgb_8);
+    kernel_surface_2d_rgba8_flip_vertical_to_global_memory_rgb8 << <grid, block>> >(sur_rgba8, width, height, d_rgb_8);
 
     return cudaThreadSynchronize();
 }

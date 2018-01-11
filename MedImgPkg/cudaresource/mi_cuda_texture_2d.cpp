@@ -9,7 +9,13 @@ CudaTexture2D::CudaTexture2D(UIDType uid) : CudaTextureBase(uid, "CudaTexture2D"
 }
 
 CudaTexture2D::~CudaTexture2D() {
+    finalize();
+}
 
+void CudaTexture2D::finalize() {
+    CudaTextureBase::finalize();
+    _width = 0;
+    _height = 0;
 }
 
 float CudaTexture2D::memory_used() const {

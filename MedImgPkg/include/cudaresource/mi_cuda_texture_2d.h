@@ -11,6 +11,7 @@ public:
     explicit CudaTexture2D(UIDType uid);
     virtual ~CudaTexture2D();
 
+    virtual void finalize();
     virtual float memory_used() const;
 
     int get_width() const;
@@ -30,8 +31,6 @@ protected:
 private:
     int _width;
     int _height;
-    int _channel[4];
-    cudaChannelFormatKind _format;
 };
 
 MED_IMG_END_NAMESPACE

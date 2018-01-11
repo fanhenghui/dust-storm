@@ -7,7 +7,15 @@ MED_IMG_BEGIN_NAMESPACE
 CudaSurface2D::CudaSurface2D(UIDType uid) : CudaSurfaceBase(uid, "CudaSurface2D"), _width(0), _height(0) {
 }
 
-CudaSurface2D::~CudaSurface2D() {}
+CudaSurface2D::~CudaSurface2D() {
+    finalize();
+}
+
+void CudaSurface2D::finalize() {
+    CudaSurfaceBase::finalize();
+    _width = 0;
+    _height = 0;
+}
 
 float CudaSurface2D::memory_used() const {
     return _width*_height*CudaUtils::get_component_byte(_channel) / 1024.0f;
@@ -45,7 +53,7 @@ int CudaSurface2D::load(int channel_x, int channel_y, int channel_z, int channel
         _width = width;
         _height = height;
         cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(channel_x, channel_y, channel_z, channel_w, format);
-        cudaError_t err = cudaMallocArray(&_d_array, &format_desc, width, height);
+        cudaError_t err = cudaMallocArray(&_d_array, &format_desc, width, height, cudaArraySurfaceLoadStore);
         if (err != cudaSuccess) {
             LOG_CUDA_ERROR(err);
             return -1;

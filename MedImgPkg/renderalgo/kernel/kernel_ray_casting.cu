@@ -232,8 +232,8 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     //fill shared array 
     uint local_thread = threadIdx.y * blockDim.x + threadIdx.x;
-    //fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
-    //__syncthreads();
+    fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
+    __syncthreads();
 
 
     if (x > width - 1 || y > height - 1) {
@@ -335,6 +335,12 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != width) {
+        grid.x += 1;
+    }
+    if (grid.y * BLOCK_SIZE != height) {
+        grid.y += 1;
+    }
     
     const int s_mem_size = get_s_array_size(ray_cast_info.label_level);
     int memcpy_step = s_mem_size / BLOCK_SIZE*BLOCK_SIZE;
@@ -355,6 +361,12 @@ cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t 
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != width) {
+        grid.x += 1;
+    }
+    if (grid.y * BLOCK_SIZE != height) {
+        grid.y += 1;
+    }
 
     const int s_mem_size = get_s_array_size(ray_cast_info.label_level);
     int memcpy_step = s_mem_size / BLOCK_SIZE*BLOCK_SIZE;

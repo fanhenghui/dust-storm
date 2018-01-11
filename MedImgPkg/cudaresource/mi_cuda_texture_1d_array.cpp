@@ -6,13 +6,11 @@
 MED_IMG_BEGIN_NAMESPACE
 
 CudaTexture1DArray::CudaTexture1DArray(UIDType uid, int array_length) :
-    CudaObject(uid, "CudaTexture1DArray"), _array_length(array_length) {
+    CudaObject(uid, "CudaTexture1DArray"), _length(0), _format(cudaChannelFormatKindNone), _array_length(array_length) {
     _channel[0] = 0;
     _channel[1] = 0;
     _channel[2] = 0;
     _channel[3] = 0;
-    _format = cudaChannelFormatKindNone;
-    _length = 0;
 }
 
 CudaTexture1DArray::~CudaTexture1DArray() {
@@ -28,6 +26,7 @@ void CudaTexture1DArray::finalize() {
     for (auto it = _tex_objs.begin(); it != _tex_objs.end(); ++it) {
         for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
             err = cudaDestroyTextureObject(it2->second);
+            it2->second = 0;
             CHECK_CUDA_ERROR(err);
         }
     }
@@ -35,10 +34,18 @@ void CudaTexture1DArray::finalize() {
 
     for (auto it = _cuda_arrays.begin(); it != _cuda_arrays.end(); ++it) {
         err = cudaFreeArray(it->second);
+        it->second = nullptr;
         CHECK_CUDA_ERROR(err);
     }
-
     _cuda_arrays.clear();
+
+    _length = 0;
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
+    _format = cudaChannelFormatKindNone;
+    _array_length =0;
 }
 
 float CudaTexture1DArray::memory_used() const {

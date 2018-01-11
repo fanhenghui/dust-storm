@@ -9,7 +9,12 @@ CudaTexture1D::CudaTexture1D(UIDType uid): CudaTextureBase(uid, "CudaTexture1D")
 }
 
 CudaTexture1D::~CudaTexture1D() {
+    finalize();
+}
 
+void CudaTexture1D::finalize() {
+    CudaTextureBase::finalize();
+    _length = 0;
 }
 
 float CudaTexture1D::memory_used() const {

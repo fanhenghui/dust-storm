@@ -93,14 +93,8 @@ namespace {
     }
 }
 
-CudaGLTexture2D::CudaGLTexture2D(UIDType uid) : CudaTextureBase(uid, "CudaGLTexture2D"), _cuda_graphic_resource(nullptr){
-    _channel[0] = 0;
-    _channel[1] = 0;
-    _channel[2] = 0;
-    _channel[3] = 0;
-    _format = cudaChannelFormatKindNone;
-    _width = 0;
-    _height = 0;
+CudaGLTexture2D::CudaGLTexture2D(UIDType uid) : CudaTextureBase(uid, "CudaGLTexture2D"), 
+    _width(0), _height(0), _cuda_graphic_resource(nullptr), _register_flag(cudaGraphicsRegisterFlagsNone){
 }
 
 CudaGLTexture2D::~CudaGLTexture2D() {
@@ -108,11 +102,30 @@ CudaGLTexture2D::~CudaGLTexture2D() {
 }
 
 void CudaGLTexture2D::finalize() {
+    //------------------------------------------------------------//
+    //note don't call base's finalize(can't free mapped cuda array)
+    //------------------------------------------------------------//
+    cudaError_t err = cudaSuccess;
     if (_cuda_graphic_resource) {
-        cudaError_t err = cudaGraphicsUnregisterResource(_cuda_graphic_resource);
+        err = cudaGraphicsUnregisterResource(_cuda_graphic_resource);
         _cuda_graphic_resource = nullptr;
         CHECK_CUDA_ERROR(err);
     }
+
+    for (auto it = _tex_objs.begin(); it != _tex_objs.end(); ++it) {
+        err = cudaDestroyTextureObject(it->second);
+        CHECK_CUDA_ERROR(err);
+    }
+    _tex_objs.clear();
+
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
+    _format = cudaChannelFormatKindNone;
+    _width = 0;
+    _height = 0;
+    _d_array = nullptr;
 }
 
 float CudaGLTexture2D::memory_used() const {
@@ -177,22 +190,7 @@ int CudaGLTexture2D::register_gl_texture(std::shared_ptr<GLTexture2D> tex, cudaG
 }
 
 int CudaGLTexture2D::unregister_gl_texture() {
-    if (_cuda_graphic_resource) {
-        cudaError_t err = cudaGraphicsUnregisterResource(_cuda_graphic_resource);
-        _cuda_graphic_resource = nullptr;
-        CHECK_CUDA_ERROR(err);
-        return -1;
-    }
-
-    _channel[0] = 0;
-    _channel[1] = 0;
-    _channel[2] = 0;
-    _channel[3] = 0;
-    _format = cudaChannelFormatKindNone;
-    _width = 0;
-    _height = 0;
-    _d_array = nullptr;
-
+    this->finalize();
     return 0;
 }
 

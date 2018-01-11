@@ -13,7 +13,7 @@ CudaTextureBase::CudaTextureBase(UIDType uid, const std::string& type):
 }
 
 CudaTextureBase::~CudaTextureBase() {
-    finalize();
+
 }
 
 void CudaTextureBase::initialize() {
@@ -27,11 +27,19 @@ void CudaTextureBase::finalize() {
         CHECK_CUDA_ERROR(err);
         _d_array = nullptr;
     }
+
     for (auto it = _tex_objs.begin(); it != _tex_objs.end(); ++it) {
         err = cudaDestroyTextureObject(it->second);
+        it->second = 0;
         CHECK_CUDA_ERROR(err);
     }
     _tex_objs.clear();
+
+    _channel[0] = 0;
+    _channel[1] = 0;
+    _channel[2] = 0;
+    _channel[3] = 0;
+    _format = cudaChannelFormatKindNone;
 }
 
 void CudaTextureBase::get_channel(int(&channel)[4]) const {

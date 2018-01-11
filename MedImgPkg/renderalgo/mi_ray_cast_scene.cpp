@@ -176,7 +176,9 @@ void RayCastScene::set_display_size(int width, int height) {
 
 void RayCastScene::render_to_back() {
     if (CUDA_BASE == _gpu_platform) {
-        //kernel memcpy ray-casting result back to FBO color-attachment0
+        //-------------------------------------------------------------//
+        // kernel memcpy ray-casting result back to FBO color-attachment0
+        // just for test
         CudaSurface2DPtr canvas_color0 = _canvas->get_color_attach_texture()->get_cuda_resource();
         std::unique_ptr<unsigned char[]> rgba(new unsigned char[_width * _height * 4]);
         std::unique_ptr<unsigned char[]> rgb(new unsigned char[_width * _height * 3]);
@@ -260,8 +262,6 @@ void RayCastScene::render() {
     //////////////////////////////////////////////////////////////////////////
     // 1 Ray casting
     _entry_exit_points->calculate_entry_exit_points();
-    //std::cout << "width: " << _width << ", height: " << _height;
-    _entry_exit_points->debug_output_entry_points("d:/temp/entry_points.rgb");
     _ray_caster->render();
 
     //////////////////////////////////////////////////////////////////////////
