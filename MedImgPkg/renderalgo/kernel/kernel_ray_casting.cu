@@ -181,7 +181,7 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
     }
 }
 
-__device__ float4 kernel_ray_cast(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos, 
+__device__ float4 kernel_ray_cast_dvr(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos, 
     float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
     float4 integral_color = input_color;
     float3 sample_pos;
@@ -194,6 +194,169 @@ __device__ float4 kernel_ray_cast(CudaVolumeInfos* __restrict__ volume_infos, Cu
             break;
         }
     }
+    return integral_color;
+}
+
+__device__ float4 kernel_ray_cast_mip(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos,
+    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color, float* mip_gray, float3* mip_pos) {
+    float4 integral_color = input_color;
+    float3 sample_pos, sample_norm;
+    int label = 0;
+    float max_gray = -65535.0f;
+    float3 max_pos;
+    int max_label = 0;
+    float gray = 0.0f;
+    for (float i = start_step; i < end_step; i += 1.0f) {
+        sample_pos = ray_start + ray_dir*i;
+        sample_norm = sample_pos*volume_infos->dim_r;
+
+        label = 0;
+        if (1 == ray_cast_infos->mask_mode) {
+            label = access_mask_nearest(volume_infos, sample_norm);
+        } else if (0 == ray_cast_infos->mask_mode) {
+            label = 0;
+        } else {
+            label = access_mask_linear(volume_infos, sample_norm);
+        }
+
+        if (label == 0 && 0 != ray_cast_infos->mask_mode) {
+            continue;
+        }
+
+        gray = tex3D<float>(volume_infos->volume_tex, sample_norm.x, sample_norm.y, sample_norm.z);
+        if (gray > max_gray) {
+            max_gray = gray;
+            max_pos = sample_pos;
+            max_label = label;
+        }
+    }
+
+    if (max_gray < -65535.0f + INF) {
+        *mip_gray = 0;
+        *mip_pos = make_float3(0.0f);
+    } else {
+        *mip_gray = max_gray;
+        *mip_pos = max_pos;
+    }
+
+    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
+    float ww = s_wl_array[0];
+    float wl = s_wl_array[1];
+    gray = (*mip_gray - wl + ww*0.5f) / ww;
+
+    //TODO 
+    //1 blend with graphic
+    //2 mip pos and mip label
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
+
+    return integral_color;
+}
+
+__device__ float4 kernel_ray_cast_minip(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos,
+    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color, float* mip_gray, float3* mip_pos) {
+    float4 integral_color = input_color;
+    float3 sample_pos, sample_norm;
+    int label = 0;
+    float min_gray = 65535.0f;
+    float3 min_pos;
+    int min_label = 0;
+    float gray = 0.0f;
+    for (float i = start_step; i < end_step; i += 1.0f) {
+        sample_pos = ray_start + ray_dir*i;
+        sample_norm = sample_pos*volume_infos->dim_r;
+
+        label = 0;
+        if (1 == ray_cast_infos->mask_mode) {
+            label = access_mask_nearest(volume_infos, sample_norm);
+        }
+        else if (0 == ray_cast_infos->mask_mode) {
+            label = 0;
+        }
+        else {
+            label = access_mask_linear(volume_infos, sample_norm);
+        }
+
+        if (label == 0 && 0 != ray_cast_infos->mask_mode) {
+            continue;
+        }
+
+        gray = tex3D<float>(volume_infos->volume_tex, sample_norm.x, sample_norm.y, sample_norm.z);
+        if (gray < min_gray) {
+            min_gray = gray;
+            min_pos = sample_pos;
+            min_label = label;
+        }
+    }
+
+    if (min_gray > 65535.0f - INF) {
+        *mip_gray = 0;
+        *mip_pos = make_float3(0.0f);
+    }
+    else {
+        *mip_gray = min_gray;
+        *mip_pos = min_pos;
+    }
+
+    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
+    float ww = s_wl_array[0];
+    float wl = s_wl_array[1];
+    gray = (*mip_gray - wl + ww*0.5f) / ww;
+
+    //TODO 
+    //1 blend with graphic
+    //2 mip pos and mip label
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
+
+    return integral_color;
+}
+
+__device__ float4 kernel_ray_cast_average(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos,
+    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color, float* mip_gray) {
+    float4 integral_color = input_color;
+    float3 sample_pos, sample_norm;
+    int label = 0;
+    float gray_sum = 0.0f;
+    float gray_count = 0.0f;
+    float gray = 0.0f;
+    for (float i = start_step; i < end_step; i += 1.0f) {
+        sample_pos = ray_start + ray_dir*i;
+        sample_norm = sample_pos*volume_infos->dim_r;
+
+        label = 0;
+        if (1 == ray_cast_infos->mask_mode) {
+            label = access_mask_nearest(volume_infos, sample_norm);
+        }
+        else if (0 == ray_cast_infos->mask_mode) {
+            label = 0;
+        }
+        else {
+            label = access_mask_linear(volume_infos, sample_norm);
+        }
+
+        if (label == 0 && 0 != ray_cast_infos->mask_mode) {
+            continue;
+        }
+
+        gray = tex3D<float>(volume_infos->volume_tex, sample_norm.x, sample_norm.y, sample_norm.z);
+        gray_sum += gray;
+        gray_count += 1.0f;
+    }
+
+    if (gray_count > 0.0f) {
+        *mip_gray = gray_sum / gray_count;
+    } else {
+        *mip_gray = 0.0f;
+    }
+
+    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
+    float ww = s_wl_array[0];
+    float wl = s_wl_array[1];
+    gray = (*mip_gray - wl + ww*0.5f) / ww;
+
+    //TODO 
+    //1 blend with graphic
+    //2 mip pos and mip label
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
 
     return integral_color;
 }
@@ -273,12 +436,24 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
         return;
     }
 
-    //__syncthreads();
-
     float4 input_color = make_float4(0.0f);
-    float4 integral_color = kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, input_color);
-
-    //__syncthreads();
+    float4 integral_color = make_float4(0.0f);
+    float  mip_gray = 0.0f;
+    float3 mip_pos = make_float3(0.0f);
+    if (0 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_dvr(&volume_infos, &ray_cast_infos, 
+            ray_dir, ray_start, start_step, end_step, input_color);
+    } else if (1 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_mip(&volume_infos, &ray_cast_infos, 
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+    } else if (2 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_minip(&volume_infos, &ray_cast_infos, 
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+    } else if (3 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos, 
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
+    }
+     
     clamp(integral_color, 0.0f, 1.0f);
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255 , integral_color.z * 255, 255);
@@ -302,8 +477,8 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     uint idx = y*width + x;
 
     float4 entry, exit;
-    surf2Dread(&entry, entry_surf, x * 4, y);
-    surf2Dread(&exit, exit_surf, x * 4, y);
+    surf2Dread(&entry, entry_surf, x * 4 * 4, y);
+    surf2Dread(&exit, exit_surf, x * 4 * 4, y);
 
     float3 entry3 = make_float3(entry);
     float3 exit3 = make_float3(exit);
@@ -313,8 +488,8 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
 
     /////////////////////////////////////////
     //debug
-    //uchar4 rgba_entry_exit(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
-    //surf2DWrite(rgba_entry_exit, canvas, x * 4, y);
+    //uchar4 rgba_entry_exit= make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
+    //surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
     //return;
     /////////////////////////////////////////
 
@@ -324,12 +499,24 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
         return;
     }
 
-    //__syncthreads();
-
     float4 input_color = make_float4(0.0f);
-    float4 integral_color = kernel_ray_cast(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, input_color);
+    float4 integral_color = make_float4(0.0f);
+    float  mip_gray = 0.0f;
+    float3 mip_pos = make_float3(0.0f);
+    if (0 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_dvr(&volume_infos, &ray_cast_infos,
+            ray_dir, ray_start, start_step, end_step, input_color);
+    } else if (1 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_mip(&volume_infos, &ray_cast_infos,
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+    } else if (2 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_minip(&volume_infos, &ray_cast_infos,
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+    } else if (3 == ray_cast_infos.composite_mode) {
+        integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos,
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
+    }
 
-    //__syncthreads();
     clamp(integral_color, 0.0f, 1.0f);
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255, integral_color.z * 255, 255);

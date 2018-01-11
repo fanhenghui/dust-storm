@@ -136,7 +136,7 @@ void RayCastScene::initialize() {
             _res_shield.add_shield<GLTexture2D>(_scene_depth_attach);
 
             //-----------------------------------------------------------//
-            //initialize others
+            // initialize others
             _canvas->initialize();
             _entry_exit_points->initialize();
             _navigator->initialize();

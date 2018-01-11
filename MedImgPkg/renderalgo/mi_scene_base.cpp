@@ -26,7 +26,7 @@ SceneBase::SceneBase(GPUPlatform platfrom) :
     _compress_ld_quality  = 15;
     _gpujpeg_encoder_dirty = false;
 
-    
+    _compressor.reset(new GPUImgCompressor(platfrom));
 }
 
 SceneBase::SceneBase(GPUPlatform platfrom, int width, int height) :

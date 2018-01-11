@@ -1,17 +1,21 @@
 #include "mi_mpr_scene.h"
 
-#include "io/mi_configure.h"
-
 #include "arithmetic/mi_arithmetic_utils.h"
 
 #include "io/mi_image_data.h"
 
-#include "renderalgo/mi_camera_calculator.h"
-#include "renderalgo/mi_camera_interactor.h"
-#include "renderalgo/mi_mpr_entry_exit_points.h"
-#include "renderalgo/mi_ray_caster.h"
+#include "glresource/mi_gl_utils.h"
+#include "cudaresource/mi_cuda_surface_2d.h"
 
+#include "mi_camera_calculator.h"
+#include "mi_camera_interactor.h"
+#include "mi_mpr_entry_exit_points.h"
+#include "mi_ray_caster.h"
+#include "mi_ray_caster_canvas.h"
 #include "mi_volume_infos.h"
+#include "mi_graphic_object_navigator.h"
+#include "mi_gpu_image_compressor.h"
+#include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -34,8 +38,24 @@ void MPRScene::initialize() {
     if (GL_BASE == _gpu_platform) {
         RayCastScene::initialize();
     } else {
-        //TODO CUDA
-        //rewrite scene-base initialize(without scene FBO)
+        //-----------------------------------------------------------//
+        // CUDA based MPR needn't scene FBO(without graphic)
+
+        //-----------------------------------------------------------//
+        // initialize others
+        _canvas->initialize();
+        _entry_exit_points->initialize();
+        _navigator->initialize();
+
+        //-------------------------------//
+        // GPU compressor (set rc-canvas's color-attach-0 as input)
+        //-------------------------------//
+        std::vector<int> qualitys(2);
+        qualitys[0] = _compress_ld_quality;
+        qualitys[1] = _compress_hd_quality;
+
+        _compressor->set_image(GPUCanvasPairPtr(new
+            GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
     }
 }
 
@@ -43,8 +63,20 @@ void MPRScene::render_to_back() {
     if (GL_BASE == _gpu_platform) {
         SceneBase::render_to_back();
     } else {
-        //TODO CUDA
-        //memcpy rc-canvas result to host, and draw pixel to BACK
+        //-------------------------------------------------------------//
+        // memcpy rc-canvas result to host, and draw pixel to BACK
+        // just for test
+        CudaSurface2DPtr canvas_color0 = _canvas->get_color_attach_texture()->get_cuda_resource();
+        std::unique_ptr<unsigned char[]> rgba(new unsigned char[_width * _height * 4]);
+
+        if (0 != canvas_color0->download(_width*_height * 4, rgba.get())) {
+            MI_RENDERALGO_LOG(MI_ERROR) << "download cuda rc result failed when render to back.";
+            return;
+        }
+
+        CHECK_GL_ERROR;
+        glDrawPixels(_width, _height, GL_RGBA, GL_UNSIGNED_BYTE, rgba.get());
+        CHECK_GL_ERROR;
     }
 }
 

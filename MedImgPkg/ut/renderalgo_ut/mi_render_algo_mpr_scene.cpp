@@ -51,6 +51,7 @@ int _height = 616;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
+GPUPlatform _gpu_platform = CUDA_BASE;
 
 std::vector<std::string> GetFiles() {
 #ifdef WIN32
@@ -74,7 +75,7 @@ void Init() {
     DICOMLoader loader;
     loader.load_series(files, _volume_data, _data_header);
 
-    _volumeinfos.reset(new VolumeInfos(GPU_BASE, GL_BASE));
+    _volumeinfos.reset(new VolumeInfos(GPU_BASE, _gpu_platform));
     _volumeinfos->set_data_header(_data_header);
     _volumeinfos->set_volume(_volume_data);
 
@@ -86,7 +87,7 @@ void Init() {
     mask_data->mem_allocate();
     _volumeinfos->set_mask(mask_data);
 
-    _scene.reset(new MPRScene(_width, _height, GPU_BASE, GL_BASE));
+    _scene.reset(new MPRScene(_width, _height, GPU_BASE, _gpu_platform));
     const float PRESET_CT_LUNGS_WW = 1500;
     const float PRESET_CT_LUNGS_WL = -400;
 

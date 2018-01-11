@@ -9,11 +9,15 @@
 #include "arithmetic/mi_point2.h"
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3f.h"
+#include "arithmetic/mi_cuda_graphic.h"
+
 #include "io/mi_image_data.h"
 
 #include "glresource/mi_gl_program.h"
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_utils.h"
+
+#include "cudaresource/mi_cuda_surface_2d.h"
 
 #include "mi_camera_calculator.h"
 #include "mi_shader_collection.h"
@@ -21,6 +25,10 @@
 #include "mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
+
+extern "C"
+cudaError_t calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry_surf, cudaSurfaceObject_t exit_surf,
+    int width, int height, mat4 mat_mvp_inv, float3 volume_dim, float thickness, float3 ray_dir);
 
 namespace {
 // Return true if out
@@ -376,9 +384,40 @@ void MPREntryExitPoints::cal_entry_exit_points_gl() {
     }
 }
 
-void MPREntryExitPoints::cal_entry_exit_points_cuda()
-{
+void MPREntryExitPoints::cal_entry_exit_points_cuda() {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_entry_points_texture);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_exit_points_texture);
+    if (!_exit_points_texture->cuda() || !_exit_points_texture->cuda()) {
+        RENDERALGO_THROW_EXCEPTION("invalid GPU platform");
+    }
+    RENDERALGO_CHECK_NULL_EXCEPTION(_camera);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_camera_calculator);
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
 
+    CudaSurface2DPtr entry_surface = _entry_points_texture->get_cuda_resource();
+    CudaSurface2DPtr exit_surface = _exit_points_texture->get_cuda_resource();
+
+    const float3 dim_vector = make_float3(
+        (float)_volume_data->_dim[0],
+        (float)_volume_data->_dim[1],
+        (float)_volume_data->_dim[2]);
+
+    const Matrix4 mat_v2w = _camera_calculator->get_volume_to_world_matrix();
+    const Matrix4 mat_vp = _camera->get_view_projection_matrix();
+    const Matrix4 mat_mvp_inv = (mat_vp * mat_v2w).get_inverse();
+    const mat4 mat_mpt_inv4 = matrix4_to_mat4(mat_mvp_inv);
+
+    Vector3 view_dir = _camera->get_look_at() - _camera->get_eye();
+    view_dir = mat_v2w.get_transpose().transform(view_dir);
+    view_dir.normalize();
+    const float3 ray_dir = make_float3((float)view_dir.x, (float)view_dir.y, (float)view_dir.z);
+
+    cudaError_t err = calculate_mpr_entry_exit_points(entry_surface->get_object(), exit_surface->get_object(),
+        _width, _height, mat_mpt_inv4, dim_vector, _thickness, ray_dir);
+    if (err != cudaSuccess) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "calculate mpr entry exit points catch cuda error: " << err << ", " << cudaGetErrorString(err);
+        RENDERALGO_THROW_EXCEPTION("calculate mpr entry exit points failed.");
+    }
 }
 
 void MPREntryExitPoints::initialize() {

@@ -72,8 +72,8 @@ void EntryExitPoints::initialize() {
 
         CHECK_GL_ERROR;
     } else {
-        _entry_points_texture->get_cuda_resource()->load(16,16,16,16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
-        _exit_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
+        _entry_points_texture->get_cuda_resource()->load(32, 32, 32, 32, cudaChannelFormatKindFloat, _width, _height, nullptr);
+        _exit_points_texture->get_cuda_resource()->load(32, 32, 32, 32, cudaChannelFormatKindFloat, _width, _height, nullptr);
     }
     _has_init = true;
 
@@ -119,9 +119,8 @@ void EntryExitPoints::set_display_size(int width, int height) {
                 GL_TEXTURE_2D, _exit_points_texture->get_gl_resource(), GL_CLAMP_TO_BORDER, GL_LINEAR,
                 GL_RGBA32F, _width, _height, 0, GL_RGBA, GL_FLOAT, nullptr);
         } else {
-            //TODO CUDA for MPR
-            _entry_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
-            _exit_points_texture->get_cuda_resource()->load(16, 16, 16, 16, cudaChannelFormatKindUnsigned, _width, _height, nullptr);
+            _entry_points_texture->get_cuda_resource()->load(32, 32, 32, 32, cudaChannelFormatKindFloat, _width, _height, nullptr);
+            _exit_points_texture->get_cuda_resource()->load(32, 32, 32, 32, cudaChannelFormatKindFloat, _width, _height, nullptr);
         }
     }
 }
@@ -221,9 +220,10 @@ void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
             _entry_points_texture->get_gl_resource()->unbind();
             FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 3);
         } else {
-            std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 4]);
+            //TODO CUDA FLOAT4
+            /*std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 4]);
             _entry_points_texture->get_cuda_resource()->download(_width*_height*4, rgb_array.get());
-            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 4);
+            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 4);*/
         }
     }
 }
