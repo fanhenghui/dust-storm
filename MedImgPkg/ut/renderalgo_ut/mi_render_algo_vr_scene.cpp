@@ -19,6 +19,8 @@
 #include "glresource/mi_gl_time_query.h"
 #include "glresource/mi_gl_utils.h"
 
+#include "cudaresource/mi_cuda_resource_manager.h"
+
 #include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_camera_interactor.h"
 #include "renderalgo/mi_color_transfer_function.h"
@@ -55,8 +57,8 @@ int _wl;
 
 std::shared_ptr<GLTimeQuery> _time_query;
 
-int _width = 1025;
-int _height = 1071;
+int _width = 1024;
+int _height = 1024;
 int _iButton = -1;
 Point2 _ptPre;
 int _iTestCode = 0;
@@ -339,6 +341,15 @@ void Keyboard(unsigned char key, int x, int y) {
         break;
     }
 
+    case 'i': {
+        std::cout << "\n<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
+        std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
+        std::cout << "<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
+        std::cout << "\n<><><><><><><><><><> CUDA RESOURCE <><><><><><><><><><>\n";
+        std::cout << CudaResourceManager::instance()->get_specification("\n");
+        std::cout << "<><><><><><><><><><> CUDA RESOURCE <><><><><><><><><><>\n";
+        break;
+    }
     case 'r': {
         _scene.reset(new VRScene(_width, _height, GPU_BASE, _gpu_platform));
         const float PRESET_CT_LUNGS_WW = 1500;
@@ -445,7 +456,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
@@ -524,7 +535,7 @@ int TE_VRScene(int argc, char* argv[]) {
         glutInitWindowPosition(0, 0);
         glutInitWindowSize(_width, _height);
 
-        glutCreateWindow("Test GL resource");
+        glutCreateWindow("Test GL&CUDA VR Scene");
 
         if (GLEW_OK != glewInit()) {
             MI_RENDERALGO_LOG(MI_FATAL) << "Init glew failed!\n";

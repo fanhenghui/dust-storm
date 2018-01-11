@@ -169,6 +169,23 @@ static void display() {
     glutSwapBuffers();
 }
 
+static void keyboard(unsigned char key, int x, int y) {
+    switch (key)
+    {
+    case 'i': {
+        std::cout << "\n<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
+        std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
+        std::cout << "<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
+        std::cout << "\n<><><><><><><><><><> CUDA RESOURCE <><><><><><><><><><>\n";
+        std::cout << CudaResourceManager::instance()->get_specification("\n");
+        std::cout << "<><><><><><><><><><> CUDA RESOURCE <><><><><><><><><><>\n";
+        break;
+    }
+    default:
+break;
+    }
+}
+
 int TE_Texture(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
@@ -183,6 +200,7 @@ int TE_Texture(int argc, char* argv[]) {
     }
 
     glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
 
     initialize();
 

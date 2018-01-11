@@ -228,7 +228,8 @@ int GLUtils::get_component_byte(GLenum format, GLenum type) {
     case GL_GREEN:
     case GL_BLUE:
     case GL_ALPHA:
-    case GL_LUMINANCE: {
+    case GL_LUMINANCE:
+    case GL_DEPTH_COMPONENT: {
         break;
     }
     case GL_RGB: {
@@ -254,16 +255,19 @@ int GLUtils::get_component_byte(GLenum format, GLenum type) {
     case GL_UNSIGNED_SHORT:
     case GL_SHORT: {
         byte *=2;
+        break;
     }
 
     case GL_FLOAT:
     case GL_UNSIGNED_INT:
     case GL_INT: {
         byte *= 4;
+        break;
     }
 
     case GL_DOUBLE:{
         byte *= 8;
+        break;
     }
 
     default:

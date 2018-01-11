@@ -1,5 +1,7 @@
 #include "mi_cuda_resource_manager.h"
 
+#include "util/mi_uid.h"
+
 #include "mi_cuda_texture_1d.h"
 #include "mi_cuda_texture_2d.h"
 #include "mi_cuda_texture_3d.h"
@@ -13,7 +15,7 @@ MED_IMG_BEGIN_NAMESPACE
 CudaResourceManager* CudaResourceManager::_instance = nullptr;
 boost::mutex CudaResourceManager::_mutex;
 
-CudaResourceManager::CudaResourceManager() {
+CudaResourceManager::CudaResourceManager():_uid_generator(new UIDGenerator()) {
 }
 
 CudaResourceManager::~CudaResourceManager() {
@@ -40,7 +42,7 @@ void CudaResourceManager::release() {
 }
 
 CudaGlobalMemoryPtr CudaResourceManager::create_global_memory(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaGlobalMemoryPtr ptr(new CudaGlobalMemory(uid));
     ptr->set_description(desc);
     _record_global_memory.insert(uid, ptr);
@@ -48,7 +50,7 @@ CudaGlobalMemoryPtr CudaResourceManager::create_global_memory(const std::string&
 }
 
 CudaTexture1DPtr CudaResourceManager::create_cuda_texture_1d(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaTexture1DPtr ptr(new CudaTexture1D(uid));
     ptr->set_description(desc);
     _record_tex_1d.insert(uid, ptr);
@@ -56,7 +58,7 @@ CudaTexture1DPtr CudaResourceManager::create_cuda_texture_1d(const std::string& 
 }
 
 CudaTexture2DPtr CudaResourceManager::create_cuda_texture_2d(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaTexture2DPtr  ptr(new CudaTexture2D(uid));
     ptr->set_description(desc);
     _record_tex_2d.insert(uid, ptr);
@@ -64,7 +66,7 @@ CudaTexture2DPtr CudaResourceManager::create_cuda_texture_2d(const std::string& 
 }
 
 CudaTexture3DPtr CudaResourceManager::create_cuda_texture_3d(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaTexture3DPtr ptr(new CudaTexture3D(uid));
     ptr->set_description(desc);
     _record_tex_3d.insert(uid, ptr);
@@ -72,7 +74,7 @@ CudaTexture3DPtr CudaResourceManager::create_cuda_texture_3d(const std::string& 
 }
 
 CudaGLTexture2DPtr CudaResourceManager::create_cuda_gl_texture_2d(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaGLTexture2DPtr ptr(new CudaGLTexture2D(uid));
     ptr->set_description(desc);
     _record_gl_tex_2d.insert(uid, ptr);
@@ -80,7 +82,7 @@ CudaGLTexture2DPtr CudaResourceManager::create_cuda_gl_texture_2d(const std::str
 }
 
 CudaSurface2DPtr CudaResourceManager::create_cuda_surface_2d(const std::string& desc) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaSurface2DPtr ptr(new CudaSurface2D(uid));
     ptr->set_description(desc);
     _record_surface_2d.insert(uid, ptr);
@@ -88,7 +90,7 @@ CudaSurface2DPtr CudaResourceManager::create_cuda_surface_2d(const std::string& 
 }
 
 CudaTexture1DArrayPtr CudaResourceManager::create_cuda_texture_1d_array(const std::string& desc, int length) {
-    UIDType uid = 0;
+    UIDType uid = _uid_generator->tick();
     CudaTexture1DArrayPtr ptr(new CudaTexture1DArray(uid, length));
     ptr->set_description(desc);
     _record_texture_1d_array.insert(uid, ptr);

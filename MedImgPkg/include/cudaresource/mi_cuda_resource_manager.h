@@ -17,6 +17,7 @@ class CudaTexture2D;
 class CudaTexture3D;
 class CudaGLTexture2D;
 class CudaGlobalMemory;
+class UIDGenerator;
 
 template<class T>
 class CudaResoueceRecord {
@@ -120,6 +121,8 @@ private:
     CudaResoueceRecord<CudaGLTexture2D>      _record_gl_tex_2d;
     CudaResoueceRecord<CudaSurface2D>        _record_surface_2d;
     CudaResoueceRecord<CudaTexture1DArray>   _record_texture_1d_array;
+
+    std::unique_ptr<UIDGenerator> _uid_generator;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CudaResourceManager);    

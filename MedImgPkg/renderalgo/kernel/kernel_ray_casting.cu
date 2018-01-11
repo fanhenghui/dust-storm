@@ -144,14 +144,14 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
 
     int label = 0;
     if (1 == ray_cast_infos->mask_mode) {
-        label = access_mask_nearest(volume_infos, sample_pos);
+        label = access_mask_nearest(volume_infos, sample_norm);
     } else if (0 == ray_cast_infos->mask_mode) {
         label = 0;
     } else {
-        label = access_mask_linear(volume_infos, sample_pos);
+        label = access_mask_linear(volume_infos, sample_norm);
     }
 
-    if (label == 0) {
+    if (label == 0 && 0 != ray_cast_infos->mask_mode) {
         return;
     }
 
@@ -166,6 +166,7 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
     //gray = clamp(gray,0.0f,1.0f);
     cudaTextureObject_t* color_opacity_texture_array = get_s_color_opacity_texture_array(ray_cast_infos->label_level);
     float4 color_ori = tex1D<float4>(color_opacity_texture_array[label], gray);
+    
     float alpha;
     if (color_ori.w > 0.0f) {
         if (1 == ray_cast_infos->shading_mode) {
@@ -223,6 +224,14 @@ __device__ void fill_shared_array(int thread_idx, void* d_mapped_array, int size
             dst[i] = src[i];
         }
     }
+
+    /*if (thread_idx == 0) {
+        char* dst = (char*)s_array;
+        char* src = (char*)d_mapped_array;
+        for (int i = 0; i < size; ++i) {
+            dst[i] = src[i];
+        }
+    }*/
 }
 
 __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,
@@ -252,10 +261,10 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     /////////////////////////////////////////
     //debug
-    float4 debug_color = entry;
-    uchar4 rgba_entry_exit = make_uchar4(debug_color.x / volume_infos.dim.x * 255, debug_color.y / volume_infos.dim.y * 255, debug_color.z / volume_infos.dim.z * 255, 255);
-    surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
-    return;
+    //float4 debug_color = entry;
+    //uchar4 rgba_entry_exit = make_uchar4(debug_color.x / volume_infos.dim.x * 255, debug_color.y / volume_infos.dim.y * 255, debug_color.z / volume_infos.dim.z * 255, 255);
+    //surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
+    //return;
     /////////////////////////////////////////
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
@@ -330,8 +339,6 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
 extern "C"
 cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,
     CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas) {
-    //1 launch ray cast kernel
-
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
@@ -343,8 +350,8 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
     }
     
     const int s_mem_size = get_s_array_size(ray_cast_info.label_level);
-    int memcpy_step = s_mem_size / BLOCK_SIZE*BLOCK_SIZE;
-    if (memcpy_step * BLOCK_SIZE * BLOCK_SIZE != s_mem_size) {
+    int memcpy_step = s_mem_size / (BLOCK_SIZE*BLOCK_SIZE);
+    if (memcpy_step * (BLOCK_SIZE*BLOCK_SIZE) != s_mem_size) {
         memcpy_step += 1;
     }
 
@@ -356,8 +363,6 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
 extern "C"
 cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int width, int height,
     CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas) {
-    //1 launch ray cast kernel
-
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
