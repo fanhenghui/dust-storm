@@ -7,7 +7,7 @@ __global__ void kernel_surface_2d_rgba8_flip_vertical_to_global_memory_rgb8(cuda
     if (x < width && y < height) {
         uchar4 rgba;
         surf2Dread(&rgba, sur_rgba8, x * 4, y);
-        unsigned int idx = (height - y) * width + x;
+        unsigned int idx = (height - y - 1) * width + x;
         d_rgb_8[idx * 3] = rgba.x;
         d_rgb_8[idx * 3 + 1] = rgba.y;
         d_rgb_8[idx * 3 + 2] = rgba.z;

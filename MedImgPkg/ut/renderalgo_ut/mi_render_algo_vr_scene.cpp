@@ -300,25 +300,28 @@ void Display() {
          glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
         //_scene->set_downsample(true);
-//        _scene->download_image_buffer();
-//        //_scene->set_downsample(false);
-//
-//        CHECK_GL_ERROR;
-//        _scene->swap_image_buffer();
-//        unsigned char* buffer = nullptr;
-//        int buffer_size = 0;
-//
-//        CHECK_GL_ERROR;
-//
-//        _scene->get_image_buffer(buffer, buffer_size);
-//
-//        CHECK_GL_ERROR;
-//
-//#ifdef WIN32
-//        FileUtil::write_raw("D:/temp/output_ut.jpeg", buffer, buffer_size);
-//#else
-//        FileUtil::write_raw("/home/wangrui22/data/output_ut.jpeg", buffer, buffer_size);
-//#endif
+        _scene->download_image_buffer();
+        //_scene->set_downsample(false);
+
+        CHECK_GL_ERROR;
+        _scene->swap_image_buffer();
+        unsigned char* buffer = nullptr;
+        int buffer_size = 0;
+
+        CHECK_GL_ERROR;
+
+        _scene->get_image_buffer(buffer, buffer_size);
+
+        CHECK_GL_ERROR;
+    
+        
+        const std::string jpeg_file_name = GL_BASE == _gpu_platform ? "output_ut_gl.jpeg" : "output_ut_cuda.jpeg";
+
+#ifdef WIN32
+        FileUtil::write_raw("D:/temp/" + jpeg_file_name, buffer, buffer_size);
+#else
+        FileUtil::write_raw("/home/wangrui22/data" + jpeg_file_name, buffer, buffer_size);
+#endif
          /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
          ", buffer size: " << buffer_size;*/
 
@@ -476,9 +479,9 @@ void MouseClick(int button, int status, int x, int y) {
 
     if (status == GLUT_DOWN) {
         _scene->set_expected_fps(100);
-        _scene->set_downsample(true);
+        //_scene->set_downsample(true);
     } else if (status == GLUT_UP) {
-        _scene->set_downsample(false);
+        //_scene->set_downsample(false);
     }
 
     _ptPre = Point2(x, y);

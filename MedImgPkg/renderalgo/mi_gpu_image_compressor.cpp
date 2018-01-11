@@ -113,7 +113,9 @@ int GPUImgCompressor::set_image(GPUCanvasPairPtr canvas, const std::vector<int>&
             //create gpujpeg's texture to bind GL texture
             gpujpeg_opengl_texture* gpujpeg_texture = gpujpeg_opengl_texture_register(tex->get_id(), GPUJPEG_OPENGL_TEXTURE_READ);
             // create encoder
+            CHECK_LAST_CUDA_ERROR
             gpujpeg_encoder* encoder = gpujpeg_encoder_create(&params, &image_param);
+            CHECK_LAST_CUDA_ERROR
             if (nullptr == encoder) {
                 MI_RENDERALGO_LOG(MI_ERROR) << "create GPU compressor failed.";
                 return -1;
@@ -164,18 +166,16 @@ int GPUImgCompressor::set_image(GPUCanvasPairPtr canvas, const std::vector<int>&
             image_param.color_space = GPUJPEG_RGB;
             image_param.sampling_factor = GPUJPEG_4_4_4;
 
-            CHECK_LAST_CUDA_ERROR
             // create encoder
+            CHECK_LAST_CUDA_ERROR
             gpujpeg_encoder* encoder = gpujpeg_encoder_create(&params, &image_param);
+            CHECK_LAST_CUDA_ERROR
             if (nullptr == encoder) {
                 MI_RENDERALGO_LOG(MI_ERROR) << "create GPU compressor failed.";
                 return -1;
             }
 
-            // set empty input
             InnerParams inner_params;
-            CHECK_LAST_CUDA_ERROR
-            
             inner_params.encoder_input.type = GPUJPEG_ENCODER_INPUT_INTERNAL_BUFFER;
             inner_params.encoder = encoder;
             _params[*it] = inner_params;
@@ -213,30 +213,32 @@ int GPUImgCompressor::compress(int quality, void* buffer, int& compress_size) {
     }
 
     InnerParams& params = it->second;
-    if (GL_BASE == _gpu_platform) {
-        //---------------------------------------------------//
-        // GL_BASE: use GL texture as input, compress directly
-        //---------------------------------------------------//
-        uint8_t* image_compressed = nullptr;
-        int err = gpujpeg_encoder_encode(params.encoder, &params.encoder_input,
-            &image_compressed, &compress_size);
-        if (err != 0) {
-            MI_RENDERALGO_LOG(MI_ERROR) << "GPU compress failed.";
-        }
-        memcpy(buffer, image_compressed, compress_size);
 
-    } else {
-        //-------------------------------------------------------------------------//
-        // CUDA_BASE: kernel write RGBA8 surface to GPUJPEG's coder's inner raw_data
-        //-------------------------------------------------------------------------//
+    //---------------------------------------------------//
+    // GL_BASE: use GL texture as input, compress directly
+    // CUDA_BASE: kernel write RGBA8 surface to GPUJPEG's coder's inner raw_data
+    //---------------------------------------------------//
+    if (CUDA_BASE == _gpu_platform) {
         CudaSurface2DPtr surface = _canvas->get_cuda_resource();
         unsigned char* d_rgb = (unsigned char*)gpujpeg_encoder_get_inner_device_image_data(params.encoder);
         cudaError_t err = surface_2d_rgba8_flip_vertical_to_global_memory_rgb8(surface->get_object(),
             surface->get_width(), surface->get_height(), d_rgb);
         if (err != cudaSuccess) {
-
+            MI_RENDERALGO_LOG(MI_ERROR) << "kernel flip vertical failed with cuda error: " << err << ", " << cudaGetErrorString(err);
+            return -1;
         }
     }
+
+    uint8_t* image_compressed = nullptr;
+    CHECK_LAST_CUDA_ERROR;
+    int err = gpujpeg_encoder_encode(params.encoder, &params.encoder_input,
+        &image_compressed, &compress_size);
+    if (err != 0) {
+        MI_RENDERALGO_LOG(MI_ERROR) << "GPU compress failed.";
+        return -1;
+    }
+    CHECK_LAST_CUDA_ERROR;
+    memcpy(buffer, image_compressed, compress_size);
 
     return 0;
 }
