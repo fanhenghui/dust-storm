@@ -343,6 +343,16 @@ void Keyboard(unsigned char key, int x, int y) {
         _scene->set_test_code(_iTestCode);
         break;
     }
+    case 'd': {
+        _scene->set_expected_fps(400);
+        _scene->set_downsample(true);
+        break;
+    }
+    case 'D': {
+        _scene->set_expected_fps(30);
+        _scene->set_downsample(false);
+        break;
+    }
 
     case 'i': {
         std::cout << "\n<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
@@ -478,10 +488,10 @@ void MouseClick(int button, int status, int x, int y) {
     }
 
     if (status == GLUT_DOWN) {
-        _scene->set_expected_fps(100);
-        //_scene->set_downsample(true);
+        _scene->set_expected_fps(300);
+        _scene->set_downsample(true);
     } else if (status == GLUT_UP) {
-        //_scene->set_downsample(false);
+        _scene->set_downsample(false);
     }
 
     _ptPre = Point2(x, y);
@@ -538,7 +548,12 @@ int TE_VRScene(int argc, char* argv[]) {
         glutInitWindowPosition(0, 0);
         glutInitWindowSize(_width, _height);
 
-        glutCreateWindow("Test GL&CUDA VR Scene");
+        if (_gpu_platform == GL_BASE) {
+            glutCreateWindow("Test GL VR Scene");
+        } else {
+            glutCreateWindow("Test CUDA VR Scene");
+        }
+        
 
         if (GLEW_OK != glewInit()) {
             MI_RENDERALGO_LOG(MI_FATAL) << "Init glew failed!\n";

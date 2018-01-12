@@ -32,7 +32,7 @@ RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
       _color_inverse_mode(COLOR_INVERSE_DISABLE),
       _mask_overlay_mode(MASK_OVERLAY_DISABLE), 
       _mask_overlay_opacity(0.5f),
-      _pre_rendering_duration(0),
+      _pre_rendering_duration(0.0f),
       _downsample(false), 
       _expected_fps(30), 
       _map_quarter_canvas(false),
@@ -97,31 +97,7 @@ void RayCaster::render_gpu_gl() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // downsample strategy
-    if (_downsample) {
-        const double para0 = 1.5;
-        const double para1 = 1.6;
-        if (_pre_rendering_duration > 0) {
-            const double exp_fps = (double)_expected_fps;
-            const double pre_fps = 1000.0 / _pre_rendering_duration;
-            if (pre_fps < exp_fps) {
-                if (pre_fps < exp_fps / para1) {
-                    if (_map_quarter_canvas) {
-                        _sample_step = (float)(_sample_step*para0);
-                    }
-                    else {
-                        _map_quarter_canvas = true;
-                    }
-                }
-                else {
-                    _sample_step = (float)(_sample_step*para0);
-                }
-            }
-        }   
-    }
-    else {
-        _map_quarter_canvas = false;
-        _sample_step = _custom_sample_step;
-    }
+    downsample_adjust();
 
     // Viewport
     int width, height;
@@ -138,16 +114,62 @@ void RayCaster::render_gpu_gl() {
     _ray_casting_gpu_gl->render();
 
     _pre_rendering_duration = _ray_casting_gpu_gl->get_rendering_duration();
-    //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms.";
+    //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms, quarter view: " << _map_quarter_canvas << ", sample step: " << _sample_step << std::endl;
 }
 
 void RayCaster::render_gpu_cuda() {
     if (!_ray_casting_gpu_cuda) {
         _ray_casting_gpu_cuda.reset(new RayCastingGPUCUDA(shared_from_this()));
     }
-    CHECK_LAST_CUDA_ERROR
+    // downsample strategy
+    downsample_adjust();
+
+    CHECK_LAST_CUDA_ERROR;
     _ray_casting_gpu_cuda->render();
-    CHECK_LAST_CUDA_ERROR
+    CHECK_LAST_CUDA_ERROR;
+
+    _pre_rendering_duration = _ray_casting_gpu_cuda->get_rendering_duration();
+    //MI_RENDERALGO_LOG(MI_DEBUG) << "ray casting cost: " << _pre_rendering_duration << " ms, quarter view: " << _map_quarter_canvas << ", sample step: " << _sample_step << std::endl;    
+}
+
+void RayCaster::downsample_adjust(){
+    if (!_downsample) {
+        _map_quarter_canvas = false;
+        _sample_step = _custom_sample_step;
+        return;
+    }
+    
+    const static float DURATION_LIMITS = 1.0f; 
+    if (_pre_rendering_duration < DURATION_LIMITS) {
+        return;
+    }
+    if (_expected_fps <= 0) {
+        return;
+    }
+    const float exp_duration = 1000.0f / (float)_expected_fps;
+    const static float TRIGGER_QUARTER = 1.7f;
+    if (_pre_rendering_duration > exp_duration) {
+        //downsample
+        const float ratio = _pre_rendering_duration / exp_duration;
+        if (ratio > TRIGGER_QUARTER && !_map_quarter_canvas) {
+            _map_quarter_canvas = true;
+        } else if (ratio > TRIGGER_QUARTER && _map_quarter_canvas){
+            _sample_step *= TRIGGER_QUARTER;
+        } else {
+            _sample_step *= ratio;
+        }
+    } else {
+        //upsample
+        const float ratio = exp_duration / _pre_rendering_duration;
+        if (ratio > TRIGGER_QUARTER && _map_quarter_canvas) {
+            _map_quarter_canvas = false;
+            _sample_step *= 1.2f;
+        } else if (ratio > TRIGGER_QUARTER && !_map_quarter_canvas) {
+            _sample_step /= TRIGGER_QUARTER;
+        } else {
+            _sample_step /= ratio;
+        }        
+    }
 }
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {

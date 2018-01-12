@@ -14,6 +14,7 @@
 #include "cudaresource/mi_cuda_texture_3d.h"
 #include "cudaresource/mi_cuda_global_memory.h"
 #include "cudaresource/mi_cuda_utils.h"
+#include "cudaresource/mi_cuda_time_query.h"
 
 #include "glresource/mi_gl_texture_2d.h"
 
@@ -29,27 +30,33 @@ MED_IMG_BEGIN_NAMESPACE
 //-------------------------------------------------//
 //CUDA method
 extern "C"
-cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas);
+cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter);
 
 extern "C"
-cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int width, int height,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas);
+cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int2 entry_exit_size,
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter);
+
+extern "C"
+cudaError_t quarter_map_back(cudaSurfaceObject_t quarter_canvas, int2 quarter_size, cudaSurfaceObject_t canvas, int2 canvas_size);
 //-------------------------------------------------//
 
-struct RayCastingGPUCUDA::InnerEntryExitPointsExt {
+struct RayCastingGPUCUDA::InnerResource {
     CudaGLTexture2DPtr entry_points_tex;
     CudaGLTexture2DPtr exit_points_tex;
+    CudaSurface2DPtr quarter_canvas;
+    CudaTimeQueryPtr time_query;
 
-    InnerEntryExitPointsExt(){
+    InnerResource(){
         entry_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
             "cuda ray-cast inner cuda-gl texture for gl entry points");
         exit_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
             "cuda ray-cast inner cuda-gl texture for gl entry points");
+        time_query = CudaResourceManager::instance()->create_cuda_time_query("cuda ray-cast inner time query");
     }
 };
 
-RayCastingGPUCUDA::RayCastingGPUCUDA(std::shared_ptr<RayCaster> ray_caster) : _ray_caster(ray_caster), _duration(0.0){
+RayCastingGPUCUDA::RayCastingGPUCUDA(std::shared_ptr<RayCaster> ray_caster) : _ray_caster(ray_caster), _duration(0.0f){
 
 }
 
@@ -58,6 +65,7 @@ RayCastingGPUCUDA::~RayCastingGPUCUDA() {
 }
 
 void RayCastingGPUCUDA::render() {
+
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(ray_caster);
 
@@ -88,13 +96,47 @@ void RayCastingGPUCUDA::render() {
         RENDERALGO_CHECK_NULL_EXCEPTION(entry);
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
         
-        cudaError_t err = ray_cast_surface(entry->get_object(), exit->get_object(), width, height, cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object());
-        if (err != cudaSuccess) {
-            LOG_CUDA_ERROR(err);
-            RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");
+        ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
+        cudaError_t err = cudaSuccess;
+        const int2 entry_exit_points_size = make_int2(width, height);
+        if (ray_caster->map_quarter_canvas()) {
+            //-----------------------------------------------------//
+            //downsample render to inner quarter canvas, then map to r-c canvas
+            const int quarter_width = width >> 1;
+            const int quarter_height = height >> 1;
+            if (nullptr == _inner_resource->quarter_canvas) {
+                _inner_resource->quarter_canvas = CudaResourceManager::instance()->
+                    create_cuda_surface_2d("cuda r-c inner quarter canvas for downsample");
+            }
+            //reload size
+            if (0 != _inner_resource->quarter_canvas->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, quarter_width, quarter_height, nullptr)) {
+                RENDERALGO_THROW_EXCEPTION("cuda r-c inner quarter canvas malloc failed.");
+            }
+            const int2 canvas_size = make_int2(quarter_width, quarter_height);
+            err = ray_cast_surface(entry->get_object(), exit->get_object(), entry_exit_points_size, 
+                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), canvas_size, 1);
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface in quarter failed.");
+            }
+
+            err = quarter_map_back(_inner_resource->quarter_canvas->get_object(), canvas_size, canvas_surface->get_object(), entry_exit_points_size);
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface quarter map back failed.");
+            }
+
+        } else {
+            err = ray_cast_surface(entry->get_object(), exit->get_object(), entry_exit_points_size, 
+                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), entry_exit_points_size, 0);
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");
+            }
         }
         
     } else {
+
         GPUCanvasPairPtr entry_pair = entry_exit_points->get_entry_points_texture();
         GPUCanvasPairPtr exit_pair = entry_exit_points->get_exit_points_texture();
         RENDERALGO_CHECK_NULL_EXCEPTION(entry_pair);
@@ -105,66 +147,103 @@ void RayCastingGPUCUDA::render() {
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
 
         //register entry exit points GL texture
-        if (nullptr == _inner_ee_ext) {
-            _inner_ee_ext.reset(new InnerEntryExitPointsExt());
-            if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
+        if (nullptr == _inner_resource) {
+            _inner_resource.reset(new InnerResource());
+            if (0 != _inner_resource->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
                 RENDERALGO_THROW_EXCEPTION("register entry points failed.");
             }
-            if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
+            if (0 != _inner_resource->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
                 RENDERALGO_THROW_EXCEPTION("register exit points failed.");
             }
         } else {
-            if (!_inner_ee_ext->entry_points_tex->valid()) {
-                if (0 != _inner_ee_ext->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
+            if (!_inner_resource->entry_points_tex->valid()) {
+                if (0 != _inner_resource->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
                     RENDERALGO_THROW_EXCEPTION("register entry points failed.");
                 }
             }
-            if (!_inner_ee_ext->exit_points_tex->valid()) {
-                if (0 != _inner_ee_ext->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
+            if (!_inner_resource->exit_points_tex->valid()) {
+                if (0 != _inner_resource->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
                     RENDERALGO_THROW_EXCEPTION("register entry points failed.");
                 }
             }
         }
            
-        if (0 != _inner_ee_ext->entry_points_tex->map_gl_texture()) {
+        if (0 != _inner_resource->entry_points_tex->map_gl_texture()) {
             RENDERALGO_THROW_EXCEPTION("map entry points failed.");
         }
-        if (0 != _inner_ee_ext->exit_points_tex->map_gl_texture()) {
+        if (0 != _inner_resource->exit_points_tex->map_gl_texture()) {
             RENDERALGO_THROW_EXCEPTION("map exit points failed.");
         }
 
-        cudaTextureObject_t entry_cuda_tex = _inner_ee_ext->entry_points_tex->
+        cudaTextureObject_t entry_cuda_tex = _inner_resource->entry_points_tex->
             get_object(cudaAddressModeClamp, cudaFilterModePoint, cudaReadModeElementType, false);
 
-        cudaTextureObject_t exit_cuda_tex = _inner_ee_ext->exit_points_tex->
+        cudaTextureObject_t exit_cuda_tex = _inner_resource->exit_points_tex->
             get_object(cudaAddressModeClamp, cudaFilterModePoint, cudaReadModeElementType, false);
         
-        cudaError_t err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, width, height, cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object());
-        if (err != cudaSuccess) {
-            LOG_CUDA_ERROR(err);
-            _inner_ee_ext->entry_points_tex->unmap_gl_texture();
-            _inner_ee_ext->exit_points_tex->unmap_gl_texture();
-            RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");
-        }
 
-        if (0 != _inner_ee_ext->entry_points_tex->unmap_gl_texture()) {
-            RENDERALGO_THROW_EXCEPTION("unmap entry points failed.");
+        ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
+        cudaError_t err = cudaSuccess;
+        const int2 entry_exit_points_size = make_int2(width, height);
+        if (ray_caster->map_quarter_canvas()) {
+            //-----------------------------------------------------//
+            //downsample render to inner quarter canvas, then map to r-c canvas
+            const int quarter_width = width >> 1;
+            const int quarter_height = height >> 1;
+            if (nullptr == _inner_resource->quarter_canvas) {
+                _inner_resource->quarter_canvas = CudaResourceManager::instance()->
+                    create_cuda_surface_2d("cuda r-c inner quarter canvas for downsample");
+            }
+            //reload size
+            if (0 != _inner_resource->quarter_canvas->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, quarter_width, quarter_height, nullptr)) {
+                RENDERALGO_THROW_EXCEPTION("cuda r-c inner quarter canvas malloc failed.");
+            }
+            const int2 canvas_size = make_int2(quarter_width, quarter_height);
+            err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, entry_exit_points_size, 
+                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), canvas_size, 1);
+
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                _inner_resource->entry_points_tex->unmap_gl_texture();
+                _inner_resource->exit_points_tex->unmap_gl_texture();
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface in quarter failed.");
+            }
+            if (0 != _inner_resource->entry_points_tex->unmap_gl_texture()) {
+                RENDERALGO_THROW_EXCEPTION("unmap entry points failed.");
+            }
+            if (0 != _inner_resource->exit_points_tex->unmap_gl_texture()) {
+                RENDERALGO_THROW_EXCEPTION("unmap exit points failed.");
+            }
+
+            err = quarter_map_back(_inner_resource->quarter_canvas->get_object(), canvas_size, canvas_surface->get_object(), entry_exit_points_size);
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface quarter map back failed.");
+            }
         }
-        if (0 != _inner_ee_ext->exit_points_tex->unmap_gl_texture()) {
-            RENDERALGO_THROW_EXCEPTION("unmap exit points failed.");
+        else {
+            err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, entry_exit_points_size, 
+                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), entry_exit_points_size , 0);
+            if (err != cudaSuccess) {
+                LOG_CUDA_ERROR(err);
+                _inner_resource->entry_points_tex->unmap_gl_texture();
+                _inner_resource->exit_points_tex->unmap_gl_texture();
+                RENDERALGO_THROW_EXCEPTION("cuda rc-surface in quarter failed.");
+            }
+            if (0 != _inner_resource->entry_points_tex->unmap_gl_texture()) {
+                RENDERALGO_THROW_EXCEPTION("unmap entry points failed.");
+            }
+            if (0 != _inner_resource->exit_points_tex->unmap_gl_texture()) {
+                RENDERALGO_THROW_EXCEPTION("unmap exit points failed.");
+            }
         }
     }
 }
 
 void RayCastingGPUCUDA::on_entry_exit_points_resize(int width, int height) {
-    if (_inner_ee_ext) {
-        /*const int old_width = _inner_ee_ext->entry_points_tex->get_width();
-        const int old_height = _inner_ee_ext->entry_points_tex->get_height();
-        if (old_width == width && old_height == height) {
-            return;
-        }*/
-        _inner_ee_ext->entry_points_tex->unregister_gl_texture();
-        _inner_ee_ext->exit_points_tex->unregister_gl_texture();
+    if (_inner_resource) {
+        _inner_resource->entry_points_tex->unregister_gl_texture();
+        _inner_resource->exit_points_tex->unregister_gl_texture();
     }
 }
 
@@ -267,7 +346,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
     cuda_ray_infos.test_code = ray_caster->get_test_code();
 }
 
-double RayCastingGPUCUDA::get_rendering_duration() const {
+float RayCastingGPUCUDA::get_rendering_duration() const {
     return _duration;
 }
 

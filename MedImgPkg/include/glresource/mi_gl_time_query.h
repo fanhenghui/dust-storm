@@ -19,14 +19,38 @@ public:
 
     void begin();
 
-    double end();
+    float end();
 
-    double get_time_elapsed();
+    float get_time_elapsed() const;
 
 private:
     unsigned int _query[2];
-    double _time_elapsed;
+    float _time_elapsed;
     bool _is_first_query;
+};
+
+class GLResource_Export ScopedGLTimeQuery
+{
+public:
+    ScopedGLTimeQuery(std::shared_ptr<GLTimeQuery> tq, float* recorder) :_time_query(tq), _recorder(recorder) {
+        if (_time_query) {
+            _time_query->begin();
+        }
+    }
+
+    ~ScopedGLTimeQuery() {
+        if (_time_query) {
+            if (_recorder) {
+                *_recorder = _time_query->end();
+            }
+        }
+    }
+private:
+    std::shared_ptr<GLTimeQuery> _time_query;
+    float* _recorder;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(ScopedGLTimeQuery);
 };
 
 MED_IMG_END_NAMESPACE

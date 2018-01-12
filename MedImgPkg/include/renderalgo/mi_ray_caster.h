@@ -162,6 +162,7 @@ private:
     void render_cpu();
     void render_gpu_gl();
     void render_gpu_cuda();
+    void downsample_adjust();
 private:
     // Processing unit type
     RayCastingStrategy _strategy;
@@ -235,7 +236,7 @@ private:
     // Canvas for rendering
     std::shared_ptr<RayCasterCanvas> _canvas;
 
-    double _pre_rendering_duration;
+    float _pre_rendering_duration;
     bool _downsample;
     int _expected_fps;
     bool _map_quarter_canvas;

@@ -21,8 +21,8 @@
 MED_IMG_BEGIN_NAMESPACE
 
 RayCastingGPUGL::RayCastingGPUGL(std::shared_ptr<RayCaster> ray_caster)
-    : _ray_caster(ray_caster), _gl_act_tex_counter(new GLActiveTextureCounter()), 
-    _render_duration(0), _last_test_code(-1) {}
+    : _ray_caster(ray_caster), _active_texture_counter(new GLActiveTextureCounter()), 
+    _render_duration(0.0f), _last_test_code(-1) {}
 
 RayCastingGPUGL::~RayCastingGPUGL() {}
 
@@ -31,17 +31,17 @@ void RayCastingGPUGL::render() {
 
     CHECK_GL_ERROR;
 
-    _gl_time_query->begin();
+    ScopedGLTimeQuery inner_timer(_time_query, &_render_duration);
 
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
     glDisable(GL_DEPTH_TEST);
     glDepthMask(false);
 
-    _gl_program->bind();
-    _gl_vao->bind();
+    _program->bind();
+    _vao->bind();
 
-    _gl_act_tex_counter->reset();
+    _active_texture_counter->reset();
 
     for (auto it = _ray_casting_steps.begin(); it != _ray_casting_steps.end(); ++it) {
         (*it)->set_gpu_parameter();
@@ -49,11 +49,9 @@ void RayCastingGPUGL::render() {
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-    _gl_vao->unbind();
-    _gl_program->unbind();
+    _vao->unbind();
+    _program->unbind();
     glPopAttrib();
-
-    _render_duration = _gl_time_query->end();
 
     CHECK_GL_ERROR;
 }
@@ -62,44 +60,44 @@ void RayCastingGPUGL::update_i() {
     CHECK_GL_ERROR;
 
     // Create VAO
-    if (!_gl_vao) {
-        _gl_vao = GLResourceManagerContainer::instance()
+    if (!_vao) {
+        _vao = GLResourceManagerContainer::instance()
             ->get_vao_manager()->create_object("GPU ray casting VAO");
-        _gl_vao->initialize();
+        _vao->initialize();
 
-        _gl_buffer_vertex = GLResourceManagerContainer::instance()
+        _buffer_vertex = GLResourceManagerContainer::instance()
             ->get_buffer_manager()->create_object("GPU ray casting vertex buffer (-1 -1)~ (1,1)");
-        _gl_buffer_vertex->initialize();
-        _gl_buffer_vertex->set_buffer_target(GL_ARRAY_BUFFER);
+        _buffer_vertex->initialize();
+        _buffer_vertex->set_buffer_target(GL_ARRAY_BUFFER);
 
-        _gl_vao->bind();
-        _gl_buffer_vertex->bind();
+        _vao->bind();
+        _buffer_vertex->bind();
         const float vertex[] = { -1, 1,  0, -1, -1, 0, 1,  -1, 0,
                            1,  -1, 0, 1,  1,  0, -1, 1,  0};
-        _gl_buffer_vertex->load(sizeof(vertex), vertex, GL_STATIC_DRAW);
+        _buffer_vertex->load(sizeof(vertex), vertex, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
         glEnableVertexAttribArray(0);
 
-        _gl_vao->unbind();
-        _gl_buffer_vertex->unbind();
+        _vao->unbind();
+        _buffer_vertex->unbind();
 
         //create time query
-        _gl_time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object("GPU ray casting time query");
-        _gl_time_query->initialize();
+        _time_query = GLResourceManagerContainer::instance()->get_time_query_manager()->create_object("GPU ray casting time query");
+        _time_query->initialize();
 
-        _res_shield.add_shield<GLVAO>(_gl_vao);
-        _res_shield.add_shield<GLBuffer>(_gl_buffer_vertex);
-        _res_shield.add_shield<GLTimeQuery>(_gl_time_query);
+        _res_shield.add_shield<GLVAO>(_vao);
+        _res_shield.add_shield<GLBuffer>(_buffer_vertex);
+        _res_shield.add_shield<GLTimeQuery>(_time_query);
     }
 
     CHECK_GL_ERROR;
 
     // Create Program
-    if (!_gl_program) {
-        _gl_program = GLResourceManagerContainer::instance()
+    if (!_program) {
+        _program = GLResourceManagerContainer::instance()
             ->get_program_manager()->create_object("GPU ray casting program");
-        _gl_program->initialize();
-        _res_shield.add_shield<GLProgram>(_gl_program);
+        _program->initialize();
+        _res_shield.add_shield<GLProgram>(_program);
     }
 
     std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
@@ -124,7 +122,7 @@ void RayCastingGPUGL::update_i() {
 
 #define STEP_PUSH_BACK(step_class_name)                                        \
   _ray_casting_steps.push_back(std::shared_ptr<step_class_name>(               \
-      new step_class_name(ray_caster, _gl_program)));
+      new step_class_name(ray_caster, _program)));
 
         if (_last_test_code == 1 || _last_test_code == 2) {
             // Main
@@ -200,13 +198,13 @@ void RayCastingGPUGL::update_i() {
             shaders.push_back((*it)->get_shader_info());
         }
 
-        _gl_program->finalize();
-        _gl_program->initialize();
-        _gl_program->set_shaders(shaders);
-        _gl_program->compile();
+        _program->finalize();
+        _program->initialize();
+        _program->set_shaders(shaders);
+        _program->compile();
 
         for (auto it = _ray_casting_steps.begin(); it != _ray_casting_steps.end(); ++it) {
-            (*it)->set_active_texture_counter(_gl_act_tex_counter);
+            (*it)->set_active_texture_counter(_active_texture_counter);
             (*it)->get_uniform_location();
         }
     }
@@ -216,7 +214,7 @@ void RayCastingGPUGL::update_i() {
     CHECK_GL_ERROR;
 }
 
-double RayCastingGPUGL::get_rendering_duration() const {
+float RayCastingGPUGL::get_rendering_duration() const {
     return _render_duration;
 }
 

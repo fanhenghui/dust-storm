@@ -23,10 +23,13 @@ public:
 
 private:
     GPUPlatform _gpu_platform;
+    
     struct InnerParams;
     std::map<int, InnerParams> _params;
     GPUCanvasPairPtr _canvas;
+
     float _duration;
+    CudaTimeQueryPtr _time_query;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(GPUImgCompressor);

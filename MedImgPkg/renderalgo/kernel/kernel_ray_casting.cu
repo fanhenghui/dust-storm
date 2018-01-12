@@ -394,8 +394,8 @@ __device__ void fill_shared_array(int thread_idx, void* d_mapped_array, int size
     }*/
 }
 
-__global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,
-    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int memcpy_step) {
+__global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
+    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter, int memcpy_step) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -405,13 +405,18 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
     __syncthreads();
 
 
-    if (x > width - 1 || y > height - 1) {
+    if (x > canvas_size.x - 1 || y > canvas_size.y - 1) {
         return;
     }
-    uint idx = y*width + x;
 
-    float4 entry = tex2D<float4>(entry_tex, x, y);
-    float4 exit  = tex2D<float4>(exit_tex, x, y);
+    float4 entry, exit;
+    if (0 == quarter) {
+        entry = tex2D<float4>(entry_tex, x, y);
+        exit = tex2D<float4>(exit_tex, x, y);
+    } else {
+        entry = tex2D<float4>(entry_tex, x<<1, y<<1);
+        exit = tex2D<float4>(exit_tex, x<<1, y<<1);
+    }
 
     float3 entry3 = make_float3(entry);
     float3 exit3  = make_float3(exit);
@@ -421,17 +426,17 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     if (1 == ray_cast_infos.test_code) {
         uchar4 rgba_entry = make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
-        surf2Dwrite(rgba_entry, canvas, x * 4, y);
+        surf2Dwrite(rgba_entry, canvas, x << 2, y);
         return;
     } else if (2 == ray_cast_infos.test_code) {
         uchar4 rgba_exit = make_uchar4(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
-        surf2Dwrite(rgba_exit, canvas, x * 4, y);
+        surf2Dwrite(rgba_exit, canvas, x << 2, y);
         return;
     }
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0,0,0,0);
-        surf2Dwrite(rgba, canvas, x * 4, y);
+        surf2Dwrite(rgba, canvas, x << 2, y);
         return;
     }
 
@@ -456,11 +461,11 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
     clamp(integral_color, 0.0f, 1.0f);
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255 , integral_color.z * 255, 255);
-    surf2Dwrite(rgba, canvas, x*4 , y);
+    surf2Dwrite(rgba, canvas, x << 2 , y);
 }
 
-__global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cudaSurfaceObject_t exit_surf, int width, int height,
-    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int memcpy_step) {
+__global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cudaSurfaceObject_t exit_surf, int2 entry_exit_size,
+    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter, int memcpy_step) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -469,15 +474,19 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
     __syncthreads();
 
-    if (x > width - 1 || y > height - 1) {
+    if (x > canvas_size.x - 1 || y > canvas_size.y - 1) {
         return;
     }
-    uint idx = y*width + x;
 
     float4 entry, exit;
-    surf2Dread(&entry, entry_surf, x * 4 * 4, y);
-    surf2Dread(&exit, exit_surf, x * 4 * 4, y);
-
+    if (0 == quarter) {
+        surf2Dread(&entry, entry_surf, x << 4, y);
+        surf2Dread(&exit, exit_surf, x << 4, y);
+    } else {
+        surf2Dread(&entry, entry_surf, x << 5, y << 1);
+        surf2Dread(&exit, exit_surf, x << 5, y << 1);
+    }
+    
     float3 entry3 = make_float3(entry);
     float3 exit3 = make_float3(exit);
 
@@ -486,17 +495,17 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
 
     if (1 == ray_cast_infos.test_code) {
         uchar4 rgba_entry= make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
-        surf2Dwrite(rgba_entry, canvas, x * 4, y);
+        surf2Dwrite(rgba_entry, canvas, x << 2, y);
         return;
     } else if (2 == ray_cast_infos.test_code) {
         uchar4 rgba_exit= make_uchar4(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
-        surf2Dwrite(rgba_exit, canvas, x * 4, y);
+        surf2Dwrite(rgba_exit, canvas, x << 2, y);
         return;
     }
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0, 0, 0, 0);
-        surf2Dwrite(rgba, canvas, x * 4, y);
+        surf2Dwrite(rgba, canvas, x << 2, y);
         return;
     }
 
@@ -521,19 +530,59 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     clamp(integral_color, 0.0f, 1.0f);
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255, integral_color.z * 255, 255);
-    surf2Dwrite(rgba, canvas, x * 4, y);
+    surf2Dwrite(rgba, canvas, x << 2, y);
+}
+
+__global__ void kernel_quarter_map_back(cudaSurfaceObject_t quater_canvas, int2 quarter_size, cudaSurfaceObject_t canvas, int2 canvas_size) {
+    unsigned int x = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int y = blockIdx.y * blockDim.y + threadIdx.y;
+    if (x > canvas_size.x - 1 || y > canvas_size.y - 1) {
+        return;
+    }
+
+    float2 tex_coord = make_float2(x / (float)canvas_size.x, y / (float)canvas_size.y);
+    float2 src_coord = tex_coord * make_float2(quarter_size);
+    float2 src_coord00 = floorf(src_coord);
+
+    int2 s_00 = make_int2(src_coord00);
+    int2 s_10 = s_00 + make_int2(1, 0);
+    int2 s_01 = s_00 + make_int2(0, 1);
+    int2 s_11 = s_00 + make_int2(1, 1);
+
+    s_10 = clamp(s_10, make_int2(0, 0), quarter_size - 1);
+    s_01 = clamp(s_10, make_int2(0, 0), quarter_size - 1);
+    s_11 = clamp(s_10, make_int2(0, 0), quarter_size - 1);
+    
+    uchar4 v00, v01, v10, v11;
+    surf2Dread(&v00, quater_canvas, s_00.x << 2, s_00.y);
+    surf2Dread(&v01, quater_canvas, s_01.x << 2, s_01.y);
+    surf2Dread(&v10, quater_canvas, s_10.x << 2, s_10.y);
+    surf2Dread(&v11, quater_canvas, s_11.x << 2, s_11.y);
+
+    float dx1 = src_coord.x - src_coord00.x;
+    float dx0 = 1.0f - dx1;
+    float dy1 = src_coord.y - src_coord00.y;
+    float dy0 = 1.0f - dy1;
+
+    float4 v_x0 = make_float4(v00.x, v00.y, v00.z, v00.w) * dx0 + make_float4(v10.x, v10.y, v10.z, v10.w) * dx1;
+    float4 v_x1 = make_float4(v01.x, v01.y, v01.z, v01.w) * dx0 + make_float4(v11.x, v11.y, v11.z, v11.w) * dx1;
+    float4 rgba32f = v_x0 * dy0 + v_x1 * dy1;
+    rgba32f = clamp(rgba32f, make_float4(0.0f), make_float4(255.0f));
+    uchar4 rgba8 = make_uchar4(rgba32f.x, rgba32f.y, rgba32f.z, rgba32f.w);
+
+    surf2Dwrite(rgba8, canvas, x << 2 , y);
 }
 
 extern "C"
-cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int width, int height,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas) {
+cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter) {
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
-    dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
-    if (grid.x * BLOCK_SIZE != width) {
+    dim3 grid(canvas_size.x / BLOCK_SIZE, canvas_size.y / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != canvas_size.x) {
         grid.x += 1;
     }
-    if (grid.y * BLOCK_SIZE != height) {
+    if (grid.y * BLOCK_SIZE != canvas_size.y) {
         grid.y += 1;
     }
     
@@ -543,21 +592,21 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
         memcpy_step += 1;
     }
 
-    kernel_ray_cast_main_texture << <grid, block, s_mem_size >> >(entry_tex, exit_tex, width, height, volume_info, ray_cast_info, canvas, memcpy_step);
+    kernel_ray_cast_main_texture << <grid, block, s_mem_size >> >(entry_tex, exit_tex, entry_exit_size, volume_info, ray_cast_info, canvas, canvas_size, quarter, memcpy_step);
 
     return cudaThreadSynchronize();
 }
 
 extern "C"
-cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int width, int height,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas) {
+cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int2 entry_exit_size,
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter) {
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
-    dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
-    if (grid.x * BLOCK_SIZE != width) {
+    dim3 grid(canvas_size.x / BLOCK_SIZE, canvas_size.y / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != canvas_size.x) {
         grid.x += 1;
     }
-    if (grid.y * BLOCK_SIZE != height) {
+    if (grid.y * BLOCK_SIZE != canvas_size.y) {
         grid.y += 1;
     }
 
@@ -567,7 +616,25 @@ cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t 
         memcpy_step += 1;
     }
 
-    kernel_ray_cast_main_surface << <grid, block, s_mem_size >> >(entry_suf, exit_suf, width, height, volume_info, ray_cast_info, canvas, memcpy_step);
+    kernel_ray_cast_main_surface << <grid, block, s_mem_size >> >(entry_suf, exit_suf, entry_exit_size, volume_info, ray_cast_info, canvas, canvas_size, quarter, memcpy_step);
+
+    return cudaThreadSynchronize();
+}
+
+extern "C"
+cudaError_t quarter_map_back(cudaSurfaceObject_t quarter_canvas, int2 quarter_size, cudaSurfaceObject_t canvas, int2 canvas_size) {
+    const int BLOCK_SIZE = 16;
+    dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 grid(canvas_size.x / BLOCK_SIZE, canvas_size.y / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != canvas_size.x) {
+        grid.x += 1;
+    }
+    if (grid.y * BLOCK_SIZE != canvas_size.y) {
+        grid.y += 1;
+    }
+
+    kernel_quarter_map_back<<<grid, block>>>(quarter_canvas, quarter_size, canvas, canvas_size);
+    
 
     return cudaThreadSynchronize();
 }

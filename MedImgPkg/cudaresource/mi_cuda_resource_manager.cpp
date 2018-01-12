@@ -9,6 +9,7 @@
 #include "mi_cuda_global_memory.h"
 #include "mi_cuda_surface_2d.h"
 #include "mi_cuda_texture_1d_array.h"
+#include "mi_cuda_time_query.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -97,6 +98,14 @@ CudaTexture1DArrayPtr CudaResourceManager::create_cuda_texture_1d_array(const st
     return ptr;
 }
 
+CudaTimeQueryPtr CudaResourceManager::create_cuda_time_query(const std::string& desc) {
+    UIDType uid = _uid_generator->tick();
+    CudaTimeQueryPtr ptr(new CudaTimeQuery(uid));
+    ptr->set_description(desc);
+    _record_time_query.insert(uid, ptr);
+    return ptr;
+}
+
 float CudaResourceManager::get_device_memory_memory_used() {
     return _record_global_memory.get_memory_used();
 }
@@ -117,8 +126,12 @@ float CudaResourceManager::get_cuda_gl_texture_2d_memory_used() {
     return _record_gl_tex_2d.get_memory_used();
 }
 
-float CudaResourceManager::get_ccuda_texture_1d_array_memory_used() {
+float CudaResourceManager::get_cuda_texture_1d_array_memory_used() {
     return _record_texture_1d_array.get_memory_used();
+}
+
+float CudaResourceManager::get_time_query_memory_used() {
+    return _record_time_query.get_memory_used();
 }
 
 std::string CudaResourceManager::get_specification(const std::string& split) {
@@ -166,5 +179,11 @@ template<>
 const char* CudaResoueceRecord<CudaSurface2D>::get_type_desc() const {
     return "CudaSurface2D";
 }
+
+template<>
+const char* CudaResoueceRecord<CudaTimeQuery>::get_type_desc() const {
+    return "CudaTimeQuery";
+}
+
 
 MED_IMG_END_NAMESPACE

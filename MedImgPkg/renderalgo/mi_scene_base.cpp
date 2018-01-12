@@ -217,6 +217,8 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
         if (err != 0) {
             MI_RENDERALGO_LOG(MI_ERROR) << "scene " << this->get_name() << " download image failed.";
         }
+
+        //MI_RENDERALGO_LOG(MI_DEBUG) << "GPU compress cost: " << _compressor->get_last_duration() << " ms\n";
     }
     else {
         // download FBO to back buffer directly
@@ -228,8 +230,6 @@ void SceneBase::download_image_buffer(bool jpeg /*= true*/) {
 
         CHECK_GL_ERROR;
     }
-    // FileUtil::write_raw("/home/wr/data/output_download.raw",_image_buffer[1 -
-    // _front_buffer_id].get() , _width*_height*4);
 }
 
 void SceneBase::swap_image_buffer() {

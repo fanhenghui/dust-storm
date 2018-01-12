@@ -12,7 +12,7 @@ public:
     RayCastingGPUCUDA(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingGPUCUDA();
 
-    double get_rendering_duration() const;
+    float get_rendering_duration() const;
 
     void render();
 
@@ -24,10 +24,10 @@ private:
 private:
     std::weak_ptr<RayCaster> _ray_caster;
     
-    double _duration;
+    float _duration;
 
-    struct InnerEntryExitPointsExt;
-    std::unique_ptr<InnerEntryExitPointsExt> _inner_ee_ext;
+    struct InnerResource;
+    std::unique_ptr<InnerResource> _inner_resource;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(RayCastingGPUCUDA);

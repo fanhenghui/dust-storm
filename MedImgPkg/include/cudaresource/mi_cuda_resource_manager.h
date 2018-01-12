@@ -12,13 +12,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CudaTexture1D;
-class CudaTexture2D;
-class CudaTexture3D;
-class CudaGLTexture2D;
-class CudaGlobalMemory;
 class UIDGenerator;
-
 template<class T>
 class CudaResoueceRecord {
 public:
@@ -94,13 +88,15 @@ public:
     CudaGLTexture2DPtr create_cuda_gl_texture_2d(const std::string& desc);
     CudaSurface2DPtr create_cuda_surface_2d(const std::string& desc);
     CudaTexture1DArrayPtr create_cuda_texture_1d_array(const std::string& desc, int length);
+    CudaTimeQueryPtr create_cuda_time_query(const std::string& desc);
 
     float get_device_memory_memory_used();
     float get_cuda_texture_1d_memory_used();
     float get_cuda_texture_2d_memory_used();
     float get_cuda_texture_3d_memory_used();
     float get_cuda_gl_texture_2d_memory_used();
-    float get_ccuda_texture_1d_array_memory_used();
+    float get_cuda_texture_1d_array_memory_used();
+    float get_time_query_memory_used();
 
     friend std::ostream& operator << (std::ostream& strm, CudaResourceManager& cuda_res_m) {
         strm << cuda_res_m.get_specification(" ");
@@ -121,6 +117,7 @@ private:
     CudaResoueceRecord<CudaGLTexture2D>      _record_gl_tex_2d;
     CudaResoueceRecord<CudaSurface2D>        _record_surface_2d;
     CudaResoueceRecord<CudaTexture1DArray>   _record_texture_1d_array;
+    CudaResoueceRecord<CudaTimeQuery>   _record_time_query;
 
     std::unique_ptr<UIDGenerator> _uid_generator;
 

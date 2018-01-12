@@ -13,6 +13,7 @@ class CudaGLTexture2D;
 class CudaTexture1DArray;
 class CudaGlobalMemory;
 class CudaSurface2D;
+class CudaTimeQuery;
 
 typedef std::shared_ptr<CudaTexture1D>    CudaTexture1DPtr;
 typedef std::shared_ptr<CudaTexture2D>    CudaTexture2DPtr;
@@ -21,6 +22,7 @@ typedef std::shared_ptr<CudaGLTexture2D>  CudaGLTexture2DPtr;
 typedef std::shared_ptr<CudaTexture1DArray>  CudaTexture1DArrayPtr;
 typedef std::shared_ptr<CudaGlobalMemory> CudaGlobalMemoryPtr;
 typedef std::shared_ptr<CudaSurface2D> CudaSurface2DPtr;
+typedef std::shared_ptr<CudaTimeQuery> CudaTimeQueryPtr;
 
 MED_IMG_END_NAMESPACE
 #endif

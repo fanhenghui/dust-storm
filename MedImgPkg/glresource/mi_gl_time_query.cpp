@@ -3,7 +3,8 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-GLTimeQuery::GLTimeQuery(UIDType uid) : GLObject(uid, "GLTimeQuery"), _is_first_query(true) {
+GLTimeQuery::GLTimeQuery(UIDType uid) : 
+    GLObject(uid, "GLTimeQuery"), _time_elapsed(0.0f), _is_first_query(true) {
     _query[0] = 0;
     _query[1] = 0;
 }
@@ -42,7 +43,7 @@ void GLTimeQuery::begin() {
     glBeginQuery(GL_TIME_ELAPSED, _query[0]);
 }
 
-double GLTimeQuery::end() {
+float GLTimeQuery::end() {
     if (_query[0] == 0) {
         GLRESOURCE_THROW_EXCEPTION("time query begin without initialize!");
     }
@@ -58,7 +59,7 @@ double GLTimeQuery::end() {
 
     unsigned int time;
     glGetQueryObjectuiv(_query[1], GL_QUERY_RESULT, &time);
-    _time_elapsed = time / 1000000.0;
+    _time_elapsed = time / 1000000.0f;
 
     if (_is_first_query) { // remove gl error
         glGetError();
@@ -70,7 +71,7 @@ double GLTimeQuery::end() {
     return _time_elapsed;
 }
 
-double GLTimeQuery::get_time_elapsed() {
+float GLTimeQuery::get_time_elapsed() const {
     return _time_elapsed;
 }
 

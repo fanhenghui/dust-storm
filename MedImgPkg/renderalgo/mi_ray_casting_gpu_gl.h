@@ -14,7 +14,7 @@ public:
     RayCastingGPUGL(std::shared_ptr<RayCaster> ray_caster);
     ~RayCastingGPUGL();
 
-    double get_rendering_duration() const;
+    float get_rendering_duration() const;
 
     void render();
 
@@ -23,7 +23,7 @@ private:
 
 private:
     std::weak_ptr<RayCaster> _ray_caster;
-    std::shared_ptr<GLActiveTextureCounter> _gl_act_tex_counter;
+    std::shared_ptr<GLActiveTextureCounter> _active_texture_counter;
 
     // render steps
     std::vector<std::shared_ptr<RCStepBase>> _ray_casting_steps;
@@ -37,13 +37,13 @@ private:
     MaskOverlayMode _mask_overlay_mode;
 
     // Resource
-    GLVAOPtr _gl_vao;
-    GLBufferPtr _gl_buffer_vertex;
-    GLProgramPtr _gl_program;
-    GLTimeQueryPtr _gl_time_query;
+    GLVAOPtr _vao;
+    GLBufferPtr _buffer_vertex;
+    GLProgramPtr _program;
+    GLTimeQueryPtr _time_query;
     GLResourceShield _res_shield;
 
-    double _render_duration;
+    float _render_duration;
     // For Testing
     int _last_test_code;
 

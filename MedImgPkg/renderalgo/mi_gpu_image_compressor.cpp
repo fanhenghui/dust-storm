@@ -8,6 +8,9 @@
 #include "glresource/mi_gl_texture_2d.h"
 #include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_utils.h"
+#include "cudaresource/mi_cuda_time_query.h"
+#include "cudaresource/mi_cuda_resource_manager.h"
+
 #include "renderalgo/mi_render_algo_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -39,7 +42,7 @@ struct GPUImgCompressor::InnerParams{
     }
 };
 
-GPUImgCompressor::GPUImgCompressor(GPUPlatform platform): _gpu_platform(platform), _duration(0.0f) {
+GPUImgCompressor::GPUImgCompressor(GPUPlatform platform): _gpu_platform(platform), _duration(0.0f){
 }
 
 GPUImgCompressor::~GPUImgCompressor() {
@@ -213,7 +216,15 @@ int GPUImgCompressor::compress(int quality, void* buffer, int& compress_size) {
     }
 
     InnerParams& params = it->second;
+    if (nullptr == _time_query) {
+        _time_query = CudaResourceManager::instance()->create_cuda_time_query("GPU compressor inner time query");    
+    }
+    
+    if (GL_BASE == _gpu_platform) {
+        ::glFinish();
+    }
 
+    ScopedCudaTimeQuery inner_timer(_time_query, &_duration);
     //---------------------------------------------------//
     // GL_BASE: use GL texture as input, compress directly
     // CUDA_BASE: kernel write RGBA8 surface to GPUJPEG's coder's inner raw_data
