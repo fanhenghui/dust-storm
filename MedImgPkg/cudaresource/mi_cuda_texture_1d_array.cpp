@@ -166,6 +166,15 @@ cudaTextureObject_t CudaTexture1DArray::create_object(
 
     return tex_obj;
 }
+
+int CudaTexture1DArray::get_array_length() const {
+    return _array_length;
+}
+
+int CudaTexture1DArray::get_length() const {
+    return _length;
+}
+
 MED_IMG_END_NAMESPACE
 
 

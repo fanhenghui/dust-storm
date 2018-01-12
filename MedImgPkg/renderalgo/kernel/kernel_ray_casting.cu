@@ -165,7 +165,7 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
     gray = (gray - min_gray) / ww;
     //gray = clamp(gray,0.0f,1.0f);
     cudaTextureObject_t* color_opacity_texture_array = get_s_color_opacity_texture_array(ray_cast_infos->label_level);
-    float4 color_ori = tex1D<float4>(color_opacity_texture_array[label], gray);
+    float4 color_ori = tex1D<float4>(color_opacity_texture_array[label], gray + ray_cast_infos->color_opacity_texture_shift);
     
     float alpha;
     if (color_ori.w > 0.0f) {
@@ -239,15 +239,14 @@ __device__ float4 kernel_ray_cast_mip(CudaVolumeInfos* __restrict__ volume_infos
         *mip_pos = max_pos;
     }
 
-    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
-    float ww = s_wl_array[0];
-    float wl = s_wl_array[1];
+    float ww = ray_cast_infos->global_ww;
+    float wl = ray_cast_infos->global_wl;
     gray = (*mip_gray - wl + ww*0.5f) / ww;
 
     //TODO 
     //1 blend with graphic
     //2 mip pos and mip label
-    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray + ray_cast_infos->pseudo_color_texture_shift);
 
     return integral_color;
 }
@@ -297,15 +296,14 @@ __device__ float4 kernel_ray_cast_minip(CudaVolumeInfos* __restrict__ volume_inf
         *mip_pos = min_pos;
     }
 
-    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
-    float ww = s_wl_array[0];
-    float wl = s_wl_array[1];
+    float ww = ray_cast_infos->global_ww;
+    float wl = ray_cast_infos->global_wl;
     gray = (*mip_gray - wl + ww*0.5f) / ww;
 
     //TODO 
     //1 blend with graphic
     //2 mip pos and mip label
-    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray + ray_cast_infos->pseudo_color_texture_shift);
 
     return integral_color;
 }
@@ -348,15 +346,14 @@ __device__ float4 kernel_ray_cast_average(CudaVolumeInfos* __restrict__ volume_i
         *mip_gray = 0.0f;
     }
 
-    float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
-    float ww = s_wl_array[0];
-    float wl = s_wl_array[1];
-    gray = (*mip_gray - wl + ww*0.5f) / ww;
+    float ww = ray_cast_infos->global_ww;
+    float wl = ray_cast_infos->global_wl;
+    gray = (gray - wl + ww*0.5f) / ww;
 
     //TODO 
     //1 blend with graphic
     //2 mip pos and mip label
-    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray);
+    integral_color = tex1D<float4>(ray_cast_infos->pseudo_color_texture, gray + ray_cast_infos->pseudo_color_texture_shift);
 
     return integral_color;
 }
@@ -422,13 +419,15 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
     float3 ray_start, ray_dir;
     float start_step, end_step;
 
-    /////////////////////////////////////////
-    //debug
-    //float4 debug_color = entry;
-    //uchar4 rgba_entry_exit = make_uchar4(debug_color.x / volume_infos.dim.x * 255, debug_color.y / volume_infos.dim.y * 255, debug_color.z / volume_infos.dim.z * 255, 255);
-    //surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
-    //return;
-    /////////////////////////////////////////
+    if (1 == ray_cast_infos.test_code) {
+        uchar4 rgba_entry = make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
+        surf2Dwrite(rgba_entry, canvas, x * 4, y);
+        return;
+    } else if (2 == ray_cast_infos.test_code) {
+        uchar4 rgba_exit = make_uchar4(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
+        surf2Dwrite(rgba_exit, canvas, x * 4, y);
+        return;
+    }
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0,0,0,0);
@@ -470,7 +469,6 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
     __syncthreads();
 
-
     if (x > width - 1 || y > height - 1) {
         return;
     }
@@ -486,12 +484,15 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     float3 ray_start, ray_dir;
     float start_step, end_step;
 
-    /////////////////////////////////////////
-    //debug
-    //uchar4 rgba_entry_exit= make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
-    //surf2Dwrite(rgba_entry_exit, canvas, x * 4, y);
-    //return;
-    /////////////////////////////////////////
+    if (1 == ray_cast_infos.test_code) {
+        uchar4 rgba_entry= make_uchar4(entry.x / volume_infos.dim.x * 255, entry.y / volume_infos.dim.y * 255, entry.z / volume_infos.dim.z * 255, 255);
+        surf2Dwrite(rgba_entry, canvas, x * 4, y);
+        return;
+    } else if (2 == ray_cast_infos.test_code) {
+        uchar4 rgba_exit= make_uchar4(exit.x / volume_infos.dim.x * 255, exit.y / volume_infos.dim.y * 255, exit.z / volume_infos.dim.z * 255, 255);
+        surf2Dwrite(rgba_exit, canvas, x * 4, y);
+        return;
+    }
 
     if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0, 0, 0, 0);

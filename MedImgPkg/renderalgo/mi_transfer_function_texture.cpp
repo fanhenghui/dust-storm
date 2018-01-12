@@ -78,7 +78,7 @@ void TransferFunctionTexture::initialize(LabelLevel label_level) {
                     gray_array[i * 4] = static_cast<unsigned char>(255.0f * (float)i / (float)S_TRANSFER_FUNC_WIDTH);
                     gray_array[i * 4 + 1] = gray_array[i * 4];
                     gray_array[i * 4 + 2] = gray_array[i * 4];
-                    gray_array[i * 4 + 2] = 255;
+                    gray_array[i * 4 + 3] = 255;
                 }
                 pseudo_color_texture->load(8, 8, 8, 8, cudaChannelFormatKindUnsigned, S_TRANSFER_FUNC_WIDTH, gray_array.get());
             }

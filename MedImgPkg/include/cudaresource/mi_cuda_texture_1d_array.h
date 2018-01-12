@@ -20,6 +20,8 @@ public:
 
     virtual float memory_used() const;
     
+    int get_array_length() const;
+
     int get_length() const;
 
     int load(int channel_x, int channel_y, int channel_z, int channel_w, int position, cudaChannelFormatKind format, int length, void* data);

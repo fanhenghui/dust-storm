@@ -8,6 +8,8 @@
 
 #include "cudaresource/mi_cuda_resource_manager.h"
 #include "cudaresource/mi_cuda_gl_texture_2d.h"
+#include "cudaresource/mi_cuda_texture_1d.h"
+#include "cudaresource/mi_cuda_texture_1d_array.h"
 #include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_texture_3d.h"
 #include "cudaresource/mi_cuda_global_memory.h"
@@ -240,6 +242,29 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
 
     CudaGlobalMemoryPtr shared_mapped_memory = ray_caster->get_inner_resource()->get_shared_map_memory();
     cuda_ray_infos.d_shared_mapped_memory = shared_mapped_memory->get_pointer();
+
+    //color opacity texture shift
+    cuda_ray_infos.color_opacity_texture_shift = 0.5f / S_TRANSFER_FUNC_WIDTH;
+
+    //global window
+    float gww, gwl;
+    ray_caster->get_global_window_level(gww, gwl);
+    volume->normalize_wl(gww, gwl);
+    cuda_ray_infos.global_ww = gww;
+    cuda_ray_infos.global_wl = gwl;
+
+    //pseudo color texture 
+    unsigned int lut_length = S_TRANSFER_FUNC_WIDTH;
+    GPUTexture1DPairPtr pseudo_texture = ray_caster->get_pseudo_color_texture(lut_length);
+    RENDERALGO_CHECK_NULL_EXCEPTION(pseudo_texture);
+    CudaTexture1DPtr cuda_pseudo_texture = pseudo_texture->get_cuda_resource();
+    RENDERALGO_CHECK_NULL_EXCEPTION(cuda_pseudo_texture);
+    cuda_ray_infos.pseudo_color_texture = cuda_pseudo_texture->get_object(
+        cudaAddressModeClamp, cudaFilterModeLinear, cudaReadModeNormalizedFloat, true);
+    cuda_ray_infos.pseudo_color_texture_shift = 0.5f / lut_length;
+
+    //test code
+    cuda_ray_infos.test_code = ray_caster->get_test_code();
 }
 
 double RayCastingGPUCUDA::get_rendering_duration() const {

@@ -13,23 +13,23 @@ inline __device__  float ray_intersect_brick(float3 init_pt, float3 brick_min, f
     float3 ttop = ray_r * top;
 
     //Adjust
-    if (fabs(bottom.x) < INF) {
+    if (fabs(bottom.x) < EPSILON) {
         tbot.x = 0.0;
     }
-    if (fabs(bottom.y) < INF) {
+    if (fabs(bottom.y) < EPSILON) {
         tbot.y = 0.0;
     }
-    if (fabs(bottom.z) < INF) {
+    if (fabs(bottom.z) < EPSILON) {
         tbot.z = 0.0;
     }
 
-    if (fabs(top.x) < INF) {
+    if (fabs(top.x) < EPSILON) {
         ttop.x = 0.0;
     }
-    if (fabs(top.y) < INF) {
+    if (fabs(top.y) < EPSILON) {
         ttop.y = 0.0;
     }
-    if (fabs(top.z) < INF) {
+    if (fabs(top.z) < EPSILON) {
         ttop.z = 0.0;
     }
 
@@ -45,10 +45,10 @@ inline __device__  float ray_intersect_brick(float3 init_pt, float3 brick_min, f
 }
 
 inline __device__ bool outside(float3 pt , float3 bound) {
-    if (pt.x < -INF || pt.y < -INF || pt.z < -INF) {
+    if (pt.x < 0|| pt.y < 0 || pt.z < 0) {
         return true;
     }
-    if (pt.x > bound.x + INF || pt.y > bound.y + INF || pt.z > bound.z + INF) {
+    if (pt.x > bound.x || pt.y > bound.y|| pt.z > bound.z) {
         return true;
     }
     return false;
@@ -64,7 +64,7 @@ __global__ void kernel_calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry
 
     float ndc_x = (float(x) + 0.5f) / float(width);
     float ndc_y = (float(y) + 0.5f) / float(height);
-    float3 pos_ndc = make_float3(ndc_x * 2.0f - 1.0f, ndc_y * 2.0f - 1.0f, 1.0f);
+    float3 pos_ndc = make_float3(ndc_x * 2.0f - 1.0f, ndc_y * 2.0f - 1.0f, 0.0f);
     float4 central4 = mat_mvp_inv * make_float4(pos_ndc, 1.0f);
     float3 central = make_float3(central4/ central4.w);
 
@@ -84,7 +84,7 @@ __global__ void kernel_calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry
     ray_intersect_brick(entry_point, make_float3(0.0f, 0.0f, 0.0f), volume_dim, ray_dir, &entry_step, &exit_step);
 
     //Entry point outside
-    if (outside(entry_point, volume_dim - make_float3(1.0f))) {
+    if (outside(entry_point, volume_dim - make_float3(1.0f))) {        
         if (entry_step >= exit_step || entry_step < 0 || entry_step > thickness)// check entry points in range of thickness and volume
         {
             exit_step = -1.0f;
@@ -120,13 +120,13 @@ extern "C"
 cudaError_t calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry_surf, cudaSurfaceObject_t exit_surf,
     int width, int height, mat4 mat_mvp_inv, float3 volume_dim, float thickness, float3 ray_dir) {
     
-    const int BLOCK_DIM = 16;
-    dim3 block(BLOCK_DIM, BLOCK_DIM);
-    dim3 grid(width / BLOCK_DIM, height / BLOCK_DIM);
-    if (grid.x * BLOCK_DIM != width) {
+    const int BLOCK_SIZE = 16;
+    dim3 block(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 grid(width / BLOCK_SIZE, height / BLOCK_SIZE);
+    if (grid.x * BLOCK_SIZE != width) {
         grid.x += 1;
     }
-    if (grid.y * BLOCK_DIM != height) {
+    if (grid.y * BLOCK_SIZE != height) {
         grid.y += 1;
     }
 

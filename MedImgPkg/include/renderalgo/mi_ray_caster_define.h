@@ -142,7 +142,7 @@ struct CudaRayCastInfos {
     int color_inverse_mode;
     int mask_overlay_mode;
 
-    // sample step
+    //sample step
     float sample_step;
 
     //illumination parameters
@@ -151,11 +151,16 @@ struct CudaRayCastInfos {
     float3 ambient_color;//ambient RGB normalized
     float ambient_intensity;//ambient intensity
 
+    //global window level(MIP MinIP Average)
+    float global_ww;
+    float global_wl;
+
     //transfer function parameters
     float color_opacity_texture_shift;
 
     //pseudo color texture
     cudaTextureObject_t pseudo_color_texture;
+    float pseudo_color_texture_shift;
 
     //---------------------------------------------------------//
     //shared mapped global memory contains follows:
@@ -166,6 +171,12 @@ struct CudaRayCastInfos {
     // sum: label_level * [4*1 + 4*2 + 8*1 + 4*9] = label_level * 56, max : 14KB < shared limits(40KB)
     //---------------------------------------------------------//
     void* d_shared_mapped_memory;
+    
+    //test code
+    //0 non-test
+    //1 show entry points
+    //2 show exit points
+    int test_code;
 
     CudaRayCastInfos() {
         label_level = 1;
@@ -184,10 +195,16 @@ struct CudaRayCastInfos {
         ambient_color = make_float3(1.0f);
         ambient_intensity = 0.3f;
 
+        global_ww = 0.0f;
+        global_wl = 0.0f;
+
         color_opacity_texture_shift = 0.5f/512.0f;
 
         pseudo_color_texture = 0; 
+        pseudo_color_texture_shift = 0.5f/512.0f;
         d_shared_mapped_memory = nullptr;
+
+        test_code = 0;
     }
 };
 

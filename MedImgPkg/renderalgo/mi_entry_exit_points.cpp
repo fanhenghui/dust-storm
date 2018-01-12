@@ -175,22 +175,15 @@ void EntryExitPoints::register_resize_callback(std::shared_ptr<IEntryExitPointsR
     _resize_callback = cb;
 }
 
-void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
-    if (CPU_BASE == _strategy) {
-        Vector4f* pPoints = _entry_points_buffer.get();
-
-        std::unique_ptr<unsigned char[]> rgb_array(
-            new unsigned char[_width * _height * 3]);
-        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
-        unsigned int* dim = _volume_data->_dim;
-        float dim_r[3] = { 1.0f / (float)dim[0], 1.0f / (float)dim[1], 1.0f / (float)dim[2]};
+namespace {
+    void rgba32f_tp_rgb8(float* rgba32f, unsigned char* rgb8, unsigned int length, unsigned int* dim) {
+        float dim_r[3] = { 1.0f / (float)dim[0], 1.0f / (float)dim[1], 1.0f / (float)dim[2] };
         unsigned char r, g, b;
         float rr, gg, bb;
-
-        for (int i = 0; i < _width * _height; ++i) {
-            rr = pPoints[i]._m[0] * dim_r[0] * 255.0f;
-            gg = pPoints[i]._m[1] * dim_r[1] * 255.0f;
-            bb = pPoints[i]._m[2] * dim_r[2] * 255.0f;
+        for (unsigned int i = 0; i < length; ++i) {
+            rr = rgba32f[i*4] * dim_r[0] * 255.0f;
+            gg = rgba32f[i*4+1] * dim_r[1] * 255.0f;
+            bb = rgba32f[i*4+2] * dim_r[2] * 255.0f;
 
             rr = rr > 255.0f ? 255.0f : rr;
             rr = rr < 0.0f ? 0.0f : rr;
@@ -201,78 +194,74 @@ void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
             bb = bb > 255.0f ? 255.0f : bb;
             bb = bb < 0.0f ? 0.0f : bb;
 
-            r = static_cast<unsigned char>(rr);
-            g = static_cast<unsigned char>(gg);
-            b = static_cast<unsigned char>(bb);
+            r = (unsigned char)rr;
+            g = (unsigned char)gg;
+            b = (unsigned char)bb;
 
-            rgb_array[i * 3] = r;
-            rgb_array[i * 3 + 1] = g;
-            rgb_array[i * 3 + 2] = b;
-        }
-
-        FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 3);
-
-    } else {
-        if (GL_BASE == _gpu_platform) {
-            _entry_points_texture->get_gl_resource()->bind();
-            std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 3]);
-            _entry_points_texture->get_gl_resource()->download(GL_RGB, GL_UNSIGNED_BYTE, rgb_array.get());
-            _entry_points_texture->get_gl_resource()->unbind();
-            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 3);
-        } else {
-            //TODO CUDA FLOAT4
-            /*std::unique_ptr<unsigned char[]> rgb_array(new unsigned char[_width * _height * 4]);
-            _entry_points_texture->get_cuda_resource()->download(_width*_height*4, rgb_array.get());
-            FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 4);*/
+            rgb8[i * 3] = r;
+            rgb8[i * 3 + 1] = g;
+            rgb8[i * 3 + 2] = b;
         }
     }
 }
+void EntryExitPoints::debug_output_entry_points(const std::string& file_name) {
+    if (nullptr == _volume_data) {
+        MI_RENDERALGO_LOG(MI_WARNING) << "output entry points failed: volume data is null";
+        return;
+    }
+    std::unique_ptr<unsigned char[]> rgb8(new unsigned char[_width * _height * 3]);
+    if (CPU_BASE == _strategy) {
+        rgba32f_tp_rgb8((float*)(_entry_points_buffer.get()), rgb8.get(), _width*_height, _volume_data->_dim);
+        
+    } else {
+        std::unique_ptr<float[]> rgbaf4(new float[_width*_height * 4]);
+        if (GL_BASE == _gpu_platform) {
+            CHECK_GL_ERROR;
+            GLUtils::set_pixel_unpack_alignment(1);
+            _entry_points_texture->get_gl_resource()->bind();
+            _entry_points_texture->get_gl_resource()->download(GL_RGBA, GL_FLOAT, rgbaf4.get());
+            _entry_points_texture->get_gl_resource()->unbind();
+            CHECK_GL_ERROR;
+        } else { 
+            if (0 != _entry_points_texture->get_cuda_resource()->download(_width * _height * 4 * sizeof(float), rgbaf4.get())) {
+                MI_RENDERALGO_LOG(MI_WARNING) << "download entry points failed.";
+                return;
+            }
+        }
+        rgba32f_tp_rgb8(rgbaf4.get(), rgb8.get(), _width*_height, _volume_data->_dim);
+    }
+    FileUtil::write_raw(file_name, rgb8.get(), _width * _height * 3);
+}
 
 void EntryExitPoints::debug_output_exit_points(const std::string& file_name) {
-    if (CPU_BASE == _strategy) {
-        Vector4f* pPoints = _exit_points_buffer.get();
-        std::unique_ptr<unsigned char[]> rgb_array(
-            new unsigned char[_width * _height * 3]);
-
-        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
-        unsigned int* dim = _volume_data->_dim;
-        float dim_r[3] = { 1.0f / (float)dim[0], 1.0f / (float)dim[1],
-            1.0f / (float)dim[2]
-        };
-        unsigned char r, g, b;
-        float rr, gg, bb;
-
-        for (int i = 0; i < _width * _height; ++i) {
-            rr = pPoints[i]._m[0] * dim_r[0] * 255.0f;
-            gg = pPoints[i]._m[1] * dim_r[1] * 255.0f;
-            bb = pPoints[i]._m[2] * dim_r[2] * 255.0f;
-
-            rr = rr > 255.0f ? 255.0f : rr;
-            rr = rr < 0.0f ? 0.0f : rr;
-
-            gg = gg > 255.0f ? 255.0f : gg;
-            gg = gg < 0.0f ? 0.0f : gg;
-
-            bb = bb > 255.0f ? 255.0f : bb;
-            bb = bb < 0.0f ? 0.0f : bb;
-
-            r = static_cast<unsigned char>(rr);
-            g = static_cast<unsigned char>(gg);
-            b = static_cast<unsigned char>(bb);
-
-            rgb_array[i * 3] = r;
-            rgb_array[i * 3 + 1] = g;
-            rgb_array[i * 3 + 2] = b;
-        }
-
-        FileUtil::write_raw(file_name, rgb_array.get(), _width * _height * 3);
-    } else {
-        if (GL_BASE == _gpu_platform) {
-            //TODO GL texture download to file
-        } else {
-            //TODO CUDA surface download to file
-        }
+    if (nullptr == _volume_data) {
+        MI_RENDERALGO_LOG(MI_WARNING) << "output exit points failed: volume data is null";
+        return;
     }
+    std::unique_ptr<unsigned char[]> rgb8(new unsigned char[_width * _height * 3]);
+    if (CPU_BASE == _strategy) {
+        rgba32f_tp_rgb8((float*)(_exit_points_buffer.get()), rgb8.get(), _width*_height, _volume_data->_dim);
+
+    }
+    else {
+        std::unique_ptr<float[]> rgbaf4(new float[_width*_height * 4]);
+        if (GL_BASE == _gpu_platform) {
+            CHECK_GL_ERROR;
+            GLUtils::set_pixel_unpack_alignment(1);
+            _exit_points_texture->get_gl_resource()->bind();
+            _exit_points_texture->get_gl_resource()->download(GL_RGBA, GL_FLOAT, rgbaf4.get());
+            _exit_points_texture->get_gl_resource()->unbind();
+            CHECK_GL_ERROR;
+        }
+        else {
+            if (0 != _exit_points_texture->get_cuda_resource()->download(_width * _height * 4 * sizeof(float), rgbaf4.get())) {
+                MI_RENDERALGO_LOG(MI_WARNING) << "download exit points failed.";
+                return;
+            }
+        }
+        rgba32f_tp_rgb8(rgbaf4.get(), rgb8.get(), _width*_height, _volume_data->_dim);
+    }
+    FileUtil::write_raw(file_name, rgb8.get(), _width * _height * 3);
 }
 
 MED_IMG_END_NAMESPACE

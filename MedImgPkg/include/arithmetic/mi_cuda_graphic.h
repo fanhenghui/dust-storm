@@ -7,6 +7,7 @@
 #include "arithmetic/mi_matrix4.h"
 
 #define INF     2e10f
+#define EPSILON 1e-6f
 
 struct Viewport {
     int x, y, width, height;
