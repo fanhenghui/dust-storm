@@ -71,9 +71,8 @@ void RCStepCompositeDVR::set_gpu_parameter() {
 
     std::shared_ptr<ImageData> volume_img = ray_caster->get_volume_data();
     RENDERALGO_CHECK_NULL_EXCEPTION(volume_img);
-    const double min_spacing =
-        (std::min)((std::min)(volume_img->_spacing[0], volume_img->_spacing[1]),
-                   volume_img->_spacing[2]);
+    const double min_spacing = (std::min)((std::min)(volume_img->_spacing[0], 
+        volume_img->_spacing[1]), volume_img->_spacing[2]);
     glUniform1f(_loc_opacity_correction, static_cast<float>(min_spacing));
 
     CHECK_GL_ERROR;

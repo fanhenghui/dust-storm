@@ -173,11 +173,11 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
             color_ori = shade_phong(volume_infos, ray_cast_infos, sample_pos, sample_norm, ray_dir, color_ori, label);
         }
         
-        alpha = color_ori.w*(1.0f - integral_color->w);
+        alpha = (1 - __powf(1 - color_ori.w, ray_cast_infos->opacity_correction))*(1.0f - integral_color->w);
         integral_color->x += color_ori.x * alpha;
         integral_color->y += color_ori.y * alpha;
         integral_color->z += color_ori.z * alpha;
-        integral_color->w += color_ori.w *(1 - integral_color->w);
+        integral_color->w += alpha;
     }
 }
 

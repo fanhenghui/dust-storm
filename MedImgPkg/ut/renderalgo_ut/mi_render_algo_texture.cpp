@@ -9,7 +9,9 @@
 #include "glresource/mi_gl_resource_manager_container.h"
 
 #include "cudaresource/mi_cuda_gl_texture_2d.h"
+#include "cudaresource/mi_cuda_texture_1d.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
+#include "cudaresource/mi_cuda_global_memory.h"
 
 #include "renderalgo/mi_volume_infos.h"
 #include "renderalgo/mi_brick_pool.h"
@@ -161,6 +163,19 @@ static void test_cuda_gl_texture() {
     _height -= 4;
 }
 
+static void test_cuda_texture_1d() {
+    std::shared_ptr<CudaGlobalMemory> mem = CudaResourceManager::instance()->create_global_memory("test global memory");
+    mem->load(512, nullptr);
+
+    std::shared_ptr<CudaTexture1D> tex = CudaResourceManager::instance()->create_cuda_texture_1d("test 1D");
+    tex->load(32, 0, 0, 0, cudaChannelFormatKindUnsigned, 512, nullptr);
+
+    std::shared_ptr<CudaTexture1D> tex2 = CudaResourceManager::instance()->create_cuda_texture_1d("test 1D");
+    tex2->load(32, 0, 0, 0, cudaChannelFormatKindUnsigned, 512, nullptr);
+
+    std::cout << "DONE.";
+}
+
 static void display() {
     glViewport(0, 0, _width, _height);
     glClearColor(1.0, 0.0, 0.0, 1.0);
@@ -204,7 +219,8 @@ int TE_Texture(int argc, char* argv[]) {
 
     initialize();
 
-    test_cuda_gl_texture();
+    //test_cuda_gl_texture();
+    test_cuda_texture_1d();
 
     glutMainLoop();
 

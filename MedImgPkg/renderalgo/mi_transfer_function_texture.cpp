@@ -92,6 +92,7 @@ void TransferFunctionTexture::initialize(LabelLevel label_level) {
     else {
         // TODO CPU gray pseudo array
     }
+    _init = true;
 }
 
 TransferFunctionTexture::~TransferFunctionTexture() {

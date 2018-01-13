@@ -144,6 +144,8 @@ struct CudaRayCastInfos {
 
     //sample step
     float sample_step;
+    //opacity correction for adaptive sample step
+    float opacity_correction;
 
     //illumination parameters
     mat4 mat_normal;//transpose(inverse(mat_m2v))
@@ -189,6 +191,7 @@ struct CudaRayCastInfos {
         mask_overlay_mode = 0;
 
         sample_step = 0.5f;
+        opacity_correction = 0.5f;
 
         mat_normal = matrix4_to_mat4(medical_imaging::Matrix4::S_IDENTITY_MATRIX);
         light_position = make_float3(0.0f);

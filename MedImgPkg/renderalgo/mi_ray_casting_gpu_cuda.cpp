@@ -293,7 +293,9 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
 
     //sample step
     cuda_ray_infos.sample_step = ray_caster->get_sample_step();
-
+    //opacity correction
+    cuda_ray_infos.opacity_correction = ray_caster->get_sample_step() / 
+        (float)(std::min)((std::min)(volume->_spacing[0], volume->_spacing[1]), volume->_spacing[2]);
     //normal matrix
     std::shared_ptr<CameraCalculator> camera_cal = ray_caster->get_camera_calculator();
     const Matrix4 mat_v2w = camera_cal->get_volume_to_world_matrix();
