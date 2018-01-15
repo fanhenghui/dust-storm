@@ -448,8 +448,9 @@ void RayCastScene::set_window_level(float ww, float wl, unsigned char label) {
         it->second.set_x(ww);
         it->second.set_y(wl);
     }
-
-    _volume_infos->get_volume()->regulate_normalize_wl(ww, wl);
+    
+    _volume_infos->get_volume()->regulate_wl(ww, wl, _strategy == GPU_BASE);
+    
     _ray_caster->set_window_level(ww, wl, label);
 
     set_dirty(true);
@@ -469,12 +470,12 @@ int RayCastScene::get_window_level(float& ww, float& wl, unsigned char label) co
 }
 
 void RayCastScene::set_global_window_level(float ww, float wl) {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+
     _global_ww = ww;
     _global_wl = wl;
-
-    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
-    _volume_infos->get_volume()->regulate_wl(ww, wl);
-
+    
+    _volume_infos->get_volume()->regulate_wl(ww, wl, _strategy == GPU_BASE);
     _ray_caster->set_global_window_level(ww, wl);
 
     set_dirty(true);
@@ -569,6 +570,12 @@ void RayCastScene::set_test_code(int test_code) {
 void RayCastScene::get_global_window_level(float& ww, float& wl) const {
     ww = _global_ww;
     wl = _global_wl;
+}
+
+void RayCastScene::set_minip_threshold(float th) {
+    RENDERALGO_CHECK_NULL_EXCEPTION(_volume_infos);
+    _volume_infos->get_volume()->regulate_pixel_value(th, _strategy == GPU_BASE);
+    _ray_caster->set_minip_threashold(th);
 }
 
 std::shared_ptr<VolumeInfos> RayCastScene::get_volume_infos() const {

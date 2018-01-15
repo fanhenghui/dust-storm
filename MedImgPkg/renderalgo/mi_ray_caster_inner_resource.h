@@ -9,6 +9,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
+class ImageData;
 class RayCasterInnerResource {
 public:
     enum BufferType {
@@ -35,6 +36,7 @@ public:
 
     //----------------------------------------------//
     //input interface
+    void set_volume_data(std::shared_ptr<ImageData> image_data);
     void set_mask_label_level(LabelLevel level);
     void set_window_level(float ww, float wl, unsigned char label);
     void set_visible_labels(std::vector<unsigned char> labels);
@@ -47,6 +49,8 @@ public:
     //get interface
     const std::vector<unsigned char>& get_visible_labels() const;
     const std::map<unsigned char, RGBAUnit>& get_mask_overlay_color() const;
+    void get_window_levels(std::map<unsigned char, Vector2f>& wls) const;
+    void get_visible_window_levels(std::map<unsigned char, Vector2f>& wls) const;
 
 private:
     bool check_dirty(BufferType type);
@@ -69,6 +73,8 @@ private:
     std::map<unsigned char, RGBAUnit> _mask_overlay_colors;
     std::map<unsigned char, Material> _material;
     GPUTexture1DArrayPairPtr _color_opacity_tex_array;
+
+    std::shared_ptr<ImageData> _volume_data;
 };
 
 MED_IMG_END_NAMESPACE

@@ -8,7 +8,7 @@ uniform vec2 global_wl;
 
 float global_max_gray = -65535.0;
 float global_min_gray = 65535.0;
-float global_target_pos = vec3(0,0,0);
+vec3 global_target_pos = vec3(0,0,0);
 
 void composite(vec3 sample_pos_volume, vec3 ray_dir, in out vec4 integral_color,
     sampler3D volume_sampler, sampler3D mask_sampler, vec3 sub_data_dim, vec3 sub_data_offset, vec3 sample_shift);
@@ -43,6 +43,11 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
     //Last sub data transfer gray to color
     if(0!= (ray_cast_step_code & 0x0004))
     {
+        //check ray cast through air
+        if (global_target_pos == vec3(0, 0, 0)) {
+            discard;
+        }
+
         float ww = global_wl.x;
         float wl = global_wl.y;
         float result_gray = current_integral_color.r;

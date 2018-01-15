@@ -214,20 +214,6 @@ void VRScene::set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos) {
     vr_entry_exit_points->set_brick_pool(_volume_infos->get_brick_pool());
 }
 
-void VRScene::set_window_level(float ww, float wl, unsigned char label) {
-    RayCastScene::set_window_level(ww, wl, label);
-    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
-        std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
-    vr_entry_exit_points->set_window_level(ww, wl, label, false);
-}
-
-void VRScene::set_global_window_level(float ww, float wl) {
-    RayCastScene::set_global_window_level(ww, wl);
-    std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
-        std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
-    vr_entry_exit_points->set_window_level(ww, wl, 0, true);
-}
-
 void VRScene::set_visible_labels(std::vector<unsigned char> labels) {
     RayCastScene::set_visible_labels(labels);
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
@@ -260,14 +246,58 @@ void VRScene::pre_render() {
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points =
         std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
 
-    if (_ray_caster->get_composite_mode() == COMPOSITE_DVR) {
+    //roll-back to custom's proxy geometry 
+    switch (_ray_caster->get_composite_mode())
+    {
+    case COMPOSITE_DVR: {
         if (_ray_caster->get_mask_mode() == MASK_MULTI_LABEL) {
+            // Use all visible labels
+            std::map<unsigned char, Vector2f> wls;
+            _ray_caster->get_visible_window_levels(wls);
+            vr_entry_exit_points->set_window_levels(wls);
             vr_entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
-        } else {
+        }
+        else {
+            // Just use label 0
+            std::map<unsigned char, Vector2f> wls;
+            _ray_caster->get_window_levels(wls);
+            auto it_label_0 = wls.find(0);
+            if (it_label_0 == wls.end()) {
+                RENDERALGO_THROW_EXCEPTION("non-mask dvr should set wl to label 0");
+            }
+            std::map<unsigned char, Vector2f> wl_0;
+            wl_0.insert(std::make_pair(0, it_label_0->second));
+            vr_entry_exit_points->set_window_levels(wl_0);
             vr_entry_exit_points->set_brick_filter_item(BF_WL);
         }
-    } else {
-        vr_entry_exit_points->set_brick_filter_item(BF_WL);
+        break;
+    }
+    case COMPOSITE_MIP:
+    case COMPOSITE_MINIP:
+    case COMPOSITE_AVERAGE: {
+        if (_ray_caster->get_mask_mode() == MASK_MULTI_LABEL) {
+            // Set all visible labels to global window levels
+            float ww, wl;
+            _ray_caster->get_global_window_level(ww, wl);
+            std::map<unsigned char, Vector2f> wls;
+            const std::vector<unsigned char> visible_labels = _ray_caster->get_visible_labels();
+            for (auto it = visible_labels.begin(); it != visible_labels.end(); ++it) {
+                wls[*it] = Vector2f(ww, wl);
+            }
+            vr_entry_exit_points->set_window_levels(wls);
+            vr_entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
+        } else {
+            // Just use global WL
+            float ww, wl;
+            _ray_caster->get_global_window_level(ww, wl);
+            vr_entry_exit_points->set_global_window_level(ww, wl);
+            vr_entry_exit_points->set_brick_filter_item(BF_WL);
+        }
+        break;
+    }
+    default:
+        RENDERALGO_THROW_EXCEPTION("invalid composite mode.");
+        break;
     }
 }
 

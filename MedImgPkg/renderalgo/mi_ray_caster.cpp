@@ -21,9 +21,10 @@ RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
     : _strategy(strategy), _gpu_platform(gpu_platform), _mask_label_level(L_8),
       _sample_step(0.5f), _custom_sample_step(0.5f), 
       _global_ww(1.0f), _global_wl(0.0f),
+      _minip_threshold(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
       _inner_resource(new RayCasterInnerResource(gpu_platform)),
-      _ssd_gray(1.0f), _enable_jittering(false),
+      _enable_jittering(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
       _mask_mode(MASK_NONE), 
       _composite_mode(COMPOSITE_AVERAGE),
@@ -174,6 +175,7 @@ void RayCaster::downsample_adjust(){
 
 void RayCaster::set_volume_data(std::shared_ptr<ImageData> image_data) {
     _volume_data = image_data;
+    _inner_resource->set_volume_data(image_data);
 }
 
 void RayCaster::set_mask_data(std::shared_ptr<ImageData> image_data) {
@@ -225,7 +227,6 @@ LabelLevel RayCaster::get_mask_label_level() const {
     return _mask_label_level;
 }
 
-
 void RayCaster::set_visible_labels(std::vector<unsigned char> labels) {
     _inner_resource->set_visible_labels(labels);
 }
@@ -241,6 +242,14 @@ void RayCaster::set_window_level(float ww, float wl, unsigned char label) {
 void RayCaster::set_global_window_level(float ww, float wl) {
     _global_ww = ww;
     _global_wl = wl;
+}
+
+void RayCaster::get_window_levels(std::map<unsigned char, Vector2f>& wls) const {
+    _inner_resource->get_window_levels(wls);
+}
+
+void RayCaster::get_visible_window_levels(std::map<unsigned char, Vector2f>& wls) const {
+    _inner_resource->get_visible_window_levels(wls);
 }
 
 void RayCaster::set_pseudo_color_texture(GPUTexture1DPairPtr tex, unsigned int length) {
@@ -285,10 +294,6 @@ void RayCaster::get_ambient_color(float(&rgba)[4]) {
 
 void RayCaster::set_material(const Material& m, unsigned char label) {
     _inner_resource->set_material(m, label);
-}
-
-void RayCaster::set_ssd_gray(float ssd_gray) {
-    _ssd_gray = ssd_gray;
 }
 
 void RayCaster::set_jittering_enabled(bool flag) {
@@ -442,6 +447,14 @@ int RayCaster::get_expected_fps() const {
 
 bool RayCaster::map_quarter_canvas() const {
     return _map_quarter_canvas;
+}
+
+void RayCaster::set_minip_threashold(float th) {
+    _minip_threshold = th;
+}
+
+float RayCaster::get_minip_threashold() const {
+    return _minip_threshold;
 }
 
 MED_IMG_END_NAMESPACE

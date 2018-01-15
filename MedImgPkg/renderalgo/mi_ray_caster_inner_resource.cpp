@@ -1,4 +1,5 @@
 #include "mi_ray_caster_inner_resource.h"
+
 #include "glresource/mi_gl_buffer.h"
 #include "glresource/mi_gl_resource_manager_container.h"
 #include "glresource/mi_gl_utils.h"
@@ -6,6 +7,8 @@
 #include "cudaresource/mi_cuda_global_memory.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
 #include "cudaresource/mi_cuda_texture_1d_array.h"
+
+#include "io/mi_image_data.h"
 
 #include "mi_render_algo_logger.h"
 
@@ -143,11 +146,12 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
         switch (type) {
         case WINDOW_LEVEL_BUCKET: {
             if (check_dirty(type)) {
+                RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
                 float* wl_array = (float*)_shared_buffer_array.get();
                 memset(wl_array, 0, sizeof(float) * static_cast<int>(_label_level) * 2);
 
-                for (auto it = _window_levels.begin(); it != _window_levels.end();
-                        ++it) {
+                float ww(0.0f),wl(0.0f);
+                for (auto it = _window_levels.begin(); it != _window_levels.end(); ++it) {
                     const unsigned char label = it->first;
 
                     if (label > static_cast<int>(_label_level) - 1) {
@@ -157,9 +161,12 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
                            << static_cast<int>(_label_level) - 1 << " !";
                         RENDERALGO_THROW_EXCEPTION(ss.str());
                     }
+                    ww = it->second._value.x;
+                    wl = it->second._value.y;
+                    _volume_data->normalize_wl(ww, wl);
 
-                    wl_array[label * 2] = it->second._value.x;
-                    wl_array[label * 2 + 1] = it->second._value.y;
+                    wl_array[label * 2] = ww;
+                    wl_array[label * 2 + 1] = wl;
                 }
 
                 buffer->bind();
@@ -311,6 +318,10 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
     }
 }
 
+void RayCasterInnerResource::set_volume_data(std::shared_ptr<ImageData> image_data) {
+    _volume_data = image_data;
+}
+
 void RayCasterInnerResource::set_mask_label_level(LabelLevel level) {
     if (_label_level != level) {
         _label_level = level;
@@ -375,6 +386,20 @@ void RayCasterInnerResource::set_mask_overlay_color(const RGBAUnit& color, unsig
 
 const std::map<unsigned char, RGBAUnit>& RayCasterInnerResource::get_mask_overlay_color() const {
     return _mask_overlay_colors;
+}
+
+void RayCasterInnerResource::get_visible_window_levels(std::map<unsigned char, Vector2f>& wls) const {
+    wls.clear();
+    for (auto it = _labels.begin(); it != _labels.end(); ++it) {
+        std::map<unsigned char, Vector2f>::const_iterator it2 = _window_levels.find(*it);
+        if (it2 != _window_levels.end()) {
+            wls.insert(*it2);
+        }
+    }
+}
+
+void RayCasterInnerResource::get_window_levels(std::map<unsigned char, Vector2f>& wls) const {
+    wls = _window_levels;
 }
 
 void RayCasterInnerResource::set_material(const Material& matrial, unsigned char label) {
@@ -451,16 +476,22 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
     }
 
     if (check_dirty(WINDOW_LEVEL_BUCKET)) {
+        RENDERALGO_CHECK_NULL_EXCEPTION(_volume_data);
         float* wls = get_wl_array(_shared_buffer_array.get(), label_level);
         memset(wls, 0, sizeof(float)*2*label_level);
         unsigned char label = 0;
+        float ww(0.0f), wl(0.0f);
         for (auto it = _window_levels.begin(); it != _window_levels.end(); ++it) {
             label = it->first;
             if (label >= label_level) {
                 RENDERALGO_THROW_EXCEPTION("window level label overflow.");
             }
-            wls[label * 2] = it->second.get_x();
-            wls[label * 2 + 1] = it->second.get_y();
+            ww = it->second.get_x();
+            wl = it->second.get_y();
+            _volume_data->normalize_wl(ww, wl);
+
+            wls[label * 2] = ww;
+            wls[label * 2 + 1] = wl;
         }
 
         if (0 != shared_map_memory->update(get_wl_offset(label_level), sizeof(float)*2*label_level, wls)) {

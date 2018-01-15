@@ -8,6 +8,7 @@ void composite(vec3 sample_pos, vec3 ray_dir, in out vec4 integral_color,
 {
     int label = 0;
     vec3 actual_sample_pos = (sample_pos + sub_data_offset + vec3(0.5,0.5,0.5))/sub_data_dim;
+    integral_color = vec4(0,0,0,0);
     if(access_mask(mask_sampler , actual_sample_pos , label))
     {
         float gray = access_volume(volume_sampler, actual_sample_pos);

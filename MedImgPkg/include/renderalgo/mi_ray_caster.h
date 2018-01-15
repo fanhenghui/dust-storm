@@ -4,6 +4,7 @@
 #include "renderalgo/mi_render_algo_export.h"
 
 #include "arithmetic/mi_matrix4.h"
+#include "arithmetic/mi_vector2f.h"
 #include "arithmetic/mi_vector4f.h"
 
 #include "renderalgo/mi_ray_caster_define.h"
@@ -91,12 +92,18 @@ public:
     void set_visible_labels(std::vector<unsigned char> labels);
     const std::vector<unsigned char>& get_visible_labels() const;
 
+    //--------------------------------------//
     // Window level parameter
-    // Here
+    // Note: here WL is regulated
     void set_window_level(float ww, float wl, unsigned char label);
+    void get_window_levels(std::map<unsigned char, Vector2f>& wls) const;
+    void get_visible_window_levels(std::map<unsigned char, Vector2f>& wls) const;
     void set_global_window_level(float ww, float wl);
 
     void get_global_window_level(float& ww, float& wl) const;
+
+    void set_minip_threashold(float th);
+    float get_minip_threashold() const;
 
     // Pseudo color parameter
     void set_pseudo_color_texture(GPUTexture1DPairPtr tex, unsigned int length);
@@ -121,9 +128,6 @@ public:
     void set_ambient_color(float r, float g, float b, float factor);
     void get_ambient_color(float(&rgba)[4]);
     void set_material(const Material& m, unsigned char label);
-
-    // SSD gray value
-    void set_ssd_gray(float ssd_gray);
 
     // Jittering to prevent wooden artifacts
     void set_jittering_enabled(bool flag);
@@ -193,6 +197,9 @@ private:
     float _global_ww;
     float _global_wl;
 
+    // MipIP threshold
+    float _minip_threshold;
+
     // Transfer function & pseudo color
     GPUTexture1DArrayPairPtr _color_opacity_texture_array;
     GPUTexture1DPairPtr _pseudo_color_texture;
@@ -201,9 +208,6 @@ private:
 
     // Inner buffer to contain label based parameter
     std::shared_ptr<RayCasterInnerResource> _inner_resource;
-
-    // SSD gray value
-    float _ssd_gray;
 
     // DVR jittering flag
     bool _enable_jittering;

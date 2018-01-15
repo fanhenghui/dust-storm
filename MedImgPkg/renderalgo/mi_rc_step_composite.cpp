@@ -27,7 +27,14 @@ GLShaderInfo RCStepCompositeMinIP::get_shader_info() {
                         "RCStepCompositeMinIP");
 }
 
-void RCStepCompositeMinIP::set_gpu_parameter() {}
+void RCStepCompositeMinIP::set_gpu_parameter() {
+    CHECK_GL_ERROR;
+    std::shared_ptr<RayCaster> ray_caster = _ray_caster.lock();
+    float minip_th = ray_caster->get_minip_threashold();
+    ray_caster->get_volume_data()->normalize_pixel_value(minip_th);
+    glUniform1f(_loc_custom_min_threshold, minip_th);
+    CHECK_GL_ERROR;
+}
 
 void RCStepCompositeMinIP::get_uniform_location() {
     GLProgramPtr program = _gl_program.lock();

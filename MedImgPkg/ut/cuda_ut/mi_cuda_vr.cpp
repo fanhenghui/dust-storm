@@ -11,6 +11,7 @@
 
 #include "arithmetic/mi_ortho_camera.h"
 #include "arithmetic/mi_run_length_operator.h"
+#include "arithmetic/mi_vector2f.h"
 
 #include "glresource/mi_gl_environment.h"
 #include "glresource/mi_gl_fbo.h"
@@ -473,7 +474,8 @@ void init_data() {
     init_material_nonmask(_ray_cast_infos, material_array);
 
     //WL
-    _volume_data->regulate_normalize_wl(ww, wl);
+    _volume_data->regulate_wl(ww, wl);
+    _volume_data->normalize_wl(ww, wl);
     float wl_array[2] = { ww,wl };
     init_wl_nonmask(_ray_cast_infos, wl_array);
 
@@ -521,7 +523,9 @@ void init_gl() {
     _entry_exit_points->set_brick_pool(_volume_infos->get_brick_pool());
 
     _entry_exit_points->set_brick_filter_item(BF_MASK | BF_WL);
-    _entry_exit_points->set_window_level(_ww, _wl, 1);
+    std::map<unsigned char, Vector2f> wls;
+    wls.insert(std::make_pair(1, Vector2f(_ww,_wl)));
+    _entry_exit_points->set_window_levels(wls);
 
     _tex_entry_points = _entry_exit_points->get_entry_points_texture()->get_gl_resource();
 
@@ -758,7 +762,9 @@ void MouseMotion(int x, int y) {
             _ww += (float)(x - _pre_pos.x);
             _wl += (float)(_pre_pos.y - y);
             _ww = _ww < 1.0f ? 1.0f : _ww;
-            _entry_exit_points->set_window_level(_ww, _wl, 0, true);
+            std::map<unsigned char, Vector2f> wls;
+            wls.insert(std::make_pair(1, Vector2f(_ww,_wl)));
+            _entry_exit_points->set_window_levels(wls);
         }
     }
 

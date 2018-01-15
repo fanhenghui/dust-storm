@@ -1,6 +1,7 @@
 #version 430
 
 float global_min_gray;
+vec3 global_target_pos;
 
 uniform float custom_min_threshold;
 

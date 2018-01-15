@@ -38,7 +38,7 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
         sample_pos = ray_start + ray_dir * i;
         composite(sample_pos , ray_dir, current_integral_color , volume_sampler , mask_sampler , sub_data_dim ,sub_data_offset ,sample_shift );
         sum_gray += current_integral_color.r*100.0;
-        ++sum_num;
+        sum_num += current_integral_color.w;
     }
 
     current_integral_color = vec4(sum_gray , sum_num , 0 ,0);
@@ -46,6 +46,10 @@ vec4 ray_cast(vec3 ray_start, vec3 ray_dir, float start_step, float end_step, ve
     //Last sub data transfer gray to color
     if(0 != (ray_cast_step_code & 0x0004))
     {
+        if (sum_num < 1.0f) {
+            discard;
+        }
+
         float ww = global_wl.x;
         float wl = global_wl.y;
         float result_gray = sum_gray/sum_num/100.0;

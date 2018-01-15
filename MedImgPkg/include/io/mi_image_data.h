@@ -21,11 +21,14 @@ public:
 
     float get_max_scalar();
 
-    bool regulate_normalize_wl(float& window, float& level);
-
-    bool regulate_wl(float& window, float& level);
+    //regulate_to_positive flag is for GPU texture
+    bool regulate_wl(float& window, float& level, bool regulate_to_positive = true);
 
     void normalize_wl(float& window, float& level);
+
+    bool regulate_pixel_value(float& pixel, bool regulate_to_positive = true);
+
+    void normalize_pixel_value(float& pixel);
 
     void get_pixel_value(unsigned int x, unsigned int y, unsigned int z,
                          double& value) const;

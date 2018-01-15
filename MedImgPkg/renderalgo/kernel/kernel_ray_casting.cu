@@ -155,7 +155,9 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
         return;
     }
 
-    label = 0;
+    if (label > ray_cast_infos->label_level - 1) {
+        printf("error label: %d\n", label);
+    }
     float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
     float ww = s_wl_array[label * 2];
     float wl = s_wl_array[label * 2 + 1];
@@ -231,9 +233,10 @@ __device__ float4 kernel_ray_cast_mip(CudaVolumeInfos* __restrict__ volume_infos
         }
     }
 
-    if (max_gray < -65535.0f + INF) {
-        *mip_gray = 0;
+    if (max_gray < -65535.0f + 1.0f) {
+        *mip_gray = 0.0f;
         *mip_pos = make_float3(0.0f);
+        return integral_color;
     } else {
         *mip_gray = max_gray;
         *mip_pos = max_pos;
@@ -280,16 +283,17 @@ __device__ float4 kernel_ray_cast_minip(CudaVolumeInfos* __restrict__ volume_inf
         }
 
         gray = tex3D<float>(volume_infos->volume_tex, sample_norm.x, sample_norm.y, sample_norm.z);
-        if (gray < min_gray) {
+        if (gray > ray_cast_infos->minip_threshold && gray < min_gray) {
             min_gray = gray;
             min_pos = sample_pos;
             min_label = label;
         }
     }
 
-    if (min_gray > 65535.0f - INF) {
-        *mip_gray = 0;
+    if (min_gray > 65535.0f - 1.0f) {
+        *mip_gray = 0.0f;
         *mip_pos = make_float3(0.0f);
+        return integral_color;
     }
     else {
         *mip_gray = min_gray;
@@ -344,11 +348,12 @@ __device__ float4 kernel_ray_cast_average(CudaVolumeInfos* __restrict__ volume_i
         *mip_gray = gray_sum / gray_count;
     } else {
         *mip_gray = 0.0f;
+        return integral_color;
     }
 
     float ww = ray_cast_infos->global_ww;
     float wl = ray_cast_infos->global_wl;
-    gray = (gray - wl + ww*0.5f) / ww;
+    gray = (*mip_gray - wl + ww*0.5f) / ww;
 
     //TODO 
     //1 blend with graphic
@@ -403,7 +408,6 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
     uint local_thread = threadIdx.y * blockDim.x + threadIdx.x;
     fill_shared_array(local_thread, ray_cast_infos.d_shared_mapped_memory, get_s_array_size(ray_cast_infos.label_level), memcpy_step);
     __syncthreads();
-
 
     if (x > canvas_size.x - 1 || y > canvas_size.y - 1) {
         return;

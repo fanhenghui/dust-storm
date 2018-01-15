@@ -48,8 +48,11 @@ public:
     void set_clipping_plane(std::vector<Plane> planes);
     void set_visible_labels(const std::vector<unsigned char>& labels);
 
-    void set_window_level(float ww, float wl, unsigned char label,
-                          bool global = false);
+    //--------------------------------------//
+    // Note: here WL is non-regulated(matched with brick info)
+    //--------------------------------------//
+    void set_global_window_level(float ww, float wl);
+    void set_window_levels(const std::map<unsigned char, Vector2f>& wls);
 
 private:
     std::shared_ptr<BrickPool> _brick_pool;

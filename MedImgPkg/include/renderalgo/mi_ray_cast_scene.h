@@ -56,12 +56,20 @@ public:
     virtual void set_visible_labels(std::vector<unsigned char> labels);
     std::vector<unsigned char> get_visible_labels() const;
 
-    // Window level parameter ( unregulated)
-    // EG: CT modality , the unit is HU
-    virtual void set_window_level(float ww, float wl, unsigned char label);
-    int get_window_level(float& ww, float& wl, unsigned char label) const;
-    virtual void set_global_window_level(float ww, float wl);
+    //-----------------------------------------------//
+    // Window level parameter ( 
+    // is unregulated intensity. EG: CT modality, the unit is HU.
+    // MIP/MinIP/Average: set WL to global
+    // DVR: 
+    //    1. mask-none: set WL to label 0
+    //    2. mask-multi-label: set WL to label 1 to label_level-1. 
+    void set_window_level(float ww, float wl, unsigned char label);
+    int  get_window_level(float& ww, float& wl, unsigned char label) const;
+    void set_global_window_level(float ww, float wl);
     void get_global_window_level(float& ww, float& wl) const;
+
+    // MinIP threshold(is unregulated intensity)
+    void set_minip_threshold(float th);
 
     // Ray casting mode parameter
     void set_mask_mode(MaskMode mode);

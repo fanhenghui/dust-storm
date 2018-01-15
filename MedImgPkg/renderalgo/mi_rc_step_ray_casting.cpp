@@ -69,7 +69,7 @@ GLShaderInfo RCStepRayCastingAverage::get_shader_info() {
 
 GLShaderInfo RCStepRayCastingMIPMinIP::get_shader_info() {
     return GLShaderInfo(GL_FRAGMENT_SHADER, S_RC_RAY_CASTING_MIP_MINIP_FRAG,
-                        "RCStepRayCastingAverage");
+                        "RCStepRayCastingMIPMinIP");
 }
 
 GLShaderInfo RCStepRayCastingDVR::get_shader_info() {

@@ -44,22 +44,18 @@ float ImageData::get_max_scalar() {
     return _max_scalar;
 }
 
-bool ImageData::regulate_wl(float& window, float& level) {
+bool ImageData::regulate_wl(float& window, float& level, bool regulate_to_positive) {
     // CT should apply slope and intercept
     // MR has always slope(1) and intercept(0)
     if (_slope < DOUBLE_EPSILON) {
         return false;
     }
 
-    if (Configure::instance()->get_processing_unit_type() == GPU) {
+    if (regulate_to_positive && (_data_type == SHORT || _data_type == CHAR)) {
         const float min_gray = get_min_scalar();
-
-        if (_data_type == SHORT || _data_type == CHAR) {
-            level = (level - _intercept - min_gray) / _slope;
-        } else {
-            level = (level - _intercept) / _slope;
-        }
-    } else {
+        level = (level - _intercept - min_gray) / _slope;
+    }
+    else {
         level = (level - _intercept) / _slope;
     }
 
@@ -80,7 +76,7 @@ void ImageData::normalize_wl(float& window, float& level) {
 
     case SHORT:
         window *= S_65535_R;
-        level = level * S_65535_R;
+        level *= S_65535_R;
         break;
 
     case UCHAR:
@@ -90,7 +86,7 @@ void ImageData::normalize_wl(float& window, float& level) {
 
     case CHAR:
         window *= S_255_R;
-        level = level * S_255_R;
+        level *= S_255_R;
         break;
 
     case FLOAT:
@@ -101,14 +97,48 @@ void ImageData::normalize_wl(float& window, float& level) {
     }
 }
 
-bool ImageData::regulate_normalize_wl(float& window, float& level) {
-    if (!regulate_wl(window, level)) {
+bool ImageData::regulate_pixel_value(float& pixel, bool regulate_to_positive) {
+    if (_slope < DOUBLE_EPSILON) {
         return false;
     }
 
-    normalize_wl(window, level);
-
+    if (regulate_to_positive && (_data_type == SHORT || _data_type == CHAR)) {
+        const float min_gray = get_min_scalar();
+        pixel = (pixel - _intercept - min_gray) / _slope;
+    }
+    else {
+        pixel = (pixel - _intercept) / _slope;
+    }
     return true;
+}
+
+void ImageData::normalize_pixel_value(float& pixel) {
+    const static float S_65535_R = 1.0f / 65535.0f;
+    const static float S_255_R = 1.0f / 255.0f;
+
+    switch (_data_type) {
+    case USHORT:
+        pixel *= S_65535_R;
+        break;
+
+    case SHORT:
+        pixel *= S_65535_R;
+        break;
+
+    case UCHAR:
+        pixel *= S_255_R;
+        break;
+
+    case CHAR:
+        pixel *= S_255_R;
+        break;
+
+    case FLOAT:
+        break;
+
+    default:
+        IO_THROW_EXCEPTION("Undefined image type!");
+    }
 }
 
 void ImageData::get_pixel_value(unsigned int x, unsigned int y, unsigned int z,

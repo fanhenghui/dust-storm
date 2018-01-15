@@ -256,9 +256,6 @@ void ProxyGeometryBrick::brick_filtering_non_mask() {
         _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
 
-    std::shared_ptr<ImageData> volume = entry_exit_points->_volume_data;
-    RENDERALGO_CHECK_NULL_EXCEPTION(volume);
-
     const std::shared_ptr<BrickPool>& brick_pool = entry_exit_points->_brick_pool;
     const BrickGeometry& brick_geometry = brick_pool->get_brick_geometry();
     VolumeBrickInfo* volume_brick_info = brick_pool->get_volume_brick_info();
@@ -272,13 +269,12 @@ void ProxyGeometryBrick::brick_filtering_non_mask() {
     unsigned int* ele_idx_array = u_ele_idx_array.get();
 
     auto it_wl = _last_window_levels.find(0);
-
     if (it_wl == _last_window_levels.end()) {
         RENDERALGO_THROW_EXCEPTION("window level of non-mask is empty");
     }
 
-    float ww = it_wl->second[0] / volume->_slope;
-    float wl = (it_wl->second[1] - volume->_intercept) / volume->_slope;
+    float ww = it_wl->second[0];
+    float wl = it_wl->second[1];
     const float filter_min = wl - ww * 0.5f;
 
     const int brick_count_layer_jump = brick_dim[0] * brick_dim[1];
@@ -322,12 +318,8 @@ void ProxyGeometryBrick::brick_filtering_non_mask() {
 void ProxyGeometryBrick::brick_flitering_mask() {
     MI_RENDERALGO_LOG(MI_TRACE) << "IN proxy geometry brick filtering with mask.";
 
-    std::shared_ptr<VREntryExitPoints> entry_exit_points =
-        _vr_entry_exit_points.lock();
+    std::shared_ptr<VREntryExitPoints> entry_exit_points = _vr_entry_exit_points.lock();
     RENDERALGO_CHECK_NULL_EXCEPTION(entry_exit_points);
-
-    std::shared_ptr<ImageData> volume = entry_exit_points->_volume_data;
-    RENDERALGO_CHECK_NULL_EXCEPTION(volume);
 
     const std::shared_ptr<BrickPool>& brick_pool = entry_exit_points->_brick_pool;
     const BrickGeometry& brick_geometry = brick_pool->get_brick_geometry();
@@ -352,8 +344,8 @@ void ProxyGeometryBrick::brick_flitering_mask() {
     for (auto it = _last_window_levels.begin(); it != _last_window_levels.end(); ++it)
     {
         unsigned int label = it->first;
-        float ww = it->second.get_x() / volume->_slope;
-        float wl =  (it->second.get_y() - volume->_intercept) / volume->_slope;
+        float ww = it->second.get_x();
+        float wl = it->second.get_y();
         filter_min[label] = wl - ww*0.5f;
     }
 

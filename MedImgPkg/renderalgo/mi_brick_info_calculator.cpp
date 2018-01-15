@@ -157,8 +157,7 @@ void VolumeBrickInfoCalculator::calculate_gl() {
 #define BRICK_DIM 3
 #define VOLUME_DIM 4
 #define VOLUME_TEXTURE 5
-#define VOLUME_MIN_SCALAR 6
-#define VOLUME_REGULATE_PARAMETER 7
+#define VOLUME_REGULATE_PARAMETER 6
 
     CHECK_GL_ERROR;
 
@@ -174,8 +173,6 @@ void VolumeBrickInfoCalculator::calculate_gl() {
                        static_cast<GLint>(_img_data->_dim[0]),
                        static_cast<GLint>(_img_data->_dim[1]),
                        static_cast<GLint>(_img_data->_dim[2]));
-    glProgramUniform1f(program_id, VOLUME_MIN_SCALAR,
-                       _img_data->get_min_scalar());
 
     float volume_reg_param = 65535.0f;
 
@@ -226,7 +223,6 @@ void VolumeBrickInfoCalculator::calculate_gl() {
 #undef BRICK_DIM
 #undef VOLUME_DIM
 #undef VOLUME_TEXTURE
-#undef VOLUME_MIN_SCALAR
 #undef VOLUME_REGULATE_PARAMETER
 }
 

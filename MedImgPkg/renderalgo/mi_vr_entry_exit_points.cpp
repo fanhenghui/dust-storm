@@ -113,19 +113,13 @@ void VREntryExitPoints::set_visible_labels(const std::vector<unsigned char>& lab
     _vis_labels = labels;
 }
 
-void VREntryExitPoints::set_window_level(float ww, float wl,
-        unsigned char label,
-        bool global /*= false*/) {
-    if (global) {
-        _window_levels.clear();
-        _window_levels[0] = Vector2f(ww, wl);
-    } else {
-        if (_window_levels.find(0) !=
-                _window_levels.end()) { // clear global window level (label 0)
-            _window_levels.clear();
-        }
-        _window_levels[label] = Vector2f(ww, wl);
-    }
+void VREntryExitPoints::set_window_levels(const std::map<unsigned char, Vector2f>& wls) {
+    _window_levels = wls;
+}
+
+void VREntryExitPoints::set_global_window_level(float ww, float wl) {
+    _window_levels.clear();
+    _window_levels.insert(std::make_pair(0, Vector2f(ww, wl)));
 }
 
 void VREntryExitPoints::set_brick_cull_item(int items) {

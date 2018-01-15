@@ -25,8 +25,6 @@ public:
 
     virtual void set_volume_infos(std::shared_ptr<VolumeInfos> volume_infos);
 
-    virtual void set_window_level(float ww, float wl, unsigned char label);
-    virtual void set_global_window_level(float ww, float wl);
     virtual void set_color_opacity(std::shared_ptr<ColorTransFunc> color,
         std::shared_ptr<OpacityTransFunc> opacity,
         unsigned char label);

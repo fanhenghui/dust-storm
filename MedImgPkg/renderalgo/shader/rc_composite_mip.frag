@@ -1,6 +1,8 @@
 #version 430
 
 float global_max_gray;
+vec3 global_target_pos;
+
 bool access_mask(sampler3D sampler , vec3 pos , out int out_label);
 float access_volume(sampler3D sampler , vec3 pos);
 

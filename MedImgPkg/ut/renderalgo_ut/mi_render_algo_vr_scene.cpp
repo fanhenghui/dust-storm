@@ -67,9 +67,16 @@ bool _pan_status = false;
 int _act_label_idx = 0;
 std::vector<unsigned char> _vis_labels;
 
-MaskMode _mask_mode = MASK_MULTI_LABEL;
+GPUPlatform _gpu_platform = GL_BASE;
 
-GPUPlatform _gpu_platform = CUDA_BASE;
+MaskMode _mask_mode = MASK_MULTI_LABEL;
+CompositeMode _composite_mode = COMPOSITE_DVR;
+ShadingMode _shading_mode = SHADING_PHONG;
+
+float _minip_threshold = 100.0f;
+
+
+bool _render_to_back = true;
 
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
@@ -176,11 +183,12 @@ void Init() {
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     _scene->set_mask_mode(_mask_mode);
     _scene->set_interpolation_mode(LINEAR);
-    _scene->set_composite_mode(COMPOSITE_DVR);
-    _scene->set_shading_mode(SHADING_PHONG);
+    _scene->set_composite_mode(_composite_mode);
+    _scene->set_shading_mode(_shading_mode);
     _scene->set_proxy_geometry(PG_BRICKS);
     _scene->set_test_code(_iTestCode);
     _scene->set_navigator_visibility(true);
+    _scene->set_minip_threshold(_minip_threshold);
 
     // Time query
     _time_query = GLResourceManagerContainer::instance()
@@ -291,7 +299,9 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-        _scene->render_to_back();
+        if (_render_to_back) {
+            _scene->render_to_back(); 
+        }
 
         CHECK_GL_ERROR;
 
@@ -338,22 +348,70 @@ void Display() {
 
 void Keyboard(unsigned char key, int x, int y) {
     switch (key) {
+    case '[':{
+        _minip_threshold += 10.0f;
+        std::cout << "MinIP threshold: " << _minip_threshold << std::endl;
+        _scene->set_minip_threshold(_minip_threshold);
+        break;
+    }
+    case ']': {
+        _minip_threshold -= 10.0f;
+        std::cout << "MinIP threshold: " << _minip_threshold << std::endl;
+        _scene->set_minip_threshold(_minip_threshold);
+        break;
+    }
+    case 'm': {
+        static int s_mode = 0;
+        s_mode++;
+        if (s_mode > 3 ) {
+            s_mode = 0; 
+        }
+
+        if (s_mode == 0) {
+            std::cout << "DVR \n";
+            _composite_mode = COMPOSITE_DVR;
+            _mask_mode = MASK_MULTI_LABEL;
+            _shading_mode = SHADING_PHONG;
+            _scene->set_composite_mode(_composite_mode);
+            _scene->set_mask_mode(_mask_mode);
+            _scene->set_shading_mode(_shading_mode);
+        }
+        else if (s_mode == 1) {
+            std::cout << "MIP \n";
+            _composite_mode = COMPOSITE_MIP;
+            _mask_mode = MASK_MULTI_LABEL;
+            _shading_mode = SHADING_NONE;
+            _scene->set_composite_mode(_composite_mode);
+            _scene->set_mask_mode(_mask_mode);
+            _scene->set_shading_mode(_shading_mode);
+        } else if (s_mode == 2) {
+            std::cout << "MINIP \n";
+            _composite_mode = COMPOSITE_MINIP;
+            _mask_mode = MASK_MULTI_LABEL;
+            _shading_mode = SHADING_NONE;
+            _scene->set_composite_mode(_composite_mode);
+            _scene->set_mask_mode(_mask_mode);
+            _scene->set_shading_mode(_shading_mode);
+        } else if (s_mode == 3) {
+            std::cout << "AVERAGE \n";
+            _composite_mode = COMPOSITE_AVERAGE;
+            _mask_mode = MASK_MULTI_LABEL;
+            _shading_mode = SHADING_NONE;
+            _scene->set_composite_mode(_composite_mode);
+            _scene->set_mask_mode(_mask_mode);
+            _scene->set_shading_mode(_shading_mode);
+        }
+        break;
+    }
+    case 'b': {
+        _render_to_back  = !_render_to_back;
+        break;
+    }
     case 'f': {
         _iTestCode = 1 - _iTestCode;
         _scene->set_test_code(_iTestCode);
         break;
     }
-    case 'd': {
-        _scene->set_expected_fps(400);
-        _scene->set_downsample(true);
-        break;
-    }
-    case 'D': {
-        _scene->set_expected_fps(30);
-        _scene->set_downsample(false);
-        break;
-    }
-
     case 'i': {
         std::cout << "\n<><><><><><><><><><> GL RESOURCE <><><><><><><><><><>\n";
         std::cout << GLResourceManagerContainer::instance()->get_specification("\n");
@@ -397,14 +455,6 @@ void Keyboard(unsigned char key, int x, int y) {
             _wl = (int)wl;
             break;
         }
-    case 'k' : {
-#ifdef WIN32
-        _volumeinfos->get_brick_pool()->debug_save_mask_brick_infos("D:/temp/");
-#else
-        _volumeinfos->get_brick_pool()->debug_save_mask_brick_infos("/home/wangrui22/data/");
-#endif
-        break;
-               }
     case 'h' : {
         static int lut_id = 0;
         static const int LUT_NUM = 11;
@@ -469,7 +519,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
@@ -513,12 +563,17 @@ void MouseMotion(int x, int y) {
         if (_pan_status) {
             _scene->pan(_ptPre , cur_pt);
         } else {
-            _ww += (x - (int)_ptPre.x);
-            _wl += ((int)_ptPre.y - y);
-            _ww = _ww < 0 ? 1 : _ww;
-            if (_mask_mode == MASK_NONE) {
-                _scene->set_global_window_level(_ww, _wl);
+            if (_composite_mode == COMPOSITE_MIP || _composite_mode == COMPOSITE_MINIP || _composite_mode == COMPOSITE_AVERAGE) {
+                float ww, wl;
+                _scene->get_global_window_level(ww, wl);
+                ww += (x - (int)_ptPre.x);
+                wl += ((int)_ptPre.y - y);
+                ww = ww < 0 ? 1 : ww;
+                _scene->set_global_window_level(ww, wl);
             } else {
+                _ww += (x - (int)_ptPre.x);
+                _wl += ((int)_ptPre.y - y);
+                _ww = _ww < 0 ? 1 : _ww;
                 _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
             }
             MI_RENDERALGO_LOG(MI_DEBUG) << "wl : " << _ww << " " << _wl << std::endl;
@@ -540,6 +595,14 @@ int TE_VRScene(int argc, char* argv[]) {
 #endif
 
     try {
+
+        if (argc == 2 &&( std::string(argv[1]) == "opengl" || std::string(argv[1]) == "cuda")) {
+            if (std::string(argv[1]) == "opengl") {
+                _gpu_platform = GL_BASE;
+            } else if (std::string(argv[1]) == "cuda") {
+                _gpu_platform = CUDA_BASE;
+            }
+        }
 
         //Init();
 

@@ -6,8 +6,7 @@
 #define BRICK_DIM 3
 #define VOLUME_DIM 4
 #define VOLUME_TEXTURE 5
-#define VOLUME_MIN_SCALAR 6
-#define VOLUME_REGULATE_PARAMETER 7
+#define VOLUME_REGULATE_PARAMETER 6
 
 //One local work group handle 5x5x1 25 bricks
 layout (local_size_x = 5 , local_size_y = 5 , local_size_z = 1) in;
@@ -27,7 +26,6 @@ layout (location = BRICK_MARGIN) uniform int brick_margin;
 layout (location = BRICK_DIM ) uniform ivec3 brick_dim;
 layout (location = VOLUME_DIM ) uniform ivec3 volume_dim;
 layout (location = VOLUME_TEXTURE ) uniform sampler3D volume_sampler;
-layout (location = VOLUME_MIN_SCALAR) uniform float volume_min_scalar;
 layout (location = VOLUME_REGULATE_PARAMETER) uniform float volume_regulate_param;
 
 bool check_out_aabb(ivec3 pos , ivec3 dim);
@@ -59,6 +57,6 @@ void main()
     float max0 = 0;
     statistic_volume_info_in_cube(begin , end, volume_sampler , volume_regulate_param , min0 , max0);
 
-    brickVolumeInfo[real_global_invocation_id].min = min0+ volume_min_scalar;
-    brickVolumeInfo[real_global_invocation_id].max = max0 + volume_min_scalar;
+    brickVolumeInfo[real_global_invocation_id].min = min0;
+    brickVolumeInfo[real_global_invocation_id].max = max0;
 }

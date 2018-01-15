@@ -157,6 +157,9 @@ struct CudaRayCastInfos {
     float global_ww;
     float global_wl;
 
+    //MinIP threshold
+    float minip_threshold;
+
     //transfer function parameters
     float color_opacity_texture_shift;
 
@@ -200,6 +203,8 @@ struct CudaRayCastInfos {
 
         global_ww = 0.0f;
         global_wl = 0.0f;
+        
+        minip_threshold = 0.0f;
 
         color_opacity_texture_shift = 0.5f/512.0f;
 

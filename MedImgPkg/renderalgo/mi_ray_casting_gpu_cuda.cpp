@@ -334,6 +334,11 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
     cuda_ray_infos.global_ww = gww;
     cuda_ray_infos.global_wl = gwl;
 
+    //min-ip threshold
+    float minip_th = ray_caster->get_minip_threashold();
+    volume->normalize_pixel_value(minip_th);
+    cuda_ray_infos.minip_threshold = minip_th;
+
     //pseudo color texture 
     unsigned int lut_length = S_TRANSFER_FUNC_WIDTH;
     GPUTexture1DPairPtr pseudo_texture = ray_caster->get_pseudo_color_texture(lut_length);
