@@ -47,11 +47,13 @@ struct RayCastingGPUCUDA::InnerResource {
     CudaSurface2DPtr quarter_canvas;
     CudaTimeQueryPtr time_query;
 
-    InnerResource(){
-        entry_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
-            "cuda ray-cast inner cuda-gl texture for gl entry points");
-        exit_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
-            "cuda ray-cast inner cuda-gl texture for gl entry points");
+    InnerResource(GPUPlatform entry_exit_gpu_platform) {
+        if (GL_BASE == entry_exit_gpu_platform) {
+            entry_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
+                "cuda ray-cast inner cuda-gl texture for gl entry points");
+            exit_points_tex = CudaResourceManager::instance()->create_cuda_gl_texture_2d(
+                "cuda ray-cast inner cuda-gl texture for gl entry points");
+        }
         time_query = CudaResourceManager::instance()->create_cuda_time_query("cuda ray-cast inner time query");
     }
 };
@@ -85,8 +87,11 @@ void RayCastingGPUCUDA::render() {
     int width(0), height(0);
     entry_exit_points->get_display_size(width, height);
 
-    const GPUPlatform gpu_platform = entry_exit_points->get_gpu_platform();
-    if (CUDA_BASE == gpu_platform) {
+    const GPUPlatform entry_exit_gpu_platform = entry_exit_points->get_gpu_platform();
+    if (nullptr == _inner_resource) {
+        _inner_resource.reset(new InnerResource(entry_exit_gpu_platform));
+    }
+    if (CUDA_BASE == entry_exit_gpu_platform) {
         GPUCanvasPairPtr entry_pair = entry_exit_points->get_entry_points_texture();
         GPUCanvasPairPtr exit_pair = entry_exit_points->get_exit_points_texture();
         RENDERALGO_CHECK_NULL_EXCEPTION(entry_pair);
@@ -95,7 +100,7 @@ void RayCastingGPUCUDA::render() {
         CudaSurface2DPtr exit = exit_pair->get_cuda_resource();
         RENDERALGO_CHECK_NULL_EXCEPTION(entry);
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
-        
+
         ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
         cudaError_t err = cudaSuccess;
         const int2 entry_exit_points_size = make_int2(width, height);
@@ -147,24 +152,14 @@ void RayCastingGPUCUDA::render() {
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
 
         //register entry exit points GL texture
-        if (nullptr == _inner_resource) {
-            _inner_resource.reset(new InnerResource());
+        if (!_inner_resource->entry_points_tex->valid()) {
             if (0 != _inner_resource->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
                 RENDERALGO_THROW_EXCEPTION("register entry points failed.");
             }
+        }
+        if (!_inner_resource->exit_points_tex->valid()) {
             if (0 != _inner_resource->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
-                RENDERALGO_THROW_EXCEPTION("register exit points failed.");
-            }
-        } else {
-            if (!_inner_resource->entry_points_tex->valid()) {
-                if (0 != _inner_resource->entry_points_tex->register_gl_texture(entry, cudaGraphicsRegisterFlagsReadOnly)) {
-                    RENDERALGO_THROW_EXCEPTION("register entry points failed.");
-                }
-            }
-            if (!_inner_resource->exit_points_tex->valid()) {
-                if (0 != _inner_resource->exit_points_tex->register_gl_texture(exit, cudaGraphicsRegisterFlagsReadOnly)) {
-                    RENDERALGO_THROW_EXCEPTION("register entry points failed.");
-                }
+                RENDERALGO_THROW_EXCEPTION("register entry points failed.");
             }
         }
            
@@ -181,7 +176,6 @@ void RayCastingGPUCUDA::render() {
         cudaTextureObject_t exit_cuda_tex = _inner_resource->exit_points_tex->
             get_object(cudaAddressModeClamp, cudaFilterModePoint, cudaReadModeElementType, false);
         
-
         ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
         cudaError_t err = cudaSuccess;
         const int2 entry_exit_points_size = make_int2(width, height);
