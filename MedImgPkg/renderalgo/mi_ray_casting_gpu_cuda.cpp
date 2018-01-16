@@ -79,18 +79,20 @@ void RayCastingGPUCUDA::render() {
     CudaSurface2DPtr canvas_surface = canvas_pair->get_cuda_resource();
     RENDERALGO_CHECK_NULL_EXCEPTION(canvas_surface);
 
-    CudaVolumeInfos cuda_volume_infos;
-    CudaRayCastInfos cuda_ray_infos;
-    fill_paramters(ray_caster, cuda_volume_infos, cuda_ray_infos);
-    
-    //TODO canvas downsample
-    int width(0), height(0);
-    entry_exit_points->get_display_size(width, height);
-
     const GPUPlatform entry_exit_gpu_platform = entry_exit_points->get_gpu_platform();
     if (nullptr == _inner_resource) {
         _inner_resource.reset(new InnerResource(entry_exit_gpu_platform));
     }
+    //timer recorder
+    ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
+
+    CudaVolumeInfos cuda_volume_infos;
+    CudaRayCastInfos cuda_ray_infos;
+    fill_paramters(ray_caster, cuda_volume_infos, cuda_ray_infos);
+    
+    int width(0), height(0);
+    entry_exit_points->get_display_size(width, height);
+
     if (CUDA_BASE == entry_exit_gpu_platform) {
         GPUCanvasPairPtr entry_pair = entry_exit_points->get_entry_points_texture();
         GPUCanvasPairPtr exit_pair = entry_exit_points->get_exit_points_texture();
@@ -100,8 +102,7 @@ void RayCastingGPUCUDA::render() {
         CudaSurface2DPtr exit = exit_pair->get_cuda_resource();
         RENDERALGO_CHECK_NULL_EXCEPTION(entry);
         RENDERALGO_CHECK_NULL_EXCEPTION(exit);
-
-        ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
+        
         cudaError_t err = cudaSuccess;
         const int2 entry_exit_points_size = make_int2(width, height);
         if (ray_caster->map_quarter_canvas()) {
@@ -176,7 +177,6 @@ void RayCastingGPUCUDA::render() {
         cudaTextureObject_t exit_cuda_tex = _inner_resource->exit_points_tex->
             get_object(cudaAddressModeClamp, cudaFilterModePoint, cudaReadModeElementType, false);
         
-        ScopedCudaTimeQuery inner_timer(_inner_resource->time_query, &_duration);
         cudaError_t err = cudaSuccess;
         const int2 entry_exit_points_size = make_int2(width, height);
         if (ray_caster->map_quarter_canvas()) {
@@ -261,8 +261,11 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
 
     const MaskMode mask_mode = ray_caster->get_mask_mode();
     GPUTexture3DPairPtr mask_tex = ray_caster->get_mask_data_texture();
-    if (MASK_NONE != mask_mode) {
-        RENDERALGO_CHECK_NULL_EXCEPTION(mask_tex);
+    if (MASK_NONE != mask_mode && nullptr == mask_tex) {
+        RENDERALGO_THROW_EXCEPTION("mask texture is null when ray cast with mask.");
+    }
+
+    if (mask_tex) {
         CudaTexture3DPtr cuda_mask_tex = mask_tex->get_cuda_resource();
         RENDERALGO_CHECK_NULL_EXCEPTION(cuda_mask_tex);
         cuda_volume_infos.mask_tex = cuda_mask_tex->get_object(cudaAddressModeBorder, 

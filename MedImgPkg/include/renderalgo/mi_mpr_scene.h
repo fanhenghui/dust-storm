@@ -49,6 +49,7 @@ public:
 
 protected:
 private:
+    bool _mpr_init;
 };
 
 MED_IMG_END_NAMESPACE

@@ -60,7 +60,7 @@ std::shared_ptr<GLTimeQuery> _time_query;
 int _width = 1024;
 int _height = 1024;
 int _iButton = -1;
-Point2 _ptPre;
+Point2 _pt_pre;
 int _iTestCode = 0;
 bool _pan_status = false;
 
@@ -507,7 +507,7 @@ void Keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void resize(int x, int y) {
+void Resize(int x, int y) {
     if (x == 0 || y == 0) {
         return;
     }
@@ -544,7 +544,7 @@ void MouseClick(int button, int status, int x, int y) {
         _scene->set_downsample(false);
     }
 
-    _ptPre = Point2(x, y);
+    _pt_pre = Point2(x, y);
     glutPostRedisplay();
 }
 
@@ -557,22 +557,22 @@ void MouseMotion(int x, int y) {
     Point2 cur_pt(x, y);
 
     if (_iButton == GLUT_LEFT_BUTTON) {
-        _scene->rotate(_ptPre, cur_pt);
+        _scene->rotate(_pt_pre, cur_pt);
 
     } else if (_iButton == GLUT_MIDDLE_BUTTON) {
         if (_pan_status) {
-            _scene->pan(_ptPre , cur_pt);
+            _scene->pan(_pt_pre , cur_pt);
         } else {
             if (_composite_mode == COMPOSITE_MIP || _composite_mode == COMPOSITE_MINIP || _composite_mode == COMPOSITE_AVERAGE) {
                 float ww, wl;
                 _scene->get_global_window_level(ww, wl);
-                ww += (x - (int)_ptPre.x);
-                wl += ((int)_ptPre.y - y);
+                ww += (x - (int)_pt_pre.x);
+                wl += ((int)_pt_pre.y - y);
                 ww = ww < 0 ? 1 : ww;
                 _scene->set_global_window_level(ww, wl);
             } else {
-                _ww += (x - (int)_ptPre.x);
-                _wl += ((int)_ptPre.y - y);
+                _ww += (x - (int)_pt_pre.x);
+                _wl += ((int)_pt_pre.y - y);
                 _ww = _ww < 0 ? 1 : _ww;
                 _scene->set_window_level(_ww, _wl, _vis_labels[_act_label_idx]);
             }
@@ -581,10 +581,10 @@ void MouseMotion(int x, int y) {
         }
 
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
-        _scene->zoom(_ptPre, cur_pt);
+        _scene->zoom(_pt_pre, cur_pt);
     }
 
-    _ptPre = cur_pt;
+    _pt_pre = cur_pt;
     glutPostRedisplay();
 }
 }
@@ -628,7 +628,7 @@ int TE_VRScene(int argc, char* argv[]) {
         env.get_gl_version(major, minor);
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(resize);
+        glutReshapeFunc(Resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

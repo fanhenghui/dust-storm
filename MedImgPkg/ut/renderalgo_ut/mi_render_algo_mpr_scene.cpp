@@ -1,13 +1,16 @@
 #include "GL/glew.h"
 
-#include "io/mi_configure.h"
+#include "log/mi_logger.h"
+
 #include "util/mi_file_util.h"
 
+#include "io/mi_configure.h"
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
 #include "io/mi_image_data_header.h"
 
 #include "arithmetic/mi_ortho_camera.h"
+#include "arithmetic/mi_run_length_operator.h"
 
 #include "glresource/mi_gl_environment.h"
 #include "glresource/mi_gl_fbo.h"
@@ -16,6 +19,9 @@
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_time_query.h"
 #include "glresource/mi_gl_utils.h"
+
+#include "cudaresource/mi_cuda_time_query.h"
+#include "cudaresource/mi_cuda_resource_manager.h"
 
 #include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_camera_interactor.h"
@@ -44,22 +50,27 @@ std::shared_ptr<VolumeInfos> _volumeinfos;
 std::shared_ptr<MPRScene> _scene;
 
 std::shared_ptr<GLTimeQuery> _time_query;
-std::shared_ptr<GLTimeQuery> _time_query2;
 
 int _width = 1033;
 int _height = 616;
 int _iButton = -1;
-Point2 _ptPre;
+Point2 _pt_pre;
 int _iTestCode = 0;
 GPUPlatform _gpu_platform = CUDA_BASE;
 
-std::vector<std::string> GetFiles() {
+int _sum_page = 0;
+int _cur_page = 0;
+
+bool _render_to_back = true;
+
+
 #ifdef WIN32
-    const std::string root = "E:/data/MyData/demo/lung/";
+const std::string root = "E:/data/MyData/demo/lung/";
 #else
-    const std::string root = "/home/wangrui22/data/demo/lung/";
+const std::string root = "/home/wangrui22/data/demo/lung/";
 #endif
 
+std::vector<std::string> GetFiles() {
     std::vector<std::string> files;
     std::set<std::string> dcm_postfix;
     dcm_postfix.insert(".dcm");
@@ -71,9 +82,21 @@ void Init() {
     Configure::instance()->set_processing_unit_type(GPU);
     GLUtils::set_check_gl_flag(true);
 
+    GLUtils::set_pixel_pack_alignment(1);
+    GLUtils::set_pixel_unpack_alignment(1);
+
+#ifdef WIN32
+    Logger::instance()->bind_config_file("./config/log_config");
+#else
+    Logger::instance()->bind_config_file("../config/log_config");
+#endif
+    Logger::instance()->initialize();
+
     std::vector<std::string> files = GetFiles();
     DICOMLoader loader;
     loader.load_series(files, _volume_data, _data_header);
+    const unsigned int data_len = _volume_data->_dim[0] * _volume_data->_dim[1] * _volume_data->_dim[2];
+    _sum_page = (int)_volume_data->_dim[2];
 
     _volumeinfos.reset(new VolumeInfos(GPU_BASE, _gpu_platform));
     _volumeinfos->set_data_header(_data_header);
@@ -85,6 +108,43 @@ void Init() {
     mask_data->_channel_num = 1;
     mask_data->_data_type = medical_imaging::UCHAR;
     mask_data->mem_allocate();
+    char* mask_raw = (char*)mask_data->get_pixel_pointer();
+    std::ifstream in(root + "/mask.raw", std::ios::in);
+    if (in.is_open()) {
+        in.read(mask_raw, data_len);
+        in.close();
+    }
+    else {
+        memset(mask_raw, 1, data_len);
+    }
+
+    std::set<unsigned char> target_label_set;
+    std::ifstream in2(root + "/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle", std::ios::binary | std::ios::in);
+    if (in2.is_open()) {
+        in2.seekg(0, in2.end);
+        const int code_len = (int)in2.tellg();
+        in2.seekg(0, in2.beg);
+        unsigned int *code_buffer = new unsigned int[code_len];
+        in2.read((char*)code_buffer, code_len);
+        in2.close();
+        unsigned char* mask_target = new unsigned char[data_len];
+
+        RunLengthOperator run_length_op;
+        if (0 == run_length_op.decode(code_buffer, code_len / sizeof(unsigned int), mask_target, data_len)) {
+            FileUtil::write_raw(root + "./nodule.raw", mask_target, data_len);
+            printf("load target mask done.\n");
+            for (unsigned int i = 0; i < data_len; ++i) {
+                if (mask_target[i] != 0) {
+                    mask_raw[i] = mask_target[i] + 1;
+                    target_label_set.insert(mask_target[i] + 1);
+                }
+            }
+        }
+        delete[] mask_target;
+    }
+
+    FileUtil::write_raw(root + "/target_mask.raw", mask_raw, data_len);
+
     _volumeinfos->set_mask(mask_data);
 
     _scene.reset(new MPRScene(_width, _height, GPU_BASE, _gpu_platform));
@@ -98,20 +158,27 @@ void Init() {
     _scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
     _scene->set_mask_mode(MASK_NONE);
     _scene->set_interpolation_mode(LINEAR);
-    _scene->place_mpr(SAGITTAL);
-    //_scene->page_to(511);
-    //_scene->initialize();
+    _scene->place_mpr(TRANSVERSE);
+    _cur_page = _sum_page/2;
+    _scene->page_to(_cur_page);
 
     // Time query
     _time_query = GLResourceManagerContainer::instance()
                   ->get_time_query_manager()
                   ->create_object("TQ 1");
-    //_time_query->initialize();
 
-    _time_query2 = GLResourceManagerContainer::instance()
-                   ->get_time_query_manager()
-                   ->create_object("TQ 2");
-    //_time_query2->initialize();
+    //Mask overlay
+    if (!target_label_set.empty()) {
+        std::vector<unsigned char> visible_labels;
+        for (auto it = target_label_set.begin(); it != target_label_set.end(); ++it) {
+            unsigned char label = *it;
+            _scene->set_mask_overlay_color(RGBAUnit(255, 0, 0, 255), label);
+            visible_labels.push_back(label);
+        }
+        _scene->set_mask_overlay_opacity(0.75f);
+        _scene->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
+        _scene->set_visible_labels(visible_labels);
+    }
 }
 
 void Display() {
@@ -130,9 +197,11 @@ void Display() {
 
         _scene->render();
 
-        _scene->render_to_back();
+        if (_render_to_back) {
+            _scene->render_to_back();
+        }
+        
 
-        //_time_query2->begin();
         // glBindFramebuffer(GL_DRAW_FRAMEBUFFER , 0);
 
         _scene->download_image_buffer();
@@ -147,9 +216,6 @@ void Display() {
         // FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
 #endif
         // std::cout << "compressing time : " << _scene->get_compressing_duration();
-
-        // std::cout << "gl compressing time : " << _time_query2->end() <<
-        // std::endl;
 
         // std::cout << "rendering time : " << _time_query->end() << std::endl;
 
@@ -177,6 +243,10 @@ void Keyboard(unsigned char key, int x, int y) {
             _scene->page(1);
         }
 
+        break;
+    }
+    case 'b': {
+        _render_to_back = !_render_to_back;
         break;
     }
 
@@ -215,7 +285,7 @@ void Keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void resize(int x, int y) {
+void Resize(int x, int y) {
     if (x == 0 || y == 0) {
         return;
     }
@@ -227,7 +297,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    // glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {
@@ -245,7 +315,7 @@ void MouseClick(int button, int status, int x, int y) {
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
     }
 
-    _ptPre = Point2(x, y);
+    _pt_pre = Point2(x, y);
     glutPostRedisplay();
 }
 
@@ -260,21 +330,38 @@ void MouseMotion(int x, int y) {
     // std::cout << "Pre : " << m_ptPre.x << " " <<m_ptPre.y << std::endl;
     // std::cout << "Cur : " << cur_pt.x << " " <<cur_pt.y << std::endl;
     if (_iButton == GLUT_LEFT_BUTTON) {
-        _scene->rotate(_ptPre, cur_pt);
+        //_scene->rotate(_ptPre, cur_pt);
+        _cur_page += (y - (int)_pt_pre.y);
+        if (_cur_page < 0) {
+            _cur_page = 0;
+        }
+        if (_cur_page > _sum_page - 1) {
+            _cur_page = _sum_page -1;
+        }
+        _scene->page_to(_cur_page);
 
     } else if (_iButton == GLUT_MIDDLE_BUTTON) {
-        _scene->pan(_ptPre, cur_pt);
+        _scene->pan(_pt_pre, cur_pt);
     } else if (_iButton == GLUT_RIGHT_BUTTON) {
-        _scene->zoom(_ptPre, cur_pt);
+        _scene->zoom(_pt_pre, cur_pt);
     }
 
-    _ptPre = cur_pt;
+    _pt_pre = cur_pt;
     glutPostRedisplay();
 }
 }
 
 int TE_MPRScene(int argc, char* argv[]) {
     try {
+        if (argc == 2 && (std::string(argv[1]) == "opengl" || std::string(argv[1]) == "cuda")) {
+            if (std::string(argv[1]) == "opengl") {
+                _gpu_platform = GL_BASE;
+            }
+            else if (std::string(argv[1]) == "cuda") {
+                _gpu_platform = CUDA_BASE;
+            }
+        }
+
         Init();
 
         glutInit(&argc, argv);
@@ -282,7 +369,12 @@ int TE_MPRScene(int argc, char* argv[]) {
         glutInitWindowPosition(0, 0);
         glutInitWindowSize(_width, _height);
 
-        glutCreateWindow("Test GL resource");
+        if (_gpu_platform == GL_BASE) {
+            glutCreateWindow("Test GL MPR Scene");
+        }
+        else {
+            glutCreateWindow("Test CUDA MPR Scene");
+        }
 
         if (GLEW_OK != glewInit()) {
             std::cout << "Init glew failed!\n";
@@ -294,7 +386,7 @@ int TE_MPRScene(int argc, char* argv[]) {
         env.get_gl_version(major, minor);
 
         glutDisplayFunc(Display);
-        glutReshapeFunc(resize);
+        glutReshapeFunc(Resize);
         glutIdleFunc(Idle);
         glutKeyboardFunc(Keyboard);
         glutMouseFunc(MouseClick);

@@ -167,13 +167,17 @@ struct CudaRayCastInfos {
     cudaTextureObject_t pseudo_color_texture;
     float pseudo_color_texture_shift;
 
+    //mask overlay
+    float mask_overlay_opacity;
+
     //---------------------------------------------------------//
     //shared mapped global memory contains follows:
     // 1. visible label (int) : label_level * sizeof(int), label_level could be 1(none-mask) 8 16 32 64 ... 128
     // 2. ww wl array (flaot) : label_level * sizeof(float) * 2
     // 3. color/opacity texture array (tex1D): label_level * sizeof(unsigned long long)
     // 4. materal parameter : label_level * sizeof(float) * 9
-    // sum: label_level * [4*1 + 4*2 + 8*1 + 4*9] = label_level * 56, max : 14KB < shared limits(40KB)
+    // 5. mask overlay color: label_level * sizeof(float) * 4
+    // sum: label_level * [4*1 + 4*2 + 8*1 + 4*9 + 4*4] = label_level * 72, max : 18KB < shared limits(40KB)
     //---------------------------------------------------------//
     void* d_shared_mapped_memory;
     
@@ -210,6 +214,9 @@ struct CudaRayCastInfos {
 
         pseudo_color_texture = 0; 
         pseudo_color_texture_shift = 0.5f/512.0f;
+
+        mask_overlay_opacity = 0.5f;
+
         d_shared_mapped_memory = nullptr;
 
         test_code = 0;

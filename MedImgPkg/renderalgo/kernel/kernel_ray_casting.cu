@@ -27,7 +27,7 @@ inline __device__ float3 intri_normalize(float3 a) {
 extern __shared__ float s_array[];
 
 inline __device__ __host__ int get_s_array_size(int label_level) {
-    return 56 * label_level;
+    return 72 * label_level;
 }
 
 inline __device__ int* get_s_visible_label_array(int label_level) {
@@ -44,6 +44,10 @@ inline __device__ cudaTextureObject_t* get_s_color_opacity_texture_array(int lab
 
 inline __device__ float* get_s_material_array(int label_level) {
     return (float*)((char*)(s_array) + 20 * label_level);
+}
+
+inline __device__ float4* get_mask_overlay_color_array(int label_level) {
+    return (float4*)((char*)(s_array) + 56 * label_level);
 }
 
 inline __device__ float3 cal_gradient(CudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos_norm) {
@@ -360,6 +364,75 @@ __device__ float4 kernel_ray_cast_average(CudaVolumeInfos* __restrict__ volume_i
     return integral_color;
 }
 
+//Encoding label to intger array 4*32 can contain 0~127 labels
+__device__ void label_encode(int label, int4 *mask_flag) {
+    if (label < 32) {
+        (*mask_flag).x = (*mask_flag).x | (1 << label);
+    } else if (label < 64) {
+        (*mask_flag).y = (*mask_flag).y | (1 << (label - 32));
+    } else if (label < 96) {
+        (*mask_flag).z = (*mask_flag).z | (1 << (label - 64));
+    } else {
+        (*mask_flag).w = (*mask_flag).w | (1 << (label - 96));
+    }
+}
+
+//Decoding label from intger array 4*32 can contain 0~127 labels
+__device__ bool label_decode(int label, int4 *mask_flag) {
+    bool is_hitted = false;
+    if (label < 32) {
+        is_hitted = ((1 << label) & (*mask_flag).x) != 0;
+    } else if (label < 64) {
+        is_hitted = ((1 << (label - 32)) & (*mask_flag).y) != 0;
+    } else if (label < 96) {
+        is_hitted = ((1 << (label - 64)) & (*mask_flag).z) != 0;
+    } else {
+        is_hitted = ((1 << (label - 96)) & (*mask_flag).w) != 0;
+    }
+    return is_hitted;
+}
+
+__device__ float4 mask_overlay(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos,
+    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
+    float4 integral_color = input_color;
+    float3 sample_pos, sample_norm;
+    int label = 0;
+    float gray_sum = 0.0f;
+    float gray_count = 0.0f;
+    float gray = 0.0f;
+    int4 tracing_label_code = make_int4(0);
+    float overlay_opacity = ray_cast_infos->mask_overlay_opacity;
+
+    //tracing & coding label(no sequence)
+    for (float i = start_step; i < end_step; i += 1.0f) {
+        sample_pos = ray_start + ray_dir*i;
+        sample_norm = sample_pos*volume_infos->dim_r;
+
+        label = access_mask_nearest(volume_infos, sample_norm);
+
+        if (label != 0) {
+            label_encode(label, &tracing_label_code);
+        }
+    }
+
+    //blending traced label to pre-color
+    float4 label_color;
+    int* visible_label = get_s_visible_label_array(ray_cast_infos->label_level);
+    for (int i = 0; i < ray_cast_infos->label_level; ++i) {
+        if (visible_label[i] != 0) {
+            if (label_decode(i, &tracing_label_code)) {
+                label_color = get_mask_overlay_color_array(ray_cast_infos->label_level)[i];
+                integral_color.x = (1.0f - overlay_opacity)* integral_color.x + overlay_opacity * label_color.x;
+                integral_color.y = (1.0f - overlay_opacity)* integral_color.y + overlay_opacity * label_color.y;
+                integral_color.z = (1.0f - overlay_opacity)* integral_color.z + overlay_opacity * label_color.z;
+            }
+        }
+    }
+
+    integral_color.w = 1.0f;
+    return integral_color;
+}
+
 __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, float3* __restrict__ ray_start, float3* __restrict__ ray_dir, float* __restrict__ start_step, float* __restrict__ end_step) {
     float3 ray_dir0 = exit - entry;
     float3 ray_dir_norm = normalize(ray_dir0);
@@ -458,6 +531,10 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
         integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos, 
             ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
     }
+
+    if (0 != ray_cast_infos.mask_overlay_mode) {
+        integral_color = mask_overlay(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, integral_color);
+    }
      
     clamp(integral_color, 0.0f, 1.0f);
 
@@ -526,6 +603,10 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     } else if (3 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos,
             ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
+    }
+
+    if (0 != ray_cast_infos.mask_overlay_mode) {
+        integral_color = mask_overlay(&volume_infos, &ray_cast_infos, ray_dir, ray_start, start_step, end_step, integral_color);
     }
 
     clamp(integral_color, 0.0f, 1.0f);

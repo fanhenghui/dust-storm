@@ -19,14 +19,14 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-MPRScene::MPRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : RayCastScene(strategy, platfrom) {
+MPRScene::MPRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : RayCastScene(strategy, platfrom), _mpr_init(false){
     std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints(strategy, platfrom));
     _entry_exit_points = mpr_entry_exit_points;
     _name = "MPR Scene";
 }
 
 MPRScene::MPRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
-    RayCastScene(width, height, strategy, platfrom) {
+    RayCastScene(width, height, strategy, platfrom), _mpr_init(false) {
     std::shared_ptr<MPREntryExitPoints> mpr_entry_exit_points(new MPREntryExitPoints(strategy, platfrom));
     _entry_exit_points = mpr_entry_exit_points;
     _name = "MPR Scene";
@@ -37,7 +37,7 @@ MPRScene::~MPRScene() {}
 void MPRScene::initialize() {
     if (GL_BASE == _gpu_platform) {
         RayCastScene::initialize();
-    } else {
+    } else if (!_mpr_init) {
         //-----------------------------------------------------------//
         // CUDA based MPR needn't scene FBO(without graphic)
 
@@ -56,6 +56,8 @@ void MPRScene::initialize() {
 
         _compressor->set_image(GPUCanvasPairPtr(new
             GPUCanvasPair(_canvas->get_color_attach_texture()->get_cuda_resource())), qualitys);
+
+        _mpr_init = true;
     }
 }
 
@@ -149,8 +151,9 @@ void MPRScene::page(int step) {
 }
 
 void MPRScene::page_to(int page) {
-    _camera_calculator->page_orthogonal_mpr_to(_ray_cast_camera, page);
-    set_dirty(true);
+    if (_camera_calculator->page_orthogonal_mpr_to(_ray_cast_camera, page)) {
+        set_dirty(true);
+    }
 }
 
 Plane MPRScene::to_plane() const {

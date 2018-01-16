@@ -15,12 +15,13 @@
 MED_IMG_BEGIN_NAMESPACE
 namespace {
     inline size_t get_shared_mapped_memory_size(LabelLevel level) {
-        return (size_t)level * 56;
+        return (size_t)level * 72;
     }
 
     inline int* get_visible_label_array(void* s_array, int label_level) {
         return (int*)(s_array);
     }
+
     inline size_t get_visible_label_offset(int label_level) {
         return 0;
     }
@@ -48,6 +49,15 @@ namespace {
     inline size_t get_material_offset(int label_level) {
         return 20 * label_level;
     }
+
+    inline float* get_mask_overlay_color_array(void* s_array, int label_level) {
+        return (float*)((char*)(s_array) + 56 * label_level);
+    }
+
+    inline size_t get_mask_overlay_color_offset(int label_level) {
+        return 56 * label_level;
+    }
+
 }
 
 struct RayCasterInnerResource::GLResource {
@@ -212,7 +222,6 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
                 memset(label_array, 0, sizeof(int) * static_cast<int>(_label_level));
 
                 int idx = 0;
-
                 for (auto it = _labels.begin(); it != _labels.end(); ++it, ++idx) {
                     if (*it > static_cast<int>(_label_level) - 1) {
                         std::stringstream ss;
@@ -237,11 +246,9 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
         case MASK_OVERLAY_COLOR_BUCKET: {
             if (check_dirty(type)) {
                 float* color_array = (float*)_shared_buffer_array.get();
-                memset(color_array, 0,
-                       sizeof(RGBAUnit) * static_cast<int>(_label_level));
+                memset(color_array, 0, sizeof(RGBAUnit) * static_cast<int>(_label_level));
 
                 unsigned char label = 0;
-
                 for (auto it = _mask_overlay_colors.begin();
                         it != _mask_overlay_colors.end(); ++it) {
                     label = it->first;
@@ -273,11 +280,9 @@ GLBufferPtr RayCasterInnerResource::get_buffer(BufferType type) {
         case MATERIAL_BUCKET: {
             if (check_dirty(type)) {
                 Material* material_array = (Material*)_shared_buffer_array.get();
-                memset(material_array, 0,
-                       sizeof(Material) * static_cast<int>(_label_level));
+                memset(material_array, 0, sizeof(Material) * static_cast<int>(_label_level));
 
                 unsigned char label = 0;
-
                 for (auto it = _material.begin(); it != _material.end(); ++it) {
                     label = it->first;
 
@@ -495,7 +500,7 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
         }
 
         if (0 != shared_map_memory->update(get_wl_offset(label_level), sizeof(float)*2*label_level, wls)) {
-            RENDERALGO_THROW_EXCEPTION("update visible shared map memory failed.");
+            RENDERALGO_THROW_EXCEPTION("update window level shared map memory failed.");
         }
         remove_dirty(WINDOW_LEVEL_BUCKET);
     }
@@ -512,7 +517,7 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
             cudaAddressModeClamp, cudaFilterModeLinear, cudaReadModeNormalizedFloat, true, color_opacity_tex_array);
 
         if (0 != shared_map_memory->update(get_color_opacity_texture_offset(label_level), sizeof(cudaTextureObject_t)*label_level, color_opacity_tex_array)) {
-            RENDERALGO_THROW_EXCEPTION("update visible shared map memory failed.");
+            RENDERALGO_THROW_EXCEPTION("update color opacity texture array shared map memory failed.");
         }
     }
 
@@ -538,8 +543,29 @@ CudaGlobalMemoryPtr RayCasterInnerResource::get_shared_map_memory() {
         }
 
         if (0 != shared_map_memory->update(get_material_offset(label_level), sizeof(float)*9*label_level, material_array)) {
-            RENDERALGO_THROW_EXCEPTION("update visible shared map memory failed.");
+            RENDERALGO_THROW_EXCEPTION("update material shared map memory failed.");
         }
+        remove_dirty(MATERIAL_BUCKET);
+    }
+
+    if (check_dirty(MASK_OVERLAY_COLOR_BUCKET)) {
+        float* mask_overlay_opacity_array = get_mask_overlay_color_array(_shared_buffer_array.get(), label_level);
+        memset(mask_overlay_opacity_array, 0, sizeof(float) * 4 * label_level);
+
+        unsigned char label = 0;
+        for (auto it = _mask_overlay_colors.begin(); it != _mask_overlay_colors.end(); ++it) {
+            label = it->first;
+            mask_overlay_opacity_array[label * 4] = it->second.r / 255.0f;
+            mask_overlay_opacity_array[label * 4 + 1] = it->second.g / 255.0f;
+            mask_overlay_opacity_array[label * 4 + 2] = it->second.b / 255.0f;
+            mask_overlay_opacity_array[label * 4 + 3] = it->second.a / 255.0f;
+        }
+
+        if (0 != shared_map_memory->update(get_mask_overlay_color_offset(label_level), sizeof(float) * 4 * label_level, mask_overlay_opacity_array)) {
+            RENDERALGO_THROW_EXCEPTION("update mask overlay color shared map memory failed.");
+        }
+
+        remove_dirty(MASK_OVERLAY_COLOR_BUCKET);
     }
 
     return shared_map_memory;
