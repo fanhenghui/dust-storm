@@ -141,31 +141,31 @@ void Init() {
     }
 
     std::set<unsigned char> target_label_set;
-    /*RunLengthOperator run_length_op;
-    std::ifstream in2(root+"/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle" , std::ios::binary | std::ios::in);
+    RunLengthOperator run_length_op;
+    std::ifstream in2(root + "/1.3.6.1.4.1.14519.5.2.1.6279.6001.100621383016233746780170740405.rle", std::ios::binary | std::ios::in);
     if (in2.is_open()) {
-        in2.seekg (0, in2.end);
+        in2.seekg(0, in2.end);
         const int code_len = in2.tellg();
-        in2.seekg (0, in2.beg);
+        in2.seekg(0, in2.beg);
         unsigned int *code_buffer = new unsigned int[code_len];
-        in2.read((char*)code_buffer ,code_len);
+        in2.read((char*)code_buffer, code_len);
         in2.close();
         unsigned char* mask_target = new unsigned char[data_len];
 
-        if(0 == run_length_op.decode(code_buffer , code_len/sizeof(unsigned int) , mask_target , data_len) ) {
-            FileUtil::write_raw(root+"./nodule.raw" , mask_target , data_len);
+        if (0 == run_length_op.decode(code_buffer, code_len / sizeof(unsigned int), mask_target, data_len)) {
+            FileUtil::write_raw(root + "./nodule.raw", mask_target, data_len);
             printf("load target mask done.\n");
-            for (unsigned int i = 0 ; i < data_len ; ++i) {
+            for (unsigned int i = 0; i < data_len; ++i) {
                 if (mask_target[i] != 0) {
                     mask_raw[i] = mask_target[i] + 1;
                     target_label_set.insert(mask_target[i] + 1);
                 }
             }
         }
-        delete [] mask_target;
+        delete[] mask_target;
     }
 
-    FileUtil::write_raw(root+"/target_mask.raw" , mask_raw, data_len);*/
+    FileUtil::write_raw(root + "/target_mask.raw", mask_raw, data_len);
 
     _volumeinfos->set_mask(mask_data);
 
@@ -519,7 +519,7 @@ void resize(int x, int y) {
 }
 
 void Idle() {
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 void MouseClick(int button, int status, int x, int y) {

@@ -5,7 +5,8 @@
 <Point><Index>350</Index><R>255</R><G>25</G><B>25</B></Point>
 </Color>
 <Opacity>
-<Point><Index>-1550</Index><A>200</A></Point>
+<Point><Index>-1550</Index><A>0</A></Point>
+<Point><Index>-1500</Index><A>200</A></Point>
 <Point><Index>-500</Index><A>200</A></Point>
 <Point><Index>350</Index><A>255</A></Point>
 </Opacity>

@@ -130,11 +130,11 @@ inline __device__ float4 shade_phong(CudaVolumeInfos* __restrict__ volume_infos,
 }
 
 inline __device__ int access_mask_nearest(CudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos) {
-    return (int)tex3D<unsigned char>(volume_infos->mask_tex, sample_pos.x, sample_pos.y, sample_pos.z);
+    return (int)(tex3D<float>(volume_infos->mask_tex, sample_pos.x, sample_pos.y, sample_pos.z)*255.0f);
 }
 
 inline __device__ int access_mask_linear(CudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos) {
-    return (int)tex3D<unsigned char>(volume_infos->mask_tex, sample_pos.x, sample_pos.y, sample_pos.z);
+    return (int)(tex3D<float>(volume_infos->mask_tex, sample_pos.x, sample_pos.y, sample_pos.z)*255.0f);
 }
 
 inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos,
@@ -155,9 +155,6 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
         return;
     }
 
-    if (label > ray_cast_infos->label_level - 1) {
-        printf("error label: %d\n", label);
-    }
     float* s_wl_array = get_s_wl_array(ray_cast_infos->label_level);
     float ww = s_wl_array[label * 2];
     float wl = s_wl_array[label * 2 + 1];

@@ -262,7 +262,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
     RENDERALGO_CHECK_NULL_EXCEPTION(volume_tex);
     CudaTexture3DPtr cuda_volume_tex = volume_tex->get_cuda_resource();
     RENDERALGO_CHECK_NULL_EXCEPTION(cuda_volume_tex);
-    cuda_volume_infos.volume_tex = cuda_volume_tex->get_object(cudaAddressModeClamp, 
+    cuda_volume_infos.volume_tex = cuda_volume_tex->get_object(cudaAddressModeBorder,
         cudaFilterModeLinear, cudaReadModeNormalizedFloat, true);
 
     const MaskMode mask_mode = ray_caster->get_mask_mode();
@@ -271,7 +271,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
         RENDERALGO_CHECK_NULL_EXCEPTION(mask_tex);
         CudaTexture3DPtr cuda_mask_tex = mask_tex->get_cuda_resource();
         RENDERALGO_CHECK_NULL_EXCEPTION(cuda_mask_tex);
-        cuda_volume_infos.mask_tex = cuda_mask_tex->get_object(cudaAddressModeClamp, 
+        cuda_volume_infos.mask_tex = cuda_mask_tex->get_object(cudaAddressModeBorder, 
             cudaFilterModePoint, cudaReadModeNormalizedFloat, true);
     }
 

@@ -159,6 +159,10 @@ cudaTextureObject_t CudaTexture1DArray::create_object(
     tex_desc.filterMode = filter_mode;
     tex_desc.readMode = read_mode;
     tex_desc.normalizedCoords = normalized_coords;
+    tex_desc.borderColor[0] = 0.0f;
+    tex_desc.borderColor[1] = 0.0f;
+    tex_desc.borderColor[2] = 0.0f;
+    tex_desc.borderColor[3] = 0.0f;
 
     cudaTextureObject_t tex_obj(0);
     cudaError_t err = cudaCreateTextureObject(&tex_obj, &res_desc, &tex_desc, NULL);
