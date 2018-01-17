@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cudaresource\mi_cuda_global_memory.cpp" />
+    <ClCompile Include="..\cudaresource\mi_cuda_gl_interop_cache.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_gl_texture_2d.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_object.cpp" />
     <ClCompile Include="..\cudaresource\mi_cuda_resource_manager.cpp" />
@@ -27,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\cudaresource\mi_cuda_global_memory.h" />
+    <ClInclude Include="..\include\cudaresource\mi_cuda_gl_interop_cache.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_gl_texture_2d.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_object.h" />
     <ClInclude Include="..\include\cudaresource\mi_cuda_resource_define.h" />

@@ -7,9 +7,6 @@
     <Filter Include="source">
       <UniqueIdentifier>{0f8cf207-fedb-4671-bb97-ffb2a4e39573}</UniqueIdentifier>
     </Filter>
-    <Filter Include="kernel">
-      <UniqueIdentifier>{29909d65-d097-4930-83ef-c50fcbce99ad}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\cudaresource\mi_cuda_texture_base.cpp">
@@ -49,6 +46,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\cudaresource\mi_cuda_time_query.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cudaresource\mi_cuda_gl_interop_cache.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -99,6 +99,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\include\cudaresource\mi_cuda_time_query.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\cudaresource\mi_cuda_gl_interop_cache.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

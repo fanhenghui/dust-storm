@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\renderalgo\mi_annotation_calculator.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\renderalgo\mi_brick_define.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -150,11 +147,14 @@
     <ClInclude Include="..\include\renderalgo\mi_transfer_function_texture.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\renderalgo\mi_ray_caster_cuda_define.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\renderalgo\mi_fps.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\renderalgo\mi_annotation_calculator.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="..\renderalgo\mi_brick_info_calculator.cpp">
       <Filter>source</Filter>
     </ClCompile>

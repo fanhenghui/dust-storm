@@ -10,7 +10,7 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-class CudaGLInteropCache {
+class CUDAResource_Export CudaGLInteropCache {
 public:
     ~CudaGLInteropCache();
     
