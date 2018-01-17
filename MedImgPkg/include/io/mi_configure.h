@@ -12,6 +12,11 @@ enum ProcessingUnitType {
     GPU,
 };
 
+enum GPUPlatformType {
+    OPENGL = 0,
+    CUDA,
+};
+
 class IO_Export Configure {
 public:
     static Configure* instance();
@@ -48,6 +53,8 @@ public:
     //GPU/CPU MPR rendering(Just for Windows client)
     ProcessingUnitType get_processing_unit_type() const;
     void set_processing_unit_type(ProcessingUnitType type);//For testing
+
+    GPUPlatformType get_gpu_platform_type() const;
 private:
     Configure();
     void init();
@@ -96,7 +103,8 @@ private:
     //GPU/CPU MPR rendering
     ProcessingUnitType _processing_unit_type;
 
-    //
+    //GPU platform(VR/MPR)
+    GPUPlatformType _gpu_platform_type;
 };
 
 MED_IMG_END_NAMESPACE

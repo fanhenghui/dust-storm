@@ -160,7 +160,8 @@ int OpInit::load_dcm_from_cache_db(std::shared_ptr<AppController> controller, co
     }
 
     // create volume infos
-    std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos());
+    const GPUPlatform gpu_platform = Configure::instance()->get_gpu_platform_type() == CUDA ? CUDA_BASE : GL_BASE;
+    std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos(GPU_BASE, gpu_platform));
     volume_infos->set_data_header(data_header);
     volume_infos->set_volume(img_data); // load volume texture if has graphic card
 
@@ -288,6 +289,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
     std::vector<std::shared_ptr<MPRScene>> mpr_scenes;
     std::vector<std::shared_ptr<VRScene>> vr_scenes;
     const int expected_fps = Configure::instance()->get_expected_fps();
+    const GPUPlatform gpu_platform = Configure::instance()->get_gpu_platform_type() == CUDA ? CUDA_BASE : GL_BASE;
     // create cells
     for (int i = 0; i < msg_init->cells_size(); ++i)
     {
@@ -302,7 +304,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
         std::shared_ptr<AppNoneImage> none_image(new AppNoneImage());
         cell->set_none_image(none_image);
         if (type_id == 1) { // MPR
-            std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height));
+            std::shared_ptr<MPRScene> mpr_scene(new MPRScene(width, height, GPU_BASE, gpu_platform));
             mpr_scene->set_mask_label_level(L_64);
             mpr_scenes.push_back(mpr_scene);
             cell->set_scene(mpr_scene);
@@ -314,7 +316,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
                 mpr_scene->set_name(ss.str());
             }
             mpr_scene->set_volume_infos(volume_infos);
-            mpr_scene->set_sample_rate(1.0);
+            mpr_scene->set_sample_step(1.0);
             mpr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
             mpr_scene->set_composite_mode(COMPOSITE_AVERAGE);
             mpr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
@@ -361,7 +363,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
             none_image->add_none_image_item(noneimg_frustum);
 
         } else if (type_id == 2) { // VR
-            std::shared_ptr<VRScene> vr_scene(new VRScene(width, height));
+            std::shared_ptr<VRScene> vr_scene(new VRScene(width, height, GPU_BASE, gpu_platform));
             vr_scene->set_mask_label_level(L_64);
             vr_scenes.push_back(vr_scene);
             cell->set_scene(vr_scene);
@@ -374,7 +376,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
             }
             vr_scene->set_navigator_visibility(true);
             vr_scene->set_volume_infos(volume_infos);
-            vr_scene->set_sample_rate(1.0);
+            vr_scene->set_sample_step(1.0);
             vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
             vr_scene->set_composite_mode(COMPOSITE_DVR);
             vr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);

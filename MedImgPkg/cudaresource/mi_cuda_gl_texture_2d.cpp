@@ -12,19 +12,19 @@ namespace {
     inline int fill_cuda_texture_parameter(GLenum format, GLenum type, int(&channel)[4]) {
         switch (format) {
         case GL_RED: {
-            if (type = GL_UNSIGNED_BYTE || type == GL_BYTE) {
+            if (GL_UNSIGNED_BYTE == type || GL_BYTE == type) {
                 channel[0] = 8;
                 channel[1] = 0;
                 channel[2] = 0;
                 channel[3] = 0;
             }
-            else if (type == GL_UNSIGNED_SHORT || type == GL_SHORT) {
+            else if (GL_UNSIGNED_SHORT == type || GL_SHORT == type) {
                 channel[0] = 16;
                 channel[1] = 0;
                 channel[2] = 0;
                 channel[3] = 0;
             }
-            else if (type == GL_FLOAT) {
+            else if (GL_FLOAT == type) {
                 channel[0] = 32;
                 channel[1] = 0;
                 channel[2] = 0;
@@ -37,17 +37,17 @@ namespace {
             break;
         }
         case GL_RGB: {
-            if (type = GL_UNSIGNED_BYTE || type == GL_BYTE) {
+            if (GL_UNSIGNED_BYTE == type || GL_BYTE == type) {
                 MI_CUDARESOURCE_LOG(MI_ERROR) << "cuda gl texture can't support GL_RGB8 format.";
                 return -1;
             }
-            else if (type == GL_UNSIGNED_SHORT || type == GL_SHORT) {
+            else if (GL_UNSIGNED_SHORT == type || GL_SHORT == type) {
                 channel[0] = 16;
                 channel[1] = 16;
                 channel[2] = 16;
                 channel[3] = 0;
             }
-            else if (type == GL_FLOAT) {
+            else if (GL_FLOAT == type) {
                 channel[0] = 32;
                 channel[1] = 32;
                 channel[2] = 32;
@@ -60,19 +60,19 @@ namespace {
             break;
         }
         case GL_RGBA: {
-            if (type = GL_UNSIGNED_BYTE || type == GL_BYTE) {
+            if (GL_UNSIGNED_BYTE == type || GL_BYTE == type) {
                 channel[0] = 8;
                 channel[1] = 8;
                 channel[2] = 8;
                 channel[3] = 8;
             }
-            else if (type == GL_UNSIGNED_SHORT || type == GL_SHORT) {
+            else if (GL_UNSIGNED_SHORT == type || GL_SHORT == type) {
                 channel[0] = 16;
                 channel[1] = 16;
                 channel[2] = 16;
                 channel[3] = 16;
             }
-            else if (type == GL_FLOAT) {
+            else if (GL_FLOAT == type) {
                 channel[0] = 32;
                 channel[1] = 32;
                 channel[2] = 32;

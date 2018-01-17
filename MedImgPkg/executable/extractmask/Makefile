@@ -1,4 +1,4 @@
-ver = debug
+ver = release
 CC  = g++ -std=c++11 -Wall -fopenmp
 
 ifeq ($(ver) , release)

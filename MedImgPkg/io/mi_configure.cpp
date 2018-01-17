@@ -35,6 +35,7 @@ void Configure::init() {
     _pacs_client_ae_title = "DBS";
     _pacs_client_port = 11115;
     _processing_unit_type = GPU;
+    _gpu_platform_type = CUDA;
 }
 
 void Configure::refresh() {
@@ -115,6 +116,12 @@ void Configure::refresh() {
         } else if (tag == "PACSClientPort") {
             StrNumConverter<unsigned short> conv;
             _pacs_client_port = conv.to_num(context);   
+        } else if (tag == "GPUPlatformType") {
+            if (context == std::string("CUDA") || context == std::string("cuda") || context == std::string("Cuda")) {
+                _gpu_platform_type = CUDA;
+            } else if (context == std::string("OPENGL") || context == std::string("opengl") || context == std::string("OpenGL") ) {
+                _gpu_platform_type = OPENGL;
+            }
         }
     }
 }
@@ -208,4 +215,9 @@ void Configure::set_processing_unit_type(ProcessingUnitType type) {
 int Configure::get_evaluation_limit() const {
     return _evaluation_limit;
 }
+
+GPUPlatformType Configure::get_gpu_platform_type() const {
+    return _gpu_platform_type;
+}
+
 MED_IMG_END_NAMESPACE

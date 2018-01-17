@@ -6,6 +6,7 @@
 #include "util/mi_memory_shield.h"
 
 #include "arithmetic/mi_ortho_camera.h"
+#include "arithmetic/mi_cuda_graphic.h"
 
 #include "glresource/mi_gl_utils.h"
 #include "glresource/mi_gl_texture_2d.h"
@@ -56,7 +57,7 @@ void GraphicObjectNavigator::initialize() {
                 unsigned char* rgba_array = new unsigned char[img_width * img_height * 4];
                 MemShield shield((char*)rgb_array);
                 MemShield shield2((char*)rgba_array);
-                for (int i = 0; i < img_width * img_height; ++i) {
+                for (unsigned int i = 0; i < img_width * img_height; ++i) {
                     rgba_array[i * 4] = rgb_array[i * 3];
                     rgba_array[i * 4 + 1] = rgb_array[i * 3 + 1];
                     rgba_array[i * 4 + 2] = rgb_array[i * 3 + 2];

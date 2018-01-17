@@ -282,7 +282,7 @@ void VolumeInfos::refresh_upload_mask() {
 
     if (GL_BASE == _gpu_platform) {
         CHECK_GL_ERROR;
-        GLTexture3DPtr& tex = _mask_texture->get_gl_resource();
+        GLTexture3DPtr tex = _mask_texture->get_gl_resource();
         tex->initialize();
         tex->bind();
         GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);
@@ -308,7 +308,7 @@ void VolumeInfos::refresh_upload_volume() {
 
     if (GL_BASE == _gpu_platform) {
         CHECK_GL_ERROR;
-        GLTexture3DPtr& tex = _volume_texture->get_gl_resource();
+        GLTexture3DPtr tex = _volume_texture->get_gl_resource();
         tex->initialize();
         tex->bind();
         GLTextureUtils::set_3d_wrap_s_t_r(GL_CLAMP_TO_BORDER);

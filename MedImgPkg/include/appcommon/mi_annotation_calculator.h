@@ -1,7 +1,7 @@
-#ifndef MEDIMG_RENDERALGO_MI_ANNOTATION_CALCULATOR_H
-#define MEDIMG_RENDERALGO_MI_ANNOTATION_CALCULATOR_H
+#ifndef MED_IMG_APPCOMMON_MI_ANNOTATION_CALCULATOR_H
+#define MED_IMG_APPCOMMON_MI_ANNOTATION_CALCULATOR_H
 
-#include "renderalgo/mi_render_algo_export.h"
+#include "appcommon/mi_app_common_export.h"
 #include "arithmetic/mi_aabb.h"
 #include "arithmetic/mi_ellipsoid.h"
 #include "arithmetic/mi_circle.h"
@@ -13,7 +13,7 @@ MED_IMG_BEGIN_NAMESPACE
 class ImageData;
 class CameraCalculator;
 class MPRScene;
-class RenderAlgo_Export AnnotationCalculator {
+class AppCommon_Export AnnotationCalculator {
 public:
     static Ellipsoid patient_sphere_to_volume_ellipsoid(
         const VOISphere& voi, 

@@ -15,6 +15,7 @@
 #include "cudaresource/mi_cuda_global_memory.h"
 #include "cudaresource/mi_cuda_utils.h"
 #include "cudaresource/mi_cuda_time_query.h"
+#include "cudaresource/mi_cuda_gl_interop_cache.h"
 
 #include "glresource/mi_gl_texture_2d.h"
 
@@ -23,6 +24,7 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_camera_calculator.h"
 #include "mi_ray_caster_inner_resource.h"
+#include "mi_ray_caster_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -236,8 +238,8 @@ void RayCastingGPUCUDA::render() {
 
 void RayCastingGPUCUDA::on_entry_exit_points_resize(int width, int height) {
     if (_inner_resource) {
-        _inner_resource->entry_points_tex->unregister_gl_texture();
-        _inner_resource->exit_points_tex->unregister_gl_texture();
+        CudaGLInteropCache::instance()->cache_interop_unregister_gl_texture(_inner_resource->entry_points_tex);
+        CudaGLInteropCache::instance()->cache_interop_unregister_gl_texture(_inner_resource->exit_points_tex);
     }
 }
 

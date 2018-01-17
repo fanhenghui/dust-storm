@@ -2,7 +2,7 @@
 #include <vector_types.h>
 #include <device_functions.h>
 
-#include "renderalgo/mi_ray_caster_define.h"
+#include "../mi_ray_caster_cuda_define.h"
 
 
 //this function will slow than operator f3*f3
@@ -716,7 +716,6 @@ cudaError_t quarter_map_back(cudaSurfaceObject_t quarter_canvas, int2 quarter_si
     }
 
     kernel_quarter_map_back<<<grid, block>>>(quarter_canvas, quarter_size, canvas, canvas_size);
-    
 
     return cudaThreadSynchronize();
 }

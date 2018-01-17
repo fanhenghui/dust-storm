@@ -20,10 +20,9 @@ MED_IMG_BEGIN_NAMESPACE
 
 AppThreadModel::AppThreadModel(): _rendering(false), _sending(false)  {
     // Creare gl context
-    UIDType uid(0);
     _glcontext = GLResourceManagerContainer::instance()
                  ->get_context_manager()
-                 ->create_object(uid);
+                 ->create_object("app thread model GL context");
     _glcontext->initialize();
     _glcontext->create_shared_context(RENDERING_CONTEXT);
     _glcontext->create_shared_context(OPERATION_CONTEXT);

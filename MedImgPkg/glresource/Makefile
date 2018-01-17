@@ -1,4 +1,4 @@
-ver = debug
+ver = release
 CC  = g++ -std=c++11 -Wall 
 
 ifeq ($(ver) , release)
@@ -24,7 +24,7 @@ mi_gl_texture_1d_array.o mi_gl_texture_1d.o mi_gl_texture_2d.o \
 mi_gl_texture_3d.o mi_gl_fbo.o \
 mi_gl_vao.o mi_gl_time_query.o mi_gl_texture_cache.o mi_gl_utils.o \
 
-OBJS = $(GL_OBJS) mi_gl_resource_manager_container.o 
+OBJS = $(GL_OBJS) mi_gl_resource_manager.o mi_gl_resource_manager_container.o  
 TARGET = $(BIN_DIR)/libmedimg_glresource.so
 
 EXPORT_HEADER = mi_gl_resource_export.h mi_gl_object.h
@@ -33,6 +33,9 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_syste
 
 $(TARGET): $(OBJS) $(BIN_DIR)/libmedimg_util.so $(BIN_DIR)/libmedimg_log.so
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
+
+mi_gl_resource_manager.o: mi_gl_resource_manager.h mi_gl_resource_manager.inl mi_gl_resource_manager.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_gl_resource_manager.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_gl_resource_manager_container.o: mi_gl_resource_manager_container.cpp mi_gl_resource_manager_container.h $(GL_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) mi_gl_resource_manager_container.cpp $(ADDITINAL_INCLUDE_DIR)

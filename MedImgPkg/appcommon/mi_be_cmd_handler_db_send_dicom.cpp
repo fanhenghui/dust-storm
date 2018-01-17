@@ -100,7 +100,8 @@ int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , cha
                 }
             
                 // create volume infos
-                std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos());
+                const GPUPlatform gpu_platform = Configure::instance()->get_gpu_platform_type() == CUDA ? CUDA_BASE : GL_BASE;
+                std::shared_ptr<VolumeInfos> volume_infos(new VolumeInfos(GPU_BASE, gpu_platform));
                 volume_infos->set_data_header(data_header);
                 volume_infos->set_volume(img_data); // load volume texture if has graphic card
             

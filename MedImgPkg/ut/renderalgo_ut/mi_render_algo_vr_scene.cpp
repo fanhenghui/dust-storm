@@ -20,6 +20,7 @@
 #include "glresource/mi_gl_utils.h"
 
 #include "cudaresource/mi_cuda_resource_manager.h"
+#include "cudaresource/mi_cuda_time_query.h"
 
 #include "renderalgo/mi_camera_calculator.h"
 #include "renderalgo/mi_camera_interactor.h"
@@ -33,6 +34,7 @@
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_brick_pool.h"
 #include "renderalgo/mi_render_algo_logger.h"
+#include "renderalgo/mi_fps.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -47,6 +49,7 @@
 
 using namespace medical_imaging;
 namespace {
+
 std::shared_ptr<ImageDataHeader> _data_header;
 std::shared_ptr<ImageData> _volume_data;
 std::shared_ptr<VolumeInfos> _volumeinfos;
@@ -56,6 +59,7 @@ int _ww;
 int _wl;
 
 std::shared_ptr<GLTimeQuery> _time_query;
+std::shared_ptr<CudaTimeQuery> _time_query_2;
 
 int _width = 1024;
 int _height = 1024;
@@ -75,8 +79,9 @@ ShadingMode _shading_mode = SHADING_PHONG;
 
 float _minip_threshold = 100.0f;
 
-
 bool _render_to_back = true;
+
+FPS _fps;
 
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
@@ -196,6 +201,9 @@ void Init() {
                   ->create_object("TQ");
     _time_query->initialize();
 
+    _time_query_2 = CudaResourceManager::instance()->create_cuda_time_query("TQ");
+    _time_query_2->initialize();
+
     // Transfer function
     std::shared_ptr<ColorTransFunc> pseudo_color;
 #ifdef WIN32
@@ -289,8 +297,10 @@ void Display() {
 
         CHECK_GL_ERROR;
 
-        //_time_query->initialize();
-        //_time_query->begin();
+        // _time_query->begin();
+
+        _time_query_2->begin();
+
         _scene->set_dirty(true);
 
         CHECK_GL_ERROR;
@@ -332,12 +342,18 @@ void Display() {
 #else
         FileUtil::write_raw("/home/wangrui22/data" + jpeg_file_name, buffer, buffer_size);
 #endif
-         /*MI_RENDERALGO_LOG(MI_ERROR) << "compressing time : " << _scene->get_compressing_duration() <<
-         ", buffer size: " << buffer_size;*/
+      
+         //const float render_time  = _time_query->end();
+         const float render_time = _time_query_2->end();
+         //MI_RENDERALGO_LOG(MI_INFO) << "rendering time : " << render_time << " " << buffer_size;
 
-         /*const double render_time  = _time_query->end();
-         MI_RENDERALGO_LOG(MI_TRACE) << "rendering time : " << render_time << " " << buffer_size;*/
-
+        int fps = _fps.fps(render_time);
+        static int tiker = 0;
+        tiker++;
+        if (tiker > 50) {
+            MI_RENDERALGO_LOG(MI_INFO) << "FPS:  " << fps;
+            tiker = 0;
+        }
 
         glutSwapBuffers();
     } catch (Exception& e) {
@@ -538,10 +554,10 @@ void MouseClick(int button, int status, int x, int y) {
     }
 
     if (status == GLUT_DOWN) {
-        _scene->set_expected_fps(300);
-        _scene->set_downsample(true);
+        //_scene->set_expected_fps(300);
+        //_scene->set_downsample(true);
     } else if (status == GLUT_UP) {
-        _scene->set_downsample(false);
+        //_scene->set_downsample(false);
     }
 
     _pt_pre = Point2(x, y);

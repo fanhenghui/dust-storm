@@ -3,8 +3,8 @@
 #include "arithmetic/mi_ortho_camera.h"
 #include "arithmetic/mi_arithmetic_utils.h"
 #include "io/mi_image_data.h"
-#include "mi_camera_calculator.h"
-#include "mi_mpr_scene.h"
+#include "renderalgo/mi_camera_calculator.h"
+#include "renderalgo/mi_mpr_scene.h"
 
 MED_IMG_BEGIN_NAMESPACE
 

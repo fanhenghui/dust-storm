@@ -1,8 +1,8 @@
-ver = debug
+ver = release
 CC = g++ -std=c++11 -Wall 
 
 ifeq ($(ver) , release) 
-CFLAGS += -o3
+CFLAGS += -O3
 else
 CFLAGS += -g
 endif

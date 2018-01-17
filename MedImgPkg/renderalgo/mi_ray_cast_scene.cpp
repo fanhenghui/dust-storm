@@ -19,6 +19,7 @@
 #include "cudaresource/mi_cuda_gl_texture_2d.h"
 #include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_resource_manager.h"
+#include "cudaresource/mi_cuda_gl_interop_cache.h"
 
 #include "mi_camera_calculator.h"
 #include "mi_camera_interactor.h"
@@ -209,6 +210,9 @@ void RayCastScene::render_to_back() {
 }
 
 void RayCastScene::pre_render() {
+    // CUDA&GL interop cache
+    CudaGLInteropCache::instance()->process_cache();
+
     // refresh volume & mask & their infos
     _volume_infos->refresh();
 

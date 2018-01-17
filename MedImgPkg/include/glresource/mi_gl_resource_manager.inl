@@ -87,7 +87,7 @@ template <class ResourceType>
 GLResourceManager<ResourceType>::~GLResourceManager() {}
 
 template <class ResourceType> 
-std::string GLResourceManager<ResourceType>::get_specification(const std::string& split = " ") {
+std::string GLResourceManager<ResourceType>::get_specification(const std::string& split) {
     boost::mutex::scoped_lock locker(_mutex);
     std::stringstream ss;
     ss << get_type() << ": [" << split;

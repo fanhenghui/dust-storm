@@ -10,9 +10,9 @@
 #include "renderalgo/mi_mask_label_store.h"
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
-#include "renderalgo/mi_annotation_calculator.h"
 #include "renderalgo/mi_volume_infos.h"
 
+#include "mi_annotation_calculator.h"
 #include "mi_model_annotation.h"
 #include "mi_model_crosshair.h"
 #include "mi_model_dbs_status.h"

@@ -59,8 +59,8 @@ int CudaTexture3D::load(int channel_x, int channel_y, int channel_z, int channel
         _depth = depth;
 
         cudaChannelFormatDesc format_desc = cudaCreateChannelDesc(channel_x, channel_y, channel_z, channel_w, format);
-        const cudaExtent extent = { width, height, depth };
-        cudaError_t err = cudaMalloc3DArray(&_d_array, &format_desc, extent, NULL);
+        const cudaExtent extent = { (size_t)width, (size_t)height, (size_t)depth };
+        cudaError_t err = cudaMalloc3DArray(&_d_array, &format_desc, extent, 0);
         if (err != cudaSuccess) {
             LOG_CUDA_ERROR(err);
             return -1;
@@ -71,7 +71,7 @@ int CudaTexture3D::load(int channel_x, int channel_y, int channel_z, int channel
         return 0;
     }
     
-    const cudaExtent extent = { width, height, depth };
+    const cudaExtent extent = { (size_t)width, (size_t)height, (size_t)depth };
     cudaMemcpy3DParms memcpy_3d_parms;
     memset(&memcpy_3d_parms, 0, sizeof(cudaMemcpy3DParms));
     memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, _width*CudaUtils::get_component_byte(_channel), _width, _height);
@@ -94,7 +94,7 @@ int CudaTexture3D::update(int offset_x, int offset_y, int offset_z, int width, i
         return -1;
     }
 
-    cudaExtent extent = { width, height, depth };
+    cudaExtent extent = { (size_t)width, (size_t)height, (size_t)depth };
     cudaMemcpy3DParms memcpy_3d_parms;
     memset(&memcpy_3d_parms, 0, sizeof(cudaMemcpy3DParms));
     memcpy_3d_parms.srcPtr = make_cudaPitchedPtr(h_data, width*CudaUtils::get_component_byte(_channel), width, height);

@@ -1,4 +1,4 @@
-ver = debug
+ver = release
 CC  = g++ -std=c++11 -Wall -Wno-unused-function
 
 ifeq ($(ver) , release)
@@ -33,7 +33,9 @@ mi_be_operation_fe_switch_preset_vrt.o mi_be_operation_fe_locate.o mi_be_operati
 mi_be_operation_fe_adjust_evaluation_probability.o 
 THREAD_MODEL_OBJS = mi_app_cell.o mi_app_none_image_item.o mi_app_none_image.o mi_app_controller.o mi_app_thread_model.o mi_app_common_util.o
 
-OBJS = $(MODEL_OBJS) $(OBSERVER_OBJS) $(CMD_HANDLER_OBJS) $(OPERATION_OBJS) $(THREAD_MODEL_OBJS)
+UTIL_OBJS = mi_annotation_calculator.o
+
+OBJS = $(MODEL_OBJS) $(OBSERVER_OBJS) $(CMD_HANDLER_OBJS) $(OPERATION_OBJS) $(THREAD_MODEL_OBJS) $(UTIL_OBJS)
 
 TARGET = $(BIN_DIR)/libmedimg_appcommon.so
 
@@ -44,7 +46,10 @@ ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_syste
 $(TARGET): $(OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(OBJS) $(ADDITIANL_DEPENDENCIES)
 
-$(MODEL_OBJS):%.o:%.cpp %.h
+$(UTIL_OBJS): %.o: %.cpp %.h 
+	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)
+
+$(MODEL_OBJS):%.o:%.cpp %.h $(UTIL_OBJS)
 	$(CC) -c -fPIC $(CFLAGS) -o $@ $< $(ADDITINAL_INCLUDE_DIR)	
 
 mi_app_common_util.o: mi_app_common_util.h mi_app_common_util.cpp mi_app_common_define.h $(MODEL_OBJS) 

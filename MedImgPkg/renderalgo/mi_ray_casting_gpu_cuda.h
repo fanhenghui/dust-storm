@@ -2,7 +2,7 @@
 #define MED_IMG_RENDERALGORITHM_MI_RAY_CASTING_GPU_CUDA_H
 
 #include "cudaresource/mi_cuda_resource_define.h"
-#include "renderalgo/mi_ray_caster_define.h"
+#include "mi_ray_caster_cuda_define.h"
 
 MED_IMG_BEGIN_NAMESPACE
 class RayCaster;

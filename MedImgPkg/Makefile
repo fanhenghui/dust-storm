@@ -1,5 +1,5 @@
 MAKE = make
-ver = debug
+ver = release
 buildall = true
 
 ifeq ($(buildall),true) 
@@ -8,6 +8,7 @@ subsystem:
 	$(MAKE) -C ./log
 	$(MAKE) -C ./util
 	$(MAKE) -C ./glresource
+	$(MAKE) -C ./cudaresource
 	$(MAKE) -C ./arithmetic
 	$(MAKE) -C ./io
 	$(MAKE) -C ./executable/shaderencoder
@@ -35,6 +36,7 @@ subsystem:
 	$(MAKE) -C ./log
 	$(MAKE) -C ./util
 	$(MAKE) -C ./glresource
+	$(MAKE) -C ./cudaresource
 	$(MAKE) -C ./arithmetic
 	$(MAKE) -C ./io
 	$(MAKE) -C ./executable/shaderencoder
@@ -52,6 +54,7 @@ clean:
 	$(MAKE) clean -C ./log
 	$(MAKE) clean -C ./util
 	$(MAKE) clean -C ./glresource
+	$(MAKE) clean -C ./cudaresource
 	$(MAKE) clean -C ./arithmetic
 	$(MAKE) clean -C ./io
 	$(MAKE) clean -C ./executable/shaderencoder

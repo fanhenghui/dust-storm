@@ -13,9 +13,9 @@
 
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_vr_scene.h"
-#include "renderalgo/mi_annotation_calculator.h"
 #include "renderalgo/mi_volume_infos.h"
 
+#include "mi_annotation_calculator.h"
 #include "mi_model_crosshair.h"
 #include "mi_app_cell.h"
 #include "mi_app_common_logger.h"

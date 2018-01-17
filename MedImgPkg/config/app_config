@@ -56,3 +56,6 @@ DoubleClickInterval = 300
 #hidden option
 NoduleOutput = TEXT
 LastOpenDirection = D:\
+
+#Config GPU platform(for test, delete when deploy)
+GPUPlatformType = Cuda

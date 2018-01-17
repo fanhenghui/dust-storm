@@ -1,4 +1,4 @@
-ver = debug
+ver = release
 CC = g++
 CFLAGS += -std=c++11 -Wall
 

@@ -9,9 +9,9 @@
 #include "renderalgo/mi_vr_scene.h"
 #include "renderalgo/mi_mpr_scene.h"
 #include "renderalgo/mi_volume_infos.h"
-#include "renderalgo/mi_annotation_calculator.h"
 #include "renderalgo/mi_camera_calculator.h"
 
+#include "mi_annotation_calculator.h"
 #include "mi_model_annotation.h"
 #include "mi_model_crosshair.h"
 #include "mi_model_anonymization.h"
