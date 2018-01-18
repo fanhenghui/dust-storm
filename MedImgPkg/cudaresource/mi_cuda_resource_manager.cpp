@@ -11,6 +11,8 @@
 #include "mi_cuda_texture_1d_array.h"
 #include "mi_cuda_time_query.h"
 
+#include "mi_cuda_resource_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 CudaResourceManager* CudaResourceManager::_instance = nullptr;
@@ -47,6 +49,7 @@ CudaGlobalMemoryPtr CudaResourceManager::create_global_memory(const std::string&
     CudaGlobalMemoryPtr ptr(new CudaGlobalMemory(uid));
     ptr->set_description(desc);
     _record_global_memory.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -55,6 +58,7 @@ CudaTexture1DPtr CudaResourceManager::create_cuda_texture_1d(const std::string& 
     CudaTexture1DPtr ptr(new CudaTexture1D(uid));
     ptr->set_description(desc);
     _record_tex_1d.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -63,6 +67,7 @@ CudaTexture2DPtr CudaResourceManager::create_cuda_texture_2d(const std::string& 
     CudaTexture2DPtr  ptr(new CudaTexture2D(uid));
     ptr->set_description(desc);
     _record_tex_2d.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -71,6 +76,7 @@ CudaTexture3DPtr CudaResourceManager::create_cuda_texture_3d(const std::string& 
     CudaTexture3DPtr ptr(new CudaTexture3D(uid));
     ptr->set_description(desc);
     _record_tex_3d.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -79,6 +85,7 @@ CudaGLTexture2DPtr CudaResourceManager::create_cuda_gl_texture_2d(const std::str
     CudaGLTexture2DPtr ptr(new CudaGLTexture2D(uid));
     ptr->set_description(desc);
     _record_gl_tex_2d.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -87,6 +94,7 @@ CudaSurface2DPtr CudaResourceManager::create_cuda_surface_2d(const std::string& 
     CudaSurface2DPtr ptr(new CudaSurface2D(uid));
     ptr->set_description(desc);
     _record_surface_2d.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -95,6 +103,7 @@ CudaTexture1DArrayPtr CudaResourceManager::create_cuda_texture_1d_array(const st
     CudaTexture1DArrayPtr ptr(new CudaTexture1DArray(uid, length));
     ptr->set_description(desc);
     _record_texture_1d_array.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 
@@ -103,6 +112,7 @@ CudaTimeQueryPtr CudaResourceManager::create_cuda_time_query(const std::string& 
     CudaTimeQueryPtr ptr(new CudaTimeQuery(uid));
     ptr->set_description(desc);
     _record_time_query.insert(uid, ptr);
+    MI_CUDARESOURCE_LOG(MI_INFO) << "create CUDA object type: " << ptr->get_type() << ", uid: " << uid << ", desc: " << desc;
     return ptr;
 }
 

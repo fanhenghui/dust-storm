@@ -1,13 +1,12 @@
 #include "mi_gl_context.h"
 
 #ifdef WIN32
-
 #else
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #endif
+
+#include "glresource/mi_gl_resource_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -35,12 +34,13 @@ XGLContext::XGLContext(UIDType uid)
 
 XGLContext::~XGLContext() {}
 
-void XGLContext::create_window() {
+int XGLContext::create_window() {
     /// \Open display
     _dpy = XOpenDisplay(NULL);
 
     if (nullptr == _dpy) {
-        GLRESOURCE_THROW_EXCEPTION("Failed to open X display!\n");
+        MI_GLRESOURCE_LOG(MI_ERROR) << "failed to open X display.\n";
+        return -1;
     }
 
     /// \Choose visual
@@ -89,34 +89,35 @@ void XGLContext::create_window() {
     _vis = glXChooseVisual(_dpy, DefaultScreen(_dpy), attributes_list);
 
     if (nullptr == _vis) {
-        GLRESOURCE_THROW_EXCEPTION("Failed to choose visual!\n");
+        MI_GLRESOURCE_LOG(MI_ERROR) << "failed to choose visual, undefiend GLX atrribute is encountered in attribList.";
+        return -1;
     }
 
     /// \Create OpenGL context
     _ctx = glXCreateContext(_dpy, _vis, 0, GL_TRUE);
-
     if (nullptr == _ctx) {
-        GLRESOURCE_THROW_EXCEPTION("Failed to create OpenGL context!\n");
+        MI_GLRESOURCE_LOG(MI_ERROR) << "failed to create GL context.";
+        return -1;
     }
 
     /// \Create window
     Colormap colormap = XCreateColormap(_dpy, RootWindow(_dpy, _vis->screen),
                                         _vis->visual, AllocNone);
-    XSetWindowAttributes swa;
-    swa.background_pixmap = None;
-    swa.border_pixel = 0;
-    swa.colormap = colormap;
-    unsigned long attribMask =
-        CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
-    _win =
-        XCreateWindow(_dpy, RootWindow(_dpy, _vis->screen), 0, 0, 64, 64, 0,
-                      _vis->depth, InputOutput, _vis->visual, attribMask, &swa);
+    XSetWindowAttributes attrs;
+    memset(&attrs, 0, sizeof(XSetWindowAttributes));
+    attrs.background_pixmap = None;
+    attrs.border_pixel = 0;
+    attrs.colormap = colormap;
+    unsigned long attribMask = CWBackPixmap | CWBorderPixel | CWColormap | CWEventMask;
+    //XCreateWindow出错会导致context创建错误，但是这里检查不到，是在X的error handler中检测的（XSetErrorHandler）
+    _win = XCreateWindow(_dpy, RootWindow(_dpy, _vis->screen), 0, 0, 64, 64, 0,
+                      _vis->depth, InputOutput, _vis->visual, attribMask, &attrs);
 
     // Get Version info
     int major = 0;
     int minor = 0;
     glXQueryVersion(_dpy, &major, &minor);
-    printf("Supported GLX version - %d.%d\n", major, minor);
+    MI_GLRESOURCE_LOG(MI_INFO) << "GLX version: " << major << "." << minor;
 
     // if(major == 1 && minor < 2)
     //{
@@ -136,12 +137,16 @@ void XGLContext::create_window() {
 
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
-        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        MI_GLRESOURCE_LOG(MI_ERROR) << "GLEW init failed: " << glewGetErrorString(err);
+        return -1;
+        
     }
 
     // Testing
     const GLubyte* s = glGetString(GL_VERSION);
-    printf("GL Version = %s\n", s);
+    MI_GLRESOURCE_LOG(MI_INFO) << "OpenGL version: " << s;
+
+    return 0;
 }
 
 void XGLContext::create_shared_context(int id) {

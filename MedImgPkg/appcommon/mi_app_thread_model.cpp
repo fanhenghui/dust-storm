@@ -90,6 +90,8 @@ void AppThreadModel::stop() {
 
     _client_proxy_dbs->stop();//force close socket
     if (_thread_dbs_recving.joinable()) {
+        _thread_dbs_recving.interrupt();
+        //TODO 这里无法直接打断，需要修改socket client成非阻塞模式
         _thread_dbs_recving.join();
     }
 }

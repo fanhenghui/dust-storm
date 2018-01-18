@@ -14,23 +14,23 @@ inline __device__  float ray_intersect_brick(float3 init_pt, float3 brick_min, f
 
     //Adjust
     if (fabs(bottom.x) < EPSILON) {
-        tbot.x = 0.0;
+        tbot.x = 0.0f;
     }
     if (fabs(bottom.y) < EPSILON) {
-        tbot.y = 0.0;
+        tbot.y = 0.0f;
     }
     if (fabs(bottom.z) < EPSILON) {
-        tbot.z = 0.0;
+        tbot.z = 0.0f;
     }
 
     if (fabs(top.x) < EPSILON) {
-        ttop.x = 0.0;
+        ttop.x = 0.0f;
     }
     if (fabs(top.y) < EPSILON) {
-        ttop.y = 0.0;
+        ttop.y = 0.0f;
     }
     if (fabs(top.z) < EPSILON) {
-        ttop.z = 0.0;
+        ttop.z = 0.0f;
     }
 
     float3 tmin = fminf(tbot, ttop);
@@ -45,7 +45,7 @@ inline __device__  float ray_intersect_brick(float3 init_pt, float3 brick_min, f
 }
 
 inline __device__ bool outside(float3 pt , float3 bound) {
-    if (pt.x < 0|| pt.y < 0 || pt.z < 0) {
+    if (pt.x < 0.0f || pt.y < 0.0f || pt.z < 0.0f) {
         return true;
     }
     if (pt.x > bound.x || pt.y > bound.y|| pt.z > bound.z) {
@@ -88,8 +88,8 @@ __global__ void kernel_calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry
         if (entry_step >= exit_step || entry_step < 0 || entry_step > thickness)// check entry points in range of thickness and volume
         {
             exit_step = -1.0f;
-            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), entry_surf, x * 4 * 4, y);
-            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), exit_surf, x * 4 * 4, y);
+            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), entry_surf, x << 4, y);
+            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), exit_surf, x << 4, y);
             return;
         }
         entry_intersection = entry_point + entry_step * ray_dir;
@@ -101,8 +101,8 @@ __global__ void kernel_calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry
         if (entry_step >= exit_step)
         {
             exit_step = -1.0f;
-            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), entry_surf, x * 4 * 4, y);
-            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), exit_surf, x * 4 * 4, y);
+            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), entry_surf, x << 4, y);
+            surf2Dwrite(make_float4(0.0f, 0.0f, 0.0f, -1.0f), exit_surf, x << 4, y);
             return;
         }
         exit_intersection = entry_point + exit_step * ray_dir;
@@ -112,8 +112,8 @@ __global__ void kernel_calculate_mpr_entry_exit_points(cudaSurfaceObject_t entry
         }
     }
 
-    surf2Dwrite(make_float4(entry_intersection, -1.0f), entry_surf, x * 4 * 4, y);
-    surf2Dwrite(make_float4(exit_intersection, -1.0f), exit_surf, x * 4 * 4, y);
+    surf2Dwrite(make_float4(entry_intersection, -1.0f), entry_surf, x << 4, y);
+    surf2Dwrite(make_float4(exit_intersection, -1.0f), exit_surf, x << 4, y);
 }
 
 extern "C" 

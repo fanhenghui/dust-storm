@@ -10,7 +10,44 @@
 #include "mi_gl_time_query.h"
 #include "mi_gl_vao.h"
 
+#include "mi_gl_resource_logger.h"
+
 MED_IMG_BEGIN_NAMESPACE
+
+#ifndef WIN32
+#include <stdio.h>
+
+static int x_error_handler(Display* dpy, XErrorEvent *event) {
+    std::stringstream ss;
+
+    char buffer[BUFSIZ];
+    char mesg[BUFSIZ];
+    char number[32];
+    const char *mtype = "XlibMessage";
+
+    XGetErrorText(dpy, event->error_code, buffer, BUFSIZ);
+    XGetErrorDatabaseText(dpy, mtype, "XError", "X Error", mesg, BUFSIZ);
+    ss << "catch " << mesg << ": " << buffer << ". ";
+    XGetErrorDatabaseText(dpy, mtype, "MajorCode", "Request Major code %d", mesg, BUFSIZ);
+
+    ss << "Failed request status: " << "{ ";
+    ss << "Major opcode: " <<  (int)event->request_code;
+    if (event->request_code < 128) {
+	    snprintf(number, sizeof(number), "%d", event->request_code);
+        XGetErrorDatabaseText(dpy, "XRequest", number, "", buffer, BUFSIZ);
+        ss << "(" << buffer << ")";
+    }
+    ss << ", ";
+    
+    ss << "Minor opcode: " <<  (int)event->minor_code << ", ";
+    ss << "Error code: " <<  (int)event->error_code << ", ";
+    ss << "Serial number: " <<  (int)event->serial << "}. ";
+
+    MI_GLRESOURCE_LOG(MI_ERROR) << ss.str();
+    return 0;
+}
+
+#endif
 
 boost::mutex GLResourceManagerContainer::_mutex;
 
@@ -69,7 +106,11 @@ GLResourceManagerContainer::GLResourceManagerContainer()
       _vao_manager(new GLVAOManager()),
       _fbo_manager(new GLFBOManager()),
       _context_manager(new GLContextManager()),
-      _time_query_manager(new GLTimeQueryManager()) {}
+      _time_query_manager(new GLTimeQueryManager()) {
+#ifndef WIN32
+    XSetErrorHandler(x_error_handler);
+#endif
+}
 
 GLProgramManagerPtr GLResourceManagerContainer::get_program_manager() const {
     return _program_manager;

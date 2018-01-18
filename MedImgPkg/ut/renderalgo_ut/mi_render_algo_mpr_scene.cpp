@@ -30,6 +30,8 @@
 #include "renderalgo/mi_ray_caster.h"
 #include "renderalgo/mi_ray_caster_canvas.h"
 #include "renderalgo/mi_volume_infos.h"
+#include "renderalgo/mi_fps.h"
+#include "renderalgo/mi_render_algo_logger.h"
 
 #ifdef WIN32
 #include "GL/glut.h"
@@ -50,6 +52,7 @@ std::shared_ptr<VolumeInfos> _volumeinfos;
 std::shared_ptr<MPRScene> _scene;
 
 std::shared_ptr<GLTimeQuery> _time_query;
+std::shared_ptr<CudaTimeQuery> _time_query_2;
 
 int _width = 1033;
 int _height = 616;
@@ -63,6 +66,7 @@ int _cur_page = 0;
 
 bool _render_to_back = true;
 
+FPS _fps;
 
 #ifdef WIN32
 const std::string root = "E:/data/MyData/demo/lung/";
@@ -166,6 +170,10 @@ void Init() {
     _time_query = GLResourceManagerContainer::instance()
                   ->get_time_query_manager()
                   ->create_object("TQ 1");
+    _time_query->initialize();
+
+    _time_query_2 = CudaResourceManager::instance()->create_cuda_time_query("TQ");
+    _time_query_2->initialize();
 
     //Mask overlay
     if (!target_label_set.empty()) {
@@ -179,6 +187,8 @@ void Init() {
         _scene->set_mask_overlay_mode(MASK_OVERLAY_ENABLE);
         _scene->set_visible_labels(visible_labels);
     }
+
+    MI_RENDERALGO_LOG(MI_DEBUG) << "TQ 3";
 }
 
 void Display() {
@@ -190,8 +200,9 @@ void Display() {
         glClearColor(0.0, 0.0, 0.0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        _time_query->initialize();
-        //_time_query->begin();
+        //_time_query->begin();        
+        _time_query_2->begin();
+
         _scene->set_test_code(_iTestCode);
         _scene->set_dirty(true);
 
@@ -215,9 +226,16 @@ void Display() {
 #else
         // FileUtil::write_raw("/home/wr/data/output_ut.jpeg",buffer , buffer_size);
 #endif
-        // std::cout << "compressing time : " << _scene->get_compressing_duration();
-
         // std::cout << "rendering time : " << _time_query->end() << std::endl;
+        const float render_time = _time_query_2->end();
+
+        int fps = _fps.fps(render_time);
+        static int tiker = 0;
+        tiker++;
+        if (tiker > 50) {
+            MI_RENDERALGO_LOG(MI_INFO) << "FPS:  " << fps;
+            tiker = 0;
+        }
 
         glutSwapBuffers();
     } catch (Exception& e) {
@@ -362,8 +380,6 @@ int TE_MPRScene(int argc, char* argv[]) {
             }
         }
 
-        Init();
-
         glutInit(&argc, argv);
         glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
         glutInitWindowPosition(0, 0);
@@ -380,6 +396,8 @@ int TE_MPRScene(int argc, char* argv[]) {
             std::cout << "Init glew failed!\n";
             return -1;
         }
+
+        Init();
 
         GLEnvironment env;
         int major, minor;

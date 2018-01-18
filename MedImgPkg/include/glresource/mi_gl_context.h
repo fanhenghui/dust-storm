@@ -48,7 +48,7 @@ public:
     void make_noncurrent();
 
 private:
-    void create_window();
+    int create_window();
 
 private:
     GLXContext _ctx;
