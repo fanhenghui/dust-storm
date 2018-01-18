@@ -185,7 +185,7 @@ inline __device__ void composite_dvr(CudaVolumeInfos* __restrict__ volume_infos,
 }
 
 __device__ float4 kernel_ray_cast_dvr(CudaVolumeInfos* __restrict__ volume_infos, CudaRayCastInfos* __restrict__ ray_cast_infos, 
-    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color) {
+    float3 ray_dir, float3 ray_start, float start_step, float end_step, float4 input_color, float3* ray_end) {
     float4 integral_color = input_color;
     float3 sample_pos;
 
@@ -197,6 +197,7 @@ __device__ float4 kernel_ray_cast_dvr(CudaVolumeInfos* __restrict__ volume_infos
             break;
         }
     }
+    *ray_end = sample_pos;
     return integral_color;
 }
 
@@ -470,7 +471,7 @@ __device__ void fill_shared_array(int thread_idx, void* d_mapped_array, int size
 }
 
 __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
-    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter, int memcpy_step) {
+    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter, int memcpy_step) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -517,16 +518,16 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
     float4 input_color = make_float4(0.0f);
     float4 integral_color = make_float4(0.0f);
     float  mip_gray = 0.0f;
-    float3 mip_pos = make_float3(0.0f);
+    float3 ray_end = make_float3(0.0f);
     if (0 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_dvr(&volume_infos, &ray_cast_infos, 
-            ray_dir, ray_start, start_step, end_step, input_color);
+            ray_dir, ray_start, start_step, end_step, input_color, &ray_end);
     } else if (1 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_mip(&volume_infos, &ray_cast_infos, 
-            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &ray_end);
     } else if (2 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_minip(&volume_infos, &ray_cast_infos, 
-            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &ray_end);
     } else if (3 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos, 
             ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
@@ -540,10 +541,18 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255 , integral_color.z * 255, 255);
     surf2Dwrite(rgba, canvas, x << 2 , y);
+
+    if(3 != ray_cast_infos.composite_mode && 0 != ray_end_canvas) {
+        uchar4 ray_end_rgba = make_uchar4(
+            (unsigned char)(ray_end.x*volume_infos.dim_r.x*255.0f), 
+            (unsigned char)(ray_end.y*volume_infos.dim_r.y*255.0f), 
+            (unsigned char)(ray_end.z*volume_infos.dim_r.z*255.0f), 255);
+        surf2Dwrite(ray_end_rgba, ray_end_canvas, x << 2, y);
+    }
 }
 
 __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cudaSurfaceObject_t exit_surf, int2 entry_exit_size,
-    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter, int memcpy_step) {
+    CudaVolumeInfos volume_infos, CudaRayCastInfos ray_cast_infos, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter, int memcpy_step) {
     uint x = blockIdx.x * blockDim.x + threadIdx.x;
     uint y = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -590,16 +599,16 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
     float4 input_color = make_float4(0.0f);
     float4 integral_color = make_float4(0.0f);
     float  mip_gray = 0.0f;
-    float3 mip_pos = make_float3(0.0f);
+    float3 ray_end = make_float3(0.0f);
     if (0 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_dvr(&volume_infos, &ray_cast_infos,
-            ray_dir, ray_start, start_step, end_step, input_color);
+            ray_dir, ray_start, start_step, end_step, input_color, &ray_end);
     } else if (1 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_mip(&volume_infos, &ray_cast_infos,
-            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &ray_end);
     } else if (2 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_minip(&volume_infos, &ray_cast_infos,
-            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &mip_pos);
+            ray_dir, ray_start, start_step, end_step, input_color, &mip_gray, &ray_end);
     } else if (3 == ray_cast_infos.composite_mode) {
         integral_color = kernel_ray_cast_average(&volume_infos, &ray_cast_infos,
             ray_dir, ray_start, start_step, end_step, input_color, &mip_gray);
@@ -613,6 +622,14 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
 
     uchar4 rgba = make_uchar4(integral_color.x * 255, integral_color.y * 255, integral_color.z * 255, 255);
     surf2Dwrite(rgba, canvas, x << 2, y);
+
+    if(3 != ray_cast_infos.composite_mode && 0 != ray_end_canvas) {
+        uchar4 ray_end_rgba = make_uchar4(
+            (unsigned char)(ray_end.x*volume_infos.dim_r.x*255.0f), 
+            (unsigned char)(ray_end.y*volume_infos.dim_r.y*255.0f), 
+            (unsigned char)(ray_end.z*volume_infos.dim_r.z*255.0f), 255);
+        surf2Dwrite(ray_end_rgba, ray_end_canvas, x << 2, y);
+    }
 }
 
 __global__ void kernel_quarter_map_back(cudaSurfaceObject_t quater_canvas, int2 quarter_size, cudaSurfaceObject_t canvas, int2 canvas_size) {
@@ -657,7 +674,7 @@ __global__ void kernel_quarter_map_back(cudaSurfaceObject_t quater_canvas, int2 
 
 extern "C"
 cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter) {
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter) {
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(canvas_size.x / BLOCK_SIZE, canvas_size.y / BLOCK_SIZE);
@@ -674,14 +691,14 @@ cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t 
         memcpy_step += 1;
     }
 
-    kernel_ray_cast_main_texture << <grid, block, s_mem_size >> >(entry_tex, exit_tex, entry_exit_size, volume_info, ray_cast_info, canvas, canvas_size, quarter, memcpy_step);
+    kernel_ray_cast_main_texture << <grid, block, s_mem_size >> >(entry_tex, exit_tex, entry_exit_size, volume_info, ray_cast_info, canvas, ray_end_canvas, canvas_size, quarter, memcpy_step);
 
     return cudaThreadSynchronize();
 }
 
 extern "C"
 cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int2 entry_exit_size,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter) {
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter) {
     const int BLOCK_SIZE = 16;
     dim3 block(BLOCK_SIZE, BLOCK_SIZE);
     dim3 grid(canvas_size.x / BLOCK_SIZE, canvas_size.y / BLOCK_SIZE);
@@ -698,7 +715,7 @@ cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t 
         memcpy_step += 1;
     }
 
-    kernel_ray_cast_main_surface << <grid, block, s_mem_size >> >(entry_suf, exit_suf, entry_exit_size, volume_info, ray_cast_info, canvas, canvas_size, quarter, memcpy_step);
+    kernel_ray_cast_main_surface << <grid, block, s_mem_size >> >(entry_suf, exit_suf, entry_exit_size, volume_info, ray_cast_info, canvas, ray_end_canvas, canvas_size, quarter, memcpy_step);
 
     return cudaThreadSynchronize();
 }

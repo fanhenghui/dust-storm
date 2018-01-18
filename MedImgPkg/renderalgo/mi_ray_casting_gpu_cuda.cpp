@@ -33,11 +33,11 @@ MED_IMG_BEGIN_NAMESPACE
 //CUDA method
 extern "C"
 cudaError_t ray_cast_texture(cudaTextureObject_t entry_tex, cudaTextureObject_t exit_tex, int2 entry_exit_size,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter);
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter);
 
 extern "C"
 cudaError_t ray_cast_surface(cudaSurfaceObject_t entry_suf, cudaSurfaceObject_t exit_suf, int2 entry_exit_size,
-    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, int2 canvas_size, int quarter);
+    CudaVolumeInfos volume_info, CudaRayCastInfos ray_cast_info, cudaSurfaceObject_t canvas, cudaSurfaceObject_t ray_end_canvas, int2 canvas_size, int quarter);
 
 extern "C"
 cudaError_t quarter_map_back(cudaSurfaceObject_t quarter_canvas, int2 quarter_size, cudaSurfaceObject_t canvas, int2 canvas_size);
@@ -81,6 +81,8 @@ void RayCastingGPUCUDA::render() {
     CudaSurface2DPtr canvas_surface = canvas_pair->get_cuda_resource();
     RENDERALGO_CHECK_NULL_EXCEPTION(canvas_surface);
 
+    GPUCanvasPairPtr ray_end_canvas_pair = ray_caster_canvas->get_color_attach_texture(1);
+
     const GPUPlatform entry_exit_gpu_platform = entry_exit_points->get_gpu_platform();
     if (nullptr == _inner_resource) {
         _inner_resource.reset(new InnerResource(entry_exit_gpu_platform));
@@ -122,7 +124,7 @@ void RayCastingGPUCUDA::render() {
             }
             const int2 canvas_size = make_int2(quarter_width, quarter_height);
             err = ray_cast_surface(entry->get_object(), exit->get_object(), entry_exit_points_size, 
-                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), canvas_size, 1);
+                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), 0, canvas_size, 1);
             if (err != cudaSuccess) {
                 LOG_CUDA_ERROR(err);
                 RENDERALGO_THROW_EXCEPTION("cuda rc-surface in quarter failed.");
@@ -135,8 +137,12 @@ void RayCastingGPUCUDA::render() {
             }
 
         } else {
+            cudaSurfaceObject_t ray_end_surface = 0;
+            if (ray_end_canvas_pair && ray_end_canvas_pair->get_cuda_resource()) {
+                ray_end_surface = ray_end_canvas_pair->get_cuda_resource()->get_object();
+            }
             err = ray_cast_surface(entry->get_object(), exit->get_object(), entry_exit_points_size, 
-                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), entry_exit_points_size, 0);
+                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), ray_end_surface, entry_exit_points_size, 0);
             if (err != cudaSuccess) {
                 LOG_CUDA_ERROR(err);
                 RENDERALGO_THROW_EXCEPTION("cuda rc-surface failed.");
@@ -196,7 +202,7 @@ void RayCastingGPUCUDA::render() {
             }
             const int2 canvas_size = make_int2(quarter_width, quarter_height);
             err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, entry_exit_points_size, 
-                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), canvas_size, 1);
+                cuda_volume_infos, cuda_ray_infos, _inner_resource->quarter_canvas->get_object(), 0, canvas_size, 1);
 
             if (err != cudaSuccess) {
                 LOG_CUDA_ERROR(err);
@@ -218,8 +224,13 @@ void RayCastingGPUCUDA::render() {
             }
         }
         else {
+            cudaSurfaceObject_t ray_end_surface = 0;
+            if (ray_end_canvas_pair && ray_end_canvas_pair->get_cuda_resource()) {
+                ray_end_surface = ray_end_canvas_pair->get_cuda_resource()->get_object();
+            }
+            
             err = ray_cast_texture(entry_cuda_tex, exit_cuda_tex, entry_exit_points_size, 
-                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), entry_exit_points_size , 0);
+                cuda_volume_infos, cuda_ray_infos, canvas_surface->get_object(), ray_end_surface, entry_exit_points_size , 0);
             if (err != cudaSuccess) {
                 LOG_CUDA_ERROR(err);
                 _inner_resource->entry_points_tex->unmap_gl_texture();

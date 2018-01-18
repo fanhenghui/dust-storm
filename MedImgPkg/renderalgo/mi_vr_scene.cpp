@@ -9,6 +9,8 @@
 #include "glresource/mi_gl_fbo.h"
 #include "glresource/mi_gl_resource_manager_container.h"
 
+#include "cudaresource/mi_cuda_surface_2d.h"
+
 #include "io/mi_image_data.h"
 
 #include "renderalgo/mi_camera_calculator.h"
@@ -32,8 +34,9 @@ struct VRScene::RayEnd
     int width;
     int height;
     bool lut_dirty;
+    GPUPlatform gpu_platform;
 
-    RayEnd():array(nullptr),width(0),height(0),lut_dirty(true) {}
+    RayEnd(GPUPlatform p):array(nullptr),width(0),height(0),lut_dirty(true),gpu_platform(p) {}
     ~RayEnd() {
         if (array) {
             delete [] array;
@@ -47,7 +50,12 @@ struct VRScene::RayEnd
             delete [] array;
             array = nullptr;
         }
-        array = new unsigned char[width*height*3];
+        if (GL_BASE == gpu_platform) {
+            array = new unsigned char[width*height*3];
+        } else {
+            array = new unsigned char[width*height*4];
+        }
+        
     }
 };
 
@@ -65,7 +73,7 @@ private:
 };
 
 VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) : 
-    RayCastScene(strategy, platfrom), _cache_ray_end(new RayEnd()) {
+    RayCastScene(strategy, platfrom), _cache_ray_end(new RayEnd(platfrom)) {
     //--------------------------------------------------//
     //VR entry exit just support GL platform
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points( new VREntryExitPoints(strategy, GL_BASE));
@@ -79,7 +87,7 @@ VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) :
 }
 
 VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform platfrom) : 
-    RayCastScene(width, height, strategy, platfrom), _cache_ray_end(new RayEnd()) {
+    RayCastScene(width, height, strategy, platfrom), _cache_ray_end(new RayEnd(platfrom)) {
     //--------------------------------------------------//
     //VR entry exit just support GL platform
     std::shared_ptr<VREntryExitPoints> vr_entry_exit_points( new VREntryExitPoints(strategy, GL_BASE));
@@ -308,45 +316,55 @@ void VRScene::set_color_opacity(std::shared_ptr<ColorTransFunc> color,
 }
 
 void VRScene::cache_ray_end() {
+    bool cache_diety = false;
+    if (nullptr == _cache_ray_end->array) {
+        _cache_ray_end->reset(_width, _height);
+        _cache_ray_end->camera = *_ray_cast_camera;
+        _cache_ray_end->lut_dirty = false;
+        cache_diety = true;
+    }
+    else if (_cache_ray_end->width != _width || _cache_ray_end->height != _height) {
+        _cache_ray_end->reset(_width, _height);
+        _cache_ray_end->camera = *_ray_cast_camera;
+        _cache_ray_end->lut_dirty = false;
+        cache_diety = true;
+    }
+    else if (_cache_ray_end->camera != *_ray_cast_camera) {
+        _cache_ray_end->camera = *_ray_cast_camera;
+        _cache_ray_end->lut_dirty = false;
+        cache_diety = true;
+    }
+    else if (_cache_ray_end->lut_dirty) {
+        _cache_ray_end->lut_dirty = false;
+        cache_diety = true;
+    }
+
+    if (!cache_diety) {
+        return;
+    }
+
+    GPUCanvasPairPtr ray_end_pair = _canvas->get_color_attach_texture(1);
+    if (nullptr == ray_end_pair) {
+        RENDERALGO_THROW_EXCEPTION("ray end texture pair is null.");
+    }
+
     if (GL_BASE == _gpu_platform) {
-        GLTexture2DPtr ray_end_tex = _canvas->get_color_attach_texture(1)->get_gl_resource();
-        if (!ray_end_tex) {
-            MI_RENDERALGO_LOG(MI_ERROR) << "ray end texture is null.";
-            RENDERALGO_THROW_EXCEPTION("ray end texture is null.");
-        }
+        GLTexture2DPtr ray_end_texture = ray_end_pair->get_gl_resource();
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_end_texture);
 
-        bool cache_diety = false;
-        if (nullptr == _cache_ray_end->array) {
-            _cache_ray_end->reset(_width, _height);
-            _cache_ray_end->camera = *_ray_cast_camera;
-            _cache_ray_end->lut_dirty = false;
-            cache_diety = true;
-        }
-        else if (_cache_ray_end->width != _width || _cache_ray_end->height != _height) {
-            _cache_ray_end->reset(_width, _height);
-            _cache_ray_end->camera = *_ray_cast_camera;
-            _cache_ray_end->lut_dirty = false;
-            cache_diety = true;
-        }
-        else if (_cache_ray_end->camera != *_ray_cast_camera) {
-            _cache_ray_end->camera = *_ray_cast_camera;
-            _cache_ray_end->lut_dirty = false;
-            cache_diety = true;
-        }
-        else if (_cache_ray_end->lut_dirty) {
-            _cache_ray_end->lut_dirty = false;
-            cache_diety = true;
-        }
-
-        if (cache_diety) {
-            GLUtils::set_pixel_pack_alignment(1);
-            GLUtils::set_pixel_unpack_alignment(1);
-            ray_end_tex->bind();
-            ray_end_tex->download(GL_RGB, GL_UNSIGNED_BYTE, _cache_ray_end->array);
-            ray_end_tex->unbind();
+        GLUtils::set_pixel_pack_alignment(1);
+        GLUtils::set_pixel_unpack_alignment(1);
+        ray_end_texture->bind();
+        ray_end_texture->download(GL_RGB, GL_UNSIGNED_BYTE, _cache_ray_end->array);
+        ray_end_texture->unbind();
+    } else {
+        CudaSurface2DPtr ray_end_surface = ray_end_pair->get_cuda_resource();
+        RENDERALGO_CHECK_NULL_EXCEPTION(ray_end_surface);
+        
+        if(0 != ray_end_surface->download(_width*_height*4, _cache_ray_end->array)) {
+            RENDERALGO_THROW_EXCEPTION("download ray end from cuda surface failed.");
         }
     }
-    
 }
 
 bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {
@@ -363,7 +381,16 @@ bool VRScene::get_ray_end(const Point2& pt_cross, Point3& pt_ray_end_world) {
     }
 
     const unsigned int idx = y*_cache_ray_end->width + x;
-    const unsigned char ray_end[3] = {_cache_ray_end->array[idx*3], _cache_ray_end->array[idx*3+1], _cache_ray_end->array[idx*3+2]};
+    unsigned char ray_end[3] = {0,0,0};
+    if (GL_BASE == _gpu_platform) {
+        ray_end[0] = _cache_ray_end->array[idx*3];
+        ray_end[1] = _cache_ray_end->array[idx*3+1];
+        ray_end[2] = _cache_ray_end->array[idx*3+2];
+    } else {
+        ray_end[0] = _cache_ray_end->array[idx*4];
+        ray_end[1] = _cache_ray_end->array[idx*4+1];
+        ray_end[2] = _cache_ray_end->array[idx*4+2];
+    }
 
     //MI_RENDERALGO_LOG(MI_DEBUG) << "ray end: " << (int)ray_end[0] << " " << (int)ray_end[1] << " " << (int)ray_end[2];
     if (ray_end[0] == 0 && ray_end[1] == 0 && ray_end[1] == 0) {
