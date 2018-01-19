@@ -130,7 +130,16 @@ public:
     void set_material(const Material& m, unsigned char label);
 
     // Jittering to prevent wooden artifacts
-    void set_jittering_enabled(bool flag);
+    void set_jittering(bool flag);
+    bool get_jittering() const;
+
+    void set_random_texture(GPUTexture2DPairPtr tex);
+    GPUTexture2DPairPtr get_random_texture() const;
+
+    // Adjust ray start align to view plane.
+    // VR set true; MPR set false
+    void set_ray_align_to_view_plane(bool flag);
+    bool get_ray_align_to_view_plane() const;
 
     // Bounding box
     void set_bounding(const Vector3f& min, const Vector3f& max);
@@ -210,7 +219,12 @@ private:
     std::shared_ptr<RayCasterInnerResource> _inner_resource;
 
     // DVR jittering flag
-    bool _enable_jittering;
+    bool _jittering;
+    // random texture for jittering
+    GPUTexture2DPairPtr _random_texture;
+
+    // VR ray cas
+    bool _ray_align_to_view_plane;
 
     // Bounding
     Vector3f _bound_min;

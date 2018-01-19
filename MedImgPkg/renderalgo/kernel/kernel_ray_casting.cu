@@ -434,7 +434,7 @@ __device__ float4 mask_overlay(CudaVolumeInfos* __restrict__ volume_infos, CudaR
     return integral_color;
 }
 
-__device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, float3* __restrict__ ray_start, float3* __restrict__ ray_dir, float* __restrict__ start_step, float* __restrict__ end_step) {
+__device__ int kernel_preprocess(uint x, uint y, float3 entry, float3 exit, CudaRayCastInfos* __restrict__ ray_cast_infos,  float3* __restrict__ ray_start, float3* __restrict__ ray_dir, float* __restrict__ start_step, float* __restrict__ end_step) {
     float3 ray_dir0 = exit - entry;
     float3 ray_dir_norm = normalize(ray_dir0);
     float ray_length = length(ray_dir0);
@@ -442,7 +442,27 @@ __device__ int kernel_preprocess(float3 entry, float3 exit, float sample_step, f
         return -1;
     }
 
-    *ray_start = entry;
+    float sample_step = ray_cast_infos->sample_step;
+
+    float adjust = 0.0f;
+    if (1 == ray_cast_infos->ray_align_to_view_plane) {
+        float len = dot(entry - ray_cast_infos->eye_position, ray_dir_norm);
+        adjust = len / sample_step;
+        adjust = (ceilf(adjust) - adjust)*sample_step;
+        ray_length = ray_length - adjust;
+        if (ray_length < 1e-5f) {
+            return -1;    
+        }
+    }
+
+    *ray_start = entry + adjust*ray_dir_norm;
+
+    if (1 == ray_cast_infos->jittering) {
+        const float random_size = 32.0f;
+        float r = tex2D<float>(ray_cast_infos->random_texture, x/random_size, y/random_size);
+        *ray_start += r*ray_dir_norm;
+    }
+
     *ray_dir = ray_dir_norm*make_float3(sample_step);
     *start_step = 0.0f;
     *end_step = ray_length / sample_step;
@@ -509,7 +529,7 @@ __global__ void kernel_ray_cast_main_texture(cudaTextureObject_t entry_tex, cuda
         return;
     }
 
-    if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
+    if (0 != kernel_preprocess(x, y, entry3, exit3, &ray_cast_infos, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0,0,0,0);
         surf2Dwrite(rgba, canvas, x << 2, y);
         return;
@@ -590,7 +610,7 @@ __global__ void kernel_ray_cast_main_surface(cudaSurfaceObject_t entry_surf, cud
         return;
     }
 
-    if (0 != kernel_preprocess(entry3, exit3, ray_cast_infos.sample_step, &ray_start, &ray_dir, &start_step, &end_step)) {
+    if (0 != kernel_preprocess(x, y, entry3, exit3, &ray_cast_infos, &ray_start, &ray_dir, &start_step, &end_step)) {
         uchar4 rgba = make_uchar4(0, 0, 0, 0);
         surf2Dwrite(rgba, canvas, x << 2, y);
         return;

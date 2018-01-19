@@ -44,6 +44,14 @@ struct CudaRayCastInfos {
     //mask overlay
     float mask_overlay_opacity;
 
+    //jittering
+    int jittering;
+    cudaTextureObject_t random_texture;
+
+    //ray align to view plane
+    int ray_align_to_view_plane;
+    float3 eye_position;
+
     //---------------------------------------------------------//
     //shared mapped global memory contains follows:
     // 1. visible label (int) : label_level * sizeof(int), label_level could be 1(none-mask) 8 16 32 64 ... 128
@@ -90,6 +98,12 @@ struct CudaRayCastInfos {
         pseudo_color_texture_shift = 0.5f/512.0f;
 
         mask_overlay_opacity = 0.5f;
+
+        jittering = 0;
+        random_texture = 0;
+
+        ray_align_to_view_plane = 0;
+        eye_position = make_float3(0.0f);
 
         d_shared_mapped_memory = nullptr;
 

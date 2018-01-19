@@ -44,7 +44,8 @@ mi_entry_exit_points.o mi_mpr_entry_exit_points.o mi_vr_entry_exit_points.o mi_v
 mi_ray_caster_canvas.o mi_ray_caster_inner_resource.o mi_ray_caster.o mi_ray_casting_cpu.o mi_ray_casting_gpu_gl.o mi_ray_casting_gpu_cuda.o \
 $(GPU_REBDER_STEP) \
 mi_volume_infos.o mi_scene_base.o mi_mpr_scene.o mi_ray_cast_scene.o mi_vr_scene.o \
-mi_graphic_object_navigator.o mi_gpu_image_compressor.o mi_transfer_function_texture.o
+mi_graphic_object_navigator.o mi_gpu_image_compressor.o mi_transfer_function_texture.o \
+mi_render_global_resource.o
 
 TARGET = $(BIN_DIR)/libmedimg_renderalgo.so
 
@@ -75,7 +76,8 @@ mi_gpu_image_compressor.o: mi_gpu_image_compressor.h mi_gpu_image_compressor.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_gpu_image_compressor.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_vr_scene.o: mi_vr_scene.h mi_vr_scene.cpp mi_ray_cast_scene.o \
-mi_color_transfer_function.o mi_opacity_transfer_function.o mi_camera_calculator.o mi_camera_interactor.o mi_volume_infos.o mi_vr_entry_exit_points.o
+mi_color_transfer_function.o mi_opacity_transfer_function.o mi_camera_calculator.o mi_camera_interactor.o \
+mi_volume_infos.o mi_vr_entry_exit_points.o mi_render_global_resource.o
 	$(CC) -c -fPIC $(CFLAGS) mi_vr_scene.cpp $(ADDITINAL_INCLUDE_DIR)
 
 mi_mpr_scene.o: mi_mpr_scene.h mi_mpr_scene.cpp mi_ray_cast_scene.o \
@@ -119,6 +121,9 @@ mi_ray_caster_inner_resource.o: mi_ray_caster_inner_resource.h mi_ray_caster_inn
 
 mi_ray_caster_canvas.o: mi_ray_caster_canvas.h mi_ray_caster_canvas.cpp
 	$(CC) -c -fPIC $(CFLAGS) mi_ray_caster_canvas.cpp $(ADDITINAL_INCLUDE_DIR)	
+
+mi_render_global_resource.o: mi_render_global_resource.h mi_render_global_resource.cpp
+	$(CC) -c -fPIC $(CFLAGS) mi_render_global_resource.cpp $(ADDITINAL_INCLUDE_DIR)
 
 #Entry exit points(VR)
 mi_vr_entry_exit_points.o: mi_vr_entry_exit_points.h mi_vr_entry_exit_points.cpp mi_ray_caster_define.h \

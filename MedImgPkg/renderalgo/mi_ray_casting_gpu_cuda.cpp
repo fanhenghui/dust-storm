@@ -7,11 +7,12 @@
 #include "io/mi_image_data.h"
 
 #include "cudaresource/mi_cuda_resource_manager.h"
-#include "cudaresource/mi_cuda_gl_texture_2d.h"
 #include "cudaresource/mi_cuda_texture_1d.h"
-#include "cudaresource/mi_cuda_texture_1d_array.h"
-#include "cudaresource/mi_cuda_surface_2d.h"
+#include "cudaresource/mi_cuda_texture_2d.h"
 #include "cudaresource/mi_cuda_texture_3d.h"
+#include "cudaresource/mi_cuda_texture_1d_array.h"
+#include "cudaresource/mi_cuda_gl_texture_2d.h"
+#include "cudaresource/mi_cuda_surface_2d.h"
 #include "cudaresource/mi_cuda_global_memory.h"
 #include "cudaresource/mi_cuda_utils.h"
 #include "cudaresource/mi_cuda_time_query.h"
@@ -262,7 +263,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
     std::shared_ptr<ImageData> volume = ray_caster->get_volume_data();
     cuda_volume_infos.dim = make_uint3(volume->_dim[0], volume->_dim[1], volume->_dim[2]);
     cuda_volume_infos.dim_r = make_float3(1.0f/(float)volume->_dim[0], 1.0f / (float)volume->_dim[1], 1.0f / (float)volume->_dim[2]);
-    cuda_volume_infos.sample_shift = 0.5f *  cuda_volume_infos.dim_r * 
+    cuda_volume_infos.sample_shift = 1.0f * cuda_volume_infos.dim_r * 
         make_float3((float)volume->_spacing[0], (float)volume->_spacing[1], (float)volume->_spacing[2]);
 
     GPUTexture3DPairPtr volume_tex = ray_caster->get_volume_data_texture();    
@@ -323,6 +324,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
             volume->_dim[2] * volume->_spacing[2]);
     const static float magic_num = 1.5f;//distance
     Point3 light_pos = lookat - view * max_dim * magic_num;
+    light_pos = camera_cal->get_world_to_volume_matrix().transform(light_pos);
     cuda_ray_infos.light_position = make_float3((float)light_pos.x, (float)light_pos.y, (float)light_pos.z);
 
     //illumination parameters: ambient attribute    
@@ -359,6 +361,39 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
         cudaAddressModeClamp, cudaFilterModeLinear, cudaReadModeNormalizedFloat, true);
     cuda_ray_infos.pseudo_color_texture_shift = 0.5f / lut_length;
 
+    //ray align to view plane
+    if (ray_caster->get_ray_align_to_view_plane()) {
+        cuda_ray_infos.ray_align_to_view_plane = 1;
+
+        std::shared_ptr<CameraBase> camera = ray_caster->get_camera();
+        Point3 eye = camera->get_eye();
+        std::shared_ptr<CameraCalculator> camera_cal = ray_caster->get_camera_calculator();
+        const Matrix4& mat_w2v = camera_cal->get_world_to_volume_matrix();
+        eye = mat_w2v.transform(eye);
+        
+        cuda_ray_infos.eye_position.x = (float)eye.x;
+        cuda_ray_infos.eye_position.y = (float)eye.y;
+        cuda_ray_infos.eye_position.z = (float)eye.z;
+    } else {
+        cuda_ray_infos.ray_align_to_view_plane = 0;
+    }
+
+    //jittering 
+    if (ray_caster->get_jittering()) {
+        cuda_ray_infos.jittering = 1;
+
+        GPUTexture2DPairPtr random_texture = ray_caster->get_random_texture();
+        RENDERALGO_CHECK_NULL_EXCEPTION(random_texture);
+
+        CudaTexture2DPtr random_cuda_texture = random_texture->get_cuda_resource();
+        RENDERALGO_CHECK_NULL_EXCEPTION(random_cuda_texture);
+
+        cuda_ray_infos.random_texture = random_cuda_texture->get_object(
+            cudaAddressModeWrap, cudaFilterModeLinear, cudaReadModeNormalizedFloat, true);
+    } else {
+        cuda_ray_infos.jittering = 0;
+    }
+    
     //test code
     cuda_ray_infos.test_code = ray_caster->get_test_code();
 }

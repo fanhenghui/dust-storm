@@ -20,13 +20,13 @@ public:
                     GLint wrap_type , GLint filter_type ,
                     GLint internalformat ,
                     GLsizei width, GLsizei height , GLsizei depth ,
-                    GLenum format , GLenum type , char* data , GLint level = 0);
+                    GLenum format , GLenum type , void* data , GLint level = 0);
 
     //update
     void cache_update(GLenum target , GLTextureBasePtr texture ,
                       GLint xoffset , GLint yoffset , GLint zoffset ,
                       GLsizei width , GLsizei height , GLsizei depth ,
-                      GLenum format , GLenum type , char* data , GLint level = 0);
+                      GLenum format , GLenum type , void* data , GLint level = 0);
 
     //process in gpu
     void process_cache();

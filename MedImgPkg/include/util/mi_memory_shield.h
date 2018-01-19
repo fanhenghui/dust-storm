@@ -7,7 +7,7 @@ MED_IMG_BEGIN_NAMESPACE
 
 class MemShield {
 public:
-    explicit MemShield(char* buffer):_buffer(buffer) {};
+    explicit MemShield(void* buffer):_buffer((char*)buffer) {};
     ~MemShield() {
         if(_buffer) {
             delete [] _buffer;

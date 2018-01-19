@@ -24,7 +24,8 @@ RayCaster::RayCaster(RayCastingStrategy strategy, GPUPlatform gpu_platform)
       _minip_threshold(0.0f),
       _pseudo_color_array(nullptr), _pseudo_color_length(256), 
       _inner_resource(new RayCasterInnerResource(gpu_platform)),
-      _enable_jittering(false),
+      _jittering(false),
+      _ray_align_to_view_plane(false),
       _bound_min(Vector3f(0, 0, 0)), _bound_max(Vector3f(32, 32, 32)),
       _mask_mode(MASK_NONE), 
       _composite_mode(COMPOSITE_AVERAGE),
@@ -147,8 +148,10 @@ void RayCaster::downsample_adjust(){
     if (_expected_fps <= 0) {
         return;
     }
-    const float exp_duration = 1000.0f / (float)_expected_fps;
+    const float exp_duration = 300.0f / (float)_expected_fps;
     const static float TRIGGER_QUARTER = 1.7f;
+    const static float SAMPLE_STEP_LIMIT_UPPER = 2.5f;
+    const static float SAMPLE_STEP_LIMIT_LOWER = 0.5f;
     if (_pre_rendering_duration > exp_duration) {
         //downsample
         const float ratio = _pre_rendering_duration / exp_duration;
@@ -156,8 +159,10 @@ void RayCaster::downsample_adjust(){
             _map_quarter_canvas = true;
         } else if (ratio > TRIGGER_QUARTER && _map_quarter_canvas){
             _sample_step *= TRIGGER_QUARTER;
+            _sample_step = (std::min)(SAMPLE_STEP_LIMIT_UPPER, _sample_step);
         } else {
             _sample_step *= ratio;
+            _sample_step = (std::min)(SAMPLE_STEP_LIMIT_UPPER, _sample_step);
         }
     } else {
         //upsample
@@ -167,8 +172,10 @@ void RayCaster::downsample_adjust(){
             _sample_step *= 1.2f;
         } else if (ratio > TRIGGER_QUARTER && !_map_quarter_canvas) {
             _sample_step /= TRIGGER_QUARTER;
+            _sample_step = (std::max)(SAMPLE_STEP_LIMIT_LOWER, _sample_step);
         } else {
             _sample_step /= ratio;
+            _sample_step = (std::max)(SAMPLE_STEP_LIMIT_LOWER, _sample_step);
         }        
     }
 }
@@ -296,8 +303,28 @@ void RayCaster::set_material(const Material& m, unsigned char label) {
     _inner_resource->set_material(m, label);
 }
 
-void RayCaster::set_jittering_enabled(bool flag) {
-    _enable_jittering = flag;
+void RayCaster::set_jittering(bool flag) {
+    _jittering = flag;
+}
+
+bool RayCaster::get_jittering() const {
+    return _jittering;
+}
+
+void RayCaster::set_random_texture(GPUTexture2DPairPtr tex) {
+    _random_texture = tex;
+}
+
+GPUTexture2DPairPtr RayCaster::get_random_texture() const {
+    return _random_texture;
+}
+
+void RayCaster::set_ray_align_to_view_plane(bool flag) {
+    _ray_align_to_view_plane = flag;
+}
+
+bool RayCaster::get_ray_align_to_view_plane() const {
+    return _ray_align_to_view_plane;
 }
 
 void RayCaster::set_bounding(const Vector3f& min, const Vector3f& max) {

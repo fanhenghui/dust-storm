@@ -1,13 +1,17 @@
 #include "mi_rc_step_main.h"
+#include "arithmetic/mi_camera_base.h"
+
 #include "glresource/mi_gl_program.h"
 #include "glresource/mi_gl_texture_2d.h"
 #include "glresource/mi_gl_texture_3d.h"
 #include "glresource/mi_gl_utils.h"
-#include "io/mi_image_data.h"
-#include "mi_shader_collection.h"
 
+#include "io/mi_image_data.h"
+
+#include "mi_shader_collection.h"
 #include "mi_entry_exit_points.h"
 #include "mi_ray_caster.h"
+#include "mi_camera_calculator.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -92,6 +96,42 @@ void RCStepMainFrag::set_gpu_parameter() {
         glDisable(GL_TEXTURE_3D);
     }
 
+    const bool ray_algin_to_view_plane = ray_caster->get_ray_align_to_view_plane();
+    if (ray_algin_to_view_plane) {
+        std::shared_ptr<CameraBase> camera = ray_caster->get_camera();
+        Point3 eye = camera->get_eye();
+        std::shared_ptr<CameraCalculator> camera_cal = ray_caster->get_camera_calculator();
+        const Matrix4& mat_w2v = camera_cal->get_world_to_volume_matrix();
+        eye = mat_w2v.transform(eye);
+        glUniform3f(_loc_eye_position, (float)eye.x, (float)eye.y, (float)eye.z);
+
+        glUniform1i(_loc_ray_align_to_view_plane, 1);
+    } else {
+        glUniform1i(_loc_ray_align_to_view_plane, 0);
+    }
+
+    const bool jittering = ray_caster->get_jittering();
+    if (jittering) {
+        glUniform1i(_loc_jittering, 1);
+
+        GPUTexture2DPairPtr random_tex = ray_caster->get_random_texture();
+        RENDERALGO_CHECK_NULL_EXCEPTION(random_tex);
+
+        GLTexture2DPtr random_gl_tex = random_tex->get_gl_resource();
+        RENDERALGO_CHECK_NULL_EXCEPTION(random_gl_tex);
+
+        act_tex = _act_tex_counter->tick();
+        glActiveTexture(GL_TEXTURE0 + act_tex);
+        random_gl_tex->bind();
+        GLTextureUtils::set_2d_wrap_s_t(GL_REPEAT);
+        GLTextureUtils::set_filter(GL_TEXTURE_2D, GL_NEAREST);
+        glUniform1i(_loc_random_texture, act_tex);
+
+    } else {
+        glUniform1i(_loc_jittering, 0);
+    }
+     
+
     CHECK_GL_ERROR;
 }
 
@@ -102,9 +142,14 @@ void RCStepMainFrag::get_uniform_location() {
     _loc_mask_data = program->get_uniform_location("mask_sampler");
     _loc_sample_step = program->get_uniform_location("sample_step");
     _loc_quarter_canvas = program->get_uniform_location("quarter_canvas");
+    _loc_eye_position = program->get_uniform_location("eye_position");
+    _loc_ray_align_to_view_plane = program->get_uniform_location("ray_align_to_view_plane");
+    _loc_jittering = program->get_uniform_location("jittering");
+    _loc_random_texture = program->get_uniform_location("random_sampler");
 
     if (-1 == _loc_volume_dim || -1 == _loc_volume_data ||
-            //-1 == m_iLocMaskData ||
+            //-1 == m_iLocMaskData || -1 == _loc_eye_position || -1 == _loc_random_texture ||
+            -1 == _loc_ray_align_to_view_plane || -1 == _loc_jittering ||
             -1 == _loc_sample_step || -1 == _loc_quarter_canvas) {
         RENDERALGO_THROW_EXCEPTION("Get uniform location failed!");
     }

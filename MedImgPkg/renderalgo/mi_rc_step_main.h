@@ -25,7 +25,8 @@ public:
     RCStepMainFrag(std::shared_ptr<RayCaster> ray_caster,
                    std::shared_ptr<GLProgram> program)
         : RCStepBase(ray_caster, program), _loc_volume_dim(-1), _loc_volume_data(-1), 
-        _loc_mask_data(-1), _loc_sample_step(-1), _loc_quarter_canvas(-1) {
+        _loc_mask_data(-1), _loc_sample_step(-1), _loc_quarter_canvas(-1), 
+        _loc_eye_position(-1), _loc_ray_align_to_view_plane(-1), _loc_jittering(-1), _loc_random_texture(-1) {
 
     };
 
@@ -43,6 +44,10 @@ private:
     int _loc_mask_data;
     int _loc_sample_step;
     int _loc_quarter_canvas;
+    int _loc_eye_position;
+    int _loc_ray_align_to_view_plane;
+    int _loc_jittering;
+    int _loc_random_texture;
 };
 
 class RCStepMainTestFrag : public RCStepBase {

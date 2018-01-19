@@ -79,7 +79,7 @@ void GLTextureCache::cache_load(GLenum target, GLTextureBasePtr texture,
                                 GLint wrap_type, GLint filter_type,
                                 GLint internalformat, GLsizei width,
                                 GLsizei height, GLsizei depth, GLenum format,
-                                GLenum type, char* data, GLint level /*= 0*/) {
+                                GLenum type, void* data, GLint level /*= 0*/) {
     boost::mutex::scoped_lock lock(_mutex);
 
     std::shared_ptr<TextureUnit> unit(new TextureUnit);
@@ -96,7 +96,7 @@ void GLTextureCache::cache_load(GLenum target, GLTextureBasePtr texture,
     unit->depth = depth;
     unit->format = format;
     unit->type = type;
-    unit->data = data;
+    unit->data = (char*)data;
     unit->level = level;
 
     _cache_list.push_back(unit);
@@ -105,7 +105,7 @@ void GLTextureCache::cache_load(GLenum target, GLTextureBasePtr texture,
 void GLTextureCache::cache_update(GLenum target, GLTextureBasePtr texture,
                                   GLint xoffset, GLint yoffset, GLint zoffset,
                                   GLsizei width, GLsizei height, GLsizei depth,
-                                  GLenum format, GLenum type, char* data,
+                                  GLenum format, GLenum type, void* data,
                                   GLint level /*= 0*/) {
     boost::mutex::scoped_lock lock(_mutex);
 
@@ -123,7 +123,7 @@ void GLTextureCache::cache_update(GLenum target, GLTextureBasePtr texture,
     unit->depth = depth;
     unit->format = format;
     unit->type = type;
-    unit->data = data;
+    unit->data = (char*)data;
     unit->level = level;
 
     _cache_list.push_back(unit);

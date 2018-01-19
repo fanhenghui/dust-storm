@@ -1,6 +1,7 @@
 #ifndef MEDIMGARITHMETIC_MI_MATRIX4_H
 #define MEDIMGARITHMETIC_MI_MATRIX4_H
 
+#include <ostream>
 #include "arithmetic/mi_point3.h"
 #include "arithmetic/mi_vector3.h"
 //#include "arithmetic/mi_arithmetic_logger.h"
@@ -333,6 +334,14 @@ public:
         for (int i = 0; i < 16; ++i) {
             fMat[i] = (float)_m[i];
         }
+    };
+
+    friend inline std::ostream& operator << (std::ostream& strm, const Matrix4& mat) {
+        strm << mat.m[0][0] << " " << mat.m[0][1] << " " << mat.m[0][2] << " " << mat.m[0][3] << std::endl;
+        strm << mat.m[1][0] << " " << mat.m[1][1] << " " << mat.m[1][2] << " " << mat.m[1][3] << std::endl;
+        strm << mat.m[2][0] << " " << mat.m[2][1] << " " << mat.m[2][2] << " " << mat.m[2][3] << std::endl;
+        strm << mat.m[3][0] << " " << mat.m[3][1] << " " << mat.m[3][2] << " " << mat.m[3][3] << std::endl;
+        return strm;
     };
 };
 

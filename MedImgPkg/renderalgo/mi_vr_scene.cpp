@@ -22,7 +22,7 @@
 #include "mi_ray_caster_canvas.h"
 #include "mi_render_algo_logger.h"
 #include "mi_graphic_object_navigator.h"
-
+#include "mi_render_global_resource.h"
 #include "mi_gpu_image_compressor.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -81,6 +81,11 @@ VRScene::VRScene(RayCastingStrategy strategy, GPUPlatform platfrom) :
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
 
+    //set ray align to view plane
+    _ray_caster->set_ray_align_to_view_plane(true);
+
+    _ray_caster->set_random_texture(RenderGlobalResource::instance(platfrom)->get_random_texture());
+
     //register entry exit points resize callback
     _entry_exit_points->register_resize_callback(
         std::shared_ptr<IEntryExitPointsResizeCallback>(new EntryExitPointsResizeCallback(_ray_caster)));
@@ -94,6 +99,11 @@ VRScene::VRScene(int width, int height, RayCastingStrategy strategy, GPUPlatform
     vr_entry_exit_points->set_brick_filter_item(BF_WL);
     _entry_exit_points = vr_entry_exit_points;
     _name = "VR Scene";
+
+    //set ray align to view plane
+    _ray_caster->set_ray_align_to_view_plane(true);
+
+    _ray_caster->set_random_texture(RenderGlobalResource::instance(platfrom)->get_random_texture());
 
     //register entry exit points resize callback
     _entry_exit_points->register_resize_callback(
@@ -255,9 +265,11 @@ void VRScene::pre_render() {
         std::dynamic_pointer_cast<VREntryExitPoints>(_entry_exit_points);
 
     //roll-back to custom's proxy geometry 
+    _ray_caster->set_jittering(false);
     switch (_ray_caster->get_composite_mode())
     {
     case COMPOSITE_DVR: {
+        _ray_caster->set_jittering(true);
         if (_ray_caster->get_mask_mode() == MASK_MULTI_LABEL) {
             // Use all visible labels
             std::map<unsigned char, Vector2f> wls;

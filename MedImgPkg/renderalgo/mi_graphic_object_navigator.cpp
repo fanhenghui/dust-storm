@@ -52,11 +52,11 @@ void GraphicObjectNavigator::initialize() {
                 _res_shield.add_shield<GLTexture2D>(navi_tex);
                 _navi_tex.reset(new GPUTexture2DPair(navi_tex));
                 GLTextureCache::instance()->cache_load(GL_TEXTURE_2D, navi_tex, GL_CLAMP_TO_BORDER,
-                    GL_LINEAR, GL_RGB8, img_width, img_height, 1, GL_RGB, GL_UNSIGNED_BYTE, (char*)rgb_array);
+                    GL_LINEAR, GL_RGB8, img_width, img_height, 1, GL_RGB, GL_UNSIGNED_BYTE, rgb_array);
             } else {
                 unsigned char* rgba_array = new unsigned char[img_width * img_height * 4];
-                MemShield shield((char*)rgb_array);
-                MemShield shield2((char*)rgba_array);
+                MemShield shield(rgb_array);
+                MemShield shield2(rgba_array);
                 for (unsigned int i = 0; i < img_width * img_height; ++i) {
                     rgba_array[i * 4] = rgb_array[i * 3];
                     rgba_array[i * 4 + 1] = rgb_array[i * 3 + 1];
@@ -100,11 +100,10 @@ void GraphicObjectNavigator::render(int code) {
         Vector3 view = _camera->get_view_direction();
         Vector3 up = _camera->get_up_direction();
         camera.set_look_at(Point3::S_ZERO_POINT);
-        const double dis = 1;
-        Point3 eye = Point3::S_ZERO_POINT - view*dis;
+        Point3 eye = Point3::S_ZERO_POINT - view*3;
         camera.set_eye(eye);
         camera.set_up_direction(up);
-        camera.set_ortho(-1,1,-1,1,0,dis*2);
+        camera.set_ortho(-1,1,-1,1,1,5);
     }
 
     CHECK_GL_ERROR;

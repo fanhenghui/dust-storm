@@ -45,7 +45,7 @@ void TransferFunctionTexture::initialize(LabelLevel label_level) {
 
                 GLTextureCache::instance()->cache_load(
                     GL_TEXTURE_1D, pseudo_color_texture, GL_CLAMP_TO_EDGE, GL_LINEAR,
-                    GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, (char*)gray_array);
+                    GL_RGB8, S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGB, GL_UNSIGNED_BYTE, gray_array);
             }
 
             //release old color opacity texture array
@@ -65,7 +65,7 @@ void TransferFunctionTexture::initialize(LabelLevel label_level) {
             GLTextureCache::instance()->cache_load(
                 GL_TEXTURE_1D_ARRAY, color_opacity_texture_array, GL_CLAMP_TO_EDGE,
                 GL_LINEAR, GL_RGBA8, S_TRANSFER_FUNC_WIDTH, tex_num, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, (char*)rgba);
+                GL_UNSIGNED_BYTE, rgba);
         }
         else {
             if (!_pseudo_color_texture) {
@@ -125,14 +125,14 @@ void TransferFunctionTexture::set_color_opacity(std::shared_ptr<ColorTransFunc> 
             
             GLTextureCache::instance()->cache_update(
                 GL_TEXTURE_1D_ARRAY, _color_opacity_texture_array->get_gl_resource(), 0, label, 0,
-                S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, (char*)rgba);
+                S_TRANSFER_FUNC_WIDTH, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
         }
         else {
             if (!_color_opacity_texture_array->cuda()) {
                 RENDERALGO_THROW_EXCEPTION("invalid color opacity transfer function texture platform");
             }
 
-            MemShield sheild((char*)rgba);
+            MemShield sheild(rgba);
             _color_opacity_texture_array->get_cuda_resource()->load(8, 8, 8, 8, label,
                 cudaChannelFormatKindUnsigned, S_TRANSFER_FUNC_WIDTH, rgba);
         }
@@ -168,7 +168,7 @@ void TransferFunctionTexture::set_pseudo_color(std::shared_ptr<ColorTransFunc> c
             }
             GLTextureCache::instance()->cache_update(
                 GL_TEXTURE_1D, _pseudo_color_texture->get_gl_resource(), 0, 0, 0, S_TRANSFER_FUNC_WIDTH, 0,
-                0, GL_RGB, GL_UNSIGNED_BYTE, (char*)rgb);
+                0, GL_RGB, GL_UNSIGNED_BYTE, rgb);
         }
         else {
             if (!_pseudo_color_texture->cuda()) {
