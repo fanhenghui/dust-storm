@@ -51,7 +51,6 @@ inline __device__ float4* get_mask_overlay_color_array(int label_level) {
 }
 
 inline __device__ float3 cal_gradient(CudaVolumeInfos* __restrict__ volume_infos, float3 sample_pos_norm) {
-    float3 x_s = sample_pos_norm + volume_infos->sample_shift;
     float x = tex3D<float>(volume_infos->volume_tex, sample_pos_norm.x + volume_infos->sample_shift.x, sample_pos_norm.y, sample_pos_norm.z) -
         tex3D<float>(volume_infos->volume_tex, sample_pos_norm.x - volume_infos->sample_shift.x, sample_pos_norm.y, sample_pos_norm.z);
 
@@ -458,8 +457,8 @@ __device__ int kernel_preprocess(uint x, uint y, float3 entry, float3 exit, Cuda
     *ray_start = entry + adjust*ray_dir_norm;
 
     if (1 == ray_cast_infos->jittering) {
-        const float random_size = 32.0f;
-        float r = tex2D<float>(ray_cast_infos->random_texture, x/random_size, y/random_size);
+        const float random_size_r = 0.03125f;// 1/32        
+        float r = tex2D<float>(ray_cast_infos->random_texture, x * random_size_r, y * random_size_r);
         *ray_start += r*ray_dir_norm;
     }
 

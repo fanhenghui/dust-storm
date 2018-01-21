@@ -87,6 +87,7 @@
     <ClCompile Include="..\renderalgo\mi_rc_step_shading.cpp" />
     <ClCompile Include="..\renderalgo\mi_rc_step_utils.cpp" />
     <ClCompile Include="..\renderalgo\mi_rc_step_volume_sampler.cpp" />
+    <ClCompile Include="..\renderalgo\mi_render_global_resource.cpp" />
     <ClCompile Include="..\renderalgo\mi_scene_base.cpp" />
     <ClCompile Include="..\renderalgo\mi_transfer_function_loader.cpp" />
     <ClCompile Include="..\renderalgo\mi_transfer_function_texture.cpp" />

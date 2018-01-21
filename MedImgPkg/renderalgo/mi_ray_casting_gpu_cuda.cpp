@@ -263,7 +263,7 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
     std::shared_ptr<ImageData> volume = ray_caster->get_volume_data();
     cuda_volume_infos.dim = make_uint3(volume->_dim[0], volume->_dim[1], volume->_dim[2]);
     cuda_volume_infos.dim_r = make_float3(1.0f/(float)volume->_dim[0], 1.0f / (float)volume->_dim[1], 1.0f / (float)volume->_dim[2]);
-    cuda_volume_infos.sample_shift = 1.0f * cuda_volume_infos.dim_r * 
+    cuda_volume_infos.sample_shift = 1.0f * cuda_volume_infos.dim_r / 
         make_float3((float)volume->_spacing[0], (float)volume->_spacing[1], (float)volume->_spacing[2]);
 
     GPUTexture3DPairPtr volume_tex = ray_caster->get_volume_data_texture();    
@@ -388,8 +388,9 @@ void RayCastingGPUCUDA::fill_paramters(std::shared_ptr<RayCaster> ray_caster,
         CudaTexture2DPtr random_cuda_texture = random_texture->get_cuda_resource();
         RENDERALGO_CHECK_NULL_EXCEPTION(random_cuda_texture);
 
+        //Note here use cudaFilterModePoint not cudaFilterModeLinear, or will cause artifacts.
         cuda_ray_infos.random_texture = random_cuda_texture->get_object(
-            cudaAddressModeWrap, cudaFilterModeLinear, cudaReadModeNormalizedFloat, true);
+            cudaAddressModeWrap, cudaFilterModePoint, cudaReadModeNormalizedFloat, true);
     } else {
         cuda_ray_infos.jittering = 0;
     }

@@ -266,6 +266,9 @@
     <ClCompile Include="..\renderalgo\mi_transfer_function_texture.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\renderalgo\mi_render_global_resource.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\renderalgo\shader\rc_main.frag">
