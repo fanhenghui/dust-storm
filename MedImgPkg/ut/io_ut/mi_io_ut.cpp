@@ -5,6 +5,7 @@ extern int pacs_ut(int argc, char* argv[]);
 extern int targa_ut(int argc, char* argv[]);
 extern int dicom_loader_ut(int argc, char* argv[]);
 extern int md5_ut(int argc, char* argv[]);
+extern int rt_ut(int argc, char* argv[]);
 
 using namespace medical_imaging;
 
@@ -16,5 +17,5 @@ int main(int argc, char* argv[]) {
     Logger::instance()->set_file_direction("");
     Logger::instance()->initialize();
 
-    return md5_ut(argc,argv);
+    return rt_ut(argc,argv);
 }
