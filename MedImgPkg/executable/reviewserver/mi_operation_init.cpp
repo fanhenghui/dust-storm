@@ -376,7 +376,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
             }
             vr_scene->set_navigator_visibility(true);
             vr_scene->set_volume_infos(volume_infos);
-            vr_scene->set_sample_step(1.0);
+            vr_scene->set_sample_step(0.5);
             vr_scene->set_global_window_level(DEFAULT_WW, DEFAULT_WL);
             vr_scene->set_composite_mode(COMPOSITE_DVR);
             vr_scene->set_color_inverse_mode(COLOR_INVERSE_DISABLE);
