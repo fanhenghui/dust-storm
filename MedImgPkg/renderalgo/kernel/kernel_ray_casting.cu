@@ -124,7 +124,7 @@ inline __device__ float4 shade_phong(CudaVolumeInfos* __restrict__ volume_infos,
     float fn = 1.0f - ln;
     float kss = 1.0f;
     float kse = 0.5f;
-    float ksc = 0.0f;
+    //float ksc = 0.0f;
     float alpha = input_color.w*(0.5f + kss * __powf(fn, kse));
     alpha = clamp(alpha, 0.0f, 1.0f);
 
@@ -207,7 +207,7 @@ __device__ float4 kernel_ray_cast_mip(CudaVolumeInfos* __restrict__ volume_infos
     int label = 0;
     float max_gray = -65535.0f;
     float3 max_pos;
-    int max_label = 0;
+    //int max_label = 0;
     float gray = 0.0f;
     for (float i = start_step; i < end_step; i += 1.0f) {
         sample_pos = ray_start + ray_dir*i;
@@ -230,7 +230,7 @@ __device__ float4 kernel_ray_cast_mip(CudaVolumeInfos* __restrict__ volume_infos
         if (gray > max_gray) {
             max_gray = gray;
             max_pos = sample_pos;
-            max_label = label;
+            //max_label = label;
         }
     }
 
@@ -262,7 +262,7 @@ __device__ float4 kernel_ray_cast_minip(CudaVolumeInfos* __restrict__ volume_inf
     int label = 0;
     float min_gray = 65535.0f;
     float3 min_pos;
-    int min_label = 0;
+    //int min_label = 0;
     float gray = 0.0f;
     for (float i = start_step; i < end_step; i += 1.0f) {
         sample_pos = ray_start + ray_dir*i;
@@ -287,7 +287,7 @@ __device__ float4 kernel_ray_cast_minip(CudaVolumeInfos* __restrict__ volume_inf
         if (gray > ray_cast_infos->minip_threshold && gray < min_gray) {
             min_gray = gray;
             min_pos = sample_pos;
-            min_label = label;
+            //min_label = label;
         }
     }
 
@@ -397,9 +397,6 @@ __device__ float4 mask_overlay(CudaVolumeInfos* __restrict__ volume_infos, CudaR
     float4 integral_color = input_color;
     float3 sample_pos, sample_norm;
     int label = 0;
-    float gray_sum = 0.0f;
-    float gray_count = 0.0f;
-    float gray = 0.0f;
     int4 tracing_label_code = make_int4(0);
     float overlay_opacity = ray_cast_infos->mask_overlay_opacity;
 

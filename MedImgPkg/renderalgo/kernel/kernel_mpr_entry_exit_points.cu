@@ -3,7 +3,6 @@
 #include <device_functions.h>
 
 #include "arithmetic/mi_cuda_graphic.h"
-#include "renderalgo/mi_ray_caster_define.h"
 
 inline __device__  float ray_intersect_brick(float3 init_pt, float3 brick_min, float3 brick_dim, float3 ray_dir, float* start_step, float* end_step) {
     float3 ray_r = 1.0f/ray_dir;

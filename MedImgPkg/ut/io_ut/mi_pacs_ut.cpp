@@ -16,7 +16,9 @@ using namespace medical_imaging;
 
 int pacs_ut(int argc, char* argv[]) {
 #ifndef WIN32
-    chdir(dirname(argv[0]));
+    if(0 != chdir(dirname(argv[0]))) {
+
+    }
 #endif
 
     const std::string PACSServerAETitle = "DCM4CHEE";

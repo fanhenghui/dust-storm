@@ -12,7 +12,9 @@ int main(int argc, char* argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     std::cout << "test protobuf\n";
-    chdir(dirname(argv[0]));
+    if (0 != chdir(dirname(argv[0])) ) {
+        std::cout << "set current direction failed.\n";
+    }
 
     MsgPoint2 pt2;
     pt2.set_x(100);

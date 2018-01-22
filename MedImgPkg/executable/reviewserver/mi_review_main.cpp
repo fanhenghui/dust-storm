@@ -17,7 +17,9 @@ using namespace medical_imaging;
 int main(int argc , char* argv[]) {
     try {
 #ifndef WIN32
-        chdir(dirname(argv[0]));
+        if( 0 != chdir(dirname(argv[0])) ) {
+            MI_REVIEW_LOG(MI_ERROR) << "set current direction failed.";
+        }
 #endif
 
         const std::string log_config_file = Configure::instance()->get_log_config_file();

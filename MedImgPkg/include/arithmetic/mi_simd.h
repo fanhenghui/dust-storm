@@ -83,11 +83,13 @@ static __m128 vec_sel(__m128 a, __m128 b, const unsigned int* _mask) {
     return vec_sel(a, b, _mm_load_ps((float*)_mask));
 }
 static __m128 vec_sel(__m128 a, __m128 b, unsigned int _mask) {
-    return vec_sel(a, b, _mm_set1_ps(*(float*)&_mask));
+    float* val = (float*)&_mask;
+    return vec_sel(a, b, _mm_set1_ps(*val));
 }
 
 static __m128 toM128(unsigned int x) {
-    return _mm_set1_ps(*(float*)&x);
+    float* val = (float*)&x;
+    return _mm_set1_ps(*val);
 }
 
 static __m128 fabsf4(__m128 x) {
