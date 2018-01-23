@@ -59,18 +59,18 @@
 			let username = $('#username').val();
 			let password = $('#password').val();
 			$.ajax({ 
-				url: '/login',
+				url: '/user/login',
 				type: 'post',
 				data: {'uname':username,'upwd':password},
 				success(data,status){ 
 					if(status == 'success'){ 
-						location.href = `review`;
+						location.href = '/app/review';
 					}
 				},
 				error(data,status){ 
 					if(status == 'error'){
 						alert(data.responseText);
-						location.href = '/login';
+						location.href = '/user/login';
 					}
 				}
 			});

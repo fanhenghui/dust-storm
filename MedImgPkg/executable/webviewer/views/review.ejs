@@ -61,7 +61,7 @@
     </style>
     <!--最好用向服务器请求的方式来传输socket.io.js 文件，否则得自己维护web前端和node服务器socket.io模块版本的一致-->
     <!-- <script src="js/socket.io.js"></script> -->
-    <script src="socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/bytebuffer.min.js"></script>
     <!-- <script src="/js/bcrypt.js"></script> -->
     <!-- <script src="/js/long.min.js"></script> -->
@@ -95,30 +95,30 @@
                         <table id ="table-preset-vrt">
                             <tr>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_lung_glass">
-                                    <img src="images/vrt_ct_lung_glass.jpeg">
+                                    <img src="/images/vrt_ct_lung_glass.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_lung_bw">
-                                    <img src="images/vrt_ct_lung_bw.jpeg">
+                                    <img src="/images/vrt_ct_lung_bw.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_calcification">
-                                    <img src="images/vrt_ct_calcification.jpeg">
+                                    <img src="/images/vrt_ct_calcification.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_cta">
-                                    <img src="images/vrt_ct_cta.jpeg">
+                                    <img src="/images/vrt_ct_cta.jpeg">
                                 </td>
                             </tr>
                             <tr>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_clr_abd_aorta_1">
-                                    <img src="images/vrt_ct_clr_abd_aorta_1.jpeg">
+                                    <img src="/images/vrt_ct_clr_abd_aorta_1.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_clr_carotid_1">
-                                    <img src="images/vrt_ct_clr_carotid_1.jpeg">
+                                    <img src="/images/vrt_ct_clr_carotid_1.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_clr_carotid_2">
-                                    <img src="images/vrt_ct_clr_carotid_2.jpeg">
+                                    <img src="/images/vrt_ct_clr_carotid_2.jpeg">
                                 </td>
                                 <td style="padding: 3px; border: 1px solid #FFFFFF" id="ct_carotids">
-                                    <img src="images/vrt_ct_carotids.jpeg">
+                                    <img src="/images/vrt_ct_carotids.jpeg">
                                 </td>
                             </tr>
                         </table>
@@ -145,9 +145,12 @@
                 <button type = "button" class="btn btn-default pull-left" id="btn-anonymous">
                     <span class="glyphicon glyphicon-eye-open"></span>
                 </button>
-                <button type = "button" class="btn btn-default pull-right" id="btn-login-0">
-                    <span class="glyphicon glyphicon-user"></span>
-                </button>
+                <div class="pull-right">
+                    <label><%=username%></label>
+                    <button type = "button" class="btn btn-default" id="btn-login-0">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </button>
+                </div>
                 <br>
                 <table class="table table-condensed table-hover" id="table-db">
                     <thead>
@@ -193,9 +196,12 @@
                 <button type = "button" class="btn btn-default pull-left" id="btn-pacs-1">
                     <span class="glyphicon glyphicon-list-alt"></span>
                 </button>
-                <button type = "button" class="btn btn-default pull-right" id="btn-login-1">
-                    <span class="glyphicon glyphicon-user"></span>
-                </button>
+                <div class="pull-right">
+                    <label><%=username%></label>
+                    <button type = "button" class="btn btn-default" id="btn-login-1">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </button>
+                </div>
                 <br>
                 <table class="table table-condensed table-hover" id="table-pacs">
                     <thead>
@@ -247,9 +253,12 @@
 				<li class="active">
 					 <a href="javascript:;">MED-REVIEW</a>
                 </li>
-                <button type = "button" class="btn btn-default pull-right" id="btn-login-2">
-                <span class="glyphicon glyphicon-user"></span>
-                </button>
+                <div class="pull-right">
+                    <label><%=username%></label>
+                    <button type = "button" class="btn btn-default" id="btn-login-2">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </button>
+                </div>
 			</ul>
             </div>
         </div>

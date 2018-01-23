@@ -63,7 +63,7 @@
 	<script type="text/javascript">
 	$(function(){ 
 		$("#btn-login").click(function(){ 
-			location.href = '/login';
+			location.href = '/user/login';
 		});
 		$("#btn-register").click(function(){ 
 			let username = $("#username").val();
@@ -74,18 +74,18 @@
 				$("#password-confirm").css("border","1px solid red");
 			} else if(password === passwordConfirm){
 				$.ajax({ 
-					url: '/register',
+					url: '/user/register',
 					type: 'post',
 					data: {'uname':username,'upwd':password},
 					success(data,status){ 
 						if(status == 'success'){ 
-							location.href = '/login';
+							location.href = '/user/login';
 						}
 					},
 					error(data,status){ 
 						if(status == 'error'){
 							alert(data.responseText);
-							location.href = '/register';
+							location.href = '/user/register';
 						}
 					}
 				}); 

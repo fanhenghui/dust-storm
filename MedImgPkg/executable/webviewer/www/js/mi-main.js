@@ -67,7 +67,7 @@
         } else {
             //return to login
             console.log('heart dead. return to login.');
-            window.location.href = '/login';
+            window.location.href = '/user/login';
         }
     }
 
@@ -910,27 +910,27 @@
             };
         }
 
-        function backToLogin() {
-            window.location.href = '/login';
+        function loginOut() {
+            window.location.href = '/user/logout';
         }
 
         let loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function() {
-                backToLogin();
+                loginOut();
             }
         }
         loginBtn = document.getElementById('btn-login-1');
         if (loginBtn) {
             loginBtn.onclick = function() {
-                backToLogin();
+                loginOut();
             }
         }
 
         loginBtn = document.getElementById('btn-login-2');
         if (loginBtn) {
             loginBtn.onclick = function() {
-                backToLogin();
+                loginOut();
             }
         }
 

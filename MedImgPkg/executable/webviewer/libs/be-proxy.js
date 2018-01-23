@@ -1,6 +1,7 @@
 const childProcess = require('child_process');
 const nodeIpc = require('node-ipc');
 const config = require('../config/config');
+const dbHandle = require('./db-handle');
 
 const COMMAND_ID_BE_FE_SHUTDOWN = 120000;
 const COMMAND_ID_BE_FE_READY = 120001;
@@ -54,7 +55,7 @@ let disconnectBE = (userid)=>{
     const username = onlineUserSet[userid].username;
     //clear user online info (DB)
     //注意 有极低的概率websocket调用disconnect失败
-    global.dbHandel.signOut(username);
+    dbHandle.signOut(global.db, username);
 
     let ipc = onlineUserSet[userid].ipc;
     let ipcSocket = onlineUserSet[userid].ipcSocket;
