@@ -6,16 +6,13 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<title><%= title %></title>
-	<link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+	<link rel="stylesheet" href="/css/bootstrap.min.css" media="screen">
 	<style type="text/css">
 	.m15{ margin: 15px;}
  	.tc{ text-align: center;font-size: 18px;font-weight: 600;}
 	</style>
 </head>
 <body screen_capture_injected="true">
-	<div style="display:none" hidden="true">
-        <p id="subpage"><%=subpage%></p>
-    </div>
 	<div class="container">
 		<form class="col-sm-offset-4 col-sm-4 form-horizontal" role="form" method="post" onsubmit="return false">
 			<fieldset>
@@ -61,36 +58,34 @@
 		</form>
 	</div>
 
-	<script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	$(function(){ 
 		$("#btn-login").click(function(){ 
-			let subpage = $('#subpage').html();
-			location.href = `${subpage}/login`;
+			location.href = '/login';
 		});
 		$("#btn-register").click(function(){ 
 			let username = $("#username").val();
 			let password = $("#password").val();
-			let subpage = $('#subpage').html();
 			var passwordConfirm = $("#password-confirm").val();
 			if(password !== passwordConfirm){ 
 				$("#password").css("border","1px solid red");
 				$("#password-confirm").css("border","1px solid red");
 			} else if(password === passwordConfirm){
 				$.ajax({ 
-					url: `${subpage}/register`,
+					url: '/register',
 					type: 'post',
 					data: {'uname':username,'upwd':password},
 					success(data,status){ 
 						if(status == 'success'){ 
-							location.href = `${subpage}/login`;
+							location.href = '/login';
 						}
 					},
 					error(data,status){ 
 						if(status == 'error'){
 							alert(data.responseText);
-							location.href = `${subpage}/register`;
+							location.href = '/register';
 						}
 					}
 				}); 

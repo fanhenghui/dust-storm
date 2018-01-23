@@ -1,9 +1,10 @@
 const  mysql = require('mysql');
 const fs = require('fs');
+const config = require('../config/config')
 let pool = null;
 
 function connectDB() {
-	fs.readFile(global.configPath, (err,data)=>{
+	fs.readFile(config.app_config_path, (err,data)=>{
 		let configStr = data.toString();
 		let configLines = configStr.split('\n');
 		if (configLines.length < 5) {
@@ -51,7 +52,6 @@ function connectDB() {
 }
 
 connectDB();
-
 
 module.exports = { 
 	closeDB: function name(params) {

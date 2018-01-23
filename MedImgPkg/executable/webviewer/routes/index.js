@@ -1,16 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-router.get(global.subPage + '/', (req, res, next)=> {
+router.get('/', (req, res, next)=> {
     res.redirect('login');
 });
 
-router.route(global.subPage+'/login')
+router.route('/login')
 .get((req, res)=>{
-    res.render('login', {
-        subpage: global.subPage,
-        title: 'User Login'
-    });
+    //这里可以给出服务器的UID
+    res.render('login', {title: 'User Login'});``
 })
 .post((req, res)=>{
     let uName = req.body.uname;
@@ -36,7 +34,7 @@ router.route(global.subPage+'/login')
     });
 });
 
-router.route(global.subPage+'/register')
+router.route('/register')
 .get((req, res)=>{
     res.render('register', {
         subpage: global.subPage,
@@ -65,14 +63,14 @@ router.get(`${global.subPage}/logout`, (req, res)=>{
     // clear session's user/error and redirect to login
     req.session.user = null;
     req.session.error = null;
-    res.redirect(global.subPage+'/login');
+    res.redirect('/login');
 });
 
-router.route(global.subPage+'/review').get((req, res)=>{
+router.route('/review').get((req, res)=>{
     //check login(check session's user)
     if (!req.session.user) { 
         req.session.error = '请先登录'
-        res.redirect(global.subPage+'/login');
+        res.redirect('/login');
     } else {
         console.log(`user ${req.session.user.name} into review`);
         res.render('review', {

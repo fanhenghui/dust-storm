@@ -67,8 +67,7 @@
         } else {
             //return to login
             console.log('heart dead. return to login.');
-            let subpage = document.getElementById('subpage').innerHTML;
-            window.location.href = subpage + '/login';
+            window.location.href = '/login';
         }
     }
 
@@ -912,8 +911,7 @@
         }
 
         function backToLogin() {
-            let subpage = document.getElementById('subpage').innerHTML;
-            window.location.href = subpage+'/login';
+            window.location.href = '/login';
         }
 
         let loginBtn = document.getElementById('btn-login-0');

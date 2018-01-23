@@ -12,20 +12,8 @@
             text-decoration: underline;
         }
     </style>
-    <script>
-        window.onload = function() {
-            let subpage = document.getElementById('subpage').innerHTML;
-            let oLogin = document.getElementById('a-login');
-            oLogin.href = subpage + '/login';
-            let oRegister = document.getElementById('a-register');
-            oRegister.href = subpage + '/register';
-        }
-    </script>
 </head>
 <body>
-    <div style="display:none" hidden="true">
-        <p id="subpage"><%=subpage%></p>
-    </div>
     <img src="/images/header.png" alt="medical picture">
     <h1>Welcome to<%= title %>
     </h1>

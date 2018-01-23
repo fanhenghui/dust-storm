@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <title>MED-REVIEW</title>
 
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <link href="css/jquery-ui.css" rel="stylesheet" />
-    <script src="js/popper.min.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css" >
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/d3.v4.min.js"></script>
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <link href="/css/jquery-ui.css" rel="stylesheet" />
+    <script src="/js/popper.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/d3.v4.min.js"></script>
     
     <style>
         svg {
@@ -62,10 +62,10 @@
     <!--最好用向服务器请求的方式来传输socket.io.js 文件，否则得自己维护web前端和node服务器socket.io模块版本的一致-->
     <!-- <script src="js/socket.io.js"></script> -->
     <script src="socket.io/socket.io.js"></script>
-    <script src="js/bytebuffer.js"></script>
-    <script src="js/bcrypt.js"></script>
-    <script src="js/long.js"></script>
-    <script src="js/protobuf.js"></script>
+    <script src="/js/bytebuffer.min.js"></script>
+    <!-- <script src="/js/bcrypt.js"></script> -->
+    <!-- <script src="/js/long.min.js"></script> -->
+    <script src="/js/protobuf.min.js"></script>
 </head>
 
 <body onselectstart="return false">
@@ -133,9 +133,6 @@
     <div class="container-fluid" id="worklist-db-div">
         <div style="display:none" hidden="true">
             <p id="username"><%=username%></p>
-        </div>
-        <div style="display:none" hidden="true">
-            <p id="subpage"><%=subpage%></p>
         </div>
         <div clss="row">
             <div class="col-md-12 col-sm-12">
@@ -401,13 +398,13 @@
     </div> -->
 </body>
 
-<script src="js/mi-define.js"></script>
-<script src="js/mi-socket-client.js"></script>
-<script src="js/mi-protobuf.js"></script>
-<script src="js/mi-action.js"></script>
-<script src="js/mi-roi.js"></script>
-<script src="js/mi-crosshair.js"></script>
-<script src="js/mi-vertical-ruler.js"></script>
-<script src="js/mi-cell.js"></script>
-<script src="js/mi-main.js"></script>
+<script src="/js/mi-define.js"></script>
+<script src="/js/mi-socket-client.js"></script>
+<script src="/js/mi-protobuf.js"></script>
+<script src="/js/mi-action.js"></script>
+<script src="/js/mi-roi.js"></script>
+<script src="/js/mi-crosshair.js"></script>
+<script src="/js/mi-vertical-ruler.js"></script>
+<script src="/js/mi-cell.js"></script>
+<script src="/js/mi-main.js"></script>
 </html>

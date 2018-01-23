@@ -1,6 +1,6 @@
-const fs = require('fs');
 const childProcess = require('child_process');
 const nodeIpc = require('node-ipc');
+const config = require('../config/config');
 
 const COMMAND_ID_BE_FE_SHUTDOWN = 120000;
 const COMMAND_ID_BE_FE_READY = 120001;
@@ -164,43 +164,31 @@ module.exports = {
             // Create BE process
             console.log('path: ' + '/tmp/app.' + obj.username);
             // reader BE process path form config file
-            fs.readFile(__dirname + '/be_path', (err, data)=>{
-                if (err) {
-                    console.log('null be path!');
-                    disconnectBE();
-                }
-                //read line 0 as be path
-                let lines = data.toString().split('\n');
-                if (lines.length == 0) {
-                    console.log('read be path fiailed!');
-                    disconnectBE();
-                }
-                let review_server_path = lines[0];
-                console.log('app path : ' + review_server_path);
+            console.log('BE path: ' +  config.be_path);
+            
+            /// run process
+            let worker = childProcess.spawn(config.be_path, ['/tmp/app.' + obj.username], {detached: true});
+            onlineUserSet[userid].BEProcess = worker;
 
-                /// run process
-                let worker = childProcess.spawn(review_server_path, ['/tmp/app.' + obj.username], {detached: true});
-                onlineUserSet[userid].BEProcess = worker;
-
-                //// std ouput to server device
-                worker.stdout.on('data', (data) => {
-                    console.log(`stdout: ${data}`);
-                });
-                worker.stderr.on('data', (data) => {
-                    console.log(`stderr: ${data}`);
-                });
-
-                worker.on('close', (code) => {
-                    console.log('child process exited with code: ' + code);
-                    if (onlineUserSet.hasOwnProperty(userid)) {
-                        // 后台主动断开：一般是crash了
-                        onlineUserSet[userid].BEProcess = null;
-                        disconnectBE(userid);
-                    }
-                    //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
-                });
-                console.log('<><><><><><> create review server success <><><><><><>');
+            //// std ouput to server device
+            worker.stdout.on('data', (data) => {
+                console.log(`stdout: ${data}`);
             });
+            worker.stderr.on('data', (data) => {
+                console.log(`stderr: ${data}`);
+            });
+
+            worker.on('close', (code) => {
+                console.log('child process exited with code: ' + code);
+                if (onlineUserSet.hasOwnProperty(userid)) {
+                    // 后台主动断开：一般是crash了
+                    onlineUserSet[userid].BEProcess = null;
+                    disconnectBE(userid);
+                }
+                //TODO 检查是否是正常退出，如果不是，而且websocket还在连接中，通知FE BE crash, 并断开连接
+            });
+
+            console.log('<><><><><><> create review server success <><><><><><>');
         });
 
         // 前台主动断开

@@ -47,7 +47,7 @@ const ACTION_ID_ROTATE = OPERATION_ID_BE_FE_ROTATE;
 const ACTION_ID_WINDOWING = OPERATION_ID_BE_FE_WINDOWING;
 const ACTION_ID_MRP_ANNOTATION = OPERATION_ID_BE_FE_ANNOTATION;
 
-const PROTOBUF_BE_FE = './data/mi_message.proto';
+const PROTOBUF_BE_FE = '/protobuf/mi_message.proto';
 
 //mouse button type
 const BTN_NONE = 0;
