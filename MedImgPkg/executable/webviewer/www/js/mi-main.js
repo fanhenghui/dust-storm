@@ -28,27 +28,28 @@
             alert('connect server failed.');
             return;
         } else {
-            // add userName&userID attribute
             socket.userName = document.getElementById('username').innerHTML;
             socket.userID = getUserID(socket.userName);
-            //create socketClient
+            const onlineToken = $.cookie('online_token');
+            
             socketClient = new SocketClient(socket);
             socketClient.loadProtoc(PROTOBUF_BE_FE);
             socket.emit('login', {
-                userid: socket.userID,
-                username: socket.userName
+                userID: socket.userID,
+                userName: socket.userName,
+                onlineToken: onlineToken,
             });
-            socket.on('data', function(tcpBuffer) {
+            socket.on('data', tcpBuffer => {
                 socketClient.recvData(tcpBuffer, cmdHandler);
+            });
+            socket.on('login_out', function() {
+                loginOut();
             });
         }
     }
 
-    function logout() {
-        if (socket != null) {
-            socket.emit('disconnect', {userid: socket.userID,username: socket.userName});
-            location.reload();
-        }
+    function loginOut() {
+        window.location.href = '/user/logout';
     }
 
     let heartbeatCount = 1;
@@ -70,7 +71,7 @@
             window.location.href = '/user/login';
         }
     }
-
+ 
     function handleBEDBRetrieve(arrayBuffer) { 
         console.log('recv DB retrieve.');
         let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
@@ -600,7 +601,6 @@
     }
 
     function prepare() {
-        let username = document.getElementById('username').innerHTML;
         login();
 
         // disable the annoying context menu triggered by the right button
@@ -910,10 +910,6 @@
             };
         }
 
-        function loginOut() {
-            window.location.href = '/user/logout';
-        }
-
         let loginBtn = document.getElementById('btn-login-0');
         if (loginBtn) {
             loginBtn.onclick = function() {
@@ -997,7 +993,11 @@
 
         // register window quit linsener
         window.onbeforeunload = function(event) {
-            logout();
+            //Socket disconnect
+            if (socket != null) {
+                socket.emit('disconnect', {userID: socket.userID,userName: socket.userName});
+                location.reload();
+            }
         }
         window.onresize = function() {
             resize()

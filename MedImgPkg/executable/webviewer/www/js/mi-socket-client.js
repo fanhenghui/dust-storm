@@ -111,8 +111,8 @@ class SocketClient {
     
             //console.log('emit data length 0.');
             this._socket.emit('data', {
-                userid: this._socket.userID,
-                username: this._socket.userName,
+                userID: this._socket.userID,
+                userName: this._socket.userName,
                 content: headerBuffer
             });
         } else {
@@ -135,8 +135,8 @@ class SocketClient {
             }
             //console.log('emit data length' + dataLen + '.');
             this._socket.emit('data', {
-                userid: this._socket.userID,
-                username: this._socket.userName,
+                userID: this._socket.userID,
+                userName: this._socket.userName,
                 content: cmdBuffer
             });
         }
@@ -145,8 +145,8 @@ class SocketClient {
     //heartbeat 
     heartbeat() {
         this._socket.emit('heartbeat', {
-            userid: this._socket.userID,
-            username: this._socket.userName
+            userID: this._socket.userID,
+            userName: this._socket.userName
         });
     }
 

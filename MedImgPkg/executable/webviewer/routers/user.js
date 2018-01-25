@@ -1,4 +1,7 @@
 const express = require('express');
+const common = require('../libs/common');
+const config = require('../config/config');
+
 let router = express.Router();
 
 module.exports = router;
@@ -13,8 +16,9 @@ router.route('/login')
     res.render('login', {title: 'User Login'});``
 })
 .post((req, res)=>{
-    let name = req.body.uname;
-    let pwd = req.body.upwd;
+    const {name, pass, verify} = req.body;
+
+    //TODO 校验用户名密码合法性
 
     req.db.getConnection((err, connection) =>{
         if (err) {
@@ -22,50 +26,48 @@ router.route('/login')
             connection.release();
             //database error
             console.log(`DB connect error when sign in: ${err}`);
-            res.status(500).send('数据库操作失败');
+            res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
         } else {
-            connection.query(`SELECT * FROM usr WHERE name='${name}'`, (err, data, fields)=>{
+            connection.query(`SELECT online_token,password FROM usr WHERE name='${name}'`, (err, data, fields)=>{
                 if(err) {
                     //done with the connection
                     connection.release();
                     //database error
                     console.log(`DB error when sign in: ${err}`);
-                    res.status(500).send('数据库操作失败');
+                    res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
                 } else if(data.length == 0) {
                     //done with the connection
                     connection.release();
                     //user doesn't exist
-                    req.session.error = '用户名或者密码错误';
-                    res.status(404).send('用户名或者密码错误');
+                    res.send({err:-1, msg:'用户名或者密码错误'});
                 } else {
-                    if (data[0].password != pwd ) {
+                    if (data[0].password != common.md5(pass) ) {
                         //done with the connection
                         connection.release();
                         //error password
-                        req.session.error = '用户名或者密码错误';
-                        res.status(404).send('用户名或者密码错误');
-                    } else if (data[0].online[0] === 1) {
-                        //done with the connection
-                        connection.release();
-                        //repeat login
-                        req.session.error = '用户已经在线，不可以重复登录';
-                        res.status(404).send('用户已经在线，不可以重复登录');
+                        res.send({err:-1, msg:'用户名或者密码错误'});
                     } else {
-                        //update online 
-                        connection.query(`UPDATE usr SET online=1 WHERE name='${name}'`, (err, data, fields)=> {
-                            //done with the connection
-                            connection.release();
-                            if (err) {
-                                //database error
-                                console.log(`DB error when sign in: ${err}`);
-                                res.status(500).send('数据库操作失败');
-                            } else {
-                                //login successs
-                                req.session.user = {name:name};
-                                res.sendStatus(200);
-                            }
-                        });
-                        
+                        if (!data[0].online_token || verify == 1) {
+                            const new_token = common.uuid();
+                            //update online 
+                            connection.query(`UPDATE usr SET online_token='${new_token}' WHERE name='${name}'`, (err, data, fields)=> {
+                               //done with the connection
+                               connection.release();
+                               if (err) {
+                                   //database error
+                                   console.log(`DB error when sign in: ${err}`);
+                                   res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
+                               } else {
+                                   //login successs
+                                   req.session.user = {name:name};
+                                   res.cookie('online_token', new_token);
+                                   res.send({err:0, msg:'登录成功'});
+                               }
+                            });
+                        } else {
+                            //ask user to verify
+                            res.send({err:1, msg:'账号已经在其他页面登录'});
+                        }
                     }
                 }
             });
@@ -80,42 +82,44 @@ router.route('/register')
     });
 })
 .post((req, res)=>{
-    let name = req.body.uname;
-    let pwd = req.body.upwd;
+    const {name, pass} = req.body;
 
+    //TODO 校验用户名密码合法性
+
+    let passHash = common.md5(pass);
     req.db.getConnection((err, connection) =>{
         if (err) {
             //done with the connection
             connection.release();
             //database error
             console.log(`DB connect error when register: ${err}`);
-            res.status(500).send('数据库操作失败');
+            res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
         } else {
-            connection.query(`SELECT * FROM usr WHERE name='${name}'`, (err, data, fields)=>{
+            connection.query(`SELECT ID FROM usr WHERE name='${name}'`, (err, data, fields)=>{
                 if(err) {
                     //done with the connection
                     connection.release();
                     //database error
                     console.log(`DB connect error when register: ${err}`);
-                    res.status(500).send('数据库操作失败');
+                    res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
                 } else if (data.length != 0) {
                     //done with the connection
                     connection.release();
                     //username has exist
-                    req.session.error = '用户名已存在';
-                    res.status(500).send('用户名已存在');
+                    res.send({err:-1, msg:'用户名已存在'});
                 } else {
-                    connection.query(`INSERT INTO usr(name,role,online,password) VALUES ('${name}',0,0,'${pwd}')`, (err, data, fields)=>{
+                    const id = common.uuid();
+                    connection.query(`INSERT INTO usr(ID,name,role,password) VALUES ('${id}','${name}',0,'${passHash}')`, (err, data, fields)=>{
                         //done with the connection
                         connection.release();
                         if(err) {
                             //database error
                             console.log(`DB connect error when register: ${err}`);
-                            res.status(500).send('数据库操作失败');
+                            res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
                         } else {
                             //register success
                             req.session.user = {name:name};//record to session
-                            res.send(200);
+                            res.send({err:0, msg:'注册成功'});
                         }
                     });
                 }
@@ -127,6 +131,5 @@ router.route('/register')
 router.get('/logout', (req, res)=>{
     // clear session's user/error and redirect to login
     req.session.user = null;
-    req.session.error = null;
     res.redirect('/user/login');
 });

@@ -59,13 +59,6 @@
         fieldset{padding:.35em 0em .35em;margin:0 1px;border:1px solid silver}
         legend{border:0;width:auto}
     </style>
-    <!--最好用向服务器请求的方式来传输socket.io.js 文件，否则得自己维护web前端和node服务器socket.io模块版本的一致-->
-    <!-- <script src="js/socket.io.js"></script> -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/bytebuffer.min.js"></script>
-    <!-- <script src="/js/bcrypt.js"></script> -->
-    <!-- <script src="/js/long.min.js"></script> -->
-    <script src="/js/protobuf.min.js"></script>
 </head>
 
 <body onselectstart="return false">
@@ -406,6 +399,10 @@
         <!-- </div>
     </div> -->
 </body>
+<!--最好用向服务器请求的方式来传输socket.io.js 文件，否则得自己维护web前端和node服务器socket.io模块版本的一致-->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/protobuf.min.js"></script>
+<script src="/js/jquery.cookie.js"></script>
 
 <script src="/js/mi-define.js"></script>
 <script src="/js/mi-socket-client.js"></script>

@@ -47,10 +47,10 @@
 					</div>
 				</div>
 				<div class="form-group">
-						<button type="submit" class="btn btn-primary btn-block" id="btn-register">注册</button>
+					<button type="submit" class="btn btn-primary btn-block" id="btn-register">注册</button>
 				</div>
 				<div class="form-group">
-						<button type="button" class="btn btn-info col-sm-2 col-sm-offset-10" id="btn-login">登录</button>
+					<button type="button" class="btn btn-info col-sm-2 col-sm-offset-10" id="btn-login">登录</button>
 				</div>
 				</div>
 				</div>
@@ -69,24 +69,25 @@
 			let username = $("#username").val();
 			let password = $("#password").val();
 			var passwordConfirm = $("#password-confirm").val();
-			if(password !== passwordConfirm){ 
+			if(password != passwordConfirm){ 
 				$("#password").css("border","1px solid red");
 				$("#password-confirm").css("border","1px solid red");
-			} else if(password === passwordConfirm){
+				alert('两次输入的密码不匹配');
+			} else {
 				$.ajax({ 
 					url: '/user/register',
 					type: 'post',
-					data: {'uname':username,'upwd':password},
-					success(data,status){ 
-						if(status == 'success'){ 
+					data: {name:username,pass:password},
+					dataType: 'json',
+					success(data) {
+						if (0 != data.err) {
+							alert(data.msg);
+						} else {
 							location.href = '/user/login';
 						}
 					},
-					error(data,status){ 
-						if(status == 'error'){
-							alert(data.responseText);
-							location.href = '/user/register';
-						}
+					error(err){ 
+						alert(`通信错误：${err}`);
 					}
 				}); 
 			}

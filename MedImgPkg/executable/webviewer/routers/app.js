@@ -10,7 +10,6 @@ router.get('/', (req,res)=>{
 router.get('/review', (req, res)=>{
     //check login(check session's user)
     if (!req.session.user) { 
-        req.session.error = '请先登录'
         res.redirect('/user/login');
     } else {
         console.log(`user ${req.session.user.name} into review`);

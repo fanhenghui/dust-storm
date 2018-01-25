@@ -36,17 +36,12 @@ module.exports = {
             }
     
             let db = mysql.createPool( {
-                connectionLimit:10,//TODO，这里的值最好要和server带的用户数量匹配，估计N/2就够了
+                connectionLimit:config.db_pool_connection,
                 host:addr.ip,
                 port:addr.port,
                 user:addr.user,
                 password:addr.password,
                 database:addr.database,
-            });
-            
-    
-            db.on('release', function (connection) {
-                console.log('Connection %d released', connection.threadId);
             });
 
             gContainer.db = db;
@@ -71,22 +66,14 @@ module.exports = {
 			if (err) {
 				console.log(`DB connect error when sign in: ${err}`);
 			} else {
-				connection.query(`SELECT * FROM usr WHERE name='${name}'`, (err, res, fields)=>{
-					if(err) {
-						//done with the connection
-						connection.release();
-						console.log(`DB error when sign out: ${err}`);
-					} else {
-						connection.query(`UPDATE usr SET online=0 WHERE name='${name}'`, (err, res, fields)=> {
-							//done with the connection
-							connection.release();
-							if (err) {
-								//database error
-								console.log(`DB error when sign out: ${err}`);
-							}
-						});
-					}
-				});
+				connection.query(`UPDATE usr SET online_token=NULL WHERE name='${name}'`, (err, res, fields)=> {
+                    //done with the connection
+                    connection.release();
+                    if (err) {
+                        //database error
+                        console.log(`DB error when sign out: ${err}`);
+                    }
+                });
 			}
 		});
     }

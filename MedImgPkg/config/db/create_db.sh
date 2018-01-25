@@ -9,7 +9,12 @@ create database med_img_db;
 show databases;
 use med_img_db;
 
-create table usr(ID INT NOT NULL AUTO_INCREMENT, name VARCHAR(30) NOT NULL, role TINYINT NOT NULL, online BIT NOT NULL, password VARCHAR(30) NOT NULL, PRIMARY KEY (ID));
+create table usr(ID VARCHAR(32) NOT NULL, 
+name VARCHAR(32) NOT NULL, 
+role TINYINT NOT NULL, 
+online_token VARCHAR(32), 
+password VARCHAR(32) NOT NULL, 
+PRIMARY KEY (ID));
 
 create table dcm_series(series_id VARCHAR(300) NOT NULL, 
 study_id VARCHAR(300) NOT NULL, 
