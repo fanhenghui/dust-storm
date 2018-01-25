@@ -25,6 +25,9 @@ public:
 
     int retrieve_all_series(std::vector<DcmInfo>& dcm_infos);
     int fetch_series(const std::string& series_id, const std::string& map_path);
+    int retrieve_series(std::vector<DcmInfo>& dcm_infos,
+        const std::string& start_study_date, 
+        const std::string& stop_study_date);
 
 private:
     int try_connect();

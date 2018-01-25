@@ -17,5 +17,5 @@ int main(int argc, char* argv[]) {
     Logger::instance()->set_file_direction("");
     Logger::instance()->initialize();
 
-    return rt_ut(argc,argv);
+    return pacs_ut(argc,argv);
 }

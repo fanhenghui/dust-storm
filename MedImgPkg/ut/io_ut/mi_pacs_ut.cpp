@@ -33,7 +33,11 @@ int pacs_ut(int argc, char* argv[]) {
     }
 
     std::vector<DcmInfo> dcm_infos;
-    if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
+    // if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
+    //     return -1;
+    // }
+
+    if(-1 == pacs_comm.retrieve_series(dcm_infos, "19990201", "20050101")) {
         return -1;
     }
 

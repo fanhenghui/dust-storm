@@ -225,6 +225,55 @@ int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
     return 0;
 }
 
+int PACSCommunicator::retrieve_series(std::vector<DcmInfo>& dcm_infos, const std::string& start_study_date,  const std::string& stop_study_date) {
+    if(0 != try_connect() ) {
+        MI_IO_LOG(MI_FATAL) << "try connect failed before query all series.";
+        return -1;
+    }
+
+    DcmDataset query_key;
+    query_key.putAndInsertString(DCM_QueryRetrieveLevel, "SERIES");
+    query_key.putAndInsertString(DCM_StudyDate, std::string(start_study_date + "-" + stop_study_date).c_str());
+    query_key.putAndInsertString(DCM_StudyInstanceUID, "");
+    query_key.putAndInsertString(DCM_SeriesInstanceUID, "");
+    query_key.putAndInsertString(DCM_Modality, "");
+    query_key.putAndInsertString(DCM_PatientID, "");
+    query_key.putAndInsertString(DCM_PatientName, "");
+    query_key.putAndInsertString(DCM_PatientSex, "");
+    query_key.putAndInsertString(DCM_PatientBirthDate, "");
+    query_key.putAndInsertString(DCM_PatientAge, "");
+
+    const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
+    if (id == 0) {
+        MI_IO_LOG(MI_ERROR) << "There is no uncompressed presentation context for Study Root FIND";
+        return -1;
+    }
+    
+    OFList<QRResponse*> res;
+    
+    OFCondition result = _scu->sendFINDRequest(id,  &query_key, &res);
+    if (result.bad()) {
+        MI_IO_LOG(MI_ERROR) << "FIND request failed.";
+    } else {
+        dcm_infos.clear();
+        MI_IO_LOG(MI_DEBUG) << "series size: " << res.size();
+        for (auto it = res.begin(); it != res.end(); ++it) {
+            if((*it)->m_dataset != NULL) {
+                DcmInfo dcm_info;
+                fill_dcm_info((*it)->m_dataset, dcm_info);
+                dcm_infos.push_back(dcm_info);
+            }
+        }
+    }
+    
+    if (!dcm_infos.empty()) {
+        _series_to_release_scp = dcm_infos[0].series_id;
+    }
+    
+    return 0;
+
+}
+
 int PACSCommunicator::fetch_series(const std::string& series_id, const std::string& map_path) {
     if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_id;
