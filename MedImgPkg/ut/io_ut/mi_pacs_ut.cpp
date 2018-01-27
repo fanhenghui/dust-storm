@@ -37,7 +37,14 @@ int pacs_ut(int argc, char* argv[]) {
     //     return -1;
     // }
 
-    if(-1 == pacs_comm.retrieve_series(dcm_infos, "19990201", "20050101")) {
+    QueryKey query_key;
+    query_key.study_date = "19990201-20151010";
+    //query_key.patient_id = "A*";
+    //query_key.accession_number = "2819497684894126";
+    //query_key.patient_name = "A*";
+    //query_key.modality = "CT";
+    query_key.patient_sex = "M";
+    if(-1 == pacs_comm.retrieve_series(dcm_infos, query_key)) {
         return -1;
     }
 
@@ -45,8 +52,13 @@ int pacs_ut(int argc, char* argv[]) {
     int id = 0;
     for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
         const std::string series_id = (*it).series_id;
-        MI_IO_LOG(MI_DEBUG) << id++ << series_id;
+        MI_IO_LOG(MI_DEBUG) << id++ <<": " << (*it).series_id << "\n"
+            << "instance_number: " << (*it).instance_number
+            << ", patient_id: " << (*it).patient_id
+            << ", patient_name: " << (*it).patient_name 
+            << ", accession_number: " << (*it).accession_number; 
     }
+
     MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
 
     int query_id = -1;

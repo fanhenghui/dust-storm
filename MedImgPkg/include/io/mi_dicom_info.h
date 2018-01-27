@@ -17,6 +17,8 @@ struct DcmInfo {
     std::string patient_age;
     std::string patient_birth_date;
     std::string modality;
+    std::string instance_number;
+    std::string accession_number;
 };
 
 MED_IMG_END_NAMESPACE
