@@ -12,11 +12,8 @@ public:
     struct ImgItem {
         std::string series_id;
         std::string study_id;
-        std::string patient_name;
-        std::string patient_id;
-        std::string modality;
         std::string path;
-        int size_mb;
+        float size_mb;
     };
 
 public:

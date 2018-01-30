@@ -39,6 +39,8 @@ public:
 
     IO_Export ~DICOMLoader();
 
+    IO_Export IOStatus load_dicom(std::string& dcm_file, std::shared_ptr<ImageDataHeader>& img_data_header);
+
     // files will removal invalid file and keep majority series
     IO_Export IOStatus load_series(std::vector<std::string>& files_in_out,
                 std::shared_ptr<ImageData>& image_data,
@@ -85,7 +87,7 @@ private:
 
     IOStatus sort_series(DcmFileFormatSet& file_format_set);
 
-    IOStatus construct_data_header(DcmFileFormatSet& file_format_set,
+    IOStatus construct_data_header(DcmFileFormatPtr& file_format,
                             std::shared_ptr<ImageDataHeader> img_data_header);
 
     IOStatus construct_image_data(DcmFileFormatSet& file_format_set,
@@ -130,6 +132,9 @@ private:
                           std::shared_ptr<ImageDataHeader>& img_data_header);
 
     bool get_study_uid(DcmDataset* data_set,
+                         std::shared_ptr<ImageDataHeader>& img_data_header);
+
+    bool get_sop_instance_uid(DcmDataset* data_set,
                          std::shared_ptr<ImageDataHeader>& img_data_header);
 
     bool get_sample_per_pixel(DcmDataset* data_set,

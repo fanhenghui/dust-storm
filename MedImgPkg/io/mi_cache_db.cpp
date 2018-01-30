@@ -46,13 +46,9 @@ int CacheDB::insert_item(const ImgItem& item) {
         std::string sql_str;
         {
             std::stringstream ss;
-            ss << "INSERT INTO " << DCM_TABLE << " (series_id, study_id, patient_name, "
-               "patient_id, modality, size_mb, path) values (";
+            ss << "INSERT INTO " << DCM_TABLE << " (series_id, study_id, size_mb, path) values (";
             ss << "\'" << item.series_id << "\',";
             ss << "\'" << item.study_id << "\',";
-            ss << "\'" << item.patient_name << "\',";
-            ss << "\'" << item.patient_id << "\',";
-            ss << "\'" << item.modality << "\',";
             ss << "\'" << item.size_mb << "\',";
             ss << "\'" << item.path << "\'";
             ss << ");";
@@ -184,9 +180,6 @@ int CacheDB::get_item(const std::string& series_id, ImgItem& item) {
         if (res->next()) {
             item.series_id = res->getString("series_id");
             item.study_id = res->getString("study_id");
-            item.patient_name = res->getString("patient_name");
-            item.patient_id = res->getString("patient_id");
-            item.modality = res->getString("modality");
             item.path = res->getString("path");
             item.size_mb = res->getDouble("size_mb");
             delete res;
@@ -234,9 +227,6 @@ int CacheDB::get_all_items(std::vector<ImgItem>& items) {
                 ImgItem item;
                 item.series_id = res->getString("series_id");
                 item.study_id = res->getString("study_id");
-                item.patient_name = res->getString("patient_name");
-                item.patient_id = res->getString("patient_id");
-                item.modality = res->getString("modality");
                 item.path = res->getString("path");
                 item.size_mb = res->getDouble("size_mb");
                 items.push_back(item);

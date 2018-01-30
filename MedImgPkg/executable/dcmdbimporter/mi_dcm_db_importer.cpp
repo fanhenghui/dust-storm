@@ -229,12 +229,30 @@ int import_one_series_cache(const std::string& map_path, DcmItem& series_info,
     item.patient_name = series_info.patient_name;
     float size_mb = 0;
 
+    DICOMLoader loader;
+    std::shared_ptr<ImageDataHeader> img_header;
     for (size_t i = 0; i < files.size(); i++) {
-        boost::filesystem::path p(files[i].c_str());
+        std::string file_src = files[i];
+        boost::filesystem::path p(file_src.c_str());
         std::string base_name = p.filename().string();
-        const std::string file_dst = series_dst + "/" + base_name;
+        
+        loader.load_dicom(file_src, img_header);
+        std::string modality;
+        if (img_header->modality == CT) {
+            modality = "CT";
+        } else if (img_header->modality == MR) {
+            modality = "MR";
+        } else if (img_header->modality == PT) {
+            modality = "PT";
+        } else if (img_header->modality == CR) {
+            modality = "CR";
+        } else if (img_header->modality == RT_STRUCT) {
+            modality = "RT_STRUCT";
+        }
+        const std::string file_dst = series_dst + "/" + modality + "." + img_header->sop_instance_uid + ".dcm";
+
         float size_slice = 0;
-        if (0 != copy_file(files[i], file_dst, size_slice)) {
+        if (0 != copy_file(file_src, file_dst, size_slice)) {
             std::stringstream ss;
             ss << "copy file " << base_name << " failed.\n";
             LOG_OUT(ss.str());
@@ -286,12 +304,30 @@ int import_one_series(const std::string& map_path, DcmItem& series_info,
     item.patient_name = series_info.patient_name;
     float size_mb = 0;
 
+    DICOMLoader loader;
+    std::shared_ptr<ImageDataHeader> img_header(new ImageDataHeader());
     for (size_t i = 0; i < files.size(); i++) {
-        boost::filesystem::path p(files[i].c_str());
+        std::string file_src = files[i];
+        boost::filesystem::path p(file_src.c_str());
         std::string base_name = p.filename().string();
-        const std::string file_dst = series_dst + "/" + base_name;
+
+        loader.load_dicom(file_src, img_header);
+        std::string modality;
+        if (img_header->modality == CT) {
+            modality = "CT";
+        } else if (img_header->modality == MR) {
+            modality = "MR";
+        } else if (img_header->modality == PT) {
+            modality = "PT";
+        } else if (img_header->modality == CR) {
+            modality = "CR";
+        } else if (img_header->modality == RT_STRUCT) {
+            modality = "RT_STRUCT";
+        }
+
+        const std::string file_dst = series_dst + "/" + modality + "." + img_header->sop_instance_uid + ".dcm";
         float size_slice = 0;
-        if (0 != copy_file(files[i], file_dst, size_slice)) {
+        if (0 != copy_file(file_src, file_dst, size_slice)) {
             std::stringstream ss;
             ss << "copy file " << base_name << " failed.\n";
             LOG_OUT(ss.str());

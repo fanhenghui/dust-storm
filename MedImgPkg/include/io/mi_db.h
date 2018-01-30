@@ -10,16 +10,25 @@ MED_IMG_BEGIN_NAMESPACE
 class IO_Export DB : public MySQLDB {
 public:
     struct ImgItem {
-        std::string series_id;
         std::string study_id;
+        std::string series_id;
+        unsigned int study_timestamp;
+
+        std::string modality;
+        
         std::string patient_name;
         std::string patient_id;
-        std::string modality;
+        std::string patient_sex;
+        unsigned int patient_birth_timestamp;
+        std::string accession_number;
+
+        int instance_number;
+        float size_mb;
         std::string dcm_path;
+
         std::string preprocess_mask_path;
         std::string annotation_ai_path;
         std::string ai_intermediate_data_path;
-        float size_mb;
     };
 
     struct AnnoItem {

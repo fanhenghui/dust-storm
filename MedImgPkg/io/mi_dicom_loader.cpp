@@ -282,8 +282,7 @@ IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffer
     //////////////////////////////////////////////////////////////////////////
     // 4 Construct image data header
     img_data_header.reset(new ImageDataHeader());
-    IOStatus data_heading_status =
-        construct_data_header(data_format_set, img_data_header);
+    IOStatus data_heading_status = construct_data_header(data_format_set[0], img_data_header);
 
     if (IO_SUCCESS != data_heading_status) {
         set_progress(100);
@@ -371,8 +370,7 @@ IOStatus DICOMLoader::load_series(std::vector<std::string>& files,
     //////////////////////////////////////////////////////////////////////////
     // 4 Construct image data header
     img_data_header.reset(new ImageDataHeader());
-    IOStatus data_heading_status =
-        construct_data_header(data_format_set, img_data_header);
+    IOStatus data_heading_status = construct_data_header(data_format_set[0], img_data_header);
 
     if (IO_SUCCESS != data_heading_status) {
         set_progress(100);
@@ -626,10 +624,10 @@ IOStatus DICOMLoader::sort_series(DcmFileFormatSet& file_format_set) {
         new_set[idx++] = file_format_set[it->second];
     }
 
-    DcmDataset* data_set_first = new_set[0]->getDataset();
+    DcmDataset* data_set = new_set[0]->getDataset();
     DcmDataset* data_set_last = new_set[new_set.size() - 1]->getDataset();
     Point3 pt_first, pt_last;
-    get_image_position(data_set_first, pt_first);
+    get_image_position(data_set, pt_first);
     get_image_position(data_set_last, pt_last);
 
     if (pt_first.z <
@@ -649,58 +647,57 @@ IOStatus DICOMLoader::sort_series(DcmFileFormatSet& file_format_set) {
 }
 
 IOStatus DICOMLoader::construct_data_header(
-    DcmFileFormatSet& file_format_set,
+    DcmFileFormatPtr& file_format,
     std::shared_ptr<ImageDataHeader> img_data_header) {
     IOStatus io_status = IO_DATA_DAMAGE;
 
     try {
-        DcmFileFormatPtr file_format_first = file_format_set[0];
-        DcmDataset* data_set_first = file_format_first->getDataset();
-
-        if (!data_set_first) {
+        DcmDataset* data_set = file_format->getDataset();
+        if (!data_set) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Get data set failed!");
         }
 
-        DcmMetaInfo* meta_info_first = file_format_first->getMetaInfo();
-
-        if (!meta_info_first) {
+        DcmMetaInfo* meta_info = file_format->getMetaInfo();
+        if (!meta_info) {
             io_status = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Get meta infp failed!");
         }
 
+        std::string err_info = "";
+
+        // 4.0 Get SOP Instance UID 
+        if (!get_sop_instance_uid(data_set, img_data_header)) {
+            err_info += "Parse tag SOPInstanceUID failed! ";
+        }
+
         // 4.1 Get Transfer Syntax UID
-        if (!get_transfer_syntax_uid(meta_info_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag TransferSyntaxUID failed!");
+        if (!get_transfer_syntax_uid(meta_info, img_data_header)) {
+            err_info += "Parse tag TransferSyntaxUID failed! ";
         }
 
         // 4.2 Get Study UID
-        if (!get_study_uid(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag StudyUID failed!");
+        if (!get_study_uid(data_set, img_data_header)) {
+            err_info += "Parse tag StudyUID failed! ";
         }
 
         // 4.3 Get Series UID
-        if (!get_series_uid(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag SeriesUID failed!");
+        if (!get_series_uid(data_set, img_data_header)) {
+            err_info += "Parse tag SeriesUID failed! ";
         }
 
         // 4.4 Get Date
-        if (!get_content_time(data_set_first, img_data_header)) {
+        if (!get_content_time(data_set, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag ContentTime failed!");
         }
 
         // 4.5 Get Modality
         OFString modality;
-        OFCondition status =
-            data_set_first->findAndGetOFString(DCM_Modality, modality);
+        OFCondition status = data_set->findAndGetOFString(DCM_Modality, modality);
 
         if (status.bad()) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag Modality failed!");
+            err_info += "Parse tag Modality failed! ";
         }
 
         if ("CT" == modality) {
@@ -711,79 +708,76 @@ IOStatus DICOMLoader::construct_data_header(
             img_data_header->modality = PT;
         } else if ("CR" == modality) {
             img_data_header->modality = CR;
+        } else if ("RT_STRUCT" == modality) {
+            img_data_header->modality = RT_STRUCT;
         } else {
-            io_status = IO_UNSUPPORTED_YET;
-            IO_THROW_EXCEPTION("Unsupport modality YET!");
+            err_info += "Unsupport modality YET! ";
         }
 
         // 4.6 Manufacturer
-        if (!get_manufacturer(data_set_first, img_data_header)) {
+        if (!get_manufacturer(data_set, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag Manufacturer failed!");
         }
 
         // 4.7 Manufacturer model
-        if (!get_manufacturer_model_name(data_set_first, img_data_header)) {
+        if (!get_manufacturer_model_name(data_set, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag ManufacturerModelName failed!");
         }
 
         // 4.8 Patient name
-        if (!get_patient_name(data_set_first, img_data_header)) {
+        if (!get_patient_name(data_set, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientName failed!");
         }
 
         // 4.9 Patient ID
-        if (!get_patient_id(data_set_first, img_data_header)) {
+        if (!get_patient_id(data_set, img_data_header)) {
             // io_status = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientID failed!");
         }
 
         // 4.10 Patient Sex(很多图像都没有这个Tag)
-        if (!get_patient_sex(data_set_first, img_data_header)) {
+        if (!get_patient_sex(data_set, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag PatientSex failed!");
         }
 
         // 4.11 Patient Age(很多图像都没有这个Tag)
-        if (!get_patient_age(data_set_first, img_data_header)) {
+        if (!get_patient_age(data_set, img_data_header)) {
             /*eLoadingStatus = IO_DATA_DAMAGE;
             IO_THROW_EXCEPTION("Parse tag PatientAge failed!");*/
         }
 
         // 4.12 Slice thickness (不是一定必要)
-        if (!get_slice_thickness(data_set_first, img_data_header)) {
+        if (!get_slice_thickness(data_set, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag SliceThickness failed!");
         }
 
         // 4.13 KVP (CT only)
-        if (!get_kvp(data_set_first, img_data_header)) {
+        if (!get_kvp(data_set, img_data_header)) {
             // eLoadingStatus = IO_DATA_DAMAGE;
             // IO_THROW_EXCEPTION("Parse tag KVP failed!");
         }
 
         // 4.14 Patient position
-        if (!get_patient_position(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PatientPositio failed!");
+        if (!get_patient_position(data_set, img_data_header)) {
+            err_info += "Parse tag PatientPositio failed! ";
         }
 
         // 4.15 Samples per Pixel
-        if (!get_sample_per_pixel(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag SamplePerPixel failed!");
+        if (!get_sample_per_pixel(data_set, img_data_header)) {
+            err_info += "Parse tag SamplePerPixel failed! ";
         }
 
         // 4.16 Photometric Interpretation
         OFString pi;
-        status =
-            data_set_first->findAndGetOFString(DCM_PhotometricInterpretation, pi);
+        status = data_set->findAndGetOFString(DCM_PhotometricInterpretation, pi);
 
         if (status.bad()) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PhotometricInterpretation failed!");
+            err_info += "Parse tag PhotometricInterpretation failed! ";
         }
 
         const std::string pi_std = std::string(pi.c_str());
@@ -795,47 +789,44 @@ IOStatus DICOMLoader::construct_data_header(
         } else if ("RGB" == pi_std) {
             img_data_header->photometric_interpretation = PI_RGB;
         } else {
-            io_status = IO_UNSUPPORTED_YET;
-            IO_THROW_EXCEPTION("Unsupport photometric Interpretation YET!");
+            err_info += "Unsupport photometric Interpretation YET! ";
         }
 
         // 4.17 Rows
-        if (!get_rows(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag Rows failed!");
+        if (!get_rows(data_set, img_data_header)) {
+            err_info += "Parse tag Rows failed! ";
         }
 
         // 4.18 Columns
-        if (!get_columns(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag Columns failed!");
+        if (!get_columns(data_set, img_data_header)) {
+            err_info += "Parse tag Columns failed! ";
         }
 
         // 4.19 Pixel Spacing
-        if (!get_pixel_spacing(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PixelSpacing failed!");
+        if (!get_pixel_spacing(data_set, img_data_header)) {
+            err_info += "Parse tag PixelSpacing failed! ";
         }
 
         // 4.20 Bits Allocated
-        if (!get_bits_allocated(data_set_first, img_data_header)) {
-            io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag BitsAllocated failed!");
+        if (!get_bits_allocated(data_set, img_data_header)) {
+            err_info += "Parse tag BitsAllocated failed! ";
         }
 
         // 4.21 Pixel Representation
-        if (!get_pixel_representation(data_set_first, img_data_header)) {
+        if (!get_pixel_representation(data_set, img_data_header)) {
+            err_info += "Parse tag PixelRepresentation failed! ";
+        }
+        
+        if (!err_info.empty()) {
             io_status = IO_DATA_DAMAGE;
-            IO_THROW_EXCEPTION("Parse tag PixelRepresentation failed!");
+            IO_THROW_EXCEPTION(err_info);
         }
 
         return IO_SUCCESS;
     } catch (const Exception& e) {
-        // TODO LOG
         MI_IO_LOG(MI_FATAL) << "construct header failed : " << e.what();
         return io_status;
     } catch (const std::exception& e) {
-        // TODO LOG
         MI_IO_LOG(MI_FATAL) << "construct header failed : " << e.what();
         return io_status;
     }
@@ -848,11 +839,11 @@ IOStatus DICOMLoader::construct_image_data(
     const unsigned int slice_count =
         static_cast<unsigned int>(file_format_set.size());
     DcmFileFormatPtr file_format_first = file_format_set[0];
-    DcmDataset* data_set_first = file_format_first->getDataset();
+    DcmDataset* data_set = file_format_first->getDataset();
 
     // Intercept and slope
-    get_intercept(data_set_first, image_data->_intercept);
-    get_slope(data_set_first, image_data->_slope);
+    get_intercept(data_set, image_data->_intercept);
+    get_slope(data_set, image_data->_slope);
 
     data_header->slice_location.resize(slice_count);
     data_header->image_position.resize(slice_count);
@@ -927,7 +918,7 @@ IOStatus DICOMLoader::construct_image_data(
     Vector3 row_orientation;
     Vector3 column_orientation;
 
-    if (!get_image_orientation(data_set_first, row_orientation,
+    if (!get_image_orientation(data_set, row_orientation,
                                  column_orientation)) {
         return IO_DATA_DAMAGE;
     }
@@ -1203,6 +1194,20 @@ bool DICOMLoader::get_study_uid(
     return true;
 }
 
+bool DICOMLoader::get_sop_instance_uid(
+    DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
+    OFString context;
+    OFCondition status =
+        data_set->findAndGetOFString(DCM_SOPInstanceUID, context);
+
+    if (status.bad()) {
+        return false;
+    }
+
+    img_data_header->sop_instance_uid = std::string(context.c_str());
+    return true;
+}
+
 bool DICOMLoader::get_sample_per_pixel(
     DcmDataset* data_set, std::shared_ptr<ImageDataHeader>& img_data_header) {
     unsigned short context = 0;
@@ -1472,6 +1477,36 @@ void DICOMLoader::set_progress(int value) {
         _model->set_progress(value);
         _model->notify();
     }
+}
+
+IOStatus DICOMLoader::load_dicom(std::string& file, std::shared_ptr<ImageDataHeader>& img_data_header) {
+    if (file.empty()) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->loadFile(file.c_str());
+
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    img_data_header.reset(new ImageDataHeader());
+    IOStatus data_heading_status = construct_data_header(file_format, img_data_header);
+
+    if (IO_SUCCESS != data_heading_status) {
+        set_progress(100);
+        img_data_header.reset();
+        return data_heading_status;
+    }
+
+    return IO_SUCCESS;
 }
 
 MED_IMG_END_NAMESPACE
