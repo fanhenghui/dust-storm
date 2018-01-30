@@ -79,10 +79,6 @@ Cell.prototype.handleJpegBuffer = function(buffer, bufferOffset, dataLen, restDa
     this.jpegStr += String.fromCharCode.apply(null, imgBuffer);
     if(restDataLen <= 0) {
         this.jpegImg.src =  'data:image/jpg;base64,' + btoa(this.jpegStr);
-        loadImg = (function(){
-            refreshCanvas(this.canvas, this.jpegImg);
-        }).bind(this);
-        this.jpegImg.onload = loadImg;
     }
 }
 
