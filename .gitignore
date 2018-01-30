@@ -310,3 +310,6 @@ be_path*
 
 #bower components
 bower_components/
+
+#npm
+package-lock.json
