@@ -14,7 +14,6 @@ struct DcmInfo {
     std::string patient_id;
     std::string patient_name;
     std::string patient_sex;
-    std::string patient_age;
     std::string patient_birth_date;
     std::string modality;
     std::string instance_number;

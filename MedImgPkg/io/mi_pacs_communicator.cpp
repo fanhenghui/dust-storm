@@ -47,9 +47,6 @@ static void fill_dcm_info(DcmDataset* dataset, DcmInfo& info) {
     if (dataset->findAndGetOFString(DCM_PatientBirthDate, str).good()) {
         info.patient_birth_date = std::string(str.c_str());
     }
-    if (dataset->findAndGetOFString(DCM_PatientAge, str).good()) {
-        info.patient_age = std::string(str.c_str());
-    }
     if (dataset->findAndGetOFString(DCM_NumberOfSeriesRelatedInstances, str).good()) {
         info.instance_number = std::string(str.c_str());
     }
@@ -182,15 +179,11 @@ int PACSCommunicator::try_connect() {
     return 0;
 }
 
-int PACSCommunicator::retrieve_all_series(std::vector<DcmInfo>& dcm_infos) {
-    return retrieve_series(dcm_infos, QueryKey());
-}
-
 inline bool check_num(char num) {
     return (num >= '0' && num <= '9');
 }
 
-int PACSCommunicator::retrieve_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key) {
+int PACSCommunicator::query_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key) {
     if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before query series.";
         return -1;
@@ -296,7 +289,7 @@ int PACSCommunicator::retrieve_series(std::vector<DcmInfo>& dcm_infos, const Que
     return 0;
 }
 
-int PACSCommunicator::fetch_series(const std::string& series_id, const std::string& map_path) {
+int PACSCommunicator::retrieve_series(const std::string& series_id, const std::string& map_path) {
     if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_id;
         return -1;

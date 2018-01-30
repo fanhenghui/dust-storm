@@ -117,6 +117,15 @@ message MsgMPRMaskOverlay {
     float opacity = 2;
 };
 
+message MsgDCMQueryKey {
+    string study_date = 1;
+    string patient_id = 2;
+    string patient_name = 3;
+    string modality = 4;
+    string accession_number = 5;
+    string patient_sex = 6;
+};
+
 //for DB server to BE server
 message MsgAnnotationUnitDB {
     float x = 1; //center x
@@ -161,11 +170,20 @@ message MsgDcmInfo {
     string patient_id = 5;
     string patient_name = 6;
     string patient_sex = 7;
-    string patient_age = 8;
-    string patient_birth_date = 9;
-    string modality = 10;
+    string patient_birth_date = 8;
+    string modality = 9;
+    string instance_number = 10;
+    string accession_number = 11;
 };
 
 message MsgDcmInfoCollection {
     repeated MsgDcmInfo dcminfo = 1;
 };
+
+message NsgDcmStudy {
+    repeated MsgDcmInfo series = 1;
+};
+
+message MsgDcmStudyCollection {
+    repeated NsgDcmStudy studies = 1;
+}

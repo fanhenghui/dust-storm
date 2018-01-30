@@ -123,19 +123,24 @@ void OBAnnotationList::update(int code_id) {
             return;
     }
 
-    char* buffer = nullptr;
-    int buffer_size = 0;
-    if (0 != protobuf_serialize(msg, buffer, buffer_size)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialized annotation list msg buffer failed.";
-        return;
-    }
-    msg.Clear();
+    if (msg.annotation_size() != 0) {
+        char* buffer = nullptr;
+        int buffer_size = 0;
+        if (0 != protobuf_serialize(msg, buffer, buffer_size)) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "serialized annotation list msg buffer failed.";
+            return;
+        }
+        msg.Clear();
     
-    header.data_len = static_cast<unsigned int>(buffer_size);
-    controller->get_client_proxy()->sync_send_data(header, buffer);
-    if (buffer != nullptr) {
-        delete [] buffer;
+        header.data_len = static_cast<unsigned int>(buffer_size);
+        controller->get_client_proxy()->sync_send_data(header, buffer);
+        if (buffer != nullptr) {
+            delete [] buffer;
+        }
+    } else {
+        MI_APPCOMMON_LOG(MI_INFO) << "annotations is empty, no need to send annotation list msg to FE.";
     }
+    
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT OBAnnotationList";
 }
 

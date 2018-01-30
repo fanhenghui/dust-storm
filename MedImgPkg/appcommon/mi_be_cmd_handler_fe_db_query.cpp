@@ -1,4 +1,4 @@
-#include "mi_be_cmd_handler_fe_db_retrieve.h"
+#include "mi_be_cmd_handler_fe_db_query.h"
 
 #include <vector>
 
@@ -15,13 +15,13 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-BECmdHandlerFEDBRetrieve::BECmdHandlerFEDBRetrieve(std::shared_ptr<AppController> controller)
+BECmdHandlerFEDBQuery::BECmdHandlerFEDBQuery(std::shared_ptr<AppController> controller)
     : _controller(controller) {}
 
-BECmdHandlerFEDBRetrieve::~BECmdHandlerFEDBRetrieve() {}
+BECmdHandlerFEDBQuery::~BECmdHandlerFEDBQuery() {}
 
-int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, char* buffer) {
-    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEDBRetrieve";
+int BECmdHandlerFEDBQuery::handle_command(const IPCDataHeader& dataheader, char* buffer) {
+    MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEDBQuery";
     
     MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
@@ -64,12 +64,12 @@ int BECmdHandlerFEDBRetrieve::handle_command(const IPCDataHeader& dataheader, ch
     IPCDataHeader header;
     header.sender = static_cast<unsigned int>(controller->get_local_pid());
     header.receiver = static_cast<unsigned int>(controller->get_server_pid());
-    header.msg_id = COMMAND_ID_FE_BE_DB_RETRIEVE_RESULT;
+    header.msg_id = COMMAND_ID_FE_BE_DB_QUERY_RESULT;
     header.data_len = msg_size;
 
     controller->get_client_proxy()->sync_send_data(header, msg_buffer);
 
-    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEDBRetrieve";
+    MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerFEDBQuery";
     return 0;
 }
 

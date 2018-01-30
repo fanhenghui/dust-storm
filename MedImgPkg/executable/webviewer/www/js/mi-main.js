@@ -72,7 +72,7 @@
         }
     }
  
-    function handleBEDBRetrieve(arrayBuffer) { 
+    function handleBEDBQuery(arrayBuffer) { 
         console.log('recv DB retrieve.');
         let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
         if (!message) {
@@ -107,7 +107,7 @@
         });
     }
 
-    function handleBEPACSRetrieve(arrayBuffer) {
+    function handleBEPACSQuery(arrayBuffer) {
         let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
         if (!message) {
             reutrn;
@@ -280,9 +280,9 @@
                     handleBEReady(packageBuffer);
                 }
                 break;
-            case COMMAND_ID_FE_BE_DB_RETRIEVE_RESULT:
+            case COMMAND_ID_FE_BE_DB_QUERY_RESULT:
                 if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
-                    handleBEDBRetrieve(packageBuffer);
+                    handleBEDBQuery(packageBuffer);
                 }
                 break;
             case COMMAND_ID_FE_BE_HEARTBEAT:
@@ -293,9 +293,9 @@
                     handleEvaluationResult(packageBuffer);
                 }
                 break;
-            case COMMAND_ID_FE_BE_PACS_RETRIEVE_RESULT:
+            case COMMAND_ID_FE_BE_PACS_QUERY_RESULT:
                 if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
-                    handleBEPACSRetrieve(packageBuffer);
+                    handleBEPACSQuery(packageBuffer);
                 }
                 break;
             default:
@@ -557,19 +557,19 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_DB_RETRIEVE, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_DB_QUERY, 0, 0, null);
     }
 
-    function retrievePACS() {
+    function queryPACS() {
         if (!revcBEReady) {
             console.log('BE not ready!');
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_PACS_RETRIEVE, 0, 0, null);
+        socketClient.sendData(COMMAND_ID_BE_FE_PACS_QUERY, 0, 0, null);
     }
 
-    function fetchPACS() {
+    function retrievePACS() {
         if (!revcBEReady) {
             console.log('BE not ready!');
             alert('BE not ready!');
@@ -592,7 +592,7 @@
 
         let buffer = Protobuf.encode(socketClient, 'MsgString', {context:choosedIndex});
         if (buffer) {
-            socketClient.sendData(COMMAND_ID_BE_FE_PACS_FETCH, 0, 0, buffer.byteLength, buffer);
+            socketClient.sendData(COMMAND_ID_BE_FE_PACS_RETRIEVE, 0, 0, buffer.byteLength, buffer);
         }        
     }
 
@@ -955,17 +955,17 @@
             }
         }
 
-        let queryPACSBtn = document.getElementById('btn-retrieve-pacs');
+        let queryPACSBtn = document.getElementById('btn-query-pacs');
         if (queryPACSBtn) {
             queryPACSBtn.onclick = function() {
-                retrievePACS();
+                queryPACS();
             }
         }
 
-        let fetchPACSBtn = document.getElementById('btn-fetch-pacs');
-        if (fetchPACSBtn) {
-            fetchPACSBtn.onclick = function() {
-                fetchPACS();
+        let retrievePACSBtn = document.getElementById('btn-retrieve-pacs');
+        if (retrievePACSBtn) {
+            retrievePACSBtn.onclick = function() {
+                retrievePACS();
             }
         }
 

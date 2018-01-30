@@ -15,9 +15,9 @@
 #include "appcommon/mi_be_cmd_handler_fe_shutdown.h"
 #include "appcommon/mi_be_cmd_handler_fe_heartbeat.h"
 #include "appcommon/mi_be_cmd_handler_fe_play_vr.h"
-#include "appcommon/mi_be_cmd_handler_fe_pacs_fetch.h"
+#include "appcommon/mi_be_cmd_handler_fe_pacs_retrieve.h"
 #include "appcommon/mi_be_cmd_handler_fe_anonymization.h"
-#include "appcommon/mi_be_cmd_handler_fe_db_retrieve.h"
+#include "appcommon/mi_be_cmd_handler_fe_db_query.h"
 #include "appcommon/mi_be_cmd_handler_fe_back_to_worklist.h"
 #include "appcommon/mi_be_operation_fe_mpr_paging.h"
 #include "appcommon/mi_be_operation_fe_pan.h"
@@ -37,9 +37,9 @@
 #include "appcommon/mi_be_cmd_handler_db_send_end_signal.h"
 #include "appcommon/mi_be_cmd_handler_db_send_error.h"
 #include "appcommon/mi_be_cmd_handler_db_send_preprocess_mask.h"
-#include "appcommon/mi_be_cmd_handler_fe_pacs_retrieve.h"
+#include "appcommon/mi_be_cmd_handler_fe_pacs_query.h"
+#include "appcommon/mi_be_cmd_handler_db_pacs_query_result.h"
 #include "appcommon/mi_be_cmd_handler_db_pacs_retrieve_result.h"
-#include "appcommon/mi_be_cmd_handler_db_pacs_fetch_result.h"
 
 #include "mi_operation_init.h"
 
@@ -73,14 +73,14 @@ void ReviewController::register_command_handler() {
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEOperation(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PLAY_VR,
     std::shared_ptr<BECmdHandlerFEPlayVR>(new BECmdHandlerFEPlayVR(app_controller)));
-    _proxy->register_command_handler(COMMAND_ID_BE_FE_DB_RETRIEVE,
-    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEDBRetrieve(app_controller)));
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_DB_QUERY,
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEDBQuery(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_BACK_TO_WORKLIST, 
     std::shared_ptr<ICommandHandler> (new BECmdHandlerFEBackToWorklist(app_controller)));
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_QUERY, 
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSQuery(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_RETRIEVE, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSRetrieve(app_controller)));
-    _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_FETCH, 
-    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSFetch(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_ANONYMIZATION, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEAnonymization(app_controller)));
 
@@ -125,10 +125,10 @@ void ReviewController::register_command_handler() {
     std::shared_ptr<ICommandHandler>(new BECmdHandlerDBSendEndSignal(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_SEND_ERROR, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerDBSendError(app_controller)));
+    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_QUERY_RESULT, 
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerDBPACSQueryResult(app_controller)));
     _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_RETRIEVE_RESULT, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerDBPACSRetrieveResult(app_controller)));
-    _client_proxy_dbs->register_command_handler(COMMAND_ID_BE_DB_PACS_FETCH_RESULT, 
-    std::shared_ptr<ICommandHandler>(new BECmdHandlerDBPACSFetchResult(app_controller)));
 }
 
 void ReviewController::init_default_model() {

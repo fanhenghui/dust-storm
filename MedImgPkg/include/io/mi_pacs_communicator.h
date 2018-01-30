@@ -32,9 +32,8 @@ public:
                 const std::string& client_ae_title, unsigned short client_port);
     void disconnect();
 
-    int retrieve_all_series(std::vector<DcmInfo>& dcm_infos);
-    int retrieve_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
-    int fetch_series(const std::string& series_id, const std::string& map_path);
+    int query_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
+    int retrieve_series(const std::string& series_id, const std::string& map_path);
 
 private:
     int try_connect();

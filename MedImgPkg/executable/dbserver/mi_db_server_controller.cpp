@@ -16,7 +16,7 @@
 #include "mi_db_operation_be_fetch_preprocess_mask.h"
 #include "mi_db_operation_be_request_end.h"
 #include "mi_db_operation_be_pacs_retrieve.h"
-#include "mi_db_operation_be_pacs_fetch.h"
+#include "mi_db_operation_be_pacs_query.h"
 #include "mi_db_cmd_handler_ai_operation.h"
 #include "mi_db_operation_ai_send_evaluation.h"
 #include "mi_db_operation_ai_ready.h"
@@ -56,10 +56,10 @@ void DBServerController::initialize() {
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_REQUEST_END, 
         std::shared_ptr<DBOpBERequestEnd>(new DBOpBERequestEnd()));
     
+    OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_QUERY, 
+        std::shared_ptr<DBOpBEPACSQuery>(new DBOpBEPACSQuery()));
     OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_RETRIEVE, 
         std::shared_ptr<DBOpBEPACSRetrieve>(new DBOpBEPACSRetrieve()));
-    OperationFactory::instance()->register_operation(OPERATION_ID_DB_BE_PACS_FETCH, 
-        std::shared_ptr<DBOpBEPACSFetch>(new DBOpBEPACSFetch()));
 
     //register cmd handler for AI server
     _server_proxy_ais->register_command_handler(COMMAND_ID_DB_AI_OPERATION, 

@@ -1,5 +1,5 @@
-#ifndef MEDIMG_APPCOMMON_MI_BE_CMD_HANDLER_FE_PACS_FETCH_H
-#define MEDIMG_APPCOMMON_MI_BE_CMD_HANDLER_FE_PACS_FETCH_H
+#ifndef MEDIMG_APPCOMMON_MI_BE_CMD_HANDLER_FE_PACS_QUERY_H
+#define MEDIMG_APPCOMMON_MI_BE_CMD_HANDLER_FE_PACS_QUERY_H
 
 #include "appcommon/mi_app_common_export.h"
 #include "util/mi_ipc_common.h"
@@ -8,10 +8,10 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class AppController;
-class AppCommon_Export BECmdHandlerFEPACSFetch : public ICommandHandler {
+class AppCommon_Export BECmdHandlerFEPACSQuery : public ICommandHandler {
 public:
-    explicit BECmdHandlerFEPACSFetch(std::shared_ptr<AppController> controller);
-    virtual ~BECmdHandlerFEPACSFetch();
+    explicit BECmdHandlerFEPACSQuery(std::shared_ptr<AppController> controller);
+    virtual ~BECmdHandlerFEPACSQuery();
 
     virtual int handle_command(const IPCDataHeader& dataheader, char* buffer);
 

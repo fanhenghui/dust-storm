@@ -1,5 +1,7 @@
 #include "io/mi_pacs_communicator.h"
 #include "io/mi_io_logger.h"
+#include "io/mi_configure.h"
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,11 +23,13 @@ int pacs_ut(int argc, char* argv[]) {
     }
 #endif
 
-    const std::string PACSServerAETitle = "DCM4CHEE";
-    const std::string PACSServerHost = "192.168.199.107";
-    const unsigned short PACSServerPort = 11112;
-    const std::string PACSClientAETitle = "DBS";
-    const unsigned short PACSClientPort = 11115;
+    std::string PACSServerAETitle = "DCM4CHEE";
+    std::string PACSServerHost = "192.168.199.107";
+    unsigned short PACSServerPort = 11112;
+    std::string PACSClientAETitle = "DBS";
+    unsigned short PACSClientPort = 11115;
+
+    Configure::instance()->get_pacs_info(PACSServerAETitle, PACSServerHost, PACSServerPort, PACSClientAETitle, PACSClientPort);
 
     PACSCommunicator pacs_comm;
     if(-1 == pacs_comm.connect(PACSServerAETitle, PACSServerHost, PACSServerPort, PACSClientAETitle, PACSClientPort)) {
@@ -38,13 +42,13 @@ int pacs_ut(int argc, char* argv[]) {
     // }
 
     QueryKey query_key;
-    query_key.study_date = "19990201-20151010";
+    //query_key.study_date = "19990201-20151010";
     //query_key.patient_id = "A*";
     //query_key.accession_number = "2819497684894126";
     //query_key.patient_name = "A*";
     //query_key.modality = "CT";
-    query_key.patient_sex = "M";
-    if(-1 == pacs_comm.retrieve_series(dcm_infos, query_key)) {
+    //query_key.patient_sex = "M";
+    if(-1 == pacs_comm.query_series(dcm_infos, query_key)) {
         return -1;
     }
 
@@ -73,7 +77,7 @@ int pacs_ut(int argc, char* argv[]) {
             MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
         } else if(query_id == -2) {
             MI_IO_LOG(MI_INFO) << "query all series again.";
-            if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
+            if(-1 == pacs_comm.query_series(dcm_infos, QueryKey())) {
                 return -1;
             }
             MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
@@ -87,8 +91,8 @@ int pacs_ut(int argc, char* argv[]) {
             pacs_comm.disconnect();
             break;
         } else if(query_id >= 0 && query_id < id) {
-            MI_IO_LOG(MI_DEBUG) << "fetch series: " << dcm_infos[query_id].series_id;
-            pacs_comm.fetch_series(dcm_infos[query_id].series_id, "/home/wangrui22/data/cache");
+            MI_IO_LOG(MI_DEBUG) << "retrieve series: " << dcm_infos[query_id].series_id;
+            pacs_comm.retrieve_series(dcm_infos[query_id].series_id, "/home/wangrui22/data/cache");
         } else {
             MI_IO_LOG(MI_WARNING) << "invalid query ID.";
         }
