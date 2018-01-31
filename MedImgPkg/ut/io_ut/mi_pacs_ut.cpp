@@ -35,7 +35,7 @@ int pacs_ut(int argc, char* argv[]) {
     if(-1 == pacs_comm.connect(PACSServerAETitle, PACSServerHost, PACSServerPort, PACSClientAETitle, PACSClientPort)) {
         return -1;
     }
-
+    std::vector<DcmInstanceInfo> instance_infos;
     std::vector<DcmInfo> dcm_infos;
     // if(-1 == pacs_comm.retrieve_all_series(dcm_infos)) {
     //     return -1;
@@ -56,11 +56,12 @@ int pacs_ut(int argc, char* argv[]) {
     int id = 0;
     for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
         const std::string series_id = (*it).series_id;
-        MI_IO_LOG(MI_DEBUG) << id++ <<": " << (*it).series_id << "\n"
-            << "instance_number: " << (*it).instance_number
-            << ", patient_id: " << (*it).patient_id
-            << ", patient_name: " << (*it).patient_name 
-            << ", accession_number: " << (*it).accession_number; 
+        MI_IO_LOG(MI_DEBUG) << id++ <<": series_id" << (*it).series_id << "\n"
+            << "study_id: " << (*it).study_id << "\n"
+            << "instance_number: " << (*it).number_of_instance << "\n"
+            << ", patient_id: " << (*it).patient_id << "\n"
+            << ", patient_name: " << (*it).patient_name << "\n"
+            << ", accession_number: " << (*it).accession_number << "\n\n"; 
     }
 
     MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
@@ -92,7 +93,8 @@ int pacs_ut(int argc, char* argv[]) {
             break;
         } else if(query_id >= 0 && query_id < id) {
             MI_IO_LOG(MI_DEBUG) << "retrieve series: " << dcm_infos[query_id].series_id;
-            pacs_comm.retrieve_series(dcm_infos[query_id].series_id, "/home/wangrui22/data/cache");
+            instance_infos.clear();
+            pacs_comm.retrieve_series(dcm_infos[query_id].series_id, "/home/wangrui22/data/cache", &instance_infos);
         } else {
             MI_IO_LOG(MI_WARNING) << "invalid query ID.";
         }

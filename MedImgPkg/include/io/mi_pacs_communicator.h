@@ -12,15 +12,6 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-struct QueryKey {
-    std::string study_date;
-    std::string patient_id;
-    std::string patient_name;
-    std::string modality;
-    std::string accession_number;
-    std::string patient_sex;
-};
-
 class MIDcmSCU;
 class MIDcmSCP;
 class IO_Export PACSCommunicator {
@@ -32,12 +23,15 @@ public:
                 const std::string& client_ae_title, unsigned short client_port);
     void disconnect();
 
+    int query_study(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
     int query_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
-    int retrieve_series(const std::string& series_id, const std::string& map_path);
+    int retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<DcmInstanceInfo>* instance_infos = nullptr);
 
 private:
     int try_connect();
     void run_scp();
+
+    int query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, const std::string& query_level);
 
 private:
     struct ConnectionCache;

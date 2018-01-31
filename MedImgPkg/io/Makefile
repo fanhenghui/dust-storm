@@ -56,7 +56,7 @@ mi_dcm_scu.o: mi_dcm_scu.cpp mi_dcm_scu.h
 mi_dcm_scp.o: mi_dcm_scp.cpp mi_dcm_scp.h 
 	$(CC) -c -fPIC $(CFLAGS) mi_dcm_scp.cpp $(ADDITINAL_INCLUDE_DIR)
 
-mi_pacs_communicator.o: mi_pacs_communicator.cpp mi_pacs_communicator.h 
+mi_pacs_communicator.o: mi_pacs_communicator.cpp mi_pacs_communicator.h mi_dcm_scu.o mi_dcm_scp.o
 	$(CC) -c -fPIC $(CFLAGS) mi_pacs_communicator.cpp $(ADDITINAL_INCLUDE_DIR)
 
 .PHONY : clean
