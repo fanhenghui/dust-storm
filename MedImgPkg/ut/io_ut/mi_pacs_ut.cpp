@@ -48,23 +48,65 @@ int pacs_ut(int argc, char* argv[]) {
     //query_key.patient_name = "A*";
     //query_key.modality = "CT";
     //query_key.patient_sex = "M";
+
+    if(-1 == pacs_comm.query_study(dcm_infos, query_key)) {
+        return -1;
+    }
+
+    MI_IO_LOG(MI_WARNING) << "<><><><><><> STUDY QUERY RESULT <><><><><><>\n";
+    int id = 0;
+    for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
+        const std::string series_id = (*it).series_id;
+        const DcmInfo& info = *it;
+        
+        MI_IO_LOG(MI_DEBUG) << id++ <<": " << std::endl
+        << "study_id: " << info.study_id << std::endl
+        << "series_id: " << info.series_id << std::endl
+        << "study_date: " << info.study_date << std::endl
+        << "study_time: " << info.study_time << std::endl
+        << "patient_id: " << info.patient_id << std::endl
+        << "patient_name: " << info.patient_name << std::endl
+        << "patient_sex: " << info.patient_sex << std::endl
+        << "patient_birth_date: " << info.patient_birth_date << std::endl
+        << "modality: " << info.modality << std::endl
+        << "accession_number: " << info.accession_number << std::endl
+        << "series_no: " << info.series_no << std::endl
+        << "institution: " << info.institution << std::endl
+        << "series_desc: " << info.series_desc << std::endl
+        << "study_desc: " << info.study_desc << std::endl
+        << "number_of_instance: " << info.number_of_instance << std::endl
+        << "number_of_series: " << info.number_of_series << std::endl
+        << std::endl;
+    }
+
     if(-1 == pacs_comm.query_series(dcm_infos, query_key)) {
         return -1;
     }
 
-    MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
-    int id = 0;
+    MI_IO_LOG(MI_WARNING) << "<><><><><><> SERIES QUERY RESULT <><><><><><>\n";
     for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
         const std::string series_id = (*it).series_id;
-        MI_IO_LOG(MI_DEBUG) << id++ <<": series_id" << (*it).series_id << "\n"
-            << "study_id: " << (*it).study_id << "\n"
-            << "instance_number: " << (*it).number_of_instance << "\n"
-            << ", patient_id: " << (*it).patient_id << "\n"
-            << ", patient_name: " << (*it).patient_name << "\n"
-            << ", accession_number: " << (*it).accession_number << "\n\n"; 
+        const DcmInfo& info = *it;
+        
+        MI_IO_LOG(MI_DEBUG) << id++ <<": " << std::endl
+        << "study_id: " << info.study_id << std::endl
+        << "series_id: " << info.series_id << std::endl
+        << "study_date: " << info.study_date << std::endl
+        << "study_time: " << info.study_time << std::endl
+        << "patient_id: " << info.patient_id << std::endl
+        << "patient_name: " << info.patient_name << std::endl
+        << "patient_sex: " << info.patient_sex << std::endl
+        << "patient_birth_date: " << info.patient_birth_date << std::endl
+        << "modality: " << info.modality << std::endl
+        << "accession_number: " << info.accession_number << std::endl
+        << "series_no: " << info.series_no << std::endl
+        << "institution: " << info.institution << std::endl
+        << "series_desc: " << info.series_desc << std::endl
+        << "study_desc: " << info.study_desc << std::endl
+        << "number_of_instance: " << info.number_of_instance << std::endl
+        << "number_of_series: " << info.number_of_series << std::endl
+        << std::endl;
     }
-
-    MI_IO_LOG(MI_DEBUG) << "<><><><><><> QUERY RESULT <><><><><><>";
 
     int query_id = -1;
     while (std::cin >> query_id) {

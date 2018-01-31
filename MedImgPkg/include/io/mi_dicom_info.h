@@ -17,9 +17,12 @@ struct DcmInfo {
     std::string patient_birth_date;
     std::string modality;
     std::string accession_number;
+    std::string series_no;
+    std::string institution;
+    std::string series_desc;
+    std::string study_desc;
     int number_of_instance;
     int number_of_series;//just for study level query
-    //TODO add other series query key
 };
 
 struct DcmInstanceInfo {

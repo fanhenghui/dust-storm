@@ -50,24 +50,35 @@ inline void fill_dcm_info(DcmDataset* dataset, DcmInfo& info, const std::string&
     if (dataset->findAndGetOFString(DCM_StudyInstanceUID, str).good()) {
         info.study_id = std::string(str.c_str());
     }
-    
+    if (dataset->findAndGetOFString(DCM_StudyDescription, str).good()) {
+        info.study_desc = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_SeriesDescription, str).good()) {
+        info.series_desc = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_InstitutionName, str).good()) {
+        info.institution = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_SeriesNumber, str).good()) {
+        info.series_no = std::string(str.c_str());
+    }
+
+    if (dataset->findAndGetOFString(DCM_SeriesInstanceUID, str).good()) {
+        info.series_id = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedSeries, str).good()) {
+        info.number_of_series = atoi(str.c_str());
+    }
     if (QUERY_LEVEL_STUDY == query_level) {
         if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedInstances, str).good()) {
             info.number_of_instance = atoi(str.c_str());
         }
-        if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedSeries, str).good()) {
-            info.number_of_series = atoi(str.c_str());
-        }
-
     } else if (QUERY_LEVEL_SERIES == query_level){
-        if (dataset->findAndGetOFString(DCM_SeriesInstanceUID, str).good()) {
-            info.series_id = std::string(str.c_str());
-        }
         if (dataset->findAndGetOFString(DCM_NumberOfSeriesRelatedInstances, str).good()) {
             info.number_of_instance = atoi(str.c_str());
         }
     }
-} 
+}
 
 struct PACSCommunicator::ConnectionCache  {
     std::string server_ae_title;
@@ -275,12 +286,13 @@ int PACSCommunicator::query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key
     }
 
     query_key.putAndInsertString(DCM_PatientBirthDate, "");
-    if (QUERY_LEVEL_SERIES == query_level) {
-        query_key.putAndInsertString(DCM_NumberOfSeriesRelatedInstances, "");
-    } else {
-        query_key.putAndInsertString(DCM_NumberOfStudyRelatedInstances, "");
-        query_key.putAndInsertString(DCM_NumberOfStudyRelatedSeries, "");
-    }    
+    query_key.putAndInsertString(DCM_StudyDescription, "");
+    query_key.putAndInsertString(DCM_SeriesDescription, "");
+    query_key.putAndInsertString(DCM_InstitutionName, "");
+    query_key.putAndInsertString(DCM_SeriesNumber, "");
+    query_key.putAndInsertString(DCM_NumberOfSeriesRelatedInstances, "");
+    query_key.putAndInsertString(DCM_NumberOfStudyRelatedInstances, "");
+    query_key.putAndInsertString(DCM_NumberOfStudyRelatedSeries, "");
 
     const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
     if (id == 0) {
@@ -309,7 +321,6 @@ int PACSCommunicator::query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key
     }
     
     return 0;
-
 }
 
 int PACSCommunicator::query_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key) {
