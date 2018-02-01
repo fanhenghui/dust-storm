@@ -46,7 +46,7 @@ inline void fill_dcm_info(DcmDataset* dataset, DcmInfo& info, const std::string&
         info.patient_birth_date = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_AccessionNumber, str).good()) {
-        info.accession_number = std::string(str.c_str());
+        info.accession_no = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_StudyInstanceUID, str).good()) {
         info.study_id = std::string(str.c_str());
@@ -302,7 +302,7 @@ int PACSCommunicator::query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key
         &key.patient_id,
         &key.patient_name,
         &key.modality,
-        &key.accession_number,
+        &key.accession_no,
         &key.patient_sex,
         &key.patient_birth_date,
     };

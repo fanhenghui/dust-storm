@@ -19,7 +19,7 @@ LOCAL_LIB_DIR = /usr/local/lib
 VPATH = $(INCLUDE_ROOT_DIR)
 
 TARGET = $(BIN_DIR)/medimg_io_ut
-OBJECTS = mi_pacs_ut.o mi_targa_ut.o mi_dicom_loader_ut.o mi_rt_ut.o mi_md5_ut.o
+OBJECTS = mi_pacs_ut.o mi_targa_ut.o mi_dicom_loader_ut.o mi_rt_ut.o mi_md5_ut.o mi_db_ut.o
 MAINOBJ = mi_io_ut.o
 
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR)

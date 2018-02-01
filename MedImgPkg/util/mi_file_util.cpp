@@ -205,6 +205,7 @@ int FileUtil::read_raw(const std::string& path, void* buffer, unsigned int lengt
 int FileUtil::read_raw_ext(const std::string& path, char*& buffer, unsigned int& length) {
     if (path.empty()) {
         MI_UTIL_LOG(MI_ERROR) << "FileUtil::read_raw input path is empty.";
+        return -1;
     }
 
     std::ifstream in(path.c_str() , std::ios::in | std::ios::binary);
@@ -259,6 +260,25 @@ float FileUtil::get_size_mb(std::vector<std::string>& files) {
     }
 
     return size_sum/1024.0f;
+}
+
+int FileUtil::get_file_size(const std::string& path, long long& fsize) {
+    if (path.empty()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::get_file_size input path is empty.";
+        return -1;
+    }
+
+    std::ifstream in(path.c_str() , std::ios::in | std::ios::binary);
+
+    if (!in.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::get_file_size open file " << path << " failed.";
+        return -1;
+    }
+
+    in.seekg(0, std::ios::end);
+    fsize = in.tellg();
+    in.close();
+    return 0;
 }
 
 MED_IMG_END_NAMESPACE

@@ -9,14 +9,14 @@ MED_IMG_BEGIN_NAMESPACE
 struct DcmInfo {
     std::string study_id;
     std::string series_id;
-    std::string study_date;
-    std::string study_time;
+    std::string study_date;//format: YYYYMMDD
+    std::string study_time;//format: HHMMSS
     std::string patient_id;
     std::string patient_name;
     std::string patient_sex;
     std::string patient_birth_date;
     std::string modality;
-    std::string accession_number;
+    std::string accession_no;
     std::string series_no;
     std::string institution;
     std::string series_desc;
@@ -44,12 +44,12 @@ enum QueryLevel {
 struct QueryKey {
     std::string study_uid;
     std::string series_uid;
-    std::string study_date;
-    std::string study_time;
+    std::string study_date;//format: YYYYMMDD
+    std::string study_time;//format: HHMMSS
     std::string patient_id;
     std::string patient_name;
     std::string modality;
-    std::string accession_number;
+    std::string accession_no;
     std::string patient_sex;
     std::string patient_birth_date;
 };
