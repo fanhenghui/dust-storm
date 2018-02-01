@@ -38,7 +38,7 @@ inline void print_help() {
     << "\t\tpatient birth date. format: YYYYMMDD | YYYYMMDD-YYYYMMDD.\n"
     << "\t-modality\n"
     << "\t\tmodality. format: CT | MR | CR | PT | RT_STRUCT.\n"
-    << "\t-accession_number\n"
+    << "\t-accession_no\n"
     << "\t\taccession number.\n"
     << "\nretrieve\n"
     << "\t-series-uid\n"
@@ -129,9 +129,9 @@ int pacs_ut(int argc, char* argv[]) {
                 } else if (item[i] == "-modality") {
                     CHECK_INDEX;
                     qkey.modality = item[++i];       
-                } else if (item[i] == "-accession_number") {
+                } else if (item[i] == "-accession_no") {
                     CHECK_INDEX;
-                    qkey.accession_number = item[++i];       
+                    qkey.accession_no = item[++i];       
                 } else if (item[i] == "-patient_sex") {
                     CHECK_INDEX;
                     qkey.patient_sex = item[++i];       
@@ -152,7 +152,7 @@ int pacs_ut(int argc, char* argv[]) {
                 <<  "\t patient_id: " << qkey.patient_id << "\n"
                 <<  "\t patient_name: " << qkey.patient_name << "\n"
                 <<  "\t modality: " << qkey.modality << "\n"
-                <<  "\t accession_number: " << qkey.accession_number << "\n"
+                <<  "\t accession_no: " << qkey.accession_no << "\n"
                 <<  "\t patient_sex: " << qkey.patient_sex << "\n"
                 <<  "\t patient_birth_date: " << qkey.patient_birth_date << "\n"
                 << "]\n";
@@ -176,7 +176,7 @@ int pacs_ut(int argc, char* argv[]) {
                         << "patient_sex: " << info.patient_sex << std::endl
                         << "patient_birth_date: " << info.patient_birth_date << std::endl
                         << "modality: " << info.modality << std::endl
-                        << "accession_number: " << info.accession_number << std::endl
+                        << "accession_no: " << info.accession_no << std::endl
                         << "series_no: " << info.series_no << std::endl
                         << "institution: " << info.institution << std::endl
                         << "series_desc: " << info.series_desc << std::endl

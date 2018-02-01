@@ -5,7 +5,9 @@ create database med_img_db;
 show databases;
 use med_img_db;
 
-CREATE TABLE role(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, name VARCHAR(64) NOT NULL);
+CREATE TABLE role(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+    name VARCHAR(64) NOT NULL);
 
 CREATE INDEX name ON role(name(64));
 
@@ -92,18 +94,27 @@ CREATE TABLE instance(
     CONSTRAINT retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
-CREATE UNIQUE INDEX sop_instance_uid ON instance(sop_instance_uid);
+CREATE UNIQUE INDEX sop_instance_uid ON instance(sop_instance_uid(64));
+
+CREATE TABLE preprocess_type (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    prep_name VARCHAR(32) NOT NULL,
+    prep_desc VARCHAR(64),
+    created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE INDEX prep_name ON preprocess_type(prep_name(32));
 
 CREATE TABLE preprocess(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
-    pre_seg_mask_version VARCHAR(32),
-    pre_seg_mask_file_path VARCHAR(4096),
-    pre_seg_mask_file_size BIGINT,
-    ai_cache_data_version VARCHAR(32),
-    ai_cache_data_file VARCHAR(4096),
-    ai_cache_data_size BIGINT,
-    CONSTRAINT series_prep_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    prep_type_fk BIGINT NOT NULL,
+    version VARCHAR(32),
+    file_path VARCHAR(4096),
+    file_size BIGINT,
+    CONSTRAINT series_preprocess_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT prep_type_fk FOREIGN KEY (prep_type_fk) REFERENCES preprocess_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE evaluation_type (
@@ -114,7 +125,7 @@ CREATE TABLE evaluation_type (
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE INDEX eva_name ON evaluation_type(eva_name);
+CREATE INDEX eva_name ON evaluation_type(eva_name(32));
 
 CREATE TABLE evaluation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -123,22 +134,21 @@ CREATE TABLE evaluation(
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
-    CONSTRAINT series_lung_eva_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT series_eva_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE annotation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     anno_type_fk BIGINT NOT NULL,
-    annotation_type VARCHAR(32) NOT NULL,
-    annotation_desc VARCHAR(256),
+    annotation_user VARCHAR(32) NOT NULL,
+    anno_desc VARCHAR(256),
     file_path VARCHAR(4096) NOT NULL,
     file_size BIGINT NOT NULL,
-    annotation_user VARCHAR(32) NOT NULL,
     CONSTRAINT series_anno_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT annotation_user FOREIGN KEY (annotation_user) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT anno_type_fk FOREIGN KEY (anno_type_fk) REFERENCES evaluation(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT anno_type_fk FOREIGN KEY (anno_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 show tables;
@@ -154,6 +164,8 @@ desc study;
 desc series;
 \\! echo \"\n+--------------------+\n| table: instance \n+--------------------+\n\";
 desc instance;
+\\! echo \"\n+-----------------------+\n| table: preprocess_type \n+-----------------------+\n\";
+desc preprocess_type;
 \\! echo \"\n+--------------------+\n| table: preprocess \n+--------------------+\n\";
 desc preprocess;
 \\! echo \"\n+-----------------------+\n| table: evaluation_type \n+-----------------------+\n\";
