@@ -35,6 +35,12 @@ struct DcmInstanceInfo {
     sop_class_uid(sop_class_uid_), sop_instance_uid(sop_instance_uid_), file_path(file_path_) {}
 };
 
+enum QueryLevel {
+    PATIENT = 0,
+    STUDY = 1,
+    SERIES = 2,
+};
+
 struct QueryKey {
     std::string study_uid;
     std::string series_uid;
@@ -45,6 +51,7 @@ struct QueryKey {
     std::string modality;
     std::string accession_number;
     std::string patient_sex;
+    std::string patient_birth_date;
 };
 
 MED_IMG_END_NAMESPACE

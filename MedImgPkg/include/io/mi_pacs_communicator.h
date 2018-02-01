@@ -23,15 +23,12 @@ public:
                 const std::string& client_ae_title, unsigned short client_port);
     void disconnect();
 
-    int query_study(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
-    int query_series(std::vector<DcmInfo>& dcm_infos, const QueryKey& key);
+    int query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel query_level);
     int retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<DcmInstanceInfo>* instance_infos = nullptr);
 
 private:
     int try_connect();
     void run_scp();
-
-    int query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, const std::string& query_level);
 
 private:
     struct ConnectionCache;

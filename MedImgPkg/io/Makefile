@@ -22,7 +22,7 @@ VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 DATA_OBJS = mi_image_data.o mi_dicom_rt_struct.o
 DATA_PARSER_OBJS = mi_meta_object_loader.o mi_dicom_exporter.o mi_dicom_loader.o mi_dicom_rt_struct_loader.o \
 mi_nodule_set_parser.o mi_zlib_utils.o mi_jpeg_parser.o mi_targa_parser.o mi_mysql_db.o \
-mi_db.o mi_cache_db.o mi_configure.o
+mi_db.o mi_cache_db.o mi_configure.o mi_md5.o
 PACS_OBJS = mi_dcm_scu.o mi_dcm_scp.o mi_pacs_communicator.o
 OBJS = $(DATA_OBJS) $(DATA_PARSER_OBJS) $(PACS_OBJS)
 
