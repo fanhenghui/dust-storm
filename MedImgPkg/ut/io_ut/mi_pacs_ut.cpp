@@ -17,11 +17,24 @@
 
 using namespace medical_imaging;
 
+struct QueryKey {
+    std::string study_uid;
+    std::string series_uid;
+    std::string study_date;//format: YYYYMMDD
+    std::string study_time;//format: HHMMSS
+    std::string patient_id;
+    std::string patient_name;
+    std::string modality;
+    std::string accession_no;
+    std::string patient_sex;
+    std::string patient_birth_date;
+};
+
 inline void print_help() {
     std::cout << "COMMAND DESCRIPTION:\n"
-    << "\nquery\n"
+    << "\nquery [q]\n"
     << "\t-level [l]\n"
-    << "\t\tquery level. format: series | study | patient.\n"
+    << "\t\tquery level. format: series | study | patient[p].\n"
     << "\t-study_uid\n"
     << "\t\tstudy uid.\n"
     << "\t-series_uid\n"
@@ -40,10 +53,10 @@ inline void print_help() {
     << "\t\tmodality. format: CT | MR | CR | PT | RT_STRUCT.\n"
     << "\t-accession_no\n"
     << "\t\taccession number.\n"
-    << "\nretrieve\n"
-    << "\t-series-uid\n"
+    << "\nretrieve [r]\n"
+    << "\t-series_uid [s]\n"
     << "\t\t series uid.\n"
-    << "\t-path\n"
+    << "\t-path [p]\n"
     << "\t\t file path.\n"
     << "\nexit\n"
     << "\texit console.\n"
@@ -90,20 +103,20 @@ int pacs_ut(int argc, char* argv[]) {
 
 #define INVALID_CMD invalid_cmd = true; break;
 
-        if (item[0] == "query") {
+        if (item[0] == "query" || item[0] == "q") {
             QueryKey qkey;
-            int qlevel = -1;//0 study, 1 series
+            int qlevel = -1;//0 study, 1 series, 2 patient
             for (size_t i=1; i<item.size(); ++i) {
                 if (item[i] == "-level" || item[i] == "-l") {
                     CHECK_INDEX;
                     if (item[i+1] == "study") {
-                        qlevel = QueryLevel::STUDY;
+                        qlevel = 0;
                         ++i;
                     } else if(item[i+1] == "series") {
-                        qlevel = QueryLevel::SERIES;
+                        qlevel = 1;
                         ++i;
-                    } else if(item[i+1] == "patient") {
-                        qlevel = QueryLevel::PATIENT;
+                    } else if(item[i+1] == "patient" || item[i+1] == "p") {
+                        qlevel = 2;
                         ++i;
                     } else {
                         INVALID_CMD;
@@ -143,61 +156,144 @@ int pacs_ut(int argc, char* argv[]) {
             }
 
             if (!invalid_cmd) {
+                StudyInfo study_key;
+                SeriesInfo series_key;
+                PatientInfo patient_key;
 
-                MI_IO_LOG(MI_WARNING) << "query key: [\n"
-                <<  "\t study_uid: " << qkey.study_uid << "\n"
-                <<  "\t series_uid: " << qkey.series_uid << "\n"
-                <<  "\t study_date: " << qkey.study_date << "\n"
-                <<  "\t study_time: " << qkey.study_time << "\n"
-                <<  "\t patient_id: " << qkey.patient_id << "\n"
-                <<  "\t patient_name: " << qkey.patient_name << "\n"
-                <<  "\t modality: " << qkey.modality << "\n"
-                <<  "\t accession_no: " << qkey.accession_no << "\n"
-                <<  "\t patient_sex: " << qkey.patient_sex << "\n"
-                <<  "\t patient_birth_date: " << qkey.patient_birth_date << "\n"
-                << "]\n";
+                study_key.study_uid = qkey.study_uid;
+                study_key.study_date = qkey.study_date;
+                study_key.study_time = qkey.study_time;
+                study_key.accession_no = qkey.accession_no;
 
-                std::vector<DcmInfo> dcm_infos;    
-                if(-1 != pacs_comm.query(dcm_infos, qkey, (QueryLevel)qlevel) ) {
-                    MI_IO_LOG(MI_WARNING) << "<><><><><><> PCAS QUERY RESULT <><><><><><>\n";
+                series_key.series_uid = qkey.series_uid;
+                series_key.modality = qkey.modality;
 
-                    int id = 0;
-                    for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
-                        const std::string series_id = (*it).series_id;
-                        const DcmInfo& info = *it;
+                patient_key.patient_name = qkey.patient_name;
+                patient_key.patient_id = qkey.patient_id;
+                patient_key.patient_birth_date = qkey.patient_birth_date;
+                patient_key.patient_sex = qkey.patient_sex;
+
+
+                if (qlevel == 0) {//study
+                    MI_IO_LOG(MI_WARNING) << "query level: study, query key: " << "\n"
+                    << "study_uid: " << qkey.study_uid << "\n" 
+                    << "study_date: " << qkey.study_date << "\n"
+                    << "study_time: " << qkey.study_time << "\n"
+                    << "accession_no: " << qkey.accession_no << "\n"
+                    << "patient_name: " << qkey.patient_name << "\n" 
+                    << "patient_id: " << qkey.patient_id << "\n"
+                    << "patient_birth_date: " << qkey.patient_birth_date << "\n"
+                    << "patient_sex: " << qkey.patient_sex << "\n";
+
+                    std::vector<StudyInfo> study_infos;
+                    std::vector<PatientInfo> patient_infos;  
+                    if(-1 != pacs_comm.query_study(patient_key, study_key, &patient_infos, &study_infos)) {
+                        MI_IO_LOG(MI_WARNING) << "<><><><><><> PCAS QUERY RESULT <><><><><><>\n";
+
+                        for (size_t i = 0; i < study_infos.size(); ++i) {
+                            const StudyInfo& study_info = study_infos[i];
+                            const PatientInfo& patient_info = patient_infos[i];
         
-                        MI_IO_LOG(MI_DEBUG) << id++ <<": " << std::endl
-                        << "study_id: " << info.study_id << std::endl
-                        << "series_id: " << info.series_id << std::endl
-                        << "study_date: " << info.study_date << std::endl
-                        << "study_time: " << info.study_time << std::endl
-                        << "patient_id: " << info.patient_id << std::endl
-                        << "patient_name: " << info.patient_name << std::endl
-                        << "patient_sex: " << info.patient_sex << std::endl
-                        << "patient_birth_date: " << info.patient_birth_date << std::endl
-                        << "modality: " << info.modality << std::endl
-                        << "accession_no: " << info.accession_no << std::endl
-                        << "series_no: " << info.series_no << std::endl
-                        << "institution: " << info.institution << std::endl
-                        << "series_desc: " << info.series_desc << std::endl
-                        << "study_desc: " << info.study_desc << std::endl
-                        << "number_of_instance: " << info.number_of_instance << std::endl
-                        << "number_of_series: " << info.number_of_series << std::endl
-                        << std::endl;
+                            MI_IO_LOG(MI_DEBUG) << i <<": " << std::endl
+                            << "study_uid: " << study_info.study_uid << std::endl
+                            << "study_id: " << study_info.study_id << std::endl
+                            << "study_date: " << study_info.study_date << std::endl
+                            << "study_time: " << study_info.study_time << std::endl
+                            << "accession_no: " << study_info.accession_no << std::endl
+                            << "study_desc: " << study_info.study_desc << std::endl
+                            << "num_instance: " << study_info.num_instance << std::endl
+                            << "num_series: " << study_info.num_series << std::endl
+                            << "patient_id: " << patient_info.patient_id << std::endl
+                            << "patient_name: " << patient_info.patient_name << std::endl
+                            << "patient_sex: " << patient_info.patient_sex << std::endl
+                            << "patient_birth_date: " << patient_info.patient_birth_date << std::endl
+                            << std::endl;
+                        }
+                    } else {
+                        MI_IO_LOG(MI_ERROR) << "PACS commucation query study failed.";
                     }
-                } else {
-                    MI_IO_LOG(MI_ERROR) << "PACS commucation query failed.";
+                } else if (qlevel == 1) {//series
+                    MI_IO_LOG(MI_WARNING) << "query level: series, query key: " << "\n"
+                    << "series_uid: " << qkey.series_uid << "\n" 
+                    << "modality: " << qkey.modality << "\n"
+                    << "study_uid: " << qkey.study_uid << "\n" 
+                    << "study_date: " << qkey.study_date << "\n"
+                    << "study_time: " << qkey.study_time << "\n"
+                    << "accession_no: " << qkey.accession_no << "\n"
+                    << "patient_name: " << qkey.patient_name << "\n" 
+                    << "patient_id: " << qkey.patient_id << "\n"
+                    << "patient_birth_date: " << qkey.patient_birth_date << "\n"
+                    << "patient_sex: " << qkey.patient_sex << "\n";
+
+                    std::vector<StudyInfo> study_infos;
+                    std::vector<SeriesInfo> series_infos;
+                    std::vector<PatientInfo> patient_infos;
+                    if(-1 != pacs_comm.query_series(patient_key, study_key, series_key, &patient_infos, &study_infos, &series_infos)) {
+                        MI_IO_LOG(MI_WARNING) << "<><><><><><> PCAS QUERY RESULT <><><><><><>\n";
+
+                        for (size_t i = 0; i < study_infos.size(); ++i) {
+                            const StudyInfo& study_info = study_infos[i];
+                            const SeriesInfo& series_info = series_infos[i];
+                            const PatientInfo& patient_info = patient_infos[i];
+        
+                            MI_IO_LOG(MI_DEBUG) << i <<": " << std::endl
+                            << "study_uid: " << study_info.study_uid << std::endl
+                            << "study_id: " << study_info.study_id << std::endl
+                            << "study_date: " << study_info.study_date << std::endl
+                            << "study_time: " << study_info.study_time << std::endl
+                            << "accession_no: " << study_info.accession_no << std::endl
+                            << "study_desc: " << study_info.study_desc << std::endl
+                            << "num_instance(study): " << study_info.num_instance << std::endl
+                            << "num_series: " << study_info.num_series << std::endl
+                            << "series_uid: " << series_info.series_uid << std::endl
+                            << "series_no: " << series_info.series_no << std::endl
+                            << "modality: " << series_info.modality << std::endl
+                            << "series_desc: " << series_info.series_desc << std::endl
+                            << "institution: " << series_info.institution << std::endl
+                            << "num_instance(series): " << series_info.num_instance << std::endl
+                            << "patient_id: " << patient_info.patient_id << std::endl
+                            << "patient_name: " << patient_info.patient_name << std::endl
+                            << "patient_sex: " << patient_info.patient_sex << std::endl
+                            << "patient_birth_date: " << patient_info.patient_birth_date << std::endl
+                            << std::endl;
+                        }
+                    } else {
+                        MI_IO_LOG(MI_ERROR) << "PACS commucation query study failed.";
+                    }
+                } else if (qlevel == 2) {//patient
+                    MI_IO_LOG(MI_WARNING) << "query level: patient, query key: " << "\n"
+                    << "patient_name: " << qkey.patient_name << "\n" 
+                    << "patient_id: " << qkey.patient_id << "\n"
+                    << "patient_sex: " << qkey.patient_sex << "\n"
+                    << "patient_birth_date: " << qkey.patient_birth_date << "\n";
+
+                    std::vector<PatientInfo> patient_infos;  
+                    if(-1 != pacs_comm.query_patient(patient_key, &patient_infos)) {
+                        MI_IO_LOG(MI_WARNING) << "<><><><><><> PCAS QUERY RESULT <><><><><><>\n";
+
+                        for (size_t i = 0; i < patient_infos.size(); ++i) {
+                            const PatientInfo& patient_info = patient_infos[i];
+        
+                            MI_IO_LOG(MI_DEBUG) << i <<": " << std::endl
+                            << "patient_id: " << patient_info.patient_id << std::endl
+                            << "patient_name: " << patient_info.patient_name << std::endl
+                            << "patient_sex: " << patient_info.patient_sex << std::endl
+                            << "patient_birth_date: " << patient_info.patient_birth_date << std::endl
+                            << std::endl;
+                        }
+                    } else {
+                        MI_IO_LOG(MI_ERROR) << "PACS commucation query study failed.";
+                    }
                 }
             }
-
-        } else if (item[0] == "retrieve") {
+        } else if (item[0] == "retrieve" || item[0] == "r") {
             std::string series_uid = "";
             std::string path = "";
             for (size_t i=1; i<item.size(); ++i) {
-                if (item[i] == "-series_uid") {
+                if (item[i] == "-series_uid" || item[i] == "-s") {
                     CHECK_INDEX;
                     series_uid = item[++i]; 
-                } else if(item[i] == "-path") {
+                } else if(item[i] == "-path" || item[i] == "-p") {
                     CHECK_INDEX;
                     path = item[++i]; 
                 }

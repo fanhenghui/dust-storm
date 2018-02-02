@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "io/mi_io_export.h"
+#include "cppconn/resultset.h"
 
 namespace sql {
     class Connection;
@@ -34,6 +35,9 @@ public:
     bool reconnect();
 
     bool try_connect();
+
+    int query(const std::string& sql, sql::ResultSet*& res);
+    
     
 protected:
     sql::Connection* _connection;

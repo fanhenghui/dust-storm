@@ -23,19 +23,26 @@ public:
                 const std::string& client_ae_title, unsigned short client_port);
     void disconnect();
 
-    int query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel query_level);
+    int query_patient(const PatientInfo& patient_key, std::vector<PatientInfo>* patient_infos);
+    int query_study(const PatientInfo& patient_key, const StudyInfo& study_key, std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos);
+    int query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key,   
+        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<SeriesInfo>* series_infos);
+
     int retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<DcmInstanceInfo>* instance_infos = nullptr);
 
 private:
     int try_connect();
     void run_scp();
+    void run_scu_cancel(int timeout, int pres_id);
 
 private:
     struct ConnectionCache;
     std::unique_ptr<ConnectionCache> _connection_cache;
     std::unique_ptr<MIDcmSCP> _scp;
     std::unique_ptr<MIDcmSCU> _scu;
+
     std::string _series_to_release_scp;
+    bool _querying_release_series;
 
     boost::thread _scp_thread;
 

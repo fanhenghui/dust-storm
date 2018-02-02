@@ -19,6 +19,9 @@ OFCondition MIDcmSCP::handleIncomingCommand(T_DIMSE_Message* incomingMsg,
 }
 
 OFBool MIDcmSCP::stopAfterCurrentAssociation() {
+    if (_stop) {
+        MI_IO_LOG(MI_INFO) << "make SCP listen stop after current association.";
+    }
     return _stop;
 }
 

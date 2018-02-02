@@ -7,7 +7,8 @@ use med_img_db;
 
 CREATE TABLE role(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-    name VARCHAR(64) NOT NULL);
+    name VARCHAR(64) CHARACTER SET UTF8 NOT NULL
+);
 
 CREATE INDEX name ON role(name(64));
 
@@ -28,10 +29,12 @@ CREATE TABLE patient(
     patient_name VARCHAR(64),
     patient_sex VARCHAR(16),
     patient_birth_date TIMESTAMP,
+    md5 VARCHAR(32) NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE UNIQUE INDEX md5 ON patient(md5);
 CREATE INDEX patient_id ON patient(patient_id(64));
 CREATE INDEX patient_name ON patient(patient_name(64));
 CREATE INDEX patient_sex ON patient(patient_sex(4));
@@ -91,13 +94,13 @@ CREATE TABLE instance(
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT series_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT instance_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE UNIQUE INDEX sop_instance_uid ON instance(sop_instance_uid(64));
 
 CREATE TABLE preprocess_type (
-    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     prep_name VARCHAR(32) NOT NULL,
     prep_desc VARCHAR(64),
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -110,17 +113,19 @@ CREATE TABLE preprocess(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     prep_type_fk BIGINT NOT NULL,
+    retrieve_user_fk VARCHAR(32) NOT NULL,
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
     CONSTRAINT series_preprocess_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT prep_type_fk FOREIGN KEY (prep_type_fk) REFERENCES preprocess_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT prep_type_fk FOREIGN KEY (prep_type_fk) REFERENCES preprocess_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT preprocess_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE evaluation_type (
-    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     eva_name VARCHAR(32) NOT NULL,
-    eva_desc VARCHAR(64),
+    eva_desc VARCHAR(64) CHARACTER SET UTF8,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -130,26 +135,30 @@ CREATE INDEX eva_name ON evaluation_type(eva_name(32));
 CREATE TABLE evaluation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
-    eva_type_fk BIGINT NOT NULL,
+    eva_type_fk INT NOT NULL,
+    retrieve_user_fk VARCHAR(32) NOT NULL,
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
     CONSTRAINT series_eva_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT evaluation_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE annotation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
-    anno_type_fk BIGINT NOT NULL,
+    anno_type_fk INT NOT NULL,
     annotation_user VARCHAR(32) NOT NULL,
-    anno_desc VARCHAR(256),
+    anno_desc VARCHAR(64) CHARACTER SET UTF8,
     file_path VARCHAR(4096) NOT NULL,
     file_size BIGINT NOT NULL,
     CONSTRAINT series_anno_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT annotation_user FOREIGN KEY (annotation_user) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT anno_type_fk FOREIGN KEY (anno_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+
+CREATE INDEX anno_desc ON annotation(anno_desc(64));
 
 show tables;
 \\! echo \"\n+--------------------+\n| table: role \n+--------------------+\n\";

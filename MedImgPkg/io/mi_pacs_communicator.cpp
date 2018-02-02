@@ -18,66 +18,73 @@ inline Uint8 findUncompressedPC(const OFString& sopClass, DcmSCU& scu) {
     return pc; 
 } 
 
-const static std::string QUERY_LEVEL_PATIENT = "PATIENT";
-const static std::string QUERY_LEVEL_STUDY = "STUDY";
-const static std::string QUERY_LEVEL_SERIES = "SERIES";
+static const char* QUERY_LEVEL_PATIENT = "PATIENT";
+static const char* QUERY_LEVEL_STUDY = "STUDY";
+static const char* QUERY_LEVEL_SERIES = "SERIES";
 
-inline void fill_dcm_info(DcmDataset* dataset, DcmInfo& info, const std::string& query_level) {
+inline void fill_patient_info(DcmDataset* dataset, PatientInfo* info) {
     OFString str;
-    if (dataset->findAndGetOFString(DCM_StudyDate, str).good()) {
-        info.study_date = std::string(str.c_str());
-    }
-    if (dataset->findAndGetOFString(DCM_StudyTime, str).good()) {
-        info.study_time = std::string(str.c_str());
-    }
-    if (dataset->findAndGetOFString(DCM_Modality, str).good()) {
-        info.modality = std::string(str.c_str());
-    }
     if (dataset->findAndGetOFString(DCM_PatientID, str).good()) {
-        info.patient_id = std::string(str.c_str());
+        info->patient_id = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_PatientName, str).good()) {
-        info.patient_name = std::string(str.c_str());
+        info->patient_name = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_PatientSex, str).good()) {
-        info.patient_sex = std::string(str.c_str());
+        info->patient_sex = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_PatientBirthDate, str).good()) {
-        info.patient_birth_date = std::string(str.c_str());
+        info->patient_birth_date = std::string(str.c_str());
+    }
+}
+
+inline void fill_study_info(DcmDataset* dataset, StudyInfo* info) {
+    OFString str;
+    if (dataset->findAndGetOFString(DCM_StudyInstanceUID, str).good()) {
+        info->study_uid = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_StudyDate, str).good()) {
+        info->study_date = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_StudyTime, str).good()) {
+        info->study_time = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_AccessionNumber, str).good()) {
-        info.accession_no = std::string(str.c_str());
+        info->accession_no = std::string(str.c_str());
     }
-    if (dataset->findAndGetOFString(DCM_StudyInstanceUID, str).good()) {
-        info.study_id = std::string(str.c_str());
+    if (dataset->findAndGetOFString(DCM_StudyID, str).good()) {
+        info->study_id = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_StudyDescription, str).good()) {
-        info.study_desc = std::string(str.c_str());
-    }
-    if (dataset->findAndGetOFString(DCM_SeriesDescription, str).good()) {
-        info.series_desc = std::string(str.c_str());
-    }
-    if (dataset->findAndGetOFString(DCM_InstitutionName, str).good()) {
-        info.institution = std::string(str.c_str());
-    }
-    if (dataset->findAndGetOFString(DCM_SeriesNumber, str).good()) {
-        info.series_no = std::string(str.c_str());
-    }
-
-    if (dataset->findAndGetOFString(DCM_SeriesInstanceUID, str).good()) {
-        info.series_id = std::string(str.c_str());
+        info->study_desc = std::string(str.c_str());
     }
     if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedSeries, str).good()) {
-        info.number_of_series = atoi(str.c_str());
+        info->num_series = atoi(str.c_str());
     }
-    if (QUERY_LEVEL_STUDY == query_level) {
-        if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedInstances, str).good()) {
-            info.number_of_instance = atoi(str.c_str());
-        }
-    } else if (QUERY_LEVEL_SERIES == query_level){
-        if (dataset->findAndGetOFString(DCM_NumberOfSeriesRelatedInstances, str).good()) {
-            info.number_of_instance = atoi(str.c_str());
-        }
+    if (dataset->findAndGetOFString(DCM_NumberOfStudyRelatedInstances, str).good()) {
+        info->num_instance = atoi(str.c_str());
+    }
+}
+
+inline void fill_series_info(DcmDataset* dataset, SeriesInfo* info) {
+    OFString str;
+    if (dataset->findAndGetOFString(DCM_SeriesInstanceUID, str).good()) {
+        info->series_uid = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_Modality, str).good()) {
+        info->modality = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_SeriesDescription, str).good()) {
+        info->series_desc = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_InstitutionName, str).good()) {
+        info->institution = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_SeriesNumber, str).good()) {
+        info->series_no = std::string(str.c_str());
+    }
+    if (dataset->findAndGetOFString(DCM_NumberOfSeriesRelatedInstances, str).good()) {
+        info->num_instance = atoi(str.c_str());
     }
 }
 
@@ -96,6 +103,7 @@ PACSCommunicator::PACSCommunicator(bool open_dcmtk_console_log) {
     } else {
         OFLog::configure(OFLogger::OFF_LOG_LEVEL);
     }
+    _querying_release_series = false;
 }
 
 PACSCommunicator::~PACSCommunicator() {
@@ -114,27 +122,60 @@ const std::string& client_ae_title, unsigned short client_port) {
     return try_connect();
 }
 
+void PACSCommunicator::run_scu_cancel(int timeout, int pres_id) {
+    sleep(timeout);
+    while(true) {
+        if (_querying_release_series && !_series_to_release_scp.empty()) {
+            _scu->sendCANCELRequest(pres_id);
+            MI_IO_LOG(MI_INFO) << "release query undone in: " << timeout << " second. send cancel request.";
+            break;
+        } else {
+            MI_IO_LOG(MI_INFO) << "release query is done in: " << timeout << " second.";
+            break;
+        }
+        sleep(timeout);
+    }
+    
+}
+
 void PACSCommunicator::disconnect() {
+
     if (_scp && _scu) {
         _scp->stop();
 
+        if (_series_to_release_scp.empty()) {
+            PatientInfo patient_key;
+            StudyInfo study_key;
+            SeriesInfo series_key;
+            std::vector<PatientInfo> patient_infos;
+            std::vector<StudyInfo> study_infos;
+            std::vector<SeriesInfo> series_infos;
+
+            _querying_release_series = true;
+            this->query_series(patient_key, study_key, series_key, &patient_infos, &study_infos, &series_infos);
+            boost::thread th_cancel = boost::thread(boost::bind(&PACSCommunicator::run_scu_cancel, this, 1, 
+                findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu)));
+            th_cancel.detach();
+            _querying_release_series = false;
+        }
+
+
         DcmDataset query_key;
         query_key.putAndInsertString(DCM_QueryRetrieveLevel, "SERIES");
-        query_key.putAndInsertString(DCM_SeriesInstanceUID, "xxx111x2x2x2x2x2");
+        query_key.putAndInsertString(DCM_SeriesInstanceUID, _series_to_release_scp.c_str());
 
         const T_ASC_PresentationContextID id = findUncompressedPC(UID_MOVEStudyRootQueryRetrieveInformationModel, *_scu);
         if (id == 0) {
             MI_IO_LOG(MI_ERROR) << "There is no uncompressed presentation context for Study Root MOVE";
-        } else {
-            //send last message to call SCP's stopAfterCurrentAssociation to return true , then stop listen
-            //TODO 这里是有风险的：取了最近一次query all series 的第一个series，万一move失败，就不会走到stopAfterCurrentAssociation函数，因此没法关闭SCP
-            MI_IO_LOG(MI_INFO) << "plase wait last query message.";
+        } else if (!_series_to_release_scp.empty()){
+            MI_IO_LOG(MI_INFO) << "plase wait query series: " << _series_to_release_scp << " to stop SCP.";
+            _scp->setDatasetStorageMode(DcmStorageSCP::DSM_Ignore);
             _scu->sendMOVERequest(id, _connection_cache->client_ae_title.c_str(), &query_key, NULL);
             _scp_thread.join();        
         }
     }
     if (_scu) {
-        _scu->closeAssociation(DCMSCU_RELEASE_ASSOCIATION);
+        _scu->releaseAssociation();
     }
 
     MI_IO_LOG(MI_INFO) << "PACS communicator disconnect.";
@@ -246,75 +287,257 @@ inline int date_valid(const std::string& date) {
     return 0;
 }
 
-int PACSCommunicator::query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel elevel) {
+int PACSCommunicator::query_patient(const PatientInfo& patient_key, std::vector<PatientInfo>* patient_infos) {
     if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed.";
         return -1;
     }
 
-    std::string query_level = QUERY_LEVEL_PATIENT;
-    if (elevel == STUDY) {
-        query_level = QUERY_LEVEL_STUDY;
-    } else if (elevel == SERIES) {
-        query_level = QUERY_LEVEL_SERIES;
-    }    
+    if(!patient_infos) {
+        MI_IO_LOG(MI_ERROR) << "input patient infos is null.";
+        return -1;
+    }
 
     DcmDataset query_key;
-    query_key.putAndInsertString(DCM_QueryRetrieveLevel, query_level.c_str());
+    query_key.putAndInsertString(DCM_QueryRetrieveLevel, QUERY_LEVEL_PATIENT);
 
-    static const int KEY_NUM = 10;
-    static const DcmTag KEY_TAGS[KEY_NUM] = {
-        DCM_StudyInstanceUID,
-        DCM_SeriesInstanceUID,
-        DCM_StudyDate,
-        DCM_StudyTime,
+    static const DcmTag KEY_TAGS[] = {
         DCM_PatientID,
         DCM_PatientName,
-        DCM_Modality,
-        DCM_AccessionNumber,
         DCM_PatientSex,
         DCM_PatientBirthDate,
     };
 
     //check query valid
-    if(-1 == date_valid(key.study_date)) {
-        MI_IO_LOG(MI_ERROR) << "invalid query key: study date.";
-        return -1;
-    } 
-
-    if(-1 == date_valid(key.patient_birth_date)) {
+    if(-1 == date_valid(patient_key.patient_birth_date)) {
         MI_IO_LOG(MI_ERROR) << "invalid query key: patient birth date.";
         return -1;
     }
 
-    if (!key.patient_sex.empty()) {
-        if (!(key.patient_sex == "M" || key.patient_sex == "F" || key.patient_sex == "*")) {
+    if (!patient_key.patient_sex.empty()) {
+        if (!(patient_key.patient_sex == "M" || patient_key.patient_sex == "F" || patient_key.patient_sex == "*")) {
             MI_IO_LOG(MI_ERROR) << "invalid query key: patient sex.";
             return -1;
         }
     }
 
-    const std::string* KEYS[KEY_NUM] = {
-        &key.study_uid,
-        &key.series_uid,
-        &key.study_date,
-        &key.study_time,
-        &key.patient_id,
-        &key.patient_name,
-        &key.modality,
-        &key.accession_no,
-        &key.patient_sex,
-        &key.patient_birth_date,
+    const std::string* KEYS[] = {
+        &patient_key.patient_id,
+        &patient_key.patient_name,
+        &patient_key.patient_sex,
+        &patient_key.patient_birth_date,
     };
-    for (int i=0; i<KEY_NUM; ++i) {
+    for (size_t i=0; i<sizeof(KEYS)/sizeof(std::string*); ++i) {
+        query_key.putAndInsertString(KEY_TAGS[i], KEYS[i]->c_str());
+    }
+
+    /*
+    //useless query key in current
+    #define DCM_NumberOfPatientRelatedStudies        DcmTagKey(0x0020, 0x1200)
+    #define DCM_NumberOfPatientRelatedSeries         DcmTagKey(0x0020, 0x1202)
+    #define DCM_NumberOfPatientRelatedInstances      DcmTagKey(0x0020, 0x1204)
+    */
+
+    const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
+    if (id == 0) {
+        MI_IO_LOG(MI_ERROR) << "There is no uncompressed presentation context for Study Root FIND";
+        return -1;
+    }
+    
+    OFList<QRResponse*> res;
+    OFCondition result = _scu->sendFINDRequest(id,  &query_key, &res);
+    if (result.bad()) {
+        MI_IO_LOG(MI_ERROR) << "FIND request failed.";
+    } else {
+        patient_infos->clear();
+        MI_IO_LOG(MI_DEBUG) << "query result size: " << res.size()-1;
+        for (auto it = res.begin(); it != res.end(); ++it) {
+            if((*it)->m_dataset != NULL) {
+                patient_infos->push_back(PatientInfo());
+                fill_patient_info((*it)->m_dataset, &((*patient_infos)[patient_infos->size()-1]));
+            }
+        }
+    }
+    
+    return 0;
+}
+
+int PACSCommunicator::query_study(const PatientInfo& patient_key, const StudyInfo& study_key, std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos) {
+    if(0 != try_connect() ) {
+        MI_IO_LOG(MI_FATAL) << "try connect failed.";
+        return -1;
+    }
+
+    if(!patient_infos) {
+        MI_IO_LOG(MI_ERROR) << "input patient infos is null.";
+        return -1;
+    }
+    if(!study_infos) {
+        MI_IO_LOG(MI_ERROR) << "input study infos is null.";
+        return -1;
+    }
+
+    DcmDataset query_key;
+    query_key.putAndInsertString(DCM_QueryRetrieveLevel, QUERY_LEVEL_STUDY);
+
+    static const DcmTag KEY_TAGS[] = {
+        DCM_StudyInstanceUID,
+        DCM_StudyID,
+        DCM_StudyDate,
+        DCM_StudyTime,
+        DCM_AccessionNumber,
+        DCM_PatientID,
+        DCM_PatientName,
+        DCM_PatientSex,
+        DCM_PatientBirthDate,
+    };
+
+    //check query valid
+    if(-1 == date_valid(study_key.study_date)) {
+        MI_IO_LOG(MI_ERROR) << "invalid query key: study date.";
+        return -1;
+    } 
+
+    if(-1 == date_valid(patient_key.patient_birth_date)) {
+        MI_IO_LOG(MI_ERROR) << "invalid query key: patient birth date.";
+        return -1;
+    }
+
+    if (!patient_key.patient_sex.empty()) {
+        if (!(patient_key.patient_sex == "M" || patient_key.patient_sex == "F" || patient_key.patient_sex == "*")) {
+            MI_IO_LOG(MI_ERROR) << "invalid query key: patient sex.";
+            return -1;
+        }
+    }
+
+    const std::string* KEYS[] = {
+        &study_key.study_uid,
+        &study_key.study_id,
+        &study_key.study_date,
+        &study_key.study_time,
+        &study_key.accession_no,
+        &patient_key.patient_id,
+        &patient_key.patient_name,
+        &patient_key.patient_sex,
+        &patient_key.patient_birth_date,
+    };
+    for (size_t i=0; i<sizeof(KEYS)/sizeof(std::string*); ++i) {
         query_key.putAndInsertString(KEY_TAGS[i], KEYS[i]->c_str());
     }
 
     query_key.putAndInsertString(DCM_StudyDescription, "");
+    query_key.putAndInsertString(DCM_NumberOfStudyRelatedInstances, "");
+    query_key.putAndInsertString(DCM_NumberOfStudyRelatedSeries, "");
+
+
+    const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
+    if (id == 0) {
+        MI_IO_LOG(MI_ERROR) << "There is no uncompressed presentation context for Study Root FIND";
+        return -1;
+    }
+    
+    OFList<QRResponse*> res;
+    OFCondition result = _scu->sendFINDRequest(id,  &query_key, &res);
+    if (result.bad()) {
+        MI_IO_LOG(MI_ERROR) << "FIND request failed.";
+    } else {
+        patient_infos->clear();
+        study_infos->clear();
+        MI_IO_LOG(MI_DEBUG) << "query result size: " << res.size()-1;
+        for (auto it = res.begin(); it != res.end(); ++it) {
+            if((*it)->m_dataset != NULL) {
+                patient_infos->push_back(PatientInfo());
+                study_infos->push_back(StudyInfo());
+                fill_patient_info((*it)->m_dataset, &((*patient_infos)[patient_infos->size()-1]));
+                fill_study_info((*it)->m_dataset, &((*study_infos)[study_infos->size()-1]));
+            }
+        }
+    }
+    
+    return 0;
+}
+
+int PACSCommunicator::query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key,   
+    std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<SeriesInfo>* series_infos) {
+    if(0 != try_connect() ) {
+        MI_IO_LOG(MI_FATAL) << "try connect failed.";
+        return -1;
+    }
+
+    if(!patient_infos) {
+        MI_IO_LOG(MI_ERROR) << "input patient infos is null.";
+        return -1;
+    }
+    if(!study_infos) {
+        MI_IO_LOG(MI_ERROR) << "input study infos is null.";
+        return -1;
+    }
+    if(!series_infos) {
+        MI_IO_LOG(MI_ERROR) << "input series infos is null.";
+        return -1;
+    }
+
+    DcmDataset query_key;
+    query_key.putAndInsertString(DCM_QueryRetrieveLevel, QUERY_LEVEL_SERIES);
+
+    static const DcmTag KEY_TAGS[] = {
+        DCM_SeriesInstanceUID,
+        DCM_SeriesNumber,
+        DCM_Modality,
+        DCM_InstitutionName,
+        DCM_AccessionNumber,
+        DCM_StudyInstanceUID,
+        DCM_StudyID,
+        DCM_StudyDate,
+        DCM_StudyTime,
+        DCM_AccessionNumber,
+        DCM_PatientID,
+        DCM_PatientName,
+        DCM_PatientSex,
+        DCM_PatientBirthDate,
+    };
+
+    //check query valid
+    if(-1 == date_valid(study_key.study_date)) {
+        MI_IO_LOG(MI_ERROR) << "invalid query key: study date.";
+        return -1;
+    } 
+
+    if(-1 == date_valid(patient_key.patient_birth_date)) {
+        MI_IO_LOG(MI_ERROR) << "invalid query key: patient birth date.";
+        return -1;
+    }
+
+    if (!patient_key.patient_sex.empty()) {
+        if (!(patient_key.patient_sex == "M" || patient_key.patient_sex == "F" || patient_key.patient_sex == "*")) {
+            MI_IO_LOG(MI_ERROR) << "invalid query key: patient sex.";
+            return -1;
+        }
+    }
+
+    const std::string* KEYS[] = {
+        &series_key.series_uid,
+        &series_key.series_no,
+        &series_key.modality,
+        &series_key.institution,
+        &study_key.study_uid,
+        &study_key.study_id,
+        &study_key.study_date,
+        &study_key.study_time,
+        &study_key.accession_no,
+        &patient_key.patient_id,
+        &patient_key.patient_name,
+        &patient_key.patient_sex,
+        &patient_key.patient_birth_date,
+    };
+    for (size_t i=0; i<sizeof(KEYS)/sizeof(std::string*); ++i) {
+        query_key.putAndInsertString(KEY_TAGS[i], KEYS[i]->c_str());
+    }
+
     query_key.putAndInsertString(DCM_SeriesDescription, "");
-    query_key.putAndInsertString(DCM_InstitutionName, "");
-    query_key.putAndInsertString(DCM_SeriesNumber, "");
-    query_key.putAndInsertString(DCM_NumberOfSeriesRelatedInstances, "");
+    query_key.putAndInsertString(DCM_NumberOfSeriesRelatedInstances, "1");
+
+    query_key.putAndInsertString(DCM_StudyDescription, "");
     query_key.putAndInsertString(DCM_NumberOfStudyRelatedInstances, "");
     query_key.putAndInsertString(DCM_NumberOfStudyRelatedSeries, "");
 
@@ -329,19 +552,23 @@ int PACSCommunicator::query(std::vector<DcmInfo>& dcm_infos, const QueryKey& key
     if (result.bad()) {
         MI_IO_LOG(MI_ERROR) << "FIND request failed.";
     } else {
-        dcm_infos.clear();
+        patient_infos->clear();
+        study_infos->clear();
+        series_infos->clear();
         MI_IO_LOG(MI_DEBUG) << "query result size: " << res.size()-1;
         for (auto it = res.begin(); it != res.end(); ++it) {
             if((*it)->m_dataset != NULL) {
-                DcmInfo dcm_info;
-                fill_dcm_info((*it)->m_dataset, dcm_info, query_level);
-                dcm_infos.push_back(dcm_info);
+                patient_infos->push_back(PatientInfo());
+                study_infos->push_back(StudyInfo());
+                series_infos->push_back(SeriesInfo());
+                fill_patient_info((*it)->m_dataset, &((*patient_infos)[patient_infos->size()-1]));
+                fill_study_info((*it)->m_dataset, &((*study_infos)[study_infos->size()-1]));
+                fill_series_info((*it)->m_dataset, &((*series_infos)[series_infos->size()-1]));
             }
         }
-    }
-    
-    if (!dcm_infos.empty()) {
-        _series_to_release_scp = dcm_infos[0].series_id;
+        if (!series_infos->empty()) {
+            _series_to_release_scp = (*series_infos)[series_infos->size()-1].series_uid;
+        }
     }
     
     return 0;
@@ -390,7 +617,7 @@ int PACSCommunicator::retrieve_series(const std::string& series_id, const std::s
     } else {
         MI_IO_LOG(MI_ERROR) << "retrieve series: " << series_id << " failed."; 
         return -1;
-    }    
+    }
 }
 
 void PACSCommunicator::run_scp() {

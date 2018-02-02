@@ -21,7 +21,9 @@ public:
     virtual ~DB();
     
     //insert 
-    int insert_dcm_series(const DcmInfo& series_info, const std::vector<DcmInstanceInfo>& instance_info, const std::string& user);
+    int insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
+         const std::vector<DcmInstanceInfo>& instance_info);
+    int insert_patient(PatientInfo& patient_info);
     int insert_evaluation(const EvaluationInfo& eva);
     int insert_annotation(const AnnotationInfo& anno);
     int insert_preprocess(const PreprocessInfo& prep);
@@ -33,13 +35,17 @@ public:
     int delete_preprocess(int prep_id);
 
     //modify
-    int modify_dcm_series(const DcmInfo& series_info, const std::vector<DcmInstanceInfo>& instance_info, const std::string& user);
     int modify_evaluation(int eva_id, const EvaluationInfo& eva);
     int modify_annotation(int anno_id, const AnnotationInfo& anno);
     int modify_preprocess(int prep_id, const PreprocessInfo& prep);
 
     //query
-    int query_dicom(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel query_level);
+    //int query_dicom(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel query_level);
+    int query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_infos);
+    int query_study(const PatientInfo& patient_key, const StudyInfo& study_key, std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos);
+    int query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key, std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<StudyInfo>* series_infos);
+    int query_instance(int series_id, std::vector<DcmInstanceInfo>* instance_infos);
+    
     int query_user(const std::string& user_name, int role);
     int query_evaluation(int series_id, int eva_type);
     int query_preprocess(int series_id, int prep_type);

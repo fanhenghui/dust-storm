@@ -120,5 +120,18 @@ std::string MySQLDB::get_sql_exception_info(const sql::SQLException* e) {
     }
 }
 
+int MySQLDB::query(const std::string& sql, sql::ResultSet*& res) {
+    try{
+        sql::PreparedStatement* pstmt = _connection->prepareStatement(sql);
+        res = pstmt->executeQuery();
+        delete pstmt;
+        return 0;
+    } catch (const sql::SQLException& e) {
+        std::string err = this->get_sql_exception_info(&e);
+        MI_IO_LOG(MI_ERROR) << "db get item failed with exception: " << err; 
+        return -1;
+    }
+}
+
 MED_IMG_END_NAMESPACE
 

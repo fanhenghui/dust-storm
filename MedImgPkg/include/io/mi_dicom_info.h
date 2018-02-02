@@ -5,13 +5,6 @@
 
 MED_IMG_BEGIN_NAMESPACE
 
-//basic DICOM tag collection for query and filter
-enum QueryLevel {
-    PATIENT = 0,
-    STUDY = 1,
-    SERIES = 2,
-};
-
 struct DcmInfo {
     std::string study_id;
     std::string series_id;
@@ -31,43 +24,56 @@ struct DcmInfo {
     int number_of_series;//just for study level query
 };
 
+//-------------------------------------------------//
+// PACA & DB common
+//-------------------------------------------------//
+
 struct PatientInfo {
-    int id;//for DB
+    int64_t id;//for DB
     std::string patient_id;
     std::string patient_name;
     std::string patient_sex;
-    std::string patient_birth_date;
+    std::string patient_birth_date;//format: YYYYMMDD
+    std::string md5;
+
+    PatientInfo(): id(0) {}
 };
 
 struct StudyInfo {
-    int id;//for DB
+    int64_t id;//For-DB //---not query key---//
     
-    int patient_fk;//for DB
-    std::string patient_name;//for PACS
+    int patient_fk;//For-DB //---not query key---//
 
     std::string study_id;
     std::string study_uid;
     std::string study_date;//format: YYYYMMDD
     std::string study_time;//format: HHMMSS
     std::string accession_no;
-    std::string study_desc;
-    int num_series;
-    int num_instance;
+    std::string study_desc;//---not query key---//
+    int num_series;//---not query key---//
+    int num_instance;//---not query key---//
+
+    StudyInfo():id(-1), patient_fk(-1), num_series(0), num_instance(0) {}
 };
 
 struct SeriesInfo {
-    int id;
+    int64_t id;//For-DB
 
-    int study_fk;
-    std::string study_uid;
+    int study_fk;//For-DB
         
     std::string series_uid;
     std::string series_no;
     std::string modality;
-    std::string series_desc;
+    std::string series_desc;//---not query key---//
     std::string institution;
-    int num_instance;
+    int num_instance;//---not query key---//
+
+    SeriesInfo():id(-1), study_fk(-1), num_instance(0) {}
 };
+
+//-------------------------------------------------//
+// DB
+//-------------------------------------------------//
 
 struct DcmInstanceInfo {
     std::string sop_class_uid;
@@ -79,22 +85,11 @@ struct DcmInstanceInfo {
     sop_class_uid(sop_class_uid_), sop_instance_uid(sop_instance_uid_), file_path(file_path_) {}
 };
 
-struct QueryKey {
-    std::string study_uid;
-    std::string series_uid;
-    std::string study_date;//format: YYYYMMDD
-    std::string study_time;//format: HHMMSS
-    std::string patient_id;
-    std::string patient_name;
-    std::string modality;
-    std::string accession_no;
-    std::string patient_sex;
-    std::string patient_birth_date;
-};
-
 struct RoleInfo {
     int id;
     std::string name;
+
+    RoleInfo(): id(-1) {}
 };
 
 struct UserInfo {
@@ -103,28 +98,34 @@ struct UserInfo {
 };
 
 struct EvaluationInfo {
-    int series_id;
+    int64_t series_id;
     int eva_type;
     std::string eva_version;
-    std::string eva_file_path;
-    long long eva_file_size;
+    std::string eva_file_path;//---not query key---//
+    long long eva_file_size;//---not query key---//
+
+    EvaluationInfo(): series_id(-1), eva_type(-1), eva_file_size(0) {}
 };
 
 struct AnnotationInfo {
-    int series_id;
+    int64_t series_id;
     int anno_type;
-    int user_id;
-    std::string anno_desc;
-    std::string anno_file_path;
-    long long anno_file_size;
+    int64_t user_id;
+    std::string anno_desc;//---not query key---//
+    std::string anno_file_path;//---not query key---//
+    long long anno_file_size;//---not query key---//
+
+    AnnotationInfo(): series_id(-1), anno_type(-1), user_id(-1), anno_file_size(0) {}
 };
 
 struct PreprocessInfo {
-    int series_id;
+    int64_t series_id;
     int prep_type;
     std::string prep_version;
     std::string prep_file_path;
     std::string prep_file_size;
+
+    PreprocessInfo(): series_id(-1), prep_type(-1) {}
 };
 
 MED_IMG_END_NAMESPACE
