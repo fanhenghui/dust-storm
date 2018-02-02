@@ -36,7 +36,7 @@ struct PatientInfo {
     std::string patient_birth_date;//format: YYYYMMDD
     std::string md5;
 
-    PatientInfo(): id(0) {}
+    PatientInfo(): id(-1) {}
 };
 
 struct StudyInfo {

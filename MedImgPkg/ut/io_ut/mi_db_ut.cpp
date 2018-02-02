@@ -43,6 +43,20 @@ int db_ut(int argc, char* argv[]) {
     db.insert_patient(patient_info);
 
     MI_IO_LOG(MI_DEBUG) << "patient id: " << patient_info.id;
+
+    PatientInfo key;
+    key.md5 = patient_info.md5;
+    std::vector<PatientInfo> res;
+    db.query_patient(key, &res);
+
+    if(!res.empty()) {
+        MI_IO_LOG(MI_INFO) << res.size();
+        MI_IO_LOG(MI_INFO) << res[0].patient_name;
+        MI_IO_LOG(MI_INFO) << res[0].patient_id;
+        MI_IO_LOG(MI_INFO) << res[0].patient_birth_date;
+        MI_IO_LOG(MI_INFO) << res[0].patient_sex;
+        MI_IO_LOG(MI_INFO) << res[0].md5;
+    }
     
     MI_IO_LOG(MI_INFO) << "BYBY.";
     return 0;

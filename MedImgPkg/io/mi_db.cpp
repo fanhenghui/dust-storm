@@ -86,6 +86,57 @@ int DB::insert_patient(PatientInfo& patient_info) {
     return 0;    
 }
 
+int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_infos) {
+    TRY_CONNECT
+
+    if (!patient_infos) {
+        MI_IO_LOG(MI_ERROR) << "patient infos is null.";
+        return -1;
+    }
+
+    patient_infos->clear();
+    std::stringstream sql;
+    sql << "SELECT id, patient_id, patient_name, patient_sex, patient_birth_date, md5 FROM patient WHERE ";
+    if (key.id != -1) {
+       sql << "id=" << key.id << " AND "; 
+    }
+    if (!key.patient_id.empty()) {
+       sql << "patient_id=\'" << key.patient_id << "\' AND "; 
+    }
+    if (!key.patient_name.empty()) {
+       sql << "patient_name=\'" << key.patient_name << "\' AND "; 
+    }
+    if (!key.patient_sex.empty()) {
+       sql << "patient_sex=\'" << key.patient_sex << "\' AND "; 
+    }
+    if (!key.md5.empty()) {
+       sql << "md5=\'" << key.md5 << "\' AND "; 
+    }
+    sql << "1";
+
+    MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
+    sql::ResultSet* res = nullptr;
+    if(-1 == this->query(sql.str(), res) ) {
+        StructShield<sql::ResultSet> shield(res);
+        MI_IO_LOG(MI_ERROR) << "db query patient failed.";
+        return -1;
+    } else {
+        StructShield<sql::ResultSet> shield(res);
+        while (res->next()) {
+            patient_infos->push_back(PatientInfo());
+            PatientInfo& info = (*patient_infos)[patient_infos->size()-1];
+            info.id = res->getInt64("id");
+            info.patient_id = res->getString("patient_id");
+            info.patient_name = res->getString("patient_name");
+            info.patient_sex = res->getString("patient_sex");
+            info.patient_birth_date = res->getString("patient_birth_date");
+            info.md5 = res->getString("md5");
+        }
+    }
+
+    return 0;
+}
+
 // int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
 //          const std::vector<DcmInstanceInfo>& instance_info) {
 //     if (!this->try_connect()) {
