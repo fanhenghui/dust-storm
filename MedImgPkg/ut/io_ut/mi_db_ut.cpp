@@ -59,5 +59,20 @@ int db_ut(int argc, char* argv[]) {
     }
     
     MI_IO_LOG(MI_INFO) << "BYBY.";
+
+    std::string date = "19890103";
+    MI_IO_LOG(MI_INFO) << atoi(date.substr(4, 2).c_str());
+    
+    std::vector<UserInfo> user_infos;
+    UserInfo ukey;
+    db.query_user(ukey, &user_infos);
+    if (!user_infos.empty()) {
+        for (auto it = user_infos.begin(); it != user_infos.end(); ++it) {
+            UserInfo& info = *it;
+            MI_IO_LOG(MI_INFO) << "user: " << info.id << ", " << info.name << ", " << info.role_fk; 
+        }
+    } else {
+        MI_IO_LOG(MI_WARNING) << "query user null.";
+    }
     return 0;
 }

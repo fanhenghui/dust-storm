@@ -28,7 +28,7 @@ public:
     static int read_raw(const std::string& path, void* buffer, unsigned int length);
     static int read_raw_ext(const std::string& path, char*& buffer, unsigned int& length);
 
-    static int get_file_size(const std::string& path, long long& fsize);
+    static int get_file_size(const std::string& path, int64_t& fsize);
 
 protected:
 private:

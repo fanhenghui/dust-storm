@@ -262,7 +262,7 @@ float FileUtil::get_size_mb(std::vector<std::string>& files) {
     return size_sum/1024.0f;
 }
 
-int FileUtil::get_file_size(const std::string& path, long long& fsize) {
+int FileUtil::get_file_size(const std::string& path, int64_t& fsize) {
     if (path.empty()) {
         MI_UTIL_LOG(MI_ERROR) << "FileUtil::get_file_size input path is empty.";
         return -1;

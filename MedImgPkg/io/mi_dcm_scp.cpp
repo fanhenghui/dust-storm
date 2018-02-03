@@ -1,6 +1,8 @@
 #include "mi_dcm_scp.h"
 #include "mi_io_logger.h"
 
+#include "util/mi_file_util.h"
+
 MED_IMG_BEGIN_NAMESPACE
 
 MIDcmSCP::MIDcmSCP():_stop(false),_instance_infos(nullptr) {
@@ -44,7 +46,15 @@ Uint16 MIDcmSCP::checkAndProcessSTORERequest(const T_DIMSE_C_StoreRQ &reqMessage
                 << info.sop_instance_uid << ", " << info.file_path;
         }
 
-        return DcmStorageSCP::checkAndProcessSTORERequest(reqMessage, fileformat);
+        Uint16 statusCode = DcmStorageSCP::checkAndProcessSTORERequest(reqMessage, fileformat);
+        if (STATUS_Success == statusCode) {
+            int64_t file_size = 0;
+            if( -1 != FileUtil::get_file_size(filename.c_str(), file_size)) {
+                (*_instance_infos)[_instance_infos->size()-1].file_size = file_size;
+            }
+        }
+
+        return statusCode;
     } else {
         return STATUS_STORE_Error_CannotUnderstand;
     }

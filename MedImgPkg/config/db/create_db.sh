@@ -112,7 +112,7 @@ CREATE INDEX prep_name ON preprocess_type(prep_name(32));
 CREATE TABLE preprocess(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
-    prep_type_fk BIGINT NOT NULL,
+    prep_type_fk INT NOT NULL,
     retrieve_user_fk VARCHAR(32) NOT NULL,
     version VARCHAR(32),
     file_path VARCHAR(4096),
@@ -141,7 +141,7 @@ CREATE TABLE evaluation(
     file_path VARCHAR(4096),
     file_size BIGINT,
     CONSTRAINT series_eva_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT evaluation_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 

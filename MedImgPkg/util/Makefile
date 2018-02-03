@@ -19,7 +19,7 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-INDEPENDENT_OBJS = mi_model_interface.o mi_file_util.o mi_operation_factory.o
+INDEPENDENT_OBJS = mi_model_interface.o mi_file_util.o mi_operation_factory.o mi_time_util.o
 
 SOCKET_OBJS = mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o mi_ipc_server_proxy.o
 

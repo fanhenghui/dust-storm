@@ -2,6 +2,7 @@
 #include "mi_dcm_scu.h"
 #include "mi_dcm_scp.h"
 #include "mi_io_logger.h"
+#include "mi_db.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -428,7 +429,6 @@ int PACSCommunicator::query_study(const PatientInfo& patient_key, const StudyInf
     query_key.putAndInsertString(DCM_StudyDescription, "");
     query_key.putAndInsertString(DCM_NumberOfStudyRelatedInstances, "");
     query_key.putAndInsertString(DCM_NumberOfStudyRelatedSeries, "");
-
 
     const T_ASC_PresentationContextID id = findUncompressedPC(UID_FINDStudyRootQueryRetrieveInformationModel, *_scu);
     if (id == 0) {

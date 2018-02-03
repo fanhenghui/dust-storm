@@ -79,6 +79,7 @@ struct DcmInstanceInfo {
     std::string sop_class_uid;
     std::string sop_instance_uid;
     std::string file_path;
+    int64_t file_size;
 
     DcmInstanceInfo() {}
     DcmInstanceInfo(std::string sop_class_uid_, std::string sop_instance_uid_, std::string file_path_): 
@@ -94,7 +95,13 @@ struct RoleInfo {
 
 struct UserInfo {
     std::string id;
+    int role_fk;
     std::string name;
+
+    UserInfo(): role_fk(-1) {}
+    
+    UserInfo(const std::string& id_, int role_fk_, const std::string& name_):
+    id(id_), role_fk(role_fk_), name(name_) {}
 };
 
 struct EvaluationInfo {

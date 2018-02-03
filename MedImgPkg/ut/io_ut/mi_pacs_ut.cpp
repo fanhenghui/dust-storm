@@ -1,6 +1,7 @@
 #include "io/mi_pacs_communicator.h"
 #include "io/mi_io_logger.h"
 #include "io/mi_configure.h"
+#include "io/mi_db.h"
 
 #include <boost/algorithm/string.hpp>
 #include <iostream>
@@ -82,6 +83,14 @@ int pacs_ut(int argc, char* argv[]) {
 
     PACSCommunicator pacs_comm;
     if(-1 == pacs_comm.connect(PACSServerAETitle, PACSServerHost, PACSServerPort, PACSClientAETitle, PACSClientPort)) {
+        return -1;
+    }
+
+    DB db;
+    std::string ip_port,user,pwd,db_name;
+    Configure::instance()->get_db_info(ip_port, user, pwd, db_name);
+    if(0 != db.connect(user, ip_port, pwd, db_name) ) {
+        MI_IO_LOG(MI_FATAL) << "connect to db failed.";
         return -1;
     }
 
@@ -302,7 +311,21 @@ int pacs_ut(int argc, char* argv[]) {
             if (!invalid_cmd) {
                 MI_IO_LOG(MI_INFO) << "try retrieve series: " << series_uid << " to path: " << path;
                 std::vector<DcmInstanceInfo> instance_infos;
+                std::vector<PatientInfo> patient_infos;
+                std::vector<StudyInfo> study_infos;
+                std::vector<SeriesInfo> series_infos;
+                PatientInfo pkey;
+                StudyInfo studykey;
+                SeriesInfo serieskey;
+                serieskey.series_uid = series_uid;
+                if (-1 != pacs_comm.query_series(pkey, studykey, serieskey, &patient_infos, &study_infos, &series_infos));
                 if( -1 != pacs_comm.retrieve_series(series_uid, path, &instance_infos) ) {
+                    std::vector<UserInfo> user_infos;
+                    UserInfo ukey;
+                    db.query_user(ukey, &user_infos);
+                    if (!user_infos.empty()) {
+                        db.insert_dcm_series(study_infos[0], series_infos[0], patient_infos[0], user_infos[0], instance_infos);
+                    }
                     
                 } else {
                     MI_IO_LOG(MI_ERROR) << "PACS commucation retrieve series failed.";
