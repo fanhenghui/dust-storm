@@ -28,7 +28,7 @@ CREATE TABLE patient(
     patient_id VARCHAR(64),
     patient_name VARCHAR(64),
     patient_sex VARCHAR(16),
-    patient_birth_date TIMESTAMP,
+    patient_birth_date VARCHAR(8),
     md5 VARCHAR(32) NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -70,7 +70,7 @@ CREATE TABLE series(
     modality VARCHAR(16),
     series_desc VARCHAR(64),
     institution VARCHAR(64),
-    instance_num INT NOT NULL,
+    num_instance INT NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT study_fk FOREIGN KEY (study_fk) REFERENCES study(id) ON DELETE RESTRICT ON UPDATE RESTRICT    

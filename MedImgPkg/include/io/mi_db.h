@@ -23,10 +23,6 @@ public:
     //insert 
     int insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
          const std::vector<DcmInstanceInfo>& instance_info);
-    int insert_patient(PatientInfo& patient_info);
-    int insert_study(StudyInfo& study_info);
-    int insert_series(SeriesInfo& series_info);
-    int insert_instance(const std::string& user_fk, int64_t series_fk, const std::vector<DcmInstanceInfo>& instance_info);
 
     int insert_evaluation(const EvaluationInfo& eva);
     int insert_annotation(const AnnotationInfo& anno);
@@ -42,7 +38,7 @@ public:
     int update_preprocess(int prep_id, const PreprocessInfo& prep);
 
     //delete
-    int delete_dcm_series(int series_id);
+    int delete_dcm_series(int series_id, bool transcation = true);
     int delete_evaluation(int eva_id);
     int delete_annotation(int anno_id);
     int delete_preprocess(int prep_id);
@@ -79,6 +75,11 @@ public:
     // int update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data);
     // int update_usr_annotation(const std::string& series_id, const std::string& usr_name, const std::string& annotation_usr_path);
 
+public://FOR test , set to private later
+    int insert_patient(PatientInfo& patient_info);
+    int insert_study(StudyInfo& study_info);
+    int insert_series(SeriesInfo& series_info);
+    int insert_instance(const std::string& user_fk, int64_t series_fk, const std::vector<DcmInstanceInfo>& instance_info);
 private:
     int verfiy_study_info(const StudyInfo& info);
     int verfiy_series_info(const SeriesInfo& info);

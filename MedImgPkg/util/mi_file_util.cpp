@@ -281,4 +281,8 @@ int FileUtil::get_file_size(const std::string& path, int64_t& fsize) {
     return 0;
 }
 
+int FileUtil::remove_file(const std::string& path) {
+    return remove(path.c_str());
+}
+
 MED_IMG_END_NAMESPACE

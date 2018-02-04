@@ -6,11 +6,13 @@
 #include "cppconn/resultset.h"
 #include "cppconn/sqlstring.h"
 #include "cppconn/statement.h"
+#include "cppconn/connection.h"
 #include "mysql_connection.h"
 #include "mi_io_logger.h"
 #include "mi_md5.h"
 #include "util/mi_memory_shield.h"
 #include "util/mi_time_util.h"
+#include "util/mi_file_util.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -34,6 +36,8 @@ if (!this->try_connect()) {\
     MI_IO_LOG(MI_ERROR) << "db connection invalid.";\
     return -1;\
 }
+
+#define THROW_SQL_EXCEPTION throw std::exception(std::logic_error("sql error"));
 
 inline int get_patient_hash(const PatientInfo& patient_info, std::string& patient_hash) {
     std::stringstream patient_msg;
@@ -173,22 +177,34 @@ int DB::insert_patient(PatientInfo& patient_info) {
             return -1;
         }
     }
-    std::stringstream sql;
-    {
-        sql << "INSERT INTO " << PATIENT_TABLE <<"(patient_id,patient_name,patient_sex,patient_birth_date,md5)" << " VALUES (\'"
-        << patient_info.patient_id << "\',\'" 
+
+    try {
+        std::stringstream sql;
+        if (patient_info.patient_birth_date.empty()) {
+            sql << "INSERT INTO " << PATIENT_TABLE <<"(patient_id,patient_name,patient_sex,md5)" << " VALUES (\'";
+        } else {
+            sql << "INSERT INTO " << PATIENT_TABLE <<"(patient_id,patient_name,patient_sex,patient_birth_date,md5)" << " VALUES (\'";
+        }
+        
+        sql << patient_info.patient_id << "\',\'" 
         << patient_info.patient_name << "\',\'" 
-        << patient_info.patient_sex << "\',\'" 
-        << patient_info.patient_birth_date << "\',\'" 
-        << patient_info.md5 << "\')";
+        << patient_info.patient_sex << "\',\'";
+        if (!patient_info.patient_birth_date.empty()) {
+            sql << patient_info.patient_birth_date << "\',\'";
+        }
+        sql << patient_info.md5 << "\')";
+
+        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str(); 
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res); 
         StructShield<sql::ResultSet> shield(res);
         if(0 != err) {
-            MI_IO_LOG(MI_ERROR) << "db insert patient failed.";
-            return -1;
+            THROW_SQL_EXCEPTION
         }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db insert patient failed: " << e.what();
+        return -1;
     }
 
     return 0;    
@@ -209,24 +225,26 @@ int DB::update_patient(PatientInfo& patient_info) {
             return -1;
         }
     }
-    std::stringstream sql;
-    {
-        sql << "UPDATE " << PATIENT_TABLE << " SET "
-        << "patient_id=\'" << patient_info.patient_id << "\',\'"
-        << "patient_sex=\'" << patient_info.patient_sex << "\',\'"
-        << "patient_name=\'" << patient_info.patient_name << "\',\'"
-        << "patient_birth_date=\'" << patient_info.patient_birth_date << "\',\'"
-        << "WHERE id=" << patient_info.id << ";";
 
+    try {
+        std::stringstream sql;
+        sql << "UPDATE " << PATIENT_TABLE << " SET "
+        << "patient_id=\'" << patient_info.patient_id << "\',"
+        << "patient_sex=\'" << patient_info.patient_sex << "\',"
+        << "patient_name=\'" << patient_info.patient_name << "\',"
+        << "patient_birth_date=\'" << patient_info.patient_birth_date << "\' "
+        << "WHERE id=" << patient_info.id << ";";
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res); 
         StructShield<sql::ResultSet> shield(res);
         if(0 != err) {
-            MI_IO_LOG(MI_ERROR) << "db insert patient failed.";
-            return -1;
+            THROW_SQL_EXCEPTION
         }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db update patient failed: " << e.what();
+        return -1;
     }
-
+    
     return 0;    
 }
 
@@ -249,30 +267,37 @@ int DB::insert_study(StudyInfo& study_info) {
         }
     }
 
-    std::stringstream sql;
-    sql << "INSERT INTO " << STUDY_TABLE << "(patient_fk, study_id, study_uid, ";
-    if (datetime.empty()) {
-        sql << "study_date_time, accession_no, study_desc, num_series, num_instance)";
-    } else {
-        sql << "accession_no, study_desc, num_series, num_instance)";
-    }
-    sql << " VALUES("
-    << "\'" << study_info.patient_fk << "\',"
-    << "\'" << study_info.study_id << "\',"
-    << "\'" << study_info.study_uid << "\',";
-    if (!datetime.empty()) {
-        sql << "\'" << datetime << "\',";
-    }
-    sql << "\'" << study_info.accession_no << "\',"
-    << "\'" << study_info.study_desc << "\',"
-    << "\'" << study_info.num_series << "\',"
-    << "\'" << study_info.num_instance << "\'"
-    << ");";
+    try {
+        std::stringstream sql;
+        sql << "INSERT INTO " << STUDY_TABLE << "(patient_fk, study_id, study_uid, ";
+        if (!datetime.empty()) {
+            sql << "study_date_time, accession_no, study_desc, num_series, num_instance)";
+        } else {
+            sql << "accession_no, study_desc, num_series, num_instance)";
+        }
+        sql << " VALUES("
+        << "\'" << study_info.patient_fk << "\',"
+        << "\'" << study_info.study_id << "\',"
+        << "\'" << study_info.study_uid << "\',";
+        if (!datetime.empty()) {
+            sql << "\'" << datetime << "\',";
+        }
+        sql << "\'" << study_info.accession_no << "\',"
+        << "\'" << study_info.study_desc << "\',"
+        << "\'" << study_info.num_series << "\',"
+        << "\'" << study_info.num_instance << "\'"
+        << ");";
 
-    sql::ResultSet* res = nullptr;
-    if(0 != this->query(sql.str(), res) ) {
+        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
         StructShield<sql::ResultSet> shield(res);
-        MI_IO_LOG(MI_ERROR) << "db insert study failed.";
+        if(0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db insert study failed: " << e.what();
         return -1;
     }
     
@@ -281,6 +306,11 @@ int DB::insert_study(StudyInfo& study_info) {
 
 int DB::update_study(StudyInfo& study_info) {
     TRY_CONNECT
+
+    if (study_info.id <= 0) {
+        MI_IO_LOG(MI_ERROR) << "update study failed: invalid study pk.";
+        return -1;
+    }
 
     //verify
     if (0 != verfiy_study_info(study_info)) {
@@ -297,24 +327,31 @@ int DB::update_study(StudyInfo& study_info) {
         }
     }
 
-    std::stringstream sql;
-    sql << "UPDATE " << STUDY_TABLE << " SET " 
-    << "study_uid=\'" << study_info.study_uid << "\'"
-    << "study_id=\'" << study_info.study_id << "\'"
-    << "study_datetime=\'" << datetime << "\'"
-    << "accession_no=\'" << study_info.accession_no << "\'"
-    << "study_desc=\'" << study_info.study_desc << "\'"
-    << "num_series=" << study_info.num_series
-    << "num_instance=" << study_info.num_instance
-    << "WHERE id=" << study_info.id;
-    
-    sql::ResultSet* res = nullptr;
-    int err = query(sql.str(), res);
-    StructShield<sql::ResultSet> shield(res);
-    if (0 != err) {
-        MI_IO_LOG(MI_ERROR) << "update study failed: sql failed.";
+    try {
+        std::stringstream sql;
+        sql << "UPDATE " << STUDY_TABLE << " SET " 
+        << "study_uid=\'" << study_info.study_uid << "\',"
+        << "study_id=\'" << study_info.study_id << "\',";
+        if (!datetime.empty()) {
+            sql << "study_date_time=\'" << datetime << "\',";
+        }
+        sql << "accession_no=\'" << study_info.accession_no << "\',"
+        << "study_desc=\'" << study_info.study_desc << "\',"
+        << "num_series=" << study_info.num_series << ","
+        << "num_instance=" << study_info.num_instance << " "
+        << "WHERE id=" << study_info.id;
+
+        sql::ResultSet* res = nullptr;
+        int err = query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db update study failed: " << e.what();
         return -1;
     }
+
     return 0;
 }
 
@@ -327,22 +364,29 @@ int DB::insert_series(SeriesInfo& series_info) {
         return -1;
     }
 
-    std::stringstream sql;
-    sql << "INSERT INTO study(study_fk, series_uid, series_no, modality, series_desc, institution, num_instance)"
-    << " VALUES("
-    << "\'" << series_info.study_fk << "\',"
-    << "\'" << series_info.series_uid << "\',"
-    << "\'" << series_info.series_no << "\',"
-    << "\'" << series_info.modality << "\',"
-    << "\'" << series_info.series_desc << "\',"
-    << "\'" << series_info.institution << "\',"
-    << "\'" << series_info.num_instance << "\'"
-    << ");";
+    try { 
+        std::stringstream sql;
+        sql << "INSERT INTO " << SERIES_TABLE
+        << "(study_fk, series_uid, series_no, modality, series_desc, institution, num_instance) VALUES("
+        << "\'" << series_info.study_fk << "\',"
+        << "\'" << series_info.series_uid << "\',"
+        << "\'" << series_info.series_no << "\',"
+        << "\'" << series_info.modality << "\',"
+        << "\'" << series_info.series_desc << "\',"
+        << "\'" << series_info.institution << "\',"
+        << "\'" << series_info.num_instance << "\'"
+        << ");";
 
-    sql::ResultSet* res = nullptr;
-    if(0 != this->query(sql.str(), res) ) {
+        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str(); 
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
         StructShield<sql::ResultSet> shield(res);
-        MI_IO_LOG(MI_ERROR) << "db insert series failed.";
+        if(0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db insert series failed: " << e.what();
         return -1;
     }
     
@@ -352,31 +396,41 @@ int DB::insert_series(SeriesInfo& series_info) {
 int DB::update_series(SeriesInfo& series_info) {
     TRY_CONNECT
 
+    if (series_info.id <= 0) {
+        MI_IO_LOG(MI_ERROR) << "update series failed: invalid series pk.";
+        return -1;
+    }
+
     //verify
     if (0 != verfiy_series_info(series_info)) {
         MI_IO_LOG(MI_ERROR) << "insert series failed: invalid series info.";
         return -1;
     }
 
-    std::stringstream sql;
-    sql << "INSERT INTO study(study_fk, series_uid, series_no, modality, series_desc, institution, num_instance)"
-    << " VALUES("
-    << "\'" << series_info.study_fk << "\',"
-    << "\'" << series_info.series_uid << "\',"
-    << "\'" << series_info.series_no << "\',"
-    << "\'" << series_info.modality << "\',"
-    << "\'" << series_info.series_desc << "\',"
-    << "\'" << series_info.institution << "\',"
-    << "\'" << series_info.num_instance << "\'"
-    << ");";
+    try { 
+        std::stringstream sql;
+        sql << "UPDATE " << SERIES_TABLE << " SET " 
+        << "study_fk=" << series_info.study_fk << ", "
+        << "series_uid=\'" << series_info.series_uid << "\', " 
+        << "series_no=\'" << series_info.series_no << "\', " 
+        << "modality=\'" << series_info.modality << "\', " 
+        << "series_desc=\'" << series_info.series_desc << "\', " 
+        << "institution=\'" << series_info.institution << "\', " 
+        << "num_instance=" << series_info.num_instance 
+        << " WHERE id=" << series_info.id << ";";
 
-    sql::ResultSet* res = nullptr;
-    if(0 != this->query(sql.str(), res) ) {
+        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
         StructShield<sql::ResultSet> shield(res);
-        MI_IO_LOG(MI_ERROR) << "db insert series failed.";
+        if(0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db update series failed: " << e.what();
         return -1;
     }
-    
     return 0;
 }
 
@@ -402,45 +456,49 @@ int DB::insert_instance(const std::string& user_fk, int64_t series_fk, const std
         return -1;
     }
 
-    for (auto it = instance_info.begin(); it != instance_info.end(); ++it) {
-        const DcmInstanceInfo &info = *it;
-        //verfiy
-        if (info.sop_class_uid.empty()) {
-            MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy sop class uid.";
-            return -1;
-        }
-        if (info.sop_instance_uid.empty()) {
-            MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy sop instance uid.";
-            return -1;
-        }
-        if (info.file_path.empty()) {
-            MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy file path.";
-            return -1;
-        }
-        if (info.file_size <=0) {
-            MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy file size.";
-            return -1;
-        }
+    try {
+        for (auto it = instance_info.begin(); it != instance_info.end(); ++it) {
+            const DcmInstanceInfo &info = *it;
+            //verfiy
+            if (info.sop_class_uid.empty()) {
+                MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy sop class uid.";
+                return -1;
+            }
+            if (info.sop_instance_uid.empty()) {
+                MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy sop instance uid.";
+                return -1;
+            }
+            if (info.file_path.empty()) {
+                MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy file path.";
+                return -1;
+            }
+            if (info.file_size <=0) {
+                MI_IO_LOG(MI_ERROR) << "invalid instance info: emtpy file size.";
+                return -1;
+            }
 
-        std::stringstream sql;
-        sql << "INSERT INTO study(series_fk, sop_class_uid, sop_instance_uid, retrieve_user_fk, file_path, file_size)"
-        << " VALUES("
-        << "\'" << series_fk << "\',"
-        << "\'" << info.sop_class_uid << "\',"
-        << "\'" << info.sop_instance_uid << "\',"
-        << "\'" << user_fk << "\',"
-        << "\'" << info.file_path << "\',"
-        << "\'" << info.file_size << "\',"
-        << ");";
+            std::stringstream sql;
+            sql << "INSERT INTO " << INSTANCE_TABLE
+            << "(series_fk, sop_class_uid, sop_instance_uid, retrieve_user_fk, file_path, file_size) VALUES("
+            << "\'" << series_fk << "\',"
+            << "\'" << info.sop_class_uid << "\',"
+            << "\'" << info.sop_instance_uid << "\',"
+            << "\'" << user_fk << "\',"
+            << "\'" << info.file_path << "\',"
+            << "\'" << info.file_size << "\'"
+            << ");";
 
-        sql::ResultSet* res = nullptr;
-        if(0 != this->query(sql.str(), res) ) {
+            sql::ResultSet* res = nullptr;
+            int err = this->query(sql.str(), res);
             StructShield<sql::ResultSet> shield(res);
-            MI_IO_LOG(MI_ERROR) << "db insert instnace failed.";
-            return -1;
+            if(0 != err) {
+                THROW_SQL_EXCEPTION
+            }
         }
+    } catch(const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "db insert instance failed: " << e.what();
+        return -1;
     }
-
     return 0;
 }
 
@@ -473,12 +531,12 @@ int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_
     sql << "1";
 
     sql::ResultSet* res = nullptr;
-    if(0 != this->query(sql.str(), res) ) {
-        StructShield<sql::ResultSet> shield(res);
+    int err = this->query(sql.str(), res);
+     StructShield<sql::ResultSet> shield(res);
+    if(0 != err) {
         MI_IO_LOG(MI_ERROR) << "db query patient failed.";
         return -1;
     } else {
-        StructShield<sql::ResultSet> shield(res);
         while (res->next()) {
             patient_infos->push_back(PatientInfo());
             PatientInfo& info = (*patient_infos)[patient_infos->size()-1];
@@ -495,25 +553,45 @@ int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_
 }
 
 int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
-         const std::vector<DcmInstanceInfo>& instance_info) {
+         const std::vector<DcmInstanceInfo>& instance_info) { 
+
     TRY_CONNECT
+
     MI_IO_LOG(MI_DEBUG) << "insert dcm series: IN";
     //transaction begin
     int err = 0;
-    sql::ResultSet* res_begin = nullptr;
-    err = this->query("BEGIN;", res_begin);
-    StructShield<sql::ResultSet> shield(res_begin);
-    if(0 != err) {
-        MI_IO_LOG(MI_ERROR) << "db query transaction begin failed.";
-        return -1;
-    }
-    
     MI_IO_LOG(MI_DEBUG) << "insert dcm series: begin";
 
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("insert_dcm_series");
+    StructShield<sql::Savepoint> shield(save_point);
     try {
+        //---------------------------//
+        //delete old series
+        //---------------------------//
+        if (series_info.series_uid.size() > UID_LIMIT) {
+            throw std::exception(std::logic_error("invalid series uid."));
+        }
+
+        std::stringstream sql_select_series;
+        sql_select_series << "SELECT id FROM " << SERIES_TABLE
+        << " WHERE series_uid=\'" << series_info.series_uid << "\';";
+
+        sql::ResultSet* res_select_series = nullptr;
+        err = query(sql_select_series.str(), res_select_series);
+        StructShield<sql::ResultSet> shield_select_series(res_select_series);
+        if (0 != err) {
+            throw std::exception(std::logic_error("query study failed."));
+        } else if (res_select_series->next()) {
+            if (0!= delete_dcm_series(res_select_series->getInt64("id"), false)) {
+                throw std::exception(std::logic_error("delete series failed."));    
+            }
+        }
+
         //---------------------------//
         //insert into patient
         //---------------------------//
+
         if (patient_info.md5.empty()) {
             if (0 != get_patient_hash(patient_info, patient_info.md5)) {
                 throw std::exception(std::logic_error("calculate patient md5 failed."));
@@ -529,11 +607,17 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
         }
 
         if (pres.size() == 0) {
+            //insert new patient
             if (0 != insert_patient(patient_info)) {
                 throw std::exception(std::logic_error("insert patient failed."));
             }
             if (0 != query_patient(pkey, &pres)) {
                throw std::exception(std::logic_error("query patient failed."));
+            }
+        } else {
+            //update patient info
+            if (0 != update_patient(pres[0])) {
+                throw std::exception(std::logic_error("update patient failed."));
             }
         }
         study_info.patient_fk = pres[0].id;
@@ -550,7 +634,7 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
         
         int64_t study_pk = -1;
         {
-            std::string sql_study("SELECT study_uid FROM study WHERE study_uid=\'");
+            std::string sql_study("SELECT id FROM study WHERE study_uid=\'");
             sql_study += study_info.study_uid;
             sql_study += "\';";
             sql::ResultSet* res_study = nullptr;
@@ -568,6 +652,19 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
             //insert study
             if(0 != insert_study(study_info)) {
                 throw std::exception(std::logic_error("insert study failed."));
+            }
+
+            std::string sql_study("SELECT id FROM study WHERE study_uid=\'");
+            sql_study += study_info.study_uid;
+            sql_study += "\';";
+            sql::ResultSet* res_study = nullptr;
+            err = query(sql_study, res_study);
+            StructShield<sql::ResultSet> shield_res_study(res_study);
+            if (0 != err) {
+                throw std::exception(std::logic_error("query study failed."));
+            }
+            if (res_study->next()) {
+                study_pk = res_study->getInt64("id");
             }
         } else {
             //update study
@@ -590,7 +687,7 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
         
         int64_t series_pk = -1;
         {
-            std::string sql_series("SELECT series_uid FROM series WHERE series_uid=\'");
+            std::string sql_series("SELECT id FROM series WHERE series_uid=\'");
             sql_series += series_info.series_uid;
             sql_series += "\';";
             sql::ResultSet* res_series = nullptr;
@@ -604,23 +701,36 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
             }
         }
 
-        if (series_pk <= 0) {
-            //insert series
-            if(0 != insert_series(series_info)) {
-                throw std::exception(std::logic_error("insert series failed."));
+        if (series_pk > 0) {
+            //delete old series
+            if (0!= delete_dcm_series(series_pk, false)) {
+                throw std::exception(std::logic_error("delete series failed."));    
             }
+            series_pk = -1;
+        }
+        
+        if(0 != insert_series(series_info)) {
+            throw std::exception(std::logic_error("insert series failed."));
         } else {
-            //update series
-            series_info.id = series_pk;
-            if (0 != update_series(series_info) ) {
-                throw std::exception(std::logic_error("update series failed."));
-            }            
+            //get series pk
+            std::string sql_series("SELECT id FROM series WHERE series_uid=\'");
+            sql_series += series_info.series_uid;
+            sql_series += "\';";
+            sql::ResultSet* res_series = nullptr;
+            err = query(sql_series, res_series);
+            StructShield<sql::ResultSet> shield_res_series(res_series);
+            if (0 != err) {
+                throw std::exception(std::logic_error("query series failed after insert new series."));
+            }
+            if (res_series->next()) {
+                series_pk = res_series->getInt64("id");
+            }
         }
 
         MI_IO_LOG(MI_DEBUG) << "insert dcm series: insert series done";
 
         //---------------------------//
-        //insert into series
+        //insert into instance
         //---------------------------//
         if (user_info.id.empty()) {
             throw std::exception(std::logic_error("invalid user fk."));
@@ -632,24 +742,12 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
         MI_IO_LOG(MI_DEBUG) << "insert dcm series: insert instance done";
         
     } catch (const std::exception& e) {
-        //transaction rollback
-        sql::ResultSet* res_rollback = nullptr;
-        err = this->query("ROLLBACK;", res_rollback);
-        StructShield<sql::ResultSet> shield(res_rollback);
-        if(0 != err) {
-            MI_IO_LOG(MI_ERROR) << "db query transaction rollback failed.";
-        }
+        MI_IO_LOG(MI_ERROR) << "db insert dcm series failed: " << e.what();
+        _connection->rollback(save_point);
         return -1;
     }
 
-    //transaction commit
-    sql::ResultSet* res_commit = nullptr;
-    err = this->query("COMMIT;", res_commit);
-    StructShield<sql::ResultSet> shield2(res_commit);
-    if(0 != err) {
-        MI_IO_LOG(MI_ERROR) << "db query transaction commit failed.";
-    }
-
+    _connection->commit();
     MI_IO_LOG(MI_DEBUG) << "insert dcm series: insert done";
 
     return 0;
@@ -697,647 +795,163 @@ int DB::query_user(const UserInfo& key, std::vector<UserInfo>* user_infos) {
     return 0;
 }
 
-// int DB::insert_evaluation(const EvaItem& eva) {
-
-// }
-
-// int DB::insert_annotation(const AnnoItem& anno) {
-
-// }
-
-// int DB::insert_preprocess(const PreprocessItem& prep) {
-
-// }
-
-// int DB::query_dicom(std::vector<DcmInfo>& dcm_infos, const QueryKey& key, QueryLevel query_level) {
-//     MI_IO_LOG(MI_TRACE) << "IN db inset item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-// }
-
-// int DB::query_user(const std::string& user_name, int role) {
-//     MI_IO_LOG(MI_TRACE) << "IN db query item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         sql::PreparedStatement* pstmt = nullptr;
-//         sql::ResultSet* res = nullptr;
-
-//         std::string sql_str;
-//         {
-//             std::stringstream ss;
-//             ss << "SELECT name, role_fk FROM " << USER_TABLE << " WHERE " <<;
-//             if (user_name.empty()) {
-//                 ss << "name=\'" << user_name << "\'";    
-//             }
-//             if (role != -1) {
-//                 ss << "role_fk=" << role;    
-//             }
-//             ss << ";";
-//             sql_str = ss.str();
-//         }
-//         pstmt = _connection->prepareStatement(sql_str.c_str());
-//         res = pstmt->executeQuery();
-//         delete pstmt;
-//         pstmt = nullptr;
-
-//         if (res->next()) {
-//             delete res;
-//             res = nullptr;
-//             in_db = true;
-//         } else {
-//             delete res;
-//             res = nullptr;
-//             in_db = false;
-//         }
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db query item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db query item.";
-//     return 0;    
-// }
-
-// int DB::query_evaluation(int series_id, int eva_type) {
-
-// }
-
-// int DB::query_preprocess(int series_id, int prep_type) {
-
-// }
-
-// int DB::query_annotation(int series_id, int anno_type, const std::string& user_id) {
-
-// }
-
-// int DB::delete_dcm_series(int series_id) {
-
-// }
-
-// int DB::delete_evaluation(int eva_id) {
-
-// }
-
-// int DB::delete_annotation(int anno_id) {
-
-// }
-
-// int DB::delete_preprocess(int prep_id) {
-
-// }
-
-// int DB::modify_dcm_series(const DcmInfo& series_info, const std::vector<DcmInstanceInfo>& instance_info, const std::string& user) {
-
-// }
-
-// int DB::modify_evaluation(int eva_id, const EvaItem& eva) {
-
-// }
-
-// int DB::modify_annotation(int anno_id, const AnnoItem& anno) {
-
-// }
-
-// int DB::modify_preprocess(int prep_id, const PreprocessItem& prep) {
-
-// }
-
-
-
-
-// int DB::insert_dcm_item(const ImgItem& item) {
-//     MI_IO_LOG(MI_TRACE) << "IN db inset item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     //query    
-//     bool in_db(false);
-//     if(0 != query_dcm_item(item.series_id, in_db)) {
-//         MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
-//         return -1;
-//     }
-
-//     //delete if exit
-//     if (in_db) {
-//         if(0 != delete_dcm_item(item.series_id)) {
-//             MI_IO_LOG(MI_ERROR) << "delete item failed when insert the item with the same primary key.";
-//             return -1;
-//         }
-//     }
-
-//     // insert new one
-//     try {
-//         // insert new item
-//         std::string sql_str;
-//         {
-//             std::stringstream ss;
-//             ss << "INSERT INTO " << DCM_TABLE << " (series_id, study_id, patient_name, "
-//                "patient_id, modality, size_mb, dcm_path, preprocess_mask_path) values (";
-//             ss << "\'" << item.series_id << "\',";
-//             ss << "\'" << item.study_id << "\',";
-//             ss << "\'" << item.patient_name << "\',";
-//             ss << "\'" << item.patient_id << "\',";
-//             ss << "\'" << item.modality << "\',";
-//             ss << "\'" << item.size_mb << "\',";
-//             ss << "\'" << item.dcm_path << "\',";
-//             ss << "\'" << item.preprocess_mask_path << "\'";
-//             ss << ");";
-//             sql_str = ss.str();
-//         }
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(sql_str.c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete pstmt;
-//         pstmt = nullptr;
-//         delete res;
-//         res = nullptr;
-
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
-//         << this->get_sql_exception_info(&e);
+int DB::delete_dcm_series(int series_id, bool transcation) {
+    
+    sql::Savepoint* save_point = nullptr;
+    if (transcation) {
+        _connection->setAutoCommit(false);
+        save_point = _connection->setSavepoint("delete_dcm_series.");
+    }
+    StructShield<sql::Savepoint> shield0(save_point);
+    
+    try {
+        int err = 0;
         
-//         //TODO recovery old one if insert failed
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db query inset item."; 
-//     return 0;
-// }
+        //-------------------------------------------------------------//
+        //delete instance file
+        //-------------------------------------------------------------//
+        std::stringstream sql;
+        sql << "SELECT file_path FROM instance WHERE series_fk=" << series_id << ";";
+        sql::ResultSet* res_select_instance = nullptr;
+        StructShield<sql::ResultSet> shield(res_select_instance);
+        err = this->query(sql.str(), res_select_instance);
+        if (err != 0) {
+            throw std::exception(std::logic_error("query instance failed."));
+        }
 
-// int DB::delete_dcm_item(const std::string& series_id) {
-//     MI_IO_LOG(MI_TRACE) << "IN db query delete item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
+        while(res_select_instance->next()) {
+            std::string file_path = res_select_instance->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove instance file: "<< file_path << " failed.";
+            }
+        }
 
-//     //query    
-//     bool in_db(false);
-//     if(0 != query_dcm_item(series_id, in_db)) {
-//         MI_IO_LOG(MI_ERROR) << "query failed when insert item.";
-//         return -1;
-//     }
+        //-------------------------------------------------------------//
+        //delete instance row
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "DELETE FROM instance WHERE series_fk=" << series_id << ";";
+        sql::ResultSet* res_delete_instance = nullptr;
+        StructShield<sql::ResultSet> shield2(res_delete_instance);
+        err = this->query(sql.str(), res_delete_instance);
+        if (err != 0) {
+            throw std::exception(std::logic_error("delete instance row failed."));
+        }
 
-//     if (!in_db) {
-//         MI_IO_LOG(MI_WARNING) << "delete item not exist which series is: " << series_id;        
-//         return 0;
-//     }
+        //-------------------------------------------------------------//
+        //delete series
+        //-------------------------------------------------------------//
+        //query study pk
+        sql.str("");
+        sql << "SELECT study_fk FROM series WHERE id=" << series_id << ";";
+        sql::ResultSet* res_select_series = nullptr;
+        StructShield<sql::ResultSet> shield3(res_select_series);
+        err = this->query(sql.str(), res_select_series);
+        if (err != 0) {
+            throw std::exception(std::logic_error("select series row failed."));
+        }
 
-//     //delete
-//     try {
-//         std::string sql_str;
-//         {
-//             std::stringstream ss;
-//             ss << "DELETE FROM " << DCM_TABLE << " where series_id=\'" << series_id << "\';";
-//             sql_str = ss.str();
-//         }
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(sql_str.c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete pstmt;
-//         pstmt = nullptr;
-//         delete res;
-//         res = nullptr;
+        int64_t study_fk = -1;
+        if(res_select_series->next()) {
+            study_fk = res_select_series->getInt64("study_fk"); 
+        }
+        if (study_fk <= 0) {
+            throw std::exception(std::logic_error("invalid study fk in this series."));
+        }   
 
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "qurey db when inset item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         // TODO recovery DB if delete failed
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db delete item."; 
-//     return 0;
-// }
+        sql.str("");
+        sql << "DELETE FROM series WHERE id=" << series_id << ";";
+        sql::ResultSet* res_delete_series = nullptr;
+        StructShield<sql::ResultSet> shield4(res_delete_series);
+        err = this->query(sql.str(), res_delete_series);
+        if (err != 0) {
+            throw std::exception(std::logic_error("delete series row failed."));
+        }
 
-// int DB::query_dcm_item(const std::string& series_id, bool& in_db) {
-//     MI_IO_LOG(MI_TRACE) << "IN db query item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
+        //-------------------------------------------------------------//
+        //delete/update study when study has just one series
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "SELECT patient_fk, num_series FROM study WHERE id=" << study_fk << ";";
+        sql::ResultSet* res_select_study = nullptr;
+        StructShield<sql::ResultSet> shield5(res_select_study);
+        err = this->query(sql.str(), res_select_study);
+        if (err != 0) {
+            throw std::exception(std::logic_error("select study row failed."));
+        }
 
-//     try {
-//         sql::PreparedStatement* pstmt = nullptr;
-//         sql::ResultSet* res = nullptr;
+        int num_series = -1;
+        int64_t patient_fk = -1;
+        if (res_select_study->next()) {
+            num_series = res_select_study->getInt("num_series");
+            patient_fk = res_select_study->getInt64("patient_fk");
+        } else {
+            throw std::exception(std::logic_error("select study row failed: null study."));
+        }
 
-//         std::string sql_str;
-//         {
-//             std::stringstream ss;
-//             ss << "SELECT * FROM " << DCM_TABLE << " where series_id=\'" << series_id << "\';";
-//             sql_str = ss.str();
-//         }
-//         pstmt = _connection->prepareStatement(sql_str.c_str());
-//         res = pstmt->executeQuery();
-//         delete pstmt;
-//         pstmt = nullptr;
+        if (1 == num_series) {
+            //delete study row
+            sql.str("");
+            sql << "DELETE FROM study WHERE id=" << study_fk << ";";
+            sql::ResultSet* res_delete_study = nullptr;
+            StructShield<sql::ResultSet> shield(res_delete_study);
+            err = this->query(sql.str(), res_delete_study);
+            if (err != 0) {
+                throw std::exception(std::logic_error("delete study row failed."));
+            }
+        } else {
+            //update study num_series
+            sql.str("");
+            sql << "UPDATE " << STUDY_TABLE <<  " SET num_series="
+            << (num_series-1)
+            << " WHERE id=" << study_fk << ";";
+            sql::ResultSet* res_update_study = nullptr;
+            StructShield<sql::ResultSet> shield(res_update_study);
+            err = this->query(sql.str(), res_update_study);
+            if (err != 0) {
+                throw std::exception(std::logic_error("update study row failed."));
+            }
+        }
 
-//         if (res->next()) {
-//             delete res;
-//             res = nullptr;
-//             in_db = true;
-//         } else {
-//             delete res;
-//             res = nullptr;
-//             in_db = false;
-//         }
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db query item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db query item.";
-//     return 0;    
-// }
+        //-------------------------------------------------------------//
+        //delete patient when patient has just one study(has one series)
+        //-------------------------------------------------------------//
+        if (num_series == 1) {
+            sql.str("");
+            sql << "SELECT id FROM study WHERE patient_fk=" << patient_fk << ";";
+            sql::ResultSet* res_select_study2 = nullptr;
+            StructShield<sql::ResultSet> shield(res_select_study2);
+            err = this->query(sql.str(), res_select_study2);
+            if (err != 0) {
+                throw std::exception(std::logic_error("delete study row failed."));
+            }
 
-// int DB::get_dcm_item(const std::string& series_id, ImgItem& item) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
+            if (!res_select_study2->next()) {
+                //delete patient
+                sql.str("");
+                sql << "DELETE FROM patient WHERE id=" << patient_fk << ";";
+                sql::ResultSet* res_delete_patient = nullptr;
+                StructShield<sql::ResultSet> shield(res_delete_patient);
+                err = this->query(sql.str(), res_delete_patient);
+                if (err != 0) {
+                    throw std::exception(std::logic_error("delete patient row failed."));
+                }
+            }
+        }
+    }
+    catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "delete series(pk): " << series_id << " failed:" << e.what();
+        if (transcation) {
+            _connection->rollback(save_point);
+        }
+        return -1;
+    }
 
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << DCM_TABLE << " WHERE series_id=\'" << series_id << "\';";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
+    if (transcation) {
+        _connection->commit();
+    }
 
-//         if (res->next()) {
-//             item.series_id = res->getString("series_id");
-//             item.study_id = res->getString("study_id");
-//             item.patient_name = res->getString("patient_name");
-//             item.patient_id = res->getString("patient_id");
-//             item.modality = res->getString("modality");
-//             item.dcm_path = res->getString("dcm_path");
-//             item.preprocess_mask_path = res->getString("preprocess_mask_path");
-//             item.annotation_ai_path = res->getString("annotation_ai_path");
-//             item.size_mb = res->getInt("size_mb");
-//             item.ai_intermediate_data_path = res->getString("ai_intermediate_data_path");
-//             delete res;
-//             res = nullptr;
-//             delete pstmt;
-//             pstmt = nullptr;
-//         } else {
-//             delete res;
-//             res = nullptr;
-//             delete pstmt;
-//             pstmt = nullptr;
-//             return -1;
-//         }
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-
-//     MI_IO_LOG(MI_TRACE) << "Out db get item."; 
-//     return 0; 
-// }
-
-// int DB::get_ai_annotation_item(const std::string& series_id, std::string& annotation_ai_path) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get AI annotation item."; 
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << DCM_TABLE << " WHERE series_id=\'" << series_id << "\';";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         if (res->next()) {
-//             annotation_ai_path = res->getString("annotation_ai_path");
-//             delete res;
-//             res = nullptr;
-//             delete pstmt;
-//             pstmt = nullptr;
-//         } else {
-//             delete res;
-//             res = nullptr;
-//             delete pstmt;
-//             pstmt = nullptr;
-//             return -1;
-//         }
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-
-//     MI_IO_LOG(MI_TRACE) << "Out db get AI annotation item."; 
-//     return 0; 
-// }
-
-// int DB::get_usr_annotation_items_by_series(const std::string& series_id, std::vector<AnnoItem>& items) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by series id.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << ANNO_TABLE << " WHERE series_id=\'" << series_id << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         items.clear();
-//         while(true) {
-//             if(res->next()) {
-//                 AnnoItem item;
-//                 item.series_id = series_id;
-//                 item.usr_name = res->getString("usr_name");
-//                 item.annotation_usr_path = res->getString("annotation_usr_path");
-//                 items.push_back(item);
-//             } else {
-//                 break;
-//             }
-//         }
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get annotation items by series id failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by series id.";
-//     return 0;
-// }
-
-// int DB::get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector<AnnoItem>& items) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation items by usr.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << ANNO_TABLE << " WHERE usr_name=\'" << usr_name << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         items.clear();
-//         while(true) {
-//             if(res->next()) {
-//                 AnnoItem item;
-//                 item.series_id = res->getString("series_id");
-//                 item.usr_name = usr_name;
-//                 item.annotation_usr_path = res->getString("annotation_usr_path");
-//                 items.push_back(item);
-//             } else {
-//                 break;
-//             }
-//         }
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get annotation items by usr name failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation items by usr.";
-//     return 0;
-// }
-
-// int DB::get_usr_annotation_item(const std::string& series_id, const std::string& usr_name, std::vector<DB::AnnoItem>& items) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get usr annotation item.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << ANNO_TABLE << " WHERE usr_name=\'" << usr_name << "\'" 
-//         << " and series_id=\'" << series_id << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         items.clear();
-//         while(true) {
-//             if(res->next()) {
-//                 AnnoItem item;
-//                 item.series_id = series_id;
-//                 item.usr_name = usr_name;
-//                 item.annotation_usr_path = res->getString("annotation_usr_path");
-//                 items.push_back(item);
-//             } else {
-//                 break;
-//             }
-//         }
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get annotation item failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db get usr annotation item.";
-//     return 0;
-// }
-
-// int DB::get_all_dcm_items(std::vector<ImgItem>& items) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get all dcm items."; 
-//     if (!this->try_connect()) {;
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << DCM_TABLE;
-//         sql::PreparedStatement* pstmt =
-//             _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         items.clear();
-//         std::cout << res->rowsCount() << std::endl;
-
-//         while (true) {
-//             if (res->next()) {
-//                 ImgItem item;
-//                 item.series_id = res->getString("series_id");
-//                 item.study_id = res->getString("study_id");
-//                 item.patient_name = res->getString("patient_name");
-//                 item.patient_id = res->getString("patient_id");
-//                 item.modality = res->getString("modality");
-//                 item.dcm_path = res->getString("dcm_path");
-//                 item.preprocess_mask_path = res->getString("preprocess_mask_path");
-//                 item.annotation_ai_path = res->getString("annotation_ai_path");
-//                 item.size_mb = res->getInt("size_mb");
-//                 item.ai_intermediate_data_path = res->getInt("ai_intermediate_data_path");
-//                 items.push_back(item);
-//             } else {
-//                 break;
-//             }
-//         }
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get all items failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db get all dcm items."; 
-//     return 0;
-// }
-
-// int DB::get_all_usr_annotation_items(std::vector<AnnoItem>& items) {
-//     MI_IO_LOG(MI_TRACE) << "IN db get all usr annotation items.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "SELECT * FROM " << ANNO_TABLE;
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-
-//         items.clear();
-//         while(true) {
-//             if(res->next()) {
-//                 AnnoItem item;
-//                 item.series_id = res->getString("series_id");
-//                 item.usr_name = res->getString("usr_name");
-//                 item.annotation_usr_path = res->getString("annotation_usr_path");
-//                 items.push_back(item);
-//             } else {
-//                 break;
-//             }
-//         }
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db get all usr annotation items failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db get all usr annotation items.";
-//     return 0;
-// }
-
-// int DB::update_preprocess_mask(const std::string& series_id, const std::string& preprocess_mask_path) {
-//     MI_IO_LOG(MI_TRACE) << "IN db update preprocess mask.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "UPDATE " << DCM_TABLE << " SET preprocess_mask_path=\'" << preprocess_mask_path << "\'" 
-//         << " WHERE series_id=\'" << series_id << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db update preprocess mask failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db update preprocess mask.";
-//     return 0;
-// }
-
-// int DB::update_ai_annotation(const std::string& series_id, const std::string& annotation_ai_path) {
-//     MI_IO_LOG(MI_TRACE) << "IN db update AI annotation.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "UPDATE " << DCM_TABLE << " SET annotation_ai_path=\'" << annotation_ai_path << "\'" 
-//         << " WHERE series_id=\'" << series_id << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db update AI annotation failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db update AI annotation.";
-//     return 0;
-// }
-
-// int DB::update_ai_intermediate_data(const std::string& series_id, const std::string& ai_intermediate_data_path) {
-//     MI_IO_LOG(MI_TRACE) << "IN db update AI intermediate data.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "UPDATE " << DCM_TABLE << " SET ai_intermediate_data_path=\'" << ai_intermediate_data_path << "\'" 
-//         << " WHERE series_id=\'" << series_id << "\'";
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db update AI intermediate data failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db update AI intermediate data.";
-//     return 0;
-// }
-
-// int DB::update_usr_annotation(const std::string& series_id, const std::string& usr_name, const std::string& annotation_usr_path) {
-//     MI_IO_LOG(MI_TRACE) << "IN db update usr annotation.";
-//     if (!this->try_connect()) {
-//         MI_IO_LOG(MI_ERROR) << "db connection invalid.";
-//         return -1;
-//     }
-
-//     try {
-//         std::stringstream ss;
-//         ss << "UPDATE " << ANNO_TABLE << " SET annotation_usr_path=\'" << annotation_usr_path << "\'" 
-//         << " WHERE series_id=\'" << series_id << "\'" << " AND usr_name=\'" << usr_name;
-//         sql::PreparedStatement* pstmt = _connection->prepareStatement(ss.str().c_str());
-//         sql::ResultSet* res = pstmt->executeQuery();
-//         delete res;
-//         res = nullptr;
-//         delete pstmt;
-//         pstmt = nullptr;
-//     } catch (const sql::SQLException& e) {
-//         MI_IO_LOG(MI_ERROR) << "db update usr annotation failed with exception: "
-//         << this->get_sql_exception_info(&e);
-//         return -1;
-//     }
-//     MI_IO_LOG(MI_TRACE) << "OUT db update usr annotation.";
-//     return 0;
-// }
+    return 0;
+}
 
 MED_IMG_END_NAMESPACE

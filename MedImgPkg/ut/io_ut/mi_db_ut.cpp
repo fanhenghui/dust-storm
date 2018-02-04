@@ -36,10 +36,10 @@ int db_ut(int argc, char* argv[]) {
     }
 
     PatientInfo patient_info;
-    patient_info.patient_name = "OJBK1";
-    patient_info.patient_id = "3344";
-    patient_info.patient_birth_date = "20000101";
-    patient_info.patient_sex = "M";
+    patient_info.patient_name = "OJBK123";
+    patient_info.patient_id = "";
+    patient_info.patient_birth_date = "";
+    patient_info.patient_sex = "";
     db.insert_patient(patient_info);
 
     MI_IO_LOG(MI_DEBUG) << "patient id: " << patient_info.id;
