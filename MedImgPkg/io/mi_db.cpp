@@ -26,7 +26,7 @@ const static std::string PREPROCESS_TYPE_TABLE = "preprocess_type";
 const static std::string PREPROCESS_TABLE = "preprocess";
 const static std::string EVALUATION_TYPE_TABLE = "evaluation_type";
 const static std::string EVALUATION_TABLE = "evaluation";
-const static std::string ANNO_TABLE = "annotation";
+const static std::string ANNOTATION_TABLE = "annotation";
 
 const static int UID_LIMIT = 64;
 const static int DESCRIPTION_LIMIT = 64;
@@ -502,56 +502,6 @@ int DB::insert_instance(const std::string& user_fk, int64_t series_fk, const std
     return 0;
 }
 
-int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_infos) {
-    TRY_CONNECT
-
-    if (!patient_infos) {
-        MI_IO_LOG(MI_ERROR) << "patient infos is null.";
-        return -1;
-    }
-
-    patient_infos->clear();
-    std::stringstream sql;
-    sql << "SELECT id, patient_id, patient_name, patient_sex, patient_birth_date, md5 FROM patient WHERE ";
-    if (key.id > 0) {
-       sql << "id=" << key.id << " AND "; 
-    }
-    if (!key.patient_id.empty()) {
-       sql << "patient_id=\'" << key.patient_id << "\' AND "; 
-    }
-    if (!key.patient_name.empty()) {
-       sql << "patient_name=\'" << key.patient_name << "\' AND "; 
-    }
-    if (!key.patient_sex.empty()) {
-       sql << "patient_sex=\'" << key.patient_sex << "\' AND "; 
-    }
-    if (!key.md5.empty()) {
-       sql << "md5=\'" << key.md5 << "\' AND "; 
-    }
-    sql << "1";
-
-    sql::ResultSet* res = nullptr;
-    int err = this->query(sql.str(), res);
-     StructShield<sql::ResultSet> shield(res);
-    if(0 != err) {
-        MI_IO_LOG(MI_ERROR) << "db query patient failed.";
-        return -1;
-    } else {
-        while (res->next()) {
-            patient_infos->push_back(PatientInfo());
-            PatientInfo& info = (*patient_infos)[patient_infos->size()-1];
-            info.id = res->getInt64("id");
-            info.patient_id = res->getString("patient_id");
-            info.patient_name = res->getString("patient_name");
-            info.patient_sex = res->getString("patient_sex");
-            info.patient_birth_date = res->getString("patient_birth_date");
-            info.md5 = res->getString("md5");
-        }
-    }
-
-    return 0;
-}
-
 int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
          const std::vector<DcmInstanceInfo>& instance_info) { 
 
@@ -753,49 +703,7 @@ int DB::insert_dcm_series(StudyInfo& study_info, SeriesInfo& series_info, Patien
     return 0;
 }
 
-int DB::query_user(const UserInfo& key, std::vector<UserInfo>* user_infos) {
-    TRY_CONNECT
-
-    if (!user_infos) {
-        MI_IO_LOG(MI_ERROR) << "query user failed: null user info input.";
-        return -1;
-    }
-
-    std::stringstream sql;
-    sql << "SELECT id,name,role_fk FROM " << USER_TABLE << " WHERE ";
-    if (!key.id.empty()) {
-        sql << "id=\'" << key.id << "\'";
-    } else {
-        if (!key.name.empty()) {
-            sql << "name=\'" << key.name << "\' AND ";
-        }
-        if (key.role_fk > 0) {
-            sql << "role_fk=" << key.role_fk << "\' AND ";
-        }
-        sql << "1";
-    }
-
-    sql::ResultSet* res = nullptr;
-    MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
-    int err = query(sql.str(), res);
-    if (0 != err) {
-        MI_IO_LOG(MI_ERROR) << "query user failed: sql error";
-        return -1;
-    } else {
-        user_infos->clear();
-        while(res->next()) {
-            user_infos->push_back(UserInfo(
-                res->getString("id").asStdString(),
-                res->getInt("role_fk"),
-                res->getString("name").asStdString()
-            ));
-        }
-    }
-
-    return 0;
-}
-
-int DB::delete_dcm_series(int series_id, bool transcation) {
+int DB::delete_dcm_series(int series_fk, bool transcation) {
     
     sql::Savepoint* save_point = nullptr;
     if (transcation) {
@@ -811,7 +719,7 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         //delete instance file
         //-------------------------------------------------------------//
         std::stringstream sql;
-        sql << "SELECT file_path FROM instance WHERE series_fk=" << series_id << ";";
+        sql << "SELECT file_path FROM instance WHERE series_fk=" << series_fk << ";";
         sql::ResultSet* res_select_instance = nullptr;
         StructShield<sql::ResultSet> shield(res_select_instance);
         err = this->query(sql.str(), res_select_instance);
@@ -830,7 +738,7 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         //delete instance row
         //-------------------------------------------------------------//
         sql.str("");
-        sql << "DELETE FROM instance WHERE series_fk=" << series_id << ";";
+        sql << "DELETE FROM instance WHERE series_fk=" << series_fk << ";";
         sql::ResultSet* res_delete_instance = nullptr;
         StructShield<sql::ResultSet> shield2(res_delete_instance);
         err = this->query(sql.str(), res_delete_instance);
@@ -843,7 +751,7 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         //-------------------------------------------------------------//
         //query study pk
         sql.str("");
-        sql << "SELECT study_fk FROM series WHERE id=" << series_id << ";";
+        sql << "SELECT study_fk FROM series WHERE id=" << series_fk << ";";
         sql::ResultSet* res_select_series = nullptr;
         StructShield<sql::ResultSet> shield3(res_select_series);
         err = this->query(sql.str(), res_select_series);
@@ -860,7 +768,7 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         }   
 
         sql.str("");
-        sql << "DELETE FROM series WHERE id=" << series_id << ";";
+        sql << "DELETE FROM series WHERE id=" << series_fk << ";";
         sql::ResultSet* res_delete_series = nullptr;
         StructShield<sql::ResultSet> shield4(res_delete_series);
         err = this->query(sql.str(), res_delete_series);
@@ -940,7 +848,7 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         }
     }
     catch (const std::exception& e) {
-        MI_IO_LOG(MI_ERROR) << "delete series(pk): " << series_id << " failed:" << e.what();
+        MI_IO_LOG(MI_ERROR) << "delete series(pk): " << series_fk << " failed:" << e.what();
         if (transcation) {
             _connection->rollback(save_point);
         }
@@ -951,6 +859,785 @@ int DB::delete_dcm_series(int series_id, bool transcation) {
         _connection->commit();
     }
 
+    return 0;
+}
+
+int DB::verify_evaluation_info(const EvaluationInfo& info) {
+    if (info.series_fk < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid evaulation series id.";    
+        return -1;    
+    }
+
+    if (info.eva_type < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid evaulation type id.";
+        return -1;    
+    }
+
+    if (info.eva_version.empty()) {
+        MI_IO_LOG(MI_ERROR) << "invalid evaulation version.";
+        return -1;    
+    }
+
+    if (info.eva_file_path.empty()) {
+        MI_IO_LOG(MI_ERROR) << "invalid evaulation file path.";
+        return -1;    
+    }
+
+    if (info.eva_file_size <= 0) {
+        MI_IO_LOG(MI_ERROR) << "invalid evaulation file size.";
+        return -1;    
+    }
+
+    return 0;
+}
+
+int DB::verify_annotation_info(const AnnotationInfo& info) {
+    if (info.series_fk < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid annotation series id.";    
+        return -1;    
+    }
+
+    if (info.user_id < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid user id.";    
+        return -1;    
+    }
+
+    if (info.anno_type < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid annotation type id.";
+        return -1;    
+    }
+
+    if (info.anno_file_path.empty()) {
+        MI_IO_LOG(MI_ERROR) << "invalid annotation file path.";
+        return -1;    
+    }
+
+    if (info.anno_file_size <= 0) {
+        MI_IO_LOG(MI_ERROR) << "invalid annotation file size.";
+        return -1;    
+    }
+
+    return 0;    
+}
+
+int DB::verify_preprocess_info(const PreprocessInfo& info) {
+    if (info.series_fk < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid preprocess series id.";    
+        return -1;    
+    }
+
+    if (info.prep_type < 1) {
+        MI_IO_LOG(MI_ERROR) << "invalid preprocess type id.";
+        return -1;    
+    }
+
+    if (info.prep_version.empty()) {
+        MI_IO_LOG(MI_ERROR) << "invalid preprocess version.";
+        return -1;    
+    }
+
+    if (info.prep_file_path.empty()) {
+        MI_IO_LOG(MI_ERROR) << "invalid preprocess file path.";
+        return -1;    
+    }
+
+    if (info.prep_file_size <= 0) {
+        MI_IO_LOG(MI_ERROR) << "invalid preprocess file size.";
+        return -1;    
+    }
+
+    return 0;    
+}
+
+int DB::insert_evaluation(const EvaluationInfo& eva_info) {
+    if (0 != verify_evaluation_info(eva_info)) {
+        MI_IO_LOG(MI_ERROR) << "insert evaluation failed: invalid evaluation info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("insert_evaluation");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "INSERT INTO " << EVALUATION_TABLE 
+        << "(series_fk, eva_type, eva_version, eva_file_path, eva_file_size) VALUES("
+        << "\'" << eva_info.series_fk << "\',"
+        << "\'" << eva_info.eva_type << "\',"
+        << "\'" << eva_info.eva_version << "\',"
+        << "\'" << eva_info.eva_file_path << "\',"
+        << "\'" << eva_info.eva_file_size << "\');";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "insert evaluation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::insert_annotation(const AnnotationInfo& anno_info) {
+    if (0 != verify_annotation_info(anno_info)) {
+        MI_IO_LOG(MI_ERROR) << "insert evaluation failed: invalid annotation info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("insert_annotation");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "INSERT INTO " << ANNOTATION_TABLE 
+        << "(series_fk, user_id, anno_type, anno_desc, eva_file_path, eva_file_size) VALUES("
+        << "\'" << anno_info.series_fk << "\',"
+        << "\'" << anno_info.user_id << "\',"
+        << "\'" << anno_info.anno_type << "\',"
+        << "\'" << anno_info.anno_desc << "\',"
+        << "\'" << anno_info.anno_file_path << "\',"
+        << "\'" << anno_info.anno_file_size << "\');";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "insert annotation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::insert_preprocess(const PreprocessInfo& prep_info) {
+    if (0 != verify_preprocess_info(prep_info)) {
+        MI_IO_LOG(MI_ERROR) << "insert preprocess failed: invalid preprocess info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("insert_preprocess");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "INSERT INTO " << PREPROCESS_TABLE 
+        << "(series_fk, prep_type, prep_version, prep_file_path, prep_file_size) VALUES("
+        << "\'" << prep_info.series_fk << "\',"
+        << "\'" << prep_info.prep_type << "\',"
+        << "\'" << prep_info.prep_version << "\',"
+        << "\'" << prep_info.prep_file_path << "\',"
+        << "\'" << prep_info.prep_file_size << "\');";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "insert annotation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::update_evaluation(const EvaluationInfo& eva_info) {
+    if (eva_info.id < 1) {
+        MI_IO_LOG(MI_ERROR) << "update evaluation failed: invalid evaluation id.";
+        return -1;
+    }
+
+    if (0 != verify_evaluation_info(eva_info)) {
+        MI_IO_LOG(MI_ERROR) << "update evaluation failed: invalid evaluation info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("update_evaluation");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "UPDATE " << EVALUATION_TABLE << " SET "
+        << "series_fk=\'" << eva_info.series_fk << "\',"
+        << "eva_type=\'" << eva_info.eva_type << "\',"
+        << "eva_version=\'" << eva_info.eva_version << "\',"
+        << "eva_file_path=\'" << eva_info.eva_file_path << "\',"
+        << "eva_file_size=\'" << eva_info.eva_file_size << "\' "
+        << "WHERE id=" << eva_info.id << ";";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "update evaluation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::update_annotation(const AnnotationInfo& anno_info) {
+    if (anno_info.id < 1) {
+        MI_IO_LOG(MI_ERROR) << "update annotation failed: invalid annotation id.";
+        return -1;
+    }
+
+    if (0 != verify_annotation_info(anno_info)) {
+        MI_IO_LOG(MI_ERROR) << "update annotation failed: invalid annotation info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("update_annotation");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "UPDATE " << ANNOTATION_TABLE << " SET "
+        << "series_fk=\'" << anno_info.series_fk << "\',"
+        << "anno_type=\'" << anno_info.anno_type << "\',"
+        << "user_id=\'" << anno_info.user_id << "\',"
+        << "anno_desc=\'" << anno_info.anno_desc << "\',"
+        << "anno_file_path=\'" << anno_info.anno_file_path << "\',"
+        << "anno_file_size=\'" << anno_info.anno_file_size << "\' "
+        << "WHERE id=" << anno_info.id << ";";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "update annotation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::update_preprocess(const PreprocessInfo& prep_info) {
+    if (prep_info.id < 1) {
+        MI_IO_LOG(MI_ERROR) << "update preprocess failed: invalid preprocess id.";
+        return -1;
+    }
+
+    if (0 != verify_preprocess_info(prep_info)) {
+        MI_IO_LOG(MI_ERROR) << "update preprocess failed: invalid preprocess info.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("update_preprocess");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "UPDATE " << PREPROCESS_TABLE << " SET "
+        << "series_fk=\'" << prep_info.series_fk << "\',"
+        << "prep_type=\'" << prep_info.prep_type << "\',"
+        << "prep_version=\'" << prep_info.prep_version << "\',"
+        << "prep_file_path=\'" << prep_info.prep_file_path << "\',"
+        << "prep_file_size=\'" << prep_info.prep_file_size << "\' "
+        << "WHERE id=" << prep_info.id << ";";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "update preprocess failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+    
+    return 0;
+}
+
+int DB::delete_evaluation(int eva_id) {
+    if (eva_id < 1) {
+        MI_IO_LOG(MI_ERROR) << "delete evaluation failed: invalid eva_id.";
+        return -1;    
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("delete_evaluation");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "DELETE FROM " << EVALUATION_TABLE 
+        << " WHERE id=" << eva_id << ";";
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "delete evaluation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+
+    return 0;
+}
+
+int DB::delete_annotation(int anno_id) {
+    if (anno_id < 1) {
+        MI_IO_LOG(MI_ERROR) << "delete annotation failed: invalid anno_id.";
+        return -1;    
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("delete_annotationn");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "DELETE FROM " << ANNOTATION_TABLE 
+        << " WHERE id=" << anno_id << ";";
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "delete annotation failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+
+    return 0;
+}
+
+int DB::delete_preprocess(int prep_id) {
+    if (prep_id < 1) {
+        MI_IO_LOG(MI_ERROR) << "delete preprocess failed: invalid anno_id.";
+        return -1;    
+    }
+
+    TRY_CONNECT
+
+    _connection->setAutoCommit(false);
+    sql::Savepoint* save_point = _connection->setSavepoint("delete_preprocess");
+    StructShield<sql::Savepoint> shield(save_point);
+    try {
+        std::stringstream sql;
+        sql << "DELETE FROM " << PREPROCESS_TABLE 
+        << " WHERE id=" << prep_id << ";";
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "delete preprocess failed: " << e.what();
+        _connection->rollback(save_point);
+        return -1;
+    }
+    _connection->commit();
+
+    return 0;
+}
+
+int DB::query_user(const UserInfo& key, std::vector<UserInfo>* user_infos) {
+    if (!user_infos) {
+        MI_IO_LOG(MI_ERROR) << "query user failed: user infos is null.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    try {
+        std::stringstream sql;
+        sql << "SELECT id , role_fk, name FROM " << USER_TABLE << " WHERE ";
+        if (!key.id.empty()) {
+            sql << "id=\'" << key.id << "\' AND ";
+        }
+        if (key.role_fk > 1) {
+            sql << "role_fk=" << key.role_fk << " AND ";
+        }
+        if (!key.name.empty()) {
+            sql << "name=\'" << key.name << "\' AND ";
+        }
+        sql << "1;";
+        
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));    
+        }
+        user_infos->clear();
+        while(res->next()) {
+            user_infos->push_back(UserInfo(
+                res->getString("id"),
+                res->getInt64("role_fk"),
+                res->getString("name")
+            ));
+        }
+        
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query user failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_evaluation(const EvaluationInfo& key, std::vector<EvaluationInfo>* eva_infos) {
+    if (!eva_infos) {
+        MI_IO_LOG(MI_ERROR) << "query evaluation failed: evaluation infos is null.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    try {
+        std::stringstream sql;
+        sql << "SELECT id , series_fk, eva_type, eva_version, eva_file_path, eva_file_size FROM " 
+        << EVALUATION_TABLE <<  " WHERE ";
+        if (key.id > 1) {
+            sql << "id=" << key.id << " AND ";
+        }
+        if (key.series_fk > 1) {
+            sql << "series_fk=" << key.series_fk << " AND ";
+        }
+        if (key.eva_type > 1) {
+            sql << "eva_type=" << key.eva_type << " AND ";
+        }
+        if (!key.eva_version.empty()) {
+            sql << "eva_version=\'" << key.eva_version << "\' AND ";
+        }
+        sql << "1;";
+        
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));    
+        }
+        eva_infos->clear();
+        while(res->next()) {
+            eva_infos->push_back(EvaluationInfo(
+                res->getInt64("id"),
+                res->getInt64("series_fk"),
+                res->getInt("eva_type"),
+                res->getString("eva_version"),
+                res->getString("eva_file_path"),
+                res->getInt64("eva_file_size")
+            ));
+        }
+        
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query evaluation failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_annotation(const AnnotationInfo& key, std::vector<AnnotationInfo>* anno_infos) {
+    if (!anno_infos) {
+        MI_IO_LOG(MI_ERROR) << "query annotation failed: annotation infos is null.";
+        return -1;
+    }
+
+    TRY_CONNECT
+
+    try {
+        std::stringstream sql;
+        sql << "SELECT id , series_fk, anno_type, user_id, anno_desc, anno_file_path, anno_file_size FROM " 
+        << ANNOTATION_TABLE <<  " WHERE ";
+        if (key.id > 1) {
+            sql << "id=" << key.id << " AND ";
+        }
+        if (key.series_fk > 1) {
+            sql << "series_fk=" << key.series_fk << " AND ";
+        }
+        if (key.anno_type > 1) {
+            sql << "anno_type=" << key.anno_type << " AND ";
+        }
+        if (key.user_id > 1) {
+            sql << "user_id=\'" << key.user_id << "\' AND ";
+        }
+        sql << "1;";
+        
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));    
+        }
+        anno_infos->clear();
+        while(res->next()) {
+            anno_infos->push_back(AnnotationInfo(
+                res->getInt64("id"),
+                res->getInt64("series_fk"),
+                res->getInt64("user_id"),
+                res->getInt("eva_type"),
+                res->getString("eva_version"),
+                res->getString("eva_file_path"),
+                res->getInt64("eva_file_size")
+            ));
+        }
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query annotation failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_infos) {
+    if (!patient_infos) {
+        MI_IO_LOG(MI_ERROR) << "patient infos is null.";
+        return -1;
+    }
+    
+    TRY_CONNECT
+
+    try {
+        std::stringstream sql;
+        sql << "SELECT id, patient_id, patient_name, patient_sex, patient_birth_date, md5 FROM patient WHERE ";
+        if (key.id > 0) {
+        sql << "id=" << key.id << " AND "; 
+        }
+        if (!key.patient_id.empty()) {
+        sql << "patient_id=\'" << key.patient_id << "\' AND "; 
+        }
+        if (!key.patient_name.empty()) {
+        sql << "patient_name=\'" << key.patient_name << "\' AND "; 
+        }
+        if (!key.patient_sex.empty()) {
+        sql << "patient_sex=\'" << key.patient_sex << "\' AND "; 
+        }
+        if (!key.md5.empty()) {
+        sql << "md5=\'" << key.md5 << "\' AND "; 
+        }
+        sql << "1";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+        if(0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+
+        patient_infos->clear();
+        while (res->next()) {
+            patient_infos->push_back(PatientInfo());
+            PatientInfo& info = (*patient_infos)[patient_infos->size()-1];
+            info.id = res->getInt64("id");
+            info.patient_id = res->getString("patient_id");
+            info.patient_name = res->getString("patient_name");
+            info.patient_sex = res->getString("patient_sex");
+            info.patient_birth_date = res->getString("patient_birth_date");
+            info.md5 = res->getString("md5");
+        }
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query patient failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+bool DB::patient_key_valid(const PatientInfo& key) {
+    return ( key.id > 1 || !key.patient_id.empty() ||
+             !key.patient_name.empty() || !key.patient_sex.empty() || 
+             !key.patient_birth_date.empty() || !key.md5.empty()); 
+}
+
+bool DB::study_key_valid(const StudyInfo& key) {
+    return ( key.id > 1 || key.patient_fk > 1 || 
+             !key.study_id.empty() || !key.study_uid.empty() ||
+             !key.study_date.empty() || !key.study_time.empty() || 
+             !key.accession_no.empty());
+}
+
+int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<StudyInfo>* study_infos) {
+    std::stringstream sql;
+    if (!study_key_valid(study_key)) {
+        sql << "SELECT id, study_id, study_uid, study_date_time, accession_no, study_desc, num_series, num_instance FROM "
+        << STUDY_TABLE << " WHERE patient_fk=" << patient_fk << ";";
+    } else {
+        sql << "SELECT id, study_id, study_uid, study_date_time, accession_no, study_desc, num_series, num_instance FROM "
+        << STUDY_TABLE << " WHERE patient_fk=" << patient_fk << " AND ";
+        //Note 这里没有 query (study_pk, num_series, num_instance) 的场景
+        if (!study_key.study_uid.empty()) {
+            sql << "study_uid=\'" << study_key.study_uid << "\' AND ";
+        }
+        if (!study_key.study_id.empty()) {
+            sql << "study_id=\'" << study_key.study_id << "\' AND ";
+        }
+        if (!study_key.accession_no.empty()) {
+            sql << "accession_no=\'" << study_key.accession_no << "\' AND ";
+        }
+        sql << "1;";
+    }
+    
+    sql::ResultSet* res = nullptr;
+    int err = this->query(sql.str(), res);
+    if (0 != err) {
+        MI_IO_LOG(MI_ERROR) << "query study failed: sql error";
+        return -1;
+    }
+
+    //study_infos->clear();
+    while(res->next()) {
+        study_infos->push_back(StudyInfo());
+        StudyInfo& info = (*study_infos)[study_infos->size()-1];
+        info.patient_fk = patient_fk;
+        info.study_id = res->getString("study_id");
+        info.study_uid = res->getString("study_uid");
+        std::string datetime = res->getString("study_date_time");
+        if (!datetime.empty() && datetime.size() == 14) {
+            info.study_date = datetime.substr(0,8);
+            info.study_time = datetime.substr(8,6);
+        }
+        info.study_desc = res->getString("study_desc");
+        info.num_series = res->getInt("num_series");
+        info.num_instance = res->getInt("num_instance");
+    }
+
+    return 0;
+}
+
+int DB::query_study(const PatientInfo& patient_key, const StudyInfo& study_key, 
+        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos) {
+    try {
+        TRY_CONNECT
+
+        patient_infos->clear();
+        study_infos->clear();
+
+        int err = 0;
+        const bool pkey_valid = patient_key_valid(patient_key);
+        const bool skey_valid = study_key_valid(study_key);
+        if (pkey_valid && skey_valid) {
+            //query patient , then query study
+            std::vector<PatientInfo> inter_patient_infos;
+            if (patient_key.id > 1) {
+                inter_patient_infos.push_back(PatientInfo());
+                inter_patient_infos[inter_patient_infos.size()-1].id = patient_key.id;
+            } else {
+                if (0 != this->query_patient(patient_key, &inter_patient_infos)) {
+                    throw std::exception(std::logic_error("query patient failed."));
+                }
+                if (inter_patient_infos.empty()) {
+                    return 0;
+                }
+                for (auto it = inter_patient_infos.begin(); it != inter_patient_infos.end(); ++it) {
+                    PatientInfo& patient_info = *it;
+                    size_t pre_study_count = study_infos->size();
+                    if (0 != this->query_study(patient_info.id, study_key, study_infos)) {
+                        throw std::exception(std::logic_error("query study by patient fk failed."));
+                    }
+                    if (study_infos->size() > pre_study_count) {
+                        for (size_t i = 0; i < study_infos->size() - pre_study_count; ++i) {
+                            patient_infos->push_back(patient_info);
+                        }
+                    }
+                }
+            }
+        } else if (!pkey_valid && skey_valid) {
+            //query study , then query patient
+        } else if (pkey_valid && !skey_valid) {
+            //query patient , then query study
+        } else {
+            //query all study , then query patient
+        }
+
+        
+        std::vector<PatientInfo> inter_patient_infos;
+        if (patient_key.id > 1) {
+            inter_patient_infos.push_back(PatientInfo());
+            inter_patient_infos[inter_patient_infos.size()-1].id = patient_key.id;
+        } else {
+            
+        }
+        
+        // if (patient_key_valid(patient_key)) {
+        //     if (patient_key)
+        //     //get patient fk
+        //     err = this->query_patient(patient_key, &inter_patient_infos);
+        //     if (-1 == err) {
+        //         throw std::exception(std::logic_error("query patient failed."));
+        //     }
+        // }
+
+        // if (inter_patient_infos.empty()) {
+        //     return 0;
+        // }
+
+        // for (auto it = )
+
+    } catch (const std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query study failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key, 
+        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<StudyInfo>* series_infos) {
+    
+    return 0;
+}
+
+int DB::query_instance(int series_fk, std::vector<DcmInstanceInfo>* instance_infos) {
     return 0;
 }
 
