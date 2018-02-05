@@ -218,6 +218,63 @@ IOStatus DICOMLoader::check_series_uid(
     return IO_SUCCESS;
 }
 
+IOStatus DICOMLoader::get_sop_instance_uid(const std::string& file, std::string& sop_instance_uid) {
+    if (file.empty()) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->loadFile(file.c_str());
+
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_SOPInstanceUID, context);
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    return IO_SUCCESS;
+}
+
+IOStatus DICOMLoader::get_sop_instance_uid(const DCMSliceStream* stream, std::string& sop_instance_uid) {
+    if (nullptr == stream) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmInputBufferStream dcm_buffer_stream;
+    dcm_buffer_stream.setBuffer(stream->buffer, stream->size);
+    dcm_buffer_stream.setEos();
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->read(dcm_buffer_stream);
+
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    OFString context;
+    status = data_set->findAndGetOFString(DCM_SOPInstanceUID, context);
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+
+    return IO_SUCCESS;
+}
+
 IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffers,
                 std::shared_ptr<ImageData>& image_data,
                 std::shared_ptr<ImageDataHeader>& img_data_header) {

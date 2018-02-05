@@ -490,7 +490,6 @@ int PACSCommunicator::query_series(const PatientInfo& patient_key, const StudyIn
         DCM_StudyID,
         DCM_StudyDate,
         DCM_StudyTime,
-        DCM_AccessionNumber,
         DCM_PatientID,
         DCM_PatientName,
         DCM_PatientSex,
@@ -520,11 +519,11 @@ int PACSCommunicator::query_series(const PatientInfo& patient_key, const StudyIn
         &series_key.series_no,
         &series_key.modality,
         &series_key.institution,
+        &study_key.accession_no,
         &study_key.study_uid,
         &study_key.study_id,
         &study_key.study_date,
         &study_key.study_time,
-        &study_key.accession_no,
         &patient_key.patient_id,
         &patient_key.patient_name,
         &patient_key.patient_sex,
@@ -574,7 +573,7 @@ int PACSCommunicator::query_series(const PatientInfo& patient_key, const StudyIn
     return 0;
 }
 
-int PACSCommunicator::retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<DcmInstanceInfo>* instance_infos) {
+int PACSCommunicator::retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<InstanceInfo>* instance_infos) {
     if(0 != try_connect() ) {
         MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_id;
         return -1;

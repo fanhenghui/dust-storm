@@ -126,6 +126,8 @@ int BECmdHandlerDBSendDICOM::handle_command(const IPCDataHeader& ipcheader , cha
 }
 
 void BECmdHandlerDBSendDICOM::update_cache_db() {
+    //TODO 这里的代码之后交给Cache dispatcher来做（单机部署不需要）
+
     while(true) {
         DICOMLoader::DCMSliceStream *dcm_stream = nullptr;
         {
@@ -149,6 +151,8 @@ void BECmdHandlerDBSendDICOM::update_cache_db() {
         }
 
         if (0 == _cur_save_slice) {
+            _dcm_instance_infos.clear();
+
             //check study and series
             DICOMLoader loader;
             if (IO_SUCCESS != loader.check_series_uid(dcm_stream, _study_id, _series_id, 
@@ -160,11 +164,6 @@ void BECmdHandlerDBSendDICOM::update_cache_db() {
             //get cache DB path
             std::string ip_port,user,pwd,db_name,path;
             Configure::instance()->get_cache_db_info(ip_port,user,pwd,db_name,path);
-            CacheDB cache_db;
-            if (0 != cache_db.connect(user,ip_port,pwd,db_name)) {
-                MI_APPCOMMON_LOG(MI_ERROR) << "connect cache DB failed.";
-                break;
-            }
             if (path == "") {
                 MI_APPCOMMON_LOG(MI_ERROR) << "DB cache is empty when try to save to cache DB.";
                 break;
@@ -193,12 +192,32 @@ void BECmdHandlerDBSendDICOM::update_cache_db() {
         }
 
         //save to path
+        //get file name
+        DICOMLoader loader;
+        std::string sop_instance_uid;
+        if (IO_SUCCESS != loader.get_sop_instance_uid(dcm_stream, sop_instance_uid)) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "check DCM stream failed when try to save to cahce DB.";
+            break;
+        }
+
         std::stringstream ss;
-        ss << _series_path << "/" << _cur_save_slice << ".dcm";
+        ss << _series_path << "/" <<_modality << "." << sop_instance_uid << ".dcm";
         if(0 != FileUtil::write_raw(ss.str(), dcm_stream->buffer, dcm_stream->size)) {
             MI_APPCOMMON_LOG(MI_ERROR) << "write to disk failed when try to save to cache DB.";
             break;
         }
+        
+        int64_t file_size = 0;
+        if (0 != FileUtil::get_file_size(ss.str(), file_size)) {
+            MI_APPCOMMON_LOG(MI_ERROR) << "get instance file size failed when try to save to cache DB.";
+            break;
+        }
+
+        _dcm_instance_infos.push_back(InstanceInfo());
+        InstanceInfo& instance_info = _dcm_instance_infos[_dcm_instance_infos.size()-1];
+        instance_info.file_path = ss.str();
+        instance_info.file_size = file_size;
+        instance_info.sop_instance_uid = sop_instance_uid;
 
         ++_cur_save_slice;
         _size_mb +=  dcm_stream->size/1024.0/1024.0;
@@ -212,17 +231,13 @@ void BECmdHandlerDBSendDICOM::update_cache_db() {
                 MI_APPCOMMON_LOG(MI_ERROR) << "connect cache DB failed.";
                 break;
             }
-            CacheDB::ImgItem img_item;
-            img_item.series_id = _series_id;
-            img_item.study_id = _study_id;
-            img_item.patient_name = _patient_name;
-            img_item.patient_id = _patient_id;
-            img_item.modality = _modality;
-            img_item.path = _series_path;
-            img_item.size_mb = _size_mb;
-            if(cache_db.insert_item(img_item)){
+
+            if(0 != cache_db.insert_series(_series_id, _dcm_instance_infos)){
                 MI_APPCOMMON_LOG(MI_ERROR) << "insert item to cache DB failed.";
             }
+
+            _dcm_instance_infos.clear();
+
             MI_APPCOMMON_LOG(MI_INFO) << "insert new DICOM item: " << _series_id << " to cache DB sucess.";
 
             //TODO check Cache DB memory status, and remove oldest cache

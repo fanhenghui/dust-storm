@@ -74,6 +74,10 @@ public:
                                         std::string& patient_name,
                                         std::string& patient_id,
                                         std::string& modality);
+    
+    IO_Export IOStatus get_sop_instance_uid(const std::string& file, std::string& sop_instance_uid);
+    IO_Export IOStatus get_sop_instance_uid(const DCMSliceStream* stream, std::string& sop_instance_uid);
+    
 
 private:
     IOStatus data_check(std::vector<std::string>& files,

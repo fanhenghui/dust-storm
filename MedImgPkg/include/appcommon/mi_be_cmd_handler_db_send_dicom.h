@@ -10,6 +10,7 @@
 #include <boost/thread/condition.hpp>
 
 #include "io/mi_dicom_loader.h"
+#include "io/mi_dicom_info.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -33,6 +34,8 @@ private:
 
     std::vector<DICOMLoader::DCMSliceStream*> _dcm_streams_store;
     std::deque<DICOMLoader::DCMSliceStream*> _dcm_streams_queue;
+    std::vector<InstanceInfo> _dcm_instance_infos;
+
     int _cur_recv_slice;
     int _cur_save_slice;
     int _total_slice;

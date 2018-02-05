@@ -15,7 +15,7 @@ public:
 
     void stop();
 
-    void set_instance_infos(std::vector<DcmInstanceInfo>* instance_infos);
+    void set_instance_infos(std::vector<InstanceInfo>* instance_infos);
 
 protected:
     virtual OFCondition handleIncomingCommand(T_DIMSE_Message* incomingMsg, const DcmPresentationContextInfo& presInfo);
@@ -25,7 +25,7 @@ protected:
                                                DcmFileFormat &fileformat);
 private:
     bool _stop;
-    std::vector<DcmInstanceInfo>* _instance_infos;
+    std::vector<InstanceInfo>* _instance_infos;
 };
 
 MED_IMG_END_NAMESPACE

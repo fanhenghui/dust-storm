@@ -162,6 +162,11 @@ message MsgEvaluationResponse {
     string err_msg = 7;//err message
 };
 
+//TODO add study / patient / series info
+message MsgStudyInfo {
+
+};
+
 message MsgDcmInfo {
     string study_id = 1;
     string series_id = 2;

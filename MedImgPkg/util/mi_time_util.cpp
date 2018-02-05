@@ -15,101 +15,105 @@ inline bool check_leap_year(int y) {
 }
 
 int TimeUtil::check_yyyymmdd(const std::string& date) {
-    try {
-        if (date.size() != 8) {
-            throw std::exception(std::logic_error("invalid length."));
+    if (date.size() != 8) {
+        return -1;
+    }
+    for (int i=0; i<8; ++i) {
+        if (!check_num(date[i])) {
+            return -1;
         }
-
-        for (int i=0; i<8; ++i) {
-            if (!check_num(date[i])) {
-                throw std::exception(std::logic_error("not number."));
-            }
+    }
+    const int month = atoi(date.substr(4,2).c_str());
+    if (month < 1 || month > 12) {
+        return -1;
+    }
+    const int day = atoi(date.substr(6,2).c_str());
+    if (month == 2) {
+        const int year = atoi(date.substr(0,4).c_str());
+        const int day_limit = check_leap_year(year) ? 29:28;
+        if (day < 1 || day > day_limit) {
+            return -1;
         }
-
-        const int month = atoi(date.substr(4,2).c_str());
-        if (month < 1 || month > 12) {
-            throw std::exception(std::logic_error("invalid month."));  
+    } else {
+        if (day < 1 || day > DAY_LIMIT[month-1]) {
+            return -1;
         }
+    }
 
-        const int day = atoi(date.substr(6,2).c_str());
-        if (month == 2) {
-            const int year = atoi(date.substr(0,4).c_str());
-            const int day_limit = check_leap_year(year) ? 29:28;
-            if (day < 1 || day > day_limit) {
-                throw std::exception(std::logic_error("invalid day."));
-            }
-        } else {
-            if (day < 1 || day > DAY_LIMIT[month-1]) {
-                throw std::exception(std::logic_error("invalid day."));
-            }
+    return 0;
+}
+
+int TimeUtil::check_yyyymmdd_range(const std::string& date_range) {
+    if (date_range.size() != 17) {
+        return -1;
+    }
+    const std::string date0 = date_range.substr(0,8);
+    const std::string date1 = date_range.substr(9,8);
+    if (date_range[8] != '-') {
+        return -1;
+    }
+    if (TimeUtil::check_yyyymmdd(date0) && TimeUtil::check_yyyymmdd(date1)) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+int TimeUtil::check_hhmmss(const std::string& time) {
+    if (time.size() != 6) {
+        return -1;
+    }
+    for (int i=0; i<6; ++i) {
+        if (!check_num(time[i])) {
+            return -1;
         }
-
-    } catch (const std::exception& e) {
-        MI_UTIL_LOG(MI_ERROR) << "invalid date: " << date << ", " << e.what();
+    }
+    const int h = atoi(time.substr(0,2).c_str());
+    if (h < 0 || h > 23) {
+        return -1;
+    }
+    const int m = atoi(time.substr(2,2).c_str());
+    if (m < 0 || m > 59) {
+        return -1;
+    }
+    const int s = atoi(time.substr(4,2).c_str());
+    if (s < 0 || s > 59) {
         return -1;
     }
 
     return 0;
 }
 
-int TimeUtil::check_hhmmss(const std::string& time) {
-    try {
-        if (time.size() != 6) {
-            throw std::exception(std::logic_error("invalid length."));
-        }
-        for (int i=0; i<8; ++i) {
-            if (!check_num(time[i])) {
-                throw std::exception(std::logic_error("not number."));
-            }
-        }
-
-        const int h = atoi(time.substr(0,2).c_str());
-        if (h < 0 || h > 23) {
-            throw std::exception(std::logic_error("invalid hour."));
-        }
-
-        const int m = atoi(time.substr(2,2).c_str());
-        if (m < 0 || m > 59) {
-            throw std::exception(std::logic_error("invalid minute."));
-        }
-
-        const int s = atoi(time.substr(4,2).c_str());
-        if (s < 0 || s > 59) {
-            throw std::exception(std::logic_error("invalid second."));
-        }
-
-
-    } catch (const std::exception& e) {
-        MI_UTIL_LOG(MI_ERROR) << "invalid time: " << time << ", " << e.what();
+int TimeUtil::check_hhmmss_range(const std::string& time_range) {
+    if (time_range.size() != 13) {
+        return -1;
+    }
+    const std::string time0 = time_range.substr(0,6);
+    const std::string time1 = time_range.substr(7,6);
+    if (time_range[6] != '-') {
+        return -1;
+    }
+    if (TimeUtil::check_hhmmss(time0) && TimeUtil::check_hhmmss(time1)) {
+        return 0;
+    } else {
         return -1;
     }
 }
 
 int TimeUtil::check_yyyymmddhhmmss(const std::string& datetime) {
-    try {
-        if (datetime.size() != 14) {
-            throw std::exception(std::logic_error("invalid size."));
-        }
-        const std::string& date = datetime.substr(0,8);
-        if (-1 == check_yyyymmdd(date)) {
-            throw std::exception(std::logic_error("invalid date."));
-        }
-        const std::string& time = datetime.substr(8,6);
-        if (-1 == check_hhmmss(time)) {
-            throw std::exception(std::logic_error("invalid time."));
-        }
-    } catch (const std::exception& e) {
-        MI_UTIL_LOG(MI_ERROR) << "invalid datetime: " << datetime << ", " << e.what();
+    if (datetime.size() != 14) {
         return -1;
-    } 
+    }
+    const std::string& date = datetime.substr(0,8);
+    if (-1 == check_yyyymmdd(date)) {
+        return -1;
+    }
+    const std::string& time = datetime.substr(8,6);
+    if (-1 == check_hhmmss(time)) {
+        return -1;
+    }
+
+    return 0;
 }
-
-// int64_t TimeUtil::date_to_timestamp(const std::string& date) {
-
-// }
-
-// int64_t TimeUtil::datetime_to_timestamp(const std::string& datetime) {
-
-// }
 
 MED_IMG_END_NAMESPACE

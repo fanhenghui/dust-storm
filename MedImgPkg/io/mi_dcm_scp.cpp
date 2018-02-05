@@ -36,12 +36,16 @@ Uint16 MIDcmSCP::checkAndProcessSTORERequest(const T_DIMSE_C_StoreRQ &reqMessage
         OFString sopInstanceUID = reqMessage.AffectedSOPInstanceUID;
         if (generateDirAndFilename(filename, directoryName, sopClassUID, sopInstanceUID, dataset).good()) {
             if (_instance_infos) {
-                _instance_infos->push_back(DcmInstanceInfo(sopClassUID.c_str(), sopInstanceUID.c_str(), filename.c_str()));
+                _instance_infos->push_back(InstanceInfo());
+                InstanceInfo& info = (*_instance_infos)[_instance_infos->size() - 1];
+                info.sop_class_uid = sopClassUID.c_str();
+                info.sop_instance_uid = sopInstanceUID.c_str();
+                info.file_path = filename.c_str();
             }
         }
 
         if (_instance_infos) {
-            const DcmInstanceInfo& info = (*_instance_infos)[_instance_infos->size()-1];
+            const InstanceInfo& info = (*_instance_infos)[_instance_infos->size()-1];
             MI_IO_LOG(MI_DEBUG) << "SCP process one store instance: " << info.sop_class_uid << ", " 
                 << info.sop_instance_uid << ", " << info.file_path;
         }
@@ -60,7 +64,7 @@ Uint16 MIDcmSCP::checkAndProcessSTORERequest(const T_DIMSE_C_StoreRQ &reqMessage
     }
 }
 
-void MIDcmSCP::set_instance_infos(std::vector<DcmInstanceInfo>* instance_infos) {
+void MIDcmSCP::set_instance_infos(std::vector<InstanceInfo>* instance_infos) {
     _instance_infos = instance_infos;
 }
 

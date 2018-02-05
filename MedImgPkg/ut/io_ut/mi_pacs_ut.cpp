@@ -310,7 +310,7 @@ int pacs_ut(int argc, char* argv[]) {
 
             if (!invalid_cmd) {
                 MI_IO_LOG(MI_INFO) << "try retrieve series: " << series_uid << " to path: " << path;
-                std::vector<DcmInstanceInfo> instance_infos;
+                std::vector<InstanceInfo> instance_infos;
                 std::vector<PatientInfo> patient_infos;
                 std::vector<StudyInfo> study_infos;
                 std::vector<SeriesInfo> series_infos;

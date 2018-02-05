@@ -4,28 +4,20 @@
 #include <string>
 #include <vector>
 #include "io/mi_mysql_db.h"
+#include "io/mi_dicom_info.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
 class IO_Export CacheDB : public MySQLDB {
 public:
-    struct ImgItem {
-        std::string series_id;
-        std::string study_id;
-        std::string path;
-        float size_mb;
-    };
-
-public:
     CacheDB();
     virtual ~CacheDB();
 
-    int insert_item(const CacheDB::ImgItem& item);
-    int delete_item(const std::string& series_id);
-    int get_item(const std::string& series_id, CacheDB::ImgItem& item);
-    int query_item(const std::string& series_id, bool &in_db);
- 
-    int get_all_items(std::vector<CacheDB::ImgItem>& items);
+    int insert_series(const std::string& series_uid, const std::vector<InstanceInfo>& instance_info);
+
+    int delete_series(int series_pk, bool transcation = true);
+
+    int query_series_instance(const std::string& series_uid, std::vector<InstanceInfo>* instance_infos);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CacheDB);
