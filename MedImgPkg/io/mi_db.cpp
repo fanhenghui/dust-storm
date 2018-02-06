@@ -433,19 +433,13 @@ int DB::update_series(SeriesInfo& series_info) {
     return 0;
 }
 
-int DB::insert_instance(const std::string& user_fk, int64_t series_fk, const std::vector<InstanceInfo>& instance_info) {
+int DB::insert_instance(int64_t series_fk, const std::vector<InstanceInfo>& instance_info) {
     TRY_CONNECT
 
     //verify
     //series_fk
     if (series_fk <= 0) {
         MI_IO_LOG(MI_ERROR) << "invalid instance info: series_fk: " << series_fk;
-        return -1;
-    }
-
-    //user_fk
-    if (user_fk.empty()) {
-        MI_IO_LOG(MI_ERROR) << "invalid instance info: user_fk: " << user_fk;
         return -1;
     }
 
@@ -478,11 +472,10 @@ int DB::insert_instance(const std::string& user_fk, int64_t series_fk, const std
 
             std::stringstream sql;
             sql << "INSERT INTO " << INSTANCE_TABLE
-            << "(series_fk, sop_class_uid, sop_instance_uid, retrieve_user_fk, file_path, file_size) VALUES("
+            << "(series_fk, sop_class_uid, sop_instance_uid, file_path, file_size) VALUES("
             << "\'" << series_fk << "\',"
             << "\'" << info.sop_class_uid << "\',"
             << "\'" << info.sop_instance_uid << "\',"
-            << "\'" << user_fk << "\',"
             << "\'" << info.file_path << "\',"
             << "\'" << info.file_size << "\'"
             << ");";
@@ -501,8 +494,7 @@ int DB::insert_instance(const std::string& user_fk, int64_t series_fk, const std
     return 0;
 }
 
-int DB::insert_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
-         const std::vector<InstanceInfo>& instance_info) { 
+int DB::insert_series(PatientInfo& patient_info, StudyInfo& study_info, SeriesInfo& series_info, const std::vector<InstanceInfo>& instance_info) { 
 
     TRY_CONNECT
     int err = 0;
@@ -679,10 +671,7 @@ int DB::insert_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInf
         //---------------------------//
         //insert into instance
         //---------------------------//
-        if (user_info.id.empty()) {
-            throw std::exception(std::logic_error("invalid user fk."));
-        }
-        if (0 != insert_instance(user_info.id, series_pk, instance_info)) {
+        if (0 != insert_instance(series_pk, instance_info)) {
             throw std::exception(std::logic_error("insert instance failed."));
         }
 

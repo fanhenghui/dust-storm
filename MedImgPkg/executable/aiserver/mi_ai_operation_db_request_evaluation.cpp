@@ -64,25 +64,29 @@ int AIOpDBRequestEvaluation::execute() {
         return notify_dbs(msg_res, controller);
     }
 
-    const std::string series_id = msg_req.series_uid();
+    const std::string& series_id = msg_req.series_uid();
+    const int64_t series_pk = msg_req.series_pk();
+    const int64_t eva_pk = msg_req.eva_pk();
+    const int64_t prep_pk = msg_req.prep_pk();
+
     const std::string dcm_path = msg_req.dcm_path();
-    std::string ai_eva_file_path = msg_req.ai_eva_file_path();
-    std::string ai_im_data_path = msg_req.ai_im_data_path();
+    std::string eva_file_path = msg_req.eva_file_path();
+    std::string ai_prep_file_path = msg_req.ai_prep_file_path();
     bool recal_im_data = msg_req.recal_im_data();
     const uint64_t socket_id = msg_req.client_socket_id();
     msg_req.Clear();
 
-    if (ai_im_data_path.empty() || recal_im_data) {
+    if (ai_prep_file_path.empty() || recal_im_data) {
         recal_im_data = true;
-        ai_im_data_path = dcm_path + "/" + series_id + ".npy";
+        ai_prep_file_path = dcm_path + "/" + series_id + ".npy";
     }
-    if (ai_eva_file_path.empty()) {
-        ai_eva_file_path = dcm_path + "/" + series_id + ".csv";
+    if (eva_file_path.empty()) {
+        eva_file_path = dcm_path + "/" + series_id + ".csv";
     }
 
     msg_res.set_series_uid(series_id);
-    msg_res.set_ai_eva_file_path(ai_eva_file_path);
-    msg_res.set_ai_im_data_path(ai_im_data_path);
+    msg_res.set_ai_eva_file_path(eva_file_path);
+    msg_res.set_ai_im_data_path(ai_prep_file_path);
     msg_res.set_recal_im_data(recal_im_data);
     msg_res.set_client_socket_id(socket_id);//TODO DBS增加 计算状态机以及等待计算结果的observer后可以删除
 
@@ -96,7 +100,7 @@ int AIOpDBRequestEvaluation::execute() {
     // MI_AISERVER_LOG(MI_DEBUG) << "py interface path: " << py_interface_path;
     // MI_AISERVER_LOG(MI_DEBUG) << "series ID: " << series_id;
     // MI_AISERVER_LOG(MI_DEBUG) << "DICOM direction: " << dcm_path;
-    // MI_AISERVER_LOG(MI_DEBUG) << "AI intermediate data path: "  << ai_im_data_path;
+    // MI_AISERVER_LOG(MI_DEBUG) << "AI intermediate data path: "  << ai_prep_file_path;
     // MI_AISERVER_LOG(MI_DEBUG) << "msg buffer length: " << _header.data_len;
 
     static std::shared_ptr<medical_ai::AILungEvaulatePyWrapper> wrapper(new medical_ai::AILungEvaulatePyWrapper());
@@ -119,6 +123,7 @@ int AIOpDBRequestEvaluation::execute() {
 
     MI_AISERVER_LOG(MI_DEBUG) << "after initialize.";
 
+    //TODO 这里AI算法的接口需要变更 : path换成instance file path 的集合 
     //Preprocess
     if (recal_im_data) {
         MI_AISERVER_LOG(MI_DEBUG) << "AI lung preprocess start.";
@@ -136,8 +141,8 @@ int AIOpDBRequestEvaluation::execute() {
         MI_AISERVER_LOG(MI_DEBUG) << "AI lung preprocess end. cost " << double(_end-_start)/CLOCKS_PER_SEC << " s.";
 
         MemShield shield(buffer_im_data);
-        if (0 != FileUtil::write_raw(ai_im_data_path, buffer_im_data, buffer_im_data_size)) {
-            MI_AISERVER_LOG(MI_ERROR) << "write AI intermediate data to: " << ai_im_data_path << " failed.";
+        if (0 != FileUtil::write_raw(ai_prep_file_path, buffer_im_data, buffer_im_data_size)) {
+            MI_AISERVER_LOG(MI_ERROR) << "write AI intermediate data to: " << ai_prep_file_path << " failed.";
             msg_res.set_status(-1);
             msg_res.set_err_msg("write AI intermediate data to disk failed.");
             return notify_dbs(msg_res, controller);
@@ -148,7 +153,7 @@ int AIOpDBRequestEvaluation::execute() {
     MI_AISERVER_LOG(MI_DEBUG) << "AI lung evalulate start.";
     clock_t _start = clock();
     medical_ai::AILungEvaulatePyWrapper::VPredictedNodules nodules;
-    if(-1 == wrapper->evaluate(ai_im_data_path.c_str(), nodules)) {
+    if(-1 == wrapper->evaluate(ai_prep_file_path.c_str(), nodules)) {
         const char* err = wrapper->get_last_err();
         MI_AISERVER_LOG(MI_ERROR) << "evalulate series: " << series_id << " failed: " << err;
         msg_res.set_status(-1);
@@ -168,8 +173,8 @@ int AIOpDBRequestEvaluation::execute() {
 
     NoduleSetParser ns_parser;
     ns_parser.set_series_id(series_id);
-    if(IO_SUCCESS != ns_parser.save_as_csv(ai_eva_file_path, nodule_set)) {
-        MI_AISERVER_LOG(MI_ERROR) << "save evaluated result to " << ai_eva_file_path << " failed.";
+    if(IO_SUCCESS != ns_parser.save_as_csv(eva_file_path, nodule_set)) {
+        MI_AISERVER_LOG(MI_ERROR) << "save evaluated result to " << eva_file_path << " failed.";
         msg_res.set_status(-1);
         msg_res.set_err_msg("save evaluated result failed.");
         return notify_dbs(msg_res, controller);

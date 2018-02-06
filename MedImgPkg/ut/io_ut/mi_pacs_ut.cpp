@@ -321,10 +321,8 @@ int pacs_ut(int argc, char* argv[]) {
                 if (-1 != pacs_comm.query_series(pkey, studykey, serieskey, &patient_infos, &study_infos, &series_infos));
                 if( -1 != pacs_comm.retrieve_series(series_uid, path, &instance_infos) ) {
                     std::vector<UserInfo> user_infos;
-                    UserInfo ukey;
-                    db.query_user(ukey, &user_infos);
                     if (!user_infos.empty()) {
-                        db.insert_dcm_series(study_infos[0], series_infos[0], patient_infos[0], user_infos[0], instance_infos);
+                        db.insert_dcm_series(study_infos[0], series_infos[0], patient_infos[0], instance_infos);
                     }
                     
                 } else {

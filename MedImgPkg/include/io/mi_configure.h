@@ -55,6 +55,8 @@ public:
     void set_processing_unit_type(ProcessingUnitType type);//For testing
 
     GPUPlatformType get_gpu_platform_type() const;
+
+    std::string get_version()
 private:
     Configure();
     void init();

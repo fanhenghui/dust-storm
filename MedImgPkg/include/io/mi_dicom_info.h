@@ -146,7 +146,7 @@ struct AnnotationInfo {
 
 enum PreprocessType {
     INIT_SEGMENT_MASK = 1,
-    LUNG_AI_INTERMEDIATE_DATA= 2,
+    LUNG_AI_DATA = 2,
 };
 
 struct PreprocessInfo {

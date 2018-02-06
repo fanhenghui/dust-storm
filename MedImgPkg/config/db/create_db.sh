@@ -88,13 +88,11 @@ CREATE TABLE instance(
     series_fk BIGINT NOT NULL,
     sop_class_uid VARCHAR(64) NOT NULL,
     sop_instance_uid VARCHAR(64) NOT NULL,
-    retrieve_user_fk VARCHAR(32),
     file_path VARCHAR(4096) NOT NULL,
     file_size BIGINT NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT series_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT instance_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT series_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE UNIQUE INDEX sop_instance_uid ON instance(sop_instance_uid(64));
@@ -113,13 +111,11 @@ CREATE TABLE preprocess(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     prep_type_fk INT NOT NULL,
-    retrieve_user_fk VARCHAR(32) NOT NULL,
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
     CONSTRAINT series_preprocess_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT prep_type_fk FOREIGN KEY (prep_type_fk) REFERENCES preprocess_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT preprocess_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT prep_type_fk FOREIGN KEY (prep_type_fk) REFERENCES preprocess_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE evaluation_type (
@@ -136,13 +132,11 @@ CREATE TABLE evaluation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     eva_type_fk INT NOT NULL,
-    retrieve_user_fk VARCHAR(32),
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
     CONSTRAINT series_eva_fk FOREIGN KEY (series_fk) REFERENCES series(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT evaluation_retrieve_user_fk FOREIGN KEY (retrieve_user_fk) REFERENCES user(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+    CONSTRAINT eva_type_fk FOREIGN KEY (eva_type_fk) REFERENCES evaluation_type(id) ON DELETE RESTRICT ON UPDATE RESTRICT
 );
 
 CREATE TABLE annotation(

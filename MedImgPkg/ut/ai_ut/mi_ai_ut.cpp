@@ -36,15 +36,15 @@ int main(int argc, char* argv[]) {
     }
     
     const std::string dcm_path = item.dcm_path;
-    std::string ai_eva_file_path = item.annotation_ai_path;
-    std::string ai_im_data_path = item.ai_intermediate_data_path;
+    std::string eva_file_path = item.annotation_ai_path;
+    std::string ai_prep_file_path = item.ai_intermediate_data_path;
     bool recal_im_data = false;
-    if (ai_im_data_path.empty()) {
+    if (ai_prep_file_path.empty()) {
         recal_im_data = true;
-        ai_im_data_path = dcm_path + "/" + series_id + ".npy";
+        ai_prep_file_path = dcm_path + "/" + series_id + ".npy";
     }
-    if (ai_eva_file_path.empty()) {
-        ai_eva_file_path = dcm_path + "/" + series_id + ".csv";
+    if (eva_file_path.empty()) {
+        eva_file_path = dcm_path + "/" + series_id + ".csv";
     }
 
     //get python running path
@@ -70,8 +70,8 @@ int main(int argc, char* argv[]) {
         clock_t _end = clock();
         MI_LOG(MI_DEBUG) << "preprocess cost: " << (double)(_end-_start)/CLOCKS_PER_SEC << " s";
 
-        if (0 != FileUtil::write_raw(ai_im_data_path, buffer_im_data, buffer_im_data_size)) {
-            MI_LOG(MI_ERROR) << "write AI intermediate data to: " << ai_im_data_path << " failed.";
+        if (0 != FileUtil::write_raw(ai_prep_file_path, buffer_im_data, buffer_im_data_size)) {
+            MI_LOG(MI_ERROR) << "write AI intermediate data to: " << ai_prep_file_path << " failed.";
             return -1;
         }
     }
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
     //Evaluate
     medical_ai::AILungEvaulatePyWrapper::VPredictedNodules nodules;
     clock_t _start = clock();
-    if(-1 == wrapper->evaluate(ai_im_data_path.c_str(), nodules)) {
+    if(-1 == wrapper->evaluate(ai_prep_file_path.c_str(), nodules)) {
         const char* err = wrapper->get_last_err();
         MI_LOG(MI_ERROR) << "evalulate series: " << series_id << " failed: " << err;
         return -1;
@@ -97,8 +97,8 @@ int main(int argc, char* argv[]) {
 
     NoduleSetParser ns_parser;
     ns_parser.set_series_id(series_id);
-    if(IO_SUCCESS != ns_parser.save_as_csv(ai_eva_file_path, nodule_set)) {
-        MI_LOG(MI_ERROR) << "save evaluated result to " << ai_eva_file_path << " failed.";
+    if(IO_SUCCESS != ns_parser.save_as_csv(eva_file_path, nodule_set)) {
+        MI_LOG(MI_ERROR) << "save evaluated result to " << eva_file_path << " failed.";
         return -1;
     }
 

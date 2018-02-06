@@ -57,7 +57,6 @@ int DBOpBEPACSRetrieve::execute() {
     }
 
     const int series_num = retrieve_key.series_uid_size();
-    const std::string& user_id = retrieve_key.user_id();
 
     std::string study_dir(""), series_dir("");
     const std::string db_path = Configure::instance()->get_db_path();
@@ -119,9 +118,7 @@ int DBOpBEPACSRetrieve::execute() {
         //------------------------------------------//
         // insert retrieved series data to DB
         //------------------------------------------//
-        UserInfo user_info;
-        user_info.id = user_id;
-        if(0 != db->insert_series(patient_infos[0], study_infos[0], series_infos[0], user_info, instances)) {
+        if(0 != db->insert_series(patient_infos[0], study_infos[0], series_infos[0], instances)) {
             MI_DBSERVER_LOG(MI_ERROR) << "insert retroeved series: " << series_uid << " to db failed.";
             continue;
         }

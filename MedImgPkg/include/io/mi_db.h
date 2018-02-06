@@ -23,7 +23,7 @@ public:
     //--------------------//
     // insert 
     //--------------------//
-    int insert_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInfo& patient_info, UserInfo& user_info, 
+    int insert_series(PatientInfo& patient_info, StudyInfo& study_info, SeriesInfo& series_info,
          const std::vector<InstanceInfo>& instance_info);
 
     int insert_evaluation(const EvaluationInfo& eva_info);
@@ -113,7 +113,7 @@ public://FOR test , set to private later
     int insert_patient(PatientInfo& patient_info);
     int insert_study(StudyInfo& study_info);
     int insert_series(SeriesInfo& series_info);
-    int insert_instance(const std::string& user_fk, int64_t series_fk, const std::vector<InstanceInfo>& instance_info);
+    int insert_instance(int64_t series_fk, const std::vector<InstanceInfo>& instance_info);
 private:
     int verify_evaluation_info(const EvaluationInfo& info);
     int verify_annotation_info(const AnnotationInfo& info);

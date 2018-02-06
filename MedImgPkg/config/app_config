@@ -50,6 +50,11 @@ PACSServerPort = 11112
 PACSClientAETitle = DBS
 PACSClientPort = 11115
 
+#evaluation&preprocess version(work on DBS)
+EvaLungNoduleVersion = 1.0.0
+PrepLungAIDataVersion = 1.0.0
+PrepInitSegMaskVersion = 1.0.0
+
 #NoduleAnotation config(work on windows)
 ProcessingUnit = GPU
 DoubleClickInterval = 300

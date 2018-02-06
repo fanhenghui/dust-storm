@@ -2,6 +2,7 @@
 
 #include "util/mi_ipc_server_proxy.h"
 #include "util/mi_operation_interface.h"
+#include "util/mi_file_util.h"
 
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
@@ -96,6 +97,15 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, Msg
 
     const std::string series_uid = msg_req->series_uid();
     const int64_t series_pk = msg_req->series_pk();
+    const int eva_type = msg_req->eva_type();
+    int ai_prep_type = -1;
+    //-----------------------------------------------------------------------//
+    //TODO 这里会汇聚各种形式的中间数据，根据evaluation的类型，选择对应AI中间(预处理)类型
+    //     不过目前只支持一种evaluation对应一个AI中间(预处理)数据
+    //-----------------------------------------------------------------------//
+    if (eva_type == LUNG_NODLUE) {
+        ai_prep_type = LUNG_AI_DATA;
+    }
 
     if (update_request_series(series_uid)) {
         boost::mutex::scoped_lock request_locker(_mutex_reveive);
@@ -116,7 +126,7 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, Msg
 
     //query DB
     PreprocessInfo prep_key;
-    prep_key.prep_type = LUNG_AI_INTERMEDIATE_DATA;
+    prep_key.prep_type = ai_prep_type;
     prep_key.series_fk = series_pk;
     std::vector<PreprocessInfo> ai_prep_infos;
     if (0 != db->query_preprocess(prep_key, &ai_prep_infos)) {
@@ -196,11 +206,11 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
 
     const int status = msg_res->status();
     const std::string series_uid = msg_res->series_uid();
-    const int64_t series_fk = msg_res->series_fk();
+    const int64_t series_fk = msg_res->series_pk();
     const int64_t eva_pk = msg_res->eva_pk();
     const int64_t prep_pk = msg_res->prep_pk();
-    const std::string ai_eva_file_path = msg_res->ai_eva_file_path();
-    const std::string ai_im_data_path = msg_res->ai_im_data_path();
+    const std::string eva_file_path = msg_res->eva_file_path();
+    const std::string ai_prep_file_path = msg_res->ai_prep_file_path();
 
     if (update_receive_series(series_uid)){
         boost::mutex::scoped_lock _mutex_request;
@@ -223,16 +233,15 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         return -1;
     }
 
-
     bool recal_im_data = msg_res->recal_im_data();
     if (recal_im_data) {
         PreprocessInfo info;
         info.series_fk = series_fk;
-        info.prep_type = LUNG_AI_INTERMEDIATE_DATA;
-        info.file_path = ai_im_data_path;
+        info.prep_type = LUNG_AI_DATA;
+        info.file_path = ai_prep_file_path;
         info.version = "0.0.0";
         int64_t file_size = -1;
-        if(0 != FileUtil::get_file_size(ai_im_data_path, file_size) ) {
+        if(0 != FileUtil::get_file_size(ai_prep_file_path, file_size) ) {
             IPCPackage* err_pkg = create_error_message("get ai preprocess data file size failed.");
             notify_all(err_pkg);
             return -1;
@@ -257,7 +266,7 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         }
     }
     
-    if (ai_eva_file_path.empty()){
+    if (eva_file_path.empty()){
         IPCPackage* err_pkg = create_error_message("update empty AI annotation data path.");
         notify_all(err_pkg);
         return -1;
@@ -267,9 +276,9 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     info.series_fk = series_fk;
     info.eva_type = LUNG_NODULE;
     info.version = "0.0.0";
-    info.file_path = ai_eva_file_path;
+    info.file_path = eva_file_path;
     int64_t file_size = -1;
-    if(0 != FileUtil::get_file_size(ai_eva_file_path, file_size) ) {
+    if(0 != FileUtil::get_file_size(eva_file_path, file_size) ) {
         IPCPackage* err_pkg = create_error_message("get ai evaluation file size failed.");
         notify_all(err_pkg);
         return -1;
@@ -297,7 +306,7 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     NoduleSetParser parser;
     parser.set_series_id(series_uid);
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-    if( IO_SUCCESS != parser.load_as_csv(ai_eva_file_path, nodule_set) ) {
+    if( IO_SUCCESS != parser.load_as_csv(eva_file_path, nodule_set) ) {
         IPCPackage* err_pkg = create_error_message("load evaluation result file failed.");
         notify_all(err_pkg);
         return -1;
@@ -333,7 +342,8 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     return 0;
 }
 
-void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req, int64_t eva_pk, int64_t ai_prep_pk) {
+void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req, 
+    int64_t eva_pk, int eva_type, int64_t ai_prep_pk, int ai_prep_type ) {
     boost::mutex::scoped_lock locker_queue(_mutex_queue);
 
     std::shared_ptr<DBServerController> controller = _controller.lock();
@@ -369,7 +379,7 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvalua
         //query AI intermidiate data
         PreprocessInfo prep_key;
         prep_key.series_fk = series_pk;
-        prep_key.prep_type = LUNG_AI_INTERMEDIATE_DATA;
+        prep_key.prep_type = ai_prep_type;
         std::vector<PreprocessInfo> prep_infos;
         if (0 != db->query_preprocess(prep_key, &prep_infos)) {
             MI_DBSERVER_LOG(MI_ERROR) << "query evaluation failed.";
@@ -379,7 +389,8 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvalua
         MsgEvaluationRequest msg;
         msg.set_series_uid(series_uid);
         msg.set_eva_pk(eva_pk);
-        msg.set_prep_pk(prep_pk);
+        msg.set_eva_pk(eva_pk);
+        msg.set_prep_pk(ai_prep_pk);
         msg.set_ai_eva_file_path(file_path);
         msg.set_ai_im_data_path(ai_im_file_path);
         msg.set_client_socket_id(client_id);
@@ -391,7 +402,7 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvalua
                 MI_DBSERVER_LOG(MI_ERROR) << "query series instance failed.";
                 return;
             }
-            for (size_t i = 0; i< instances_file_paths; ++i) {
+            for (size_t i = 0; i< instances_file_paths.size(); ++i) {
                std::string* files = msg.add_instance_files(); 
                *files = instances_file_paths[i];
             }

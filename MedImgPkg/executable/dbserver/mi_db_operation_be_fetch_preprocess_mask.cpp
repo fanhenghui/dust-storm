@@ -22,36 +22,46 @@ int DBOpBEFetchPreprocessMask::execute() {
     MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEFetchPreprocessMask.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
-    MsgString msg;
+    MsgPreprocessRetrieveKey msg;
     if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_DBSERVER_LOG(MI_ERROR) << "parse fetch preprocess mask message send by BE failed.";
         return -1;
     }
-    const std::string series_id = msg.context();
+     
+    const std::string& series_id = msg.series_uid();
+    const int64_t series_pk = msg.series_pk();
+    const int prep_type = msg.prep_type();
     msg.Clear();
-    
+
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
+    const unsigned int receiver = _header.receiver;
 
     std::shared_ptr<DB> db = controller->get_db();
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
 
-    const unsigned int receiver = _header.receiver;
-    DB::ImgItem item;
-    if(0 != db->get_dcm_item(series_id, item) ) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series item not existed.");
+    PreprocessInfo prep_key;
+    prep_key.series_fk = series_pk;
+    prep_key.prep_type = prep_type;
+    std::vector<PreprocessInfo> prep_infos;
+    if (0 == db->query_preprocess(prep_key, &prep_infos)) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "query preprocess failed.");
+        return -1;
+    }
+    if (prep_infos.empty()) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "query preprocess empty.");
         return -1;
     }
 
-    if (item.preprocess_mask_path.empty()) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM preprocessing mask path null.");
+    if (prep_infos[0].file_path.empty()) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "preprocess file path null.");
         return -1;
     }
-    //MI_DBSERVER_LOG(MI_DEBUG) << "preprocess mask path: " << item.preprocess_mask_path;
+
     char* buffer = nullptr;
     unsigned int size = 0;
-    if(0 != FileUtil::read_raw_ext(item.preprocess_mask_path, buffer, size) ) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "preprocess mask file not existed.");
+    if(0 != FileUtil::read_raw_ext(prep_infos[0].file_path, buffer, size) ) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "preprocess file read failed.");
         return -1; 
     }
 

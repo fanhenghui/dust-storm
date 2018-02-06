@@ -27,13 +27,13 @@ int DBOpBEFetchDICOM::execute() {
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
     clock_t _start = clock();
 
-    MsgString msg;
+    MsgDcmDBRetrieveKey msg;
     if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_DBSERVER_LOG(MI_ERROR) << "parse fetch DICOM message send by BE failed.";
         return -1;
     }
 
-    const std::string series_id = msg.context();
+    const int64_t series_pk = msg.series_pk();
     msg.Clear();
     
     std::shared_ptr<DBServerController> controller  = get_controller<DBServerController>();
@@ -43,32 +43,23 @@ int DBOpBEFetchDICOM::execute() {
     std::shared_ptr<IPCServerProxy> server_proxy = controller->get_server_proxy_be();
 
     const unsigned int receiver = _header.receiver;
-    DB::ImgItem item;
-    if(0 != db->get_dcm_item(series_id, item) ) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series item not existed.");
+    
+    std::vector<std::string> instance_files;
+    if(0 != db->query_series_instance(series_pk, &instance_files)) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "query instance failed.");
         return -1;
     }
-    if(item.dcm_path.empty()) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series path null.");
-        return -1;
-    }
-    //MI_DBSERVER_LOG(MI_DEBUG) << "series: " << series_id << ". path: " << item.dcm_path;
 
-    std::set<std::string> postfix;
-    postfix.insert(".dcm");
-    std::vector<std::string> files;
-    FileUtil::get_all_file_recursion(item.dcm_path, postfix, files);
-    if(files.empty()) {
-        SEND_ERROR_TO_BE(server_proxy, receiver, "DICOM series file disk empty.");
+    if(instance_files.empty()) {
+        SEND_ERROR_TO_BE(server_proxy, receiver, "query instance empty.");
         return -1;
     }
-    //TODO sort files
 
     //batch read file(Don't need to use mutl-thread)
-    for (size_t i = 0; i < files.size(); ++i) {
+    for (size_t i = 0; i < instance_files.size(); ++i) {
         char* buffer = nullptr;
         unsigned int size = 0;
-        if(0 != FileUtil::read_raw_ext(files[i], buffer, size) ) {
+        if(0 != FileUtil::read_raw_ext(instance_files[i], buffer, size) ) {
             SEND_ERROR_TO_BE(server_proxy, receiver, "read DICOM file failed.");
             return -1;
         }
@@ -77,8 +68,8 @@ int DBOpBEFetchDICOM::execute() {
         header.receiver = receiver;
         header.data_len = size;
         header.msg_id = COMMAND_ID_BE_DB_SEND_DICOM_SERIES;
-        header.reserved0 = i==files.size()-1 ? 1:0;
-        header.reserved1 = files.size();
+        header.reserved0 = i==instance_files.size()-1 ? 1:0;
+        header.reserved1 = instance_files.size();
         IPCPackage* package = new IPCPackage(header, buffer);
         if(0 != server_proxy->async_send_data(package)){
             delete package;
@@ -88,7 +79,7 @@ int DBOpBEFetchDICOM::execute() {
         }
     }
     clock_t _end = clock();
-    MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_id << ", slice:" << files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "s}.";
+    MI_DBSERVER_LOG(MI_INFO) << "success send {series:" << series_pk << ", slice:" << instance_files.size() << ", cost:" << double(_end-_start)/CLOCKS_PER_SEC << "s}.";
 
     MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEFetchDICOM.";
     return 0;
