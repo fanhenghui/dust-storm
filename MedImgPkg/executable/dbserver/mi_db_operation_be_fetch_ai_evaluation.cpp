@@ -19,24 +19,23 @@ int DBOpBEFetchAIEvaluation::execute() {
     MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEFetchAIEvaluation.";
     DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
-    MsgString msg;
+    MsgEvaluationRetrieveKey msg;
     if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
         MI_DBSERVER_LOG(MI_ERROR) << "parse fetch evaluation message send by BE failed.";
         return -1;
     }
-
-    const std::string series_id = msg.context();
-    msg.Clear();
     
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
     std::shared_ptr<DBEvaluationDispatcher> dispatcher = controller->get_evaluation_dispatcher();
     DBSERVER_CHECK_NULL_EXCEPTION(dispatcher);
 
-    if (-1 == dispatcher->request_evaluation(_header.receiver, series_id) ) {
+    if (-1 == dispatcher->request_evaluation(_header.receiver, &msg) ) {
         MI_DBSERVER_LOG(MI_ERROR) << "rquest evaluation failed.";
+        msg.Clear();
         return -1;
     }
+    msg.Clear();
 
     MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEFetchAIEvaluation.";
     return 0;

@@ -183,6 +183,8 @@ int BECmdHandlerDBSendAIEvaluation::handle_command(const IPCDataHeader& ipcheade
             //canceled by user do nothing
             MI_APPCOMMON_LOG(MI_INFO) << "AI annotation query has been canceled by user.";
         } else {
+            //TOOD check current series uid equal to received one 
+
             //create operation and push to BE operation queue
             std::shared_ptr<IOperation> op(new OpReceiveAnnotation());
             op->set_data(ipcheader , buffer);

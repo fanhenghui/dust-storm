@@ -13,6 +13,7 @@
 #include "io/mi_protobuf.h"
 #include "io/mi_configure.h"
 #include "io/mi_db.h"
+#include "io/mi_dicom_info.h"
 
 #include "io/mi_dicom_loader.h"
 #include "io/mi_image_data.h"
@@ -43,29 +44,35 @@ int DBOpBEPACSRetrieve::execute() {
     std::shared_ptr<DB> db = controller->get_db();
     DBSERVER_CHECK_NULL_EXCEPTION(db);
 
-    MsgDcmInfoCollection msg;
-    if (0 != protobuf_parse(_buffer, _header.data_len, msg)) {
+    MsgDcmPACSRetrieveKey retrieve_key;
+    
+    if (0 != protobuf_parse(_buffer, _header.data_len, retrieve_key)) {
         MI_DBSERVER_LOG(MI_ERROR) << "parse PACS retrieve message send by BE failed.";
         return -1;
     }
 
-    const int series_num = msg.dcminfo_size();
-    std::string series_id(""), study_id(""), study_dir(""), series_dir("");
+    if (retrieve_key.series_uid_size() != retrieve_key.study_uid_size()) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse PACS retrieve message send by BE failed 2.";
+        return -1;
+    }
+
+    const int series_num = retrieve_key.series_uid_size();
+    const std::string& user_id = retrieve_key.user_id();
+
+    std::string study_dir(""), series_dir("");
     const std::string db_path = Configure::instance()->get_db_path();
     for (int i = 0; i < series_num; ++i) {
-        MsgDcmInfo item = msg.dcminfo(i);
-        study_id = item.study_id();
-        series_id = item.series_id();
-
+        const std::string& series_uid = retrieve_key.series_uid(i);
+        const std::string& study_uid = retrieve_key.study_uid(i);
         //1 create direction
-        study_dir = db_path + "/" + study_id;
+        study_dir = db_path + "/" + study_uid;
         if (0 != FileUtil::check_direction(study_dir)) {
             if (0 != FileUtil::make_direction(study_dir)) {
                 MI_DBSERVER_LOG(MI_ERROR) << "create study direction: " << study_dir << " failed.";
                 continue;
             }
         } 
-        series_dir = study_dir + "/" + series_id;
+        series_dir = study_dir + "/" + series_uid;
         if (0 != FileUtil::check_direction(series_dir)) {
             if (0 != FileUtil::make_direction(series_dir)) {
                 MI_DBSERVER_LOG(MI_ERROR) << "create series direction: " << series_dir << " failed.";
@@ -73,39 +80,85 @@ int DBOpBEPACSRetrieve::execute() {
             }
         }
 
-        MI_DBSERVER_LOG(MI_INFO) << "PACS retrieve series : " << series_id << " >>>>>>";
-        //2 retrieve data from PACS
-        if(0 != pacs_commu->retrieve_series(series_id, series_dir)){
-            MI_DBSERVER_LOG(MI_ERROR) << "PACS try retrieve series: " << series_id << " failed.";
+        MI_DBSERVER_LOG(MI_INFO) << "PACS retrieve series : " << series_uid << " >>>>>>";
+        
+        //------------------------------------------//
+        // query dicom infos from PACS
+        //------------------------------------------//
+        SeriesInfo series_key;
+        series_key.series_uid = series_uid;
+        StudyInfo study_key;
+        study_key.study_uid = study_uid;
+        std::vector<PatientInfo> patient_infos;
+        std::vector<StudyInfo> study_infos;
+        std::vector<SeriesInfo> series_infos;
+        if (0 != pacs_commu->query_series(PatientInfo(), study_key, series_key, &patient_infos, &study_infos, &series_infos)) {
+            MI_DBSERVER_LOG(MI_ERROR) << "PACS try query series: " << series_uid << " failed.";
             continue;
         }
-        MI_DBSERVER_LOG(MI_INFO) << "PACS retrieve series: " << series_id << " success.";
-
-        //3 preprocess mask calculate(size mb will calculate then)
-        // TODO 暂时使用方案2（简单版本：串行计算），方案1会比较好
-        const std::string preprocess_mask_path = series_dir + "/" + series_id + ".rle";
-        float dicoms_size_mb = 0;
-        if(0 != preprocess(series_dir, preprocess_mask_path, dicoms_size_mb)) {
-            MI_DBSERVER_LOG(MI_ERROR) << "preprocess PACS retrieved series: " << series_id << " failed.";
+        
+        if (patient_infos.empty()) {
+            MI_DBSERVER_LOG(MI_ERROR) << "PACS try query series: " << series_uid << " empty.";
             continue;
         }
-        MI_DBSERVER_LOG(MI_INFO) << "preprocess PACS retrieved series: " << series_id << " success.";
 
-        //4 update DB
-        DB::ImgItem img;
-        img.series_id = series_id;
-        img.study_id = study_id;
-        img.patient_name = item.patient_name();
-        img.patient_id = item.patient_id();
-        img.modality = item.modality();
-        img.dcm_path = series_dir;
-        img.preprocess_mask_path = preprocess_mask_path;
-        img.size_mb = dicoms_size_mb;
-        db->insert_dcm_item(img);
+        //------------------------------------------//
+        // retrieve data from PACS
+        //------------------------------------------//
+        std::vector<InstanceInfo> instances;
+        if(0 != pacs_commu->retrieve_series(series_uid, series_dir, &instances)){
+            MI_DBSERVER_LOG(MI_ERROR) << "PACS try retrieve series: " << series_uid << " failed.";
+            continue;
+        }
+        if (instances.empty()) {
+            MI_DBSERVER_LOG(MI_ERROR) << "PACS try retrieve series: " << series_uid << " empty.";
+            continue;
+        }
+        MI_DBSERVER_LOG(MI_INFO) << "PACS retrieve series: " << series_uid << " success.";
 
-        //5 send response message back to BE
+        //------------------------------------------//
+        // insert retrieved series data to DB
+        //------------------------------------------//
+        UserInfo user_info;
+        user_info.id = user_id;
+        if(0 != db->insert_series(patient_infos[0], study_infos[0], series_infos[0], user_info, instances)) {
+            MI_DBSERVER_LOG(MI_ERROR) << "insert retroeved series: " << series_uid << " to db failed.";
+            continue;
+        }
+
+        //------------------------------------------//
+        // preprocess mask calculate
+        // TODO 这里仅仅调用了一个临时的简单mask分割，后续需要发送消息到AIS调用AI的接口（mask分割加ai计算预处理）
+        //------------------------------------------//
+        if (instances.size() > VOLUME_SLICE_LIMIT) {
+            const std::string prep_mask_path = series_dir + "/" + series_uid + ".rle";
+            if(0 != preprocess(instances, prep_mask_path)) {
+                MI_DBSERVER_LOG(MI_ERROR) << "preprocess PACS retrieved series: " << series_uid << " failed.";
+                continue;
+            }
+            
+            int64_t file_size = 0;
+            if (0 != FileUtil::get_file_size(prep_mask_path, file_size)) {
+                MI_DBSERVER_LOG(MI_ERROR) << "get retrieved series " << series_uid << "'s preprocess file failed.";
+                continue;
+            }
+
+            PreprocessInfo prep_info;
+            prep_info.series_fk = series_infos[0].id;
+            prep_info.prep_type = INIT_SEGMENT_MASK;
+            prep_info.version = "0.0.0";
+            prep_info.file_path = prep_mask_path;
+            prep_info.file_size = file_size;
+            db->insert_preprocess(prep_info);
+
+            MI_DBSERVER_LOG(MI_INFO) << "preprocess PACS retrieved series: " << series_uid << " success.";
+        }
+
+        //------------------------------------------//
+        //  send response message back to BE
+        //------------------------------------------//
         MsgString msg_response;
-        msg_response.set_context(series_id);
+        msg_response.set_context(series_uid);
         int buffer_size = 0;
         char* buffer_response = nullptr;
         if (0 != protobuf_serialize(msg_response, buffer_response, buffer_size)) {
@@ -129,19 +182,17 @@ int DBOpBEPACSRetrieve::execute() {
     return 0;
 }
 
-int DBOpBEPACSRetrieve::preprocess(const std::string& series_dir, const std::string& preprocess_mask_path, float& dicoms_size_mb) {
-    std::vector<std::string> files;
-    std::set<std::string> dcm_postfix;
-    dcm_postfix.insert(".dcm");
-    FileUtil::get_all_file_recursion(series_dir, dcm_postfix, files);
-    dicoms_size_mb = FileUtil::get_size_mb(files);
-
+int DBOpBEPACSRetrieve::preprocess(const std::vector<InstanceInfo>& instances, const std::string& preprocess_mask_path) {
+    std::vector<std::string> files(instances.size());
+    for (size_t i = 0; i < instances.size(); ++i) {
+        files[i] = instances[i].file_path;
+    }
     std::shared_ptr<ImageDataHeader> data_header;
     std::shared_ptr<ImageData> volume_data;
     DICOMLoader loader;
     IOStatus status = loader.load_series(files, volume_data, data_header);
     if(status != IO_SUCCESS) {
-        MI_DBSERVER_LOG(MI_ERROR) << "preprocess load DICOM root " << series_dir << " failed.";
+        MI_DBSERVER_LOG(MI_ERROR) << "preprocess load DICOM failed.";
         return -1;
     }
     MI_DBSERVER_LOG(MI_DEBUG) << "preprocess load DICOM " << data_header->series_uid << " done.";

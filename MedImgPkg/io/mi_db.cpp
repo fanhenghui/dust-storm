@@ -673,6 +673,7 @@ int DB::insert_series(StudyInfo& study_info, SeriesInfo& series_info, PatientInf
             }
         }
 
+        series_info.id = series_pk;
         MI_IO_LOG(MI_DEBUG) << "insert dcm series: insert series done";
 
         //---------------------------//
@@ -869,17 +870,17 @@ int DB::verify_evaluation_info(const EvaluationInfo& info) {
         return -1;    
     }
 
-    if (info.eva_version.empty()) {
+    if (info.version.empty()) {
         MI_IO_LOG(MI_ERROR) << "invalid evaulation version.";
         return -1;    
     }
 
-    if (info.eva_file_path.empty()) {
+    if (info.file_path.empty()) {
         MI_IO_LOG(MI_ERROR) << "invalid evaulation file path.";
         return -1;    
     }
 
-    if (info.eva_file_size <= 0) {
+    if (info.file_size <= 0) {
         MI_IO_LOG(MI_ERROR) << "invalid evaulation file size.";
         return -1;    
     }
@@ -903,12 +904,12 @@ int DB::verify_annotation_info(const AnnotationInfo& info) {
         return -1;    
     }
 
-    if (info.anno_file_path.empty()) {
+    if (info.file_path.empty()) {
         MI_IO_LOG(MI_ERROR) << "invalid annotation file path.";
         return -1;    
     }
 
-    if (info.anno_file_size <= 0) {
+    if (info.file_size <= 0) {
         MI_IO_LOG(MI_ERROR) << "invalid annotation file size.";
         return -1;    
     }
@@ -927,17 +928,17 @@ int DB::verify_preprocess_info(const PreprocessInfo& info) {
         return -1;    
     }
 
-    if (info.prep_version.empty()) {
+    if (info.version.empty()) {
         MI_IO_LOG(MI_ERROR) << "invalid preprocess version.";
         return -1;    
     }
 
-    if (info.prep_file_path.empty()) {
+    if (info.file_path.empty()) {
         MI_IO_LOG(MI_ERROR) << "invalid preprocess file path.";
         return -1;    
     }
 
-    if (info.prep_file_size <= 0) {
+    if (info.file_size <= 0) {
         MI_IO_LOG(MI_ERROR) << "invalid preprocess file size.";
         return -1;    
     }
@@ -959,12 +960,12 @@ int DB::insert_evaluation(const EvaluationInfo& eva_info) {
     try {
         std::stringstream sql;
         sql << "INSERT INTO " << EVALUATION_TABLE 
-        << "(series_fk, eva_type, eva_version, eva_file_path, eva_file_size) VALUES("
+        << "(series_fk, eva_type, version, file_path, file_size) VALUES("
         << "\'" << eva_info.series_fk << "\',"
         << "\'" << eva_info.eva_type << "\',"
-        << "\'" << eva_info.eva_version << "\',"
-        << "\'" << eva_info.eva_file_path << "\',"
-        << "\'" << eva_info.eva_file_size << "\');";
+        << "\'" << eva_info.version << "\',"
+        << "\'" << eva_info.file_path << "\',"
+        << "\'" << eva_info.file_size << "\');";
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res);
@@ -997,13 +998,13 @@ int DB::insert_annotation(const AnnotationInfo& anno_info) {
     try {
         std::stringstream sql;
         sql << "INSERT INTO " << ANNOTATION_TABLE 
-        << "(series_fk, user_id, anno_type, anno_desc, eva_file_path, eva_file_size) VALUES("
+        << "(series_fk, user_id, anno_type, anno_desc, file_path, file_size) VALUES("
         << "\'" << anno_info.series_fk << "\',"
         << "\'" << anno_info.user_id << "\',"
         << "\'" << anno_info.anno_type << "\',"
         << "\'" << anno_info.anno_desc << "\',"
-        << "\'" << anno_info.anno_file_path << "\',"
-        << "\'" << anno_info.anno_file_size << "\');";
+        << "\'" << anno_info.file_path << "\',"
+        << "\'" << anno_info.file_size << "\');";
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res);
@@ -1036,12 +1037,12 @@ int DB::insert_preprocess(const PreprocessInfo& prep_info) {
     try {
         std::stringstream sql;
         sql << "INSERT INTO " << PREPROCESS_TABLE 
-        << "(series_fk, prep_type, prep_version, prep_file_path, prep_file_size) VALUES("
+        << "(series_fk, prep_type, version, file_path, file_size) VALUES("
         << "\'" << prep_info.series_fk << "\',"
         << "\'" << prep_info.prep_type << "\',"
-        << "\'" << prep_info.prep_version << "\',"
-        << "\'" << prep_info.prep_file_path << "\',"
-        << "\'" << prep_info.prep_file_size << "\');";
+        << "\'" << prep_info.version << "\',"
+        << "\'" << prep_info.file_path << "\',"
+        << "\'" << prep_info.file_size << "\');";
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res);
@@ -1081,9 +1082,9 @@ int DB::update_evaluation(const EvaluationInfo& eva_info) {
         sql << "UPDATE " << EVALUATION_TABLE << " SET "
         << "series_fk=\'" << eva_info.series_fk << "\',"
         << "eva_type=\'" << eva_info.eva_type << "\',"
-        << "eva_version=\'" << eva_info.eva_version << "\',"
-        << "eva_file_path=\'" << eva_info.eva_file_path << "\',"
-        << "eva_file_size=\'" << eva_info.eva_file_size << "\' "
+        << "version=\'" << eva_info.version << "\',"
+        << "file_path=\'" << eva_info.file_path << "\',"
+        << "file_size=\'" << eva_info.file_size << "\' "
         << "WHERE id=" << eva_info.id << ";";
 
         sql::ResultSet* res = nullptr;
@@ -1126,8 +1127,8 @@ int DB::update_annotation(const AnnotationInfo& anno_info) {
         << "anno_type=\'" << anno_info.anno_type << "\',"
         << "user_id=\'" << anno_info.user_id << "\',"
         << "anno_desc=\'" << anno_info.anno_desc << "\',"
-        << "anno_file_path=\'" << anno_info.anno_file_path << "\',"
-        << "anno_file_size=\'" << anno_info.anno_file_size << "\' "
+        << "file_path=\'" << anno_info.file_path << "\',"
+        << "file_size=\'" << anno_info.file_size << "\' "
         << "WHERE id=" << anno_info.id << ";";
 
         sql::ResultSet* res = nullptr;
@@ -1168,9 +1169,9 @@ int DB::update_preprocess(const PreprocessInfo& prep_info) {
         sql << "UPDATE " << PREPROCESS_TABLE << " SET "
         << "series_fk=\'" << prep_info.series_fk << "\',"
         << "prep_type=\'" << prep_info.prep_type << "\',"
-        << "prep_version=\'" << prep_info.prep_version << "\',"
-        << "prep_file_path=\'" << prep_info.prep_file_path << "\',"
-        << "prep_file_size=\'" << prep_info.prep_file_size << "\' "
+        << "version=\'" << prep_info.version << "\',"
+        << "file_path=\'" << prep_info.file_path << "\',"
+        << "file_size=\'" << prep_info.file_size << "\' "
         << "WHERE id=" << prep_info.id << ";";
 
         sql::ResultSet* res = nullptr;
@@ -1341,7 +1342,7 @@ int DB::query_evaluation(const EvaluationInfo& key, std::vector<EvaluationInfo>*
 
     try {
         std::stringstream sql;
-        sql << "SELECT id , series_fk, eva_type, eva_version, eva_file_path, eva_file_size FROM " 
+        sql << "SELECT id , series_fk, eva_type, version, file_path, file_size FROM " 
         << EVALUATION_TABLE <<  " WHERE ";
         if (key.id > 1) {
             sql << "id=" << key.id << " AND ";
@@ -1352,8 +1353,8 @@ int DB::query_evaluation(const EvaluationInfo& key, std::vector<EvaluationInfo>*
         if (key.eva_type > 1) {
             sql << "eva_type=" << key.eva_type << " AND ";
         }
-        if (!key.eva_version.empty()) {
-            sql << "eva_version=\'" << key.eva_version << "\' AND ";
+        if (!key.version.empty()) {
+            sql << "version=\'" << key.version << "\' AND ";
         }
         sql << "1;";
         
@@ -1370,9 +1371,9 @@ int DB::query_evaluation(const EvaluationInfo& key, std::vector<EvaluationInfo>*
             info.id = res->getInt64("id");
             info.series_fk = res->getInt64("series_fk");
             info.eva_type = res->getInt("eva_type");
-            info.eva_version = res->getString("eva_version").asStdString();
-            info.eva_file_path = res->getString("eva_file_path").asStdString();
-            info.eva_file_size = res->getInt64("eva_file_size");
+            info.version = res->getString("version").asStdString();
+            info.file_path = res->getString("file_path").asStdString();
+            info.file_size = res->getInt64("file_size");
         }
         
     } catch (const std::exception& e) {
@@ -1393,7 +1394,7 @@ int DB::query_annotation(const AnnotationInfo& key, std::vector<AnnotationInfo>*
 
     try {
         std::stringstream sql;
-        sql << "SELECT id , series_fk, anno_type, user_id, anno_desc, anno_file_path, anno_file_size FROM " 
+        sql << "SELECT id , series_fk, anno_type, user_id, anno_desc, file_path, file_size FROM " 
         << ANNOTATION_TABLE <<  " WHERE ";
         if (key.id > 1) {
             sql << "id=" << key.id << " AND ";
@@ -1424,14 +1425,58 @@ int DB::query_annotation(const AnnotationInfo& key, std::vector<AnnotationInfo>*
             info.user_id = res->getInt64("user_id");
             info.anno_type = res->getInt("anno_type");
             info.anno_desc = res->getString("anno_desc").asStdString();
-            info.anno_file_path = res->getString("anno_file_path").asStdString();
-            info.anno_file_size = res->getInt64("anno_file_size");
+            info.file_path = res->getString("file_path").asStdString();
+            info.file_size = res->getInt64("file_size");
         }
     } catch (const std::exception& e) {
         MI_IO_LOG(MI_ERROR) << "query annotation failed: " << e.what();
         return -1;
     }
 
+    return 0;
+}
+
+int DB::query_preprocess(const PreprocessInfo& key, std::vector<PreprocessInfo>* prep_infos) {
+    if (!prep_infos) {
+        MI_IO_LOG(MI_ERROR) << "preprocess infos is null.";
+        return -1;
+    }
+
+    std::stringstream sql;
+    sql << "SELECT id, series_fk, prep_type_fk, version, file_path, file_size FROM " 
+    << PREPROCESS_TABLE << " WHERE " ;
+    if (key.id > 0) {
+       sql << "id=" << key.id << " AND "; 
+    }
+    if (key.series_fk > 0) {
+        sql << "series_fk=" << key.series_fk << " AND "; 
+    }
+    if (key.prep_type > 0) {
+        sql << "prep_type_fk=" << key.prep_type << " AND "; 
+    }
+    if (key.version.empty()) {
+        sql << "retrieve_user_id=\'" << key.version << "\' AND "; 
+    }
+    sql << "1";
+
+    sql::ResultSet* res = nullptr;
+    int err = this->query(sql.str(), res);
+    if (0 != err) {
+        MI_IO_LOG(MI_ERROR) << "query preprocess failed: sql error.";
+        return -1;
+    }
+
+    prep_infos->clear();
+    while (res->next()) {
+        prep_infos->push_back(PreprocessInfo());
+        PreprocessInfo& info = (*prep_infos)[prep_infos->size()-1];
+        info.id = res->getInt64("id");
+        info.series_fk = res->getInt64("series_fk");
+        info.prep_type = res->getInt64("prep_type_fk");
+        info.version = res->getString("version").asStdString();
+        info.file_path = res->getString("file_path").asStdString();
+        info.file_size = res->getInt64("file_size");
+    }
     return 0;
 }
 
@@ -1864,6 +1909,82 @@ int DB::query_series_instance(int64_t series_pk, std::vector<InstanceInfo>* inst
             info.sop_instance_uid = res->getString("sop_instance_uid").asStdString();
             info.file_path = res->getString("file_path").asStdString();
             info.file_size = res->getInt64("file_size");
+        }
+    } catch (std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_series_instance(int64_t series_pk, std::vector<std::string>* instance_file_paths) {
+    if (series_pk < 1) {
+        MI_IO_LOG(MI_ERROR) << "query series instance failed: invalid series pk: " << series_pk;
+        return -1;
+    }
+
+    if (!instance_file_paths) {
+        MI_IO_LOG(MI_ERROR) << "query series instance failed: null instance infos input/output.";
+        return -1;
+    }
+
+    try {
+        TRY_CONNECT
+        
+        std::stringstream sql;
+        sql << "SELECT sop_class_uid, sop_instance_uid, file_path, file_size FROM " 
+        << INSTANCE_TABLE << " WHERE series_fk=" << series_pk << ";";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+
+        instance_file_paths->clear();
+        while(res->next()) {
+            instance_file_paths->push_back(res->getString("file_path").asStdString());
+        }
+    } catch (std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int DB::query_series_uid(int64_t series_pk, std::vector<std::string>* series_uid) { 
+    if (series_pk < 1) {
+        MI_IO_LOG(MI_ERROR) << "query series uid failed: invalid series pk: " << series_pk;
+        return -1;
+    }
+
+    if (!series_uid) {
+        MI_IO_LOG(MI_ERROR) << "query series uid failed: null series_uid input/output.";
+        return -1;
+    }
+
+    try {
+        TRY_CONNECT
+        
+        std::stringstream sql;
+        sql << "SELECT series_uid FROM " 
+        << SERIES_TABLE << " WHERE id=" << series_pk << ";";
+
+        sql::ResultSet* res = nullptr;
+        int err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            THROW_SQL_EXCEPTION
+        }
+
+        series_uid->clear();
+        while(res->next()) {
+            series_uid->push_back(res->getString("series_uid").asStdString());
         }
     } catch (std::exception& e) {
         MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();

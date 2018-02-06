@@ -11,7 +11,6 @@
 #include "mi_app_controller.h"
 #include "mi_app_common_define.h"
 #include "mi_app_common_util.h"
-#include "mi_model_pacs.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -24,80 +23,38 @@ BECmdHandlerFEPACSRetrieve::~BECmdHandlerFEPACSRetrieve() {}
 int BECmdHandlerFEPACSRetrieve::handle_command(const IPCDataHeader& dataheader, char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEPACSRetrieve";
 
-    MemShield shield(buffer);
     APPCOMMON_CHECK_NULL_EXCEPTION(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
-    std::shared_ptr<ModelPACS> model_pacs = AppCommonUtil::get_model_pacs(controller);
-    APPCOMMON_CHECK_NULL_EXCEPTION(model_pacs);
 
     //check msg
-    MsgString msg;
+    MsgDcmPACSRetrieveKey msg;
     if (0 != protobuf_parse(buffer, dataheader.data_len, msg)) {
         MI_APPCOMMON_LOG(MI_ERROR) << "parse series message from FE PACS fetch failed.";
         return -1;
     }
 
-    const std::string series_idx_str = msg.context();
+    //Test parse to print
+    const int series_size = msg.series_uid_size();
+    for (int i = 0; i < series_size; ++i) {
+        MI_APPCOMMON_LOG(MI_DEBUG) << "PACS retrieve series: " << msg.series_uid(i);
+    }
     msg.Clear();
 
-    std::vector<std::string> series_idx;
-    boost::split(series_idx, series_idx_str, boost::is_any_of("|"));
-    if (series_idx.empty()) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "FE fetch PACS series index empty.";
+    if (series_size <= 0) {
+        MI_APPCOMMON_LOG(MI_WARNING) << "PACS retrieve null series.";
         return -1;
     }
-
-    bool query_more_than_0 = false;
-    MsgDcmInfoCollection msg_response;
-    for (auto it = series_idx.begin(); it != series_idx.end(); ++it) {
-        //must check null string, because atoi("") will return 0!
-        if((*it).empty()) {
-            continue;
-        }
-
-        int idx = atoi(((*it).c_str()));
-        DcmInfo dcm_info;
-        if (0 != model_pacs->query_dicom(idx, dcm_info)) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "FE fetch invalid series index: " << idx;
-            continue;
-        }
-        query_more_than_0 = true;
-        MsgDcmInfo* item = msg_response.add_dcminfo();
-        item->set_study_id(dcm_info.study_id);
-        item->set_series_id(dcm_info.series_id);
-        item->set_study_date(dcm_info.study_date);
-        item->set_study_time(dcm_info.study_time);
-        item->set_patient_id(dcm_info.patient_id);
-        item->set_patient_name(dcm_info.patient_name);
-        item->set_patient_sex(dcm_info.patient_sex);
-        item->set_patient_birth_date(dcm_info.patient_birth_date);
-        item->set_modality(dcm_info.modality);
-
-        MI_APPCOMMON_LOG(MI_INFO) << "FE fetch series : " << dcm_info.series_id;
-    }
-    if (!query_more_than_0 ) {
-        msg_response.Clear();
-        return -1;
-    }
-
-    int msg_buffer_size = 0;
-    char* msg_buffer = nullptr;
-    if (0 != protobuf_serialize(msg_response, msg_buffer, msg_buffer_size)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "serialize FE fetch series message failed.";
-        return -1;
-    }
-    msg_response.Clear();
 
     //send message to DBS to fetch choosed DICOM series
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     header.op_id = OPERATION_ID_DB_BE_PACS_RETRIEVE;
-    header.data_len = msg_buffer_size;
-    IPCPackage* package = new IPCPackage(header,msg_buffer);
+    header.data_len = dataheader.data_len;
+    IPCPackage* package = new IPCPackage(header,buffer);
     if(0 != controller->get_client_proxy_dbs()->sync_send_data(package)) {
         delete package;
-        MI_APPCOMMON_LOG(MI_ERROR) << "send to DB to fetch PACS failed.";
+        MI_APPCOMMON_LOG(MI_ERROR) << "send to DB to retrieve PACS failed.";
         return -1;
     }    
 

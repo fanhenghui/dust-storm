@@ -160,6 +160,11 @@ int CacheDB::query_series_instance(const std::string& series_uid, std::vector<In
         return -1;
     }
 
+    if (!instance_infos) {
+        MI_IO_LOG(MI_ERROR) << "cache query series instance failed: null instance infos input/output.";
+        return -1;
+    }
+
     try {
         TRY_CONNECT
 
@@ -201,6 +206,65 @@ int CacheDB::query_series_instance(const std::string& series_uid, std::vector<In
             InstanceInfo& info = (*instance_infos)[instance_infos->size() - 1];
             info.file_path = res->getString("file_path").asStdString();
             info.file_size = res->getInt64("file_size");
+        }
+    } catch (std::exception& e) {
+        MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();
+        return -1;
+    }
+
+    return 0;
+}
+
+int CacheDB::query_series_instance(const std::string& series_uid, std::vector<std::string>* instance_file_paths) {
+    //verify
+    if (series_uid.empty() || series_uid.size() > UID_LIMIT) {
+        MI_IO_LOG(MI_ERROR) << "cache query series instance failed: invalid series_uid: " << series_uid;
+        return -1;
+    }
+
+    if (!instance_file_paths) {
+        MI_IO_LOG(MI_ERROR) << "cache query series instance failed: null instance infos input/output.";
+        return -1;
+    }
+
+    try {
+        TRY_CONNECT
+
+        std::stringstream sql;
+        sql << "SELECT id FROM " << SERIES_TABLE
+        << " WHERE series_uid=\'" << series_uid << "\';";
+
+        sql::ResultSet* res_series = nullptr;
+        int err = this->query(sql.str(), res_series);
+        StructShield<sql::ResultSet> shield_series(res_series);
+        if (0 != err) {
+            throw std::exception(std::logic_error("query series failed."));
+        }
+
+        int series_pk = -1;
+        if (res_series->next()) {
+            series_pk = res_series->getInt64("id");
+        }
+        if (series_pk < 1) {
+            throw std::exception(std::logic_error("invalid series pk."));
+        }
+
+        
+        sql.str("");
+        sql << "SELECT file_path, file_size FROM " 
+        << INSTANCE_TABLE << " WHERE series_fk=" << series_pk << ";";
+
+        sql::ResultSet* res = nullptr;
+        err = this->query(sql.str(), res);
+        StructShield<sql::ResultSet> shield(res);
+
+        if (0 != err) {
+            throw std::exception(std::logic_error("query instance failed."));
+        }
+
+        instance_file_paths->clear();
+        while(res->next()) {
+            instance_file_paths->push_back(res->getString("file_path").asStdString());
         }
     } catch (std::exception& e) {
         MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();

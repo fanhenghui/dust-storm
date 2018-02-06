@@ -18,6 +18,7 @@ public:
     int delete_series(int series_pk, bool transcation = true);
 
     int query_series_instance(const std::string& series_uid, std::vector<InstanceInfo>* instance_infos);
+    int query_series_instance(const std::string& series_uid, std::vector<std::string>* instance_file_paths);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(CacheDB);

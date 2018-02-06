@@ -61,6 +61,10 @@ public:
 
     //query series instance for data transform(DB->CACHE or DB->APP)
     int query_series_instance(int64_t series_pk, std::vector<InstanceInfo>* instance_infos);
+    int query_series_instance(int64_t series_pk, std::vector<std::string>* instance_file_paths);
+
+    //query series uid
+    int query_series_uid(int64_t series_pk, std::vector<std::string>* series_uid);
 
     int query_user(const UserInfo& key, std::vector<UserInfo>* user_infos);
     int query_evaluation(const EvaluationInfo& key, std::vector<EvaluationInfo>* eva_infos);

@@ -66,7 +66,7 @@ int AIOpDBRequestEvaluation::execute() {
 
     const std::string series_id = msg_req.series_uid();
     const std::string dcm_path = msg_req.dcm_path();
-    std::string ai_anno_path = msg_req.ai_anno_path();
+    std::string ai_eva_file_path = msg_req.ai_eva_file_path();
     std::string ai_im_data_path = msg_req.ai_im_data_path();
     bool recal_im_data = msg_req.recal_im_data();
     const uint64_t socket_id = msg_req.client_socket_id();
@@ -76,12 +76,12 @@ int AIOpDBRequestEvaluation::execute() {
         recal_im_data = true;
         ai_im_data_path = dcm_path + "/" + series_id + ".npy";
     }
-    if (ai_anno_path.empty()) {
-        ai_anno_path = dcm_path + "/" + series_id + ".csv";
+    if (ai_eva_file_path.empty()) {
+        ai_eva_file_path = dcm_path + "/" + series_id + ".csv";
     }
 
     msg_res.set_series_uid(series_id);
-    msg_res.set_ai_anno_path(ai_anno_path);
+    msg_res.set_ai_eva_file_path(ai_eva_file_path);
     msg_res.set_ai_im_data_path(ai_im_data_path);
     msg_res.set_recal_im_data(recal_im_data);
     msg_res.set_client_socket_id(socket_id);//TODO DBS增加 计算状态机以及等待计算结果的observer后可以删除
@@ -168,8 +168,8 @@ int AIOpDBRequestEvaluation::execute() {
 
     NoduleSetParser ns_parser;
     ns_parser.set_series_id(series_id);
-    if(IO_SUCCESS != ns_parser.save_as_csv(ai_anno_path, nodule_set)) {
-        MI_AISERVER_LOG(MI_ERROR) << "save evaluated result to " << ai_anno_path << " failed.";
+    if(IO_SUCCESS != ns_parser.save_as_csv(ai_eva_file_path, nodule_set)) {
+        MI_AISERVER_LOG(MI_ERROR) << "save evaluated result to " << ai_eva_file_path << " failed.";
         msg_res.set_status(-1);
         msg_res.set_err_msg("save evaluated result failed.");
         return notify_dbs(msg_res, controller);

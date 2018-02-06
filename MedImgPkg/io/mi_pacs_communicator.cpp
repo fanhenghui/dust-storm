@@ -573,14 +573,14 @@ int PACSCommunicator::query_series(const PatientInfo& patient_key, const StudyIn
     return 0;
 }
 
-int PACSCommunicator::retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<InstanceInfo>* instance_infos) {
+int PACSCommunicator::retrieve_series(const std::string& series_uid, const std::string& map_path, std::vector<InstanceInfo>* instance_infos) {
     if(0 != try_connect() ) {
-        MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_id;
+        MI_IO_LOG(MI_FATAL) << "try connect failed before fetch seriess: " << series_uid;
         return -1;
     }
 
     if (!_scp) {
-        MI_IO_LOG(MI_ERROR) << "SCP is null when fetch series: " << series_id;
+        MI_IO_LOG(MI_ERROR) << "SCP is null when fetch series: " << series_uid;
         return -1;
     }
     //set mapping directory
@@ -588,7 +588,7 @@ int PACSCommunicator::retrieve_series(const std::string& series_id, const std::s
 
     DcmDataset query_key;
     query_key.putAndInsertString(DCM_QueryRetrieveLevel, "SERIES");
-    query_key.putAndInsertString(DCM_SeriesInstanceUID,series_id.c_str());
+    query_key.putAndInsertString(DCM_SeriesInstanceUID,series_uid.c_str());
 
     const T_ASC_PresentationContextID id = findUncompressedPC(UID_MOVEStudyRootQueryRetrieveInformationModel, *_scu);
     if (id == 0) {
@@ -611,10 +611,10 @@ int PACSCommunicator::retrieve_series(const std::string& series_id, const std::s
 
     OFCondition result = _scu->sendMOVERequest(id, _connection_cache->client_ae_title.c_str(), &query_key, NULL);
     if (result.good() && (!instance_infos || !instance_infos->empty()) ) {
-        MI_IO_LOG(MI_DEBUG) << "retrieve series: " << series_id << " success."; 
+        MI_IO_LOG(MI_DEBUG) << "retrieve series: " << series_uid << " success."; 
         return 0;
     } else {
-        MI_IO_LOG(MI_ERROR) << "retrieve series: " << series_id << " failed."; 
+        MI_IO_LOG(MI_ERROR) << "retrieve series: " << series_uid << " failed."; 
         return -1;
     }
 }

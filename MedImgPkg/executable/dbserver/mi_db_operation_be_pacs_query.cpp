@@ -19,6 +19,7 @@ DBOpBEPACSQuery::~DBOpBEPACSQuery() {
 
 int DBOpBEPACSQuery::execute() {    
     MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEPACSQuery.";
+    DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
@@ -27,65 +28,85 @@ int DBOpBEPACSQuery::execute() {
     std::shared_ptr<PACSCommunicator> pacs_commu = controller->get_pacs_communicator();
     DBSERVER_CHECK_NULL_EXCEPTION(pacs_commu);
 
-    std::vector<DcmInfo> dcm_infos;
-    //TODO use queru key to query
-    if (0 != pacs_commu->query_series(dcm_infos, QueryKey())) {
+    MsgDcmQueryKey query_key;
+    if (0 != protobuf_parse(_buffer, _header.data_len, query_key)) {
+        MI_DBSERVER_LOG(MI_ERROR) << "parse PACS query key message send by BE failed.";
+        return -1;        
+    }
+
+    //query key
+    PatientInfo patient_key;
+    StudyInfo study_key;
+    SeriesInfo series_key;
+
+    patient_key.patient_id = query_key.patient_id();
+    patient_key.patient_name = query_key.patient_name();
+    patient_key.patient_birth_date = query_key.patient_birth_date();
+
+    study_key.study_date = query_key.study_date();
+    study_key.study_time = query_key.study_time();
+    study_key.accession_no = query_key.accession_no();
+
+    series_key.modality = query_key.modality();
+
+    std::vector<PatientInfo> patient_infos;
+    std::vector<StudyInfo> study_infos;
+    std::vector<SeriesInfo> series_infos;
+    if (0 != pacs_commu->query_series(patient_key, study_key, series_key, &patient_infos, &study_infos, &series_infos)) {
         MI_DBSERVER_LOG(MI_ERROR) << "PACS query series failed.";
         //TODO send message to notify BE
         return -1; 
     }
 
-    //DEBUG
-    {
-        int id = 0;
-        for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
-            const DcmInfo &item = *it;
-            MI_DBSERVER_LOG(MI_DEBUG) << id++ << "study_id: " << item.study_id << std::endl <<
-            "series_id: " << item.series_id << std::endl <<
-            "study_date: " << item.study_date << std::endl <<
-            "study_time: " << item.study_time << std::endl <<
-            "study_date: " << item.study_date << std::endl <<
-            "patient_id: " << item.patient_id << std::endl <<
-            "patient_name: " << item.patient_name << std::endl <<
-            "patient_sex: " << item.patient_sex << std::endl <<
-            "patient_birth_date: " << item.patient_birth_date << std::endl <<
-            "modality: " << item.modality << std::endl <<
-            "instance_number: " << item.instance_number << std::endl <<
-            "accession_number: " << item.accession_number << std::endl;
+    MsgStudyWrapperCollection study_wrapper_col;
+    int64_t pre_study_pk = -1;
+    MsgStudyWrapper* cur_study_wrapper = nullptr;
+    study_wrapper_col.set_num_study(study_infos.size());
+    for (size_t i = 0; i < study_infos.size(); ++i) {
+        StudyInfo& study_info = study_infos[i];
+        SeriesInfo& series_info = series_infos[i];
+        PatientInfo& patient_info = patient_infos[i];
+        if (pre_study_pk != study_info.id) {
+            cur_study_wrapper = study_wrapper_col.add_study_wrappers();
+
+            MsgStudyInfo* msg_study_info = cur_study_wrapper->mutable_study_info();
+            msg_study_info->set_patient_fk(study_info.patient_fk);
+            msg_study_info->set_study_date(study_info.study_date);
+            msg_study_info->set_study_time(study_info.study_time);
+            msg_study_info->set_accession_no(study_info.accession_no);
+            msg_study_info->set_study_desc(study_info.study_desc);
+            msg_study_info->set_num_series(study_info.num_series);
+            msg_study_info->set_num_instance(study_info.num_instance);
+
+            MsgPatientInfo* msg_patient_info = cur_study_wrapper->mutable_patient_info();
+            msg_patient_info->set_patient_id(patient_info.patient_id);
+            msg_patient_info->set_patient_name(patient_info.patient_name);
+            msg_patient_info->set_patient_birth_date(patient_info.patient_birth_date);
+
+            MsgSeriesInfo* msg_series_info = cur_study_wrapper->add_series_infos();
+            msg_series_info->set_id(series_info.id);
+            msg_series_info->set_series_no(series_info.series_no);
+            msg_series_info->set_modality(series_info.modality);
+            msg_series_info->set_institution(series_info.institution);
+            msg_series_info->set_num_instance(series_info.num_instance);
+
+        } else {
+            MsgSeriesInfo* msg_series_info = cur_study_wrapper->add_series_infos();
+            msg_series_info->set_id(series_info.id);
+            msg_series_info->set_series_no(series_info.series_no);
+            msg_series_info->set_modality(series_info.modality);
+            msg_series_info->set_institution(series_info.institution);
+            msg_series_info->set_num_instance(series_info.num_instance);
         }
-    }
-    
-
-    if (dcm_infos.empty()) {
-        MI_DBSERVER_LOG(MI_ERROR) << "retrieve 0 result from PACS.";
-        return -1;
-    }
-
-    //send to BE
-    MsgDcmInfoCollection msg_dcm_info_collection;
-    for (auto it = dcm_infos.begin(); it != dcm_infos.end(); ++it) {
-        const std::string series_id = (*it).series_id;
-        MsgDcmInfo* msg_dcm_info = msg_dcm_info_collection.add_dcminfo();
-        msg_dcm_info->set_study_id((*it).study_id);
-        msg_dcm_info->set_series_id((*it).series_id);
-        msg_dcm_info->set_study_date((*it).study_date);
-        msg_dcm_info->set_study_time((*it).study_time);
-        msg_dcm_info->set_patient_id((*it).patient_id);
-        msg_dcm_info->set_patient_name((*it).patient_name);
-        msg_dcm_info->set_patient_sex((*it).patient_sex);
-        msg_dcm_info->set_patient_birth_date((*it).patient_birth_date);
-        msg_dcm_info->set_modality((*it).modality);
-        msg_dcm_info->set_instance_number((*it).instance_number);
-        msg_dcm_info->set_accession_number((*it).accession_number);
     }
 
     char* buffer = nullptr;
     int buffer_size = 0;
-    if (0 != protobuf_serialize(msg_dcm_info_collection, buffer, buffer_size)) {
+    if (0 != protobuf_serialize(study_wrapper_col, buffer, buffer_size)) {
         MI_DBSERVER_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
         return -1;
     }
-    msg_dcm_info_collection.Clear();
+    study_wrapper_col.Clear();
     
     IPCDataHeader header;
     header.receiver = _header.receiver;

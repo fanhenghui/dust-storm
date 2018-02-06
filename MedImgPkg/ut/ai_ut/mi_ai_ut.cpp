@@ -36,15 +36,15 @@ int main(int argc, char* argv[]) {
     }
     
     const std::string dcm_path = item.dcm_path;
-    std::string ai_anno_path = item.annotation_ai_path;
+    std::string ai_eva_file_path = item.annotation_ai_path;
     std::string ai_im_data_path = item.ai_intermediate_data_path;
     bool recal_im_data = false;
     if (ai_im_data_path.empty()) {
         recal_im_data = true;
         ai_im_data_path = dcm_path + "/" + series_id + ".npy";
     }
-    if (ai_anno_path.empty()) {
-        ai_anno_path = dcm_path + "/" + series_id + ".csv";
+    if (ai_eva_file_path.empty()) {
+        ai_eva_file_path = dcm_path + "/" + series_id + ".csv";
     }
 
     //get python running path
@@ -97,8 +97,8 @@ int main(int argc, char* argv[]) {
 
     NoduleSetParser ns_parser;
     ns_parser.set_series_id(series_id);
-    if(IO_SUCCESS != ns_parser.save_as_csv(ai_anno_path, nodule_set)) {
-        MI_LOG(MI_ERROR) << "save evaluated result to " << ai_anno_path << " failed.";
+    if(IO_SUCCESS != ns_parser.save_as_csv(ai_eva_file_path, nodule_set)) {
+        MI_LOG(MI_ERROR) << "save evaluated result to " << ai_eva_file_path << " failed.";
         return -1;
     }
 

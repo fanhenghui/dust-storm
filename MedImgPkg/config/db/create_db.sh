@@ -28,7 +28,7 @@ CREATE TABLE patient(
     patient_id VARCHAR(64),
     patient_name VARCHAR(64),
     patient_sex VARCHAR(16),
-    patient_birth_date VARCHAR(8),
+    patient_birth_date DATE,
     md5 VARCHAR(32) NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -38,7 +38,7 @@ CREATE UNIQUE INDEX md5 ON patient(md5);
 CREATE INDEX patient_id ON patient(patient_id(64));
 CREATE INDEX patient_name ON patient(patient_name(64));
 CREATE INDEX patient_sex ON patient(patient_sex(4));
-CREATE INDEX patient_bitrh_date ON patient(patient_birth_date);
+CREATE INDEX patient_birth_date ON patient(patient_birth_date);
 
 CREATE TABLE study(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -88,7 +88,7 @@ CREATE TABLE instance(
     series_fk BIGINT NOT NULL,
     sop_class_uid VARCHAR(64) NOT NULL,
     sop_instance_uid VARCHAR(64) NOT NULL,
-    retrieve_user_fk VARCHAR(32) NOT NULL,
+    retrieve_user_fk VARCHAR(32),
     file_path VARCHAR(4096) NOT NULL,
     file_size BIGINT NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -136,7 +136,7 @@ CREATE TABLE evaluation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     eva_type_fk INT NOT NULL,
-    retrieve_user_fk VARCHAR(32) NOT NULL,
+    retrieve_user_fk VARCHAR(32),
     version VARCHAR(32),
     file_path VARCHAR(4096),
     file_size BIGINT,
@@ -149,7 +149,7 @@ CREATE TABLE annotation(
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     series_fk BIGINT NOT NULL,
     anno_type_fk INT NOT NULL,
-    annotation_user VARCHAR(32) NOT NULL,
+    annotation_user VARCHAR(32),
     anno_desc VARCHAR(64) CHARACTER SET UTF8,
     file_path VARCHAR(4096) NOT NULL,
     file_size BIGINT NOT NULL,

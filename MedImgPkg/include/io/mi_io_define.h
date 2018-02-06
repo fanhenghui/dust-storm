@@ -33,5 +33,7 @@ enum ExportDicomDataType {
     EXPORT_BITMAP,
 };
 
+#define VOLUME_SLICE_LIMIT 16 
+
 MED_IMG_END_NAMESPACE
 #endif

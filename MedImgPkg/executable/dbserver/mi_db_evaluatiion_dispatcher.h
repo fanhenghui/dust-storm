@@ -16,6 +16,7 @@
 MED_IMG_BEGIN_NAMESPACE
 
 class MsgEvaluationResponse;
+class MsgEvaluationRetrieveKey;
 class DBServerController;
 
 class DBEvaluationDispatcher : public IModel {
@@ -25,11 +26,11 @@ public:
 
     void set_controller(std::shared_ptr<DBServerController> controller);
 
-    int request_evaluation(const unsigned int client_id, const std::string& series_id);
+    int request_evaluation(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req);
     int receive_evaluation(MsgEvaluationResponse* msg_res);
 
 private:
-    void add_request(const unsigned int client_id, DB::ImgItem& item);
+    void add_request(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req, int64_t eva_pk, int64_t ai_prep_pk);
     
     void notify_all(IPCPackage* pkg);
 

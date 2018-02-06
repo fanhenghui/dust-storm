@@ -6,6 +6,7 @@
 #include "io/mi_nodule_set_parser.h"
 #include "io/mi_nodule_set.h"
 #include "io/mi_protobuf.h"
+#include "io/mi_configure.h"
 
 #include "appcommon/mi_app_common_define.h"
 
@@ -84,7 +85,7 @@ void DBEvaluationDispatcher::set_controller(std::shared_ptr<DBServerController> 
     _controller = controller;
 }
 
-int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, const std::string& series_id) {
+int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req) {
     // lock
     ConditionGuard guard(_condition_request);
     struct SeriesCleaner {
@@ -93,7 +94,10 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
         ~SeriesCleaner() { _dispatcher->update_request_series("");}
     } cleaner(this);
 
-    if (update_request_series(series_id)) {
+    const std::string series_uid = msg_req->series_uid();
+    const int64_t series_pk = msg_req->series_pk();
+
+    if (update_request_series(series_uid)) {
         boost::mutex::scoped_lock request_locker(_mutex_reveive);
         _condition_receive.wait(_mutex_reveive);
     }
@@ -111,29 +115,41 @@ int DBEvaluationDispatcher::request_evaluation(const unsigned int client_id, con
     DBSERVER_CHECK_NULL_EXCEPTION(server_proxy);
 
     //query DB
-    DB::ImgItem item;
-    if(0 != db->get_dcm_item(series_id, item) ) {
-        SEND_ERROR_TO_BE(server_proxy, client_id, "DICOM series item not existed.");
+    PreprocessInfo prep_key;
+    prep_key.prep_type = LUNG_AI_INTERMEDIATE_DATA;
+    prep_key.series_fk = series_pk;
+    std::vector<PreprocessInfo> ai_prep_infos;
+    if (0 != db->query_preprocess(prep_key, &ai_prep_infos)) {
+        SEND_ERROR_TO_BE(server_proxy, client_id, "query db ai preprocess failed.");
         return -1;
     }
+    int64_t ai_prep_pk = ai_prep_infos.empty() ? -1 : ai_prep_infos[0].id;
 
-    if (item.annotation_ai_path.empty()) {
-        add_request(client_id, item);     
+    EvaluationInfo eva_key;
+    eva_key.series_fk = series_pk;
+    std::vector<EvaluationInfo> eva_infos;
+    if (0 != db->query_evaluation(eva_key, &eva_infos)) {
+        SEND_ERROR_TO_BE(server_proxy, client_id, "query db evaluation failed.");
+        return -1;
+    }
+    int64_t eva_pk = eva_infos.empty() ? -1 : eva_infos[0].id;
+    
+    //TODO check version
+    if (eva_infos.empty()) {
+        add_request(client_id, msg_req, eva_pk, ai_prep_pk);     
         return 0;
     }
-
-    //TODO check version
-
+    
     NoduleSetParser parser;
-    parser.set_series_id(series_id);
+    parser.set_series_id(series_uid);
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-    if( IO_SUCCESS != parser.load_as_csv(item.annotation_ai_path, nodule_set) ) {
-        SEND_ERROR_TO_BE(server_proxy, client_id, "load annotation file failed.");
+    if( IO_SUCCESS != parser.load_as_csv(eva_infos[0].file_path, nodule_set) ) {
+        SEND_ERROR_TO_BE(server_proxy, client_id, "load evaluation file failed.");
         return -1;
     }
 
     MsgAnnotationCollectionDB msg_annos;
-    msg_annos.set_series_uid(series_id);
+    msg_annos.set_series_uid(series_uid);
 
     const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
     for (auto it = vois.begin(); it != vois.end(); ++it) {
@@ -179,11 +195,14 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     } cleaner(this);
 
     const int status = msg_res->status();
-    const std::string series_id = msg_res->series_uid();
-    const std::string ai_anno_path = msg_res->ai_anno_path();
+    const std::string series_uid = msg_res->series_uid();
+    const int64_t series_fk = msg_res->series_fk();
+    const int64_t eva_pk = msg_res->eva_pk();
+    const int64_t prep_pk = msg_res->prep_pk();
+    const std::string ai_eva_file_path = msg_res->ai_eva_file_path();
     const std::string ai_im_data_path = msg_res->ai_im_data_path();
 
-    if (update_receive_series(series_id)){
+    if (update_receive_series(series_uid)){
         boost::mutex::scoped_lock _mutex_request;
         _condition_request.wait(_mutex_request);
     }
@@ -204,36 +223,88 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
         return -1;
     }
 
-    //update DB
+
     bool recal_im_data = msg_res->recal_im_data();
     if (recal_im_data) {
-        if (!ai_im_data_path.empty()){
-            db->update_ai_intermediate_data(series_id, ai_im_data_path);
+        PreprocessInfo info;
+        info.series_fk = series_fk;
+        info.prep_type = LUNG_AI_INTERMEDIATE_DATA;
+        info.file_path = ai_im_data_path;
+        info.version = "0.0.0";
+        int64_t file_size = -1;
+        if(0 != FileUtil::get_file_size(ai_im_data_path, file_size) ) {
+            IPCPackage* err_pkg = create_error_message("get ai preprocess data file size failed.");
+            notify_all(err_pkg);
+            return -1;
+        }
+        info.file_size = file_size;
+
+        if (prep_pk < 1) {
+            //insert new one
+            if (0 != db->insert_preprocess(info)) {
+                IPCPackage* err_pkg = create_error_message("insert ai preprocess data failed.");
+                notify_all(err_pkg);
+                return -1;
+            }
         } else {
-            MI_DBSERVER_LOG(MI_ERROR) << "update empty AI intermediate data path.";
+            info.id = prep_pk;
+            //update old one 
+            if (0 != db->update_preprocess(info)) {
+                IPCPackage* err_pkg = create_error_message("update ai preprocess data failed.");
+                notify_all(err_pkg);
+                return -1;
+            }
         }
     }
     
-    if (ai_anno_path.empty()){
+    if (ai_eva_file_path.empty()){
         IPCPackage* err_pkg = create_error_message("update empty AI annotation data path.");
         notify_all(err_pkg);
         return -1;
     }
     
-    db->update_ai_annotation(series_id, ai_anno_path);
+    EvaluationInfo info;
+    info.series_fk = series_fk;
+    info.eva_type = LUNG_NODULE;
+    info.version = "0.0.0";
+    info.file_path = ai_eva_file_path;
+    int64_t file_size = -1;
+    if(0 != FileUtil::get_file_size(ai_eva_file_path, file_size) ) {
+        IPCPackage* err_pkg = create_error_message("get ai evaluation file size failed.");
+        notify_all(err_pkg);
+        return -1;
+    }
+    info.file_size = file_size;
+
+    if (eva_pk < 1) {
+        //insert new one
+        if (0 != db->insert_evaluation(info)) {
+            IPCPackage* err_pkg = create_error_message("insert ai evaluation failed.");
+            notify_all(err_pkg);
+            return -1;
+        }
+    } else {
+        info.id = prep_pk;
+        //update old one 
+        if (0 != db->update_evaluation(info)) {
+            IPCPackage* err_pkg = create_error_message("update ai evaluation failed.");
+            notify_all(err_pkg);
+            return -1;
+        }
+    }
 
     //load annotation and send to client
     NoduleSetParser parser;
-    parser.set_series_id(series_id);
+    parser.set_series_id(series_uid);
     std::shared_ptr<NoduleSet> nodule_set(new NoduleSet());
-    if( IO_SUCCESS != parser.load_as_csv(ai_anno_path, nodule_set) ) {
+    if( IO_SUCCESS != parser.load_as_csv(ai_eva_file_path, nodule_set) ) {
         IPCPackage* err_pkg = create_error_message("load evaluation result file failed.");
         notify_all(err_pkg);
         return -1;
     }
 
     MsgAnnotationCollectionDB msg_annos;
-    msg_annos.set_series_uid(series_id);
+    msg_annos.set_series_uid(series_uid);
     const std::vector<VOISphere>& vois = nodule_set->get_nodule_set();
     for (auto it = vois.begin(); it != vois.end(); ++it) {
         const VOISphere &voi = *it;
@@ -262,10 +333,24 @@ int DBEvaluationDispatcher::receive_evaluation(MsgEvaluationResponse* msg_res) {
     return 0;
 }
 
-void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgItem& item) {
+void DBEvaluationDispatcher::add_request(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req, int64_t eva_pk, int64_t ai_prep_pk) {
     boost::mutex::scoped_lock locker_queue(_mutex_queue);
-    const std::string series_id = item.series_id;
-    auto it = _request_queue.find(series_id);
+
+    std::shared_ptr<DBServerController> controller = _controller.lock();
+    DBSERVER_CHECK_NULL_EXCEPTION(controller);
+    std::shared_ptr<DB> db = controller->get_db();
+    DBSERVER_CHECK_NULL_EXCEPTION(db);
+
+    const int64_t series_pk = msg_req->series_pk();
+    const std::string& series_uid = msg_req->series_uid();
+    const std::string& study_uid = msg_req->study_uid();
+    const std::string db_path = Configure::instance()->get_db_path();
+    const std::string series_path = db_path + "/" + study_uid + "/" + series_uid + "/";
+    const std::string file_path = series_path + series_uid + ".csv";
+    const std::string ai_im_file_path = series_path + series_uid + ".npy";
+
+    
+    auto it = _request_queue.find(series_uid);
     if (it != _request_queue.end()) {
         RequesterCollection& req_coll = it->second;
         if (req_coll.req_set.find(client_id) == req_coll.req_set.end()) {
@@ -277,42 +362,66 @@ void DBEvaluationDispatcher::add_request(const unsigned int client_id, DB::ImgIt
         }
     } else {
         //first request
-        RequesterCollection req_coll;
-        req_coll.req_set.insert(client_id);
-        req_coll.req_queue.push_back(client_id);
-        _request_queue.insert(std::make_pair(series_id, req_coll));
-
         MI_DBSERVER_LOG(MI_INFO) << "Ecaluation dispatcher: trigger evaluation " << client_id;
 
         //send evaluation request to AI server
-        std::shared_ptr<DBServerController> controller = _controller.lock();
-        DBSERVER_CHECK_NULL_EXCEPTION(controller);
+        
+        //query AI intermidiate data
+        PreprocessInfo prep_key;
+        prep_key.series_fk = series_pk;
+        prep_key.prep_type = LUNG_AI_INTERMEDIATE_DATA;
+        std::vector<PreprocessInfo> prep_infos;
+        if (0 != db->query_preprocess(prep_key, &prep_infos)) {
+            MI_DBSERVER_LOG(MI_ERROR) << "query evaluation failed.";
+            return;
+        }
 
         MsgEvaluationRequest msg;
-        msg.set_series_uid(series_id);
-        msg.set_dcm_path(item.dcm_path);
-        msg.set_ai_anno_path(item.dcm_path+"/"+series_id+".csv");
+        msg.set_series_uid(series_uid);
+        msg.set_eva_pk(eva_pk);
+        msg.set_prep_pk(prep_pk);
+        msg.set_ai_eva_file_path(file_path);
+        msg.set_ai_im_data_path(ai_im_file_path);
         msg.set_client_socket_id(client_id);
-        if (item.ai_intermediate_data_path.empty()) {
-            msg.set_ai_im_data_path(item.dcm_path+"/"+series_id+".npy");
+        if (prep_infos.empty()) {
             msg.set_recal_im_data(true);
+
+            std::vector<std::string> instances_file_paths;
+            if (0 != db->query_series_instance(series_pk, &instances_file_paths)) {
+                MI_DBSERVER_LOG(MI_ERROR) << "query series instance failed.";
+                return;
+            }
+            for (size_t i = 0; i< instances_file_paths; ++i) {
+               std::string* files = msg.add_instance_files(); 
+               *files = instances_file_paths[i];
+            }
         } else {
-            msg.set_ai_im_data_path(item.ai_intermediate_data_path);
+            
             msg.set_recal_im_data(false);
         }
         int msg_buffer_size = 0;
         char* msg_buffer = nullptr;
-        if (0 == protobuf_serialize(msg, msg_buffer, msg_buffer_size)) {
-            IPCDataHeader header;
-            header.data_len = msg_buffer_size;
-            header.receiver = controller->get_ais_client();
-            header.msg_id = COMMAND_ID_AI_DB_OPERATION;
-            header.op_id = OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION;
-            std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());
-            op->set_data(header, msg_buffer);
-            op->set_controller(controller);
-            controller->get_thread_model()->push_operation_ais(op);
+        if (0 != protobuf_serialize(msg, msg_buffer, msg_buffer_size)) {
         }
+
+        //add to queue
+        RequesterCollection req_coll;
+        req_coll.req_set.insert(client_id);
+        req_coll.req_queue.push_back(client_id);
+        _request_queue.insert(std::make_pair(series_uid, req_coll));
+
+        //send request to AI server
+        IPCDataHeader header;
+        header.data_len = msg_buffer_size;
+        header.receiver = controller->get_ais_client();
+        header.msg_id = COMMAND_ID_AI_DB_OPERATION;
+        header.op_id = OPERATION_ID_AI_DB_REQUEST_AI_EVALUATION;
+        std::shared_ptr<DBOpRequestEvaluation> op(new DBOpRequestEvaluation());
+        op->set_data(header, msg_buffer);
+        op->set_controller(controller);
+        controller->get_thread_model()->push_operation_ais(op);
+
+
         msg.Clear();
         MI_DBSERVER_LOG(MI_INFO) << "send request to AIS.";
     }

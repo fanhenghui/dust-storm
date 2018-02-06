@@ -20,16 +20,14 @@ BECmdHandlerFEPACSQuery::~BECmdHandlerFEPACSQuery() {}
 int BECmdHandlerFEPACSQuery::handle_command(const IPCDataHeader& dataheader, char* buffer) {
     MI_APPCOMMON_LOG(MI_TRACE) << "IN BECmdHandlerFEPACSQuery";
 
-    MemShield shield(buffer);
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
-    //TODO query key
-    //send message to DBS to query DICOM study/series
+    //send message to DBS to query DICOM
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     header.op_id = OPERATION_ID_DB_BE_PACS_QUERY;
-    IPCPackage* package = new IPCPackage(header);
+    IPCPackage* package = new IPCPackage(header, buffer);
     if(0 != controller->get_client_proxy_dbs()->sync_send_data(package)) {
         delete package;
         MI_APPCOMMON_LOG(MI_ERROR) << "send to DB to query PACS failed.";

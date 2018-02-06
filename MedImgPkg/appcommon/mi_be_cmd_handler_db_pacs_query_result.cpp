@@ -11,7 +11,6 @@
 #include "mi_app_common_define.h"
 #include "mi_app_thread_model.h"
 #include "mi_app_common_util.h"
-#include "mi_model_pacs.h"
 #include "mi_app_common_logger.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -57,52 +56,45 @@ int BECmdHandlerDBPACSQueryResult::handle_command(const IPCDataHeader& dataheade
     std::shared_ptr<AppController> controller = _controller.lock();
     APPCOMMON_CHECK_NULL_EXCEPTION(controller);
 
-    //parse PACS result and save to model
-    MsgDcmInfoCollection msg;
+    //Debug code
+    //Test parse and print
+    MsgStudyWrapperCollection msg;
     if (0 != protobuf_parse(buffer, dataheader.data_len, msg)) {
-        MI_APPCOMMON_LOG(MI_ERROR) << "parse dicom info collection msg from DBS failed(PCAS query).";
+        MI_APPCOMMON_LOG(MI_ERROR) << "parse study wrapper collection msg from DBS failed(PCAS query).";
         return -1;
     }
 
-    std::vector<DcmInfo> dcm_infos(msg.dcminfo_size());
-    int id=0;
-    for (int i=0; i<msg.dcminfo_size(); ++i) {
-        MsgDcmInfo item = msg.dcminfo(i);
-        
-        DcmInfo dcm_info;
-        dcm_info.study_id = item.study_id();
-        dcm_info.series_id = item.series_id();
-        dcm_info.study_date = item.study_date();
-        dcm_info.study_time = item.study_time();
-        dcm_info.patient_id = item.patient_id();
-        dcm_info.patient_name = item.patient_name();
-        dcm_info.patient_sex = item.patient_sex();
-        dcm_info.patient_birth_date = item.patient_birth_date();
-        dcm_info.modality = item.modality();
-        dcm_info.instance_number = item.instance_number();
-        dcm_info.accession_number = item.accession_number();
+    const int study_size = msg.study_wrappers_size();
+    for (int i = 0; i < study_size; ++i) {
+        const MsgStudyWrapper& study_wrapper = msg.study_wrappers(i);
+        const MsgStudyInfo& study_info = study_wrapper.study_info();
+        const MsgPatientInfo& patient_info = study_wrapper.patient_info();
 
-        dcm_infos[id++] = dcm_info;
-
-        MI_APPCOMMON_LOG(MI_DEBUG) << id++ << 
-            "study_id: " << dcm_info.study_id << std::endl <<
-            "series_id: " << dcm_info.series_id << std::endl <<
-            "study_date: " << dcm_info.study_date << std::endl <<
-            "study_time: " << dcm_info.study_time << std::endl <<
-            "study_date: " << dcm_info.study_date << std::endl <<
-            "patient_id: " << dcm_info.patient_id << std::endl <<
-            "patient_name: " << dcm_info.patient_name << std::endl <<
-            "patient_sex: " << dcm_info.patient_sex << std::endl <<
-            "patient_birth_date: " << dcm_info.patient_birth_date << std::endl <<
-            "modality: " << dcm_info.modality << std::endl <<
-            "instance_number: " << dcm_info.instance_number << std::endl <<
-            "accession_number: " << dcm_info.accession_number << std::endl;
+        int series_size = study_wrapper.series_infos_size();
+        for (int j = 0; j < series_size; ++j) {
+            const MsgSeriesInfo& series_info = study_wrapper.series_infos(j);
+            MI_APPCOMMON_LOG(MI_DEBUG) << i <<": " << std::endl
+            << "study_uid: " << study_info.study_uid() << std::endl
+            << "study_id: " << study_info.study_id() << std::endl
+            << "study_date: " << study_info.study_date() << std::endl
+            << "study_time: " << study_info.study_time() << std::endl
+            << "accession_no: " << study_info.accession_no() << std::endl
+            << "study_desc: " << study_info.study_desc() << std::endl
+            << "num_instance(study): " << study_info.num_instance() << std::endl
+            << "num_series: " << study_info.num_series() << std::endl
+            << "series_uid: " << series_info.series_uid() << std::endl
+            << "series_no: " << series_info.series_no() << std::endl
+            << "modality: " << series_info.modality() << std::endl
+            << "series_desc: " << series_info.series_desc() << std::endl
+            << "institution: " << series_info.institution() << std::endl
+            << "num_instance(series): " << series_info.num_instance() << std::endl
+            << "patient_id: " << patient_info.patient_id() << std::endl
+            << "patient_name: " << patient_info.patient_name() << std::endl
+            << "patient_sex: " << patient_info.patient_sex() << std::endl
+            << "patient_birth_date: " << patient_info.patient_birth_date() << std::endl
+            << std::endl;
+        }
     }
-    msg.Clear();
-
-    std::shared_ptr<ModelPACS> model_pacs = AppCommonUtil::get_model_pacs(controller);
-    APPCOMMON_CHECK_NULL_EXCEPTION(model_pacs);
-    model_pacs->update(dcm_infos);
 
     //receive DB's retrive response , and create operation to BE queue to nofity FE to refresh PACS table
     //transmit to FE 

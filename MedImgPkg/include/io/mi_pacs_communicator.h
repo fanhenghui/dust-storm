@@ -28,7 +28,7 @@ public:
     int query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key,   
         std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<SeriesInfo>* series_infos);
 
-    int retrieve_series(const std::string& series_id, const std::string& map_path, std::vector<InstanceInfo>* instance_infos = nullptr);
+    int retrieve_series(const std::string& series_uid, const std::string& map_path, std::vector<InstanceInfo>* instance_infos = nullptr);
 
 private:
     int try_connect();

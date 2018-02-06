@@ -6,34 +6,34 @@
 MED_IMG_BEGIN_NAMESPACE
 
 // For 
-struct DcmInfo {
-    //patient info
-    int64_t patient_pk;//For retrieve (DB only)
-    std::string patient_id;
-    std::string patient_name;
-    std::string patient_sex;
-    std::string patient_birth_date;//format: YYYYMMDD
+// struct DcmInfo {
+//     //patient info
+//     int64_t patient_pk;//For retrieve (DB only)
+//     std::string patient_id;
+//     std::string patient_name;
+//     std::string patient_sex;
+//     std::string patient_birth_date;//format: YYYYMMDD
     
-    //study info
-    int64_t study_pk;//For retrieve (DB only)
-    std::string study_id;
-    std::string study_uid;
-    std::string accession_no;
-    std::string study_desc;
-    std::string study_date;//format: YYYYMMDD
-    std::string study_time;//format: HHMMSS
-    int num_series;
-    int num_instance_study_related;
+//     //study info
+//     int64_t study_pk;//For retrieve (DB only)
+//     std::string study_id;
+//     std::string study_uid;
+//     std::string accession_no;
+//     std::string study_desc;
+//     std::string study_date;//format: YYYYMMDD
+//     std::string study_time;//format: HHMMSS
+//     int num_series;
+//     int num_instance_study_related;
 
-    //series info
-    int64_t series_pk;//For retrieve (DB only)
-    std::string series_id;
-    std::string modality;
-    std::string series_no;
-    std::string institution;
-    std::string series_desc;
-    int num_instance_series_related;
-};
+//     //series info
+//     int64_t series_pk;//For retrieve (DB only)
+//     std::string series_id;
+//     std::string modality;
+//     std::string series_no;
+//     std::string institution;
+//     std::string series_desc;
+//     int num_instance_series_related;
+// };
 
 //-------------------------------------------------//
 // PACA & DB common
@@ -95,6 +95,13 @@ struct InstanceInfo {
     InstanceInfo(): file_size(0) {}
 };
 
+enum RoleType {
+    CHIEF_PHYSICAN = 1,//主任医师
+    ASSOCIATE_CHIEF_PHYSICAN = 2,//副主任医师
+    ATTENDING_PHYSICAN = 3,//主治医师
+    RESIDENT_PHYSICAN = 4,//住院医师
+};
+
 struct RoleInfo {
     int id;
     std::string name;
@@ -110,15 +117,19 @@ struct UserInfo {
     UserInfo(): role_fk(-1) {}
 };
 
+enum EvaluationType {
+    LUNG_NODULE = 1,
+};
+
 struct EvaluationInfo {
     int64_t id;
     int64_t series_fk;
     int eva_type;
-    std::string eva_version;
-    std::string eva_file_path;//---not query key---//
-    int64_t eva_file_size;//---not query key---//
+    std::string version;
+    std::string file_path;//---not query key---//
+    int64_t file_size;//---not query key---//
 
-    EvaluationInfo(): id(-1), series_fk(-1), eva_type(-1), eva_file_size(0) {}
+    EvaluationInfo(): id(-1), series_fk(-1), eva_type(-1), file_size(0) {}
 };
 
 struct AnnotationInfo {
@@ -127,19 +138,24 @@ struct AnnotationInfo {
     int anno_type;
     int64_t user_id;
     std::string anno_desc;//---not query key---//
-    std::string anno_file_path;//---not query key---//
-    int64_t anno_file_size;//---not query key---//
+    std::string file_path;//---not query key---//
+    int64_t file_size;//---not query key---//
 
-    AnnotationInfo(): id(-1), series_fk(-1), anno_type(-1), user_id(-1), anno_file_size(0) {}
+    AnnotationInfo(): id(-1), series_fk(-1), anno_type(-1), user_id(-1), file_size(0) {}
+};
+
+enum PreprocessType {
+    INIT_SEGMENT_MASK = 1,
+    LUNG_AI_INTERMEDIATE_DATA= 2,
 };
 
 struct PreprocessInfo {
     int64_t id;
     int64_t series_fk;
     int prep_type;
-    std::string prep_version;
-    std::string prep_file_path;
-    int64_t prep_file_size;
+    std::string version;
+    std::string file_path;
+    int64_t file_size;
 
     PreprocessInfo(): id(-1), series_fk(-1), prep_type(-1) {}
 };

@@ -45,9 +45,11 @@ message MsgCellInfo {
 };
 
 message MsgInit {
-    int32 pid = 1;
-    string series_uid = 2;
-    repeated MsgCellInfo cells = 3; 
+    int64 patient_pk = 1;
+    int64 study_pk = 2;
+    int64 series_pk = 3;
+    string user_id = 4;
+    repeated MsgCellInfo cells = 5;
 };
 
 message MsgResize {
@@ -117,13 +119,114 @@ message MsgMPRMaskOverlay {
     float opacity = 2;
 };
 
-message MsgDCMQueryKey {
-    string study_date = 1;
+//for DB server to BE server
+message MsgAnnotationCollectionDB {
+    string series_uid = 1;
+    repeated MsgAnnotationUnitDB annotation = 2;
+};
+
+//for DB server to AIS server
+message MsgEvaluationRequest {
+    string series_uid = 1; //series uid
+    int64 eva_pk = 2;
+    int64 prep_pk = 3;
+    string ai_eva_file_path = 4; //output evaluation file path
+    string ai_im_data_path = 5; //intermediate data path for AI algorithm(resample volume ...), if recal_im_data is true, this file will be create/update
+    bool recal_im_data = 6; //recalculate AI intermediate data flag
+    uint64 client_socket_id = 7; //requested client socket ID
+    repeated string instance_files = 8; //if recal_im_data is true, this para will be used
+};
+
+//for AIS server back to DB server
+message MsgEvaluationResponse {
+    int32 status = 1;//0 success -1 error
+    string series_uid = 2; // series uid
+    int64 eva_pk = 3;
+    int64 prep_pk = 4;
+    string ai_eva_file_path = 5; //output evaluation file path
+    string ai_im_data_path = 6; //intermediate data path for AI algorithm,if recal_im_data is true, DBS shoule update DB
+    bool recal_im_data = 7;//recalculate AI intermediate data flag
+    uint64 client_socket_id = 8; //requested client socket ID
+    string err_msg = 9;//err message
+};
+
+//DB PACS query&retrieve
+
+message MsgPatientInfo {
     string patient_id = 2;
     string patient_name = 3;
-    string modality = 4;
-    string accession_number = 5;
-    string patient_sex = 6;
+    string patient_sex = 4;
+    string patient_birth_date = 5;
+};
+
+message MsgStudyInfo {
+    int64 patient_fk = 2;
+    string study_id = 3;
+    string study_uid = 4;
+    string study_date = 5;
+    string study_time = 6;
+    string accession_no = 7;
+    string study_desc = 8;
+    int32 num_series = 9;
+    int32 num_instance = 10;
+};
+
+message MsgSeriesInfo {
+    int64 id = 1;//for app loading
+    string series_uid = 3;
+    string series_no = 4;
+    string modality = 5;
+    string series_desc = 6;
+    string institution = 7;
+    int32 num_instance = 8;
+};
+
+message MsgStudyWrapper {
+    MsgStudyInfo study_info = 1;
+    MsgPatientInfo patient_info = 2;
+    repeated MsgSeriesInfo series_infos = 3;
+};
+
+message MsgStudyWrapperCollection {
+    repeated MsgStudyWrapper study_wrappers = 1;
+    int32 num_study = 2;
+};
+
+message MsgDcmQueryKey {
+    string patient_id = 1;
+    string patient_name = 2;
+    string patient_birth_date = 3;
+
+    string study_date = 4;
+    string study_time = 5;
+    string accession_no = 6;
+
+    string modality = 7;
+};
+
+message MsgDcmPACSRetrieveKey {
+    string user_id = 1;
+    repeated string series_uid = 2;
+    repeated string study_uid = 3;
+}
+
+message MsgDcmDBRetrieveKey {
+    int64 series_pk = 1;
+};
+
+message MsgEvaluationRetrieveKey {
+    string series_uid = 1;
+    string study_uid = 2;
+    int64 series_pk = 3;
+    int32 eva_type = 4;
+    string user_id = 5;
+};
+
+message MsgPreprocessRetrieveKey {
+    string series_uid = 1;
+    int64 series_pk = 2;
+    int32 prep_type = 3;
+    string user_id = 4;
 };
 
 //for DB server to BE server
@@ -135,37 +238,8 @@ message MsgAnnotationUnitDB {
     float p = 5; //probability
 };
 
-//for DB server to BE server
-message MsgAnnotationCollectionDB {
-    string series_uid = 1;
-    repeated MsgAnnotationUnitDB annotation = 2;
-};
 
-//for DB server to AIS server
-message MsgEvaluationRequest {
-    string series_uid = 1; //series id
-    string dcm_path = 2; //if recal_im_data is true, this para will be used
-    string ai_anno_path = 3; //output annotation file path
-    string ai_im_data_path = 4; //intermediate data path for AI algorithm(resample volume ...), if recal_im_data is true, this file will be create/update
-    bool recal_im_data = 5; //recalculate AI intermediate data flag
-    uint64 client_socket_id = 6; //requested client socket ID
-};
 
-//for AIS server back to DB server
-message MsgEvaluationResponse {
-    int32 status = 1;//0 success -1 error
-    string series_uid = 2; // series id
-    string ai_anno_path = 3; //output annotation file path
-    string ai_im_data_path = 4; //intermediate data path for AI algorithm,if recal_im_data is true, DBS shoule update DB
-    bool recal_im_data = 5;//recalculate AI intermediate data flag
-    uint64 client_socket_id = 6; //requested client socket ID
-    string err_msg = 7;//err message
-};
-
-//TODO add study / patient / series info
-message MsgStudyInfo {
-
-};
 
 message MsgDcmInfo {
     string study_id = 1;
@@ -184,11 +258,3 @@ message MsgDcmInfo {
 message MsgDcmInfoCollection {
     repeated MsgDcmInfo dcminfo = 1;
 };
-
-message NsgDcmStudy {
-    repeated MsgDcmInfo series = 1;
-};
-
-message MsgDcmStudyCollection {
-    repeated NsgDcmStudy studies = 1;
-}

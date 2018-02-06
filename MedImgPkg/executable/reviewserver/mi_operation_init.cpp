@@ -37,7 +37,6 @@
 #include "appcommon/mi_model_annotation.h"
 #include "appcommon/mi_model_dbs_status.h"
 #include "appcommon/mi_model_crosshair.h"
-#include "appcommon/mi_model_pacs.h"
 #include "appcommon/mi_model_anonymization.h"
 #include "appcommon/mi_ob_annotation_list.h"
 #include "appcommon/mi_ob_annotation_segment.h"
@@ -74,18 +73,39 @@ int OpInit::execute() {
 
     std::shared_ptr<AppController> controller = get_controller<AppController>();
     REVIEW_CHECK_NULL_EXCEPTION(controller);
-    if (0 != init_model(controller, &msg_init)) {
+    if (0 != init_model(controller)) {
         MI_REVIEW_LOG(MI_FATAL) << "init model failed.";
         return -1;
     }
 
+    //query to get series uid
+    //query in remote DB
+    std::string db_ip_port,db_user,db_pwd,db_name;
+    Configure::instance()->get_db_info(db_ip_port, db_user, db_pwd, db_name);
+    DB db;
+    if( 0 != db.connect(db_user, db_ip_port, db_pwd, db_name)) {
+        MI_REVIEW_LOG(MI_FATAL) << "connect DB failed.";
+        return -1;
+    }
+
+    std::vector<std::string> series_uids;
+    if(0 != db.query_series_uid(msg_init.series_pk(), &series_uids)) {
+        MI_REVIEW_LOG(MI_FATAL) << "query series " << msg_init.series_pk() <<  " failed.";
+        return -1;
+    } else if (series_uids.empty()) {
+        MI_REVIEW_LOG(MI_FATAL) << "series " << msg_init.series_pk() <<  " doesn't existed.";
+        return -1;
+    }
+
+    const std::string series_uid = series_uids[0];
+
     bool preprocessing_mask = false;
-    if (0 != init_data(controller, msg_init.series_uid(), preprocessing_mask)) {
+    if (0 != init_data(controller, series_uid, &msg_init, preprocessing_mask)) {
         MI_REVIEW_LOG(MI_FATAL) << "init data failed.";
         return -1;
     }
 
-    if (0 != init_cell(controller, &msg_init, preprocessing_mask)) {
+    if (0 != init_cell(controller, series_uid, &msg_init, preprocessing_mask)) {
         MI_REVIEW_LOG(MI_FATAL) << "init cell failed.";
         return -1;
     }
@@ -95,7 +115,7 @@ int OpInit::execute() {
     return 0;
 }
 
-int OpInit::init_data(std::shared_ptr<AppController> controller, const std::string& series_uid, bool& preprocessing_mask) {
+int OpInit::init_data(std::shared_ptr<AppController> controller, const std::string& series_uid, MsgInit* msg_init, bool& preprocessing_mask) {
     // reset mask label store
     MaskLabelStore::instance()->reset_labels();
     
@@ -109,53 +129,41 @@ int OpInit::init_data(std::shared_ptr<AppController> controller, const std::stri
         return -1;
     }
 
-    CacheDB::ImgItem item;
-    bool data_in_cache = false;
-    if (0 == cache_db.get_item(series_uid, item)) {
-        MI_REVIEW_LOG(MI_INFO) << "hit dcm in cache db.";
-        const int err = load_dcm_from_cache_db(controller, series_uid, item.path);
-        if(-1 == err ) {
-            //load series failed
-            return -1;
-        } else if (-2 == err) {
-            //DB has damaged cache series
-            //load from remote to update cache
-            data_in_cache = false;
-        } else {
-            MI_REVIEW_LOG(MI_INFO) << "load series from cache db success.";
-            data_in_cache = true;
+    std::vector<std::string> instance_file_paths;
+    bool dicom_in_cache = false;
+    if (0 != cache_db.query_series_instance(series_uid, &instance_file_paths)) {
+        MI_REVIEW_LOG(MI_ERROR) << "query cache db failed. try retrieve from remote db.";
+    } else {
+        if (!instance_file_paths.empty()) {
+            MI_REVIEW_LOG(MI_INFO) << "series: " << series_uid << " hit cache.";
+            const int err = load_dcm_from_cache_db(controller, instance_file_paths);
+            if(-1 == err ) {
+                //load series failed
+                MI_REVIEW_LOG(MI_FATAL) << "load series :" << series_uid << " failed.";
+                return -1;
+            } else if (-2 == err) {
+                //DB has damaged cache series
+                //load from remote to update cache
+                dicom_in_cache = false;
+            } else {
+                MI_REVIEW_LOG(MI_INFO) << "load series from cache db success.";
+                dicom_in_cache = true;
+            }
         }
     }
 
-    return query_from_remote_db(controller, series_uid, data_in_cache, preprocessing_mask);
+    return query_from_remote_db(controller, series_uid, msg_init, dicom_in_cache, preprocessing_mask);
 }
 
-int OpInit::load_dcm_from_cache_db(std::shared_ptr<AppController> controller, const std::string& series_uid, const std::string& local_dcm_path) {
+int OpInit::load_dcm_from_cache_db(std::shared_ptr<AppController> controller, std::vector<std::string>& instance_file_paths) {
     MI_REVIEW_LOG(MI_TRACE) << "IN load dcm from cache db.";
-    if (local_dcm_path.empty()) {
-        MI_REVIEW_LOG(MI_ERROR) << "series path null in cache db.";
-        return -2;
-    }
-
-    const std::string series_path = local_dcm_path;
-    
-    //get dcm files
-    std::vector<std::string> dcm_files;
-    std::set<std::string> postfix;
-    postfix.insert(".dcm");
-    FileUtil::get_all_file_recursion(series_path, postfix, dcm_files);
-    if (dcm_files.empty()) {
-        MI_REVIEW_LOG(MI_ERROR) << "series path has no DICOM(.dcm) files.";
-        return -2;
-    }
 
     //load DICOM
     std::shared_ptr<ImageDataHeader> data_header;
     std::shared_ptr<ImageData> img_data;
     DICOMLoader loader;
-    IOStatus status = loader.load_series(dcm_files, img_data, data_header);
+    IOStatus status = loader.load_series(instance_file_paths, img_data, data_header);
     if (status != IO_SUCCESS) {
-        MI_REVIEW_LOG(MI_FATAL) << "load series :" << series_uid << " failed.";
         return -1;
     }
 
@@ -204,7 +212,7 @@ static IPCPackage* create_query_end_msg_package() {
     return (new IPCPackage(header));
 }
 
-int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, const std::string& series_uid, bool data_in_cache, bool& preprocessing_mask) {
+int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, const std::string& series_uid, MsgInit* msg_init, bool dicom_in_cache, bool& preprocessing_mask) {
     std::string dbs_ip,dbs_port;
     Configure::instance()->get_db_server_host(dbs_ip, dbs_port);
     if (dbs_ip.empty() || dbs_port.empty()) {
@@ -222,11 +230,72 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     client_proxy.set_server_address(dbs_ip,dbs_port);
 
     std::vector<IPCPackage*> packages;
-    if (!data_in_cache) {
-        packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_DICOM, series_uid));
+    //retrieve DICOM from remote DB
+    if (!dicom_in_cache) {
+        IPCDataHeader post_header;
+        post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+        post_header.op_id = OPERATION_ID_DB_BE_FETCH_DICOM;
+
+        MsgDcmDBRetrieveKey msg;
+        msg.set_series_pk(msg_init->series_pk());
+        char* post_data = nullptr;
+        int post_size = 0;
+        if (0 == protobuf_serialize(msg, post_data, post_size)) {
+            msg.Clear();
+            post_header.data_len = post_size;
+            packages.push_back(new IPCPackage(post_header,post_data));    
+        } else {
+            msg.Clear();
+            MI_REVIEW_LOG(MI_ERROR) << "create dcm series retrieve msg failed.";
+            return -1;
+        }
     }
-    packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK, series_uid));
-    packages.push_back(create_info_msg_package(OPERATION_ID_DB_BE_FETCH_AI_EVALUATION, series_uid));
+
+    //TODO 这里的请求不是通用的，eva_type prep_type 需要根据不同的应用来定义，不过现在一个app的情况下，无所谓
+    //retrieve preprocess(init_segment_mask)
+    {
+        IPCDataHeader post_header;
+        post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+        post_header.op_id = OPERATION_ID_DB_BE_FETCH_PREPROCESS_MASK;
+
+        MsgPreprocessRetrieveKey msg;
+        msg.set_series_pk(msg_init->series_pk());
+        msg.set_prep_type(INIT_SEGMENT_MASK);
+        msg.set_user_id(msg_init->user_id());
+        char* post_data = nullptr;
+        int post_size = 0;
+        if (0 == protobuf_serialize(msg, post_data, post_size)) {
+            msg.Clear();
+            post_header.data_len = post_size;
+            packages.push_back(new IPCPackage(post_header,post_data));    
+        } else {
+            msg.Clear();
+            MI_REVIEW_LOG(MI_ERROR) << "create preprocess retrieve msg failed.";
+            return -1;
+        }
+    }
+    //retrieve evaluation(lung nodule)
+    {
+        IPCDataHeader post_header;
+        post_header.msg_id = COMMAND_ID_DB_BE_OPERATION;
+        post_header.op_id = OPERATION_ID_DB_BE_FETCH_AI_EVALUATION;
+
+        MsgEvaluationRetrieveKey msg;
+        msg.set_series_pk(msg_init->series_pk());
+        msg.set_eva_type(LUNG_NODULE);
+        msg.set_user_id(msg_init->user_id());
+        char* post_data = nullptr;
+        int post_size = 0;
+        if (0 == protobuf_serialize(msg, post_data, post_size)) {
+            msg.Clear();
+            post_header.data_len = post_size;
+            packages.push_back(new IPCPackage(post_header,post_data));    
+        } else {
+            msg.Clear();
+            MI_REVIEW_LOG(MI_ERROR) << "create evaluation retrieve msg failed.";
+            return -1;
+        }
+    }
     packages.push_back(create_query_end_msg_package());
 
     model_dbs_status->query_ai_annotation();
@@ -258,7 +327,7 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
     return 0;
 }
 
-int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_init, bool preprocessing_mask) {
+int OpInit::init_cell(std::shared_ptr<AppController> controller, const std::string& series_uid, MsgInit* msg_init, bool preprocessing_mask) {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation: cell.";
 
     std::shared_ptr<VolumeInfos> volume_infos = controller->get_volume_infos();
@@ -463,7 +532,7 @@ int OpInit::init_cell(std::shared_ptr<AppController> controller, MsgInit* msg_in
     return 0;
 }
 
-int OpInit::init_model(std::shared_ptr<AppController> controller, MsgInit*) {
+int OpInit::init_model(std::shared_ptr<AppController> controller) {
     MI_REVIEW_LOG(MI_TRACE) << "IN init operation: model.";
 
     controller->add_model(MODEL_ID_ANNOTATION,

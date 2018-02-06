@@ -8,7 +8,6 @@
 
 #include "appcommon/mi_app_common_define.h"
 #include "appcommon/mi_app_thread_model.h"
-#include "appcommon/mi_model_pacs.h"
 #include "appcommon/mi_model_anonymization.h"
 #include "appcommon/mi_be_cmd_handler_fe_operation.h"
 #include "appcommon/mi_be_cmd_handler_fe_ready.h"
@@ -132,8 +131,6 @@ void ReviewController::register_command_handler() {
 }
 
 void ReviewController::init_default_model() {
-    this->add_model(MODEL_ID_PACS,
-    std::shared_ptr<IModel>(new ModelPACS()));
     this->add_model(MODEL_ID_ANONYMIZATION,
     std::shared_ptr<IModel>(new ModelAnonymization()));
 }
