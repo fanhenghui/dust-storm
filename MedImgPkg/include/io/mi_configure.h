@@ -2,8 +2,11 @@
 #define MEDIMG_IO_MI_CONFIGURE_H
 
 #include <string>
-#include "io/mi_io_export.h"
 #include "boost/thread/mutex.hpp"
+
+#include "io/mi_io_export.h"
+#include "util/mi_version_util.h"
+#include "io/mi_dicom_info.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -56,7 +59,9 @@ public:
 
     GPUPlatformType get_gpu_platform_type() const;
 
-    std::string get_version()
+    Version get_evaluation_version(EvaluationType type) const;
+    Version get_preprocess_version(PreprocessType type) const;
+
 private:
     Configure();
     void init();

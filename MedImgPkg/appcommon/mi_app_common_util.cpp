@@ -6,6 +6,7 @@
 #include "mi_model_crosshair.h"
 #include "mi_model_dbs_status.h"
 #include "mi_model_anonymization.h"
+#include "mi_model_user.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -48,5 +49,16 @@ std::shared_ptr<ModelAnonymization> AppCommonUtil::get_model_anonymization(std::
         return model;
     }
 }
+
+std::shared_ptr<ModelUser> AppCommonUtil::get_model_user(std::shared_ptr<AppController> controller) {
+    std::shared_ptr<IModel> model_ = controller->get_model(MODEL_ID_USER);
+    if (nullptr == model_) {
+        return nullptr;
+    } else {
+        std::shared_ptr<ModelUser> model = std::dynamic_pointer_cast<ModelUser>(model_);
+        return model;
+    }
+}
+
 
 MED_IMG_END_NAMESPACE

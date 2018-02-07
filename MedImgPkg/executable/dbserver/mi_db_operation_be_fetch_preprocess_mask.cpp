@@ -28,7 +28,7 @@ int DBOpBEFetchPreprocessMask::execute() {
         return -1;
     }
      
-    const std::string& series_id = msg.series_uid();
+    //const std::string& series_id = msg.series_uid();
     const int64_t series_pk = msg.series_pk();
     const int prep_type = msg.prep_type();
     msg.Clear();

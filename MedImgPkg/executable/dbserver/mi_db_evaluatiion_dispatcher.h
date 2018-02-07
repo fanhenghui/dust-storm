@@ -31,7 +31,7 @@ public:
 
 private:
     void add_request(const unsigned int client_id, MsgEvaluationRetrieveKey* msg_req, 
-        int64_t eva_pk, int eva_type, int64_t ai_prep_pk, int ai_prep_type);
+        const EvaluationInfo eva_info, const PreprocessInfo& prep_info, bool ai_prep_expired);
     
     void notify_all(IPCPackage* pkg);
 

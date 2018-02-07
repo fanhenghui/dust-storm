@@ -12,12 +12,14 @@ class ModelAnnotation;
 class ModelCrosshair;
 class ModelDBSStatus;
 class ModelAnonymization;
+class ModelUser;
 class AppCommon_Export AppCommonUtil {
 public:
     static std::shared_ptr<ModelAnnotation> get_model_annotation(std::shared_ptr<AppController> controller);
     static std::shared_ptr<ModelCrosshair> get_model_crosshair(std::shared_ptr<AppController> controller);
     static std::shared_ptr<ModelDBSStatus> get_model_dbs_status(std::shared_ptr<AppController> controller);
     static std::shared_ptr<ModelAnonymization> get_model_anonymization(std::shared_ptr<AppController> controller);
+    static std::shared_ptr<ModelUser> get_model_user(std::shared_ptr<AppController> controller);
 };
 
 MED_IMG_END_NAMESPACE

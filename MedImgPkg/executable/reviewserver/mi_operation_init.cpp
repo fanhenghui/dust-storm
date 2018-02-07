@@ -261,7 +261,6 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
         MsgPreprocessRetrieveKey msg;
         msg.set_series_pk(msg_init->series_pk());
         msg.set_prep_type(INIT_SEGMENT_MASK);
-        msg.set_user_id(msg_init->user_id());
         char* post_data = nullptr;
         int post_size = 0;
         if (0 == protobuf_serialize(msg, post_data, post_size)) {
@@ -283,7 +282,6 @@ int OpInit::query_from_remote_db(std::shared_ptr<AppController> controller, cons
         MsgEvaluationRetrieveKey msg;
         msg.set_series_pk(msg_init->series_pk());
         msg.set_eva_type(LUNG_NODULE);
-        msg.set_user_id(msg_init->user_id());
         char* post_data = nullptr;
         int post_size = 0;
         if (0 == protobuf_serialize(msg, post_data, post_size)) {

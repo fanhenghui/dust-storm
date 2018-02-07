@@ -127,35 +127,39 @@ message MsgAnnotationCollectionDB {
 
 //for DB server to AIS server
 message MsgEvaluationRequest {
-    string series_uid = 1; //series uid
-    int64 series_pk = 2; // for DB
-    int64 eva_pk = 3; // for DB
-    int eva_type = 4; // for DB
-    int64 prep_pk = 5; // for DB
-    int64 prep_type = 6; // for DB
-    string eva_file_path = 7; //output evaluation file path
-    string ai_prep_file_path = 9; //intermediate data path for AI algorithm(resample volume ...), if recal_im_data is true, this file will be create/update
-    bool recal_im_data = 9; //recalculate AI intermediate data flag
-    uint64 client_socket_id = 10; //requested client socket ID
-    repeated string instance_files = 11; //if recal_im_data is true, this para will be used
+    string series_uid = 1;
+    int64 series_pk = 2;
+    
+    int64 eva_pk = 3;
+    int32 eva_type = 4;
+    string eva_file_path = 5;
+
+    int64 prep_pk = 6;
+    int32 prep_type = 7;
+    string prep_file_path = 8; //preprocess data path for AI algorithm(resample volume ...), if prep_expired is true, this file will be create/update
+    bool prep_expired = 9; //recalculate AI preprocess data flag
+
+    repeated string instance_files = 10; //if prep_expired is true, this para will be used
 };
 
 //for AIS server back to DB server
 message MsgEvaluationResponse {
     int32 status = 1;//0 success -1 error
-    string series_uid = 2; // series uid
-    int64 series_pk = 3; // for DB
-    int64 eva_pk = 4; // for DB
-    int64 eva_type = 5; // for DB
-    int64 prep_pk = 6; // for DB
-    int64 prep_type = 7; // for DB
+    string err_msg = 2;//err message
+
+    string series_uid = 3;
+    int64  series_pk = 4;
+    
+    int64 eva_pk = 5;
+    int32 eva_type = 6;
+    string eva_file_path = 7; //output evaluation file path
     string eva_version = 8;
-    string ai_prep_version = 9;
-    string eva_file_path = 10; //output evaluation file path
-    string ai_prep_file_path = 11; //intermediate data path for AI algorithm,if recal_im_data is true, DBS shoule update DB
-    bool recal_im_data = 12;//recalculate AI intermediate data flag
-    uint64 client_socket_id = 13; //requested client socket ID
-    string err_msg = 14;//err message
+
+    int64 prep_pk = 9;
+    int32 prep_type = 10;
+    string prep_file_path = 11; //preprocess data path for AI algorithm,if prep_expired is true, DBS shoule update DB
+    string prep_version = 12;
+    bool prep_expired = 13; //recalculate AI preprocess data flag    
 };
 
 //DB PACS query&retrieve
@@ -242,9 +246,6 @@ message MsgAnnotationUnitDB {
     float r = 4; //diameter 
     float p = 5; //probability
 };
-
-
-
 
 message MsgDcmInfo {
     string study_id = 1;

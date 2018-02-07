@@ -220,4 +220,113 @@ GPUPlatformType Configure::get_gpu_platform_type() const {
     return _gpu_platform_type;
 }
 
+Version Configure::get_evaluation_version(EvaluationType type) const {
+    Version v;
+#ifdef WIN32
+    std::ifstream in("./config/app_config");
+#else
+    std::ifstream in("../config/app_config");
+#endif
+    
+    if (!in.is_open()) {
+        MI_IO_LOG(MI_ERROR) << "can't open configure file when get evaluation version.";
+        return v;
+    }
+
+    std::string line;
+    std::string tag;
+    std::string equal;
+    std::string context;
+
+    const static std::map<EvaluationType, std::string>::value_type mapper_value[] = {
+        std::map<EvaluationType, std::string>::value_type(LUNG_NODULE, "EvaLungNoduleVersion")
+    };
+
+    const static std::map<EvaluationType, std::string> mapper(mapper_value, mapper_value+1);
+
+    auto it = mapper.find(type);
+    if (it == mapper.end()) {
+        MI_IO_LOG(MI_ERROR) << "get evaluation : " << type << " mapper string failed.";
+        return v;
+    }
+
+    const std::string& type_str = it->second;
+    while (std::getline(in , line)) {
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '#') {
+            continue;
+        }
+        std::stringstream ss(line);
+        ss >> tag >> equal >> context;
+        if (tag == type_str) {
+            if(0 != make_version(context, v)) {
+                MI_IO_LOG(MI_ERROR) << "make evaluation : " << type << " version failed.";
+            }
+            break;
+        }
+    }
+
+    if (LUNG_NODULE == type) {
+        
+    }
+
+    in.close();
+    return v;
+}
+
+Version Configure::get_preprocess_version(PreprocessType type) const {
+    Version v;
+#ifdef WIN32
+    std::ifstream in("./config/app_config");
+#else
+    std::ifstream in("../config/app_config");
+#endif
+    
+    if (!in.is_open()) {
+        MI_IO_LOG(MI_ERROR) << "can't open configure file when get preprocess version.";
+        return v;
+    }
+
+    std::string line;
+    std::string tag;
+    std::string equal;
+    std::string context;
+
+    const static std::map<PreprocessType, std::string>::value_type mapper_value[] = {
+        std::map<PreprocessType, std::string>::value_type(INIT_SEGMENT_MASK, "PrepInitSegMaskVersion"),
+        std::map<PreprocessType, std::string>::value_type(LUNG_AI_DATA, "PrepLungAIDataVersion")
+    };
+
+    const static std::map<PreprocessType, std::string> mapper(mapper_value, mapper_value+2);
+
+    auto it = mapper.find(type);
+    if (it == mapper.end()) {
+        MI_IO_LOG(MI_ERROR) << "get preprocess : " << type << " mapper string failed.";
+        return v;
+    }
+
+    const std::string& type_str = it->second;
+    while (std::getline(in , line)) {
+        if (line.empty()) {
+            continue;
+        }
+        if (line[0] == '#') {
+            continue;
+        }
+        std::stringstream ss(line);
+        ss >> tag >> equal >> context;
+        if (tag == type_str) {
+            if(0 != make_version(context, v)) {
+                MI_IO_LOG(MI_ERROR) << "make preprocess : " << type << " version failed.";
+            }
+            break;
+        }
+    }
+
+    in.close();
+    return v;
+}
+
 MED_IMG_END_NAMESPACE

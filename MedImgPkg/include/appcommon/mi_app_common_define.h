@@ -95,6 +95,7 @@ MED_IMG_BEGIN_NAMESPACE
 #define MODEL_ID_DBS_STATUS 910002
 #define MODEL_ID_PACS 910002
 #define MODEL_ID_ANONYMIZATION 910003
+#define MODEL_ID_USER 910004
 //***************************************************************//
 
 
