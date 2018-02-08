@@ -107,6 +107,7 @@ int DB::verfiy_study_info(const StudyInfo& study_info) {
         return -1;
     }
 
+    /*
     //series number
     if (study_info.num_series <= 0) {
         MI_IO_LOG(MI_ERROR) << "invalid study info: number of series: " << study_info.num_series;
@@ -118,6 +119,7 @@ int DB::verfiy_study_info(const StudyInfo& study_info) {
         MI_IO_LOG(MI_ERROR) << "invalid study info: number of instance: " << study_info.num_instance;
         return -1;
     }
+    */
 
     return 0;
 }
@@ -285,8 +287,8 @@ int DB::insert_study(StudyInfo& study_info) {
         }
         sql << "\'" << study_info.accession_no << "\',"
         << "\'" << study_info.study_desc << "\',"
-        << "\'" << study_info.num_series << "\',"
-        << "\'" << study_info.num_instance << "\'"
+        << "\'" << 0 << "\'," //Note: insert study with defalut 0 series number
+        << "\'" << 0 << "\'" //Note: insert study with defalut 0 instance number
         << ");";
 
         MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
@@ -337,10 +339,18 @@ int DB::update_study(StudyInfo& study_info) {
             sql << "study_date_time=\'" << datetime << "\',";
         }
         sql << "accession_no=\'" << study_info.accession_no << "\',"
-        << "study_desc=\'" << study_info.study_desc << "\',"
-        << "num_series=" << study_info.num_series << ","
-        << "num_instance=" << study_info.num_instance << " "
-        << "WHERE id=" << study_info.id;
+        << "study_desc=\'" << study_info.study_desc << "\' ";
+        //num serie & num_instance is updated by new series insert
+        /*
+        if (study_info.num_series > 0) {
+            sql << ", num_series=" << study_info.num_series;
+        }
+        if (study_info.num_instance > 0) {
+            sql << ", num_instance=" << study_info.num_instance << " ";
+        }
+        */
+        
+        sql << "WHERE id=" << study_info.id;
 
         sql::ResultSet* res = nullptr;
         int err = query(sql.str(), res);
@@ -366,6 +376,7 @@ int DB::insert_series(SeriesInfo& series_info) {
     }
 
     try { 
+        //insert new series
         std::stringstream sql;
         sql << "INSERT INTO " << SERIES_TABLE
         << "(study_fk, series_uid, series_no, modality, series_desc, institution, num_instance) VALUES("
@@ -382,8 +393,40 @@ int DB::insert_series(SeriesInfo& series_info) {
         int err = this->query(sql.str(), res);
         StructShield<sql::ResultSet> shield(res);
         if(0 != err) {
-            THROW_SQL_EXCEPTION
+            throw std::exception(std::logic_error("insert series sql error."));
         }
+
+        //query existed study
+        sql.str("");
+        sql << "SELECT num_instance, num_series FROM " << STUDY_TABLE
+        << " WHERE id=" << series_info.study_fk << ";";
+        
+        sql::ResultSet* res1 = nullptr;
+        err = this->query(sql.str(), res1);
+        StructShield<sql::ResultSet> shield1(res1);
+        if (0 != err) {
+            throw std::exception(std::logic_error("query study sql error."));
+        }
+
+        if (!res1->next()) {
+            throw std::exception(std::logic_error("query study null."));
+        }
+
+        const int num_series = res1->getInt("num_series") + 1;
+        const int num_instance = res1->getInt("num_instance") + series_info.num_instance;
+        
+        //update existed study
+        sql.str("");
+        sql << "UPDATE " << STUDY_TABLE << " SET num_series=" << num_series
+        << ", num_instance=" << num_instance << " WHERE id=" << series_info.study_fk << ";";
+
+        sql::ResultSet* res2 = nullptr;
+        err = this->query(sql.str(), res2);
+        StructShield<sql::ResultSet> shield2(res2);
+        if (0 != err) {
+            throw std::exception(std::logic_error("update study sql error."));
+        }
+
     } catch(const std::exception& e) {
         MI_IO_LOG(MI_ERROR) << "db insert series failed: " << e.what();
         return -1;
@@ -640,7 +683,7 @@ int DB::insert_series(PatientInfo& patient_info, StudyInfo& study_info, SeriesIn
         }
 
         if (series_pk > 0) {
-            //delete old series
+            //delete old seriesdone
             if (0!= delete_series(series_pk, false)) {
                 throw std::exception(std::logic_error("delete series failed."));    
             }

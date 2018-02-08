@@ -274,6 +274,101 @@ IOStatus DICOMLoader::get_sop_instance_uid(const DCMSliceStream* stream, std::st
 
     return IO_SUCCESS;
 }
+IOStatus DICOMLoader::get_dicom_info(const std::string& file, 
+        PatientInfo& patient_info, StudyInfo& study_info, SeriesInfo& series_info, InstanceInfo& instance_info) {
+    if (file.empty()) {
+        return IO_EMPTY_INPUT;
+    }
+
+    DcmFileFormatPtr file_format(new DcmFileFormat());
+    OFCondition status = file_format->loadFile(file.c_str());
+    if (status.bad()) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    DcmDataset* data_set = file_format->getDataset();
+    if (nullptr == data_set) {
+        return IO_FILE_OPEN_FAILED;
+    }
+
+    //study uid, series uid, modality, series sop instance uid is not null
+    OFString context;
+    if (data_set->findAndGetOFString(DCM_StudyInstanceUID, context).bad()) {
+        return IO_DATA_DAMAGE;
+    }
+    study_info.study_uid = std::string(context.c_str());
+
+    if (data_set->findAndGetOFString(DCM_SeriesInstanceUID, context).bad()) {
+        return IO_DATA_DAMAGE;
+    }
+    series_info.series_uid = std::string(context.c_str());
+
+    if (data_set->findAndGetOFString(DCM_Modality, context).bad()) {
+        return IO_DATA_DAMAGE;
+    }
+    series_info.modality = std::string(context.c_str());
+
+    data_set->findAndGetOFString(DCM_SOPInstanceUID, context);
+    if (status.bad()) {
+        return IO_DATA_DAMAGE;
+    }
+    instance_info.sop_instance_uid = std::string(context.c_str());
+
+
+    if (data_set->findAndGetOFString(DCM_PatientName, context).good()) {
+        patient_info.patient_name = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_PatientID, context).good()) {
+        patient_info.patient_id = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_PatientBirthDate, context).good()) {
+        patient_info.patient_birth_date = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_PatientSex, context).good()) {
+        patient_info.patient_sex = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_StudyID, context).good()) {
+        study_info.study_id = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_AccessionNumber, context).good()) {
+        study_info.study_id = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_StudyDescription, context).good()) {
+        study_info.study_desc = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_StudyDate, context).good()) {
+        study_info.study_date = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_StudyTime, context).good()) {
+        study_info.study_time = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_SeriesNumber, context).good()) {
+        series_info.series_no = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_InstitutionName, context).good()) {
+        series_info.institution = std::string(context.c_str());
+    }
+
+    if (data_set->findAndGetOFString(DCM_SeriesDescription, context).good()) {
+        series_info.series_desc = std::string(context.c_str());
+    }
+
+    if(data_set->findAndGetOFString(DCM_SOPClassUID, context).good()) {
+        instance_info.sop_class_uid = std::string(context.c_str());
+    }
+
+    return IO_SUCCESS;
+}
 
 IO_Export IOStatus DICOMLoader::load_series(std::vector<DCMSliceStream*>& buffers,
                 std::shared_ptr<ImageData>& image_data,

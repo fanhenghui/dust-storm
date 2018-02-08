@@ -6,6 +6,7 @@
 #include "arithmetic/mi_point2.h"
 #include "io/mi_io_define.h"
 #include "io/mi_io_export.h"
+#include "io/mi_dicom_info.h"
 
 class DcmFileFormat;
 class DcmDataset;
@@ -78,6 +79,8 @@ public:
     IO_Export IOStatus get_sop_instance_uid(const std::string& file, std::string& sop_instance_uid);
     IO_Export IOStatus get_sop_instance_uid(const DCMSliceStream* stream, std::string& sop_instance_uid);
     
+    IO_Export IOStatus get_dicom_info(const std::string& file, 
+        PatientInfo& patient_info, StudyInfo& study_info, SeriesInfo& series_info, InstanceInfo& instance_info);
 
 private:
     IOStatus data_check(std::vector<std::string>& files,

@@ -322,7 +322,7 @@ int pacs_ut(int argc, char* argv[]) {
                 if( -1 != pacs_comm.retrieve_series(series_uid, path, &instance_infos) ) {
                     std::vector<UserInfo> user_infos;
                     if (!user_infos.empty()) {
-                        db.insert_dcm_series(study_infos[0], series_infos[0], patient_infos[0], instance_infos);
+                        db.insert_series(patient_infos[0], study_infos[0], series_infos[0], instance_infos);
                     }
                     
                 } else {

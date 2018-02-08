@@ -31,6 +31,7 @@ public:
     static int get_file_size(const std::string& path, int64_t& fsize);
 
     static int remove_file(const std::string& path);
+    static int copy_file(const std::string& src, const std::string& dst);
 
 protected:
 private:

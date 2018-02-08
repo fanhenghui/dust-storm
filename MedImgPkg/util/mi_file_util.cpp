@@ -285,4 +285,36 @@ int FileUtil::remove_file(const std::string& path) {
     return remove(path.c_str());
 }
 
+int FileUtil::copy_file(const std::string& src, const std::string& dst) {
+    std::ifstream in;
+    std::ofstream out;
+    in.open(src, std::ios::binary | std::ios::in);
+    out.open(dst, std::ios::binary | std::ios::out);
+
+    if (!in.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::copy file open src " << src << " failed.";
+        in.close();
+        out.close();
+        return -1;
+    }
+
+    if (!out.is_open()) {
+        MI_UTIL_LOG(MI_ERROR) << "FileUtil::copy file open dst " << src << " failed.";
+        in.close();
+        out.close();
+        return -1;
+    }
+
+    // cal size
+    in.seekg(0, std::ios::end);
+    in.seekg(0, std::ios::beg);
+    // copy
+    out << in.rdbuf();
+
+    in.close();
+    out.close();
+
+    return 0;
+}
+
 MED_IMG_END_NAMESPACE
