@@ -197,8 +197,6 @@ int DB::insert_patient(PatientInfo& patient_info) {
         }
         sql << patient_info.md5 << "\')";
 
-        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str(); 
-
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res); 
         StructShield<sql::ResultSet> shield(res);
@@ -290,8 +288,6 @@ int DB::insert_study(StudyInfo& study_info) {
         << "\'" << 0 << "\'," //Note: insert study with defalut 0 series number
         << "\'" << 0 << "\'" //Note: insert study with defalut 0 instance number
         << ");";
-
-        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res);
@@ -460,8 +456,6 @@ int DB::update_series(SeriesInfo& series_info) {
         << "institution=\'" << series_info.institution << "\', " 
         << "num_instance=" << series_info.num_instance 
         << " WHERE id=" << series_info.id << ";";
-
-        MI_IO_LOG(MI_DEBUG) << "SQL: " << sql.str();
 
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res);
@@ -836,6 +830,9 @@ int DB::delete_series(int series_pk, bool transcation) {
             if (err != 0) {
                 throw std::exception(std::logic_error("delete study row failed."));
             }
+
+            MI_IO_LOG(MI_WARNING) << "Delete study column.";
+            
         } else {
             //update study num_series
             sql.str("");
@@ -848,6 +845,8 @@ int DB::delete_series(int series_pk, bool transcation) {
             if (err != 0) {
                 throw std::exception(std::logic_error("update study row failed."));
             }
+
+            MI_IO_LOG(MI_WARNING) << "Update study column.";
         }
 
         //-------------------------------------------------------------//

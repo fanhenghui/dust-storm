@@ -13,6 +13,11 @@ public:
     static int check_hhmmss(const std::string& time);
     static int check_hhmmss_range(const std::string& time_range);
     static int check_yyyymmddhhmmss(const std::string& datetime);
+
+    //default return beijing time
+    static std::string current_date(int time_zone = 8);
+    static std::string current_time(int time_zone = 8);
+    static std::string current_date_time(int time_zone = 8);
 };
 
 MED_IMG_END_NAMESPACE

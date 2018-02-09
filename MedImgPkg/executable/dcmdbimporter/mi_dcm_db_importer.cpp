@@ -25,10 +25,18 @@
 #include "io/mi_configure.h"
 
 #include "mi_dcm_file_browser.h"
+#include "util/mi_time_util.h"
 
 using namespace medical_imaging;
 
 int main(int argc, char* argv[]) {
+
+    const std::string log_config_file = "../config/log_cofig";
+    Logger::instance()->bind_config_file(log_config_file);
+    Logger::instance()->set_file_name_format("logs/dcm-db-importer-log-%Y-%m-%d_%H-%M-%S.%N.log");
+    Logger::instance()->set_file_direction("");
+    Logger::instance()->initialize();
+    
     DB db;
     std::string ip_port,user,pwd,db_name;
     Configure::instance()->get_db_info(ip_port, user, pwd, db_name);
@@ -66,8 +74,12 @@ int main(int argc, char* argv[]) {
     size_t count = 0;
     size_t sum = browser._series_infos.size();
     const std::string db_path = Configure::instance()->get_db_path();
+    const std::string dcm_path = db_path + "/instance/" + TimeUtil::current_date();
+
     FileUtil::make_direction(db_path);
-    FileUtil::make_direction(db_path + "/instance");
+    FileUtil::make_direction(db_path + "/instance/");
+    FileUtil::make_direction(dcm_path);
+    
     for (auto it = browser._series_infos.begin(); it!= browser._series_infos.end(); ++it) {
         const std::string& series_uid = it->first;
         StudyInfo& study_info = browser._study_infos[series_uid];
@@ -75,7 +87,7 @@ int main(int argc, char* argv[]) {
         PatientInfo& patient_info = browser._patient_infos[series_uid];
 
         //print debug
-        MI_LOG(MI_DEBUG) << ++count <<"/" << sum << " : " << std::endl
+        MI_LOG(MI_INFO) << ++count <<"/" << sum << " : " << std::endl
                             << "study_uid: " << study_info.study_uid << std::endl
                             << "study_id: " << study_info.study_id << std::endl
                             << "study_date: " << study_info.study_date << std::endl
@@ -97,7 +109,7 @@ int main(int argc, char* argv[]) {
                             << std::endl;
 
 
-        const std::string study_map_path = db_path + "/instance/" + study_info.study_uid;
+        const std::string study_map_path = dcm_path + "/" + study_info.study_uid;
         const std::string series_map_path = study_map_path + "/" + series_uid;
         FileUtil::make_direction(study_map_path);
         FileUtil::make_direction(series_map_path);

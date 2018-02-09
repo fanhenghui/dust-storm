@@ -1,6 +1,7 @@
 #include "mi_time_util.h"
 #include <exception>
-#include "mi_util_logger.h"
+#include <time.h>
+#include <sstream>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -114,6 +115,79 @@ int TimeUtil::check_yyyymmddhhmmss(const std::string& datetime) {
     }
 
     return 0;
+}
+
+std::string TimeUtil::current_date(int time_zone) {
+    time_zone = time_zone < 0 ? 0 : time_zone; 
+    time_zone = time_zone > 23 ? 23 : time_zone;
+    time_t rt = time(0) + time_zone*3600;
+    tm* lt = gmtime(&rt);
+
+    std::stringstream ss;
+    ss << lt->tm_year + 1900;
+    if (lt->tm_mon < 9) {
+        ss << 0;
+    }
+    ss << lt->tm_mon + 1;
+    if (lt->tm_mday < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_mday;
+    return ss.str();
+}
+
+std::string TimeUtil::current_time(int time_zone) {
+    time_zone = time_zone < 0 ? 0 : time_zone; 
+    time_zone = time_zone > 23 ? 23 : time_zone;
+    time_t rt = time(0) + time_zone*3600;
+    tm* lt = gmtime(&rt);
+
+    std::stringstream ss;
+    if (lt->tm_hour < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_hour;
+    if (lt->tm_min < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_min;
+    if (lt->tm_sec < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_sec;
+    return ss.str();
+}
+
+std::string TimeUtil::current_date_time(int time_zone) {
+    time_zone = time_zone < 0 ? 0 : time_zone; 
+    time_zone = time_zone > 23 ? 23 : time_zone;
+    time_t rt = time(0) + time_zone*3600;
+    tm* lt = gmtime(&rt);
+    
+    std::stringstream ss;
+    ss << lt->tm_year + 1900;
+    if (lt->tm_mon < 9) {
+        ss << 0;
+    }
+    ss << lt->tm_mon + 1;
+    if (lt->tm_mday < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_mday;
+
+    if (lt->tm_hour < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_hour;
+    if (lt->tm_min < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_min;
+    if (lt->tm_sec < 10) {
+        ss << 0;
+    }
+    ss << lt->tm_sec;
+    return ss.str();
 }
 
 MED_IMG_END_NAMESPACE
