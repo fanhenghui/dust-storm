@@ -67,7 +67,6 @@ clean:
 	$(MAKE) clean -C ./executable/extractmask
 	$(MAKE) clean -C ./executable/compressmask
 	$(MAKE) clean -C ./executable/anonymization
-	$(MAKE) clean -C ./ut/ai_ut
 	$(MAKE) clean -C ./ut/dbserver_ut
 	$(MAKE) clean -C ./ut/appcommon_ut
 	$(MAKE) clean -C ./ut/util_ut
@@ -76,6 +75,7 @@ clean:
 	$(MAKE) clean -C ./ut/renderalgo_ut
 	$(MAKE) clean -C ./ut/io_ut
 	$(MAKE) clean -C ./ut/protocol_ut
+	$(MAKE) clean -C ./ut/ai_ut
 	-rm -r bin
 
 DESTDIR = /usr/local

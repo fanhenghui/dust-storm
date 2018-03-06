@@ -10,6 +10,7 @@
 #include "appcommon/mi_app_thread_model.h"
 #include "appcommon/mi_model_anonymization.h"
 #include "appcommon/mi_model_user.h"
+#include "appcommon/mi_model_pacs_cache.h"
 #include "appcommon/mi_be_cmd_handler_fe_operation.h"
 #include "appcommon/mi_be_cmd_handler_fe_ready.h"
 #include "appcommon/mi_be_cmd_handler_fe_shutdown.h"
@@ -40,7 +41,8 @@
 #include "appcommon/mi_be_cmd_handler_fe_pacs_query.h"
 #include "appcommon/mi_be_cmd_handler_db_pacs_query_result.h"
 #include "appcommon/mi_be_cmd_handler_db_pacs_retrieve_result.h"
-
+#include "appcommon/mi_be_cmd_handler_fe_pacs_get_series_list.h"
+#include "appcommon/mi_be_cmd_handler_fe_pacs_get_study_list.h"
 #include "mi_operation_init.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -83,6 +85,10 @@ void ReviewController::register_command_handler() {
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSRetrieve(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_ANONYMIZATION, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEAnonymization(app_controller)));
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_GET_STUDY_LIST, 
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSGetStudyList(app_controller)));
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSGetSeriesList(app_controller)));
 
     // Register operation
     OperationFactory::instance()->register_operation(OPERATION_ID_BE_FE_MPR_PAGING,
@@ -137,6 +143,9 @@ void ReviewController::init_default_model() {
 
     this->add_model(MODEL_ID_USER,
     std::shared_ptr<IModel>(new ModelUser()));
+
+    this->add_model(MODEL_ID_PACS_CACHE,
+    std::shared_ptr<IModel>(new ModelPACSCache()));
 }
 
 MED_IMG_END_NAMESPACE

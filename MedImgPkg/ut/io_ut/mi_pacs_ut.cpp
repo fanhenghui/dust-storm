@@ -3,6 +3,10 @@
 #include "io/mi_configure.h"
 #include "io/mi_db.h"
 
+#include "util/mi_file_util.h"
+#include "util/mi_time_util.h"
+#include "util/mi_uid.h"
+
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string>
@@ -57,8 +61,6 @@ inline void print_help() {
     << "\nretrieve [r]\n"
     << "\t-series_uid [s]\n"
     << "\t\t series uid.\n"
-    << "\t-path [p]\n"
-    << "\t\t file path.\n"
     << "\nexit\n"
     << "\texit console.\n"
     << "\nhelp\n"
@@ -297,18 +299,22 @@ int pacs_ut(int argc, char* argv[]) {
             }
         } else if (item[0] == "retrieve" || item[0] == "r") {
             std::string series_uid = "";
-            std::string path = "";
             for (size_t i=1; i<item.size(); ++i) {
                 if (item[i] == "-series_uid" || item[i] == "-s") {
                     CHECK_INDEX;
                     series_uid = item[++i]; 
-                } else if(item[i] == "-path" || item[i] == "-p") {
-                    CHECK_INDEX;
-                    path = item[++i]; 
                 }
             }
 
             if (!invalid_cmd) {
+                std::string path = Configure::instance()->get_db_path();
+                FileUtil::make_direction(path);
+                path += "/instance";
+                FileUtil::make_direction(path);
+                path += "/" + TimeUtil::current_date();
+                FileUtil::make_direction(path);
+                path += "/" + UUIDGenerator::uuid();
+                FileUtil::make_direction(path);
                 MI_IO_LOG(MI_INFO) << "try retrieve series: " << series_uid << " to path: " << path;
                 std::vector<InstanceInfo> instance_infos;
                 std::vector<PatientInfo> patient_infos;

@@ -26,6 +26,7 @@
 
 #include "mi_dcm_file_browser.h"
 #include "util/mi_time_util.h"
+#include "util/mi_uid.h"
 
 using namespace medical_imaging;
 
@@ -109,9 +110,7 @@ int main(int argc, char* argv[]) {
                             << std::endl;
 
 
-        const std::string study_map_path = dcm_path + "/" + study_info.study_uid;
-        const std::string series_map_path = study_map_path + "/" + series_uid;
-        FileUtil::make_direction(study_map_path);
+        const std::string series_map_path = dcm_path + "/" + UUIDGenerator::uuid();
         FileUtil::make_direction(series_map_path);
 
         std::vector<InstanceInfo>& instances = browser._instance_infos[series_uid];

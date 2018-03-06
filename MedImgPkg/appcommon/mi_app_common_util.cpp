@@ -7,6 +7,7 @@
 #include "mi_model_dbs_status.h"
 #include "mi_model_anonymization.h"
 #include "mi_model_user.h"
+#include "mi_model_pacs_cache.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -60,5 +61,14 @@ std::shared_ptr<ModelUser> AppCommonUtil::get_model_user(std::shared_ptr<AppCont
     }
 }
 
+std::shared_ptr<ModelPACSCache> AppCommonUtil::get_model_pacs_cache(std::shared_ptr<AppController> controller) {
+    std::shared_ptr<IModel> model_ = controller->get_model(MODEL_ID_PACS_CACHE);
+    if (nullptr == model_) {
+        return nullptr;
+    } else {
+        std::shared_ptr<ModelPACSCache> model = std::dynamic_pointer_cast<ModelPACSCache>(model_);
+        return model;
+    }
+}
 
 MED_IMG_END_NAMESPACE

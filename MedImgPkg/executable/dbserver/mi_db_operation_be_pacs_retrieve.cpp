@@ -8,6 +8,8 @@
 
 #include "util/mi_ipc_server_proxy.h"
 #include "util/mi_file_util.h"
+#include "util/mi_time_util.h"
+#include "util/mi_uid.h"
 
 #include "io/mi_pacs_communicator.h"
 #include "io/mi_protobuf.h"
@@ -58,20 +60,23 @@ int DBOpBEPACSRetrieve::execute() {
 
     const int series_num = retrieve_key.series_uid_size();
 
-    std::string study_dir(""), series_dir("");
-    const std::string db_path = Configure::instance()->get_db_path();
+    std::string date_dir(""), series_dir("");
+    std::string db_path = Configure::instance()->get_db_path();
+    FileUtil::make_direction(db_path);
+    db_path += "/instance";
+    FileUtil::make_direction(db_path);
     for (int i = 0; i < series_num; ++i) {
         const std::string& series_uid = retrieve_key.series_uid(i);
         const std::string& study_uid = retrieve_key.study_uid(i);
         //1 create direction
-        study_dir = db_path + "/" + study_uid;
-        if (0 != FileUtil::check_direction(study_dir)) {
-            if (0 != FileUtil::make_direction(study_dir)) {
-                MI_DBSERVER_LOG(MI_ERROR) << "create study direction: " << study_dir << " failed.";
+        date_dir = db_path + "/" + TimeUtil::current_date();
+        if (0 != FileUtil::check_direction(date_dir)) {
+            if (0 != FileUtil::make_direction(date_dir)) {
+                MI_DBSERVER_LOG(MI_ERROR) << "create date direction: " << date_dir << " failed.";
                 continue;
             }
         } 
-        series_dir = study_dir + "/" + series_uid;
+        series_dir = date_dir + "/" + UUIDGenerator::uuid();
         if (0 != FileUtil::check_direction(series_dir)) {
             if (0 != FileUtil::make_direction(series_dir)) {
                 MI_DBSERVER_LOG(MI_ERROR) << "create series direction: " << series_dir << " failed.";

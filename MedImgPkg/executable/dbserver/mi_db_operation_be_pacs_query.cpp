@@ -19,7 +19,6 @@ DBOpBEPACSQuery::~DBOpBEPACSQuery() {
 
 int DBOpBEPACSQuery::execute() {    
     MI_DBSERVER_LOG(MI_TRACE) << "IN DBOpBEPACSQuery.";
-    DBSERVER_CHECK_NULL_EXCEPTION(_buffer);
 
     std::shared_ptr<DBServerController> controller = get_controller<DBServerController>();
     DBSERVER_CHECK_NULL_EXCEPTION(controller);
@@ -28,26 +27,27 @@ int DBOpBEPACSQuery::execute() {
     std::shared_ptr<PACSCommunicator> pacs_commu = controller->get_pacs_communicator();
     DBSERVER_CHECK_NULL_EXCEPTION(pacs_commu);
 
-    MsgDcmQueryKey query_key;
-    if (0 != protobuf_parse(_buffer, _header.data_len, query_key)) {
-        MI_DBSERVER_LOG(MI_ERROR) << "parse PACS query key message send by BE failed.";
-        return -1;        
-    }
-
     //query key
     PatientInfo patient_key;
     StudyInfo study_key;
     SeriesInfo series_key;
 
-    patient_key.patient_id = query_key.patient_id();
-    patient_key.patient_name = query_key.patient_name();
-    patient_key.patient_birth_date = query_key.patient_birth_date();
+    if (_buffer) {
+        MsgDcmQueryKey query_key;
+        if (0 != protobuf_parse(_buffer, _header.data_len, query_key)) {
+            MI_DBSERVER_LOG(MI_ERROR) << "parse PACS query key message send by BE failed.";
+            return -1;        
+        }
+        patient_key.patient_id = query_key.patient_id();
+        patient_key.patient_name = query_key.patient_name();
+        patient_key.patient_birth_date = query_key.patient_birth_date();
 
-    study_key.study_date = query_key.study_date();
-    study_key.study_time = query_key.study_time();
-    study_key.accession_no = query_key.accession_no();
+        study_key.study_date = query_key.study_date();
+        study_key.study_time = query_key.study_time();
+        study_key.accession_no = query_key.accession_no();
 
-    series_key.modality = query_key.modality();
+        series_key.modality = query_key.modality();
+    }
 
     std::vector<PatientInfo> patient_infos;
     std::vector<StudyInfo> study_infos;
@@ -58,45 +58,74 @@ int DBOpBEPACSQuery::execute() {
         return -1; 
     }
 
-    MsgStudyWrapperCollection study_wrapper_col;
-    int64_t pre_study_pk = -1;
-    MsgStudyWrapper* cur_study_wrapper = nullptr;
-    study_wrapper_col.set_num_study(study_infos.size());
+    for (size_t i = 0; i < series_infos.size(); ++i) {  
+        MI_DBSERVER_LOG(MI_DEBUG) << series_infos[i].series_uid;
+    }
+    
+    std::vector<StudyInfo*> cp_study_info;
+    std::map<std::string, size_t> cp_study_map;
+    std::map<size_t, std::vector<SeriesInfo*>> cp_series_info;
+    std::map<size_t, PatientInfo*> cp_patient_info;
     for (size_t i = 0; i < study_infos.size(); ++i) {
-        StudyInfo& study_info = study_infos[i];
-        SeriesInfo& series_info = series_infos[i];
-        PatientInfo& patient_info = patient_infos[i];
-        if (pre_study_pk != study_info.id) {
-            cur_study_wrapper = study_wrapper_col.add_study_wrappers();
-
-            MsgStudyInfo* msg_study_info = cur_study_wrapper->mutable_study_info();
-            msg_study_info->set_patient_fk(study_info.patient_fk);
-            msg_study_info->set_study_date(study_info.study_date);
-            msg_study_info->set_study_time(study_info.study_time);
-            msg_study_info->set_accession_no(study_info.accession_no);
-            msg_study_info->set_study_desc(study_info.study_desc);
-            msg_study_info->set_num_series(study_info.num_series);
-            msg_study_info->set_num_instance(study_info.num_instance);
-
-            MsgPatientInfo* msg_patient_info = cur_study_wrapper->mutable_patient_info();
-            msg_patient_info->set_patient_id(patient_info.patient_id);
-            msg_patient_info->set_patient_name(patient_info.patient_name);
-            msg_patient_info->set_patient_birth_date(patient_info.patient_birth_date);
-
-            MsgSeriesInfo* msg_series_info = cur_study_wrapper->add_series_infos();
-            msg_series_info->set_id(series_info.id);
-            msg_series_info->set_series_no(series_info.series_no);
-            msg_series_info->set_modality(series_info.modality);
-            msg_series_info->set_institution(series_info.institution);
-            msg_series_info->set_num_instance(series_info.num_instance);
-
+        
+        size_t study_map_idx = 0;
+        auto it = cp_study_map.find(study_infos[i].study_uid);
+        if (it == cp_study_map.end()) {
+            cp_study_info.push_back(&(study_infos[i]));
+            cp_study_map.insert(std::make_pair(study_infos[i].study_uid, cp_study_info.size()-1));
+            study_map_idx = cp_study_info.size()-1;
         } else {
+            study_map_idx = it->second;
+        }
+
+        if (cp_patient_info.find(study_map_idx) == cp_patient_info.end()) {
+            cp_patient_info.insert(std::make_pair(study_map_idx, &(patient_infos[i])));
+        }
+        
+        auto it1 = cp_series_info.find(study_map_idx);
+        if (it1 == cp_series_info.end()) {
+            cp_series_info.insert(std::make_pair(study_map_idx, 
+                std::vector<SeriesInfo*>(1, &(series_infos[i]))));
+        } else {
+            it1->second.push_back(&(series_infos[i]));
+        }
+    }
+
+    MsgStudyWrapperCollection study_wrapper_col;
+    MsgStudyWrapper* cur_study_wrapper = nullptr;
+    study_wrapper_col.set_num_study(cp_study_info.size());
+    for (size_t i = 0; i < cp_study_info.size(); ++i) {
+        
+        StudyInfo& study_info = *(cp_study_info[i]);
+        PatientInfo& patient_info = *(cp_patient_info[i]);
+
+        cur_study_wrapper = study_wrapper_col.add_study_wrappers();
+
+        MsgStudyInfo* msg_study_info = cur_study_wrapper->mutable_study_info();
+        msg_study_info->set_patient_fk(study_info.patient_fk);
+        msg_study_info->set_study_date(study_info.study_date);
+        msg_study_info->set_study_time(study_info.study_time);
+        msg_study_info->set_accession_no(study_info.accession_no);
+        msg_study_info->set_study_desc(study_info.study_desc);
+        msg_study_info->set_num_series(study_info.num_series);
+        msg_study_info->set_num_instance(study_info.num_instance);
+
+        MsgPatientInfo* msg_patient_info = cur_study_wrapper->mutable_patient_info();
+        msg_patient_info->set_patient_id(patient_info.patient_id);
+        msg_patient_info->set_patient_name(patient_info.patient_name);
+        msg_patient_info->set_patient_sex(patient_info.patient_sex);
+        msg_patient_info->set_patient_birth_date(patient_info.patient_birth_date);
+
+        std::vector<SeriesInfo*> series_infos_in_study = cp_series_info[i];
+        for (size_t j = 0; j < series_infos_in_study.size(); ++j) {
+            SeriesInfo& series_info = *(series_infos_in_study[j]);
             MsgSeriesInfo* msg_series_info = cur_study_wrapper->add_series_infos();
             msg_series_info->set_id(series_info.id);
             msg_series_info->set_series_no(series_info.series_no);
             msg_series_info->set_modality(series_info.modality);
             msg_series_info->set_institution(series_info.institution);
             msg_series_info->set_num_instance(series_info.num_instance);
+            msg_series_info->set_series_desc(series_info.series_desc);
         }
     }
 
@@ -120,6 +149,8 @@ int DBOpBEPACSQuery::execute() {
     }
     
     MI_DBSERVER_LOG(MI_TRACE) << "OUT DBOpBEPACSQuery.";
+
+    MI_DBSERVER_LOG(MI_DEBUG) << "db op be pacs query done.";
     return 0;
 }
 

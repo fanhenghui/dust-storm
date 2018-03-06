@@ -28,7 +28,7 @@ router.route('/login')
             console.log(`DB connect error when sign in: ${err}`);
             res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
         } else {
-            connection.query(`SELECT online_token,password FROM usr WHERE name='${name}'`, (err, data, fields)=>{
+            connection.query(`SELECT online_token,password FROM user WHERE name='${name}'`, (err, data, fields)=>{
                 if(err) {
                     //done with the connection
                     connection.release();
@@ -50,7 +50,7 @@ router.route('/login')
                         if (!data[0].online_token || verify == 1) {
                             const new_token = common.uuid();
                             //update online 
-                            connection.query(`UPDATE usr SET online_token='${new_token}' WHERE name='${name}'`, (err, data, fields)=> {
+                            connection.query(`UPDATE user SET online_token='${new_token}' WHERE name='${name}'`, (err, data, fields)=> {
                                //done with the connection
                                connection.release();
                                if (err) {
@@ -95,7 +95,7 @@ router.route('/register')
             console.log(`DB connect error when register: ${err}`);
             res.send({err:-1, msg:'数据库操作失败,请稍后再试'});
         } else {
-            connection.query(`SELECT ID FROM usr WHERE name='${name}'`, (err, data, fields)=>{
+            connection.query(`SELECT ID FROM user WHERE name='${name}'`, (err, data, fields)=>{
                 if(err) {
                     //done with the connection
                     connection.release();
@@ -109,7 +109,7 @@ router.route('/register')
                     res.send({err:-1, msg:'用户名已存在'});
                 } else {
                     const id = common.uuid();
-                    connection.query(`INSERT INTO usr(ID,name,role,password) VALUES ('${id}','${name}',0,'${passHash}')`, (err, data, fields)=>{
+                    connection.query(`INSERT INTO user(ID,name,role,password) VALUES ('${id}','${name}',0,'${passHash}')`, (err, data, fields)=>{
                         //done with the connection
                         connection.release();
                         if(err) {

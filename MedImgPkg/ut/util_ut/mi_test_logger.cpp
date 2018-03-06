@@ -1,5 +1,6 @@
 #include "util/mi_util_logger.h"
 #include "util/mi_version_util.h"
+#include "util/mi_uid.h"
 
 using namespace medical_imaging;
 //extern std::ostream& operator<<(std::ostream& strm, medical_imaging::SeverityLevel lvl);
@@ -35,6 +36,10 @@ int TestLogger(int argc, char* argv[]) {
         MI_LOG(MI_DEBUG) << v0 << ">" << v1;
     } else {
         MI_LOG(MI_DEBUG) << v0 << "=" << v1;
+    }
+
+    for (int i = 0; i < 20; ++i) {
+        MI_LOG(MI_INFO) << UUIDGenerator::uuid();
     }
 
     return 1;

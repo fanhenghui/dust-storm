@@ -16,6 +16,11 @@
     let layoutStatus = LAYOUT_2X2;
     let maxCellID = -1;
 
+    //pacs result
+    let pacs_study_number = 0;
+    let pacs_page_sum = 0;
+    let pacs_current_page = 1;
+
     function getUserID(userName) {
         return userName + '|' + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
     }
@@ -108,37 +113,127 @@
     }
 
     function handleBEPACSQuery(arrayBuffer) {
-        let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
+        let message = Protobuf.decode(socketClient, 'MsgStudyWrapperCollection', arrayBuffer);
         if (!message) {
-            reutrn;
-        }
-
-        let dcminfo = message.dcminfo;
-        if (!dcminfo || dcminfo.length == 0) {
-            console.log(`can't get dcminfo.`);
             return;
         }
 
-        let tbody = document.getElementById('worklist-pacs');
+        let studyWrappers = message.studyWrappers;
+        if (!studyWrappers || studyWrappers.length == 0) {
+            console.log(`can't get study wrappers.`);
+            return;
+        }
+
+        pacs_study_number = message.numStudy;
+        pacs_page_sum = Math.ceil(pacs_study_number/LIST_CAPACITY);
+        pacs_current_page = 1;
+        let study_from = (pacs_current_page-1)*LIST_CAPACITY + 1;
+        let study_to = pacs_current_page*LIST_CAPACITY;
+        study_to = study_to > pacs_study_number ? pacs_study_number : study_to;
+        $('#pacs-study-info').html(`Study ${study_from} to ${study_to} of ${pacs_study_number}`);
+        if (pacs_page_sum > 1) {
+            $('#btn-pacs-page-down').removeClass('disabled');
+        }
+        let tbody = document.getElementById('worklist-pacs-study');
         tbody.innerHTML = '';
         
-        dcminfo.forEach(ele => {
-            let tr = '<tr>';
-            tr += `<td>${ele.patientName}</td>`;
-            tr += `<td>${ele.patientId}</td>`;
-            tr += `<td>${ele.seriesId}</td>`;
-            tr += `<td>${ele.modality}</td>`;
+        studyWrappers.forEach(ele => {
+            let tr = `<tr studyidx="${ele.studyInfo.id}">`;
+            tr += `<td>${ele.patientInfo.patientName}</td>`;
+            tr += `<td>${ele.patientInfo.patientId}</td>`;
+            tr += `<td>${ele.patientInfo.patientBirthDate}</td>`;
+            tr += `<td>${ele.patientInfo.patientSex}</td>`;
+            tr += `<td>${ele.studyInfo.studyDate}</td>`;
+            tr += `<td>${ele.studyInfo.studyDesc}</td>`;
+            tr += `<td>${ele.studyInfo.numSeries}</td>`;
             tr += '</tr>';   
             tbody.innerHTML += tr; 
         });
 
         //style changed when choose tr (based on bootstrap)
-        $('#table-pacs tbody tr').click(function() {
-            if ($(this).hasClass('success')) {
-                $(this).removeClass('success');
-            } else {
-                $(this).addClass('success');
+        $('#table-pacs-study tbody tr').click(function() {
+            // if ($(this).hasClass('success')) {
+            //     $(this).removeClass('success');
+            // } else {
+            //     $(this).addClass('success');
+            // }
+            $(this).addClass('success').siblings().removeClass('success');
+
+            let buffer = Protobuf.encode(socketClient, 'MsgInt', {value:this.getAttribute('studyidx')});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 0, 0, buffer.byteLength, buffer);
             }
+        });
+    }
+
+    function handleBEPACSStudyList(arrayBuffer) {
+        let message = Protobuf.decode(socketClient, 'MsgStudyWrapperCollection', arrayBuffer);
+        if (!message) {
+            return;
+        }
+
+        let studyWrappers = message.studyWrappers;
+        if (!studyWrappers || studyWrappers.length == 0) {
+            console.log(`can't get study wrappers.`);
+            return;
+        }
+
+        let tbody = document.getElementById('worklist-pacs-study');
+        tbody.innerHTML = '';
+        
+        studyWrappers.forEach(ele => {
+            let tr = `<tr studyidx="${ele.studyInfo.id}">`;
+            tr += `<td>${ele.patientInfo.patientName}</td>`;
+            tr += `<td>${ele.patientInfo.patientId}</td>`;
+            tr += `<td>${ele.patientInfo.patientBirthDate}</td>`;
+            tr += `<td>${ele.patientInfo.patientSex}</td>`;
+            tr += `<td>${ele.studyInfo.studyDate}</td>`;
+            tr += `<td>${ele.studyInfo.studyDesc}</td>`;
+            tr += `<td>${ele.studyInfo.numSeries}</td>`;
+            tr += '</tr>';   
+            tbody.innerHTML += tr; 
+        });
+
+        //style changed when choose tr (based on bootstrap)
+        $('#table-pacs-study tbody tr').click(function() {
+            // if ($(this).hasClass('success')) {
+            //     $(this).removeClass('success');
+            // } else {
+            //     $(this).addClass('success');
+            // }
+            $(this).addClass('success').siblings().removeClass('success');
+
+            let buffer = Protobuf.encode(socketClient, 'MsgInt', {value:this.getAttribute('studyidx')});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 0, 0, buffer.byteLength, buffer);
+            }
+        });
+    }
+
+    function handleBEPACSSeriesList(arrayBuffer) {
+        let message = Protobuf.decode(socketClient, 'MsgStudyWrapper', arrayBuffer);
+        if (!message) {
+            return;
+        }
+
+        let seriesInfos = message.seriesInfos;
+        if (!seriesInfos || seriesInfos.length == 0) {
+            console.log(`can't get series infos.`);
+            return;
+        }
+
+        let tbody = document.getElementById('worklist-pacs-series');
+        tbody.innerHTML = '';
+        
+        seriesInfos.forEach(ele => {
+            //let tr = `<tr seriesidx="${ele.studyInfo.id}">`;
+            let tr = '<tr>'
+            tr += `<td>${ele.seriesNo}</td>`;
+            tr += `<td>${ele.modality}</td>`;
+            tr += `<td>${ele.seriesDesc}</td>`;
+            tr += `<td>${ele.numInstance}</td>`;
+            tr += '</tr>';   
+            tbody.innerHTML += tr; 
         });
     }
 
@@ -191,7 +286,6 @@
         }
     }
 
-    
     function handleEvaluationResult(arrayBuffer) {
         let annotationList = Protobuf.decode(socketClient, 'MsgNoneImgAnnotations', arrayBuffer);
         if (annotationList) {
@@ -296,6 +390,16 @@
             case COMMAND_ID_FE_BE_PACS_QUERY_RESULT:
                 if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
                     handleBEPACSQuery(packageBuffer);
+                }
+                break;
+            case COMMAND_ID_FE_BE_PACS_STUDY_LIST_RESULT:
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEPACSStudyList(packageBuffer);
+                }
+                break;
+            case COMMAND_ID_FE_BE_PACS_SERIES_LIST_RESULT:
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEPACSSeriesList(packageBuffer);
                 }
                 break;
             default:
@@ -566,7 +670,32 @@
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_PACS_QUERY, 0, 0, null);
+        //construct query key
+        let queryKey = {
+            patient_id: $('#pacs-key-patient-id').val(),
+            patient_name: $('#pacs-key-patient-name').val(),
+            patient_birth_date: '',
+            study_date: '',
+            study_time: '',
+            accession_no: '',
+            modality: ''
+        };
+        let patientBirthDateFrom = $('#pacs-key-patient-birth-date-from').val().replace(/\-+/g, '');;
+        let patientBirthDateTo = $('#pacs-key-patient-birth-date-to').val().replace(/\-+/g, '');;
+        if (patientBirthDateFrom.length !=0 && patientBirthDateTo.length != 0) {
+            queryKey.patient_birth_date = `${patientBirthDateFrom}-${patientBirthDateTo}`;
+        }
+
+        let studyDateFrom = $('#pacs-key-study-date-from').val().replace(/\-+/g, '');;
+        let studyDateTo = $('#pacs-key-study-date-to').val().replace(/\-+/g, '');;
+        if (studyDateFrom.length !=0 && studyDateTo.length != 0) {
+            queryKey.study_date = `${studyDateFrom}-${studyDateTo}`;
+        }
+
+        let buffer = Protobuf.encode(socketClient, 'MsgDcmQueryKey', queryKey);
+        if (buffer) {
+            socketClient.sendData(COMMAND_ID_BE_FE_PACS_QUERY, 0, 0, buffer.byteLength, buffer);
+        }
     }
 
     function retrievePACS() {
@@ -576,7 +705,7 @@
             return;
         }
 
-        let choosed = $('#table-pacs tbody tr');
+        let choosed = $('#table-pacs-study tbody tr');
         let choosedIndex = '';
         Array.from(choosed).forEach((item,index)=>{
             if($(item).hasClass('success')) {
@@ -681,7 +810,6 @@
                         sendAnnotationMSG(0, 0, id, ANNOTATION_DELETE, false, 0, 0, 0, 0, socketClient);//Delete msg
                     }
                 }
-
             };
         }
 
@@ -959,6 +1087,70 @@
         if (queryPACSBtn) {
             queryPACSBtn.onclick = function() {
                 queryPACS();
+            }
+        }
+        
+        let resetPACSQueryKey = document.getElementById('btn-reset-pacs-query-key');
+        if (resetPACSQueryKey) {
+            resetPACSQueryKey.onclick = function() {
+                $('#pacs-key-patient-name').val('');
+                $('#pacs-key-patient-id').val('');
+                $('#pacs-key-patient-birth-date-from').val('');
+                $('#pacs-key-patient-birth-date-to').val('');
+                $('#pacs-key-study-date-from').val('');
+                $('#pacs-key-study-date-to').val('');
+            }
+        }
+
+        let pageDownPACSStudyList = document.getElementById("btn-pacs-page-down");
+        if (pageDownPACSStudyList) {
+            pageDownPACSStudyList.onclick = function() {
+                if (pacs_current_page < pacs_page_sum) {
+                    pacs_current_page += 1;
+
+                    let study_from = (pacs_current_page-1)*LIST_CAPACITY + 1;
+                    let study_to = pacs_current_page*LIST_CAPACITY;
+                    study_to = study_to > pacs_study_number ? pacs_study_number : study_to;
+                    $('#pacs-study-info').html(`Study ${study_from} to ${study_to} of ${pacs_study_number}`);
+                    if (pacs_current_page > 1) {
+                        $('#btn-pacs-page-up').removeClass('disabled');
+                    }
+
+                    let buffer = Protobuf.encode(socketClient, 'MsgListPage', {from:study_from-1, to:study_to});
+                    if (buffer) {
+                        socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_STUDY_LIST, 0, 0, buffer.byteLength, buffer);
+                    }
+                }
+                
+                if (pacs_current_page >= pacs_page_sum) {
+                    $('#btn-pacs-page-down').addClass('disabled');
+                }
+            }
+        }
+
+        let pageUpPACSStudyList = document.getElementById("btn-pacs-page-up");
+        if (pageUpPACSStudyList) {
+            pageUpPACSStudyList.onclick = function() {
+                if (pacs_current_page > 1) {
+                    pacs_current_page -= 1;
+
+                    let study_from = (pacs_current_page-1)*LIST_CAPACITY + 1;
+                    let study_to = pacs_current_page*LIST_CAPACITY;
+                    study_to = study_to > pacs_study_number ? pacs_study_number : study_to;
+                    $('#pacs-study-info').html(`Study ${study_from} to ${study_to} of ${pacs_study_number}`);
+                    if (pacs_current_page < pacs_page_sum) {
+                        $('#btn-pacs-page-down').removeClass('disabled');
+                    }
+
+                    let buffer = Protobuf.encode(socketClient, 'MsgListPage', {from:study_from-1, to:study_to});
+                    if (buffer) {
+                        socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_STUDY_LIST, 0, 0, buffer.byteLength, buffer);
+                    }
+                }
+                
+                if (pacs_current_page <= 1) {
+                    $('#btn-pacs-page-up').addClass('disabled');
+                }
             }
         }
 

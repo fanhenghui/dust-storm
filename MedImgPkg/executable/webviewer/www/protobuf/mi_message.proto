@@ -10,6 +10,11 @@ message MsgInt {
     int32 value = 1;
 }
 
+message MsgListPage {
+    int32 from = 1;
+    int32 to = 2;
+}
+
 message MsgFlag {
     bool flag = 1; 
 }
@@ -172,6 +177,7 @@ message MsgPatientInfo {
 };
 
 message MsgStudyInfo {
+    int64 id = 1;//for search series
     int64 patient_fk = 2;
     string study_id = 3;
     string study_uid = 4;

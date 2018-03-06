@@ -89,7 +89,7 @@ function disconnectBE(userID) {
 };
 
 function onlineChecking(socket, userID, userName, onlineToken) {
-    global.db.query(`SELECT online_token FROM usr WHERE name='${userName}'`, (err, data)=>{
+    global.db.query(`SELECT online_token FROM user WHERE name='${userName}'`, (err, data)=>{
         if (err) {
             console.log(`DB error: ${err}`);
         } else if (data.length != 0) {

@@ -3,6 +3,7 @@
 
 #include "util/mi_util_export.h"
 #include <boost/thread/mutex.hpp>
+#include <string>
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -29,6 +30,11 @@ public:
 private:
     UIDType _base;
     boost::mutex _mutex;
+};
+
+class Util_Export UUIDGenerator {
+public:
+    static std::string uuid();
 };
 
 MED_IMG_END_NAMESPACE

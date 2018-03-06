@@ -66,7 +66,7 @@ module.exports = {
 			if (err) {
 				console.log(`DB connect error when sign in: ${err}`);
 			} else {
-				connection.query(`UPDATE usr SET online_token=NULL WHERE name='${name}'`, (err, res, fields)=> {
+				connection.query(`UPDATE user SET online_token=NULL WHERE name='${name}'`, (err, res, fields)=> {
                     //done with the connection
                     connection.release();
                     if (err) {

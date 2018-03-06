@@ -19,14 +19,14 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-MODEL_OBJS = mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_model_anonymization.o mi_model_user.o
+MODEL_OBJS = mi_model_crosshair.o mi_model_annotation.o mi_model_dbs_status.o mi_model_anonymization.o mi_model_user.o mi_model_pacs_cache.o
 OBSERVER_OBJS = mi_ob_annotation_segment.o mi_ob_annotation_statistic.o mi_ob_annotation_list.o
 CMD_HANDLER_OBJS = mi_be_cmd_handler_fe_operation.o mi_be_cmd_handler_fe_heartbeat.o mi_be_cmd_handler_fe_ready.o \
 mi_be_cmd_handler_fe_shutdown.o mi_be_cmd_handler_fe_anonymization.o mi_be_cmd_handler_fe_db_query.o mi_be_cmd_handler_fe_play_vr.o \
 mi_be_cmd_handler_db_send_error.o mi_be_cmd_handler_db_send_ai_evaluation.o mi_be_cmd_handler_db_send_end_signal.o \
 mi_be_cmd_handler_db_send_preprocess_mask.o mi_be_cmd_handler_db_send_dicom.o mi_be_cmd_handler_fe_back_to_worklist.o \
 mi_be_cmd_handler_fe_pacs_retrieve.o mi_be_cmd_handler_fe_pacs_query.o mi_be_cmd_handler_db_pacs_retrieve_result.o \
-mi_be_cmd_handler_db_pacs_query_result.o
+mi_be_cmd_handler_db_pacs_query_result.o mi_be_cmd_handler_fe_pacs_get_study_list.o mi_be_cmd_handler_fe_pacs_get_series_list.o
 OPERATION_OBJS = mi_be_operation_fe_mpr_paging.o mi_be_operation_fe_rotate.o mi_be_operation_fe_pan.o mi_be_operation_fe_zoom.o \
 mi_be_operation_fe_windowing.o mi_be_operation_fe_resize.o mi_be_operation_fe_mpr_mask_overlay.o mi_be_operation_fe_switch_preset_windowing.o \
 mi_be_operation_fe_switch_preset_vrt.o mi_be_operation_fe_locate.o mi_be_operation_fe_downsample.o mi_be_operation_fe_annotation.o mi_be_operation_fe_fetch_ai_evaluation.o \

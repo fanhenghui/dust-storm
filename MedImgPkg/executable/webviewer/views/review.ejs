@@ -183,9 +183,12 @@
     <div class="container-fluid" id="worklist-pacs-div" hidden="true">
         <div clss="row">
             <div class="col-md-12 col-sm-12">
-                <h3 class="text-primary">
-                    PACS Series List
+                <h3 class="text-primary" style="background:silver; ">
+                    PACS Worklist
                 </h3>
+            </div>
+            <br>
+            <div class="col-md-12 col-sm-12">
                 <button type = "button" class="btn btn-default pull-left" id="btn-pacs-1">
                     <span class="glyphicon glyphicon-list-alt"></span>
                 </button>
@@ -195,8 +198,52 @@
                         <span class="glyphicon glyphicon-user"></span>
                     </button>
                 </div>
-                <br>
-                <table class="table table-condensed table-hover" id="table-pacs">
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Search
+                </h4>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="col-md-4 col-sm-4">
+                    Patient Name: <input type="text" id="pacs-key-patient-name"><br>
+                    Patient ID: <input type="text" id="pacs-key-patient-id"> 
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    Patient Birth Date From: <input type="date" id="pacs-key-patient-birth-date-from">
+                    TO: <input type="date" id="pacs-key-patient-birth-date-to">  
+                    <br>
+                    Study Date From: <input type="date" id="pacs-key-study-date-from"> 
+                    TO: <input type="date" id="pacs-key-study-date-to">  
+                </div>
+                <div class="col-md-2 col-sm-2">
+                    <div class="pull-right">
+                        <button type = "button" class="btn btn-default " id="btn-reset-pacs-query-key">
+                            <span class="glyphicon glyphicon-repeat"></span>
+                        </button>
+                        <br>
+                        <button type = "button" class="btn btn-default" id="btn-query-pacs">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Study List
+                </h4>
+            </div>
+            <div class="col-md-12 col-sm-12" id="pacs-page">
+                <button type = "button" class="btn btn-default disabled" id="btn-pacs-page-up">
+                    <span class="glyphicon glyphicon glyphicon-chevron-left"></span>
+                </button>
+                <span id="pacs-study-info"></span>
+                <button type = "button" class="btn btn-default disabled" id="btn-pacs-page-down">
+                    <span class="glyphicon glyphicon glyphicon-chevron-right"></span>
+                </button>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <table class="table table-condensed table-hover" id="table-pacs-study">
                     <thead>
                         <tr>
                             <th>
@@ -206,19 +253,28 @@
                                 Patient ID
                             </th>
                             <th>
-                                Series ID
+                                Birth Date
                             </th>
                             <th>
-                                Modality
+                                Sex
+                            </th>
+                            <th>
+                                Study Time
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Series Number
                             </th>
                         </tr>
                     </thead>
-                    <tbody id="worklist-pacs">
+                    <tbody id="worklist-pacs-study">
                         <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
                         <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
                     </tbody>
                 </table>
-                <div class="row">
+                <!-- <div class="row">
                     <div class="col-md-6 col-sm-6">
                         <button type="button" class="btn btn-default" id="btn-query-pacs">
                             Query
@@ -229,9 +285,36 @@
                             Retrieve
                         </button>
                     </div>
-                </div>
+                </div> -->
             </div>
-        </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Series List
+                </h4>
+                <table class="table table-condensed table-hover" id="table-pacs-series">
+                    <thead>
+                        <tr>
+                            <th>
+                                Series No
+                            </th>
+                            <th>
+                                Modality
+                            </th>
+                            <th>
+                                Descripiton
+                            </th>
+                            <th>
+                                Instance Number
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="worklist-pacs-series">
+                        <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
+                        <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
+                    </tbody>
+                </table>
+            </div>
+
     </div>
     <div class="container-fluid" hidden="false" id="review-div">
         <div class="row clearfix">

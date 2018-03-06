@@ -19,7 +19,7 @@ LOCAL_LIB_DIR = /usr/local/lib
 
 VPATH = $(INCLUDE_ROOT_DIR) : $(INCLUDE_DIR)
 
-INDEPENDENT_OBJS = mi_model_interface.o mi_file_util.o mi_operation_factory.o mi_time_util.o
+INDEPENDENT_OBJS = mi_model_interface.o mi_file_util.o mi_operation_factory.o mi_time_util.o mi_uid.o
 
 SOCKET_OBJS = mi_socket_client.o mi_socket_server.o mi_ipc_client_proxy.o mi_ipc_server_proxy.o
 
@@ -28,7 +28,8 @@ TARGET = $(BIN_DIR)/libmedimg_util.so
 EXPORT_HEADER = mi_util_export.h
 COMMON_HEADER = mi_ipc_common.h
 ADDITINAL_INCLUDE_DIR = -I$(INCLUDE_ROOT_DIR) -I$(INCLUDE_DIR)
-ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -lboost_log -lmedimg_log
+ADDITIANL_DEPENDENCIES = -L$(BIN_DIR) -L$(LOCAL_LIB_DIR) -lpthread -lboost_system -lboost_filesystem -lboost_thread -luuid \
+-lboost_log -lmedimg_log
 
 $(TARGET): $(INDEPENDENT_OBJS) $(SOCKET_OBJS)
 	$(CC) -shared $(CFLAGS) -o $(TARGET) $(INDEPENDENT_OBJS) $(SOCKET_OBJS) $(ADDITIANL_DEPENDENCIES)
