@@ -46,6 +46,7 @@ int BECmdHandlerFEPACSGetSeriesList::handle_command(const IPCDataHeader &datahea
         for (size_t i = 0; i < series_infos.size(); ++i) {
             MsgSeriesInfo* series_info = msg_res.add_series_infos();
             *series_info = *(series_infos[i]);
+            series_info->set_series_uid("");
         }
 
         char* buffer_res = nullptr;

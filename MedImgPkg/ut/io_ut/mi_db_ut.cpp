@@ -35,30 +35,30 @@ int db_ut(int argc, char* argv[]) {
         return -1;
     }
 
-    PatientInfo patient_info;
-    patient_info.patient_name = "OJBK123";
-    patient_info.patient_id = "";
-    patient_info.patient_birth_date = "";
-    patient_info.patient_sex = "";
-    db.insert_patient(patient_info);
+    // PatientInfo patient_info;
+    // patient_info.patient_name = "OJBK123";
+    // patient_info.patient_id = "";
+    // patient_info.patient_birth_date = "";
+    // patient_info.patient_sex = "";
+    // db.insert_patient(patient_info);
 
-    MI_IO_LOG(MI_DEBUG) << "patient id: " << patient_info.id;
+    // MI_IO_LOG(MI_DEBUG) << "patient id: " << patient_info.id;
 
-    PatientInfo key;
-    key.md5 = patient_info.md5;
-    std::vector<PatientInfo> res;
-    db.query_patient(key, &res);
+    // PatientInfo key;
+    // key.md5 = patient_info.md5;
+    // std::vector<PatientInfo> res;
+    // db.query_patient(key, &res);
 
-    if(!res.empty()) {
-        MI_IO_LOG(MI_INFO) << res.size();
-        MI_IO_LOG(MI_INFO) << res[0].patient_name;
-        MI_IO_LOG(MI_INFO) << res[0].patient_id;
-        MI_IO_LOG(MI_INFO) << res[0].patient_birth_date;
-        MI_IO_LOG(MI_INFO) << res[0].patient_sex;
-        MI_IO_LOG(MI_INFO) << res[0].md5;
-    }
+    // if(!res.empty()) {
+    //     MI_IO_LOG(MI_INFO) << res.size();
+    //     MI_IO_LOG(MI_INFO) << res[0].patient_name;
+    //     MI_IO_LOG(MI_INFO) << res[0].patient_id;
+    //     MI_IO_LOG(MI_INFO) << res[0].patient_birth_date;
+    //     MI_IO_LOG(MI_INFO) << res[0].patient_sex;
+    //     MI_IO_LOG(MI_INFO) << res[0].md5;
+    // }
     
-    MI_IO_LOG(MI_INFO) << "BYBY.";
+    // MI_IO_LOG(MI_INFO) << "BYBY.";
 
     std::string date = "19890103";
     MI_IO_LOG(MI_INFO) << atoi(date.substr(4, 2).c_str());

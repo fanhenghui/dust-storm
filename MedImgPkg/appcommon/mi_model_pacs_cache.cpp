@@ -17,7 +17,7 @@ void ModelPACSCache::update(MsgStudyWrapperCollection& msg) {
     _patient_infos.clear();
     _series_infos.clear();
 
-    const int study_size = msg.study_wrappers_size();
+    const int study_size = msg.study_wrappers_size() <= 0 ? 0 : msg.study_wrappers_size();
     for (int i = 0; i < study_size; ++i) {
         const MsgStudyWrapper& study_wrapper = msg.study_wrappers(i);
         const MsgStudyInfo& study_info = study_wrapper.study_info();
@@ -27,11 +27,11 @@ void ModelPACSCache::update(MsgStudyWrapperCollection& msg) {
         _study_infos[_study_infos.size()-1].set_id(i);
         _patient_infos.push_back(patient_info);
         _series_infos.push_back(std::vector<MsgSeriesInfo>());
-
         int series_size = study_wrapper.series_infos_size();
         for (int j = 0; j < series_size; ++j) {
             const MsgSeriesInfo& series_info = study_wrapper.series_infos(j);
             _series_infos[i].push_back(series_info);
+            _series_infos[i][j].set_id(j);
         }
     }
 }
@@ -50,13 +50,29 @@ void ModelPACSCache::get_study_infos(int start, int end,
     }
 }
 
-void ModelPACSCache::get_series_info(int study_id, std::vector<MsgSeriesInfo*>& series_infos) {
-    if (study_id < (int)_series_infos.size()) {
+void ModelPACSCache::get_series_info(int study_idx, std::vector<MsgSeriesInfo*>& series_infos) {
+    if (study_idx < (int)_series_infos.size()) {
         series_infos.clear();
-        for (size_t i = 0; i < _series_infos[study_id].size(); ++i) {
-            series_infos.push_back(&(_series_infos[study_id][i]));
+        for (size_t i = 0; i < _series_infos[study_idx].size(); ++i) {
+            series_infos.push_back(&(_series_infos[study_idx][i]));
         }
     }
+}
+
+int ModelPACSCache::get_study_series_uid(int study_idx, int series_idx, std::string& study_uid, std::string& series_uid) {
+    if (study_idx > (int)_series_infos.size()-1) { 
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid study idx: " << study_idx;
+        return -1;
+    }
+    const std::vector<MsgSeriesInfo>& series_infos = _series_infos[study_idx];
+    if (series_idx > (int)series_infos.size() - 1) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "invalid series idx: " << series_idx;
+        return -1;
+    }
+    
+    study_uid = _study_infos[study_idx].study_uid();
+    series_uid = series_infos[series_idx].series_uid();
+    return 0;
 }
 
 void ModelPACSCache::print_all_series() {

@@ -85,6 +85,24 @@ int TimeUtil::check_hhmmss(const std::string& time) {
     return 0;
 }
 
+int TimeUtil::check_hhmmssfrac(const std::string& time) {
+    if (time.size() < 7) {
+        return -1;
+    }
+    if (time[6] != '.') {
+        return -1;
+    }
+    return TimeUtil::check_hhmmss(time.substr(0,6));
+}
+
+int TimeUtil::remove_time_frac(std::string& time) {
+    if (time.size() < 7) {
+        return -1;
+    }
+    time = time.substr(0,6);
+    return 0;
+}
+
 int TimeUtil::check_hhmmss_range(const std::string& time_range) {
     if (time_range.size() != 13) {
         return -1;

@@ -80,34 +80,33 @@ int BECmdHandlerDBPACSQueryResult::handle_command(const IPCDataHeader& dataheade
     std::vector<MsgStudyInfo*> study_infos;
     std::vector<MsgPatientInfo*> patient_infos;
     pacs_cache_model->get_study_infos(0, 10, study_infos, patient_infos);
-    if (!study_infos.empty() && !patient_infos.empty()) {
-        MsgStudyWrapperCollection msg_res;
-        msg_res.set_num_study(study_count);
-        MsgStudyWrapper* cur_study_wrapper = nullptr;
-        for (size_t i = 0; i < study_infos.size(); ++i) {
-            cur_study_wrapper = msg_res.add_study_wrappers();
-            MsgStudyInfo* msg_study_info = cur_study_wrapper->mutable_study_info();
-            *msg_study_info = *(study_infos[i]);
-            MsgPatientInfo* msg_patient_info = cur_study_wrapper->mutable_patient_info();
-            *msg_patient_info = *(patient_infos[i]);
-        }
 
-        char* buffer_res = nullptr;
-        int buffer_size = 0;
-        if (0 != protobuf_serialize(msg_res, buffer_res, buffer_size)) {
-            MI_APPCOMMON_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
-            return -1;
-        }
-        msg_res.Clear();
-
-        IPCDataHeader header;
-        header.msg_id = COMMAND_ID_FE_BE_PACS_QUERY_RESULT;
-        header.data_len = buffer_size;
-        std::shared_ptr<IOperation> op(new BEOpDBSendPACSQueryResult());
-        op->set_controller(controller);
-        op->set_data(header , buffer_res);//transmit buffer from DB to FE(no need to shield)
-        controller->get_thread_model()->push_operation_fe(op);
+    MsgStudyWrapperCollection msg_res;
+    msg_res.set_num_study(study_count);
+    MsgStudyWrapper* cur_study_wrapper = nullptr;
+    for (size_t i = 0; i < study_infos.size(); ++i) {
+        cur_study_wrapper = msg_res.add_study_wrappers();
+        MsgStudyInfo* msg_study_info = cur_study_wrapper->mutable_study_info();
+        *msg_study_info = *(study_infos[i]);
+        MsgPatientInfo* msg_patient_info = cur_study_wrapper->mutable_patient_info();
+        *msg_patient_info = *(patient_infos[i]);
     }
+
+    char* buffer_res = nullptr;
+    int buffer_size = 0;
+    if (0 != protobuf_serialize(msg_res, buffer_res, buffer_size)) {
+        MI_APPCOMMON_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
+        return -1;
+    }
+    msg_res.Clear();
+
+    IPCDataHeader header;
+    header.msg_id = COMMAND_ID_FE_BE_PACS_QUERY_RESULT;
+    header.data_len = buffer_size;
+    std::shared_ptr<IOperation> op(new BEOpDBSendPACSQueryResult());
+    op->set_controller(controller);
+    op->set_data(header , buffer_res);//transmit buffer from DB to FE(no need to shield)
+    controller->get_thread_model()->push_operation_fe(op);
 
     MI_APPCOMMON_LOG(MI_TRACE) << "OUT BECmdHandlerDBPACSQueryResult";
     return 0;

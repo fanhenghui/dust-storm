@@ -46,6 +46,7 @@ int BECmdHandlerFEPACSGetStudyList::handle_command(const IPCDataHeader &datahead
             MsgStudyWrapper* study_wrapper = msg_res.add_study_wrappers();
             MsgStudyInfo* study_info = study_wrapper->mutable_study_info();
             *study_info = *(study_infos[i]);
+            study_info->set_study_uid("");
             MsgPatientInfo* patient_info = study_wrapper->mutable_patient_info();
             *patient_info = *(patient_infos[i]);
         }

@@ -47,6 +47,19 @@ int DBOpBEPACSQuery::execute() {
         study_key.accession_no = query_key.accession_no();
 
         series_key.modality = query_key.modality();
+
+        //for debug
+        MI_DBSERVER_LOG(MI_DEBUG) << "dcm query key: " << 
+        "patient_id: " << patient_key.patient_id << std::endl << 
+        "patient_name: " << patient_key.patient_name << std::endl << 
+        "patient_birth_date: " << patient_key.patient_birth_date << std::endl << 
+        "study_date: " << study_key.study_date << std::endl << 
+        "study_time: " << study_key.study_time << std::endl << 
+        "accession_no: " << study_key.accession_no << std::endl << 
+        "modality: " << series_key.modality;
+    } else {
+        //for debug
+        MI_DBSERVER_LOG(MI_WARNING) << "null query key buffer.";
     }
 
     std::vector<PatientInfo> patient_infos;
@@ -58,6 +71,7 @@ int DBOpBEPACSQuery::execute() {
         return -1; 
     }
 
+    //for debug
     for (size_t i = 0; i < series_infos.size(); ++i) {  
         MI_DBSERVER_LOG(MI_DEBUG) << series_infos[i].series_uid;
     }
@@ -67,7 +81,7 @@ int DBOpBEPACSQuery::execute() {
     std::map<size_t, std::vector<SeriesInfo*>> cp_series_info;
     std::map<size_t, PatientInfo*> cp_patient_info;
     for (size_t i = 0; i < study_infos.size(); ++i) {
-        
+
         size_t study_map_idx = 0;
         auto it = cp_study_map.find(study_infos[i].study_uid);
         if (it == cp_study_map.end()) {
@@ -95,7 +109,7 @@ int DBOpBEPACSQuery::execute() {
     MsgStudyWrapper* cur_study_wrapper = nullptr;
     study_wrapper_col.set_num_study(cp_study_info.size());
     for (size_t i = 0; i < cp_study_info.size(); ++i) {
-        
+
         StudyInfo& study_info = *(cp_study_info[i]);
         PatientInfo& patient_info = *(cp_patient_info[i]);
 
@@ -107,6 +121,7 @@ int DBOpBEPACSQuery::execute() {
         msg_study_info->set_study_time(study_info.study_time);
         msg_study_info->set_accession_no(study_info.accession_no);
         msg_study_info->set_study_desc(study_info.study_desc);
+        msg_study_info->set_study_uid(study_info.study_uid);
         msg_study_info->set_num_series(study_info.num_series);
         msg_study_info->set_num_instance(study_info.num_instance);
 
@@ -126,11 +141,19 @@ int DBOpBEPACSQuery::execute() {
             msg_series_info->set_institution(series_info.institution);
             msg_series_info->set_num_instance(series_info.num_instance);
             msg_series_info->set_series_desc(series_info.series_desc);
+            msg_series_info->set_series_uid(series_info.series_uid);
         }
     }
 
+    //---------------------------------//
+    //这里感觉是protobuf的bug，如果为空结果，会序列化失败，因此加了下面的代码
+    if (series_infos.size() == 0) {
+        study_wrapper_col.set_num_study(-1);    
+    }
+    //---------------------------------//
+
     char* buffer = nullptr;
-    int buffer_size = 0;
+    int buffer_size = 0;    
     if (0 != protobuf_serialize(study_wrapper_col, buffer, buffer_size)) {
         MI_DBSERVER_LOG(MI_ERROR) << "serialize dicom info collection message failed.";
         return -1;

@@ -11,8 +11,10 @@ public:
     static int check_yyyymmdd(const std::string& date);
     static int check_yyyymmdd_range(const std::string& date_range);
     static int check_hhmmss(const std::string& time);
+    static int check_hhmmssfrac(const std::string& time);
     static int check_hhmmss_range(const std::string& time_range);
     static int check_yyyymmddhhmmss(const std::string& datetime);
+    static int remove_time_frac(std::string& time);
 
     //default return beijing time
     static std::string current_date(int time_zone = 8);

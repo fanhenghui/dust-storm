@@ -2,7 +2,7 @@
 TestDataRoot = /home/wangrui22/data
 
 #DB host
-DBIP = 192.168.199.107
+DBIP = 127.0.0.1
 DBPort = 3306
 DBUser = root
 DBPWD = 123456
@@ -45,7 +45,7 @@ PyInterfacePath = /home/wangrui22/program/git/luna_detect/training
 
 #DBS<=>PACS(work on DBS)
 PACSServerAETitle = DCM4CHEE
-PACSServerHost = 192.168.199.107
+PACSServerHost = 127.0.0.1
 PACSServerPort = 11112
 PACSClientAETitle = DBS
 PACSClientPort = 11115

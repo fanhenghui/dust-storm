@@ -85,31 +85,11 @@ public:
     int count_preprocess(int64_t& num);
     
     //--------------------//
-    // sum
+    // sum&statistic
     //--------------------//
     // TODO
 
-    
-     
-    // int insert_dcm_item(const DB::ImgItem& item);
-    // int delete_dcm_item(const std::string& series_fk);
-    // int query_dcm_item(const std::string& series_fk, bool& in_db);
-    // int get_dcm_item(const std::string& series_fk, DB::ImgItem& item);
-
-    // int get_ai_annotation_item(const std::string& series_fk, std::string& annotation_ai_path);
-    // int get_usr_annotation_items_by_series(const std::string& series_fk, std::vector<DB::AnnotationInfo>& items);
-    // int get_usr_annotation_items_by_usr(const std::string& usr_name, std::vector<DB::AnnotationInfo>& items);
-    // int get_usr_annotation_item(const std::string& series_fk, const std::string& usr_name, std::vector<DB::AnnotationInfo>& items);
-
-    // int get_all_dcm_items(std::vector<DB::ImgItem>& items);
-    // int get_all_usr_annotation_items(std::vector<DB::AnnotationInfo>& items);
-
-    // int update_preprocess_mask(const std::string& series_fk, const std::string& preprocess_mask_path);
-    // int update_ai_annotation(const std::string& series_fk, const std::string& annotation_ai_path);
-    // int update_ai_intermediate_data(const std::string& series_fk, const std::string& ai_intermediate_data);
-    // int update_usr_annotation(const std::string& series_fk, const std::string& usr_name, const std::string& annotation_usr_path);
-
-public://FOR test , set to private later
+private://FOR test , set to private later
     int insert_patient(PatientInfo& patient_info);
     int insert_study(StudyInfo& study_info);
     int insert_series(SeriesInfo& series_info);
@@ -118,7 +98,7 @@ private:
     int verify_evaluation_info(const EvaluationInfo& info);
     int verify_annotation_info(const AnnotationInfo& info);
     int verify_preprocess_info(const PreprocessInfo& info);
-    int verfiy_study_info(const StudyInfo& info);
+    int verfiy_study_info(StudyInfo& info);
     int verfiy_series_info(const SeriesInfo& info);
 
     bool patient_key_valid(const PatientInfo& key);

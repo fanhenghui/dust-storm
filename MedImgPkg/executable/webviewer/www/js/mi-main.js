@@ -120,11 +120,15 @@
 
         let studyWrappers = message.studyWrappers;
         if (!studyWrappers || studyWrappers.length == 0) {
-            console.log(`can't get study wrappers.`);
+            $('#pacs-study-info').html('');
+            $('#worklist-pacs-study').html('');
+            $('#worklist-pacs-series').html('');
+            $('#btn-pacs-page-up').addClass('disabled');
+            $('#btn-pacs-page-down').addClass('disabled');
             return;
         }
 
-        pacs_study_number = message.numStudy;
+        pacs_study_number = message.numStudy <=0 ? 0 : message.numStudy;
         pacs_page_sum = Math.ceil(pacs_study_number/LIST_CAPACITY);
         pacs_current_page = 1;
         let study_from = (pacs_current_page-1)*LIST_CAPACITY + 1;
@@ -226,14 +230,21 @@
         tbody.innerHTML = '';
         
         seriesInfos.forEach(ele => {
-            //let tr = `<tr seriesidx="${ele.studyInfo.id}">`;
-            let tr = '<tr>'
+            let tr = `<tr seriesidx="${ele.id}">`;
             tr += `<td>${ele.seriesNo}</td>`;
             tr += `<td>${ele.modality}</td>`;
             tr += `<td>${ele.seriesDesc}</td>`;
             tr += `<td>${ele.numInstance}</td>`;
-            tr += '</tr>';   
+            tr += '</tr>';
             tbody.innerHTML += tr; 
+        });
+
+        $('#table-pacs-series tbody tr').click(function() {
+            if ($(this).hasClass('success')) {
+                $(this).removeClass('success');
+            } else {
+                $(this).addClass('success');
+            }
         });
     }
 
@@ -672,24 +683,24 @@
         }
         //construct query key
         let queryKey = {
-            patient_id: $('#pacs-key-patient-id').val(),
-            patient_name: $('#pacs-key-patient-name').val(),
-            patient_birth_date: '',
-            study_date: '',
-            study_time: '',
-            accession_no: '',
-            modality: ''
+            patientId: $('#pacs-key-patient-id').val(),
+            patientName: $('#pacs-key-patient-name').val(),
+            patientBirthDate: '',
+            studyDate: '',
+            studyTime: '',
+            accessionNo: '',
+            modality: $('#pacs-key-modality').attr('modality'),
         };
         let patientBirthDateFrom = $('#pacs-key-patient-birth-date-from').val().replace(/\-+/g, '');;
         let patientBirthDateTo = $('#pacs-key-patient-birth-date-to').val().replace(/\-+/g, '');;
         if (patientBirthDateFrom.length !=0 && patientBirthDateTo.length != 0) {
-            queryKey.patient_birth_date = `${patientBirthDateFrom}-${patientBirthDateTo}`;
+            queryKey.patientBirthDate = `${patientBirthDateFrom}-${patientBirthDateTo}`;
         }
 
         let studyDateFrom = $('#pacs-key-study-date-from').val().replace(/\-+/g, '');;
         let studyDateTo = $('#pacs-key-study-date-to').val().replace(/\-+/g, '');;
         if (studyDateFrom.length !=0 && studyDateTo.length != 0) {
-            queryKey.study_date = `${studyDateFrom}-${studyDateTo}`;
+            queryKey.studyDate = `${studyDateFrom}-${studyDateTo}`;
         }
 
         let buffer = Protobuf.encode(socketClient, 'MsgDcmQueryKey', queryKey);
@@ -704,25 +715,34 @@
             alert('BE not ready!');
             return;
         }
+        //这里暂时只支持一个study的多个series的retrieve
 
-        let choosed = $('#table-pacs-study tbody tr');
-        let choosedIndex = '';
-        Array.from(choosed).forEach((item,index)=>{
-            if($(item).hasClass('success')) {
-                choosedIndex += index + '|';
+        let studyIdx = -1;
+        let studyList = $('#table-pacs-study tbody tr');
+        for (let i = 0; i < studyList.length; ++i) {
+            if ($(studyList[i]).hasClass('success')) {
+                studyIdx = $(studyList[i]).attr('studyidx');
+                break;
             }
-        });
-        console.log(choosedIndex);
-
-        if (!choosedIndex) {
-            alert('please choose one series to fetch.');
-            reutrn;
+        }
+        if (studyIdx == -1) {
+            alert('please choose a study.');
+            return;
         }
 
-        let buffer = Protobuf.encode(socketClient, 'MsgString', {context:choosedIndex});
+        let choosed = $('#table-pacs-series tbody tr');
+        let context = {seriesUid:[], studyUid:[]};
+        Array.from(choosed).forEach((item,index)=>{
+            if($(item).hasClass('success')) {
+                context.studyUid.push(studyIdx);
+                context.seriesUid.push($(item).attr('seriesidx'));
+            }
+        });
+
+        let buffer = Protobuf.encode(socketClient, 'MsgDcmPACSRetrieveKey', context);
         if (buffer) {
             socketClient.sendData(COMMAND_ID_BE_FE_PACS_RETRIEVE, 0, 0, buffer.byteLength, buffer);
-        }        
+        }
     }
 
     function playVR() {
@@ -1099,8 +1119,26 @@
                 $('#pacs-key-patient-birth-date-to').val('');
                 $('#pacs-key-study-date-from').val('');
                 $('#pacs-key-study-date-to').val('');
+                $('#pacs-key-modality').html('All<span class="caret"></span>');
+                $('#pacs-key-modality').attr('modality','');
             }
         }
+        $('#pacs-key-modality-all').click(function() {
+            $('#pacs-key-modality').html('All<span class="caret"></span>');
+            $('#pacs-key-modality').attr('modality','');
+        });
+        $('#pacs-key-modality-ct').click(function() {
+            $('#pacs-key-modality').html('CT<span class="caret"></span>');
+            $('#pacs-key-modality').attr('modality','CT');
+        });
+        $('#pacs-key-modality-mr').click(function() {
+            $('#pacs-key-modality').html('MR<span class="caret"></span>');
+            $('#pacs-key-modality').attr('modality','MR');
+        });
+        $('#pacs-key-modality-rt-struct').click(function() {
+            $('#pacs-key-modality').html('RT_STRUCT<span class="caret"></span>');
+            $('#pacs-key-modality').attr('modality','RT_STRUCT');
+        });
 
         let pageDownPACSStudyList = document.getElementById("btn-pacs-page-down");
         if (pageDownPACSStudyList) {

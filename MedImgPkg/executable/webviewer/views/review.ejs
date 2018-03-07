@@ -205,16 +205,27 @@
                 </h4>
             </div>
             <div class="col-md-12 col-sm-12">
-                <div class="col-md-4 col-sm-4">
+                <div class="col-md-3 col-sm-3">
                     Patient Name: <input type="text" id="pacs-key-patient-name"><br>
                     Patient ID: <input type="text" id="pacs-key-patient-id"> 
                 </div>
-                <div class="col-md-6 col-sm-6">
+                <div class="col-md-5 col-sm-5">
                     Patient Birth Date From: <input type="date" id="pacs-key-patient-birth-date-from">
                     TO: <input type="date" id="pacs-key-patient-birth-date-to">  
                     <br>
                     Study Date From: <input type="date" id="pacs-key-study-date-from"> 
                     TO: <input type="date" id="pacs-key-study-date-to">  
+                </div>
+                <div class="col-md-2 col-sm-2">
+                        Modality: <button class="dropdown-toggle" data-toggle="dropdown" href="javascript:;" id="pacs-key-modality" modality="">
+                                All<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" id="pacs-key-modality-ct">CT</a></li>
+                                <li><a href="javascript:;" id="pacs-key-modality-mr">MR</a></li>
+                                <li><a href="javascript:;" id="pacs-key-modality-rt-struct">RT_STRUCT</a></li>
+                                <li><a href="javascript:;" id="pacs-key-modality-all">All</a></li>
+                            </ul>
                 </div>
                 <div class="col-md-2 col-sm-2">
                     <div class="pull-right">
@@ -270,22 +281,8 @@
                         </tr>
                     </thead>
                     <tbody id="worklist-pacs-study">
-                        <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
-                        <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
                     </tbody>
                 </table>
-                <!-- <div class="row">
-                    <div class="col-md-6 col-sm-6">
-                        <button type="button" class="btn btn-default" id="btn-query-pacs">
-                            Query
-                        </button>
-                    </div>
-                    <div class="col-md-6 col-sm-6">
-                        <button type="button" class="btn btn-default pull-right" id="btn-retrieve-pacs">
-                            Retrieve
-                        </button>
-                    </div>
-                </div> -->
             </div>
             <div class="col-md-12 col-sm-12">
                 <h4 class="text-primary" style="background:silver; ">
@@ -309,22 +306,16 @@
                         </tr>
                     </thead>
                     <tbody id="worklist-pacs-series">
-                        <!-- <tr> <td> 1.1 </td> <td> 1.2 </td>  <td> 1.3 </td> </tr>
-                        <tr> <td> 2.1 </td> <td> 2.2 </td>  <td> test_uid </td> </tr> -->
                     </tbody>
                 </table>
+                <div class="col-md-12 col-sm-12">
+                    <button type="button" class="btn btn-default pull-right" id="btn-retrieve-pacs">Retrieve</button>
+                </div>
             </div>
-
     </div>
     <div class="container-fluid" hidden="false" id="review-div">
         <div class="row clearfix">
             <div class="col-md-12 col-sm-12 column" id="navigator-div" style=" Background-color:WhiteSmoke">
-                <!-- <nav class="navbar navbar-default" role="navigation">
-                    <div class="navbar-header" id="navigator-div">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
-                        <a class="navbar-brand" href="#">MED-REVIEW</a>
-                    </div>
-                </nav> -->
                 <ul class="nav nav-tabs">
 				<li class="active">
 					 <a href="javascript:;">MED-REVIEW</a>

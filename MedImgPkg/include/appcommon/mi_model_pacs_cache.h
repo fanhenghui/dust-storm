@@ -23,7 +23,9 @@ public:
         std::vector<MsgStudyInfo*>& study_infos, 
         std::vector<MsgPatientInfo*>& patient_infos);
 
-    void get_series_info(int study_id, std::vector<MsgSeriesInfo*>& series_infos);
+    void get_series_info(int study_idx, std::vector<MsgSeriesInfo*>& series_infos);
+    
+    int get_study_series_uid(int study_idx, int series_idx, std::string& study_uid, std::string& series_uid);
 
     void print_all_series();
 

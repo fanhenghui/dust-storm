@@ -60,7 +60,7 @@ DB::DB() {}
 
 DB::~DB() {}
 
-int DB::verfiy_study_info(const StudyInfo& study_info) {
+int DB::verfiy_study_info(StudyInfo& study_info) {
     //verify
     //patient_fk
     if (study_info.patient_fk <= 0) {
@@ -78,8 +78,12 @@ int DB::verfiy_study_info(const StudyInfo& study_info) {
 
     if (!study_info.study_time.empty()) {
         if (0 != TimeUtil::check_hhmmss(study_info.study_time)) {
-            MI_IO_LOG(MI_ERROR) << "invalid study info: study time: " << study_info.study_time;
-            return -1;
+            if (0 != TimeUtil::check_hhmmssfrac(study_info.study_time) ) {
+                MI_IO_LOG(MI_ERROR) << "invalid study info: study time: " << study_info.study_time;
+                return -1;
+            } else {
+                TimeUtil::remove_time_frac(study_info.study_time);
+            }
         }
     }
 
@@ -232,9 +236,11 @@ int DB::update_patient(PatientInfo& patient_info) {
         sql << "UPDATE " << PATIENT_TABLE << " SET "
         << "patient_id=\'" << patient_info.patient_id << "\',"
         << "patient_sex=\'" << patient_info.patient_sex << "\',"
-        << "patient_name=\'" << patient_info.patient_name << "\',"
-        << "patient_birth_date=\'" << patient_info.patient_birth_date << "\' "
-        << "WHERE id=" << patient_info.id << ";";
+        << "patient_name=\'" << patient_info.patient_name << "\' ";
+        if (!patient_info.patient_birth_date.empty()) {
+            sql << ",patient_birth_date=\'" << patient_info.patient_birth_date << "\' ";
+        }
+        sql << "WHERE id=" << patient_info.id << ";";
         sql::ResultSet* res = nullptr;
         int err = this->query(sql.str(), res); 
         StructShield<sql::ResultSet> shield(res);
@@ -737,14 +743,14 @@ int DB::delete_series(int series_pk, bool transcation) {
     
     try {
         int err = 0;
-        
+        std::stringstream sql;
+
         //-------------------------------------------------------------//
         //delete instance file
         //-------------------------------------------------------------//
-        std::stringstream sql;
         sql << "SELECT file_path FROM instance WHERE series_fk=" << series_pk << ";";
         sql::ResultSet* res_select_instance = nullptr;
-        StructShield<sql::ResultSet> shield(res_select_instance);
+        StructShield<sql::ResultSet> shield0(res_select_instance);
         err = this->query(sql.str(), res_select_instance);
         if (err != 0) {
             throw std::exception(std::logic_error("query instance failed."));
@@ -763,11 +769,76 @@ int DB::delete_series(int series_pk, bool transcation) {
         sql.str("");
         sql << "DELETE FROM instance WHERE series_fk=" << series_pk << ";";
         sql::ResultSet* res_delete_instance = nullptr;
-        StructShield<sql::ResultSet> shield2(res_delete_instance);
+        StructShield<sql::ResultSet> shield1(res_delete_instance);
         err = this->query(sql.str(), res_delete_instance);
         if (err != 0) {
             throw std::exception(std::logic_error("delete instance row failed."));
         }
+
+        //-------------------------------------------------------------//
+        //delete evaluation file
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "SELECT file_path FROM " << EVALUATION_TABLE << " WHERE series_fk=" << series_pk << ";";
+        sql::ResultSet* res_select_eva = nullptr;
+        err = this->query(sql.str(), res_select_eva);
+        StructShield<sql::ResultSet> shield2(res_select_eva);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+        while(res_select_eva->next()) {
+            std::string file_path = res_select_eva->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove evaluation file: "<< file_path << " failed.";
+            }
+        }
+
+        //-------------------------------------------------------------//
+        //delete evaluation
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "DELETE FROM " << EVALUATION_TABLE << " WHERE series_fk=" << series_pk << ";";
+        sql::ResultSet* res_delete_eva = nullptr;
+        StructShield<sql::ResultSet> shield3(res_delete_eva);
+        err = this->query(sql.str(), res_delete_eva);
+        if (err != 0) {
+            throw std::exception(std::logic_error("delete evaluation row failed."));
+        }
+
+        //-------------------------------------------------------------//
+        //delete preprocess file
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "SELECT file_path FROM " << PREPROCESS_TABLE << " WHERE series_fk=" << series_pk << ";";
+        sql::ResultSet* res_select_prep = nullptr;
+        err = this->query(sql.str(), res_select_prep);
+        StructShield<sql::ResultSet> shield4(res_select_prep);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+        while(res_select_prep->next()) {
+            std::string file_path = res_select_prep->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove preprocess file: "<< file_path << " failed.";
+            }
+        }
+
+        //-------------------------------------------------------------//
+        //delete preprocess
+        //-------------------------------------------------------------//
+        sql.str("");
+        sql << "DELETE FROM " << PREPROCESS_TABLE << " WHERE series_fk=" << series_pk << ";";
+        sql::ResultSet* res_delete_prep = nullptr;
+        StructShield<sql::ResultSet> shield5(res_delete_prep);
+        err = this->query(sql.str(), res_delete_prep);
+        if (err != 0) {
+            throw std::exception(std::logic_error("delete preprocess row failed."));
+        }
+
+        //-------------------------------------------------------------//
+        //delete annotation
+        //-------------------------------------------------------------//
+        //TODO            
 
         //-------------------------------------------------------------//
         //delete series
@@ -776,7 +847,7 @@ int DB::delete_series(int series_pk, bool transcation) {
         sql.str("");
         sql << "SELECT study_fk FROM series WHERE id=" << series_pk << ";";
         sql::ResultSet* res_select_series = nullptr;
-        StructShield<sql::ResultSet> shield3(res_select_series);
+        StructShield<sql::ResultSet> shield6(res_select_series);
         err = this->query(sql.str(), res_select_series);
         if (err != 0) {
             throw std::exception(std::logic_error("select series row failed."));
@@ -793,7 +864,7 @@ int DB::delete_series(int series_pk, bool transcation) {
         sql.str("");
         sql << "DELETE FROM series WHERE id=" << series_pk << ";";
         sql::ResultSet* res_delete_series = nullptr;
-        StructShield<sql::ResultSet> shield4(res_delete_series);
+        StructShield<sql::ResultSet> shield7(res_delete_series);
         err = this->query(sql.str(), res_delete_series);
         if (err != 0) {
             throw std::exception(std::logic_error("delete series row failed."));
@@ -805,7 +876,7 @@ int DB::delete_series(int series_pk, bool transcation) {
         sql.str("");
         sql << "SELECT patient_fk, num_series FROM study WHERE id=" << study_fk << ";";
         sql::ResultSet* res_select_study = nullptr;
-        StructShield<sql::ResultSet> shield5(res_select_study);
+        StructShield<sql::ResultSet> shield8(res_select_study);
         err = this->query(sql.str(), res_select_study);
         if (err != 0) {
             throw std::exception(std::logic_error("select study row failed."));
@@ -846,7 +917,7 @@ int DB::delete_series(int series_pk, bool transcation) {
                 throw std::exception(std::logic_error("update study row failed."));
             }
 
-            MI_IO_LOG(MI_WARNING) << "Update study column.";
+            MI_IO_LOG(MI_DEBUG) << "Update study column.";
         }
 
         //-------------------------------------------------------------//
@@ -1068,7 +1139,7 @@ int DB::insert_preprocess(const PreprocessInfo& prep_info) {
     try {
         std::stringstream sql;
         sql << "INSERT INTO " << PREPROCESS_TABLE 
-        << "(series_fk, prep_type, version, file_path, file_size) VALUES("
+        << "(series_fk, prep_type_fk, version, file_path, file_size) VALUES("
         << "\'" << prep_info.series_fk << "\',"
         << "\'" << prep_info.prep_type << "\',"
         << "\'" << prep_info.version << "\',"
@@ -1083,7 +1154,7 @@ int DB::insert_preprocess(const PreprocessInfo& prep_info) {
         }
 
     } catch (const std::exception& e) {
-        MI_IO_LOG(MI_ERROR) << "insert annotation failed: " << e.what();
+        MI_IO_LOG(MI_ERROR) << "insert preprocess failed: " << e.what();
         _connection->rollback(save_point);
         return -1;
     }
@@ -1235,12 +1306,27 @@ int DB::delete_evaluation(int eva_pk) {
     StructShield<sql::Savepoint> shield(save_point);
     try {
         std::stringstream sql;
+        sql << "SELECT file_path FROM " << EVALUATION_TABLE
+        << " WHERE id=" << eva_pk << ";";
+        sql::ResultSet* res_select = nullptr;
+        int err = this->query(sql.str(), res_select);
+        StructShield<sql::ResultSet> shield(res_select);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+        while(res_select->next()) {
+            std::string file_path = res_select->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove evaluation file: "<< file_path << " failed.";
+            }
+        }
+
+        sql.str("");
         sql << "DELETE FROM " << EVALUATION_TABLE 
         << " WHERE id=" << eva_pk << ";";
-        sql::ResultSet* res = nullptr;
-        int err = this->query(sql.str(), res);
-        StructShield<sql::ResultSet> shield(res);
-
+        sql::ResultSet* res_delete = nullptr;
+        err = this->query(sql.str(), res_delete);
+        StructShield<sql::ResultSet> shield1(res_delete);
         if (0 != err) {
             throw std::exception(std::logic_error("sql error"));
         }
@@ -1267,12 +1353,27 @@ int DB::delete_annotation(int anno_pk) {
     StructShield<sql::Savepoint> shield(save_point);
     try {
         std::stringstream sql;
+        sql << "SELECT file_path FROM " << ANNOTATION_TABLE
+        << " WHERE id=" << anno_pk << ";";
+        sql::ResultSet* res_select = nullptr;
+        int err = this->query(sql.str(), res_select);
+        StructShield<sql::ResultSet> shield(res_select);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+        while(res_select->next()) {
+            std::string file_path = res_select->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove annotation file: "<< file_path << " failed.";
+            }
+        }
+
+        sql.str("");
         sql << "DELETE FROM " << ANNOTATION_TABLE 
         << " WHERE id=" << anno_pk << ";";
-        sql::ResultSet* res = nullptr;
-        int err = this->query(sql.str(), res);
-        StructShield<sql::ResultSet> shield(res);
-
+        sql::ResultSet* res_delete = nullptr;
+        err = this->query(sql.str(), res_delete);
+        StructShield<sql::ResultSet> shield1(res_delete);
         if (0 != err) {
             throw std::exception(std::logic_error("sql error"));
         }
@@ -1299,12 +1400,27 @@ int DB::delete_preprocess(int prep_pk) {
     StructShield<sql::Savepoint> shield(save_point);
     try {
         std::stringstream sql;
+        sql << "SELECT file_path FROM " << PREPROCESS_TABLE
+        << " WHERE id=" << prep_pk << ";";
+        sql::ResultSet* res_select = nullptr;
+        int err = this->query(sql.str(), res_select);
+        StructShield<sql::ResultSet> shield(res_select);
+        if (0 != err) {
+            throw std::exception(std::logic_error("sql error"));
+        }
+        while(res_select->next()) {
+            std::string file_path = res_select->getString("file_path");
+            if (0 != FileUtil::remove_file(file_path)) {
+                MI_IO_LOG(MI_WARNING) << "remove annotation file: "<< file_path << " failed.";
+            }
+        }
+
+        sql.str("");
         sql << "DELETE FROM " << PREPROCESS_TABLE 
         << " WHERE id=" << prep_pk << ";";
-        sql::ResultSet* res = nullptr;
-        int err = this->query(sql.str(), res);
-        StructShield<sql::ResultSet> shield(res);
-
+        sql::ResultSet* res_delete = nullptr;
+        err = this->query(sql.str(), res_delete);
+        StructShield<sql::ResultSet> shield1(res_delete);
         if (0 != err) {
             throw std::exception(std::logic_error("sql error"));
         }

@@ -27,6 +27,7 @@ int BECmdHandlerFEPACSQuery::handle_command(const IPCDataHeader& dataheader, cha
     IPCDataHeader header;
     header.msg_id = COMMAND_ID_DB_BE_OPERATION;
     header.op_id = OPERATION_ID_DB_BE_PACS_QUERY;
+    header.data_len = dataheader.data_len;
     IPCPackage* package = new IPCPackage(header, buffer);
     if(0 != controller->get_client_proxy_dbs()->sync_send_data(package)) {
         delete package;
