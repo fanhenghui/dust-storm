@@ -44,13 +44,29 @@ MED_IMG_BEGIN_NAMESPACE
 // VolumeInfo contain extern information of volume
 enum Modality         // 0008,0060
 {
-  CR,                 // Computed Radiography
-  CT,                 // Computed Tomography
-  MR,                 // Magnetic Resonance
-  PT,                 // Positron emission tomography(PET)
-  RT_STRUCT,          // RT structure set
-  MODALITY_UNDEFINED, // Other modality supported yet!
+  CT = 1,                    // Computed Tomography
+  MR = 1<<1,                 // Magnetic Resonance
+  CR = 1<<2,                 // Computed Radiography
+  PT = 1<<3,                 // Positron emission tomography(PET)
+  RT_STRUCT = 1<<4,          // RT structure set
+  MODALITY_UNDEFINED = 0, // Other modality supported yet!
 };
+
+inline Modality modality_to_enum(const std::string& modality) {
+    if (modality == "CT") {
+        return CT;
+    } else if (modality == "MR") {
+        return MR;
+    } else if (modality == "CR") {
+        return CR;
+    } else if (modality == "PT") {
+        return PT;
+    } else if (modality == "RT_STRUCT" || modality == "RTSTRUCT") {
+        return RT_STRUCT;
+    } else {
+        return MODALITY_UNDEFINED;
+    }
+}
 
 enum PatientPosition // 0018,5100
 { 

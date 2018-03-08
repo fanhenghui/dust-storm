@@ -1,5 +1,6 @@
 #include "mi_db_operation_be_fetch_ai_evaluation.h"
 
+#include "util/mi_ipc_server_proxy.h"
 #include "io/mi_protobuf.h"
 
 #include "mi_db_server_controller.h"
@@ -30,7 +31,12 @@ int DBOpBEFetchAIEvaluation::execute() {
     std::shared_ptr<DBEvaluationDispatcher> dispatcher = controller->get_evaluation_dispatcher();
     DBSERVER_CHECK_NULL_EXCEPTION(dispatcher);
 
-    if (-1 == dispatcher->request_evaluation(_header.receiver, &msg) ) {
+    //TODO tmp code to remove AIS
+    SEND_ERROR_TO_BE(controller->get_server_proxy_be(), _header.receiver, "query evaluation failed.");
+    return 0;
+
+
+    if (0 != dispatcher->request_evaluation(_header.receiver, &msg) ) {
         MI_DBSERVER_LOG(MI_ERROR) << "rquest evaluation failed.";
         msg.Clear();
         return -1;

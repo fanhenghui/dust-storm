@@ -55,9 +55,14 @@ public:
     //DICOM query (corresponding to query level)
     int query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_infos);
     int query_study(const PatientInfo& patient_key, const StudyInfo& study_key, 
-        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos);
+        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos,
+        int limit_begin = -1, int limit_end = -1);
     int query_series(const PatientInfo& patient_key, const StudyInfo& study_key, const SeriesInfo& series_key, 
         std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos, std::vector<SeriesInfo>* series_infos);
+
+    int query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<StudyInfo>* study_infos, 
+                    int limit_begin = -1, int limit_end = -1);
+    int query_series(int64_t study_fk, const SeriesInfo& series_key, std::vector<SeriesInfo>* series_infos);
 
     //query series instance for data transform(DB->CACHE or DB->APP)
     int query_series_instance(int64_t series_pk, std::vector<InstanceInfo>* instance_infos);
@@ -104,9 +109,6 @@ private:
     bool patient_key_valid(const PatientInfo& key);
     bool study_key_valid(const StudyInfo& key);
     bool series_key_valid(const SeriesInfo& key);
-
-    int query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<StudyInfo>* study_infos);
-    int query_series(int64_t study_fk, const SeriesInfo& series_key, std::vector<SeriesInfo>* series_infos);
 
 private:
     DISALLOW_COPY_AND_ASSIGN(DB);

@@ -48,6 +48,7 @@ CREATE TABLE study(
     study_date_time TIMESTAMP,
     accession_no VARCHAR(16),
     study_desc VARCHAR(64),
+    study_mods INT NOT NULL DEFAULT 0,
     num_series INT NOT NULL,
     num_instance INT NOT NULL,
     created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

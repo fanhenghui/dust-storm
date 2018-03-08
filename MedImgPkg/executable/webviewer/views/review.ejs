@@ -129,8 +129,8 @@
         </div>
         <div clss="row">
             <div class="col-md-12 col-sm-12">
-                <h3 class="text-primary">
-                    DB Series List
+                <h3 class="text-primary" style="background:silver;">
+                    DB Worklist
                 </h3>
                 <button type = "button" class="btn btn-default pull-left" id="btn-pacs-0">
                     <span class="glyphicon glyphicon-list-alt"></span>
@@ -144,8 +144,63 @@
                         <span class="glyphicon glyphicon-user"></span>
                     </button>
                 </div>
-                <br>
-                <table class="table table-condensed table-hover" id="table-db">
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Search
+                </h4>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <div class="col-md-3 col-sm-3">
+                    Patient Name: <input type="text" id="db-key-patient-name"><br>
+                    Patient ID: <input type="text" id="db-key-patient-id"> 
+                </div>
+                <div class="col-md-5 col-sm-5">
+                    Patient Birth Date From: <input type="date" id="db-key-patient-birth-date-from">
+                    TO: <input type="date" id="db-key-patient-birth-date-to">  
+                    <br>
+                    Study Date From: <input type="date" id="db-key-study-date-from"> 
+                    TO: <input type="date" id="db-key-study-date-to">  
+                </div>
+                <div class="col-md-2 col-sm-2">
+                        Modality: <button class="dropdown-toggle" data-toggle="dropdown" href="javascript:;" id="db-key-modality" modality="">
+                                All<span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" id="db-key-modality-ct">CT</a></li>
+                                <li><a href="javascript:;" id="db-key-modality-mr">MR</a></li>
+                                <li><a href="javascript:;" id="db-key-modality-rt-struct">RT_STRUCT</a></li>
+                                <li><a href="javascript:;" id="db-key-modality-all">All</a></li>
+                            </ul>
+                </div>
+                <div class="col-md-2 col-sm-2">
+                    <div class="pull-right">
+                        <button type = "button" class="btn btn-default " id="btn-reset-db-query-key">
+                            <span class="glyphicon glyphicon-repeat"></span>
+                        </button>
+                        <br>
+                        <button type = "button" class="btn btn-default" id="btn-query-db">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Study List
+                </h4>
+            </div>
+            <div class="col-md-12 col-sm-12" id="db-page">
+                <button type = "button" class="btn btn-default disabled" id="btn-db-page-up">
+                    <span class="glyphicon glyphicon glyphicon-chevron-left"></span>
+                </button>
+                <span id="db-study-info"></span>
+                <button type = "button" class="btn btn-default disabled" id="btn-db-page-down">
+                    <span class="glyphicon glyphicon glyphicon-chevron-right"></span>
+                </button>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <table class="table table-condensed table-hover" id="table-db-study">
                     <thead>
                         <tr>
                             <th>
@@ -155,27 +210,52 @@
                                 Patient ID
                             </th>
                             <th>
-                                Series ID
+                                Birth Date
+                            </th>
+                            <th>
+                                Sex
+                            </th>
+                            <th>
+                                Study Time
+                            </th>
+                            <th>
+                                Description
+                            </th>
+                            <th>
+                                Series Number
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="worklist-db-study">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12 col-sm-12">
+                <h4 class="text-primary" style="background:silver; ">
+                    Series List
+                </h4>
+                <table class="table table-condensed table-hover" id="table-db-series">
+                    <thead>
+                        <tr>
+                            <th>
+                                Series No
                             </th>
                             <th>
                                 Modality
                             </th>
+                            <th>
+                                Descripiton
+                            </th>
+                            <th>
+                                Instance Number
+                            </th>
                         </tr>
                     </thead>
-                    <tbody id="worklist-db">
+                    <tbody id="worklist-db-series">
                     </tbody>
                 </table>
-                <div class="row">
-                    <div class="col-md-6 col-sm-6">
-                        <button type="button" class="btn btn-default" id="btn-search-worklist">
-                            Query
-                        </button>
-                    </div>
-                    <div class="col-md-6 col-sm-6">
-                        <button type="button" class="btn btn-default pull-right" id="btn-load-series">
-                            Load
-                        </button>
-                    </div>
+                <div class="col-md-12 col-sm-12">
+                    <button type="button" class="btn btn-default pull-right" id="btn-load-series">Load</button>
                 </div>
             </div>
         </div>
@@ -312,6 +392,7 @@
                     <button type="button" class="btn btn-default pull-right" id="btn-retrieve-pacs">Retrieve</button>
                 </div>
             </div>
+        </div>
     </div>
     <div class="container-fluid" hidden="false" id="review-div">
         <div class="row clearfix">

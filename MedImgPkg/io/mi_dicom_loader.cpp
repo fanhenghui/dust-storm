@@ -242,6 +242,8 @@ IOStatus DICOMLoader::get_sop_instance_uid(const std::string& file, std::string&
         return IO_DATA_DAMAGE;
     }
 
+    sop_instance_uid = context.c_str();
+
     return IO_SUCCESS;
 }
 
@@ -271,6 +273,8 @@ IOStatus DICOMLoader::get_sop_instance_uid(const DCMSliceStream* stream, std::st
     if (status.bad()) {
         return IO_DATA_DAMAGE;
     }
+
+    sop_instance_uid = context.c_str();
 
     return IO_SUCCESS;
 }
@@ -851,20 +855,7 @@ IOStatus DICOMLoader::construct_data_header(
         if (status.bad()) {
             err_info += "Parse tag Modality failed! ";
         }
-
-        if ("CT" == modality) {
-            img_data_header->modality = CT;
-        } else if ("MR" == modality) {
-            img_data_header->modality = MR;
-        } else if ("PT" == modality) {
-            img_data_header->modality = PT;
-        } else if ("CR" == modality) {
-            img_data_header->modality = CR;
-        } else if ("RT_STRUCT" == modality) {
-            img_data_header->modality = RT_STRUCT;
-        } else {
-            err_info += "Unsupport modality YET! ";
-        }
+        img_data_header->modality = modality_to_enum(modality.c_str());
 
         // 4.6 Manufacturer
         if (!get_manufacturer(data_set, img_data_header)) {

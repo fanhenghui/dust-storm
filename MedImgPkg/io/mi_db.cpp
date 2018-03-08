@@ -14,6 +14,7 @@
 
 #include "mi_io_logger.h"
 #include "mi_md5.h"
+#include "mi_image_data_header.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -400,7 +401,7 @@ int DB::insert_series(SeriesInfo& series_info) {
 
         //query existed study
         sql.str("");
-        sql << "SELECT num_instance, num_series FROM " << STUDY_TABLE
+        sql << "SELECT num_instance, num_series, study_mods FROM " << STUDY_TABLE
         << " WHERE id=" << series_info.study_fk << ";";
         
         sql::ResultSet* res1 = nullptr;
@@ -416,11 +417,11 @@ int DB::insert_series(SeriesInfo& series_info) {
 
         const int num_series = res1->getInt("num_series") + 1;
         const int num_instance = res1->getInt("num_instance") + series_info.num_instance;
-        
+        const int study_mods = res1->getInt("study_mods") | (int)modality_to_enum(series_info.modality);
         //update existed study
         sql.str("");
         sql << "UPDATE " << STUDY_TABLE << " SET num_series=" << num_series
-        << ", num_instance=" << num_instance << " WHERE id=" << series_info.study_fk << ";";
+        << ", num_instance=" << num_instance << ", study_mods=" << study_mods << " WHERE id=" << series_info.study_fk << ";";
 
         sql::ResultSet* res2 = nullptr;
         err = this->query(sql.str(), res2);
@@ -1584,6 +1585,8 @@ int DB::query_annotation(const AnnotationInfo& key, std::vector<AnnotationInfo>*
 }
 
 int DB::query_preprocess(const PreprocessInfo& key, std::vector<PreprocessInfo>* prep_infos) {
+    MI_IO_LOG(MI_DEBUG) << "in query preprocess.";
+
     if (!prep_infos) {
         MI_IO_LOG(MI_ERROR) << "preprocess infos is null.";
         return -1;
@@ -1600,9 +1603,6 @@ int DB::query_preprocess(const PreprocessInfo& key, std::vector<PreprocessInfo>*
     }
     if (key.prep_type > 0) {
         sql << "prep_type_fk=" << key.prep_type << " AND "; 
-    }
-    if (key.version.empty()) {
-        sql << "retrieve_user_id=\'" << key.version << "\' AND "; 
     }
     sql << "1";
 
@@ -1662,7 +1662,7 @@ int DB::query_patient(const PatientInfo& key, std::vector<PatientInfo>* patient_
             THROW_SQL_EXCEPTION
         }
 
-        patient_infos->clear();
+        //patient_infos->clear();
         while (res->next()) {
             patient_infos->push_back(PatientInfo());
             PatientInfo& info = (*patient_infos)[patient_infos->size()-1];
@@ -1700,7 +1700,9 @@ bool DB::series_key_valid(const SeriesInfo& key) {
              !key.modality.empty() || !key.institution.empty());
 }
 
-int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<StudyInfo>* study_infos) {
+int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<StudyInfo>* study_infos, 
+    int limit_begin, int limit_end) {
+    
     if (!study_infos) {
         MI_IO_LOG(MI_ERROR) << "query study failed: nulll study infos input/output.";
         return -1;
@@ -1760,7 +1762,8 @@ int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<
     }
     
     std::stringstream sql;
-    sql << "SELECT id, patient_fk, study_id, study_uid, study_date_time, accession_no, study_desc, num_series, num_instance FROM " << STUDY_TABLE << " WHERE ";
+    sql << "SELECT id, patient_fk, study_id, study_uid, study_date_time, accession_no, study_desc, num_series, num_instance FROM " << STUDY_TABLE;
+    sql << " WHERE ";
     if (patient_fk > 0) {
         sql << "patient_fk=" << patient_fk << " AND ";
     }
@@ -1774,6 +1777,7 @@ int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<
     if (!study_key.accession_no.empty()) {
         sql << "accession_no=\'" << study_key.accession_no << "\' AND ";
     }
+    sql << "study_mods & " << study_key.study_mods << " = " << study_key.study_mods << " AND ";
     if (!study_datetime.empty()) {
         if (0 == study_datetime_range) {
             sql << "study_date_time>=\'" << study_datetime.substr(0,14) << "\' AND "
@@ -1783,7 +1787,11 @@ int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<
             sql << "study_date_time=\'" << study_datetime << "\' AND ";
         }
     }
-    sql << "1;";
+    sql << "1";
+    if (limit_begin != -1 && limit_end != -1) {
+       sql <<  " LIMIT " << limit_begin << "," << limit_end - limit_begin + 1;
+    }
+    sql << ";";
 
     sql::ResultSet* res = nullptr;
     int err = this->query(sql.str(), res);
@@ -1796,6 +1804,7 @@ int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<
     while(res->next()) {
         study_infos->push_back(StudyInfo());
         StudyInfo& info = (*study_infos)[study_infos->size()-1];
+        info.id = res->getInt64("id");
         info.patient_fk = res->getInt64("patient_fk");;
         info.study_id = res->getString("study_id").asStdString();
         info.study_uid = res->getString("study_uid").asStdString();
@@ -1813,7 +1822,8 @@ int DB::query_study(int64_t patient_fk, const StudyInfo& study_key, std::vector<
 }
 
 int DB::query_study(const PatientInfo& patient_key, const StudyInfo& study_key, 
-        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos) {
+        std::vector<PatientInfo>* patient_infos, std::vector<StudyInfo>* study_infos,
+        int limit_begin, int limit_end) {
     try {
         TRY_CONNECT
 
@@ -1829,7 +1839,7 @@ int DB::query_study(const PatientInfo& patient_key, const StudyInfo& study_key,
             for (auto it = inter_patient_infos.begin(); it != inter_patient_infos.end(); ++it) {
                 PatientInfo& patient_info = *it;
                 size_t pre_study_count = study_infos->size();
-                if (0 != this->query_study(patient_info.id, study_key, study_infos)) {
+                if (0 != this->query_study(patient_info.id, study_key, study_infos, limit_begin, limit_end)) {
                     throw std::exception(std::logic_error("query study failed(1)."));
                 }
                 if (study_infos->size() > pre_study_count) {
@@ -1840,7 +1850,7 @@ int DB::query_study(const PatientInfo& patient_key, const StudyInfo& study_key,
             }
         } else {
             //query study , then query patient
-            if (0 != this->query_study(-1, study_key, study_infos)) {
+            if (0 != this->query_study(-1, study_key, study_infos, limit_begin, limit_end)) {
                 throw std::exception(std::logic_error("query study failed(2)."));
             }
             PatientInfo pkey_each;
@@ -1849,7 +1859,7 @@ int DB::query_study(const PatientInfo& patient_key, const StudyInfo& study_key,
                 if (0 != this->query_patient(pkey_each, patient_infos)) {
                     throw std::exception(std::logic_error("query patient failed(2)."));
                 }
-            }  
+            }
         }
 
         if(patient_infos->size() != study_infos->size()) {
@@ -1899,8 +1909,8 @@ int DB::query_series(int64_t study_fk, const SeriesInfo& series_key, std::vector
 
     std::stringstream sql;
     sql << "SELECT id, study_fk, series_uid, series_no, modality, series_desc, institution, num_instance FROM " << SERIES_TABLE << " WHERE ";
-    if (series_key.study_fk > 0) {
-        sql << "study_fk=" << series_key.study_fk << " AND ";
+    if (study_fk > 0) {
+        sql << "study_fk=" << study_fk << " AND ";
     }
     if (!series_key.series_uid.empty()) {
         sql << "series_uid=\'" << series_key.series_uid << "\' AND ";

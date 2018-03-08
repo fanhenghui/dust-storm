@@ -2,6 +2,7 @@
 
 #include "util/mi_memory_shield.h"
 #include "util/mi_ipc_client_proxy.h"
+#include "util/mi_file_util.h"
 
 #include "arithmetic/mi_run_length_operator.h"
 
@@ -60,6 +61,8 @@ int BECmdHandlerDBSendPreprocessMask::handle_command(const IPCDataHeader& ipchea
     if(0 == RunLengthOperator::decode((unsigned int*)buffer,ipcheader.data_len/sizeof(unsigned int), (unsigned char*)mask->get_pixel_pointer(), volume_size)) {
         MaskLabelStore::instance()->fill_label(1);
         volume_infos->cache_original_mask();
+        //debug
+        //FileUtil::write_raw("/home/wangrui22/data/mask.raw", (unsigned char*)mask->get_pixel_pointer(), volume_size);
         MI_APPCOMMON_LOG(MI_INFO) << "decode DBS compressed preprocess mask success.";
     } else {
         model_dbs_status->push_error_info("decode IPC buffer failed when recv dbs preprocess mask");

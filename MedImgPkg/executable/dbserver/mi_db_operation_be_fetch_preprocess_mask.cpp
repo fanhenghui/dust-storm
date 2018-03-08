@@ -44,7 +44,7 @@ int DBOpBEFetchPreprocessMask::execute() {
     prep_key.series_fk = series_pk;
     prep_key.prep_type = prep_type;
     std::vector<PreprocessInfo> prep_infos;
-    if (0 == db->query_preprocess(prep_key, &prep_infos)) {
+    if (0 != db->query_preprocess(prep_key, &prep_infos)) {
         SEND_ERROR_TO_BE(server_proxy, receiver, "query preprocess failed.");
         return -1;
     }

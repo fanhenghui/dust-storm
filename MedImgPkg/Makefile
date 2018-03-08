@@ -21,7 +21,6 @@ subsystem:
 	$(MAKE) -C ./executable/extractmask
 	$(MAKE) -C ./executable/compressmask
 	$(MAKE) -C ./executable/anonymization
-	$(MAKE) -C ./ut/ai_ut
 	$(MAKE) -C ./ut/dbserver_ut
 	$(MAKE) -C ./ut/appcommon_ut
 	$(MAKE) -C ./ut/util_ut
@@ -30,6 +29,7 @@ subsystem:
 	$(MAKE) -C ./ut/renderalgo_ut
 	$(MAKE) -C ./ut/io_ut
 	$(MAKE) -C ./ut/protocol_ut
+	$(MAKE) -C ./ut/ai_ut
 else 
 subsystem:
 	-mkdir bin

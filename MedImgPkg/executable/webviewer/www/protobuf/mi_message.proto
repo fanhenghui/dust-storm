@@ -10,6 +10,10 @@ message MsgInt {
     int32 value = 1;
 }
 
+message MsgInt64 {
+    int64 value = 1;
+}
+
 message MsgListPage {
     int32 from = 1;
     int32 to = 2;
@@ -220,6 +224,9 @@ message MsgDcmQueryKey {
     string accession_no = 6;
 
     string modality = 7;
+
+    int32 study_from = 8;
+    int32 study_to = 9;
 };
 
 message MsgDcmPACSRetrieveKey {
@@ -251,22 +258,4 @@ message MsgAnnotationUnitDB {
     float z = 3; //center z
     float r = 4; //diameter 
     float p = 5; //probability
-};
-
-message MsgDcmInfo {
-    string study_id = 1;
-    string series_id = 2;
-    string study_date = 3;
-    string study_time = 4;
-    string patient_id = 5;
-    string patient_name = 6;
-    string patient_sex = 7;
-    string patient_birth_date = 8;
-    string modality = 9;
-    string instance_number = 10;
-    string accession_number = 11;
-};
-
-message MsgDcmInfoCollection {
-    repeated MsgDcmInfo dcminfo = 1;
 };

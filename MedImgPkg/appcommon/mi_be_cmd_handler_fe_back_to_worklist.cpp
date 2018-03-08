@@ -10,6 +10,7 @@
 #include "mi_app_thread_model.h"
 #include "mi_app_common_util.h"
 #include "mi_model_anonymization.h"
+#include "mi_model_pacs_cache.h"
 
 MED_IMG_BEGIN_NAMESPACE
 
@@ -40,9 +41,11 @@ public:
 
         //keep PACS/Anonymization model, and remove other models
         std::shared_ptr<ModelAnonymization> model_anonymization = AppCommonUtil::get_model_anonymization(controller);
+        std::shared_ptr<ModelPACSCache> model_pacs_cache = AppCommonUtil::get_model_pacs_cache(controller);
         controller->remove_all_models();
         if (model_anonymization) {
             controller->add_model(MODEL_ID_ANONYMIZATION, model_anonymization);
+            controller->add_model(MODEL_ID_PACS_CACHE, model_pacs_cache);
         }
 
         if (_condition) {

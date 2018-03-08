@@ -208,7 +208,7 @@ int CacheDB::query_series_instance(const std::string& series_uid, std::vector<In
             info.file_size = res->getInt64("file_size");
         }
     } catch (std::exception& e) {
-        MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();
+        MI_IO_LOG(MI_ERROR) << "cache query series instance failed: " << e.what();
         return -1;
     }
 
@@ -246,7 +246,8 @@ int CacheDB::query_series_instance(const std::string& series_uid, std::vector<st
             series_pk = res_series->getInt64("id");
         }
         if (series_pk < 1) {
-            throw std::exception(std::logic_error("invalid series pk."));
+            //empty result
+            return 0;
         }
 
         
@@ -267,7 +268,7 @@ int CacheDB::query_series_instance(const std::string& series_uid, std::vector<st
             instance_file_paths->push_back(res->getString("file_path").asStdString());
         }
     } catch (std::exception& e) {
-        MI_IO_LOG(MI_ERROR) << "query series instance failed: " << e.what();
+        MI_IO_LOG(MI_ERROR) << "cache query series instance failed: " << e.what();
         return -1;
     }
 

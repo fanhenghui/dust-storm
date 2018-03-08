@@ -43,6 +43,7 @@
 #include "appcommon/mi_be_cmd_handler_db_pacs_retrieve_result.h"
 #include "appcommon/mi_be_cmd_handler_fe_pacs_get_series_list.h"
 #include "appcommon/mi_be_cmd_handler_fe_pacs_get_study_list.h"
+#include "appcommon/mi_be_cmd_handler_fe_db_get_series_list.h"
 #include "mi_operation_init.h"
 
 MED_IMG_BEGIN_NAMESPACE
@@ -89,6 +90,8 @@ void ReviewController::register_command_handler() {
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSGetStudyList(app_controller)));
     _proxy->register_command_handler(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 
     std::shared_ptr<ICommandHandler>(new BECmdHandlerFEPACSGetSeriesList(app_controller)));
+    _proxy->register_command_handler(COMMAND_ID_BE_FE_DB_GET_SERIES_LIST, 
+    std::shared_ptr<ICommandHandler>(new BECmdHandlerFEDBGetSeriesList(app_controller)));
 
     // Register operation
     OperationFactory::instance()->register_operation(OPERATION_ID_BE_FE_MPR_PAGING,

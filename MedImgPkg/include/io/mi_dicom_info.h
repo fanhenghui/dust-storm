@@ -63,8 +63,9 @@ struct StudyInfo {
     std::string study_desc;//---not query key---//
     int num_series;//---not query key---//
     int num_instance;//---not query key---//
+    int study_mods;//see modality enum
 
-    StudyInfo():id(-1), patient_fk(-1), num_series(0), num_instance(0) {}
+    StudyInfo():id(-1), patient_fk(-1), num_series(0), num_instance(0), study_mods(0) {}
 };
 
 struct SeriesInfo {

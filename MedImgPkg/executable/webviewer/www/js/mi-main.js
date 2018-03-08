@@ -21,6 +21,11 @@
     let pacs_page_sum = 0;
     let pacs_current_page = 1;
 
+    //db result
+    let db_study_number = 0;
+    let db_page_sum = 0;
+    let db_current_page = 1;
+
     function getUserID(userName) {
         return userName + '|' + new Date().getTime() + Math.floor(Math.random() * 173 + 511);
     }
@@ -78,37 +83,87 @@
     }
  
     function handleBEDBQuery(arrayBuffer) { 
-        console.log('recv DB retrieve.');
-        let message = Protobuf.decode(socketClient, 'MsgDcmInfoCollection', arrayBuffer);
+        let message = Protobuf.decode(socketClient, 'MsgStudyWrapperCollection', arrayBuffer);
         if (!message) {
-            reutrn;
-        }
-
-        let dcminfo = message.dcminfo;
-        if (!dcminfo || dcminfo.length == 0) {
             return;
         }
 
-        let tbody = document.getElementById('worklist-db');
+        let studyWrappers = message.studyWrappers;
+        if (!studyWrappers || studyWrappers.length == 0) {
+            $('#db-study-info').html('');
+            $('#worklist-db-study').html('');
+            $('#worklist-db-series').html('');
+            $('#btn-db-page-up').addClass('disabled');
+            $('#btn-db-page-down').addClass('disabled');
+            return;
+        }
+
+        db_study_number = message.numStudy <=0 ? 0 : message.numStudy;
+        db_page_sum = Math.ceil(db_study_number/LIST_CAPACITY);
+        db_current_page = 1;
+        let study_from = (db_current_page-1)*LIST_CAPACITY + 1;
+        let study_to = db_current_page*LIST_CAPACITY;
+        study_to = study_to > db_study_number ? db_study_number : study_to;
+        $('#db-study-info').html(`Study ${study_from} to ${study_to} of ${db_study_number}`);
+        if (db_page_sum > 1) {
+            $('#btn-db-page-down').removeClass('disabled');
+        }
+        let tbody = document.getElementById('worklist-db-study');
         tbody.innerHTML = '';
         
-        dcminfo.forEach(ele => {
-            let tr = '<tr>';
-            tr += `<td>${ele.patientName}</td>`;
-            tr += `<td>${ele.patientId}</td>`;
-            tr += `<td>${ele.seriesId}</td>`;
-            tr += `<td>${ele.modality}</td>`;
+        studyWrappers.forEach(ele => {
+            let tr = `<tr studyidx="${ele.studyInfo.id}">`;
+            tr += `<td>${ele.patientInfo.patientName}</td>`;
+            tr += `<td>${ele.patientInfo.patientId}</td>`;
+            tr += `<td>${ele.patientInfo.patientBirthDate}</td>`;
+            tr += `<td>${ele.patientInfo.patientSex}</td>`;
+            tr += `<td>${ele.studyInfo.studyDate}</td>`;
+            tr += `<td>${ele.studyInfo.studyDesc}</td>`;
+            tr += `<td>${ele.studyInfo.numSeries}</td>`;
             tr += '</tr>';   
             tbody.innerHTML += tr; 
         });
 
         //style changed when choose tr (based on bootstrap)
-        $('#table-db tbody tr').click(function() {
-            if ($(this).hasClass('success')) {
-                $(this).removeClass('success');
-            } else {
-                $(this).addClass('success').siblings().removeClass('success');
+        $('#table-db-study tbody tr').click(function() {
+            $(this).addClass('success').siblings().removeClass('success');
+
+            let buffer = Protobuf.encode(socketClient, 'MsgInt', {value:this.getAttribute('studyidx')});
+            if (buffer) {
+                socketClient.sendData(COMMAND_ID_BE_FE_DB_GET_SERIES_LIST, 0, 0, buffer.byteLength, buffer);
             }
+        });
+
+        $('#worklist-db-series').html("");
+    }
+
+    function handleBEDBSeriesList(arrayBuffer) {
+        let message = Protobuf.decode(socketClient, 'MsgStudyWrapper', arrayBuffer);
+        if (!message) {
+            return;
+        }
+
+        let seriesInfos = message.seriesInfos;
+        if (!seriesInfos || seriesInfos.length == 0) {
+            console.log(`can't get series infos.`);
+            return;
+        }
+
+        let tbody = document.getElementById('worklist-db-series');
+        tbody.innerHTML = '';
+        
+        seriesInfos.forEach(ele => {
+            let tr = `<tr seriesidx="${ele.id}">`;
+            tr += `<td>${ele.seriesNo}</td>`;
+            tr += `<td>${ele.modality}</td>`;
+            tr += `<td>${ele.seriesDesc}</td>`;
+            tr += `<td>${ele.numInstance}</td>`;
+            tr += '</tr>';
+            tbody.innerHTML += tr; 
+        });
+
+        $('#table-db-series tbody tr').click(function() {
+            $(this).addClass('success').siblings().removeClass('success');
         });
     }
 
@@ -168,6 +223,7 @@
                 socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 0, 0, buffer.byteLength, buffer);
             }
         });
+        $('#worklist-pacs-series').html("");
     }
 
     function handleBEPACSStudyList(arrayBuffer) {
@@ -212,6 +268,8 @@
                 socketClient.sendData(COMMAND_ID_BE_FE_PACS_GET_SERIES_LIST, 0, 0, buffer.byteLength, buffer);
             }
         });
+
+        $('#worklist-pacs-series').html("");
     }
 
     function handleBEPACSSeriesList(arrayBuffer) {
@@ -413,6 +471,11 @@
                     handleBEPACSSeriesList(packageBuffer);
                 }
                 break;
+            case COMMAND_ID_FE_BE_DB_SERIES_LIST_RESULT:
+                if (recvPackageBuffer(buffer, bufferOffset, dataLen, restDataLen, withHeader))  {
+                    handleBEDBSeriesList(packageBuffer);
+                }
+                break;
             default:
                 break;
         }
@@ -547,8 +610,7 @@
         seriesUID = '';
     }
 
-    function loadSeries(series) {
-        seriesUID = series;
+    function loadSeries() {
         if (!socketClient) {
             console.log('socket client is null.');
             return;
@@ -557,6 +619,32 @@
             console.log('null protocbuf.')
             return;
         }
+        
+        //get study&series id
+        let chooseStudy = $('#table-db-study tbody tr.success');
+        if (!chooseStudy) {
+            alert('please choose a study.');
+            return;
+        }
+        let studyIdx = chooseStudy.attr('studyidx');
+
+        let chooseSeries = $('#table-db-series tbody tr.success');
+        if (!chooseSeries) {
+            alert('please choose a series.');
+            return;
+        }
+        let seriesIdx = chooseSeries.attr('seriesidx');
+        seriesUID = seriesIdx;
+
+        let instance_num = $('#table-db-series tbody tr.success td:nth-child(4)').html();
+        if (parseInt(instance_num) < 16) {
+            alert('series instance number must be large than 16.');
+            return;
+        }
+
+        document.getElementById('worklist-db-div').hidden = true;
+        document.getElementById('review-div').hidden = false;
+
         //recover cell layout
         document.getElementById('cell02-container').hidden = false;
         document.getElementById('cell13-container').hidden = false;
@@ -615,7 +703,11 @@
             console.log('create init message failed.');
             return;
         }
-        msgInit.seriesUid = seriesUID;
+
+        msgInit.studyPk = studyIdx;
+        msgInit.seriesPk = seriesIdx;
+        //TODO set user ID to annotation
+        msgInit.userID = "";
         msgInit.pid = 1000;
         msgInit.cells.push({id: 0, type: 1, direction: 0, width: w, height: h});
         msgInit.cells.push({id: 1, type: 1, direction: 1, width: w, height: h});
@@ -666,13 +758,40 @@
         }
     }
 
-    function searchWorklist() {
+    function queryDB(study_from, study_to) {
         if (!revcBEReady) {
             console.log('BE not ready!');
             alert('BE not ready!');
             return;
         }
-        socketClient.sendData(COMMAND_ID_BE_FE_DB_QUERY, 0, 0, null);
+        //construct query key
+        let queryKey = {
+            patientId: $('#db-key-patient-id').val(),
+            patientName: $('#db-key-patient-name').val(),
+            patientBirthDate: '',
+            studyDate: '',
+            studyTime: '',
+            accessionNo: '',
+            modality: $('#db-key-modality').attr('modality'),
+            studyFrom: study_from,
+            studyTo: study_to,
+        };
+        let patientBirthDateFrom = $('#db-key-patient-birth-date-from').val().replace(/\-+/g, '');;
+        let patientBirthDateTo = $('#db-key-patient-birth-date-to').val().replace(/\-+/g, '');;
+        if (patientBirthDateFrom.length !=0 && patientBirthDateTo.length != 0) {
+            queryKey.patientBirthDate = `${patientBirthDateFrom}-${patientBirthDateTo}`;
+        }
+
+        let studyDateFrom = $('#db-key-study-date-from').val().replace(/\-+/g, '');;
+        let studyDateTo = $('#db-key-study-date-to').val().replace(/\-+/g, '');;
+        if (studyDateFrom.length !=0 && studyDateTo.length != 0) {
+            queryKey.studyDate = `${studyDateFrom}-${studyDateTo}`;
+        }
+
+        let buffer = Protobuf.encode(socketClient, 'MsgDcmQueryKey', queryKey);
+        if (buffer) {
+            socketClient.sendData(COMMAND_ID_BE_FE_DB_QUERY, 0, 0, buffer.byteLength, buffer);
+        }
     }
 
     function queryPACS() {
@@ -767,33 +886,6 @@
             document.getElementById('svg0'), document.getElementById('svg1'),
             document.getElementById('svg2'), document.getElementById('svg3')
         ];
-
-        // register button event
-        let searchWorklistBtn = document.getElementById('btn-search-worklist');
-        if (searchWorklist) {
-            searchWorklistBtn.onclick = function(event) {
-                searchWorklist();
-            };
-        } else {
-            console.log('get searchBtn node failed.');
-        }
-        
-        let loadSeriesBtn = document.getElementById('btn-load-series');
-        if (loadSeriesBtn) {
-            loadSeriesBtn.onclick = function(event) {
-                let series = $('#table-db tbody tr.success td:nth-child(3)').html();
-                if (!series) {
-                    alert('please choose one series.');
-                    reutrn;
-                }
-                document.getElementById('worklist-db-div').hidden = true;
-                document.getElementById('review-div').hidden = false;
-                annoListClean();
-                loadSeries(series);
-            };
-        } else {
-            console.log('get loadBtn node failed.');
-        }
 
         let comToolsDiv = document.getElementById('common-tools');
         if (comToolsDiv) {
@@ -1103,6 +1195,108 @@
             }
         }
 
+        //------------------------------------------//
+        //query&load from DB
+        //------------------------------------------//
+        let queryDBBtn = document.getElementById('btn-query-db');
+        if (queryDBBtn) {
+            queryDBBtn.onclick = function(event) {
+                queryDB(0,9);
+            };
+        } else {
+            console.log('get searchBtn node failed.');
+        }
+
+        let resetDBQueryKey = document.getElementById('btn-reset-db-query-key');
+        if (resetDBQueryKey) {
+            resetDBQueryKey.onclick = function() {
+                $('#db-key-patient-name').val('');
+                $('#db-key-patient-id').val('');
+                $('#db-key-patient-birth-date-from').val('');
+                $('#db-key-patient-birth-date-to').val('');
+                $('#db-key-study-date-from').val('');
+                $('#db-key-study-date-to').val('');
+                $('#db-key-modality').html('All<span class="caret"></span>');
+                $('#db-key-modality').attr('modality','');
+            }
+        }
+        $('#db-key-modality-all').click(function() {
+            $('#db-key-modality').html('All<span class="caret"></span>');
+            $('#db-key-modality').attr('modality','');
+        });
+        $('#db-key-modality-ct').click(function() {
+            $('#db-key-modality').html('CT<span class="caret"></span>');
+            $('#db-key-modality').attr('modality','CT');
+        });
+        $('#db-key-modality-mr').click(function() {
+            $('#db-key-modality').html('MR<span class="caret"></span>');
+            $('#db-key-modality').attr('modality','MR');
+        });
+        $('#db-key-modality-rt-struct').click(function() {
+            $('#db-key-modality').html('RT_STRUCT<span class="caret"></span>');
+            $('#db-key-modality').attr('modality','RT_STRUCT');
+        });
+
+        let pageDownDBtudyList = document.getElementById("btn-db-page-down");
+        if (pageDownDBtudyList) {
+            pageDownDBtudyList.onclick = function() {
+                if (db_current_page < db_page_sum) {
+                    db_current_page += 1;
+
+                    let study_from = (db_current_page-1)*LIST_CAPACITY + 1;
+                    let study_to = db_current_page*LIST_CAPACITY;
+                    study_to = study_to > db_study_number ? db_study_number : study_to;
+                    $('#db-study-info').html(`Study ${study_from} to ${study_to} of ${db_study_number}`);
+                    if (db_current_page > 1) {
+                        $('#btn-db-page-up').removeClass('disabled');
+                    }
+
+                    queryDB(study_from, study_to);
+                }
+                
+                if (db_current_page >= db_page_sum) {
+                    $('#btn-db-page-down').addClass('disabled');
+                }
+            }
+        }
+
+        let pageUpDBStudyList = document.getElementById("btn-db-page-up");
+        if (pageUpDBStudyList) {
+            pageUpDBStudyList.onclick = function() {
+                if (db_current_page > 1) {
+                    db_current_page -= 1;
+
+                    let study_from = (db_current_page-1)*LIST_CAPACITY + 1;
+                    let study_to = db_current_page*LIST_CAPACITY;
+                    study_to = study_to > db_study_number ? db_study_number : study_to;
+                    $('#db-study-info').html(`Study ${study_from} to ${study_to} of ${db_study_number}`);
+                    if (db_current_page < db_page_sum) {
+                        $('#btn-db-page-down').removeClass('disabled');
+                    }
+
+                    queryDB(study_from, study_to-1);
+                }
+                
+                if (db_current_page <= 1) {
+                    $('#btn-db-page-up').addClass('disabled');
+                }
+            }
+        }
+        
+        let loadSeriesBtn = document.getElementById('btn-load-series');
+        if (loadSeriesBtn) {
+            loadSeriesBtn.onclick = function(event) {
+                annoListClean();
+                loadSeries();
+            };
+        } else {
+            console.log('get loadBtn node failed.');
+        }
+
+
+        //------------------------------------------//
+        //query&retrieve from PACS
+        //------------------------------------------//
         let queryPACSBtn = document.getElementById('btn-query-pacs');
         if (queryPACSBtn) {
             queryPACSBtn.onclick = function() {
